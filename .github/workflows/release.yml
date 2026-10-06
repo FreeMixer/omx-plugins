@@ -1,0 +1,65 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 Pau Aliagas <linuxnow@gmail.com>
+name: release
+
+# A version tag builds omx-plugins-clap and omx-plugins-lv2 as RPMs (Fedora 44, x86_64 and aarch64) and
+# DEBs (bookworm and trixie, amd64 and arm64), signs them, publishes them into the rpm/ and deb/ trees of
+# the FreeMixer Pages repository and attaches them to the GitHub release. Anything else builds unsigned
+# trees and publishes nothing. Everything is in FreeMixer/.github; the secrets are the organisation's.
+# The build dependencies the distributions do not carry (omx-dsp-devel, omx-clap-core-devel,
+# omx-clap-host) come from the FreeMixer channel, inside the build containers only.
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: 'Sign and publish; only a run on a tag publishes'
+        type: boolean
+        default: false
+  workflow_call:
+    inputs:
+      publish:
+        type: boolean
+        default: false
+      runner:
+        type: string
+        default: 'ubuntu-latest'
+        description: "Runner for the x86 jobs: the pull-request dry run passes arc-freemixer"
+      arm:
+        type: boolean
+        default: true
+        description: "Build the arm64/aarch64 packages too; the pull-request dry run passes false (arm builds run at release only)"
+
+permissions:
+  contents: write
+
+jobs:
+  rpm:
+    uses: FreeMixer/.github/.github/workflows/build-rpm.yml@main
+    with:
+      package-name: omx-plugins
+      binary-names: omx-plugins omx-plugins-clap omx-plugins-lv2
+      publish: ${{ github.event_name == 'push' || inputs.publish == true }}
+      needs-mod-host: false
+      runner: ${{ inputs.runner || 'ubuntu-latest' }}
+      arch-matrix: ${{ inputs.arm == false && '["x86_64"]' || '["x86_64", "aarch64"]' }}
+      channel-deps: true
+    secrets: inherit
+
+  # after the RPMs: both publish into one tree, and a push that loses a race is refused
+  deb:
+    needs: rpm
+    if: ${{ !cancelled() }}
+    uses: FreeMixer/.github/.github/workflows/build-deb.yml@main
+    with:
+      package-name: omx-plugins
+      binary-names: omx-plugins omx-plugins-clap omx-plugins-lv2
+      publish: ${{ github.event_name == 'push' || inputs.publish == true }}
+      dependencies: 'clap-headers'
+      runner: ${{ inputs.runner || 'ubuntu-latest' }}
+      arch-matrix: ${{ inputs.arm == false && '["amd64"]' || '["amd64", "arm64"]' }}
+      requires: ''
+      channel-deps: true
+    secrets: inherit

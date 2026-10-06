@@ -1,15 +1,184 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 Pau Aliagas <linuxnow@gmail.com>
 name: ci
+
+# On every push and pull request: the whole suite on Fedora, with no test skipped; the RPMs and DEBs
+# built (their own make test included), their file lists checked and the packages installed and loaded
+# by a CLAP and an LV2 scanner; and the release workflow as a dry run. Nothing is signed or published
+# here. The build dependencies Fedora and Debian do not carry come from the FreeMixer channel.
+
 on:
+  pull_request:
   push:
     branches: [main]
-  pull_request:
+
+permissions:
+  contents: read
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    name: make test (fedora:44, amd64)
+    runs-on: arc-freemixer
+    timeout-minutes: 30
+    container:
+      image: fedora:44
     steps:
+      - name: Install the build dependencies
+        run: |
+          dnf install -y --setopt=install_weak_deps=False git dnf5-plugins
+          dnf config-manager addrepo --from-repofile=https://freemixer.github.io/rpm/freemixer.repo
+
       - uses: actions/checkout@v4
-      # the lane hand-back runs only the steps marked handback-*
-      - name: make test
+
+      - name: Install what the spec builds and tests with
+        run: dnf builddep -y --setopt=install_weak_deps=False packaging/omx-plugins.spec
+
+      - name: The version agrees everywhere it is written
+        id: handback-version
+        run: |
+          set -euo pipefail
+          v=$(make -s version)
+          grep -q "^Version: $v\$" packaging/omx-plugins.spec
+          head -1 debian/changelog | grep -q "^omx-plugins ($v) "
+
+      - name: Every source file carries its SPDX line
+        id: handback-spdx
+        run: tools/spdx-check.sh
+
+      - name: Every generated file is fresh, built or not
+        id: handback-gen
+        run: node tools/gen.mjs --check
+
+      - name: make test, and nothing skipped
         id: handback-test
-        run: make test
+        run: |
+          set -euo pipefail
+          make test 2>&1 | tee test.log
+          if grep -E '^SKIP' test.log; then echo "::error::a test was skipped"; exit 1; fi
+
+  rpm:
+    name: omx-plugins RPMs (fc44, ${{ matrix.arch }})
+    runs-on: arc-freemixer
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [x86_64]  # aarch64 builds run at release only (release.yml)
+    container:
+      image: fedora:44
+    steps:
+      - name: Install the build tools
+        run: |
+          dnf install -y --setopt=install_weak_deps=False git rpm-build dnf5-plugins gcc make tar gzip diffutils
+          dnf config-manager addrepo --from-repofile=https://freemixer.github.io/rpm/freemixer.repo
+
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: FreeMixer/.github/.github/actions/build-rpm@main
+
+      - name: Check the file lists
+        run: |
+          set -euo pipefail
+          for sub in clap lv2; do
+            rpm=$(ls rpms/omx-plugins-$sub-[0-9]*.${{ matrix.arch }}.rpm)
+            rpm -qlp "$rpm" | grep -v '^/usr/lib/.build-id' | sort > files-$sub.txt
+          done
+          printf '%s\n' /usr/lib64/clap /usr/lib64/clap/omx-delay.clap /usr/lib64/clap/omx-drive.clap \
+            /usr/lib64/clap/omx-eq8.clap /usr/lib64/clap/omx-strip.clap \
+            /usr/share/doc/omx-plugins-clap /usr/share/doc/omx-plugins-clap/README.md \
+            /usr/share/licenses/omx-plugins-clap /usr/share/licenses/omx-plugins-clap/LICENSE | sort > expected-clap.txt
+          diff -u expected-clap.txt files-clap.txt
+          for p in omx-delay omx-drive omx-eq8 omx-strip; do
+            for f in "$p.so" manifest.ttl "$p.ttl"; do grep -qx "/usr/lib64/lv2/$p.lv2/$f" files-lv2.txt; done
+          done
+          ! grep -vE '^/usr/lib64/lv2/omx-(delay|drive|eq8|strip)\.lv2(/|$)|^/usr/share/(doc|licenses)/omx-plugins-lv2(/|$)' files-lv2.txt
+
+      - name: The packages install and their plugins load
+        run: |
+          set -euo pipefail
+          # the metapackage, with both formats beside it as the repository would offer them
+          dnf install -y --setopt=install_weak_deps=False rpms/omx-plugins-[0-9]*.${{ matrix.arch }}.rpm \
+            rpms/omx-plugins-clap-[0-9]*.${{ matrix.arch }}.rpm rpms/omx-plugins-lv2-[0-9]*.${{ matrix.arch }}.rpm
+          req=$(rpm -q --requires omx-plugins)
+          grep -qE '^omx-plugins-clap\([a-z0-9-]+\) = ' <<<"$req"
+          grep -qE '^omx-plugins-lv2\([a-z0-9-]+\) = ' <<<"$req"
+          for p in delay drive eq8 strip; do
+            # captured first: grep -q leaving a pipe early would fail the step under pipefail
+            out=$(omx-clap-scan --json /usr/lib64/clap/omx-$p.clap); grep -q "\"id\":\"org.openmixer.$p\"" <<<"$out"
+            out=$(lv2ls); grep -qx "urn:openmixer:$p" <<<"$out"
+            out=$(lv2info "urn:openmixer:$p"); grep -q 'Binary:' <<<"$out"
+          done
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: omx-plugins-rpms-fc44-${{ matrix.arch }}
+          path: rpms/*.rpm
+          if-no-files-found: error
+          retention-days: 7
+
+  deb:
+    name: omx-plugins DEBs (${{ matrix.suite }}, ${{ matrix.arch }})
+    runs-on: arc-freemixer
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        suite: [bookworm, trixie]
+        arch: [amd64]  # arm64 builds run at release only (release.yml)
+    container:
+      image: debian:${{ matrix.suite }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Install the build tools
+        run: |
+          apt-get update -qq
+          apt-get install -y --no-install-recommends ca-certificates curl git dpkg-dev debhelper build-essential lintian
+
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: FreeMixer/.github/.github/actions/deb-deps@main
+        with:
+          names: clap-headers
+
+      - name: Take build dependencies from the FreeMixer channel
+        env:
+          URL: https://freemixer.github.io/deb
+          SUITE: ${{ matrix.suite }}
+        run: |
+          install -d /etc/apt/keyrings
+          curl -fsSL -o /etc/apt/keyrings/freemixer.asc "$URL/freemixer.asc"
+          echo "deb [signed-by=/etc/apt/keyrings/freemixer.asc] $URL/debian/$SUITE ./" > /etc/apt/sources.list.d/freemixer.list
+          apt-get update -qq
+
+      - uses: FreeMixer/.github/.github/actions/build-deb@main
+
+      - name: The packages install and their plugins load
+        run: |
+          set -euo pipefail
+          # the metapackage, with both formats beside it as the repository would offer them
+          apt-get install -y --no-install-recommends ./debs/omx-plugins_*.deb ./debs/omx-plugins-clap_*.deb ./debs/omx-plugins-lv2_*.deb
+          dep=$(dpkg -s omx-plugins); grep -q '^Depends: omx-plugins-clap (= .*), omx-plugins-lv2 (= .*)' <<<"$dep"
+          for p in delay drive eq8 strip; do
+            # captured first: grep -q leaving a pipe early would fail the step under pipefail
+            out=$(dpkg -L omx-plugins-clap); grep -qx "/usr/lib/clap/omx-$p.clap" <<<"$out"
+            out=$(dpkg -L omx-plugins-lv2); grep -qx "/usr/lib/lv2/omx-$p.lv2/omx-$p.so" <<<"$out"
+            out=$(omx-clap-scan --json /usr/lib/clap/omx-$p.clap); grep -q "\"id\":\"org.openmixer.$p\"" <<<"$out"
+            out=$(lv2ls); grep -qx "urn:openmixer:$p" <<<"$out"
+            out=$(lv2info "urn:openmixer:$p"); grep -q 'Binary:' <<<"$out"
+          done
+
+  release-dry-run:
+    name: release workflow, dry run
+    permissions:
+      contents: write
+    uses: ./.github/workflows/release.yml
+    with:
+      publish: false
+      runner: arc-freemixer
+      arm: false  # arm64/aarch64 build at release only
