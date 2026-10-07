@@ -1,0 +1,758 @@
+{
+  "$comment": "THE declaration of omx-eq16: the CLAP and LV2 faces and the parameter header are generated from this file by tools/gen.mjs. Parameter order is append-only. The travels are the console's own EQ_FREQ_RANGE, EQ_GAIN_RANGE, EQ_Q_RANGE (a notch's Q reaches EQ_NOTCH_Q_RANGE), HPF_FREQ_RANGE and LPF_FREQ_RANGE, read as omx-dsp's omx_contract_limits.h carries them. The band count is a compile-time 16; band types are 0 bell, 1 low shelf, 2 high shelf, 3 notch, 4 allpass1, 5 allpass2. Each band's frequency default is the console's own (defaultEqState(), log-spaced across the audio band), as the console's in-tree omx-eq16.lv2 declares it. No MOD GUI: tools/modgui-gen.mjs does not draw selectors.",
+  "stem": "omx-eq16",
+  "kernel": "eq16",
+  "name": "omx eq16",
+  "noun": "16-band EQ",
+  "vendor": "openmixer",
+  "url": "https://github.com/FreeMixer/omx-plugins",
+  "version": "0.1.0",
+  "description": "The OpenMixer console's channel EQ, 16-band form: sixteen parametric bands (bell, shelves, notch, allpass) and a high-pass and a low-pass filter at 12 or 24 dB/oct, stereo, zero latency. The DSP is omx-dsp's <omxdsp/fx/omx_eq_instance.h>, the console's own EQ; every band ships off, so a racked instance is a wire.",
+  "clap": {
+    "id": "org.openmixer.eq16",
+    "features": [
+      "audio-effect",
+      "equalizer",
+      "stereo"
+    ]
+  },
+  "lv2": {
+    "uri": "urn:openmixer:eq16",
+    "class": "lv2:ParaEQPlugin"
+  },
+  "params": [
+    {
+      "symbol": "on",
+      "name": "EQ On",
+      "unit": "",
+      "min": 0,
+      "max": 1,
+      "def": 1,
+      "kind": "toggle"
+    },
+    {
+      "symbol": "hpf_on",
+      "name": "HPF On",
+      "unit": "",
+      "min": 0,
+      "max": 1,
+      "def": 0,
+      "kind": "toggle"
+    },
+    {
+      "symbol": "hpf_freq",
+      "name": "HPF Frequency",
+      "unit": "Hz",
+      "min": 20,
+      "max": 1000,
+      "def": 80
+    },
+    {
+      "symbol": "hpf_slope",
+      "name": "HPF Slope",
+      "unit": "dB/oct",
+      "min": 12,
+      "max": 24,
+      "def": 12,
+      "kind": "integer"
+    },
+    {
+      "symbol": "lpf_on",
+      "name": "LPF On",
+      "unit": "",
+      "min": 0,
+      "max": 1,
+      "def": 0,
+      "kind": "toggle"
+    },
+    {
+      "symbol": "lpf_freq",
+      "name": "LPF Frequency",
+      "unit": "Hz",
+      "min": 1000,
+      "max": 20000,
+      "def": 18000
+    },
+    {
+      "symbol": "lpf_slope",
+      "name": "LPF Slope",
+      "unit": "dB/oct",
+      "min": 12,
+      "max": 24,
+      "def": 12,
+      "kind": "integer"
+    },
+    {
+      "symbol": "b1_type",
+      "name": "Band 1 Type",
+      "unit": "",
+      "min": 0,
+      "max": 5,
+      "def": 0,
+      "kind": "integer"
+    },
+    {
+      "symbol": "b1_freq",
+      "name": "Band 1 Frequency",
+      "unit": "Hz",
+      "min": 20,
+      "max": 20000,
+      "def": 25
+    },
+    {
+      "symbol": "b1_gain",
+      "name": "Band 1 Gain",
+      "unit": "dB",
+      "min": -15,
+      "max": 15,
+      "def": 0
+    },
+    {
+      "symbol": "b1_q",
+      "name": "Band 1 Q",
+      "unit": "",
+      "min": 0.3,
+      "max": 116,
+      "def": 1
+    },
+    {
+      "symbol": "b1_on",
+      "name": "Band 1 On",
+      "unit": "",
+      "min": 0,
+      "max": 1,
+      "def": 0,
+      "kind": "toggle"
+    },
+    {
+      "symbol": "b2_type",
+      "name": "Band 2 Type",
+      "unit": "",
+      "min": 0,
+      "max": 5,
+      "def": 0,
+      "kind": "integer"
+    },
+    {
+      "symbol": "b2_freq",
+      "name": "Band 2 Frequency",
+      "unit": "Hz",
+      "min": 20,
+      "max": 20000,
+      "def": 38
+    },
+    {
+      "symbol": "b2_gain",
+      "name": "Band 2 Gain",
+      "unit": "dB",
+      "min": -15,
+      "max": 15,
+      "def": 0
+    },
+    {
+      "symbol": "b2_q",
+      "name": "Band 2 Q",
+      "unit": "",
+      "min": 0.3,
+      "max": 116,
+      "def": 1
+    },
+    {
+      "symbol": "b2_on",
+      "name": "Band 2 On",
+      "unit": "",
+      "min": 0,
+      "max": 1,
+      "def": 0,
+      "kind": "toggle"
+    },
+    {
+      "symbol": "b3_type",
+      "name": "Band 3 Type",
+      "unit": "",
+      "min": 0,
+      "max": 5,
+      "def": 0,
+      "kind": "integer"
+    },
+    {
+      "symbol": "b3_freq",
+      "name": "Band 3 Frequency",
+      "unit": "Hz",
+      "min": 20,
+      "max": 20000,
+      "def": 59
+    },
+    {
+      "symbol": "b3_gain",
+      "name": "Band 3 Gain",
+      "unit": "dB",
+      "min": -15,
+      "max": 15,
+      "def": 0
+    },
+    {
+      "symbol": "b3_q",
+      "name": "Band 3 Q",
+      "unit": "",
+      "min": 0.3,
+      "max": 116,
+      "def": 1
+    },
+    {
+      "symbol": "b3_on",
+      "name": "Band 3 On",
+      "unit": "",
+      "min": 0,
+      "max": 1,
+      "def": 0,
+      "kind": "toggle"
+    },
+    {
+      "symbol": "b4_type",
+      "name": "Band 4 Type",
+      "unit": "",
+      "min": 0,
+      "max": 5,
+      "def": 0,
+      "kind": "integer"
+    },
+    {
+      "symbol": "b4_freq",
+      "name": "Band 4 Frequency",
+      "unit": "Hz",
+      "min": 20,
+      "max": 20000,
+      "def": 91
+    },
+    {
+      "symbol": "b4_gain",
+      "name": "Band 4 Gain",
+      "unit": "dB",
+      "min": -15,
+      "max": 15,
+      "def": 0
+    },
+    {
+      "symbol": "b4_q",
+      "name": "Band 4 Q",
+      "unit": "",
+      "min": 0.3,
+      "max": 116,
+      "def": 1
+    },
+    {
+      "symbol": "b4_on",
+      "name": "Band 4 On",
+      "unit": "",
+      "min": 0,
+      "max": 1,
+      "def": 0,
+      "kind": "toggle"
+    },
+    {
+      "symbol": "b5_type",
+      "name": "Band 5 Type",
+      "unit": "",
+      "min": 0,
+      "max": 5,
+      "def": 0,
+      "kind": "integer"
+    },
+    {
+      "symbol": "b5_freq",
+      "name": "Band 5 Frequency",
+      "unit": "Hz",
+      "min": 20,
+      "max": 20000,
+      "def": 140
+    },
+    {
+      "symbol": "b5_gain",
+      "name": "Band 5 Gain",
+      "unit": "dB",
+      "min": -15,
+      "max": 15,
+      "def": 0
+    },
+    {
+      "symbol": "b5_q",
+      "name": "Band 5 Q",
+      "unit": "",
+      "min": 0.3,
+      "max": 116,
+      "def": 1
+    },
+    {
+      "symbol": "b5_on",
+      "name": "Band 5 On",
+      "unit": "",
+      "min": 0,
+      "max": 1,
+      "def": 0,
+      "kind": "toggle"
+    },
+    {
+      "symbol": "b6_type",
+      "name": "Band 6 Type",
+      "unit": "",
+      "min": 0,
+      "max": 5,
+      "def": 0,
+      "kind": "integer"
+    },
+    {
+      "symbol": "b6_freq",
+      "name": "Band 6 Frequency",
+      "unit": "Hz",
+      "min": 20,
+      "max": 20000,
+      "def": 215
+    },
+    {
+      "symbol": "b6_gain",
+      "name": "Band 6 Gain",
+      "unit": "dB",
+      "min": -15,
+      "max": 15,
+      "def": 0
+    },
+    {
+      "symbol": "b6_q",
+      "name": "Band 6 Q",
+      "unit": "",
+      "min": 0.3,
+      "max": 116,
+      "def": 1
+    },
+    {
+      "symbol": "b6_on",
+      "name": "Band 6 On",
+      "unit": "",
+      "min": 0,
+      "max": 1,
+      "def": 0,
+      "kind": "toggle"
+    },
+    {
+      "symbol": "b7_type",
+      "name": "Band 7 Type",
+      "unit": "",
+      "min": 0,
+      "max": 5,
+      "def": 0,
+      "kind": "integer"
+    },
+    {
+      "symbol": "b7_freq",
+      "name": "Band 7 Frequency",
+      "unit": "Hz",
+      "min": 20,
+      "max": 20000,
+      "def": 331
+    },
+    {
+      "symbol": "b7_gain",
+      "name": "Band 7 Gain",
+      "unit": "dB",
+      "min": -15,
+      "max": 15,
+      "def": 0
+    },
+    {
+      "symbol": "b7_q",
+      "name": "Band 7 Q",
+      "unit": "",
+      "min": 0.3,
+      "max": 116,
+      "def": 1
+    },
+    {
+      "symbol": "b7_on",
+      "name": "Band 7 On",
+      "unit": "",
+      "min": 0,
+      "max": 1,
+      "def": 0,
+      "kind": "toggle"
+    },
+    {
+      "symbol": "b8_type",
+      "name": "Band 8 Type",
+      "unit": "",
+      "min": 0,
+      "max": 5,
+      "def": 0,
+      "kind": "integer"
+    },
+    {
+      "symbol": "b8_freq",
+      "name": "Band 8 Frequency",
+      "unit": "Hz",
+      "min": 20,
+      "max": 20000,
+      "def": 510
+    },
+    {
+      "symbol": "b8_gain",
+      "name": "Band 8 Gain",
+      "unit": "dB",
+      "min": -15,
+      "max": 15,
+      "def": 0
+    },
+    {
+      "symbol": "b8_q",
+      "name": "Band 8 Q",
+      "unit": "",
+      "min": 0.3,
+      "max": 116,
+      "def": 1
+    },
+    {
+      "symbol": "b8_on",
+      "name": "Band 8 On",
+      "unit": "",
+      "min": 0,
+      "max": 1,
+      "def": 0,
+      "kind": "toggle"
+    },
+    {
+      "symbol": "b9_type",
+      "name": "Band 9 Type",
+      "unit": "",
+      "min": 0,
+      "max": 5,
+      "def": 0,
+      "kind": "integer"
+    },
+    {
+      "symbol": "b9_freq",
+      "name": "Band 9 Frequency",
+      "unit": "Hz",
+      "min": 20,
+      "max": 20000,
+      "def": 785
+    },
+    {
+      "symbol": "b9_gain",
+      "name": "Band 9 Gain",
+      "unit": "dB",
+      "min": -15,
+      "max": 15,
+      "def": 0
+    },
+    {
+      "symbol": "b9_q",
+      "name": "Band 9 Q",
+      "unit": "",
+      "min": 0.3,
+      "max": 116,
+      "def": 1
+    },
+    {
+      "symbol": "b9_on",
+      "name": "Band 9 On",
+      "unit": "",
+      "min": 0,
+      "max": 1,
+      "def": 0,
+      "kind": "toggle"
+    },
+    {
+      "symbol": "b10_type",
+      "name": "Band 10 Type",
+      "unit": "",
+      "min": 0,
+      "max": 5,
+      "def": 0,
+      "kind": "integer"
+    },
+    {
+      "symbol": "b10_freq",
+      "name": "Band 10 Frequency",
+      "unit": "Hz",
+      "min": 20,
+      "max": 20000,
+      "def": 1209
+    },
+    {
+      "symbol": "b10_gain",
+      "name": "Band 10 Gain",
+      "unit": "dB",
+      "min": -15,
+      "max": 15,
+      "def": 0
+    },
+    {
+      "symbol": "b10_q",
+      "name": "Band 10 Q",
+      "unit": "",
+      "min": 0.3,
+      "max": 116,
+      "def": 1
+    },
+    {
+      "symbol": "b10_on",
+      "name": "Band 10 On",
+      "unit": "",
+      "min": 0,
+      "max": 1,
+      "def": 0,
+      "kind": "toggle"
+    },
+    {
+      "symbol": "b11_type",
+      "name": "Band 11 Type",
+      "unit": "",
+      "min": 0,
+      "max": 5,
+      "def": 0,
+      "kind": "integer"
+    },
+    {
+      "symbol": "b11_freq",
+      "name": "Band 11 Frequency",
+      "unit": "Hz",
+      "min": 20,
+      "max": 20000,
+      "def": 1861
+    },
+    {
+      "symbol": "b11_gain",
+      "name": "Band 11 Gain",
+      "unit": "dB",
+      "min": -15,
+      "max": 15,
+      "def": 0
+    },
+    {
+      "symbol": "b11_q",
+      "name": "Band 11 Q",
+      "unit": "",
+      "min": 0.3,
+      "max": 116,
+      "def": 1
+    },
+    {
+      "symbol": "b11_on",
+      "name": "Band 11 On",
+      "unit": "",
+      "min": 0,
+      "max": 1,
+      "def": 0,
+      "kind": "toggle"
+    },
+    {
+      "symbol": "b12_type",
+      "name": "Band 12 Type",
+      "unit": "",
+      "min": 0,
+      "max": 5,
+      "def": 0,
+      "kind": "integer"
+    },
+    {
+      "symbol": "b12_freq",
+      "name": "Band 12 Frequency",
+      "unit": "Hz",
+      "min": 20,
+      "max": 20000,
+      "def": 2866
+    },
+    {
+      "symbol": "b12_gain",
+      "name": "Band 12 Gain",
+      "unit": "dB",
+      "min": -15,
+      "max": 15,
+      "def": 0
+    },
+    {
+      "symbol": "b12_q",
+      "name": "Band 12 Q",
+      "unit": "",
+      "min": 0.3,
+      "max": 116,
+      "def": 1
+    },
+    {
+      "symbol": "b12_on",
+      "name": "Band 12 On",
+      "unit": "",
+      "min": 0,
+      "max": 1,
+      "def": 0,
+      "kind": "toggle"
+    },
+    {
+      "symbol": "b13_type",
+      "name": "Band 13 Type",
+      "unit": "",
+      "min": 0,
+      "max": 5,
+      "def": 0,
+      "kind": "integer"
+    },
+    {
+      "symbol": "b13_freq",
+      "name": "Band 13 Frequency",
+      "unit": "Hz",
+      "min": 20,
+      "max": 20000,
+      "def": 4413
+    },
+    {
+      "symbol": "b13_gain",
+      "name": "Band 13 Gain",
+      "unit": "dB",
+      "min": -15,
+      "max": 15,
+      "def": 0
+    },
+    {
+      "symbol": "b13_q",
+      "name": "Band 13 Q",
+      "unit": "",
+      "min": 0.3,
+      "max": 116,
+      "def": 1
+    },
+    {
+      "symbol": "b13_on",
+      "name": "Band 13 On",
+      "unit": "",
+      "min": 0,
+      "max": 1,
+      "def": 0,
+      "kind": "toggle"
+    },
+    {
+      "symbol": "b14_type",
+      "name": "Band 14 Type",
+      "unit": "",
+      "min": 0,
+      "max": 5,
+      "def": 0,
+      "kind": "integer"
+    },
+    {
+      "symbol": "b14_freq",
+      "name": "Band 14 Frequency",
+      "unit": "Hz",
+      "min": 20,
+      "max": 20000,
+      "def": 6796
+    },
+    {
+      "symbol": "b14_gain",
+      "name": "Band 14 Gain",
+      "unit": "dB",
+      "min": -15,
+      "max": 15,
+      "def": 0
+    },
+    {
+      "symbol": "b14_q",
+      "name": "Band 14 Q",
+      "unit": "",
+      "min": 0.3,
+      "max": 116,
+      "def": 1
+    },
+    {
+      "symbol": "b14_on",
+      "name": "Band 14 On",
+      "unit": "",
+      "min": 0,
+      "max": 1,
+      "def": 0,
+      "kind": "toggle"
+    },
+    {
+      "symbol": "b15_type",
+      "name": "Band 15 Type",
+      "unit": "",
+      "min": 0,
+      "max": 5,
+      "def": 0,
+      "kind": "integer"
+    },
+    {
+      "symbol": "b15_freq",
+      "name": "Band 15 Frequency",
+      "unit": "Hz",
+      "min": 20,
+      "max": 20000,
+      "def": 10466
+    },
+    {
+      "symbol": "b15_gain",
+      "name": "Band 15 Gain",
+      "unit": "dB",
+      "min": -15,
+      "max": 15,
+      "def": 0
+    },
+    {
+      "symbol": "b15_q",
+      "name": "Band 15 Q",
+      "unit": "",
+      "min": 0.3,
+      "max": 116,
+      "def": 1
+    },
+    {
+      "symbol": "b15_on",
+      "name": "Band 15 On",
+      "unit": "",
+      "min": 0,
+      "max": 1,
+      "def": 0,
+      "kind": "toggle"
+    },
+    {
+      "symbol": "b16_type",
+      "name": "Band 16 Type",
+      "unit": "",
+      "min": 0,
+      "max": 5,
+      "def": 0,
+      "kind": "integer"
+    },
+    {
+      "symbol": "b16_freq",
+      "name": "Band 16 Frequency",
+      "unit": "Hz",
+      "min": 20,
+      "max": 20000,
+      "def": 16117
+    },
+    {
+      "symbol": "b16_gain",
+      "name": "Band 16 Gain",
+      "unit": "dB",
+      "min": -15,
+      "max": 15,
+      "def": 0
+    },
+    {
+      "symbol": "b16_q",
+      "name": "Band 16 Q",
+      "unit": "",
+      "min": 0.3,
+      "max": 116,
+      "def": 1
+    },
+    {
+      "symbol": "b16_on",
+      "name": "Band 16 On",
+      "unit": "",
+      "min": 0,
+      "max": 1,
+      "def": 0,
+      "kind": "toggle"
+    }
+  ]
+}
