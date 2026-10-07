@@ -6,7 +6,7 @@
  * OpenMixer engine runs.
  *
  * Every number comes from generated/omx_delay_params.h (tools/gen.mjs, from omx-delay.decl.json); the
- * DSP is omx-dsp's <omxdsp/fx/omx_delay_instance.h> over <omxdsp/fx/omx_delay.h>. This file adds no
+ * DSP is omx_delay_instance.h over <omxdsp/fx/omx_delay.h>. This file adds no
  * arithmetic on the audio path: drain the events, resolve, run.
  */
 #include <stdatomic.h>
@@ -29,7 +29,7 @@
 /* The generated table FIRST: its guard is omx-dsp's own, so the instance header reads this table. */
 #include "omx_delay_params.h"
 #include <omx-clap-host/omx_clap_ext.h>
-#include <omxdsp/fx/omx_delay_instance.h>
+#include "omx_delay_instance.h"
 #include <omxdsp/omx_denormal.h> /* omx_denormals_off, per callback */
 
 #define G_DECLARED OMX_DELAY_PARAM_COUNT

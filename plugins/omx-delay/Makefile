@@ -45,10 +45,10 @@ TTL_SRCS := $(shell find $(TTL) -type f 2>/dev/null)
 
 all: $(B)/$(NAME).clap $(BUNDLE)/$(NAME).so $(BUNDLE)/manifest.ttl
 
-$(B)/$(NAME).clap: omx_delay_clap.c $(GEN)/omx_delay_params.h | $(B)
+$(B)/$(NAME).clap: omx_delay_clap.c omx_delay_instance.h $(GEN)/omx_delay_params.h | $(B)
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(WARN) $(PLUGIN) $(ABI_CFLAGS) -o $@ $< $(LDFLAGS) $(LDLIBS)
 
-$(BUNDLE)/$(NAME).so: omx_delay_lv2.c $(GEN)/omx_delay_params.h | $(B)
+$(BUNDLE)/$(NAME).so: omx_delay_lv2.c omx_delay_instance.h $(GEN)/omx_delay_params.h | $(B)
 	@mkdir -p $(BUNDLE)
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(WARN) $(PLUGIN) $(LV2_CFLAGS) -o $@ $< $(LDFLAGS) $(LDLIBS)
 

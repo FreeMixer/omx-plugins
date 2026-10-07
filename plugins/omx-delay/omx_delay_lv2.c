@@ -16,7 +16,7 @@
 
 /* The generated table FIRST: its guard is omx-dsp's own, so the instance header reads this table. */
 #include "omx_delay_params.h"
-#include <omxdsp/fx/omx_delay_instance.h>
+#include "omx_delay_instance.h"
 #include <omxdsp/omx_denormal.h>
 
 typedef struct {
