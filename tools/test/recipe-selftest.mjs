@@ -15,6 +15,9 @@
  *      not exist breaks the recipe.
  *   5. The wizard refuses, before writing, a taken stem, a typed travel, an unresolved reference, a
  *      reference into another kernel, a derived field answered wrong and a panel it cannot draw.
+ *   6. The port hints (tools/port-hints.mjs): a TTL that drops a hint, a declaration that drops a
+ *      band type's labels or declares a frequency linear, and a plugin with no pin are each named;
+ *      the whole tree is green.
  *
  * Works in build/selftest/ (removed first). Needs git, and omx-dsp's headers as the build does.
  */
@@ -24,6 +27,8 @@ import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { checkCommits, rangeCommits } from '../commit-plan-check.mjs';
 import { commitPlan, planPlugin, writePlugin } from '../omx-new-plugin.mjs';
+import { emitPluginTtl, loadDecl } from '../gen.mjs';
+import { hintErrors } from '../port-hints.mjs';
 import { checkPlugin, debtGrowth, debtVerdict, gapLines, loadDebt, loadRecipe, pluginStems, recipeErrors } from '../plugin-recipe.mjs';
 
 const ROOT = resolve(fileURLToPath(import.meta.url), '..', '..', '..');
@@ -312,6 +317,44 @@ async function main() {
   await refused('a panel the MOD GUI cannot draw', (a) => {
     a.panel = { family: 'modulation', roles: { mode: 'mode' }, sections: [{ key: 'tremolo', label: 'Tremolo', controls: ['rateHz', 'depth', 'mix', 'mode'] }] };
   }, '/panel');
+
+  // ---- 6. the port hints ---------------------------------------------------------------------
+  {
+    const hints = join(WORK, 'hints');
+    copyTree(hints);
+    const named = (what, needle) => {
+      const e = hintErrors(hints);
+      expect(e.some((x) => x.includes(needle)), `port hints: ${what} is named${e.length ? ` (${e[0]})` : ' (NOTHING NAMED)'}`);
+    };
+    expect(hintErrors(hints).length === 0, 'port hints: the whole tree keeps every pinned hint');
+    const eq16 = join(hints, 'plugins/omx-eq16/generated/omx-eq16.lv2/omx-eq16.ttl');
+    const ttl16 = readFileSync(eq16, 'utf8');
+    writeFileSync(eq16, ttl16.replace('pprops:logarithmic ;', '').replace('units:unit units:db', 'units:unit units:pc'));
+    named('a TTL that drops a frequency\'s logarithmic travel', 'omx-eq16: port "hpf_freq" lost pprops:logarithmic');
+    named('a TTL that drops a gain\'s unit', 'omx-eq16: port "b1_gain" lost units:unit units:db');
+    writeFileSync(eq16, ttl16);
+    const dir8 = join(hints, 'plugins/omx-eq8'), decl8 = join(dir8, 'omx-eq8.decl.json'), ttl8 = join(dir8, 'generated/omx-eq8.lv2/omx-eq8.ttl');
+    const d8 = readFileSync(decl8, 'utf8');
+    const regen = (mutate) => {
+      const d = JSON.parse(d8);
+      mutate(d.params);
+      writeFileSync(decl8, JSON.stringify(d, null, 2));
+      writeFileSync(ttl8, emitPluginTtl(loadDecl(dir8)));
+    };
+    regen((ps) => delete ps.find((p) => p.symbol === 'b1_type').values);
+    named('a declaration that drops a band type\'s labels', 'omx-eq8: port "b1_type" lost the scale point 0 Bell');
+    regen((ps) => (ps.find((p) => p.symbol === 'hpf_freq').scale = 'linear'));
+    named('a frequency declared linear', 'omx-eq8: port "hpf_freq" lost pprops:logarithmic');
+    regen(() => {});
+    expect(hintErrors(hints).length === 0, 'port hints: restored, green again');
+    cpSync(join(hints, 'plugins/omx-eq8'), join(hints, 'plugins/omx-eq9'), { recursive: true });
+    for (const [from, to] of [['omx-eq8.decl.json', 'omx-eq9.decl.json'], ['generated/omx-eq8.lv2', 'generated/omx-eq9.lv2'], ['generated/omx-eq9.lv2/omx-eq8.ttl', 'generated/omx-eq9.lv2/omx-eq9.ttl']])
+      execFileSync('mv', [join(hints, 'plugins/omx-eq9', from), join(hints, 'plugins/omx-eq9', to)]);
+    const d9 = JSON.parse(readFileSync(join(hints, 'plugins/omx-eq9/omx-eq9.decl.json'), 'utf8'));
+    d9.stem = 'omx-eq9';
+    writeFileSync(join(hints, 'plugins/omx-eq9/omx-eq9.decl.json'), JSON.stringify(d9, null, 2));
+    named('a plugin with no pin', 'omx-eq9: no pinned hints');
+  }
 
   console.log(fails ? `recipe-selftest: ${fails} check(s) failed` : 'recipe-selftest: every arm red when broken, green when whole');
   process.exit(fails ? 1 : 0);
