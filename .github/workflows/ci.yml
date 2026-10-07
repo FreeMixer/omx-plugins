@@ -38,6 +38,9 @@ jobs:
 
       - uses: actions/checkout@v4
 
+      - name: The checkout is a git directory this job may read
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+
       - name: Install what the spec builds and tests with
         run: dnf builddep -y --setopt=install_weak_deps=False packaging/omx-plugins.spec
 
