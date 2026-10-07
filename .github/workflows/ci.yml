@@ -38,6 +38,9 @@ jobs:
 
       - uses: actions/checkout@v4
 
+      - name: The checkout is a git directory this job may read
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+
       - name: Install what the spec builds and tests with
         run: dnf builddep -y --setopt=install_weak_deps=False packaging/omx-plugins.spec
 
@@ -63,6 +66,14 @@ jobs:
           set -euo pipefail
           make test 2>&1 | tee test.log
           if grep -E '^SKIP' test.log; then echo "::error::a test was skipped"; exit 1; fi
+
+      - name: The recipe machinery, sabotaged arm by arm
+        id: handback-selftest
+        run: make selftest
+
+      - name: Every plugin has every artifact of the plugin recipe
+        id: handback-completeness
+        run: make completeness
 
   rpm:
     name: omx-plugins RPMs (fc44, ${{ matrix.arch }})

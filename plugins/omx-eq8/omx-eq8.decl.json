@@ -3,6 +3,7 @@
   "stem": "omx-eq8",
   "kernel": "eq8",
   "name": "omx eq8",
+  "noun": "8-band EQ",
   "vendor": "openmixer",
   "url": "https://github.com/FreeMixer/omx-plugins",
   "version": "0.1.0",
