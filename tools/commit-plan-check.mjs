@@ -12,7 +12,7 @@
  * A file maps to a layer through the recipe's artifact `paths` (any stem, any kernel); a file no
  * artifact names (the tools, the recipe itself) is outside the protocol and ignored. It reads the
  * recipe of the tree it runs from. Exit 0 the range keeps the protocol; 1 it does not (each
- * violation named with its commit); 2 usage.
+ * violation named with its commit; an empty range is one); 2 usage.
  */
 import { execFileSync } from 'node:child_process';
 import { resolve } from 'node:path';
@@ -36,6 +36,7 @@ export function checkCommits(recipe, commits) {
   const lines = [];
   let last = -1;
   let lastCommit;
+  if (commits.length === 0) violations.push('the range holds no commit: a check over nothing proves nothing (is <base> the branch point and <head> the tip?)');
   for (const c of commits) {
     const layers = [...new Set(c.files.map((f) => layerOfPath(recipe, f)).filter(Boolean))];
     const short = `${c.sha.slice(0, 9)} ${c.subject}`;
