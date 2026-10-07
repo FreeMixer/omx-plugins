@@ -1,12 +1,12 @@
 {
-  "$comment": "THE declaration of omx-eq8: the CLAP and LV2 faces and the parameter header are generated from this file by tools/gen.mjs. Parameter order is append-only. The travels are the console's own EQ_FREQ_RANGE, EQ_GAIN_RANGE, EQ_Q_RANGE (a notch's Q reaches EQ_NOTCH_Q_RANGE), HPF_FREQ_RANGE and LPF_FREQ_RANGE, read as omx-dsp's omx_contract_limits.h carries them. The band count is the compile-time 8 of the 8/16/32 ruling; band types are 0 bell, 1 low shelf, 2 high shelf, 3 notch, 4 allpass1, 5 allpass2. No MOD GUI: tools/modgui-gen.mjs does not draw selectors.",
+  "$comment": "THE declaration of omx-eq8: the CLAP and LV2 faces and the parameter header are generated from this file by tools/gen.mjs. Parameter order is append-only. The travels are the console's own EQ_FREQ_RANGE, EQ_GAIN_RANGE, EQ_Q_RANGE (a notch's Q reaches EQ_NOTCH_Q_RANGE), HPF_FREQ_RANGE and LPF_FREQ_RANGE, read as omx-dsp's omx_contract_limits.h carries them. The band count is a compile-time 8; band types are 0 bell, 1 low shelf, 2 high shelf, 3 notch, 4 allpass1, 5 allpass2. No MOD GUI: tools/modgui-gen.mjs does not draw selectors.",
   "stem": "omx-eq8",
   "kernel": "eq8",
   "name": "omx eq8",
   "vendor": "openmixer",
   "url": "https://github.com/FreeMixer/omx-plugins",
   "version": "0.1.0",
-  "description": "openmixer's channel EQ, 8-band form: eight parametric bands (bell, shelves, notch, allpass) and a high-pass and a low-pass filter at 12 or 24 dB/oct, stereo, zero latency. The DSP is omx-dsp's <omxdsp/fx/omx_eq_instance.h>, the console's own EQ; every band ships off, so a racked instance is a wire.",
+  "description": "The OpenMixer console's channel EQ, 8-band form: eight parametric bands (bell, shelves, notch, allpass) and a high-pass and a low-pass filter at 12 or 24 dB/oct, stereo, zero latency. The DSP is omx-dsp's <omxdsp/fx/omx_eq_instance.h>, the console's own EQ; every band ships off, so a racked instance is a wire.",
   "clap": {
     "id": "org.openmixer.eq8",
     "features": [
@@ -19,7 +19,6 @@
     "uri": "urn:openmixer:eq8",
     "class": "lv2:ParaEQPlugin"
   },
-  "source": "CONSOLE_TRAVEL_DECLS['/channel/{kind}/{index}/eq'], EQ_FREQ_RANGE, EQ_GAIN_RANGE, EQ_Q_RANGE, EQ_NOTCH_Q_RANGE, HPF_FREQ_RANGE, LPF_FREQ_RANGE, EQ_BAND_TYPES",
   "params": [
     {
       "symbol": "on",

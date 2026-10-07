@@ -1,5 +1,5 @@
 {
-  "$comment": "THE declaration of omx-drive, carrying the travels of openmixer's /channel/{kind}/{index}/drive row. Every face and the parameter header are generated from this file by tools/gen.mjs. Parameter order is append-only.",
+  "$comment": "THE declaration of omx-drive. Every face and the parameter header are generated from this file by tools/gen.mjs. Parameter order is append-only.",
   "stem": "omx-drive",
   "kernel": "drive",
   "name": "omx drive",
@@ -18,7 +18,6 @@
     "uri": "urn:openmixer:drive",
     "class": "lv2:Plugin"
   },
-  "source": "CONSOLE_TRAVEL_DECLS['/channel/{kind}/{index}/drive']",
   "params": [
     {
       "symbol": "driveDb",

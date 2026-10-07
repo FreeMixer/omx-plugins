@@ -3,7 +3,7 @@
 # Copyright (C) 2026 Pau Aliagas <linuxnow@gmail.com>
 #
 # host-check.sh <x.clap> <bundle.lv2> <lv2-uri> <clap-id> — the built faces load in real hosts' scanners:
-# omx-clap-scan (openmixer's CLAP host) for the CLAP file, lv2ls/lv2info (lilv) for the LV2 bundle.
+# omx-clap-scan (omx-clap-host's scanner) for the CLAP file, lv2ls/lv2info (lilv) for the LV2 bundle.
 # A scanner that is not installed is SKIPped, named; one that is installed must pass.
 set -u
 clap=$1 bundle=$2 uri=$3 clap_id=$4

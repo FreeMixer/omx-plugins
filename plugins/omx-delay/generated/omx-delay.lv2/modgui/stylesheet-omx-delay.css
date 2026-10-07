@@ -4,7 +4,7 @@
  * GENERATED — DO NOT EDIT BY HAND. Produced by tools/modgui-gen.mjs from
  * plugins/omx-delay/omx-delay.decl.json (its panel block) and tools/look.json
  * Regenerate: `node tools/modgui-gen.mjs`, then commit the result.
- * Colours and font: the dark theme's "openmixer" look of openmixer's web-ui tokens.css, resolved in tools/look.json.
+ * Colours and font: the OpenMixer console's dark theme, resolved in tools/look.json.
  */
 .omx-pedal{{{cns}}} { position: relative; box-sizing: border-box; background: #15191e; border: 1px solid #3a444f; border-radius: 10px; color: #eaf0f4; font-family: "Inter", "Helvetica Neue", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
 .omx-pedal{{{cns}}} .omx-head { position: absolute; left: 0; right: 0; top: 0; border-bottom: 2px solid #28c8e6; }

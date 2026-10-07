@@ -266,7 +266,7 @@ export function emitStylesheet(panel, look, source) {
   const film = `/resources/${relative(MODGUI_DIR, f.film)}{{{ns}}}`;
   return `/*
 ${banner(' * ', source).join('\n')}
- * Colours and font: the ${look.theme} theme's "${look.personality}" look of openmixer's web-ui tokens.css, resolved in tools/look.json.
+ * Colours and font: the OpenMixer console's ${look.theme} theme, resolved in tools/look.json.
  */
 ${P} { position: relative; box-sizing: border-box; background: ${tok['--surface']}; border: 1px solid ${tok['--border-strong']}; border-radius: ${g.radius}px; color: ${tok['--ink']}; font-family: ${tok['--font-ui']}; }
 ${P} .omx-head { position: absolute; left: 0; right: 0; top: 0; border-bottom: 2px solid ${tok['--accent']}; }

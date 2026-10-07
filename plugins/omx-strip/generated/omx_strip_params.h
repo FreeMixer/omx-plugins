@@ -4,8 +4,7 @@
 #define OMX_STRIP_PARAMS_H
 /*
  * GENERATED — DO NOT EDIT BY HAND.
- * Produced by tools/gen.mjs from plugins/omx-strip/omx-strip.decl.json (openmixer's
- * OMX_TRIM_RANGE_*_DB, OMX_HPF_FREQ_RANGE_*, OMX_LPF_FREQ_RANGE_*, OMX_GATE_*, OMX_EQ_*_RANGE_*, OMX_COMP_* (omx_contract_limits.h)).
+ * Produced by tools/gen.mjs from plugins/omx-strip/omx-strip.decl.json.
  * Regenerate: `make -C plugins/omx-strip gen`, then commit the result. Order is append-only.
  * The include guard is omx-dsp's own <omxdsp/params/omx_strip_params.h>: included first, this
  * table is the one the kernel's instance header reads.
@@ -241,12 +240,12 @@ static const omx_plugin_param OMX_STRIP_PARAMS[OMX_STRIP_PARAM_COUNT] = {
 #define OMX_STRIP_VENDOR "openmixer"
 #define OMX_STRIP_URL "https://github.com/FreeMixer/omx-plugins"
 #define OMX_STRIP_VERSION "0.1.0"
-#define OMX_STRIP_DESCRIPTION "openmixer’s channel strip in one plugin: input trim with high- and low-pass filters, gate, four-band EQ and compressor, in the console’s default order or any other. No DSP of its own: each stage is omx-dsp’s strip module, called in order."
+#define OMX_STRIP_DESCRIPTION "The OpenMixer console’s channel strip in one plugin: input trim with high- and low-pass filters, gate, four-band EQ and compressor, in the console’s default order or any other. No DSP of its own: each stage is omx-dsp’s strip module, called in order."
 #define OMX_STRIP_CLAP_ID "org.openmixer.strip"
 #define OMX_STRIP_CLAP_FEATURES "audio-effect", "mixing", "stereo"
 #define OMX_STRIP_LV2_URI "urn:openmixer:strip"
-/* org.openmixer.declaration/1: the source expression and the digest of the resolved parameters. */
-#define OMX_STRIP_DECL_SOURCE "OMX_TRIM_RANGE_*_DB, OMX_HPF_FREQ_RANGE_*, OMX_LPF_FREQ_RANGE_*, OMX_GATE_*, OMX_EQ_*_RANGE_*, OMX_COMP_* (omx_contract_limits.h)"
+/* org.openmixer.declaration/1: the declaration's plain description and the digest of its parameters. */
+#define OMX_STRIP_DECL_SOURCE "omx strip: Trim -24 to 24 dB, HPF 0 to 1, HPF Freq 20 to 1000 Hz, HPF Slope 12 to 24 dB/oct, LPF 0 to 1, LPF Freq 1000 to 20000 Hz, LPF Slope 12 to 24 dB/oct, Gate 0 to 1, Gate Threshold -80 to 0 dB, Gate Ratio 1 to 100, Gate Range -90 to 0 dB, Gate Attack 0 to 500 ms, Gate Release 0 to 5000 ms, EQ 0 to 1, EQ 1 Type 0 to 5, EQ 1 Freq 20 to 20000 Hz, EQ 1 Gain -15 to 15 dB, EQ 1 Q 0.3 to 8, EQ 1 0 to 1, EQ 2 Type 0 to 5, EQ 2 Freq 20 to 20000 Hz, EQ 2 Gain -15 to 15 dB, EQ 2 Q 0.3 to 8, EQ 2 0 to 1, EQ 3 Type 0 to 5, EQ 3 Freq 20 to 20000 Hz, EQ 3 Gain -15 to 15 dB, EQ 3 Q 0.3 to 8, EQ 3 0 to 1, EQ 4 Type 0 to 5, EQ 4 Freq 20 to 20000 Hz, EQ 4 Gain -15 to 15 dB, EQ 4 Q 0.3 to 8, EQ 4 0 to 1, Comp 0 to 1, Comp Threshold -60 to 0 dB, Comp Ratio 1 to 20, Comp Knee 0 to 24 dB, Comp Attack 0.1 to 100 ms, Comp Release 5 to 3000 ms, Comp Makeup 0 to 24 dB, Comp RMS 0 to 1, Order 0 to 23"
 #define OMX_STRIP_DECL_DIGEST "f0520137037652deb3de4a92c4a067573585bdd0bebdac8e477b742560b3a91b"
 
 /* LV2 port indices (tools/gen.mjs lv2Ports): audio, then parameter i at FIRST_PARAM + i, then these. */

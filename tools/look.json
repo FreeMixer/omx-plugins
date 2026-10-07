@@ -1,5 +1,5 @@
 {
-  "$comment": "The look the MOD GUI wears (tools/modgui-gen.mjs): openmixer's dark theme, 'openmixer' personality, resolved ONCE from packages/web-ui/app/assets/tokens.css by packages/web-ui/app/assets/tokenCascade.ts resolveTokens(css, { theme: 'dark', personality: 'openmixer' }) at openmixer commit 6c6e709f4429d933e77fd753295bf7ed3d9c3915 (origin/integration/waves-2026-10; tokens.css last changed in dac58e761a9e238ca65a168c9edfb92de4fc1553). Plain values: colours are #rrggbb, nothing here is a var(). Re-resolve and regenerate when that look changes.",
+  "$comment": "The look the MOD GUI wears (tools/modgui-gen.mjs): the OpenMixer console's dark theme, resolved once into plain values: colours are #rrggbb, nothing here is a var(). Re-resolve and regenerate when that look changes.",
   "theme": "dark",
   "personality": "openmixer",
   "tokens": {

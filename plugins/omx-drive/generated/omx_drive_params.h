@@ -4,8 +4,7 @@
 #define OMX_DRIVE_PARAMS_H
 /*
  * GENERATED — DO NOT EDIT BY HAND.
- * Produced by tools/gen.mjs from plugins/omx-drive/omx-drive.decl.json (openmixer's
- * CONSOLE_TRAVEL_DECLS['/channel/{kind}/{index}/drive']).
+ * Produced by tools/gen.mjs from plugins/omx-drive/omx-drive.decl.json.
  * Regenerate: `make -C plugins/omx-drive gen`, then commit the result. Order is append-only.
  * The include guard is omx-dsp's own <omxdsp/params/omx_drive_params.h>: included first, this
  * table is the one the kernel's instance header reads.
@@ -55,8 +54,8 @@ static const omx_plugin_param OMX_DRIVE_PARAMS[OMX_DRIVE_PARAM_COUNT] = {
 #define OMX_DRIVE_CLAP_ID "org.openmixer.drive"
 #define OMX_DRIVE_CLAP_FEATURES "audio-effect", "stereo"
 #define OMX_DRIVE_LV2_URI "urn:openmixer:drive"
-/* org.openmixer.declaration/1: the source expression and the digest of the resolved parameters. */
-#define OMX_DRIVE_DECL_SOURCE "CONSOLE_TRAVEL_DECLS['/channel/{kind}/{index}/drive']"
+/* org.openmixer.declaration/1: the declaration's plain description and the digest of its parameters. */
+#define OMX_DRIVE_DECL_SOURCE "omx drive: Drive 0 to 36 dB, Character -1 to 1, Band 20 to 20000 Hz, Mix 0 to 100 %, Trim -24 to 12 dB"
 #define OMX_DRIVE_DECL_DIGEST "f0931beb3084e2ef070de18ce082d1c72938674a9971d68ffc7508bb6775d1bf"
 
 /* LV2 port indices (tools/gen.mjs lv2Ports): audio, then parameter i at FIRST_PARAM + i, then these. */

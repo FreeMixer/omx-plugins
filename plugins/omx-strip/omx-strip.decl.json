@@ -6,10 +6,9 @@
   "vendor": "openmixer",
   "url": "https://github.com/FreeMixer/omx-plugins",
   "version": "0.1.0",
-  "description": "openmixer’s channel strip in one plugin: input trim with high- and low-pass filters, gate, four-band EQ and compressor, in the console’s default order or any other. No DSP of its own: each stage is omx-dsp’s strip module, called in order.",
+  "description": "The OpenMixer console’s channel strip in one plugin: input trim with high- and low-pass filters, gate, four-band EQ and compressor, in the console’s default order or any other. No DSP of its own: each stage is omx-dsp’s strip module, called in order.",
   "clap": { "id": "org.openmixer.strip", "features": ["audio-effect", "mixing", "stereo"] },
   "lv2": { "uri": "urn:openmixer:strip", "class": "lv2:MixerPlugin" },
-  "source": "OMX_TRIM_RANGE_*_DB, OMX_HPF_FREQ_RANGE_*, OMX_LPF_FREQ_RANGE_*, OMX_GATE_*, OMX_EQ_*_RANGE_*, OMX_COMP_* (omx_contract_limits.h)",
   "params": [
     { "symbol": "trimDb", "name": "Trim", "unit": "dB", "min": -24, "max": 24, "def": 0 },
     { "symbol": "hpfOn", "name": "HPF", "unit": "", "min": 0, "max": 1, "def": 0, "kind": "toggle" },

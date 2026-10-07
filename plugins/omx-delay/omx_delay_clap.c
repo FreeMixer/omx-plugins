@@ -2,8 +2,8 @@
 // Copyright (C) 2026 Pau Aliagas <linuxnow@gmail.com>
 /*
  * omx_delay_clap.c — the CLAP face of omx-delay, in plain C over our CLAP ABI (the released
- * omx-clap-host's <omx-clap-host/omx_clap_ext.h> for the openmixer extensions). Ported from openmixer's
- * generated native stage (packages/omx-plugins/generated/clap/omx_delay_clap.c).
+ * omx-clap-host's <omx-clap-host/omx_clap_ext.h> for the openmixer extensions), the same face the
+ * OpenMixer engine runs.
  *
  * Every number comes from generated/omx_delay_params.h (tools/gen.mjs, from omx-delay.decl.json); the
  * DSP is omx-dsp's <omxdsp/fx/omx_delay_instance.h> over <omxdsp/fx/omx_delay.h>. This file adds no

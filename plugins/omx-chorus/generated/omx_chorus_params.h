@@ -4,8 +4,7 @@
 #define OMX_CHORUS_PARAMS_H
 /*
  * GENERATED — DO NOT EDIT BY HAND.
- * Produced by tools/gen.mjs from plugins/omx-chorus/omx-chorus.decl.json (openmixer's
- * CONSOLE_TRAVEL_DECLS['/channel/{kind}/{index}/chorus']).
+ * Produced by tools/gen.mjs from plugins/omx-chorus/omx-chorus.decl.json.
  * Regenerate: `make -C plugins/omx-chorus gen`, then commit the result. Order is append-only.
  * The include guard is omx-dsp's own <omxdsp/params/omx_chorus_params.h>: included first, this
  * table is the one the kernel's instance header reads.
@@ -55,8 +54,8 @@ static const omx_plugin_param OMX_CHORUS_PARAMS[OMX_CHORUS_PARAM_COUNT] = {
 #define OMX_CHORUS_CLAP_ID "org.openmixer.chorus"
 #define OMX_CHORUS_CLAP_FEATURES "audio-effect", "stereo"
 #define OMX_CHORUS_LV2_URI "urn:openmixer:chorus"
-/* org.openmixer.declaration/1: the source expression and the digest of the resolved parameters. */
-#define OMX_CHORUS_DECL_SOURCE "CONSOLE_TRAVEL_DECLS['/channel/{kind}/{index}/chorus']"
+/* org.openmixer.declaration/1: the declaration's plain description and the digest of its parameters. */
+#define OMX_CHORUS_DECL_SOURCE "omx chorus: Rate 0.05 to 8 Hz, Depth 0 to 12 ms, Voices 1 to 4, Mix 0 to 100 %, Spread 0 to 0.5"
 #define OMX_CHORUS_DECL_DIGEST "9282092ea121c8b503a493f00e4e744a4ea23bc7b29f3e2b5f0e265b3218f185"
 
 /* LV2 port indices (tools/gen.mjs lv2Ports): audio, then parameter i at FIRST_PARAM + i, then these. */

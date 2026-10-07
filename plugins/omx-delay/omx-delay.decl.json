@@ -1,15 +1,14 @@
 {
-  "$comment": "THE declaration of omx-delay: every face (CLAP, LV2, the MOD GUI) and the parameter header are generated from this file by tools/gen.mjs and tools/modgui-gen.mjs. Parameter order is append-only. The travels are openmixer's @freemixer/core declaration (source below), copied here at the omx-dsp pin.",
+  "$comment": "THE declaration of omx-delay: every face (CLAP, LV2, the MOD GUI) and the parameter header are generated from this file by tools/gen.mjs and tools/modgui-gen.mjs. Parameter order is append-only. The travels are the OpenMixer console's delay travels.",
   "stem": "omx-delay",
   "kernel": "delay",
   "name": "omx delay",
   "vendor": "openmixer",
   "url": "https://github.com/FreeMixer/omx-plugins",
   "version": "0.1.0",
-  "description": "openmixer's stereo delay: one time, feedback through a tone filter, ping-pong and a wet/dry mix. The DSP is omx-dsp's <omxdsp/fx/omx_delay.h>, the console's own delay.",
+  "description": "The OpenMixer console's stereo delay: one time, feedback through a tone filter, ping-pong and a wet/dry mix. The DSP is omx-dsp's <omxdsp/fx/omx_delay.h>, the console's own delay.",
   "clap": { "id": "org.openmixer.delay", "features": ["audio-effect", "delay", "stereo"] },
   "lv2": { "uri": "urn:openmixer:delay", "class": "lv2:DelayPlugin" },
-  "source": "CONSOLE_TRAVEL_DECLS['/channel/{kind}/{index}/delay'], limitForKind(DELAY_MIX_RANGE, 'input'), FX_DELAY_PINGPONG_DEFAULT",
   "params": [
     { "symbol": "timeMs", "name": "Time", "unit": "ms", "min": 0, "max": 2000, "def": 300, "kind": "integer" },
     { "symbol": "feedback", "name": "Feedback", "unit": "", "min": 0, "max": 0.99, "def": 0.3 },

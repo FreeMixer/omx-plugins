@@ -4,8 +4,7 @@
 #define OMX_DEESSER_PARAMS_H
 /*
  * GENERATED — DO NOT EDIT BY HAND.
- * Produced by tools/gen.mjs from plugins/omx-deesser/omx-deesser.decl.json (openmixer's
- * CONSOLE_TRAVEL_DECLS['/channel/{kind}/{index}/deEsser']).
+ * Produced by tools/gen.mjs from plugins/omx-deesser/omx-deesser.decl.json.
  * Regenerate: `make -C plugins/omx-deesser gen`, then commit the result. Order is append-only.
  * The include guard is omx-dsp's own <omxdsp/params/omx_deesser_params.h>: included first, this
  * table is the one the kernel's instance header reads.
@@ -65,8 +64,8 @@ static const omx_plugin_param OMX_DEESSER_PARAMS[OMX_DEESSER_PARAM_COUNT] = {
 #define OMX_DEESSER_CLAP_ID "org.openmixer.deesser"
 #define OMX_DEESSER_CLAP_FEATURES "audio-effect", "stereo"
 #define OMX_DEESSER_LV2_URI "urn:openmixer:deesser"
-/* org.openmixer.declaration/1: the source expression and the digest of the resolved parameters. */
-#define OMX_DEESSER_DECL_SOURCE "CONSOLE_TRAVEL_DECLS['/channel/{kind}/{index}/deEsser']"
+/* org.openmixer.declaration/1: the declaration's plain description and the digest of its parameters. */
+#define OMX_DEESSER_DECL_SOURCE "omx deesser: Freq 2000 to 16000 Hz, Width 0.25 to 4 oct, Threshold -60 to 0 dB, Ratio 1 to 20, Range -24 to 0 dB, Attack 0.1 to 50 ms, Release 5 to 500 ms"
 #define OMX_DEESSER_DECL_DIGEST "dd94080599a6850a161e387a4a6cfb9d9b93762e07318da2afca0d9e6f6db409"
 
 /* LV2 port indices (tools/gen.mjs lv2Ports): audio, then parameter i at FIRST_PARAM + i, then these. */

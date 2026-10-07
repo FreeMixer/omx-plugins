@@ -1,5 +1,5 @@
 {
-  "$comment": "THE declaration of omx-chorus, carrying the travels of openmixer's /channel/{kind}/{index}/chorus row. Every face and the parameter header are generated from this file by tools/gen.mjs. Parameter order is append-only.",
+  "$comment": "THE declaration of omx-chorus. Every face and the parameter header are generated from this file by tools/gen.mjs. Parameter order is append-only.",
   "stem": "omx-chorus",
   "kernel": "chorus",
   "name": "omx chorus",
@@ -18,7 +18,6 @@
     "uri": "urn:openmixer:chorus",
     "class": "lv2:Plugin"
   },
-  "source": "CONSOLE_TRAVEL_DECLS['/channel/{kind}/{index}/chorus']",
   "params": [
     {
       "symbol": "rateHz",

@@ -4,8 +4,7 @@
 #define OMX_EQ8_PARAMS_H
 /*
  * GENERATED — DO NOT EDIT BY HAND.
- * Produced by tools/gen.mjs from plugins/omx-eq8/omx-eq8.decl.json (openmixer's
- * CONSOLE_TRAVEL_DECLS['/channel/{kind}/{index}/eq'], EQ_FREQ_RANGE, EQ_GAIN_RANGE, EQ_Q_RANGE, EQ_NOTCH_Q_RANGE, HPF_FREQ_RANGE, LPF_FREQ_RANGE, EQ_BAND_TYPES).
+ * Produced by tools/gen.mjs from plugins/omx-eq8/omx-eq8.decl.json.
  * Regenerate: `make -C plugins/omx-eq8 gen`, then commit the result. Order is append-only.
  * The include guard is omx-dsp's own <omxdsp/params/omx_eq8_params.h>: included first, this
  * table is the one the kernel's instance header reads.
@@ -261,12 +260,12 @@ static const omx_plugin_param OMX_EQ8_PARAMS[OMX_EQ8_PARAM_COUNT] = {
 #define OMX_EQ8_VENDOR "openmixer"
 #define OMX_EQ8_URL "https://github.com/FreeMixer/omx-plugins"
 #define OMX_EQ8_VERSION "0.1.0"
-#define OMX_EQ8_DESCRIPTION "openmixer's channel EQ, 8-band form: eight parametric bands (bell, shelves, notch, allpass) and a high-pass and a low-pass filter at 12 or 24 dB/oct, stereo, zero latency. The DSP is omx-dsp's <omxdsp/fx/omx_eq_instance.h>, the console's own EQ; every band ships off, so a racked instance is a wire."
+#define OMX_EQ8_DESCRIPTION "The OpenMixer console's channel EQ, 8-band form: eight parametric bands (bell, shelves, notch, allpass) and a high-pass and a low-pass filter at 12 or 24 dB/oct, stereo, zero latency. The DSP is omx-dsp's <omxdsp/fx/omx_eq_instance.h>, the console's own EQ; every band ships off, so a racked instance is a wire."
 #define OMX_EQ8_CLAP_ID "org.openmixer.eq8"
 #define OMX_EQ8_CLAP_FEATURES "audio-effect", "equalizer", "stereo"
 #define OMX_EQ8_LV2_URI "urn:openmixer:eq8"
-/* org.openmixer.declaration/1: the source expression and the digest of the resolved parameters. */
-#define OMX_EQ8_DECL_SOURCE "CONSOLE_TRAVEL_DECLS['/channel/{kind}/{index}/eq'], EQ_FREQ_RANGE, EQ_GAIN_RANGE, EQ_Q_RANGE, EQ_NOTCH_Q_RANGE, HPF_FREQ_RANGE, LPF_FREQ_RANGE, EQ_BAND_TYPES"
+/* org.openmixer.declaration/1: the declaration's plain description and the digest of its parameters. */
+#define OMX_EQ8_DECL_SOURCE "omx eq8: EQ On 0 to 1, HPF On 0 to 1, HPF Frequency 20 to 1000 Hz, HPF Slope 12 to 24 dB/oct, LPF On 0 to 1, LPF Frequency 1000 to 20000 Hz, LPF Slope 12 to 24 dB/oct, Band 1 Type 0 to 5, Band 1 Frequency 20 to 20000 Hz, Band 1 Gain -15 to 15 dB, Band 1 Q 0.3 to 116, Band 1 On 0 to 1, Band 2 Type 0 to 5, Band 2 Frequency 20 to 20000 Hz, Band 2 Gain -15 to 15 dB, Band 2 Q 0.3 to 116, Band 2 On 0 to 1, Band 3 Type 0 to 5, Band 3 Frequency 20 to 20000 Hz, Band 3 Gain -15 to 15 dB, Band 3 Q 0.3 to 116, Band 3 On 0 to 1, Band 4 Type 0 to 5, Band 4 Frequency 20 to 20000 Hz, Band 4 Gain -15 to 15 dB, Band 4 Q 0.3 to 116, Band 4 On 0 to 1, Band 5 Type 0 to 5, Band 5 Frequency 20 to 20000 Hz, Band 5 Gain -15 to 15 dB, Band 5 Q 0.3 to 116, Band 5 On 0 to 1, Band 6 Type 0 to 5, Band 6 Frequency 20 to 20000 Hz, Band 6 Gain -15 to 15 dB, Band 6 Q 0.3 to 116, Band 6 On 0 to 1, Band 7 Type 0 to 5, Band 7 Frequency 20 to 20000 Hz, Band 7 Gain -15 to 15 dB, Band 7 Q 0.3 to 116, Band 7 On 0 to 1, Band 8 Type 0 to 5, Band 8 Frequency 20 to 20000 Hz, Band 8 Gain -15 to 15 dB, Band 8 Q 0.3 to 116, Band 8 On 0 to 1"
 #define OMX_EQ8_DECL_DIGEST "ccaa93e8aad67ceb5a55903a9ca2d95556ed80d572003df5243a308407d33a15"
 
 /* LV2 port indices (tools/gen.mjs lv2Ports): audio, then parameter i at FIRST_PARAM + i, then these. */

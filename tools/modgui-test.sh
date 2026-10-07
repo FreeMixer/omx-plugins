@@ -3,7 +3,7 @@
 # Copyright (C) 2026 Pau Aliagas <linuxnow@gmail.com>
 #
 # tools/modgui-test.sh plugins/<stem> — the plugin's MOD GUI carries its declaration, tested on
-# VALUES (openmixer's test/modgui-gen.test.ts, ported to POSIX sh):
+# VALUES:
 #   (a) `node tools/modgui-gen.mjs --check` is clean;
 #   (b) every declared parameter is drawn in the template with its symbol, min, max and default;
 #   (c) sord_validate passes the bundle against the LV2 specs and tools/modgui-terms.ttl (skipped

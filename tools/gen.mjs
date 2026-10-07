@@ -43,8 +43,14 @@ export function loadDecl(dir) {
   return { ...d, dir: resolve(dir) };
 }
 
-/** SHA-256 of the resolved parameter list: the org.openmixer.declaration/1 digest, the SAME formula
- * openmixer's clap-gen.mjs uses, so the engine's stale-parameter check reads ours unchanged. */
+/** SHA-256 of the resolved parameter list: the org.openmixer.declaration/1 digest, the formula the
+ * OpenMixer engine computes for its stale-parameter check, so it reads ours unchanged. */
+/** The declaration's plain description for org.openmixer.declaration/1: each parameter's name and
+ * travel, in declaration order. */
+export function sourceOf(d) {
+  return `${d.name}: ${d.params.map((p) => `${p.name} ${p.min} to ${p.max}${p.unit ? ` ${p.unit}` : ''}`).join(', ')}`;
+}
+
 export function digestOf(params) {
   const rows = params.map((p) => [p.symbol, p.unit, p.min, p.max, p.def, p.kind ? 1 : 0, p.kind === 'toggle']);
   return createHash('sha256').update(JSON.stringify(rows)).digest('hex');
@@ -79,8 +85,7 @@ export function emitParamsHeader(d) {
 #define OMX_${K}_PARAMS_H
 /*
  * GENERATED — DO NOT EDIT BY HAND.
- * Produced by tools/gen.mjs from plugins/${d.stem}/${d.stem}.decl.json (openmixer's
- * ${d.source}).
+ * Produced by tools/gen.mjs from plugins/${d.stem}/${d.stem}.decl.json.
  * Regenerate: \`make -C plugins/${d.stem} gen\`, then commit the result. Order is append-only.
  * The include guard is omx-dsp's own <omxdsp/params/omx_${d.kernel}_params.h>: included first, this
  * table is the one the kernel's instance header reads.
@@ -108,8 +113,8 @@ ${d.params.map((p) => [['MIN', p.min], ['MAX', p.max], ['DEFAULT', p.def]].map((
 #define OMX_${K}_CLAP_ID "${d.clap.id}"
 #define OMX_${K}_CLAP_FEATURES ${d.clap.features.map((f) => `"${f}"`).join(', ')}
 #define OMX_${K}_LV2_URI "${d.lv2.uri}"
-/* org.openmixer.declaration/1: the source expression and the digest of the resolved parameters. */
-#define OMX_${K}_DECL_SOURCE "${d.source.replace(/"/g, '\\"')}"
+/* org.openmixer.declaration/1: the declaration's plain description and the digest of its parameters. */
+#define OMX_${K}_DECL_SOURCE "${sourceOf(d).replace(/"/g, '\\"')}"
 #define OMX_${K}_DECL_DIGEST "${digestOf(d.params)}"
 
 /* LV2 port indices (tools/gen.mjs lv2Ports): audio, then parameter i at FIRST_PARAM + i, then these. */
