@@ -36,10 +36,13 @@ fi
 
 # (b) every declared parameter, with its numbers, in the template. The declared rows come from the
 # declaration itself (JSON, read by node); the drawn rows are grepped from the template as text.
-node -e '
-const d = JSON.parse(require("fs").readFileSync(process.argv[1], "utf8"));
+# The declared rows are the RESOLVED declaration's (a parameter by reference reads its travel from
+# omx-contract), so they come from gen.mjs's loadDecl, the one reader every generator uses.
+node --input-type=module -e '
+const { loadDecl } = await import(process.argv[1]);
+const d = loadDecl(process.argv[2]);
 for (const p of d.params) console.log(`data-symbol="${p.symbol}" data-min="${p.min}" data-max="${p.max}" data-default="${p.def}"`);
-' "$DECL" >"$TMP/declared" || fail "read declaration $DECL"
+' "$ROOT/tools/gen.mjs" "$PDIR" >"$TMP/declared" || fail "read declaration $DECL"
 n=0
 while IFS= read -r row; do
   n=$((n + 1))
@@ -90,18 +93,11 @@ else
 fi
 
 # (d) perturbation: the same plugin dir (same basename: loadDecl requires the stem) with the first
-# parameter's default moved; its stale generated copy must be refused.
-mkdir -p "$TMP/p" && cp -R "$PDIR" "$TMP/p/$STEM"
-if node -e '
-const fs = require("fs");
-const f = process.argv[1];
-const d = JSON.parse(fs.readFileSync(f, "utf8"));
-const p = d.params[0];
-if (!p) process.exit(3);
-p.def = p.def === p.max ? p.min : p.max;
-fs.writeFileSync(f, JSON.stringify(d, null, 2) + "\n");
-' "$TMP/p/$STEM/$STEM.decl.json"; then
-  if node "$ROOT/tools/modgui-gen.mjs" --check "$TMP/p/$STEM" >"$TMP/perturb.out" 2>&1; then
+# parameter's default moved WHERE IT IS DECLARED (the declaration, or omx-contract's data when the
+# parameter is by reference); its stale generated copy must be refused.
+mkdir -p "$TMP/p" "$TMP/c" && cp -R "$PDIR" "$TMP/p/$STEM"
+if env=$(node "$ROOT/tools/perturb.mjs" "$TMP/p/$STEM" "$TMP/c"); then
+  if env $env node "$ROOT/tools/modgui-gen.mjs" --check "$TMP/p/$STEM" >"$TMP/perturb.out" 2>&1; then
     fail "a moved default makes modgui-gen --check fail"
   elif grep -q "icon-$STEM.html" "$TMP/perturb.out"; then
     pass "a moved default makes modgui-gen --check fail"
@@ -109,7 +105,7 @@ fs.writeFileSync(f, JSON.stringify(d, null, 2) + "\n");
     fail "a moved default makes modgui-gen --check fail (not on the template: $(head -1 "$TMP/perturb.out"))"
   fi
 else
-  fail "perturb the first parameter's default in the copied declaration"
+  fail "perturb the first parameter's default where it is declared"
 fi
 
 [ "$fails" -eq 0 ] || { echo "modgui-test: $fails check(s) failed" >&2; exit 1; }
