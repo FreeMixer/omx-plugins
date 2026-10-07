@@ -289,15 +289,30 @@ export const CHECKERS = {
     return bad.length ? missing(`${p}: ${bad.join('; ')}`) : ok(p);
   },
 
-  /** A source of the plugin includes an omx-dsp header, and none is still the wizard's stub. */
-  kernelBinding(root, _recipe, facts, { dir }) {
+  /**
+   * The plugin's own sources include the omx-dsp header of EACH kernel it declares (`kernel`, or
+   * every one of `kernels`): <omxdsp/fx/omx_<kernel>.h> or its instance core. Another omx-dsp
+   * header (omx_denormal.h) binds nothing. `headerStems` names the headers of a kernel whose omx-dsp
+   * modules are not named like it (eq8 is omx-dsp's eq; strip is its gate, eq and dynamics). None
+   * of the sources may still be the wizard's stub.
+   */
+  kernelBinding(root, _recipe, facts, { dir, headerStems = {} }) {
     const d = fill(dir, facts);
     const srcs = ownSources(root, d);
     if (!srcs.length) return missing(`${d}: no C source`);
     const stubs = srcs.filter((f) => /^#define OMX_WIZARD_STUB\b/m.test(text(root, f)));
     if (stubs.length) return missing(`${stubs.join(', ')}: still the wizard's stub (OMX_WIZARD_STUB): bind the faces to omx-dsp's ${facts.kernel} kernel`);
-    const reach = srcs.filter((f) => /#include\s*<omxdsp\/(fx\/)?omx_[a-z0-9_]+\.h>/.test(stripC(text(root, f))));
-    return reach.length ? ok(`${reach.join(', ')} include omx-dsp`) : missing(`${d}: no source includes an omx-dsp kernel header (<omxdsp/...>)`);
+    const code = srcs.map((f) => stripC(text(root, f))).join('\n');
+    const kernels = facts.decl ? declKernels(facts.decl) : [facts.kernel];
+    const unbound = [];
+    for (const k of kernels) {
+      for (const st of [headerStems[k] ?? k].flat()) {
+        if (!new RegExp(`#include\\s*<omxdsp/fx/omx_${escapeRe(st)}(_instance)?\\.h>`).test(code)) unbound.push(`<omxdsp/fx/omx_${st}.h> (kernel ${k})`);
+      }
+    }
+    return unbound.length
+      ? missing(`${d}: no source includes ${unbound.join(', ')}: the binding reaches the plugin's own omx-dsp kernel, not just any omxdsp header`)
+      : ok(`${d} includes the omx-dsp header of ${kernels.join(', ')}`);
   },
 
   /** The Makefile's `test` target runs every token. */
@@ -563,9 +578,11 @@ export const loadDebt = (root = ROOT) => (existsSync(join(root, DEBT_PATH)) ? JS
 
 /**
  * The ratchet over the reports: every gap must be a debt entry (`new`: a gap the debt does not
- * hold), and every debt entry must still be a gap (`stale`: a paid debt, to delete). Both fail.
+ * hold), and every debt entry must still be a gap (`stale`: a paid debt, to delete). Both fail,
+ * and so does an entry naming a plugin that is not in the tree (`unknown`, `known` being every
+ * plugin there is: a debt for nothing is never paid and never noticed).
  */
-export function debtVerdict(reports, debt) {
+export function debtVerdict(reports, debt, known = reports.map((r) => r.stem)) {
   const gaps = new Set();
   for (const r of reports) for (const x of r.results) if (x.required && !x.ok) gaps.add(`${r.stem} ${x.id}`);
   const owed = new Set(debt.map((d) => `${d.plugin} ${d.entry}`));
@@ -574,7 +591,31 @@ export function debtVerdict(reports, debt) {
     fresh: [...gaps].filter((g) => !owed.has(g)),
     stale: debt.filter((d) => checked.has(d.plugin) && !gaps.has(`${d.plugin} ${d.entry}`)).map((d) => `${d.plugin} ${d.entry} (${d.owedBy})`),
     held: [...gaps].filter((g) => owed.has(g)),
+    unknown: debt.filter((d) => !known.includes(d.plugin)).map((d) => `${d.plugin} ${d.entry} (${d.owedBy})`),
   };
+}
+
+/**
+ * The debt only shrinks: the entries it holds now against the ones at the merge-base with
+ * `origin/main` (OMX_DEBT_BASE_REF overrides the ref). `added` lists the entries the base did not
+ * hold; `grown` is set when the debt has MORE entries than the base, which fails (a gap paid and
+ * another added in the same change keeps the count and is caught as a new gap by debtVerdict).
+ * `base` is undefined, with `why`, when there is no base to compare to: a failure in CI, where
+ * the checkout must hold main, a note elsewhere.
+ */
+export function debtGrowth(root, debt) {
+  const ref = process.env.OMX_DEBT_BASE_REF || 'origin/main';
+  const git = (...a) => execFileSync('git', ['-C', root, ...a], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim();
+  let base;
+  try {
+    const point = git('merge-base', 'HEAD', ref);
+    base = JSON.parse(git('show', `${point}:${DEBT_PATH}`)).debt;
+  } catch (e) {
+    return { base: undefined, why: `no merge-base with ${ref} to read ${DEBT_PATH} at (${String(e.stderr || e.message).trim().split('\n')[0]})`, added: [], grown: false };
+  }
+  const held = new Set(base.map((d) => `${d.plugin} ${d.entry}`));
+  const added = debt.filter((d) => !held.has(`${d.plugin} ${d.entry}`)).map((d) => `${d.plugin} ${d.entry}`);
+  return { base: base.length, added, grown: debt.length > base.length };
 }
 
 // ---- the completeness test ------------------------------------------------------------------
@@ -591,6 +632,10 @@ async function main(argv) {
   }
   const asked = argv.filter((a) => !a.startsWith('--'));
   const stems = asked.length ? asked : pluginStems(root);
+  if (!stems.length) {
+    console.error(`FAIL completeness: no plugin to check (no plugins/<stem>/<stem>.decl.json in ${root}): a run over nothing proves nothing`);
+    process.exit(1);
+  }
   const reports = [];
   for (const s of stems) reports.push(await checkPlugin(root, recipe, s));
   if (json) {
@@ -612,13 +657,21 @@ async function main(argv) {
   const total = reports.reduce((n, r) => n + gapLines(r).length, 0);
   console.log(`completeness: ${reports.length} plugins, ${total} gaps (recipe ${RECIPE_PATH}: ${recipe.artifacts.length} artifacts, ${recipe.laws.length} laws)`);
   if (argv.includes('--no-debt')) process.exit(total ? 1 : 0);
-  const v = debtVerdict(reports, loadDebt(root));
+  const v = debtVerdict(reports, loadDebt(root), pluginStems(root));
   for (const g of v.fresh) console.log(`FAIL new gap, not in ${DEBT_PATH}: ${g}`);
   for (const g of v.stale) console.log(`FAIL stale debt, now satisfied: ${g} (delete it from ${DEBT_PATH})`);
-  console.log(v.fresh.length || v.stale.length
-    ? `completeness: ${v.fresh.length} new gap(s), ${v.stale.length} stale debt entr${v.stale.length === 1 ? 'y' : 'ies'}`
+  for (const g of v.unknown) console.log(`FAIL debt for a plugin that does not exist: ${g} (delete it from ${DEBT_PATH})`);
+  const growth = debtGrowth(root, loadDebt(root));
+  if (growth.base === undefined) {
+    console.log(`${process.env.CI ? 'FAIL' : 'NOTE'} debt growth cannot be checked: ${growth.why}${process.env.CI ? ' (CI must fetch main: checkout with fetch-depth 0)' : ''}`);
+  } else if (growth.grown) {
+    console.log(`FAIL the debt grew: ${loadDebt(root).length} entries, ${growth.base} at the merge-base with main; added: ${growth.added.join(', ') || 'none by name'}. Nothing is added to ${DEBT_PATH} to make a gap pass`);
+  }
+  const bad = v.fresh.length + v.stale.length + v.unknown.length + (growth.grown ? 1 : 0) + (growth.base === undefined && process.env.CI ? 1 : 0);
+  console.log(bad
+    ? `completeness: ${v.fresh.length} new gap(s), ${v.stale.length} stale debt entr${v.stale.length === 1 ? 'y' : 'ies'}, ${v.unknown.length} debt entr${v.unknown.length === 1 ? 'y' : 'ies'} for no plugin`
     : `PASS completeness: every gap is held by ${DEBT_PATH} (${v.held.length}), no debt is stale`);
-  process.exit(v.fresh.length || v.stale.length ? 1 : 0);
+  process.exit(bad ? 1 : 0);
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) await main(process.argv.slice(2));

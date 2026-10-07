@@ -18,13 +18,13 @@
  *
  * Works in build/selftest/ (removed first). Needs git, and omx-dsp's headers as the build does.
  */
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
 import { cpSync, existsSync, mkdirSync, readFileSync, rmSync, unlinkSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { checkCommits, rangeCommits } from '../commit-plan-check.mjs';
 import { commitPlan, planPlugin, writePlugin } from '../omx-new-plugin.mjs';
-import { checkPlugin, debtVerdict, gapLines, loadDebt, loadRecipe, pluginStems, recipeErrors } from '../plugin-recipe.mjs';
+import { checkPlugin, debtGrowth, debtVerdict, gapLines, loadDebt, loadRecipe, pluginStems, recipeErrors } from '../plugin-recipe.mjs';
 
 const ROOT = resolve(fileURLToPath(import.meta.url), '..', '..', '..');
 const WORK = join(ROOT, 'build', 'selftest');
@@ -129,6 +129,9 @@ async function main() {
   const two = applyPlan(join(WORK, 'plan-merged'), ROOT, tree, merged);
   expect(!two.ok && two.violations.some((v) => /2 concerns in one commit/.test(v)), 'sabotage: declaration and faces in one commit is refused');
 
+  const none = checkCommits(recipe, rangeCommits(join(WORK, 'plan-ok'), 'HEAD..HEAD'));
+  expect(!none.ok && none.violations.some((v) => /holds no commit/.test(v)), 'sabotage: an empty commit range fails the protocol check');
+
   // ---- 3. every checker family, broken on a copy of omx-drive --------------------------------
   delete process.env.OMX_CONTRACT_DIR;
   const t = join(WORK, 'sabotage');
@@ -166,6 +169,12 @@ async function main() {
     ['face', 'clap-face', () => edit(`${P}/omx_drive_clap.c`, (s) => s.replace('#include "omx_drive_params.h"', ''))],
     ['face', 'lv2-face', () => edit(`${P}/omx_drive_lv2.c`, (s) => s.replace('lv2_descriptor(uint32_t', 'lv2_descriptor_gone(uint32_t'))],
     ['kernelBinding', 'kernel-binding', () => edit(`${P}/omx_drive_lv2.c`, (s) => `#define OMX_WIZARD_STUB 1\n${s}`)],
+    ['kernelBinding', 'kernel-binding', () => {
+      // only omx_denormal.h left: an omx-dsp header, but not the plugin's own kernel
+      const undo = ['omx_drive_clap.c', 'omx_drive_lv2.c'].map((f) => edit(`${P}/${f}`, (s) => s.replace(/#include <omxdsp\/fx\/omx_drive_instance\.h>\n/, '')));
+      return () => undo.forEach((u) => u());
+    }],
+    ['kernelBinding', 'kernel-binding', () => edit(`${P}/omx-drive.decl.json`, (s) => s.replace('"kernel": "drive",', '"kernel": "drive",\n  "kernels": ["drive", "delay"],'))],
     ['makeTestRuns', 'parameter-test', () => edit(`${P}/Makefile`, (s) => s.replace(/^.*clap-params-check\.mjs.*\n/m, ''))],
     ['oracle', 'kernel-identity-test', () => remove(`${P}/test/drive-oracle.c`)],
     ['linesPresent', 'spec-files', () => edit('packaging/omx-plugins.spec', (s) => s.replace('%{_libdir}/lv2/omx-drive.lv2/\n', ''))],
@@ -218,6 +227,44 @@ async function main() {
   const paid = await ratchet();
   undo();
   expect(paid.stale.some((x) => x.startsWith('omx-chorus changelog')), `sabotage: a debt entry now satisfied fails the ratchet as stale (${paid.stale.join(', ')})`);
+
+  const ghost = await (async () => {
+    const reports = [];
+    for (const st of pluginStems(t)) reports.push(await checkPlugin(t, recipe, st));
+    return debtVerdict(reports, [...loadDebt(t), { plugin: 'omx-ghost', entry: 'makefile', owedBy: 'nobody' }], pluginStems(t));
+  })();
+  expect((ghost.unknown ?? []).length === 1 && ghost.unknown[0].startsWith('omx-ghost makefile'), `sabotage: a debt entry for a plugin that does not exist fails the ratchet (${(ghost.unknown ?? []).join(', ')})`);
+  {
+    // an empty plugin set: the run itself fails, rather than passing over nothing
+    const empty = join(WORK, 'empty');
+    mkdirSync(join(empty, 'plugins'), { recursive: true });
+    cpSync(join(ROOT, 'recipes'), join(empty, 'recipes'), { recursive: true });
+    cpSync(join(ROOT, 'schema'), join(empty, 'schema'), { recursive: true });
+    cpSync(join(ROOT, 'omx-contract.pin.json'), join(empty, 'omx-contract.pin.json'));
+    const run = spawnSync('node', [join(ROOT, 'tools', 'plugin-recipe.mjs')], { env: { ...process.env, OMX_PLUGINS_ROOT: empty }, encoding: 'utf8' });
+    expect(run.status === 1 && /no plugin to check/.test(run.stdout + run.stderr), `sabotage: a run over no plugin fails (exit ${run.status})`);
+  }
+
+  {
+    // the debt against its merge-base: a throwaway repository whose origin/main holds today's debt
+    const repo = join(WORK, 'growth');
+    copyTree(repo);
+    git(repo, 'init', '-q');
+    git(repo, 'add', '-A');
+    git(repo, 'commit', '-q', '-m', 'main');
+    git(repo, 'update-ref', 'refs/remotes/origin/main', 'HEAD');
+    git(repo, 'checkout', '-q', '-b', 'topic');
+    const level = debtGrowth(repo, loadDebt(repo));
+    expect(level.base === loadDebt(repo).length && !level.grown, `the debt as main holds it has not grown (${level.base} entries at the merge-base)`);
+    const more = [...loadDebt(repo), { plugin: 'omx-drive', entry: 'changelog', owedBy: 'sabotage' }];
+    const grew = debtGrowth(repo, more);
+    expect(grew.grown && grew.added.join() === 'omx-drive changelog', `sabotage: a debt entry added since main fails the growth check (${grew.added.join()})`);
+    const fewer = debtGrowth(repo, loadDebt(repo).slice(1));
+    expect(!fewer.grown, 'a debt that shrank passes the growth check');
+    git(repo, 'update-ref', '-d', 'refs/remotes/origin/main');
+    const none = debtGrowth(repo, loadDebt(repo));
+    expect(none.base === undefined && /no merge-base/.test(none.why), `no main to compare to is reported, never a silent pass (${none.why?.slice(0, 60)})`);
+  }
 
   // ---- 4. the recipe itself ----------------------------------------------------------------
   const grown = JSON.parse(JSON.stringify(recipe));

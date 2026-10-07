@@ -37,6 +37,8 @@ jobs:
           dnf config-manager addrepo --from-repofile=https://freemixer.github.io/rpm/freemixer.repo
 
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # main and its history: make completeness reads the debt at the merge-base
 
       - name: The checkout is a git directory this job may read
         run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
