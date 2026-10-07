@@ -1,0 +1,87 @@
+{
+  "$comment": "THE declaration of omx-drive. Every face and the parameter header are generated from this file by tools/gen.mjs. Parameter order is append-only.",
+  "stem": "omx-drive",
+  "kernel": "drive",
+  "name": "omx drive",
+  "vendor": "openmixer",
+  "url": "https://github.com/FreeMixer/omx-plugins",
+  "version": "0.1.0",
+  "description": "the native DRIVE stage: one waveshaper, run inside the console's ONE oversampler.",
+  "clap": {
+    "id": "org.openmixer.drive",
+    "features": [
+      "audio-effect",
+      "stereo"
+    ]
+  },
+  "lv2": {
+    "uri": "urn:openmixer:drive",
+    "class": "lv2:Plugin"
+  },
+  "params": [
+    {
+      "symbol": "driveDb",
+      "name": "Drive",
+      "unit": "dB",
+      "min": 0,
+      "max": 36,
+      "def": 0
+    },
+    {
+      "symbol": "character",
+      "name": "Character",
+      "unit": "",
+      "min": -1,
+      "max": 1,
+      "def": 0
+    },
+    {
+      "symbol": "bandHz",
+      "name": "Band",
+      "unit": "Hz",
+      "min": 20,
+      "max": 20000,
+      "def": 2000,
+      "kind": "integer"
+    },
+    {
+      "symbol": "mix",
+      "name": "Mix",
+      "unit": "%",
+      "min": 0,
+      "max": 100,
+      "def": 100
+    },
+    {
+      "symbol": "trimDb",
+      "name": "Trim",
+      "unit": "dB",
+      "min": -24,
+      "max": 12,
+      "def": 0
+    }
+  ],
+  "panel": {
+    "family": "drive",
+    "roles": {
+      "drive": "driveDb",
+      "character": "character",
+      "band": "bandHz",
+      "mix": "mix",
+      "trim": "trimDb"
+    },
+    "sections": [
+      {
+        "key": "drive",
+        "label": "Drive",
+        "controls": [
+          "driveDb",
+          "character",
+          "bandHz",
+          "mix",
+          "trimDb"
+        ]
+      }
+    ]
+  }
+}

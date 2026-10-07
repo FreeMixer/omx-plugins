@@ -1,0 +1,17 @@
+#!/usr/bin/make -f
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 Pau Aliagas <linuxnow@gmail.com>
+
+export DEB_BUILD_MAINT_OPTIONS = hardening=+all
+
+%:
+	dh $@
+
+# CLAP and LV2 hosts look in /usr/lib/clap and /usr/lib/lv2, not in the multiarch directory
+override_dh_auto_install:
+	dh_auto_install -- PREFIX=/usr LIBDIR=/usr/lib
+
+override_dh_auto_test:
+ifeq (,$(filter nocheck,$(DEB_BUILD_OPTIONS)))
+	$(MAKE) test OMX_LV2_SPEC_DIR=/usr/lib/lv2
+endif

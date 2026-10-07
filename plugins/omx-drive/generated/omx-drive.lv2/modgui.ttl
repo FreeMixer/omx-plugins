@@ -1,0 +1,39 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 Pau Aliagas <linuxnow@gmail.com>
+# GENERATED — DO NOT EDIT BY HAND. Produced by tools/modgui-gen.mjs from
+# plugins/omx-drive/omx-drive.decl.json (its panel block) and tools/look.json
+# Regenerate: `node tools/modgui-gen.mjs`, then commit the result.
+@prefix lv2:    <http://lv2plug.in/ns/lv2core#> .
+@prefix modgui: <http://moddevices.com/ns/modgui#> .
+
+<urn:openmixer:drive>
+    modgui:gui [
+        modgui:resourcesDirectory <modgui> ;
+        modgui:iconTemplate <modgui/icon-omx-drive.html> ;
+        modgui:stylesheet <modgui/stylesheet-omx-drive.css> ;
+        modgui:screenshot <modgui/screenshot-omx-drive.png> ;
+        modgui:thumbnail <modgui/thumbnail-omx-drive.png> ;
+        modgui:brand "openmixer" ;
+        modgui:label "omx drive" ;
+        modgui:port [
+            lv2:index 0 ;
+            lv2:symbol "driveDb" ;
+            lv2:name "Drive" ;
+        ] , [
+            lv2:index 1 ;
+            lv2:symbol "character" ;
+            lv2:name "Character" ;
+        ] , [
+            lv2:index 2 ;
+            lv2:symbol "bandHz" ;
+            lv2:name "Band" ;
+        ] , [
+            lv2:index 3 ;
+            lv2:symbol "mix" ;
+            lv2:name "Mix" ;
+        ] , [
+            lv2:index 4 ;
+            lv2:symbol "trimDb" ;
+            lv2:name "Trim" ;
+        ] ;
+    ] .

@@ -1,0 +1,15 @@
+{
+  "$comment": "The look the MOD GUI wears (tools/modgui-gen.mjs): the OpenMixer console's dark theme, resolved once into plain values: colours are #rrggbb, nothing here is a var(). Re-resolve and regenerate when that look changes.",
+  "theme": "dark",
+  "personality": "openmixer",
+  "tokens": {
+    "--surface": "#15191e",
+    "--surface-2": "#1c2127",
+    "--surface-3": "#242b33",
+    "--border-strong": "#3a444f",
+    "--ink": "#eaf0f4",
+    "--ink-dim": "#8a97a3",
+    "--accent": "#28c8e6",
+    "--font-ui": "\"Inter\", \"Helvetica Neue\", system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif"
+  }
+}
