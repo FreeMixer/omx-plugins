@@ -7,7 +7,9 @@
 #   make            build/omx-eq8.clap and build/omx-eq8.lv2/ (binary, TTL)
 #   make test       freshness of every generated file, the plugin probe (each face against the
 #                   instance core called directly, bit for bit), the four-rate EQ oracle (closed-form
-#                   responses), and the host checks (omx-clap-scan, lv2info) where installed
+#                   responses), the kernel-identity test (both faces against the console's EQ, bit for
+#                   bit, at the nine RME rates: tools/eq-identity.c), and the host checks (omx-clap-scan,
+#                   lv2info) where installed
 #                   (no MOD GUI: tools/modgui-gen.mjs does not draw selectors, and the band type and
 #                   the pass-filter slopes are selectors)
 #   make gen        regenerate generated/ from the declaration (commit the result)
@@ -69,6 +71,10 @@ $(B)/plugin-probe: test/plugin-probe.c | $(B)
 $(B)/eq-oracle: test/eq-oracle.c | $(B)
 	$(CC) $(CFLAGS) $(WARN) $(ABI_CFLAGS) -o $@ $< $(LILV) -ldl $(LDLIBS)
 
+# One source for the three EQs: the band count is the kernel's compile-time number.
+$(B)/eq-identity: $(ROOT)/tools/eq-identity.c | $(B)
+	$(CC) $(CFLAGS) $(WARN) -DOMX_EQ_LV2_BANDS=8 $(DSP_CFLAGS) $(ABI_CFLAGS) $(LV2_CFLAGS) -o $@ $< $(LILV) -ldl $(LDLIBS)
+
 gen:
 	node $(ROOT)/tools/gen.mjs $(CURDIR)
 
@@ -81,7 +87,7 @@ PORT = $(shell sed -n 's/^\#define OMX_EQ8_LV2_PORT_$(1) \([0-9]*\)u$$/\1/p' $(G
 LV2_PORTS = $(call PORT,IN_L) $(call PORT,IN_R) $(call PORT,OUT_L) $(call PORT,OUT_R) $(call PORT,LATENCY) \
   $(call PORT,FIRST_PARAM) $(call PORT,ENABLED)
 
-test: all check $(B)/plugin-probe $(B)/eq-oracle
+test: all check $(B)/plugin-probe $(B)/eq-oracle $(B)/eq-identity
 	$(B)/plugin-probe clap-params $(B)/$(NAME).clap > $(B)/clap-params.txt
 	node $(ROOT)/tools/clap-params-check.mjs $(CURDIR) $(B)/clap-params.txt
 	$(B)/plugin-probe clap-identity $(B)/$(NAME).clap
@@ -90,6 +96,8 @@ test: all check $(B)/plugin-probe $(B)/eq-oracle
 	$(B)/plugin-probe clap-vs-lv2 $(B)/$(NAME).clap $(BUNDLE)/$(NAME).so $(URI) $(LV2_PORTS)
 	$(B)/eq-oracle clap $(B)/$(NAME).clap
 	$(B)/eq-oracle lv2 $(BUNDLE) $(URI)
+	$(B)/eq-identity clap $(B)/$(NAME).clap
+	$(B)/eq-identity lv2 $(BUNDLE) $(URI)
 	sh $(ROOT)/tools/host-check.sh $(B)/$(NAME).clap $(BUNDLE) $(URI) $(CLAP_ID)
 
 install: all
