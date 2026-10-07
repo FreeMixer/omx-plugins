@@ -1,0 +1,87 @@
+{
+  "$comment": "THE declaration of omx-keyed-gate. Every face and the parameter header are generated from this file by tools/gen.mjs. Parameter order is append-only. It replaces the console's own keyed gate bundle, so its LV2 URI, port indices, symbols, travels and defaults are that bundle's: the travels are omx-contract's GATE_LIMITS (thresholdDb, ratio, rangeDb, attackMs, releaseMs), typed here while the pin is before contract.byReferenceSince; by reference they would read as whole steps (their step is 1), which the console's bundle never declared.",
+  "stem": "omx-keyed-gate",
+  "kernel": "gate",
+  "kernels": [
+    "gate"
+  ],
+  "name": "omx keyed-gate",
+  "noun": "keyed gate",
+  "vendor": "openmixer",
+  "url": "https://github.com/FreeMixer/omx-plugins",
+  "version": "0.1.0",
+  "description": "The OpenMixer console's channel gate with an external key: the stereo signal is gated while the detector listens to the sidechain input the host routes to it, or to the signal itself with the key unconnected or set to Self. One gain drives both legs. An attack under 0.5 ms engages 4x detector oversampling, which adds 72 frames of latency, reported to the host. The DSP is omx-dsp's <omxdsp/fx/omx_gate_instance.h>, the console's own gate.",
+  "clap": {
+    "id": "org.openmixer.keyed-gate",
+    "features": [
+      "audio-effect",
+      "gate",
+      "stereo"
+    ]
+  },
+  "lv2": {
+    "uri": "urn:openmixer:keyed-gate",
+    "class": "lv2:GatePlugin",
+    "enabledPort": "first"
+  },
+  "params": [
+    {
+      "symbol": "key_external",
+      "name": "Key",
+      "min": 0,
+      "max": 1,
+      "def": 1,
+      "unit": "",
+      "kind": "integer",
+      "values": [
+        "Self",
+        "Sidechain"
+      ]
+    },
+    {
+      "symbol": "threshold",
+      "name": "Threshold",
+      "min": -80,
+      "max": 0,
+      "def": -40,
+      "unit": "dB"
+    },
+    {
+      "symbol": "ratio",
+      "name": "Ratio",
+      "scale": "log",
+      "min": 1,
+      "max": 100,
+      "def": 16,
+      "unit": ""
+    },
+    {
+      "symbol": "range",
+      "name": "Range",
+      "min": -90,
+      "max": 0,
+      "def": -90,
+      "unit": "dB"
+    },
+    {
+      "symbol": "attack",
+      "name": "Attack",
+      "min": 0,
+      "max": 500,
+      "def": 1,
+      "unit": "ms"
+    },
+    {
+      "symbol": "release",
+      "name": "Release",
+      "min": 0,
+      "max": 5000,
+      "def": 100,
+      "unit": "ms"
+    }
+  ],
+  "sidechain": {
+    "symbol": "key",
+    "name": "Key (Sidechain)"
+  }
+}
