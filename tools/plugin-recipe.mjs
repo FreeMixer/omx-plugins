@@ -578,9 +578,11 @@ export const loadDebt = (root = ROOT) => (existsSync(join(root, DEBT_PATH)) ? JS
 
 /**
  * The ratchet over the reports: every gap must be a debt entry (`new`: a gap the debt does not
- * hold), and every debt entry must still be a gap (`stale`: a paid debt, to delete). Both fail.
+ * hold), and every debt entry must still be a gap (`stale`: a paid debt, to delete). Both fail,
+ * and so does an entry naming a plugin that is not in the tree (`unknown`, `known` being every
+ * plugin there is: a debt for nothing is never paid and never noticed).
  */
-export function debtVerdict(reports, debt) {
+export function debtVerdict(reports, debt, known = reports.map((r) => r.stem)) {
   const gaps = new Set();
   for (const r of reports) for (const x of r.results) if (x.required && !x.ok) gaps.add(`${r.stem} ${x.id}`);
   const owed = new Set(debt.map((d) => `${d.plugin} ${d.entry}`));
@@ -589,6 +591,7 @@ export function debtVerdict(reports, debt) {
     fresh: [...gaps].filter((g) => !owed.has(g)),
     stale: debt.filter((d) => checked.has(d.plugin) && !gaps.has(`${d.plugin} ${d.entry}`)).map((d) => `${d.plugin} ${d.entry} (${d.owedBy})`),
     held: [...gaps].filter((g) => owed.has(g)),
+    unknown: debt.filter((d) => !known.includes(d.plugin)).map((d) => `${d.plugin} ${d.entry} (${d.owedBy})`),
   };
 }
 
@@ -606,6 +609,10 @@ async function main(argv) {
   }
   const asked = argv.filter((a) => !a.startsWith('--'));
   const stems = asked.length ? asked : pluginStems(root);
+  if (!stems.length) {
+    console.error(`FAIL completeness: no plugin to check (no plugins/<stem>/<stem>.decl.json in ${root}): a run over nothing proves nothing`);
+    process.exit(1);
+  }
   const reports = [];
   for (const s of stems) reports.push(await checkPlugin(root, recipe, s));
   if (json) {
@@ -627,13 +634,15 @@ async function main(argv) {
   const total = reports.reduce((n, r) => n + gapLines(r).length, 0);
   console.log(`completeness: ${reports.length} plugins, ${total} gaps (recipe ${RECIPE_PATH}: ${recipe.artifacts.length} artifacts, ${recipe.laws.length} laws)`);
   if (argv.includes('--no-debt')) process.exit(total ? 1 : 0);
-  const v = debtVerdict(reports, loadDebt(root));
+  const v = debtVerdict(reports, loadDebt(root), pluginStems(root));
   for (const g of v.fresh) console.log(`FAIL new gap, not in ${DEBT_PATH}: ${g}`);
   for (const g of v.stale) console.log(`FAIL stale debt, now satisfied: ${g} (delete it from ${DEBT_PATH})`);
-  console.log(v.fresh.length || v.stale.length
-    ? `completeness: ${v.fresh.length} new gap(s), ${v.stale.length} stale debt entr${v.stale.length === 1 ? 'y' : 'ies'}`
+  for (const g of v.unknown) console.log(`FAIL debt for a plugin that does not exist: ${g} (delete it from ${DEBT_PATH})`);
+  const bad = v.fresh.length + v.stale.length + v.unknown.length;
+  console.log(bad
+    ? `completeness: ${v.fresh.length} new gap(s), ${v.stale.length} stale debt entr${v.stale.length === 1 ? 'y' : 'ies'}, ${v.unknown.length} debt entr${v.unknown.length === 1 ? 'y' : 'ies'} for no plugin`
     : `PASS completeness: every gap is held by ${DEBT_PATH} (${v.held.length}), no debt is stale`);
-  process.exit(v.fresh.length || v.stale.length ? 1 : 0);
+  process.exit(bad ? 1 : 0);
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) await main(process.argv.slice(2));
