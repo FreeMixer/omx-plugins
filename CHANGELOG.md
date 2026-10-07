@@ -11,6 +11,9 @@ GitHub release notes are generated from this file.
 - New plugins, **omx eq16** and **omx eq32** (CLAP and LV2): the console's channel EQ as a
   16-band EQ and a 32-band EQ, the same bands, pass filters and DSP as omx eq8. Stereo, zero
   latency; every band starts off, so a freshly loaded instance passes the signal untouched.
+- Every LV2 plugin shows its controls as the console's bundles did: frequencies on a logarithmic
+  travel in hertz, gains in dB, times, percentages and octaves in their units, the latency in
+  frames, and the EQ band types and filter slopes as named choices instead of bare numbers.
 
 ## 0.1.0 - 2026-10-07
 
