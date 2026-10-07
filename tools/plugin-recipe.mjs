@@ -289,15 +289,30 @@ export const CHECKERS = {
     return bad.length ? missing(`${p}: ${bad.join('; ')}`) : ok(p);
   },
 
-  /** A source of the plugin includes an omx-dsp header, and none is still the wizard's stub. */
-  kernelBinding(root, _recipe, facts, { dir }) {
+  /**
+   * The plugin's own sources include the omx-dsp header of EACH kernel it declares (`kernel`, or
+   * every one of `kernels`): <omxdsp/fx/omx_<kernel>.h> or its instance core. Another omx-dsp
+   * header (omx_denormal.h) binds nothing. `headerStems` names the headers of a kernel whose omx-dsp
+   * modules are not named like it (eq8 is omx-dsp's eq; strip is its gate, eq and dynamics). None
+   * of the sources may still be the wizard's stub.
+   */
+  kernelBinding(root, _recipe, facts, { dir, headerStems = {} }) {
     const d = fill(dir, facts);
     const srcs = ownSources(root, d);
     if (!srcs.length) return missing(`${d}: no C source`);
     const stubs = srcs.filter((f) => /^#define OMX_WIZARD_STUB\b/m.test(text(root, f)));
     if (stubs.length) return missing(`${stubs.join(', ')}: still the wizard's stub (OMX_WIZARD_STUB): bind the faces to omx-dsp's ${facts.kernel} kernel`);
-    const reach = srcs.filter((f) => /#include\s*<omxdsp\/(fx\/)?omx_[a-z0-9_]+\.h>/.test(stripC(text(root, f))));
-    return reach.length ? ok(`${reach.join(', ')} include omx-dsp`) : missing(`${d}: no source includes an omx-dsp kernel header (<omxdsp/...>)`);
+    const code = srcs.map((f) => stripC(text(root, f))).join('\n');
+    const kernels = facts.decl ? declKernels(facts.decl) : [facts.kernel];
+    const unbound = [];
+    for (const k of kernels) {
+      for (const st of [headerStems[k] ?? k].flat()) {
+        if (!new RegExp(`#include\\s*<omxdsp/fx/omx_${escapeRe(st)}(_instance)?\\.h>`).test(code)) unbound.push(`<omxdsp/fx/omx_${st}.h> (kernel ${k})`);
+      }
+    }
+    return unbound.length
+      ? missing(`${d}: no source includes ${unbound.join(', ')}: the binding reaches the plugin's own omx-dsp kernel, not just any omxdsp header`)
+      : ok(`${d} includes the omx-dsp header of ${kernels.join(', ')}`);
   },
 
   /** The Makefile's `test` target runs every token. */
