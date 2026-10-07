@@ -9,7 +9,7 @@
  */
 import { readFileSync, writeFileSync } from 'node:fs';
 import { basename, join, resolve } from 'node:path';
-import { ROOT, locateContract, perturbCopy } from './omx-contract.mjs';
+import { ROOT, locateContract, paramKernel, perturbCopy } from './omx-contract.mjs';
 
 const [pdir, scratch] = process.argv.slice(2);
 const file = join(pdir, `${basename(resolve(pdir))}.decl.json`);
@@ -25,6 +25,6 @@ if (p.ref === undefined) {
     console.error(`perturb: ${where.why}`);
     process.exit(2);
   }
-  perturbCopy(where.dir, scratch, d.kernel, p);
+  perturbCopy(where.dir, scratch, paramKernel(d, p), p);
   console.log(`OMX_CONTRACT_DIR=${scratch}`);
 }

@@ -6,11 +6,26 @@
   "$defs": {
     "plugin": {
       "type": "object",
-      "required": ["stem", "kernel", "name", "vendor", "url", "version", "description", "clap", "lv2", "params"],
+      "required": [
+        "stem",
+        "kernel",
+        "name",
+        "vendor",
+        "url",
+        "version",
+        "description",
+        "clap",
+        "lv2",
+        "params"
+      ],
       "additionalProperties": false,
       "properties": {
-        "$schema": { "type": "string" },
-        "$comment": { "type": "string" },
+        "$schema": {
+          "type": "string"
+        },
+        "$comment": {
+          "type": "string"
+        },
         "stem": {
           "type": "string",
           "pattern": "^omx-[a-z][a-z0-9]*$",
@@ -21,7 +36,18 @@
           "type": "string",
           "pattern": "^[a-z][a-z0-9_]*$",
           "title": "Kernel",
-          "description": "The omx-dsp kernel the plugin runs, by its omx-contract name (data/kernels/<kernel>.json). A kernel omx-contract does not have yet is NEW: the kernel recipe in omx-contract and omx-dsp runs first."
+          "description": "The plugin's C name, which names its generated header and its faces (omx_<kernel>_params.h, omx_<kernel>_clap.c). For a plugin over one omx-dsp kernel it is that kernel's omx-contract name."
+        },
+        "kernels": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]*$"
+          },
+          "minItems": 1,
+          "uniqueItems": true,
+          "title": "Kernels",
+          "description": "The omx-contract kernels the parameters reference (data/kernels/<kernel>.json). One entry is the normal case; several make a composite, and then each parameter names its kernel. A kernel omx-contract does not have yet is NEW: the kernel recipe in omx-contract and omx-dsp runs first. Defaults to [kernel]."
         },
         "name": {
           "type": "string",
@@ -29,8 +55,22 @@
           "title": "Name",
           "description": "The name a host shows: 'omx <short>'."
         },
-        "vendor": { "const": "openmixer", "title": "Vendor", "description": "The vendor every plugin publishes." },
-        "url": { "const": "https://github.com/FreeMixer/omx-plugins", "title": "URL", "description": "The project's home." },
+        "noun": {
+          "type": "string",
+          "minLength": 1,
+          "title": "Noun",
+          "description": "How the packages' descriptions and the changelog name the effect in prose (\"8-band EQ\", \"channel strip\"). Defaults to the short name."
+        },
+        "vendor": {
+          "const": "openmixer",
+          "title": "Vendor",
+          "description": "The vendor every plugin publishes."
+        },
+        "url": {
+          "const": "https://github.com/FreeMixer/omx-plugins",
+          "title": "URL",
+          "description": "The project's home."
+        },
         "version": {
           "type": "string",
           "pattern": "^\\d+\\.\\d+\\.\\d+$",
@@ -45,7 +85,10 @@
         },
         "clap": {
           "type": "object",
-          "required": ["id", "features"],
+          "required": [
+            "id",
+            "features"
+          ],
           "additionalProperties": false,
           "properties": {
             "id": {
@@ -56,7 +99,10 @@
             },
             "features": {
               "type": "array",
-              "items": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+              "items": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9-]*$"
+              },
               "minItems": 1,
               "uniqueItems": true,
               "title": "CLAP features",
@@ -66,7 +112,10 @@
         },
         "lv2": {
           "type": "object",
-          "required": ["uri", "class"],
+          "required": [
+            "uri",
+            "class"
+          ],
           "additionalProperties": false,
           "properties": {
             "uri": {
@@ -86,20 +135,38 @@
         "params": {
           "type": "array",
           "minItems": 1,
-          "items": { "$ref": "#/$defs/param" },
+          "items": {
+            "$ref": "#/$defs/param"
+          },
           "title": "Parameters",
           "description": "The parameters, in order. Append-only once released: the order is the CLAP param id and the LV2 port order."
         },
-        "panel": { "$ref": "#/$defs/panel" }
+        "panel": {
+          "$ref": "#/$defs/panel"
+        }
       }
     },
     "param": {
       "type": "object",
-      "required": ["symbol", "name"],
+      "required": [
+        "symbol",
+        "name"
+      ],
       "additionalProperties": false,
       "anyOf": [
-        { "required": ["ref"] },
-        { "required": ["min", "max", "def", "unit"] }
+        {
+          "required": [
+            "ref"
+          ]
+        },
+        {
+          "required": [
+            "min",
+            "max",
+            "def",
+            "unit"
+          ]
+        }
       ],
       "properties": {
         "symbol": {
@@ -108,12 +175,23 @@
           "title": "Symbol",
           "description": "The parameter's field name: its LV2 symbol and its CLAP identity."
         },
-        "name": { "type": "string", "minLength": 1, "title": "Name", "description": "The label a host shows." },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "title": "Name",
+          "description": "The label a host shows."
+        },
         "ref": {
           "type": "string",
           "pattern": "^[A-Z][A-Z0-9_]*$",
           "title": "Reference",
           "description": "The omx-contract export that holds the travel: a name in the kernel's file (or in primitives.json/rates.json). The numbers are read from it, never typed here."
+        },
+        "kernel": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*$",
+          "title": "Kernel",
+          "description": "For a composite (several kernels): which of the plugin's kernels the reference is read from."
         },
         "field": {
           "type": "string",
@@ -133,34 +211,82 @@
           "title": "Default reference",
           "description": "For a reference to a list of values: the scalar export naming the value a fresh plugin comes up at."
         },
-        "scale": { "enum": ["linear", "log"], "title": "Scale", "description": "How a host should draw the travel." },
-        "min": { "type": "number" },
-        "max": { "type": "number" },
-        "def": { "type": "number" },
-        "unit": { "type": "string" },
-        "kind": { "enum": ["integer", "toggle"] }
+        "scale": {
+          "enum": [
+            "linear",
+            "log"
+          ],
+          "title": "Scale",
+          "description": "How a host should draw the travel."
+        },
+        "min": {
+          "type": "number"
+        },
+        "max": {
+          "type": "number"
+        },
+        "def": {
+          "type": "number"
+        },
+        "unit": {
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "integer",
+            "toggle"
+          ]
+        }
       }
     },
     "panel": {
       "type": "object",
-      "required": ["family", "roles", "sections"],
+      "required": [
+        "family",
+        "roles",
+        "sections"
+      ],
       "additionalProperties": false,
       "title": "Panel",
       "description": "The MOD GUI and house-view panel: a family, each control's role, and the sections drawn. Leave it out for a plugin with no panel yet.",
       "properties": {
-        "family": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
-        "roles": { "type": "object", "additionalProperties": { "type": "string" } },
+        "family": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]*$"
+        },
+        "roles": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
         "sections": {
           "type": "array",
           "minItems": 1,
           "items": {
             "type": "object",
-            "required": ["key", "label", "controls"],
+            "required": [
+              "key",
+              "label",
+              "controls"
+            ],
             "additionalProperties": false,
             "properties": {
-              "key": { "type": "string", "pattern": "^[a-z][a-zA-Z0-9]*$" },
-              "label": { "type": "string", "minLength": 1 },
-              "controls": { "type": "array", "minItems": 1, "items": { "type": "string" } }
+              "key": {
+                "type": "string",
+                "pattern": "^[a-z][a-zA-Z0-9]*$"
+              },
+              "label": {
+                "type": "string",
+                "minLength": 1
+              },
+              "controls": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "string"
+                }
+              }
             }
           }
         }

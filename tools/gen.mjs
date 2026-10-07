@@ -18,7 +18,7 @@ import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { PIN_FILE, locateContract, resolveParam } from './omx-contract.mjs';
+import { PIN_FILE, locateContract, paramKernel, resolveParam } from './omx-contract.mjs';
 
 export const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -61,7 +61,7 @@ function resolveParams(file, d) {
     if (p.ref === undefined) throw new Error(`${file}: '${p.symbol}' has no ref; a declaration is by reference throughout or not at all`);
     const typed = TRAVEL_FIELDS.filter((k) => k in p);
     if (typed.length) throw new Error(`${file}: '${p.symbol}' is by reference and retypes ${typed.join(', ')}; omx-contract holds them`);
-    const t = resolveParam(where.dir, d.kernel, p);
+    const t = resolveParam(where.dir, paramKernel(d, p), p);
     const out = { ...p, min: t.min, max: t.max, def: t.def, unit: t.unit };
     if (t.kind) out.kind = t.kind;
     return out;

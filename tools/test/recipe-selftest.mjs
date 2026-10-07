@@ -167,11 +167,11 @@ async function main() {
     ['oracle', 'kernel-identity-test', () => remove(`${P}/test/drive-oracle.c`)],
     ['linesPresent', 'spec-files', () => edit('packaging/omx-plugins.spec', (s) => s.replace('%{_libdir}/lv2/omx-drive.lv2/\n', ''))],
     ['installCovers', 'deb-install', () => edit('debian/omx-plugins-clap.install', () => 'usr/lib/clap/omx-delay.clap\n')],
-    ['namedIn', 'package-description', () => edit('debian/control', (s) => s.replace(/omx delay, omx drive,/g, 'omx delay,'))],
+    ['namedIn', 'package-description', () => edit('debian/control', (s) => s.replace(/delay, drive,/g, 'delay,'))],
     ['ciCovers', 'ci-installed-files', () => edit('.github/workflows/ci.yml', (s) => s.replaceAll('/usr/lib64/clap/omx-drive.clap', ''))],
     ['catalogueRow', 'catalogue-row', () => edit('README.md', (s) => s.replace('`org.openmixer.drive`', '`org.openmixer.x`'))],
     ['heading', 'manual-section', () => edit('README.md', (s) => s.replace('### omx drive\n', '### drive\n'))],
-    ['namedIn', 'changelog', () => edit('CHANGELOG.md', (s) => s.replace('omx drive, ', ''))],
+    ['namedIn', 'changelog', () => edit('CHANGELOG.md', (s) => s.replace('delay, drive,', 'delay,'))],
     ['noFiles', 'no-cpp', () => add(`${P}/shell.cpp`, '// SPDX-License-Identifier: GPL-3.0-or-later\n')],
     ['noText', 'no-dpf', () => add(`${P}/dpf_shell.h`, '#include "DistrhoPlugin.hpp"\n')],
     ['noCopiedDsp', 'no-copied-dsp', () => add(`${P}/copied.h`, `static inline float ${dspName}(float x) {\n  return x;\n}\n`)],
@@ -229,6 +229,18 @@ async function main() {
   await refused('an unresolved reference', (a) => { a.params[1].ref = 'TREMOLO_SPEED_RANGE'; }, '/params/1/ref');
   await refused('a reference into another kernel', (a) => { a.params[0].ref = 'FX_DELAY_TIME_RANGE'; }, '/params/0/ref');
   await refused('a derived field answered wrong', (a) => { a.clap.id = 'org.openmixer.trem'; }, '/clap/id');
+  await refused('a composite parameter that names no kernel', (a) => { a.kernels = ['tremolo', 'delay']; }, '/params/0/kernel');
+  await refused('a parameter naming a kernel the plugin does not declare', (a) => { a.params[0].kernel = 'delay'; }, '/params/0/kernel');
+  {
+    const a = JSON.parse(JSON.stringify(answers));
+    a.kernels = ['tremolo', 'delay'];
+    for (const p of a.params) p.kernel = 'tremolo';
+    a.params.push({ symbol: 'timeMs', name: 'Time', kernel: 'delay', ref: 'FX_DELAY_TIME_RANGE', scale: 'linear' });
+    const p = await planPlugin(a, { root: fresh, recipe });
+    const time = p.resolved?.find((x) => x.symbol === 'timeMs');
+    const rate = p.resolved?.find((x) => x.symbol === 'rateHz');
+    expect(p.ok && time?.max === 2000 && rate?.max === 20, `a composite resolves each parameter in its own kernel (timeMs from delay: ${time?.max}, rateHz from tremolo: ${rate?.max})`);
+  }
   await refused('a panel the MOD GUI cannot draw', (a) => {
     a.panel = { family: 'modulation', roles: { mode: 'mode' }, sections: [{ key: 'tremolo', label: 'Tremolo', controls: ['rateHz', 'depth', 'mix', 'mode'] }] };
   }, '/panel');

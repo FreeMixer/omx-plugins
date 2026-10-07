@@ -33,7 +33,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join, relative, resolve } from 'node:path';
 import { createInterface } from 'node:readline/promises';
 import { fileURLToPath } from 'node:url';
-import { compareVersions, contractPin, findName, kernelExists, locateContract, resolveParam, PIN_FILE } from './omx-contract.mjs';
+import { compareVersions, contractPin, declKernels, kernelExists, locateContract, paramKernel, resolveParam, PIN_FILE } from './omx-contract.mjs';
 import {
   ROOT,
   checkPlugin,
@@ -131,6 +131,7 @@ export async function planPlugin(answers, { root = ROOT, recipe = loadRecipe(roo
       else if (ptr !== '/$comment' && given !== want) refuse(ptr, `'${given}' is derived: it is '${want}'`);
     }
   }
+  if (typeof decl.kernel === 'string') decl.kernels ??= [decl.kernel];
   for (const e of validate(schema, schema, decl)) refuse(e.split(':')[0], `schema: ${e.slice(e.indexOf(':') + 2)}`);
   if (refusals.length) return { ok: false, refusals, notes };
 
@@ -156,11 +157,13 @@ export async function planPlugin(answers, { root = ROOT, recipe = loadRecipe(roo
   for (const s of decl.panel?.sections ?? []) for (const c of s.controls) if (!symbols.has(c)) refuse('/panel/sections', `section '${s.key}' names '${c}', which is no parameter`);
   for (const [role, sym] of Object.entries(decl.panel?.roles ?? {})) if (!symbols.has(sym)) refuse(`/panel/roles/${role}`, `'${sym}' is no parameter`);
 
-  // the kernel: at the pin, at the release the answers name, or NEW
+  // the kernels: all at the pin, all at the release the answers name, or NEW
+  const kernels = declKernels(decl);
   const pin = contractPin(root);
   const where = locateContract(root);
-  let kernel = { state: 'unknown', at: undefined, dir: undefined };
-  if (where.dir && kernelExists(where.dir, decl.kernel)) kernel = { state: 'existing', at: `omx-contract ${pin}`, dir: where.dir };
+  let kernel = { state: 'new', at: undefined, dir: undefined };
+  const missingAt = (dir) => kernels.filter((k) => !kernelExists(dir, k));
+  if (where.dir && !missingAt(where.dir).length) kernel = { state: 'existing', at: `omx-contract ${pin}`, dir: where.dir };
   else if (extra.contractRelease) {
     if (compareVersions(extra.contractRelease, pin) <= 0) refuse('#/questions/contractRelease', `${extra.contractRelease} is not after the pin ${pin}`);
     const env = process.env.OMX_CONTRACT_DIR;
@@ -170,28 +173,35 @@ export async function planPlugin(answers, { root = ROOT, recipe = loadRecipe(roo
     } catch {
       v = undefined;
     }
-    if (env && v === extra.contractRelease && kernelExists(env, decl.kernel)) {
-      kernel = { state: 'released', at: `omx-contract ${v} (OMX_CONTRACT_DIR)`, dir: env };
-    } else {
-      kernel = { state: 'new', at: `omx-contract ${extra.contractRelease}, to be cut by the kernel recipe`, dir: undefined };
-    }
-  } else kernel = { state: 'new', at: undefined, dir: undefined };
-  if (!where.dir && kernel.state === 'new') notes.push(`no omx-contract ${pin} reachable (${where.why}): the kernel counts as NEW until it is checked`);
+    if (env && v === extra.contractRelease && !missingAt(env).length) kernel = { state: 'released', at: `omx-contract ${v} (OMX_CONTRACT_DIR)`, dir: env };
+    else kernel = { state: 'new', at: `omx-contract ${extra.contractRelease}, to be cut by the kernel recipe`, dir: undefined };
+  }
+  const newKernels = where.dir ? missingAt(where.dir) : kernels;
+  if (!where.dir && kernel.state === 'new') notes.push(`no omx-contract ${pin} reachable (${where.why}): the kernels count as NEW until they are checked`);
 
-  // every reference resolves in the kernel's file (or is owed by the kernel recipe)
+  // every reference resolves in its kernel's file (or is owed by the kernel recipe)
   const resolved = [];
-  const owedNames = [];
+  const owedNames = new Map(kernels.map((k) => [k, new Set()]));
   for (const [i, p] of decl.params.entries()) {
+    let k;
+    try {
+      k = paramKernel(decl, p);
+    } catch (e) {
+      refuse(`/params/${i}/kernel`, e.message);
+      continue;
+    }
     if (kernel.dir) {
       try {
-        resolved.push({ ...p, ...resolveParam(kernel.dir, decl.kernel, p) });
+        resolved.push({ ...p, ...resolveParam(kernel.dir, k, p) });
       } catch (e) {
         refuse(`/params/${i}/ref`, e.message);
       }
     } else {
-      owedNames.push(p.ref, ...(p.defaultRef ? [p.defaultRef] : []));
+      owedNames.get(k).add(p.ref);
+      if (p.defaultRef) owedNames.get(k).add(p.defaultRef);
     }
   }
+
   // the panel, drawn as the MOD GUI generator will draw it (a selector it cannot draw is refused now)
   if (decl.panel && resolved.length === decl.params.length) {
     const mg = await import(join(root, 'tools', 'modgui-gen.mjs'));
@@ -205,13 +215,17 @@ export async function planPlugin(answers, { root = ROOT, recipe = loadRecipe(roo
     }
   }
   if (kernel.state === 'new') {
-    notes.push(`kernel '${decl.kernel}': NEW — not in omx-contract ${pin}. The kernel recipe in omx-contract and omx-dsp runs first ` +
-      `(\`omx new kernel ${decl.kernel}\`): data/kernels/${decl.kernel}.json must export ${[...new Set(owedNames)].join(', ')}, then omx-contract is released and ${PIN_FILE} moves to it.`);
-  } else notes.push(`kernel '${decl.kernel}': in ${kernel.at}; every reference resolves there`);
+    for (const k of newKernels.length ? newKernels : kernels) {
+      notes.push(`kernel '${k}': NEW — not in omx-contract ${pin}. The kernel recipe in omx-contract and omx-dsp runs first ` +
+        `(\`omx new kernel ${k}\`): data/kernels/${k}.json must export ${[...owedNames.get(k)].join(', ') || '(no reference yet)'}, then omx-contract is released and ${PIN_FILE} moves to it.`);
+    }
+  } else notes.push(`kernel${kernels.length > 1 ? 's' : ''} ${kernels.map((k) => `'${k}'`).join(', ')}: in ${kernel.at}; every reference resolves there`);
   const inc = omxdspInclude();
   if (inc) {
-    const fx = join(existsSync(join(inc, 'omxdsp')) ? join(inc, 'omxdsp') : inc, 'fx', `omx_${decl.kernel}.h`);
-    notes.push(existsSync(fx) ? `omx-dsp has <omxdsp/fx/omx_${decl.kernel}.h>: the binding calls it` : `omx-dsp has no <omxdsp/fx/omx_${decl.kernel}.h>: the kernel recipe moves it into omx-dsp first`);
+    for (const k of kernels) {
+      const fx = join(existsSync(join(inc, 'omxdsp')) ? join(inc, 'omxdsp') : inc, 'fx', `omx_${k}.h`);
+      notes.push(existsSync(fx) ? `omx-dsp has <omxdsp/fx/omx_${k}.h>: the binding calls it` : `omx-dsp has no <omxdsp/fx/omx_${k}.h>: the kernel recipe moves it into omx-dsp first`);
+    }
   }
 
   return { ok: refusals.length === 0, refusals, notes, decl: canonical(schema, decl), extra, kernel, resolved, pin };
@@ -253,7 +267,14 @@ function insertBlock(textIn, block, tpl) {
     if (at < 0) throw new Error(`no line matches ${tpl.before}`);
     lines.splice(at, 0, ...body, '');
   } else if (tpl.after) {
-    const at = lines.findIndex((l) => new RegExp(tpl.after).test(l));
+    let at = lines.findIndex((l) => new RegExp(tpl.after).test(l));
+    if (at < 0 && tpl.create) {
+      // the section is not there yet: open it before the first line `createBefore` matches
+      const before = lines.findIndex((l) => new RegExp(tpl.createBefore).test(l));
+      if (before < 0) throw new Error(`no line matches ${tpl.createBefore}`);
+      lines.splice(before, 0, tpl.create, '');
+      at = before;
+    }
     if (at < 0) throw new Error(`no line matches ${tpl.after}`);
     lines.splice(at + 1, 0, '', ...body);
   }
@@ -340,7 +361,7 @@ export function commitPlan(recipe, plan, files) {
   for (const l of recipe.layers) {
     const fs = [...new Set(byLayer.get(l.id))].sort();
     if (l.id === 'kernel' && !fs.length && plan.kernel.state === 'new') {
-      commits.push({ layer: l.id, files: [PIN_FILE], message: fill(l.message, facts), pending: `after the kernel recipe releases omx-contract with data/kernels/${plan.decl.kernel}.json: move ${PIN_FILE} to it` });
+      commits.push({ layer: l.id, files: [PIN_FILE], message: fill(l.message, facts), pending: `after the kernel recipe releases omx-contract with ${declKernels(plan.decl).map((k) => `data/kernels/${k}.json`).join(', ')}: move ${PIN_FILE} to it` });
       continue;
     }
     if (l.id === 'generated' && !fs.length && !plan.kernel.dir) {
