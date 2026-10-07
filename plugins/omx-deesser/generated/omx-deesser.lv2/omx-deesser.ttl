@@ -4,6 +4,7 @@
 @prefix doap:  <http://usefulinc.com/ns/doap#> .
 @prefix foaf:  <http://xmlns.com/foaf/0.1/> .
 @prefix lv2:   <http://lv2plug.in/ns/lv2core#> .
+@prefix pprops: <http://lv2plug.in/ns/ext/port-props#> .
 @prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix units: <http://lv2plug.in/ns/extensions/units#> .
 
@@ -54,7 +55,9 @@
         lv2:default 7000 ;
         lv2:minimum 2000 ;
         lv2:maximum 16000 ;
-        lv2:portProperty lv2:integer
+        lv2:portProperty lv2:integer ;
+        lv2:portProperty pprops:logarithmic ;
+        units:unit units:hz
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -63,7 +66,8 @@
         lv2:name "Width" ;
         lv2:default 1 ;
         lv2:minimum 0.25 ;
-        lv2:maximum 4
+        lv2:maximum 4 ;
+        units:unit units:oct
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -72,7 +76,8 @@
         lv2:name "Threshold" ;
         lv2:default -30 ;
         lv2:minimum -60 ;
-        lv2:maximum 0
+        lv2:maximum 0 ;
+        units:unit units:db
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -90,7 +95,8 @@
         lv2:name "Range" ;
         lv2:default -12 ;
         lv2:minimum -24 ;
-        lv2:maximum 0
+        lv2:maximum 0 ;
+        units:unit units:db
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -130,5 +136,6 @@
         lv2:symbol "latency" ;
         lv2:name "Latency" ;
         lv2:designation lv2:latency ;
-        lv2:portProperty lv2:reportsLatency , lv2:integer
+        lv2:portProperty lv2:reportsLatency , lv2:integer ;
+        units:unit units:frame
     ] .

@@ -5,7 +5,8 @@
 # `install` and `clean`.
 #
 #   make            build every plugin
-#   make test       every plugin's tests (what the package builds run)
+#   make test       every plugin's tests (what the package builds run), then `make hints`
+#   make hints      no LV2 face lost a port hint: tools/port-hints.mjs against tools/test/port-hints.json
 #   make recipe-test   the repository's own checks, run by CI beside `make test`:
 #     make completeness  every plugin against recipes/plugin.recipe.json, each gap naming its wizard step;
 #                        a gap not in recipes/completeness-debt.json fails, and so does a paid debt entry
@@ -15,12 +16,15 @@
 VERSION := 0.1.0
 PLUGINS := $(sort $(dir $(wildcard plugins/*/Makefile)))
 
-.PHONY: all test install clean version recipe-test completeness selftest
+.PHONY: all test hints install clean version recipe-test completeness selftest
 all:
 	@for p in $(PLUGINS); do $(MAKE) -C $$p all || exit 1; done
 test:
 	@if [ -z "$(PLUGINS)" ]; then echo "no plugins yet"; fi
 	@for p in $(PLUGINS); do $(MAKE) -C $$p test || exit 1; done
+	@$(MAKE) -s hints
+hints:
+	node tools/port-hints.mjs
 # A plugin is complete when it has every artifact the recipe lists and keeps every law; a new plugin
 # starts with `node tools/omx-new-plugin.mjs --answers <file>`, which writes them.
 recipe-test: selftest completeness

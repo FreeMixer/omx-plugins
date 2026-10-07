@@ -294,7 +294,7 @@
       "checker": {
         "fn": "kernelBinding",
         "dir": "plugins/{stem}",
-        "headerStems": { "eq8": "eq", "strip": ["gate", "eq", "dynamics"] }
+        "headerStems": { "eq8": "eq", "eq16": "eq", "eq32": "eq", "strip": ["gate", "eq", "dynamics"] }
       }
     },
     {

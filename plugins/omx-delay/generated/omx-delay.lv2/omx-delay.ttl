@@ -111,5 +111,6 @@
         lv2:symbol "latency" ;
         lv2:name "Latency" ;
         lv2:designation lv2:latency ;
-        lv2:portProperty lv2:reportsLatency , lv2:integer
+        lv2:portProperty lv2:reportsLatency , lv2:integer ;
+        units:unit units:frame
     ] .

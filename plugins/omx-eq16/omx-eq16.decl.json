@@ -1,15 +1,15 @@
 {
-  "$comment": "THE declaration of omx-eq8: the CLAP and LV2 faces and the parameter header are generated from this file by tools/gen.mjs. Parameter order is append-only. The travels are the console's own EQ_FREQ_RANGE, EQ_GAIN_RANGE, EQ_Q_RANGE (a notch's Q reaches EQ_NOTCH_Q_RANGE), HPF_FREQ_RANGE and LPF_FREQ_RANGE, read as omx-dsp's omx_contract_limits.h carries them. The band count is a compile-time 8; band types are 0 bell, 1 low shelf, 2 high shelf, 3 notch, 4 allpass1, 5 allpass2, labelled as the console's bundle labels them; a slope takes 12 or 24 dB/oct and nothing between. No MOD GUI: tools/modgui-gen.mjs does not draw selectors.",
-  "stem": "omx-eq8",
-  "kernel": "eq8",
-  "name": "omx eq8",
-  "noun": "8-band EQ",
+  "$comment": "THE declaration of omx-eq16: the CLAP and LV2 faces and the parameter header are generated from this file by tools/gen.mjs. Parameter order is append-only. The travels are the console's own EQ_FREQ_RANGE, EQ_GAIN_RANGE, EQ_Q_RANGE (a notch's Q reaches EQ_NOTCH_Q_RANGE), HPF_FREQ_RANGE and LPF_FREQ_RANGE, read as omx-dsp's omx_contract_limits.h carries them. The band count is a compile-time 16; band types are 0 bell, 1 low shelf, 2 high shelf, 3 notch, 4 allpass1, 5 allpass2, labelled as the console's bundle labels them; a slope takes 12 or 24 dB/oct and nothing between. Each band's frequency default is the console's own (defaultEqState(), log-spaced across the audio band), as the console's in-tree omx-eq16.lv2 declares it. No MOD GUI: tools/modgui-gen.mjs does not draw selectors.",
+  "stem": "omx-eq16",
+  "kernel": "eq16",
+  "name": "omx eq16",
+  "noun": "16-band EQ",
   "vendor": "openmixer",
   "url": "https://github.com/FreeMixer/omx-plugins",
   "version": "0.1.0",
-  "description": "The OpenMixer console's channel EQ, 8-band form: eight parametric bands (bell, shelves, notch, allpass) and a high-pass and a low-pass filter at 12 or 24 dB/oct, stereo, zero latency. The DSP is omx-dsp's <omxdsp/fx/omx_eq_instance.h>, the console's own EQ; every band ships off, so a racked instance is a wire.",
+  "description": "The OpenMixer console's channel EQ, 16-band form: sixteen parametric bands (bell, shelves, notch, allpass) and a high-pass and a low-pass filter at 12 or 24 dB/oct, stereo, zero latency. The DSP is omx-dsp's <omxdsp/fx/omx_eq_instance.h>, the console's own EQ; every band ships off, so a racked instance is a wire.",
   "clap": {
-    "id": "org.openmixer.eq8",
+    "id": "org.openmixer.eq16",
     "features": [
       "audio-effect",
       "equalizer",
@@ -17,7 +17,7 @@
     ]
   },
   "lv2": {
-    "uri": "urn:openmixer:eq8",
+    "uri": "urn:openmixer:eq16",
     "class": "lv2:ParaEQPlugin"
   },
   "params": [
@@ -125,7 +125,7 @@
       "unit": "Hz",
       "min": 20,
       "max": 20000,
-      "def": 1000
+      "def": 25
     },
     {
       "symbol": "b1_gain",
@@ -175,7 +175,7 @@
       "unit": "Hz",
       "min": 20,
       "max": 20000,
-      "def": 1000
+      "def": 38
     },
     {
       "symbol": "b2_gain",
@@ -225,7 +225,7 @@
       "unit": "Hz",
       "min": 20,
       "max": 20000,
-      "def": 1000
+      "def": 59
     },
     {
       "symbol": "b3_gain",
@@ -275,7 +275,7 @@
       "unit": "Hz",
       "min": 20,
       "max": 20000,
-      "def": 1000
+      "def": 91
     },
     {
       "symbol": "b4_gain",
@@ -325,7 +325,7 @@
       "unit": "Hz",
       "min": 20,
       "max": 20000,
-      "def": 1000
+      "def": 140
     },
     {
       "symbol": "b5_gain",
@@ -375,7 +375,7 @@
       "unit": "Hz",
       "min": 20,
       "max": 20000,
-      "def": 1000
+      "def": 215
     },
     {
       "symbol": "b6_gain",
@@ -425,7 +425,7 @@
       "unit": "Hz",
       "min": 20,
       "max": 20000,
-      "def": 1000
+      "def": 331
     },
     {
       "symbol": "b7_gain",
@@ -475,7 +475,7 @@
       "unit": "Hz",
       "min": 20,
       "max": 20000,
-      "def": 1000
+      "def": 510
     },
     {
       "symbol": "b8_gain",
@@ -496,6 +496,406 @@
     {
       "symbol": "b8_on",
       "name": "Band 8 On",
+      "unit": "",
+      "min": 0,
+      "max": 1,
+      "def": 0,
+      "kind": "toggle"
+    },
+    {
+      "symbol": "b9_type",
+      "name": "Band 9 Type",
+      "unit": "",
+      "min": 0,
+      "max": 5,
+      "def": 0,
+      "kind": "integer",
+      "values": [
+        "Bell",
+        "Low Shelf",
+        "High Shelf",
+        "Notch",
+        "All-pass 1st",
+        "All-pass 2nd"
+      ]
+    },
+    {
+      "symbol": "b9_freq",
+      "name": "Band 9 Frequency",
+      "unit": "Hz",
+      "min": 20,
+      "max": 20000,
+      "def": 785
+    },
+    {
+      "symbol": "b9_gain",
+      "name": "Band 9 Gain",
+      "unit": "dB",
+      "min": -15,
+      "max": 15,
+      "def": 0
+    },
+    {
+      "symbol": "b9_q",
+      "name": "Band 9 Q",
+      "unit": "",
+      "min": 0.3,
+      "max": 116,
+      "def": 1
+    },
+    {
+      "symbol": "b9_on",
+      "name": "Band 9 On",
+      "unit": "",
+      "min": 0,
+      "max": 1,
+      "def": 0,
+      "kind": "toggle"
+    },
+    {
+      "symbol": "b10_type",
+      "name": "Band 10 Type",
+      "unit": "",
+      "min": 0,
+      "max": 5,
+      "def": 0,
+      "kind": "integer",
+      "values": [
+        "Bell",
+        "Low Shelf",
+        "High Shelf",
+        "Notch",
+        "All-pass 1st",
+        "All-pass 2nd"
+      ]
+    },
+    {
+      "symbol": "b10_freq",
+      "name": "Band 10 Frequency",
+      "unit": "Hz",
+      "min": 20,
+      "max": 20000,
+      "def": 1209
+    },
+    {
+      "symbol": "b10_gain",
+      "name": "Band 10 Gain",
+      "unit": "dB",
+      "min": -15,
+      "max": 15,
+      "def": 0
+    },
+    {
+      "symbol": "b10_q",
+      "name": "Band 10 Q",
+      "unit": "",
+      "min": 0.3,
+      "max": 116,
+      "def": 1
+    },
+    {
+      "symbol": "b10_on",
+      "name": "Band 10 On",
+      "unit": "",
+      "min": 0,
+      "max": 1,
+      "def": 0,
+      "kind": "toggle"
+    },
+    {
+      "symbol": "b11_type",
+      "name": "Band 11 Type",
+      "unit": "",
+      "min": 0,
+      "max": 5,
+      "def": 0,
+      "kind": "integer",
+      "values": [
+        "Bell",
+        "Low Shelf",
+        "High Shelf",
+        "Notch",
+        "All-pass 1st",
+        "All-pass 2nd"
+      ]
+    },
+    {
+      "symbol": "b11_freq",
+      "name": "Band 11 Frequency",
+      "unit": "Hz",
+      "min": 20,
+      "max": 20000,
+      "def": 1861
+    },
+    {
+      "symbol": "b11_gain",
+      "name": "Band 11 Gain",
+      "unit": "dB",
+      "min": -15,
+      "max": 15,
+      "def": 0
+    },
+    {
+      "symbol": "b11_q",
+      "name": "Band 11 Q",
+      "unit": "",
+      "min": 0.3,
+      "max": 116,
+      "def": 1
+    },
+    {
+      "symbol": "b11_on",
+      "name": "Band 11 On",
+      "unit": "",
+      "min": 0,
+      "max": 1,
+      "def": 0,
+      "kind": "toggle"
+    },
+    {
+      "symbol": "b12_type",
+      "name": "Band 12 Type",
+      "unit": "",
+      "min": 0,
+      "max": 5,
+      "def": 0,
+      "kind": "integer",
+      "values": [
+        "Bell",
+        "Low Shelf",
+        "High Shelf",
+        "Notch",
+        "All-pass 1st",
+        "All-pass 2nd"
+      ]
+    },
+    {
+      "symbol": "b12_freq",
+      "name": "Band 12 Frequency",
+      "unit": "Hz",
+      "min": 20,
+      "max": 20000,
+      "def": 2866
+    },
+    {
+      "symbol": "b12_gain",
+      "name": "Band 12 Gain",
+      "unit": "dB",
+      "min": -15,
+      "max": 15,
+      "def": 0
+    },
+    {
+      "symbol": "b12_q",
+      "name": "Band 12 Q",
+      "unit": "",
+      "min": 0.3,
+      "max": 116,
+      "def": 1
+    },
+    {
+      "symbol": "b12_on",
+      "name": "Band 12 On",
+      "unit": "",
+      "min": 0,
+      "max": 1,
+      "def": 0,
+      "kind": "toggle"
+    },
+    {
+      "symbol": "b13_type",
+      "name": "Band 13 Type",
+      "unit": "",
+      "min": 0,
+      "max": 5,
+      "def": 0,
+      "kind": "integer",
+      "values": [
+        "Bell",
+        "Low Shelf",
+        "High Shelf",
+        "Notch",
+        "All-pass 1st",
+        "All-pass 2nd"
+      ]
+    },
+    {
+      "symbol": "b13_freq",
+      "name": "Band 13 Frequency",
+      "unit": "Hz",
+      "min": 20,
+      "max": 20000,
+      "def": 4413
+    },
+    {
+      "symbol": "b13_gain",
+      "name": "Band 13 Gain",
+      "unit": "dB",
+      "min": -15,
+      "max": 15,
+      "def": 0
+    },
+    {
+      "symbol": "b13_q",
+      "name": "Band 13 Q",
+      "unit": "",
+      "min": 0.3,
+      "max": 116,
+      "def": 1
+    },
+    {
+      "symbol": "b13_on",
+      "name": "Band 13 On",
+      "unit": "",
+      "min": 0,
+      "max": 1,
+      "def": 0,
+      "kind": "toggle"
+    },
+    {
+      "symbol": "b14_type",
+      "name": "Band 14 Type",
+      "unit": "",
+      "min": 0,
+      "max": 5,
+      "def": 0,
+      "kind": "integer",
+      "values": [
+        "Bell",
+        "Low Shelf",
+        "High Shelf",
+        "Notch",
+        "All-pass 1st",
+        "All-pass 2nd"
+      ]
+    },
+    {
+      "symbol": "b14_freq",
+      "name": "Band 14 Frequency",
+      "unit": "Hz",
+      "min": 20,
+      "max": 20000,
+      "def": 6796
+    },
+    {
+      "symbol": "b14_gain",
+      "name": "Band 14 Gain",
+      "unit": "dB",
+      "min": -15,
+      "max": 15,
+      "def": 0
+    },
+    {
+      "symbol": "b14_q",
+      "name": "Band 14 Q",
+      "unit": "",
+      "min": 0.3,
+      "max": 116,
+      "def": 1
+    },
+    {
+      "symbol": "b14_on",
+      "name": "Band 14 On",
+      "unit": "",
+      "min": 0,
+      "max": 1,
+      "def": 0,
+      "kind": "toggle"
+    },
+    {
+      "symbol": "b15_type",
+      "name": "Band 15 Type",
+      "unit": "",
+      "min": 0,
+      "max": 5,
+      "def": 0,
+      "kind": "integer",
+      "values": [
+        "Bell",
+        "Low Shelf",
+        "High Shelf",
+        "Notch",
+        "All-pass 1st",
+        "All-pass 2nd"
+      ]
+    },
+    {
+      "symbol": "b15_freq",
+      "name": "Band 15 Frequency",
+      "unit": "Hz",
+      "min": 20,
+      "max": 20000,
+      "def": 10466
+    },
+    {
+      "symbol": "b15_gain",
+      "name": "Band 15 Gain",
+      "unit": "dB",
+      "min": -15,
+      "max": 15,
+      "def": 0
+    },
+    {
+      "symbol": "b15_q",
+      "name": "Band 15 Q",
+      "unit": "",
+      "min": 0.3,
+      "max": 116,
+      "def": 1
+    },
+    {
+      "symbol": "b15_on",
+      "name": "Band 15 On",
+      "unit": "",
+      "min": 0,
+      "max": 1,
+      "def": 0,
+      "kind": "toggle"
+    },
+    {
+      "symbol": "b16_type",
+      "name": "Band 16 Type",
+      "unit": "",
+      "min": 0,
+      "max": 5,
+      "def": 0,
+      "kind": "integer",
+      "values": [
+        "Bell",
+        "Low Shelf",
+        "High Shelf",
+        "Notch",
+        "All-pass 1st",
+        "All-pass 2nd"
+      ]
+    },
+    {
+      "symbol": "b16_freq",
+      "name": "Band 16 Frequency",
+      "unit": "Hz",
+      "min": 20,
+      "max": 20000,
+      "def": 16117
+    },
+    {
+      "symbol": "b16_gain",
+      "name": "Band 16 Gain",
+      "unit": "dB",
+      "min": -15,
+      "max": 15,
+      "def": 0
+    },
+    {
+      "symbol": "b16_q",
+      "name": "Band 16 Q",
+      "unit": "",
+      "min": 0.3,
+      "max": 116,
+      "def": 1
+    },
+    {
+      "symbol": "b16_on",
+      "name": "Band 16 On",
       "unit": "",
       "min": 0,
       "max": 1,

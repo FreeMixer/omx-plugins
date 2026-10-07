@@ -1,0 +1,881 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Copyright (C) 2026 Pau Aliagas <linuxnow@gmail.com>
+#ifndef OMX_EQ32_PARAMS_H
+#define OMX_EQ32_PARAMS_H
+/*
+ * GENERATED — DO NOT EDIT BY HAND.
+ * Produced by tools/gen.mjs from plugins/omx-eq32/omx-eq32.decl.json.
+ * Regenerate: `make -C plugins/omx-eq32 gen`, then commit the result. Order is append-only.
+ * The include guard is omx-dsp's own <omxdsp/params/omx_eq32_params.h>: included first, this
+ * table is the one the kernel's instance header reads.
+ */
+#include "omx_plugin_param.h"
+
+enum {
+  OMX_EQ32_PARAM_ON = 0,
+  OMX_EQ32_PARAM_HPF_ON = 1,
+  OMX_EQ32_PARAM_HPF_FREQ = 2,
+  OMX_EQ32_PARAM_HPF_SLOPE = 3,
+  OMX_EQ32_PARAM_LPF_ON = 4,
+  OMX_EQ32_PARAM_LPF_FREQ = 5,
+  OMX_EQ32_PARAM_LPF_SLOPE = 6,
+  OMX_EQ32_PARAM_B1_TYPE = 7,
+  OMX_EQ32_PARAM_B1_FREQ = 8,
+  OMX_EQ32_PARAM_B1_GAIN = 9,
+  OMX_EQ32_PARAM_B1_Q = 10,
+  OMX_EQ32_PARAM_B1_ON = 11,
+  OMX_EQ32_PARAM_B2_TYPE = 12,
+  OMX_EQ32_PARAM_B2_FREQ = 13,
+  OMX_EQ32_PARAM_B2_GAIN = 14,
+  OMX_EQ32_PARAM_B2_Q = 15,
+  OMX_EQ32_PARAM_B2_ON = 16,
+  OMX_EQ32_PARAM_B3_TYPE = 17,
+  OMX_EQ32_PARAM_B3_FREQ = 18,
+  OMX_EQ32_PARAM_B3_GAIN = 19,
+  OMX_EQ32_PARAM_B3_Q = 20,
+  OMX_EQ32_PARAM_B3_ON = 21,
+  OMX_EQ32_PARAM_B4_TYPE = 22,
+  OMX_EQ32_PARAM_B4_FREQ = 23,
+  OMX_EQ32_PARAM_B4_GAIN = 24,
+  OMX_EQ32_PARAM_B4_Q = 25,
+  OMX_EQ32_PARAM_B4_ON = 26,
+  OMX_EQ32_PARAM_B5_TYPE = 27,
+  OMX_EQ32_PARAM_B5_FREQ = 28,
+  OMX_EQ32_PARAM_B5_GAIN = 29,
+  OMX_EQ32_PARAM_B5_Q = 30,
+  OMX_EQ32_PARAM_B5_ON = 31,
+  OMX_EQ32_PARAM_B6_TYPE = 32,
+  OMX_EQ32_PARAM_B6_FREQ = 33,
+  OMX_EQ32_PARAM_B6_GAIN = 34,
+  OMX_EQ32_PARAM_B6_Q = 35,
+  OMX_EQ32_PARAM_B6_ON = 36,
+  OMX_EQ32_PARAM_B7_TYPE = 37,
+  OMX_EQ32_PARAM_B7_FREQ = 38,
+  OMX_EQ32_PARAM_B7_GAIN = 39,
+  OMX_EQ32_PARAM_B7_Q = 40,
+  OMX_EQ32_PARAM_B7_ON = 41,
+  OMX_EQ32_PARAM_B8_TYPE = 42,
+  OMX_EQ32_PARAM_B8_FREQ = 43,
+  OMX_EQ32_PARAM_B8_GAIN = 44,
+  OMX_EQ32_PARAM_B8_Q = 45,
+  OMX_EQ32_PARAM_B8_ON = 46,
+  OMX_EQ32_PARAM_B9_TYPE = 47,
+  OMX_EQ32_PARAM_B9_FREQ = 48,
+  OMX_EQ32_PARAM_B9_GAIN = 49,
+  OMX_EQ32_PARAM_B9_Q = 50,
+  OMX_EQ32_PARAM_B9_ON = 51,
+  OMX_EQ32_PARAM_B10_TYPE = 52,
+  OMX_EQ32_PARAM_B10_FREQ = 53,
+  OMX_EQ32_PARAM_B10_GAIN = 54,
+  OMX_EQ32_PARAM_B10_Q = 55,
+  OMX_EQ32_PARAM_B10_ON = 56,
+  OMX_EQ32_PARAM_B11_TYPE = 57,
+  OMX_EQ32_PARAM_B11_FREQ = 58,
+  OMX_EQ32_PARAM_B11_GAIN = 59,
+  OMX_EQ32_PARAM_B11_Q = 60,
+  OMX_EQ32_PARAM_B11_ON = 61,
+  OMX_EQ32_PARAM_B12_TYPE = 62,
+  OMX_EQ32_PARAM_B12_FREQ = 63,
+  OMX_EQ32_PARAM_B12_GAIN = 64,
+  OMX_EQ32_PARAM_B12_Q = 65,
+  OMX_EQ32_PARAM_B12_ON = 66,
+  OMX_EQ32_PARAM_B13_TYPE = 67,
+  OMX_EQ32_PARAM_B13_FREQ = 68,
+  OMX_EQ32_PARAM_B13_GAIN = 69,
+  OMX_EQ32_PARAM_B13_Q = 70,
+  OMX_EQ32_PARAM_B13_ON = 71,
+  OMX_EQ32_PARAM_B14_TYPE = 72,
+  OMX_EQ32_PARAM_B14_FREQ = 73,
+  OMX_EQ32_PARAM_B14_GAIN = 74,
+  OMX_EQ32_PARAM_B14_Q = 75,
+  OMX_EQ32_PARAM_B14_ON = 76,
+  OMX_EQ32_PARAM_B15_TYPE = 77,
+  OMX_EQ32_PARAM_B15_FREQ = 78,
+  OMX_EQ32_PARAM_B15_GAIN = 79,
+  OMX_EQ32_PARAM_B15_Q = 80,
+  OMX_EQ32_PARAM_B15_ON = 81,
+  OMX_EQ32_PARAM_B16_TYPE = 82,
+  OMX_EQ32_PARAM_B16_FREQ = 83,
+  OMX_EQ32_PARAM_B16_GAIN = 84,
+  OMX_EQ32_PARAM_B16_Q = 85,
+  OMX_EQ32_PARAM_B16_ON = 86,
+  OMX_EQ32_PARAM_B17_TYPE = 87,
+  OMX_EQ32_PARAM_B17_FREQ = 88,
+  OMX_EQ32_PARAM_B17_GAIN = 89,
+  OMX_EQ32_PARAM_B17_Q = 90,
+  OMX_EQ32_PARAM_B17_ON = 91,
+  OMX_EQ32_PARAM_B18_TYPE = 92,
+  OMX_EQ32_PARAM_B18_FREQ = 93,
+  OMX_EQ32_PARAM_B18_GAIN = 94,
+  OMX_EQ32_PARAM_B18_Q = 95,
+  OMX_EQ32_PARAM_B18_ON = 96,
+  OMX_EQ32_PARAM_B19_TYPE = 97,
+  OMX_EQ32_PARAM_B19_FREQ = 98,
+  OMX_EQ32_PARAM_B19_GAIN = 99,
+  OMX_EQ32_PARAM_B19_Q = 100,
+  OMX_EQ32_PARAM_B19_ON = 101,
+  OMX_EQ32_PARAM_B20_TYPE = 102,
+  OMX_EQ32_PARAM_B20_FREQ = 103,
+  OMX_EQ32_PARAM_B20_GAIN = 104,
+  OMX_EQ32_PARAM_B20_Q = 105,
+  OMX_EQ32_PARAM_B20_ON = 106,
+  OMX_EQ32_PARAM_B21_TYPE = 107,
+  OMX_EQ32_PARAM_B21_FREQ = 108,
+  OMX_EQ32_PARAM_B21_GAIN = 109,
+  OMX_EQ32_PARAM_B21_Q = 110,
+  OMX_EQ32_PARAM_B21_ON = 111,
+  OMX_EQ32_PARAM_B22_TYPE = 112,
+  OMX_EQ32_PARAM_B22_FREQ = 113,
+  OMX_EQ32_PARAM_B22_GAIN = 114,
+  OMX_EQ32_PARAM_B22_Q = 115,
+  OMX_EQ32_PARAM_B22_ON = 116,
+  OMX_EQ32_PARAM_B23_TYPE = 117,
+  OMX_EQ32_PARAM_B23_FREQ = 118,
+  OMX_EQ32_PARAM_B23_GAIN = 119,
+  OMX_EQ32_PARAM_B23_Q = 120,
+  OMX_EQ32_PARAM_B23_ON = 121,
+  OMX_EQ32_PARAM_B24_TYPE = 122,
+  OMX_EQ32_PARAM_B24_FREQ = 123,
+  OMX_EQ32_PARAM_B24_GAIN = 124,
+  OMX_EQ32_PARAM_B24_Q = 125,
+  OMX_EQ32_PARAM_B24_ON = 126,
+  OMX_EQ32_PARAM_B25_TYPE = 127,
+  OMX_EQ32_PARAM_B25_FREQ = 128,
+  OMX_EQ32_PARAM_B25_GAIN = 129,
+  OMX_EQ32_PARAM_B25_Q = 130,
+  OMX_EQ32_PARAM_B25_ON = 131,
+  OMX_EQ32_PARAM_B26_TYPE = 132,
+  OMX_EQ32_PARAM_B26_FREQ = 133,
+  OMX_EQ32_PARAM_B26_GAIN = 134,
+  OMX_EQ32_PARAM_B26_Q = 135,
+  OMX_EQ32_PARAM_B26_ON = 136,
+  OMX_EQ32_PARAM_B27_TYPE = 137,
+  OMX_EQ32_PARAM_B27_FREQ = 138,
+  OMX_EQ32_PARAM_B27_GAIN = 139,
+  OMX_EQ32_PARAM_B27_Q = 140,
+  OMX_EQ32_PARAM_B27_ON = 141,
+  OMX_EQ32_PARAM_B28_TYPE = 142,
+  OMX_EQ32_PARAM_B28_FREQ = 143,
+  OMX_EQ32_PARAM_B28_GAIN = 144,
+  OMX_EQ32_PARAM_B28_Q = 145,
+  OMX_EQ32_PARAM_B28_ON = 146,
+  OMX_EQ32_PARAM_B29_TYPE = 147,
+  OMX_EQ32_PARAM_B29_FREQ = 148,
+  OMX_EQ32_PARAM_B29_GAIN = 149,
+  OMX_EQ32_PARAM_B29_Q = 150,
+  OMX_EQ32_PARAM_B29_ON = 151,
+  OMX_EQ32_PARAM_B30_TYPE = 152,
+  OMX_EQ32_PARAM_B30_FREQ = 153,
+  OMX_EQ32_PARAM_B30_GAIN = 154,
+  OMX_EQ32_PARAM_B30_Q = 155,
+  OMX_EQ32_PARAM_B30_ON = 156,
+  OMX_EQ32_PARAM_B31_TYPE = 157,
+  OMX_EQ32_PARAM_B31_FREQ = 158,
+  OMX_EQ32_PARAM_B31_GAIN = 159,
+  OMX_EQ32_PARAM_B31_Q = 160,
+  OMX_EQ32_PARAM_B31_ON = 161,
+  OMX_EQ32_PARAM_B32_TYPE = 162,
+  OMX_EQ32_PARAM_B32_FREQ = 163,
+  OMX_EQ32_PARAM_B32_GAIN = 164,
+  OMX_EQ32_PARAM_B32_Q = 165,
+  OMX_EQ32_PARAM_B32_ON = 166,
+  OMX_EQ32_PARAM_COUNT = 167
+};
+
+static const omx_plugin_param OMX_EQ32_PARAMS[OMX_EQ32_PARAM_COUNT] = {
+  { "on", "EQ On", "", 0.0f, 1.0f, 1.0f, OMX_PLUGIN_PARAM_TOGGLE },
+  { "hpf_on", "HPF On", "", 0.0f, 1.0f, 0.0f, OMX_PLUGIN_PARAM_TOGGLE },
+  { "hpf_freq", "HPF Frequency", "Hz", 20.0f, 1000.0f, 80.0f, 0u },
+  { "hpf_slope", "HPF Slope", "dB/oct", 12.0f, 24.0f, 12.0f, OMX_PLUGIN_PARAM_INTEGER },
+  { "lpf_on", "LPF On", "", 0.0f, 1.0f, 0.0f, OMX_PLUGIN_PARAM_TOGGLE },
+  { "lpf_freq", "LPF Frequency", "Hz", 1000.0f, 20000.0f, 18000.0f, 0u },
+  { "lpf_slope", "LPF Slope", "dB/oct", 12.0f, 24.0f, 12.0f, OMX_PLUGIN_PARAM_INTEGER },
+  { "b1_type", "Band 1 Type", "", 0.0f, 5.0f, 0.0f, OMX_PLUGIN_PARAM_INTEGER },
+  { "b1_freq", "Band 1 Frequency", "Hz", 20.0f, 20000.0f, 22.0f, 0u },
+  { "b1_gain", "Band 1 Gain", "dB", -15.0f, 15.0f, 0.0f, 0u },
+  { "b1_q", "Band 1 Q", "", 0.3f, 116.0f, 1.0f, 0u },
+  { "b1_on", "Band 1 On", "", 0.0f, 1.0f, 0.0f, OMX_PLUGIN_PARAM_TOGGLE },
+  { "b2_type", "Band 2 Type", "", 0.0f, 5.0f, 0.0f, OMX_PLUGIN_PARAM_INTEGER },
+  { "b2_freq", "Band 2 Frequency", "Hz", 20.0f, 20000.0f, 28.0f, 0u },
+  { "b2_gain", "Band 2 Gain", "dB", -15.0f, 15.0f, 0.0f, 0u },
+  { "b2_q", "Band 2 Q", "", 0.3f, 116.0f, 1.0f, 0u },
+  { "b2_on", "Band 2 On", "", 0.0f, 1.0f, 0.0f, OMX_PLUGIN_PARAM_TOGGLE },
+  { "b3_type", "Band 3 Type", "", 0.0f, 5.0f, 0.0f, OMX_PLUGIN_PARAM_INTEGER },
+  { "b3_freq", "Band 3 Frequency", "Hz", 20.0f, 20000.0f, 34.0f, 0u },
+  { "b3_gain", "Band 3 Gain", "dB", -15.0f, 15.0f, 0.0f, 0u },
+  { "b3_q", "Band 3 Q", "", 0.3f, 116.0f, 1.0f, 0u },
+  { "b3_on", "Band 3 On", "", 0.0f, 1.0f, 0.0f, OMX_PLUGIN_PARAM_TOGGLE },
+  { "b4_type", "Band 4 Type", "", 0.0f, 5.0f, 0.0f, OMX_PLUGIN_PARAM_INTEGER },
+  { "b4_freq", "Band 4 Frequency", "Hz", 20.0f, 20000.0f, 43.0f, 0u },
+  { "b4_gain", "Band 4 Gain", "dB", -15.0f, 15.0f, 0.0f, 0u },
+  { "b4_q", "Band 4 Q", "", 0.3f, 116.0f, 1.0f, 0u },
+  { "b4_on", "Band 4 On", "", 0.0f, 1.0f, 0.0f, OMX_PLUGIN_PARAM_TOGGLE },
+  { "b5_type", "Band 5 Type", "", 0.0f, 5.0f, 0.0f, OMX_PLUGIN_PARAM_INTEGER },
+  { "b5_freq", "Band 5 Frequency", "Hz", 20.0f, 20000.0f, 53.0f, 0u },
+  { "b5_gain", "Band 5 Gain", "dB", -15.0f, 15.0f, 0.0f, 0u },
+  { "b5_q", "Band 5 Q", "", 0.3f, 116.0f, 1.0f, 0u },
+  { "b5_on", "Band 5 On", "", 0.0f, 1.0f, 0.0f, OMX_PLUGIN_PARAM_TOGGLE },
+  { "b6_type", "Band 6 Type", "", 0.0f, 5.0f, 0.0f, OMX_PLUGIN_PARAM_INTEGER },
+  { "b6_freq", "Band 6 Frequency", "Hz", 20.0f, 20000.0f, 66.0f, 0u },
+  { "b6_gain", "Band 6 Gain", "dB", -15.0f, 15.0f, 0.0f, 0u },
+  { "b6_q", "Band 6 Q", "", 0.3f, 116.0f, 1.0f, 0u },
+  { "b6_on", "Band 6 On", "", 0.0f, 1.0f, 0.0f, OMX_PLUGIN_PARAM_TOGGLE },
+  { "b7_type", "Band 7 Type", "", 0.0f, 5.0f, 0.0f, OMX_PLUGIN_PARAM_INTEGER },
+  { "b7_freq", "Band 7 Frequency", "Hz", 20.0f, 20000.0f, 81.0f, 0u },
+  { "b7_gain", "Band 7 Gain", "dB", -15.0f, 15.0f, 0.0f, 0u },
+  { "b7_q", "Band 7 Q", "", 0.3f, 116.0f, 1.0f, 0u },
+  { "b7_on", "Band 7 On", "", 0.0f, 1.0f, 0.0f, OMX_PLUGIN_PARAM_TOGGLE },
+  { "b8_type", "Band 8 Type", "", 0.0f, 5.0f, 0.0f, OMX_PLUGIN_PARAM_INTEGER },
+  { "b8_freq", "Band 8 Frequency", "Hz", 20.0f, 20000.0f, 101.0f, 0u },
+  { "b8_gain", "Band 8 Gain", "dB", -15.0f, 15.0f, 0.0f, 0u },
+  { "b8_q", "Band 8 Q", "", 0.3f, 116.0f, 1.0f, 0u },
+  { "b8_on", "Band 8 On", "", 0.0f, 1.0f, 0.0f, OMX_PLUGIN_PARAM_TOGGLE },
+  { "b9_type", "Band 9 Type", "", 0.0f, 5.0f, 0.0f, OMX_PLUGIN_PARAM_INTEGER },
+  { "b9_freq", "Band 9 Frequency", "Hz", 20.0f, 20000.0f, 125.0f, 0u },
+  { "b9_gain", "Band 9 Gain", "dB", -15.0f, 15.0f, 0.0f, 0u },
+  { "b9_q", "Band 9 Q", "", 0.3f, 116.0f, 1.0f, 0u },
+  { "b9_on", "Band 9 On", "", 0.0f, 1.0f, 0.0f, OMX_PLUGIN_PARAM_TOGGLE },
+  { "b10_type", "Band 10 Type", "", 0.0f, 5.0f, 0.0f, OMX_PLUGIN_PARAM_INTEGER },
+  { "b10_freq", "Band 10 Frequency", "Hz", 20.0f, 20000.0f, 155.0f, 0u },
+  { "b10_gain", "Band 10 Gain", "dB", -15.0f, 15.0f, 0.0f, 0u },
+  { "b10_q", "Band 10 Q", "", 0.3f, 116.0f, 1.0f, 0u },
+  { "b10_on", "Band 10 On", "", 0.0f, 1.0f, 0.0f, OMX_PLUGIN_PARAM_TOGGLE },
+  { "b11_type", "Band 11 Type", "", 0.0f, 5.0f, 0.0f, OMX_PLUGIN_PARAM_INTEGER },
+  { "b11_freq", "Band 11 Frequency", "Hz", 20.0f, 20000.0f, 193.0f, 0u },
+  { "b11_gain", "Band 11 Gain", "dB", -15.0f, 15.0f, 0.0f, 0u },
+  { "b11_q", "Band 11 Q", "", 0.3f, 116.0f, 1.0f, 0u },
+  { "b11_on", "Band 11 On", "", 0.0f, 1.0f, 0.0f, OMX_PLUGIN_PARAM_TOGGLE },
+  { "b12_type", "Band 12 Type", "", 0.0f, 5.0f, 0.0f, OMX_PLUGIN_PARAM_INTEGER },
+  { "b12_freq", "Band 12 Frequency", "Hz", 20.0f, 20000.0f, 239.0f, 0u },
+  { "b12_gain", "Band 12 Gain", "dB", -15.0f, 15.0f, 0.0f, 0u },
+  { "b12_q", "Band 12 Q", "", 0.3f, 116.0f, 1.0f, 0u },
+  { "b12_on", "Band 12 On", "", 0.0f, 1.0f, 0.0f, OMX_PLUGIN_PARAM_TOGGLE },
+  { "b13_type", "Band 13 Type", "", 0.0f, 5.0f, 0.0f, OMX_PLUGIN_PARAM_INTEGER },
+  { "b13_freq", "Band 13 Frequency", "Hz", 20.0f, 20000.0f, 297.0f, 0u },
+  { "b13_gain", "Band 13 Gain", "dB", -15.0f, 15.0f, 0.0f, 0u },
+  { "b13_q", "Band 13 Q", "", 0.3f, 116.0f, 1.0f, 0u },
+  { "b13_on", "Band 13 On", "", 0.0f, 1.0f, 0.0f, OMX_PLUGIN_PARAM_TOGGLE },
+  { "b14_type", "Band 14 Type", "", 0.0f, 5.0f, 0.0f, OMX_PLUGIN_PARAM_INTEGER },
+  { "b14_freq", "Band 14 Frequency", "Hz", 20.0f, 20000.0f, 369.0f, 0u },
+  { "b14_gain", "Band 14 Gain", "dB", -15.0f, 15.0f, 0.0f, 0u },
+  { "b14_q", "Band 14 Q", "", 0.3f, 116.0f, 1.0f, 0u },
+  { "b14_on", "Band 14 On", "", 0.0f, 1.0f, 0.0f, OMX_PLUGIN_PARAM_TOGGLE },
+  { "b15_type", "Band 15 Type", "", 0.0f, 5.0f, 0.0f, OMX_PLUGIN_PARAM_INTEGER },
+  { "b15_freq", "Band 15 Frequency", "Hz", 20.0f, 20000.0f, 458.0f, 0u },
+  { "b15_gain", "Band 15 Gain", "dB", -15.0f, 15.0f, 0.0f, 0u },
+  { "b15_q", "Band 15 Q", "", 0.3f, 116.0f, 1.0f, 0u },
+  { "b15_on", "Band 15 On", "", 0.0f, 1.0f, 0.0f, OMX_PLUGIN_PARAM_TOGGLE },
+  { "b16_type", "Band 16 Type", "", 0.0f, 5.0f, 0.0f, OMX_PLUGIN_PARAM_INTEGER },
+  { "b16_freq", "Band 16 Frequency", "Hz", 20.0f, 20000.0f, 568.0f, 0u },
+  { "b16_gain", "Band 16 Gain", "dB", -15.0f, 15.0f, 0.0f, 0u },
+  { "b16_q", "Band 16 Q", "", 0.3f, 116.0f, 1.0f, 0u },
+  { "b16_on", "Band 16 On", "", 0.0f, 1.0f, 0.0f, OMX_PLUGIN_PARAM_TOGGLE },
+  { "b17_type", "Band 17 Type", "", 0.0f, 5.0f, 0.0f, OMX_PLUGIN_PARAM_INTEGER },
+  { "b17_freq", "Band 17 Frequency", "Hz", 20.0f, 20000.0f, 705.0f, 0u },
+  { "b17_gain", "Band 17 Gain", "dB", -15.0f, 15.0f, 0.0f, 0u },
+  { "b17_q", "Band 17 Q", "", 0.3f, 116.0f, 1.0f, 0u },
+  { "b17_on", "Band 17 On", "", 0.0f, 1.0f, 0.0f, OMX_PLUGIN_PARAM_TOGGLE },
+  { "b18_type", "Band 18 Type", "", 0.0f, 5.0f, 0.0f, OMX_PLUGIN_PARAM_INTEGER },
+  { "b18_freq", "Band 18 Frequency", "Hz", 20.0f, 20000.0f, 874.0f, 0u },
+  { "b18_gain", "Band 18 Gain", "dB", -15.0f, 15.0f, 0.0f, 0u },
+  { "b18_q", "Band 18 Q", "", 0.3f, 116.0f, 1.0f, 0u },
+  { "b18_on", "Band 18 On", "", 0.0f, 1.0f, 0.0f, OMX_PLUGIN_PARAM_TOGGLE },
+  { "b19_type", "Band 19 Type", "", 0.0f, 5.0f, 0.0f, OMX_PLUGIN_PARAM_INTEGER },
+  { "b19_freq", "Band 19 Frequency", "Hz", 20.0f, 20000.0f, 1085.0f, 0u },
+  { "b19_gain", "Band 19 Gain", "dB", -15.0f, 15.0f, 0.0f, 0u },
+  { "b19_q", "Band 19 Q", "", 0.3f, 116.0f, 1.0f, 0u },
+  { "b19_on", "Band 19 On", "", 0.0f, 1.0f, 0.0f, OMX_PLUGIN_PARAM_TOGGLE },
+  { "b20_type", "Band 20 Type", "", 0.0f, 5.0f, 0.0f, OMX_PLUGIN_PARAM_INTEGER },
+  { "b20_freq", "Band 20 Frequency", "Hz", 20.0f, 20000.0f, 1346.0f, 0u },
+  { "b20_gain", "Band 20 Gain", "dB", -15.0f, 15.0f, 0.0f, 0u },
+  { "b20_q", "Band 20 Q", "", 0.3f, 116.0f, 1.0f, 0u },
+  { "b20_on", "Band 20 On", "", 0.0f, 1.0f, 0.0f, OMX_PLUGIN_PARAM_TOGGLE },
+  { "b21_type", "Band 21 Type", "", 0.0f, 5.0f, 0.0f, OMX_PLUGIN_PARAM_INTEGER },
+  { "b21_freq", "Band 21 Frequency", "Hz", 20.0f, 20000.0f, 1671.0f, 0u },
+  { "b21_gain", "Band 21 Gain", "dB", -15.0f, 15.0f, 0.0f, 0u },
+  { "b21_q", "Band 21 Q", "", 0.3f, 116.0f, 1.0f, 0u },
+  { "b21_on", "Band 21 On", "", 0.0f, 1.0f, 0.0f, OMX_PLUGIN_PARAM_TOGGLE },
+  { "b22_type", "Band 22 Type", "", 0.0f, 5.0f, 0.0f, OMX_PLUGIN_PARAM_INTEGER },
+  { "b22_freq", "Band 22 Frequency", "Hz", 20.0f, 20000.0f, 2073.0f, 0u },
+  { "b22_gain", "Band 22 Gain", "dB", -15.0f, 15.0f, 0.0f, 0u },
+  { "b22_q", "Band 22 Q", "", 0.3f, 116.0f, 1.0f, 0u },
+  { "b22_on", "Band 22 On", "", 0.0f, 1.0f, 0.0f, OMX_PLUGIN_PARAM_TOGGLE },
+  { "b23_type", "Band 23 Type", "", 0.0f, 5.0f, 0.0f, OMX_PLUGIN_PARAM_INTEGER },
+  { "b23_freq", "Band 23 Frequency", "Hz", 20.0f, 20000.0f, 2573.0f, 0u },
+  { "b23_gain", "Band 23 Gain", "dB", -15.0f, 15.0f, 0.0f, 0u },
+  { "b23_q", "Band 23 Q", "", 0.3f, 116.0f, 1.0f, 0u },
+  { "b23_on", "Band 23 On", "", 0.0f, 1.0f, 0.0f, OMX_PLUGIN_PARAM_TOGGLE },
+  { "b24_type", "Band 24 Type", "", 0.0f, 5.0f, 0.0f, OMX_PLUGIN_PARAM_INTEGER },
+  { "b24_freq", "Band 24 Frequency", "Hz", 20.0f, 20000.0f, 3193.0f, 0u },
+  { "b24_gain", "Band 24 Gain", "dB", -15.0f, 15.0f, 0.0f, 0u },
+  { "b24_q", "Band 24 Q", "", 0.3f, 116.0f, 1.0f, 0u },
+  { "b24_on", "Band 24 On", "", 0.0f, 1.0f, 0.0f, OMX_PLUGIN_PARAM_TOGGLE },
+  { "b25_type", "Band 25 Type", "", 0.0f, 5.0f, 0.0f, OMX_PLUGIN_PARAM_INTEGER },
+  { "b25_freq", "Band 25 Frequency", "Hz", 20.0f, 20000.0f, 3962.0f, 0u },
+  { "b25_gain", "Band 25 Gain", "dB", -15.0f, 15.0f, 0.0f, 0u },
+  { "b25_q", "Band 25 Q", "", 0.3f, 116.0f, 1.0f, 0u },
+  { "b25_on", "Band 25 On", "", 0.0f, 1.0f, 0.0f, OMX_PLUGIN_PARAM_TOGGLE },
+  { "b26_type", "Band 26 Type", "", 0.0f, 5.0f, 0.0f, OMX_PLUGIN_PARAM_INTEGER },
+  { "b26_freq", "Band 26 Frequency", "Hz", 20.0f, 20000.0f, 4916.0f, 0u },
+  { "b26_gain", "Band 26 Gain", "dB", -15.0f, 15.0f, 0.0f, 0u },
+  { "b26_q", "Band 26 Q", "", 0.3f, 116.0f, 1.0f, 0u },
+  { "b26_on", "Band 26 On", "", 0.0f, 1.0f, 0.0f, OMX_PLUGIN_PARAM_TOGGLE },
+  { "b27_type", "Band 27 Type", "", 0.0f, 5.0f, 0.0f, OMX_PLUGIN_PARAM_INTEGER },
+  { "b27_freq", "Band 27 Frequency", "Hz", 20.0f, 20000.0f, 6101.0f, 0u },
+  { "b27_gain", "Band 27 Gain", "dB", -15.0f, 15.0f, 0.0f, 0u },
+  { "b27_q", "Band 27 Q", "", 0.3f, 116.0f, 1.0f, 0u },
+  { "b27_on", "Band 27 On", "", 0.0f, 1.0f, 0.0f, OMX_PLUGIN_PARAM_TOGGLE },
+  { "b28_type", "Band 28 Type", "", 0.0f, 5.0f, 0.0f, OMX_PLUGIN_PARAM_INTEGER },
+  { "b28_freq", "Band 28 Frequency", "Hz", 20.0f, 20000.0f, 7571.0f, 0u },
+  { "b28_gain", "Band 28 Gain", "dB", -15.0f, 15.0f, 0.0f, 0u },
+  { "b28_q", "Band 28 Q", "", 0.3f, 116.0f, 1.0f, 0u },
+  { "b28_on", "Band 28 On", "", 0.0f, 1.0f, 0.0f, OMX_PLUGIN_PARAM_TOGGLE },
+  { "b29_type", "Band 29 Type", "", 0.0f, 5.0f, 0.0f, OMX_PLUGIN_PARAM_INTEGER },
+  { "b29_freq", "Band 29 Frequency", "Hz", 20.0f, 20000.0f, 9395.0f, 0u },
+  { "b29_gain", "Band 29 Gain", "dB", -15.0f, 15.0f, 0.0f, 0u },
+  { "b29_q", "Band 29 Q", "", 0.3f, 116.0f, 1.0f, 0u },
+  { "b29_on", "Band 29 On", "", 0.0f, 1.0f, 0.0f, OMX_PLUGIN_PARAM_TOGGLE },
+  { "b30_type", "Band 30 Type", "", 0.0f, 5.0f, 0.0f, OMX_PLUGIN_PARAM_INTEGER },
+  { "b30_freq", "Band 30 Frequency", "Hz", 20.0f, 20000.0f, 11659.0f, 0u },
+  { "b30_gain", "Band 30 Gain", "dB", -15.0f, 15.0f, 0.0f, 0u },
+  { "b30_q", "Band 30 Q", "", 0.3f, 116.0f, 1.0f, 0u },
+  { "b30_on", "Band 30 On", "", 0.0f, 1.0f, 0.0f, OMX_PLUGIN_PARAM_TOGGLE },
+  { "b31_type", "Band 31 Type", "", 0.0f, 5.0f, 0.0f, OMX_PLUGIN_PARAM_INTEGER },
+  { "b31_freq", "Band 31 Frequency", "Hz", 20.0f, 20000.0f, 14468.0f, 0u },
+  { "b31_gain", "Band 31 Gain", "dB", -15.0f, 15.0f, 0.0f, 0u },
+  { "b31_q", "Band 31 Q", "", 0.3f, 116.0f, 1.0f, 0u },
+  { "b31_on", "Band 31 On", "", 0.0f, 1.0f, 0.0f, OMX_PLUGIN_PARAM_TOGGLE },
+  { "b32_type", "Band 32 Type", "", 0.0f, 5.0f, 0.0f, OMX_PLUGIN_PARAM_INTEGER },
+  { "b32_freq", "Band 32 Frequency", "Hz", 20.0f, 20000.0f, 17954.0f, 0u },
+  { "b32_gain", "Band 32 Gain", "dB", -15.0f, 15.0f, 0.0f, 0u },
+  { "b32_q", "Band 32 Q", "", 0.3f, 116.0f, 1.0f, 0u },
+  { "b32_on", "Band 32 On", "", 0.0f, 1.0f, 0.0f, OMX_PLUGIN_PARAM_TOGGLE },
+};
+
+/* One macro per declared bound: what a C face reads where a constant is needed. */
+#define OMX_EQ32_PARAM_ON_MIN 0.0f
+#define OMX_EQ32_PARAM_ON_MAX 1.0f
+#define OMX_EQ32_PARAM_ON_DEFAULT 1.0f
+#define OMX_EQ32_PARAM_HPF_ON_MIN 0.0f
+#define OMX_EQ32_PARAM_HPF_ON_MAX 1.0f
+#define OMX_EQ32_PARAM_HPF_ON_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_HPF_FREQ_MIN 20.0f
+#define OMX_EQ32_PARAM_HPF_FREQ_MAX 1000.0f
+#define OMX_EQ32_PARAM_HPF_FREQ_DEFAULT 80.0f
+#define OMX_EQ32_PARAM_HPF_SLOPE_MIN 12.0f
+#define OMX_EQ32_PARAM_HPF_SLOPE_MAX 24.0f
+#define OMX_EQ32_PARAM_HPF_SLOPE_DEFAULT 12.0f
+#define OMX_EQ32_PARAM_LPF_ON_MIN 0.0f
+#define OMX_EQ32_PARAM_LPF_ON_MAX 1.0f
+#define OMX_EQ32_PARAM_LPF_ON_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_LPF_FREQ_MIN 1000.0f
+#define OMX_EQ32_PARAM_LPF_FREQ_MAX 20000.0f
+#define OMX_EQ32_PARAM_LPF_FREQ_DEFAULT 18000.0f
+#define OMX_EQ32_PARAM_LPF_SLOPE_MIN 12.0f
+#define OMX_EQ32_PARAM_LPF_SLOPE_MAX 24.0f
+#define OMX_EQ32_PARAM_LPF_SLOPE_DEFAULT 12.0f
+#define OMX_EQ32_PARAM_B1_TYPE_MIN 0.0f
+#define OMX_EQ32_PARAM_B1_TYPE_MAX 5.0f
+#define OMX_EQ32_PARAM_B1_TYPE_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_B1_FREQ_MIN 20.0f
+#define OMX_EQ32_PARAM_B1_FREQ_MAX 20000.0f
+#define OMX_EQ32_PARAM_B1_FREQ_DEFAULT 22.0f
+#define OMX_EQ32_PARAM_B1_GAIN_MIN -15.0f
+#define OMX_EQ32_PARAM_B1_GAIN_MAX 15.0f
+#define OMX_EQ32_PARAM_B1_GAIN_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_B1_Q_MIN 0.3f
+#define OMX_EQ32_PARAM_B1_Q_MAX 116.0f
+#define OMX_EQ32_PARAM_B1_Q_DEFAULT 1.0f
+#define OMX_EQ32_PARAM_B1_ON_MIN 0.0f
+#define OMX_EQ32_PARAM_B1_ON_MAX 1.0f
+#define OMX_EQ32_PARAM_B1_ON_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_B2_TYPE_MIN 0.0f
+#define OMX_EQ32_PARAM_B2_TYPE_MAX 5.0f
+#define OMX_EQ32_PARAM_B2_TYPE_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_B2_FREQ_MIN 20.0f
+#define OMX_EQ32_PARAM_B2_FREQ_MAX 20000.0f
+#define OMX_EQ32_PARAM_B2_FREQ_DEFAULT 28.0f
+#define OMX_EQ32_PARAM_B2_GAIN_MIN -15.0f
+#define OMX_EQ32_PARAM_B2_GAIN_MAX 15.0f
+#define OMX_EQ32_PARAM_B2_GAIN_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_B2_Q_MIN 0.3f
+#define OMX_EQ32_PARAM_B2_Q_MAX 116.0f
+#define OMX_EQ32_PARAM_B2_Q_DEFAULT 1.0f
+#define OMX_EQ32_PARAM_B2_ON_MIN 0.0f
+#define OMX_EQ32_PARAM_B2_ON_MAX 1.0f
+#define OMX_EQ32_PARAM_B2_ON_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_B3_TYPE_MIN 0.0f
+#define OMX_EQ32_PARAM_B3_TYPE_MAX 5.0f
+#define OMX_EQ32_PARAM_B3_TYPE_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_B3_FREQ_MIN 20.0f
+#define OMX_EQ32_PARAM_B3_FREQ_MAX 20000.0f
+#define OMX_EQ32_PARAM_B3_FREQ_DEFAULT 34.0f
+#define OMX_EQ32_PARAM_B3_GAIN_MIN -15.0f
+#define OMX_EQ32_PARAM_B3_GAIN_MAX 15.0f
+#define OMX_EQ32_PARAM_B3_GAIN_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_B3_Q_MIN 0.3f
+#define OMX_EQ32_PARAM_B3_Q_MAX 116.0f
+#define OMX_EQ32_PARAM_B3_Q_DEFAULT 1.0f
+#define OMX_EQ32_PARAM_B3_ON_MIN 0.0f
+#define OMX_EQ32_PARAM_B3_ON_MAX 1.0f
+#define OMX_EQ32_PARAM_B3_ON_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_B4_TYPE_MIN 0.0f
+#define OMX_EQ32_PARAM_B4_TYPE_MAX 5.0f
+#define OMX_EQ32_PARAM_B4_TYPE_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_B4_FREQ_MIN 20.0f
+#define OMX_EQ32_PARAM_B4_FREQ_MAX 20000.0f
+#define OMX_EQ32_PARAM_B4_FREQ_DEFAULT 43.0f
+#define OMX_EQ32_PARAM_B4_GAIN_MIN -15.0f
+#define OMX_EQ32_PARAM_B4_GAIN_MAX 15.0f
+#define OMX_EQ32_PARAM_B4_GAIN_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_B4_Q_MIN 0.3f
+#define OMX_EQ32_PARAM_B4_Q_MAX 116.0f
+#define OMX_EQ32_PARAM_B4_Q_DEFAULT 1.0f
+#define OMX_EQ32_PARAM_B4_ON_MIN 0.0f
+#define OMX_EQ32_PARAM_B4_ON_MAX 1.0f
+#define OMX_EQ32_PARAM_B4_ON_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_B5_TYPE_MIN 0.0f
+#define OMX_EQ32_PARAM_B5_TYPE_MAX 5.0f
+#define OMX_EQ32_PARAM_B5_TYPE_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_B5_FREQ_MIN 20.0f
+#define OMX_EQ32_PARAM_B5_FREQ_MAX 20000.0f
+#define OMX_EQ32_PARAM_B5_FREQ_DEFAULT 53.0f
+#define OMX_EQ32_PARAM_B5_GAIN_MIN -15.0f
+#define OMX_EQ32_PARAM_B5_GAIN_MAX 15.0f
+#define OMX_EQ32_PARAM_B5_GAIN_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_B5_Q_MIN 0.3f
+#define OMX_EQ32_PARAM_B5_Q_MAX 116.0f
+#define OMX_EQ32_PARAM_B5_Q_DEFAULT 1.0f
+#define OMX_EQ32_PARAM_B5_ON_MIN 0.0f
+#define OMX_EQ32_PARAM_B5_ON_MAX 1.0f
+#define OMX_EQ32_PARAM_B5_ON_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_B6_TYPE_MIN 0.0f
+#define OMX_EQ32_PARAM_B6_TYPE_MAX 5.0f
+#define OMX_EQ32_PARAM_B6_TYPE_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_B6_FREQ_MIN 20.0f
+#define OMX_EQ32_PARAM_B6_FREQ_MAX 20000.0f
+#define OMX_EQ32_PARAM_B6_FREQ_DEFAULT 66.0f
+#define OMX_EQ32_PARAM_B6_GAIN_MIN -15.0f
+#define OMX_EQ32_PARAM_B6_GAIN_MAX 15.0f
+#define OMX_EQ32_PARAM_B6_GAIN_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_B6_Q_MIN 0.3f
+#define OMX_EQ32_PARAM_B6_Q_MAX 116.0f
+#define OMX_EQ32_PARAM_B6_Q_DEFAULT 1.0f
+#define OMX_EQ32_PARAM_B6_ON_MIN 0.0f
+#define OMX_EQ32_PARAM_B6_ON_MAX 1.0f
+#define OMX_EQ32_PARAM_B6_ON_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_B7_TYPE_MIN 0.0f
+#define OMX_EQ32_PARAM_B7_TYPE_MAX 5.0f
+#define OMX_EQ32_PARAM_B7_TYPE_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_B7_FREQ_MIN 20.0f
+#define OMX_EQ32_PARAM_B7_FREQ_MAX 20000.0f
+#define OMX_EQ32_PARAM_B7_FREQ_DEFAULT 81.0f
+#define OMX_EQ32_PARAM_B7_GAIN_MIN -15.0f
+#define OMX_EQ32_PARAM_B7_GAIN_MAX 15.0f
+#define OMX_EQ32_PARAM_B7_GAIN_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_B7_Q_MIN 0.3f
+#define OMX_EQ32_PARAM_B7_Q_MAX 116.0f
+#define OMX_EQ32_PARAM_B7_Q_DEFAULT 1.0f
+#define OMX_EQ32_PARAM_B7_ON_MIN 0.0f
+#define OMX_EQ32_PARAM_B7_ON_MAX 1.0f
+#define OMX_EQ32_PARAM_B7_ON_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_B8_TYPE_MIN 0.0f
+#define OMX_EQ32_PARAM_B8_TYPE_MAX 5.0f
+#define OMX_EQ32_PARAM_B8_TYPE_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_B8_FREQ_MIN 20.0f
+#define OMX_EQ32_PARAM_B8_FREQ_MAX 20000.0f
+#define OMX_EQ32_PARAM_B8_FREQ_DEFAULT 101.0f
+#define OMX_EQ32_PARAM_B8_GAIN_MIN -15.0f
+#define OMX_EQ32_PARAM_B8_GAIN_MAX 15.0f
+#define OMX_EQ32_PARAM_B8_GAIN_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_B8_Q_MIN 0.3f
+#define OMX_EQ32_PARAM_B8_Q_MAX 116.0f
+#define OMX_EQ32_PARAM_B8_Q_DEFAULT 1.0f
+#define OMX_EQ32_PARAM_B8_ON_MIN 0.0f
+#define OMX_EQ32_PARAM_B8_ON_MAX 1.0f
+#define OMX_EQ32_PARAM_B8_ON_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_B9_TYPE_MIN 0.0f
+#define OMX_EQ32_PARAM_B9_TYPE_MAX 5.0f
+#define OMX_EQ32_PARAM_B9_TYPE_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_B9_FREQ_MIN 20.0f
+#define OMX_EQ32_PARAM_B9_FREQ_MAX 20000.0f
+#define OMX_EQ32_PARAM_B9_FREQ_DEFAULT 125.0f
+#define OMX_EQ32_PARAM_B9_GAIN_MIN -15.0f
+#define OMX_EQ32_PARAM_B9_GAIN_MAX 15.0f
+#define OMX_EQ32_PARAM_B9_GAIN_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_B9_Q_MIN 0.3f
+#define OMX_EQ32_PARAM_B9_Q_MAX 116.0f
+#define OMX_EQ32_PARAM_B9_Q_DEFAULT 1.0f
+#define OMX_EQ32_PARAM_B9_ON_MIN 0.0f
+#define OMX_EQ32_PARAM_B9_ON_MAX 1.0f
+#define OMX_EQ32_PARAM_B9_ON_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_B10_TYPE_MIN 0.0f
+#define OMX_EQ32_PARAM_B10_TYPE_MAX 5.0f
+#define OMX_EQ32_PARAM_B10_TYPE_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_B10_FREQ_MIN 20.0f
+#define OMX_EQ32_PARAM_B10_FREQ_MAX 20000.0f
+#define OMX_EQ32_PARAM_B10_FREQ_DEFAULT 155.0f
+#define OMX_EQ32_PARAM_B10_GAIN_MIN -15.0f
+#define OMX_EQ32_PARAM_B10_GAIN_MAX 15.0f
+#define OMX_EQ32_PARAM_B10_GAIN_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_B10_Q_MIN 0.3f
+#define OMX_EQ32_PARAM_B10_Q_MAX 116.0f
+#define OMX_EQ32_PARAM_B10_Q_DEFAULT 1.0f
+#define OMX_EQ32_PARAM_B10_ON_MIN 0.0f
+#define OMX_EQ32_PARAM_B10_ON_MAX 1.0f
+#define OMX_EQ32_PARAM_B10_ON_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_B11_TYPE_MIN 0.0f
+#define OMX_EQ32_PARAM_B11_TYPE_MAX 5.0f
+#define OMX_EQ32_PARAM_B11_TYPE_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_B11_FREQ_MIN 20.0f
+#define OMX_EQ32_PARAM_B11_FREQ_MAX 20000.0f
+#define OMX_EQ32_PARAM_B11_FREQ_DEFAULT 193.0f
+#define OMX_EQ32_PARAM_B11_GAIN_MIN -15.0f
+#define OMX_EQ32_PARAM_B11_GAIN_MAX 15.0f
+#define OMX_EQ32_PARAM_B11_GAIN_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_B11_Q_MIN 0.3f
+#define OMX_EQ32_PARAM_B11_Q_MAX 116.0f
+#define OMX_EQ32_PARAM_B11_Q_DEFAULT 1.0f
+#define OMX_EQ32_PARAM_B11_ON_MIN 0.0f
+#define OMX_EQ32_PARAM_B11_ON_MAX 1.0f
+#define OMX_EQ32_PARAM_B11_ON_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_B12_TYPE_MIN 0.0f
+#define OMX_EQ32_PARAM_B12_TYPE_MAX 5.0f
+#define OMX_EQ32_PARAM_B12_TYPE_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_B12_FREQ_MIN 20.0f
+#define OMX_EQ32_PARAM_B12_FREQ_MAX 20000.0f
+#define OMX_EQ32_PARAM_B12_FREQ_DEFAULT 239.0f
+#define OMX_EQ32_PARAM_B12_GAIN_MIN -15.0f
+#define OMX_EQ32_PARAM_B12_GAIN_MAX 15.0f
+#define OMX_EQ32_PARAM_B12_GAIN_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_B12_Q_MIN 0.3f
+#define OMX_EQ32_PARAM_B12_Q_MAX 116.0f
+#define OMX_EQ32_PARAM_B12_Q_DEFAULT 1.0f
+#define OMX_EQ32_PARAM_B12_ON_MIN 0.0f
+#define OMX_EQ32_PARAM_B12_ON_MAX 1.0f
+#define OMX_EQ32_PARAM_B12_ON_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_B13_TYPE_MIN 0.0f
+#define OMX_EQ32_PARAM_B13_TYPE_MAX 5.0f
+#define OMX_EQ32_PARAM_B13_TYPE_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_B13_FREQ_MIN 20.0f
+#define OMX_EQ32_PARAM_B13_FREQ_MAX 20000.0f
+#define OMX_EQ32_PARAM_B13_FREQ_DEFAULT 297.0f
+#define OMX_EQ32_PARAM_B13_GAIN_MIN -15.0f
+#define OMX_EQ32_PARAM_B13_GAIN_MAX 15.0f
+#define OMX_EQ32_PARAM_B13_GAIN_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_B13_Q_MIN 0.3f
+#define OMX_EQ32_PARAM_B13_Q_MAX 116.0f
+#define OMX_EQ32_PARAM_B13_Q_DEFAULT 1.0f
+#define OMX_EQ32_PARAM_B13_ON_MIN 0.0f
+#define OMX_EQ32_PARAM_B13_ON_MAX 1.0f
+#define OMX_EQ32_PARAM_B13_ON_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_B14_TYPE_MIN 0.0f
+#define OMX_EQ32_PARAM_B14_TYPE_MAX 5.0f
+#define OMX_EQ32_PARAM_B14_TYPE_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_B14_FREQ_MIN 20.0f
+#define OMX_EQ32_PARAM_B14_FREQ_MAX 20000.0f
+#define OMX_EQ32_PARAM_B14_FREQ_DEFAULT 369.0f
+#define OMX_EQ32_PARAM_B14_GAIN_MIN -15.0f
+#define OMX_EQ32_PARAM_B14_GAIN_MAX 15.0f
+#define OMX_EQ32_PARAM_B14_GAIN_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_B14_Q_MIN 0.3f
+#define OMX_EQ32_PARAM_B14_Q_MAX 116.0f
+#define OMX_EQ32_PARAM_B14_Q_DEFAULT 1.0f
+#define OMX_EQ32_PARAM_B14_ON_MIN 0.0f
+#define OMX_EQ32_PARAM_B14_ON_MAX 1.0f
+#define OMX_EQ32_PARAM_B14_ON_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_B15_TYPE_MIN 0.0f
+#define OMX_EQ32_PARAM_B15_TYPE_MAX 5.0f
+#define OMX_EQ32_PARAM_B15_TYPE_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_B15_FREQ_MIN 20.0f
+#define OMX_EQ32_PARAM_B15_FREQ_MAX 20000.0f
+#define OMX_EQ32_PARAM_B15_FREQ_DEFAULT 458.0f
+#define OMX_EQ32_PARAM_B15_GAIN_MIN -15.0f
+#define OMX_EQ32_PARAM_B15_GAIN_MAX 15.0f
+#define OMX_EQ32_PARAM_B15_GAIN_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_B15_Q_MIN 0.3f
+#define OMX_EQ32_PARAM_B15_Q_MAX 116.0f
+#define OMX_EQ32_PARAM_B15_Q_DEFAULT 1.0f
+#define OMX_EQ32_PARAM_B15_ON_MIN 0.0f
+#define OMX_EQ32_PARAM_B15_ON_MAX 1.0f
+#define OMX_EQ32_PARAM_B15_ON_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_B16_TYPE_MIN 0.0f
+#define OMX_EQ32_PARAM_B16_TYPE_MAX 5.0f
+#define OMX_EQ32_PARAM_B16_TYPE_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_B16_FREQ_MIN 20.0f
+#define OMX_EQ32_PARAM_B16_FREQ_MAX 20000.0f
+#define OMX_EQ32_PARAM_B16_FREQ_DEFAULT 568.0f
+#define OMX_EQ32_PARAM_B16_GAIN_MIN -15.0f
+#define OMX_EQ32_PARAM_B16_GAIN_MAX 15.0f
+#define OMX_EQ32_PARAM_B16_GAIN_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_B16_Q_MIN 0.3f
+#define OMX_EQ32_PARAM_B16_Q_MAX 116.0f
+#define OMX_EQ32_PARAM_B16_Q_DEFAULT 1.0f
+#define OMX_EQ32_PARAM_B16_ON_MIN 0.0f
+#define OMX_EQ32_PARAM_B16_ON_MAX 1.0f
+#define OMX_EQ32_PARAM_B16_ON_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_B17_TYPE_MIN 0.0f
+#define OMX_EQ32_PARAM_B17_TYPE_MAX 5.0f
+#define OMX_EQ32_PARAM_B17_TYPE_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_B17_FREQ_MIN 20.0f
+#define OMX_EQ32_PARAM_B17_FREQ_MAX 20000.0f
+#define OMX_EQ32_PARAM_B17_FREQ_DEFAULT 705.0f
+#define OMX_EQ32_PARAM_B17_GAIN_MIN -15.0f
+#define OMX_EQ32_PARAM_B17_GAIN_MAX 15.0f
+#define OMX_EQ32_PARAM_B17_GAIN_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_B17_Q_MIN 0.3f
+#define OMX_EQ32_PARAM_B17_Q_MAX 116.0f
+#define OMX_EQ32_PARAM_B17_Q_DEFAULT 1.0f
+#define OMX_EQ32_PARAM_B17_ON_MIN 0.0f
+#define OMX_EQ32_PARAM_B17_ON_MAX 1.0f
+#define OMX_EQ32_PARAM_B17_ON_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_B18_TYPE_MIN 0.0f
+#define OMX_EQ32_PARAM_B18_TYPE_MAX 5.0f
+#define OMX_EQ32_PARAM_B18_TYPE_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_B18_FREQ_MIN 20.0f
+#define OMX_EQ32_PARAM_B18_FREQ_MAX 20000.0f
+#define OMX_EQ32_PARAM_B18_FREQ_DEFAULT 874.0f
+#define OMX_EQ32_PARAM_B18_GAIN_MIN -15.0f
+#define OMX_EQ32_PARAM_B18_GAIN_MAX 15.0f
+#define OMX_EQ32_PARAM_B18_GAIN_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_B18_Q_MIN 0.3f
+#define OMX_EQ32_PARAM_B18_Q_MAX 116.0f
+#define OMX_EQ32_PARAM_B18_Q_DEFAULT 1.0f
+#define OMX_EQ32_PARAM_B18_ON_MIN 0.0f
+#define OMX_EQ32_PARAM_B18_ON_MAX 1.0f
+#define OMX_EQ32_PARAM_B18_ON_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_B19_TYPE_MIN 0.0f
+#define OMX_EQ32_PARAM_B19_TYPE_MAX 5.0f
+#define OMX_EQ32_PARAM_B19_TYPE_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_B19_FREQ_MIN 20.0f
+#define OMX_EQ32_PARAM_B19_FREQ_MAX 20000.0f
+#define OMX_EQ32_PARAM_B19_FREQ_DEFAULT 1085.0f
+#define OMX_EQ32_PARAM_B19_GAIN_MIN -15.0f
+#define OMX_EQ32_PARAM_B19_GAIN_MAX 15.0f
+#define OMX_EQ32_PARAM_B19_GAIN_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_B19_Q_MIN 0.3f
+#define OMX_EQ32_PARAM_B19_Q_MAX 116.0f
+#define OMX_EQ32_PARAM_B19_Q_DEFAULT 1.0f
+#define OMX_EQ32_PARAM_B19_ON_MIN 0.0f
+#define OMX_EQ32_PARAM_B19_ON_MAX 1.0f
+#define OMX_EQ32_PARAM_B19_ON_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_B20_TYPE_MIN 0.0f
+#define OMX_EQ32_PARAM_B20_TYPE_MAX 5.0f
+#define OMX_EQ32_PARAM_B20_TYPE_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_B20_FREQ_MIN 20.0f
+#define OMX_EQ32_PARAM_B20_FREQ_MAX 20000.0f
+#define OMX_EQ32_PARAM_B20_FREQ_DEFAULT 1346.0f
+#define OMX_EQ32_PARAM_B20_GAIN_MIN -15.0f
+#define OMX_EQ32_PARAM_B20_GAIN_MAX 15.0f
+#define OMX_EQ32_PARAM_B20_GAIN_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_B20_Q_MIN 0.3f
+#define OMX_EQ32_PARAM_B20_Q_MAX 116.0f
+#define OMX_EQ32_PARAM_B20_Q_DEFAULT 1.0f
+#define OMX_EQ32_PARAM_B20_ON_MIN 0.0f
+#define OMX_EQ32_PARAM_B20_ON_MAX 1.0f
+#define OMX_EQ32_PARAM_B20_ON_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_B21_TYPE_MIN 0.0f
+#define OMX_EQ32_PARAM_B21_TYPE_MAX 5.0f
+#define OMX_EQ32_PARAM_B21_TYPE_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_B21_FREQ_MIN 20.0f
+#define OMX_EQ32_PARAM_B21_FREQ_MAX 20000.0f
+#define OMX_EQ32_PARAM_B21_FREQ_DEFAULT 1671.0f
+#define OMX_EQ32_PARAM_B21_GAIN_MIN -15.0f
+#define OMX_EQ32_PARAM_B21_GAIN_MAX 15.0f
+#define OMX_EQ32_PARAM_B21_GAIN_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_B21_Q_MIN 0.3f
+#define OMX_EQ32_PARAM_B21_Q_MAX 116.0f
+#define OMX_EQ32_PARAM_B21_Q_DEFAULT 1.0f
+#define OMX_EQ32_PARAM_B21_ON_MIN 0.0f
+#define OMX_EQ32_PARAM_B21_ON_MAX 1.0f
+#define OMX_EQ32_PARAM_B21_ON_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_B22_TYPE_MIN 0.0f
+#define OMX_EQ32_PARAM_B22_TYPE_MAX 5.0f
+#define OMX_EQ32_PARAM_B22_TYPE_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_B22_FREQ_MIN 20.0f
+#define OMX_EQ32_PARAM_B22_FREQ_MAX 20000.0f
+#define OMX_EQ32_PARAM_B22_FREQ_DEFAULT 2073.0f
+#define OMX_EQ32_PARAM_B22_GAIN_MIN -15.0f
+#define OMX_EQ32_PARAM_B22_GAIN_MAX 15.0f
+#define OMX_EQ32_PARAM_B22_GAIN_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_B22_Q_MIN 0.3f
+#define OMX_EQ32_PARAM_B22_Q_MAX 116.0f
+#define OMX_EQ32_PARAM_B22_Q_DEFAULT 1.0f
+#define OMX_EQ32_PARAM_B22_ON_MIN 0.0f
+#define OMX_EQ32_PARAM_B22_ON_MAX 1.0f
+#define OMX_EQ32_PARAM_B22_ON_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_B23_TYPE_MIN 0.0f
+#define OMX_EQ32_PARAM_B23_TYPE_MAX 5.0f
+#define OMX_EQ32_PARAM_B23_TYPE_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_B23_FREQ_MIN 20.0f
+#define OMX_EQ32_PARAM_B23_FREQ_MAX 20000.0f
+#define OMX_EQ32_PARAM_B23_FREQ_DEFAULT 2573.0f
+#define OMX_EQ32_PARAM_B23_GAIN_MIN -15.0f
+#define OMX_EQ32_PARAM_B23_GAIN_MAX 15.0f
+#define OMX_EQ32_PARAM_B23_GAIN_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_B23_Q_MIN 0.3f
+#define OMX_EQ32_PARAM_B23_Q_MAX 116.0f
+#define OMX_EQ32_PARAM_B23_Q_DEFAULT 1.0f
+#define OMX_EQ32_PARAM_B23_ON_MIN 0.0f
+#define OMX_EQ32_PARAM_B23_ON_MAX 1.0f
+#define OMX_EQ32_PARAM_B23_ON_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_B24_TYPE_MIN 0.0f
+#define OMX_EQ32_PARAM_B24_TYPE_MAX 5.0f
+#define OMX_EQ32_PARAM_B24_TYPE_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_B24_FREQ_MIN 20.0f
+#define OMX_EQ32_PARAM_B24_FREQ_MAX 20000.0f
+#define OMX_EQ32_PARAM_B24_FREQ_DEFAULT 3193.0f
+#define OMX_EQ32_PARAM_B24_GAIN_MIN -15.0f
+#define OMX_EQ32_PARAM_B24_GAIN_MAX 15.0f
+#define OMX_EQ32_PARAM_B24_GAIN_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_B24_Q_MIN 0.3f
+#define OMX_EQ32_PARAM_B24_Q_MAX 116.0f
+#define OMX_EQ32_PARAM_B24_Q_DEFAULT 1.0f
+#define OMX_EQ32_PARAM_B24_ON_MIN 0.0f
+#define OMX_EQ32_PARAM_B24_ON_MAX 1.0f
+#define OMX_EQ32_PARAM_B24_ON_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_B25_TYPE_MIN 0.0f
+#define OMX_EQ32_PARAM_B25_TYPE_MAX 5.0f
+#define OMX_EQ32_PARAM_B25_TYPE_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_B25_FREQ_MIN 20.0f
+#define OMX_EQ32_PARAM_B25_FREQ_MAX 20000.0f
+#define OMX_EQ32_PARAM_B25_FREQ_DEFAULT 3962.0f
+#define OMX_EQ32_PARAM_B25_GAIN_MIN -15.0f
+#define OMX_EQ32_PARAM_B25_GAIN_MAX 15.0f
+#define OMX_EQ32_PARAM_B25_GAIN_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_B25_Q_MIN 0.3f
+#define OMX_EQ32_PARAM_B25_Q_MAX 116.0f
+#define OMX_EQ32_PARAM_B25_Q_DEFAULT 1.0f
+#define OMX_EQ32_PARAM_B25_ON_MIN 0.0f
+#define OMX_EQ32_PARAM_B25_ON_MAX 1.0f
+#define OMX_EQ32_PARAM_B25_ON_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_B26_TYPE_MIN 0.0f
+#define OMX_EQ32_PARAM_B26_TYPE_MAX 5.0f
+#define OMX_EQ32_PARAM_B26_TYPE_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_B26_FREQ_MIN 20.0f
+#define OMX_EQ32_PARAM_B26_FREQ_MAX 20000.0f
+#define OMX_EQ32_PARAM_B26_FREQ_DEFAULT 4916.0f
+#define OMX_EQ32_PARAM_B26_GAIN_MIN -15.0f
+#define OMX_EQ32_PARAM_B26_GAIN_MAX 15.0f
+#define OMX_EQ32_PARAM_B26_GAIN_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_B26_Q_MIN 0.3f
+#define OMX_EQ32_PARAM_B26_Q_MAX 116.0f
+#define OMX_EQ32_PARAM_B26_Q_DEFAULT 1.0f
+#define OMX_EQ32_PARAM_B26_ON_MIN 0.0f
+#define OMX_EQ32_PARAM_B26_ON_MAX 1.0f
+#define OMX_EQ32_PARAM_B26_ON_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_B27_TYPE_MIN 0.0f
+#define OMX_EQ32_PARAM_B27_TYPE_MAX 5.0f
+#define OMX_EQ32_PARAM_B27_TYPE_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_B27_FREQ_MIN 20.0f
+#define OMX_EQ32_PARAM_B27_FREQ_MAX 20000.0f
+#define OMX_EQ32_PARAM_B27_FREQ_DEFAULT 6101.0f
+#define OMX_EQ32_PARAM_B27_GAIN_MIN -15.0f
+#define OMX_EQ32_PARAM_B27_GAIN_MAX 15.0f
+#define OMX_EQ32_PARAM_B27_GAIN_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_B27_Q_MIN 0.3f
+#define OMX_EQ32_PARAM_B27_Q_MAX 116.0f
+#define OMX_EQ32_PARAM_B27_Q_DEFAULT 1.0f
+#define OMX_EQ32_PARAM_B27_ON_MIN 0.0f
+#define OMX_EQ32_PARAM_B27_ON_MAX 1.0f
+#define OMX_EQ32_PARAM_B27_ON_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_B28_TYPE_MIN 0.0f
+#define OMX_EQ32_PARAM_B28_TYPE_MAX 5.0f
+#define OMX_EQ32_PARAM_B28_TYPE_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_B28_FREQ_MIN 20.0f
+#define OMX_EQ32_PARAM_B28_FREQ_MAX 20000.0f
+#define OMX_EQ32_PARAM_B28_FREQ_DEFAULT 7571.0f
+#define OMX_EQ32_PARAM_B28_GAIN_MIN -15.0f
+#define OMX_EQ32_PARAM_B28_GAIN_MAX 15.0f
+#define OMX_EQ32_PARAM_B28_GAIN_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_B28_Q_MIN 0.3f
+#define OMX_EQ32_PARAM_B28_Q_MAX 116.0f
+#define OMX_EQ32_PARAM_B28_Q_DEFAULT 1.0f
+#define OMX_EQ32_PARAM_B28_ON_MIN 0.0f
+#define OMX_EQ32_PARAM_B28_ON_MAX 1.0f
+#define OMX_EQ32_PARAM_B28_ON_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_B29_TYPE_MIN 0.0f
+#define OMX_EQ32_PARAM_B29_TYPE_MAX 5.0f
+#define OMX_EQ32_PARAM_B29_TYPE_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_B29_FREQ_MIN 20.0f
+#define OMX_EQ32_PARAM_B29_FREQ_MAX 20000.0f
+#define OMX_EQ32_PARAM_B29_FREQ_DEFAULT 9395.0f
+#define OMX_EQ32_PARAM_B29_GAIN_MIN -15.0f
+#define OMX_EQ32_PARAM_B29_GAIN_MAX 15.0f
+#define OMX_EQ32_PARAM_B29_GAIN_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_B29_Q_MIN 0.3f
+#define OMX_EQ32_PARAM_B29_Q_MAX 116.0f
+#define OMX_EQ32_PARAM_B29_Q_DEFAULT 1.0f
+#define OMX_EQ32_PARAM_B29_ON_MIN 0.0f
+#define OMX_EQ32_PARAM_B29_ON_MAX 1.0f
+#define OMX_EQ32_PARAM_B29_ON_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_B30_TYPE_MIN 0.0f
+#define OMX_EQ32_PARAM_B30_TYPE_MAX 5.0f
+#define OMX_EQ32_PARAM_B30_TYPE_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_B30_FREQ_MIN 20.0f
+#define OMX_EQ32_PARAM_B30_FREQ_MAX 20000.0f
+#define OMX_EQ32_PARAM_B30_FREQ_DEFAULT 11659.0f
+#define OMX_EQ32_PARAM_B30_GAIN_MIN -15.0f
+#define OMX_EQ32_PARAM_B30_GAIN_MAX 15.0f
+#define OMX_EQ32_PARAM_B30_GAIN_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_B30_Q_MIN 0.3f
+#define OMX_EQ32_PARAM_B30_Q_MAX 116.0f
+#define OMX_EQ32_PARAM_B30_Q_DEFAULT 1.0f
+#define OMX_EQ32_PARAM_B30_ON_MIN 0.0f
+#define OMX_EQ32_PARAM_B30_ON_MAX 1.0f
+#define OMX_EQ32_PARAM_B30_ON_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_B31_TYPE_MIN 0.0f
+#define OMX_EQ32_PARAM_B31_TYPE_MAX 5.0f
+#define OMX_EQ32_PARAM_B31_TYPE_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_B31_FREQ_MIN 20.0f
+#define OMX_EQ32_PARAM_B31_FREQ_MAX 20000.0f
+#define OMX_EQ32_PARAM_B31_FREQ_DEFAULT 14468.0f
+#define OMX_EQ32_PARAM_B31_GAIN_MIN -15.0f
+#define OMX_EQ32_PARAM_B31_GAIN_MAX 15.0f
+#define OMX_EQ32_PARAM_B31_GAIN_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_B31_Q_MIN 0.3f
+#define OMX_EQ32_PARAM_B31_Q_MAX 116.0f
+#define OMX_EQ32_PARAM_B31_Q_DEFAULT 1.0f
+#define OMX_EQ32_PARAM_B31_ON_MIN 0.0f
+#define OMX_EQ32_PARAM_B31_ON_MAX 1.0f
+#define OMX_EQ32_PARAM_B31_ON_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_B32_TYPE_MIN 0.0f
+#define OMX_EQ32_PARAM_B32_TYPE_MAX 5.0f
+#define OMX_EQ32_PARAM_B32_TYPE_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_B32_FREQ_MIN 20.0f
+#define OMX_EQ32_PARAM_B32_FREQ_MAX 20000.0f
+#define OMX_EQ32_PARAM_B32_FREQ_DEFAULT 17954.0f
+#define OMX_EQ32_PARAM_B32_GAIN_MIN -15.0f
+#define OMX_EQ32_PARAM_B32_GAIN_MAX 15.0f
+#define OMX_EQ32_PARAM_B32_GAIN_DEFAULT 0.0f
+#define OMX_EQ32_PARAM_B32_Q_MIN 0.3f
+#define OMX_EQ32_PARAM_B32_Q_MAX 116.0f
+#define OMX_EQ32_PARAM_B32_Q_DEFAULT 1.0f
+#define OMX_EQ32_PARAM_B32_ON_MIN 0.0f
+#define OMX_EQ32_PARAM_B32_ON_MAX 1.0f
+#define OMX_EQ32_PARAM_B32_ON_DEFAULT 0.0f
+
+/* The identity every face publishes. */
+#define OMX_EQ32_NAME "omx eq32"
+#define OMX_EQ32_VENDOR "openmixer"
+#define OMX_EQ32_URL "https://github.com/FreeMixer/omx-plugins"
+#define OMX_EQ32_VERSION "0.1.0"
+#define OMX_EQ32_DESCRIPTION "The OpenMixer console's channel EQ, 32-band form: thirty-two parametric bands (bell, shelves, notch, allpass) and a high-pass and a low-pass filter at 12 or 24 dB/oct, stereo, zero latency. The DSP is omx-dsp's <omxdsp/fx/omx_eq_instance.h>, the console's own EQ; every band ships off, so a racked instance is a wire."
+#define OMX_EQ32_CLAP_ID "org.openmixer.eq32"
+#define OMX_EQ32_CLAP_FEATURES "audio-effect", "equalizer", "stereo"
+#define OMX_EQ32_LV2_URI "urn:openmixer:eq32"
+/* org.openmixer.declaration/1: the declaration's plain description and the digest of its parameters. */
+#define OMX_EQ32_DECL_SOURCE "omx eq32: EQ On 0 to 1, HPF On 0 to 1, HPF Frequency 20 to 1000 Hz, HPF Slope 12 to 24 dB/oct, LPF On 0 to 1, LPF Frequency 1000 to 20000 Hz, LPF Slope 12 to 24 dB/oct, Band 1 Type 0 to 5, Band 1 Frequency 20 to 20000 Hz, Band 1 Gain -15 to 15 dB, Band 1 Q 0.3 to 116, Band 1 On 0 to 1, Band 2 Type 0 to 5, Band 2 Frequency 20 to 20000 Hz, Band 2 Gain -15 to 15 dB, Band 2 Q 0.3 to 116, Band 2 On 0 to 1, Band 3 Type 0 to 5, Band 3 Frequency 20 to 20000 Hz, Band 3 Gain -15 to 15 dB, Band 3 Q 0.3 to 116, Band 3 On 0 to 1, Band 4 Type 0 to 5, Band 4 Frequency 20 to 20000 Hz, Band 4 Gain -15 to 15 dB, Band 4 Q 0.3 to 116, Band 4 On 0 to 1, Band 5 Type 0 to 5, Band 5 Frequency 20 to 20000 Hz, Band 5 Gain -15 to 15 dB, Band 5 Q 0.3 to 116, Band 5 On 0 to 1, Band 6 Type 0 to 5, Band 6 Frequency 20 to 20000 Hz, Band 6 Gain -15 to 15 dB, Band 6 Q 0.3 to 116, Band 6 On 0 to 1, Band 7 Type 0 to 5, Band 7 Frequency 20 to 20000 Hz, Band 7 Gain -15 to 15 dB, Band 7 Q 0.3 to 116, Band 7 On 0 to 1, Band 8 Type 0 to 5, Band 8 Frequency 20 to 20000 Hz, Band 8 Gain -15 to 15 dB, Band 8 Q 0.3 to 116, Band 8 On 0 to 1, Band 9 Type 0 to 5, Band 9 Frequency 20 to 20000 Hz, Band 9 Gain -15 to 15 dB, Band 9 Q 0.3 to 116, Band 9 On 0 to 1, Band 10 Type 0 to 5, Band 10 Frequency 20 to 20000 Hz, Band 10 Gain -15 to 15 dB, Band 10 Q 0.3 to 116, Band 10 On 0 to 1, Band 11 Type 0 to 5, Band 11 Frequency 20 to 20000 Hz, Band 11 Gain -15 to 15 dB, Band 11 Q 0.3 to 116, Band 11 On 0 to 1, Band 12 Type 0 to 5, Band 12 Frequency 20 to 20000 Hz, Band 12 Gain -15 to 15 dB, Band 12 Q 0.3 to 116, Band 12 On 0 to 1, Band 13 Type 0 to 5, Band 13 Frequency 20 to 20000 Hz, Band 13 Gain -15 to 15 dB, Band 13 Q 0.3 to 116, Band 13 On 0 to 1, Band 14 Type 0 to 5, Band 14 Frequency 20 to 20000 Hz, Band 14 Gain -15 to 15 dB, Band 14 Q 0.3 to 116, Band 14 On 0 to 1, Band 15 Type 0 to 5, Band 15 Frequency 20 to 20000 Hz, Band 15 Gain -15 to 15 dB, Band 15 Q 0.3 to 116, Band 15 On 0 to 1, Band 16 Type 0 to 5, Band 16 Frequency 20 to 20000 Hz, Band 16 Gain -15 to 15 dB, Band 16 Q 0.3 to 116, Band 16 On 0 to 1, Band 17 Type 0 to 5, Band 17 Frequency 20 to 20000 Hz, Band 17 Gain -15 to 15 dB, Band 17 Q 0.3 to 116, Band 17 On 0 to 1, Band 18 Type 0 to 5, Band 18 Frequency 20 to 20000 Hz, Band 18 Gain -15 to 15 dB, Band 18 Q 0.3 to 116, Band 18 On 0 to 1, Band 19 Type 0 to 5, Band 19 Frequency 20 to 20000 Hz, Band 19 Gain -15 to 15 dB, Band 19 Q 0.3 to 116, Band 19 On 0 to 1, Band 20 Type 0 to 5, Band 20 Frequency 20 to 20000 Hz, Band 20 Gain -15 to 15 dB, Band 20 Q 0.3 to 116, Band 20 On 0 to 1, Band 21 Type 0 to 5, Band 21 Frequency 20 to 20000 Hz, Band 21 Gain -15 to 15 dB, Band 21 Q 0.3 to 116, Band 21 On 0 to 1, Band 22 Type 0 to 5, Band 22 Frequency 20 to 20000 Hz, Band 22 Gain -15 to 15 dB, Band 22 Q 0.3 to 116, Band 22 On 0 to 1, Band 23 Type 0 to 5, Band 23 Frequency 20 to 20000 Hz, Band 23 Gain -15 to 15 dB, Band 23 Q 0.3 to 116, Band 23 On 0 to 1, Band 24 Type 0 to 5, Band 24 Frequency 20 to 20000 Hz, Band 24 Gain -15 to 15 dB, Band 24 Q 0.3 to 116, Band 24 On 0 to 1, Band 25 Type 0 to 5, Band 25 Frequency 20 to 20000 Hz, Band 25 Gain -15 to 15 dB, Band 25 Q 0.3 to 116, Band 25 On 0 to 1, Band 26 Type 0 to 5, Band 26 Frequency 20 to 20000 Hz, Band 26 Gain -15 to 15 dB, Band 26 Q 0.3 to 116, Band 26 On 0 to 1, Band 27 Type 0 to 5, Band 27 Frequency 20 to 20000 Hz, Band 27 Gain -15 to 15 dB, Band 27 Q 0.3 to 116, Band 27 On 0 to 1, Band 28 Type 0 to 5, Band 28 Frequency 20 to 20000 Hz, Band 28 Gain -15 to 15 dB, Band 28 Q 0.3 to 116, Band 28 On 0 to 1, Band 29 Type 0 to 5, Band 29 Frequency 20 to 20000 Hz, Band 29 Gain -15 to 15 dB, Band 29 Q 0.3 to 116, Band 29 On 0 to 1, Band 30 Type 0 to 5, Band 30 Frequency 20 to 20000 Hz, Band 30 Gain -15 to 15 dB, Band 30 Q 0.3 to 116, Band 30 On 0 to 1, Band 31 Type 0 to 5, Band 31 Frequency 20 to 20000 Hz, Band 31 Gain -15 to 15 dB, Band 31 Q 0.3 to 116, Band 31 On 0 to 1, Band 32 Type 0 to 5, Band 32 Frequency 20 to 20000 Hz, Band 32 Gain -15 to 15 dB, Band 32 Q 0.3 to 116, Band 32 On 0 to 1"
+#define OMX_EQ32_DECL_DIGEST "ca34363b4e2adca95e0cd2aaf282d521ba9e2e3ea79860c8e1bd8b21ef9ecf24"
+
+/* LV2 port indices (tools/gen.mjs lv2Ports): audio, then parameter i at FIRST_PARAM + i, then these. */
+#define OMX_EQ32_LV2_PORT_IN_L 0u
+#define OMX_EQ32_LV2_PORT_IN_R 1u
+#define OMX_EQ32_LV2_PORT_OUT_L 2u
+#define OMX_EQ32_LV2_PORT_OUT_R 3u
+#define OMX_EQ32_LV2_PORT_ENABLED 171u
+#define OMX_EQ32_LV2_PORT_LATENCY 172u
+#define OMX_EQ32_LV2_PORT_FIRST_PARAM 4u
+#define OMX_EQ32_LV2_PORT_COUNT 173u
+
+#endif /* OMX_EQ32_PARAMS_H */

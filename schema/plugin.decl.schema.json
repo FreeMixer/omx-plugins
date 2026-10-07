@@ -249,7 +249,7 @@
             "log"
           ],
           "title": "Scale",
-          "description": "How a host should draw the travel."
+          "description": "How a host should draw the travel. Left out, a frequency (unit Hz) is logarithmic and every other travel linear."
         },
         "values": {
           "type": "array",
@@ -260,6 +260,29 @@
           "minItems": 2,
           "title": "Values",
           "description": "For an integer parameter that picks one of a few choices: the label of each value from min up, one per step. LV2 then lists them as an enumeration of scale points."
+        },
+        "points": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "value",
+              "label"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "value": {
+                "type": "integer"
+              },
+              "label": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "minItems": 2,
+          "title": "Points",
+          "description": "For an integer parameter that takes only some of the values in its travel (a slope of 12 or 24 dB/oct): each value it takes with its label, from min up to max. LV2 then lists them as an enumeration of scale points. A parameter has values or points, not both."
         },
         "min": {
           "type": "number"

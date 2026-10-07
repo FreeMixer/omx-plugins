@@ -42,6 +42,12 @@ export function loadDecl(dir) {
     if (p.kind && p.kind !== 'integer' && p.kind !== 'toggle') throw new Error(`${file}: '${p.symbol}' kind '${p.kind}'`);
     if (p.kind === 'toggle' && (p.min !== 0 || p.max !== 1)) throw new Error(`${file}: toggle '${p.symbol}' is not 0..1`);
     if (p.values && (p.kind !== 'integer' || p.values.length !== p.max - p.min + 1)) throw new Error(`${file}: '${p.symbol}' values name every step of an integer travel`);
+    if (p.points) {
+      const v = p.points.map((x) => x.value);
+      if (p.kind !== 'integer' || p.values) throw new Error(`${file}: '${p.symbol}' points label an integer travel that has no values`);
+      if (v[0] !== p.min || v[v.length - 1] !== p.max || v.some((x, k) => !Number.isInteger(x) || (k && x <= v[k - 1])) || !v.includes(p.def))
+        throw new Error(`${file}: '${p.symbol}' points rise from min to max in whole steps and include the default`);
+    }
   }
   if (d.sidechain && (seen.has(d.sidechain.symbol) || FIXED_PORTS.includes(d.sidechain.symbol))) throw new Error(`${file}: sidechain symbol '${d.sidechain.symbol}' is taken`);
   return { ...d, dir: resolve(dir) };
@@ -82,6 +88,17 @@ export function digestOf(params) {
   const rows = params.map((p) => [p.symbol, p.unit, p.min, p.max, p.def, p.kind ? 1 : 0, p.kind === 'toggle']);
   return createHash('sha256').update(JSON.stringify(rows)).digest('hex');
 }
+
+/** The LV2 unit of a declared unit, where the units extension names one. */
+const LV2_UNITS = { Hz: 'hz', dB: 'db', ms: 'ms', s: 's', '%': 'pc', oct: 'oct' };
+
+/** How a host draws a travel: as declared, else a frequency logarithmic (the console's every
+ * frequency control is), else linear. */
+export const scaleOf = (p) => p.scale ?? (p.unit === 'Hz' ? 'log' : 'linear');
+
+/** The labelled values of an integer travel, `{value, label}` from min up: one per step (`values`)
+ * or only the ones it takes (`points`). Either makes the LV2 port an enumeration. */
+export const choicesOf = (p) => p.points ?? p.values?.map((label, k) => ({ value: p.min + k, label }));
 
 /** The port symbols every plugin has, which no parameter or key may take. */
 const FIXED_PORTS = ['in_l', 'in_r', 'out_l', 'out_r', 'enabled', 'latency'];
@@ -183,12 +200,13 @@ export function emitPluginTtl(d) {
     if (p.param) {
       const q = p.param;
       lines.push(`        lv2:default ${ttlNum(q.def)} ;`, `        lv2:minimum ${ttlNum(q.min)} ;`, `        lv2:maximum ${ttlNum(q.max)} ;`);
-      if (q.kind === 'integer') lines.push(`        lv2:portProperty lv2:integer${q.values ? ' , lv2:enumeration' : ''} ;`);
-      if (q.scale === 'log') lines.push('        lv2:portProperty pprops:logarithmic ;');
+      const choices = choicesOf(q);
+      if (q.kind === 'integer') lines.push(`        lv2:portProperty lv2:integer${choices ? ' , lv2:enumeration' : ''} ;`);
+      if (scaleOf(q) === 'log') lines.push('        lv2:portProperty pprops:logarithmic ;');
       if (q.kind === 'toggle') lines.push('        lv2:portProperty lv2:toggled ;');
-      if (q.unit === 'ms') lines.push('        units:unit units:ms ;');
-      if (q.values) {
-        const points = q.values.map((label, k) => `            [ rdfs:label ${ttlStr(label)} ; rdf:value ${q.min + k} ]`);
+      if (LV2_UNITS[q.unit]) lines.push(`        units:unit units:${LV2_UNITS[q.unit]} ;`);
+      if (choices) {
+        const points = choices.map((c) => `            [ rdfs:label ${ttlStr(c.label)} ; rdf:value ${c.value} ]`);
         lines.push(`        lv2:scalePoint\n${points.join(' ,\n')} ;`);
       }
     } else if (p.sidechain) {
@@ -197,7 +215,7 @@ export function emitPluginTtl(d) {
     } else if (p.enabled) {
       lines.push('        lv2:default 1 ;', '        lv2:minimum 0 ;', '        lv2:maximum 1 ;', '        lv2:designation lv2:enabled ;', '        lv2:portProperty lv2:toggled ;');
     } else if (p.latency) {
-      lines.push('        lv2:designation lv2:latency ;', '        lv2:portProperty lv2:reportsLatency , lv2:integer ;');
+      lines.push('        lv2:designation lv2:latency ;', '        lv2:portProperty lv2:reportsLatency , lv2:integer ;', '        units:unit units:frame ;');
     }
     return `    [\n${lines.join('\n').replace(/ ;$/, '')}\n    ]`;
   };
@@ -205,7 +223,7 @@ export function emitPluginTtl(d) {
 @prefix doap:  <http://usefulinc.com/ns/doap#> .
 @prefix foaf:  <http://xmlns.com/foaf/0.1/> .
 @prefix lv2:   <http://lv2plug.in/ns/lv2core#> .
-${d.params.some((q) => q.scale === 'log') ? '@prefix pprops: <http://lv2plug.in/ns/ext/port-props#> .\n' : ''}${d.params.some((q) => q.values) ? '@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .\n' : ''}@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+${d.params.some((q) => scaleOf(q) === 'log') ? '@prefix pprops: <http://lv2plug.in/ns/ext/port-props#> .\n' : ''}${d.params.some((q) => choicesOf(q)) ? '@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .\n' : ''}@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix units: <http://lv2plug.in/ns/extensions/units#> .
 
 <${d.url}>

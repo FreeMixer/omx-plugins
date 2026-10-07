@@ -2,9 +2,9 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # Copyright (C) 2026 Pau Aliagas <linuxnow@gmail.com>
 #
-# omx-eq8 as CLAP and LV2, in plain C, from ONE declaration (omx-eq8.decl.json).
+# omx-eq16 as CLAP and LV2, in plain C, from ONE declaration (omx-eq16.decl.json).
 #
-#   make            build/omx-eq8.clap and build/omx-eq8.lv2/ (binary, TTL)
+#   make            build/omx-eq16.clap and build/omx-eq16.lv2/ (binary, TTL)
 #   make test       freshness of every generated file, the plugin probe (each face against the
 #                   instance core called directly, bit for bit), the four-rate EQ oracle (closed-form
 #                   responses), the kernel-identity test (both faces against the console's EQ, bit for
@@ -13,14 +13,14 @@
 #                   (no MOD GUI: tools/modgui-gen.mjs does not draw selectors, and the band type and
 #                   the pass-filter slopes are selectors)
 #   make gen        regenerate generated/ from the declaration (commit the result)
-#   make install    DESTDIR/PREFIX/LIBDIR: $(LIBDIR)/clap/omx-eq8.clap, $(LIBDIR)/lv2/omx-eq8.lv2/
+#   make install    DESTDIR/PREFIX/LIBDIR: $(LIBDIR)/clap/omx-eq16.clap, $(LIBDIR)/lv2/omx-eq16.lv2/
 #
 # Build deps: omx-dsp (pkg-config omxdsp, >= OMXDSP_MIN), omx-clap-core (the CLAP ABI's openmixer
 # extensions), clap, lv2; for the tests lilv and node.
 
-NAME       := omx-eq8
-URI        := urn:openmixer:eq8
-CLAP_ID    := org.openmixer.eq8
+NAME       := omx-eq16
+URI        := urn:openmixer:eq16
+CLAP_ID    := org.openmixer.eq16
 OMXDSP_MIN ?= 0.1.4
 ROOT       := $(abspath ../..)
 GEN        := generated
@@ -50,10 +50,10 @@ TTL_SRCS := $(shell find $(TTL) -type f 2>/dev/null)
 
 all: $(B)/$(NAME).clap $(BUNDLE)/$(NAME).so $(BUNDLE)/manifest.ttl
 
-$(B)/$(NAME).clap: omx_eq8_clap.c omx_eq8_stereo.h $(GEN)/omx_eq8_params.h | $(B)
+$(B)/$(NAME).clap: omx_eq16_clap.c omx_eq16_stereo.h $(GEN)/omx_eq16_params.h | $(B)
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(WARN) $(PLUGIN) $(ABI_CFLAGS) -o $@ $< $(LDFLAGS) $(LDLIBS)
 
-$(BUNDLE)/$(NAME).so: omx_eq8_lv2.c omx_eq8_stereo.h $(GEN)/omx_eq8_params.h | $(B)
+$(BUNDLE)/$(NAME).so: omx_eq16_lv2.c omx_eq16_stereo.h $(GEN)/omx_eq16_params.h | $(B)
 	@mkdir -p $(BUNDLE)
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(WARN) $(PLUGIN) $(LV2_CFLAGS) -o $@ $< $(LDFLAGS) $(LDLIBS)
 
@@ -73,7 +73,7 @@ $(B)/eq-oracle: test/eq-oracle.c | $(B)
 
 # One source for the three EQs: the band count is the kernel's compile-time number.
 $(B)/eq-identity: $(ROOT)/tools/eq-identity.c | $(B)
-	$(CC) $(CFLAGS) $(WARN) -DOMX_EQ_LV2_BANDS=8 $(DSP_CFLAGS) $(ABI_CFLAGS) $(LV2_CFLAGS) -o $@ $< $(LILV) -ldl $(LDLIBS)
+	$(CC) $(CFLAGS) $(WARN) -DOMX_EQ_LV2_BANDS=16 $(DSP_CFLAGS) $(ABI_CFLAGS) $(LV2_CFLAGS) -o $@ $< $(LILV) -ldl $(LDLIBS)
 
 gen:
 	node $(ROOT)/tools/gen.mjs $(CURDIR)
@@ -83,7 +83,7 @@ check:
 
 # LV2 port indices for the probe, read back from the generated header, the one place they are
 # numbered: in_l in_r out_l out_r latency, the first declared parameter (the rest follow it), enabled.
-PORT = $(shell sed -n 's/^\#define OMX_EQ8_LV2_PORT_$(1) \([0-9]*\)u$$/\1/p' $(GEN)/omx_eq8_params.h)
+PORT = $(shell sed -n 's/^\#define OMX_EQ16_LV2_PORT_$(1) \([0-9]*\)u$$/\1/p' $(GEN)/omx_eq16_params.h)
 LV2_PORTS = $(call PORT,IN_L) $(call PORT,IN_R) $(call PORT,OUT_L) $(call PORT,OUT_R) $(call PORT,LATENCY) \
   $(call PORT,FIRST_PARAM) $(call PORT,ENABLED)
 
