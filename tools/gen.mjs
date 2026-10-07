@@ -41,7 +41,9 @@ export function loadDecl(dir) {
     if (!(p.min <= p.def && p.def <= p.max && p.min < p.max)) throw new Error(`${file}: '${p.symbol}' travel ${p.min}..${p.max} default ${p.def}`);
     if (p.kind && p.kind !== 'integer' && p.kind !== 'toggle') throw new Error(`${file}: '${p.symbol}' kind '${p.kind}'`);
     if (p.kind === 'toggle' && (p.min !== 0 || p.max !== 1)) throw new Error(`${file}: toggle '${p.symbol}' is not 0..1`);
+    if (p.values && (p.kind !== 'integer' || p.values.length !== p.max - p.min + 1)) throw new Error(`${file}: '${p.symbol}' values name every step of an integer travel`);
   }
+  if (d.sidechain && (seen.has(d.sidechain.symbol) || FIXED_PORTS.includes(d.sidechain.symbol))) throw new Error(`${file}: sidechain symbol '${d.sidechain.symbol}' is taken`);
   return { ...d, dir: resolve(dir) };
 }
 
@@ -81,18 +83,27 @@ export function digestOf(params) {
   return createHash('sha256').update(JSON.stringify(rows)).digest('hex');
 }
 
-/** The LV2 port list, in index order: audio, the declared parameters, enabled, latency. One rule,
- * read by the TTL, the MOD GUI and (as macros) the LV2 C face. */
+/** The port symbols every plugin has, which no parameter or key may take. */
+const FIXED_PORTS = ['in_l', 'in_r', 'out_l', 'out_r', 'enabled', 'latency'];
+
+/** The LV2 port list, in index order: audio in (and the sidechain key, when declared), audio out,
+ * the declared parameters, enabled, latency; `lv2.enabledPort: "first"` puts enabled before the
+ * parameters. One rule, read by the TTL, the MOD GUI and (as macros) the LV2 C face. */
 export function lv2Ports(d) {
+  const IN = 'lv2:AudioPort , lv2:InputPort', OUT = 'lv2:AudioPort , lv2:OutputPort';
   const audio = [
-    ['in_l', 'In L', 'lv2:AudioPort , lv2:InputPort'], ['in_r', 'In R', 'lv2:AudioPort , lv2:InputPort'],
-    ['out_l', 'Out L', 'lv2:AudioPort , lv2:OutputPort'], ['out_r', 'Out R', 'lv2:AudioPort , lv2:OutputPort'],
-  ].map(([symbol, name, a]) => ({ symbol, name, a }));
+    { symbol: 'in_l', name: 'In L', a: IN }, { symbol: 'in_r', name: 'In R', a: IN },
+    ...(d.sidechain ? [{ symbol: d.sidechain.symbol, name: d.sidechain.name, a: IN, sidechain: true }] : []),
+    { symbol: 'out_l', name: 'Out L', a: OUT }, { symbol: 'out_r', name: 'Out R', a: OUT },
+  ];
   const params = d.params.map((p) => ({ symbol: p.symbol, name: p.name, a: 'lv2:ControlPort , lv2:InputPort', param: p }));
+  const enabled = { symbol: 'enabled', name: 'Enabled', a: 'lv2:ControlPort , lv2:InputPort', enabled: true };
+  const first = d.lv2.enabledPort === 'first';
   return [
     ...audio,
+    ...(first ? [enabled] : []),
     ...params,
-    { symbol: 'enabled', name: 'Enabled', a: 'lv2:ControlPort , lv2:InputPort', enabled: true },
+    ...(first ? [] : [enabled]),
     { symbol: 'latency', name: 'Latency', a: 'lv2:ControlPort , lv2:OutputPort', latency: true },
   ].map((p, index) => ({ ...p, index }));
 }
@@ -172,9 +183,17 @@ export function emitPluginTtl(d) {
     if (p.param) {
       const q = p.param;
       lines.push(`        lv2:default ${ttlNum(q.def)} ;`, `        lv2:minimum ${ttlNum(q.min)} ;`, `        lv2:maximum ${ttlNum(q.max)} ;`);
-      if (q.kind === 'integer') lines.push('        lv2:portProperty lv2:integer ;');
+      if (q.kind === 'integer') lines.push(`        lv2:portProperty lv2:integer${q.values ? ' , lv2:enumeration' : ''} ;`);
+      if (q.scale === 'log') lines.push('        lv2:portProperty pprops:logarithmic ;');
       if (q.kind === 'toggle') lines.push('        lv2:portProperty lv2:toggled ;');
       if (q.unit === 'ms') lines.push('        units:unit units:ms ;');
+      if (q.values) {
+        const points = q.values.map((label, k) => `            [ rdfs:label ${ttlStr(label)} ; rdf:value ${q.min + k} ]`);
+        lines.push(`        lv2:scalePoint\n${points.join(' ,\n')} ;`);
+      }
+    } else if (p.sidechain) {
+      // optional: a host that routes nothing to the key gets the effect's own detector
+      lines.push('        lv2:portProperty lv2:isSideChain , lv2:connectionOptional ;');
     } else if (p.enabled) {
       lines.push('        lv2:default 1 ;', '        lv2:minimum 0 ;', '        lv2:maximum 1 ;', '        lv2:designation lv2:enabled ;', '        lv2:portProperty lv2:toggled ;');
     } else if (p.latency) {
@@ -186,7 +205,7 @@ export function emitPluginTtl(d) {
 @prefix doap:  <http://usefulinc.com/ns/doap#> .
 @prefix foaf:  <http://xmlns.com/foaf/0.1/> .
 @prefix lv2:   <http://lv2plug.in/ns/lv2core#> .
-@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+${d.params.some((q) => q.scale === 'log') ? '@prefix pprops: <http://lv2plug.in/ns/ext/port-props#> .\n' : ''}${d.params.some((q) => q.values) ? '@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .\n' : ''}@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix units: <http://lv2plug.in/ns/extensions/units#> .
 
 <${d.url}>

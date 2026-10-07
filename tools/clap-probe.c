@@ -16,7 +16,9 @@
  *       toggle on and every other travel at its far end. A parameter whose output is
  *       byte-identical in all four is one the face does not deliver to the kernel.
  *       `PASS live <name>` / `FAIL live <name>` per parameter. A face still on the wizard's stub
- *       binding is red here, by design.
+ *       binding is red here, by design. Every input port past the main one (a sidechain key) is
+ *       connected too, fed a signal of its own: square-wave bursts the main signal does not have, so a
+ *       parameter that picks what the detector listens to can move the output.
  */
 #include <dlfcn.h>
 #include <stdint.h>
@@ -25,6 +27,7 @@
 #include <string.h>
 
 #include "clap/entry.h"
+#include "clap/ext/audio-ports.h"
 #include "clap/ext/params.h"
 #include "clap/factory/plugin-factory.h"
 #include "clap/host.h"
@@ -33,6 +36,7 @@
 #define BLOCK 256u
 #define FRAMES (282u * BLOCK) /* 1.5 s at 48 kHz in whole blocks: a delay's second repeat */
 #define MAX_PARAMS 256u
+#define MAX_SIDE 8u /* channels over every input port past the main one */
 
 static const void *host_get_extension(const clap_host_t *h, const char *id) {
   (void)h, (void)id;
@@ -114,6 +118,14 @@ static void make_signal(float *l, float *r) {
   }
 }
 
+/** The side inputs' signal: a 1 kHz square wave at half scale, on for the first 0.1 s of every
+ * second and silent for the rest, long enough for a detector's slowest release to tell. */
+static void make_side(float *k) {
+  for (uint32_t i = 0; i < FRAMES; i++) k[i] = (i % 48000u) < 4800u ? 0.5f * (float)((i / 24u) % 2u ? 1 : -1) : 0.0f;
+}
+
+static float *side;
+
 /** One run from a fresh instance, the `n` (id, value) pairs set before the first block. */
 static int render(const char *path, const clap_id *ids, const double *vals, uint32_t n, const float *in_l,
                   const float *in_r, float *out_l, float *out_r) {
@@ -123,8 +135,24 @@ static int render(const char *path, const clap_id *ids, const double *vals, uint
     clap_close(&c);
     return fprintf(stderr, "activate\n"), 0;
   }
+  /* The input ports the plugin declares past the main one, each channel fed the side signal. */
+  const clap_plugin_audio_ports_t *ap = (const clap_plugin_audio_ports_t *)c.plugin->get_extension(c.plugin, CLAP_EXT_AUDIO_PORTS);
+  uint32_t nin = ap ? ap->count(c.plugin, true) : 1u, nside = 0;
+  clap_audio_buffer_t ain[1 + MAX_SIDE];
+  float *side_ch[MAX_SIDE];
+  uint32_t side_first[MAX_SIDE];
+  if (nin < 1u) nin = 1u;
+  for (uint32_t k = 1; k < nin && k <= MAX_SIDE; k++) {
+    clap_audio_port_info_t pi;
+    uint32_t ch = ap->get(c.plugin, k, true, &pi) ? pi.channel_count : 0u;
+    side_first[k - 1] = nside;
+    for (; ch > 0 && nside < MAX_SIDE; ch--) nside++;
+    ain[k] = (clap_audio_buffer_t){side_ch + side_first[k - 1], NULL, nside - side_first[k - 1], 0, 0};
+  }
+  if (nin > 1u + MAX_SIDE) nin = 1u + MAX_SIDE;
   static EvList evs;
   for (uint32_t f = 0; f < FRAMES; f += BLOCK) {
+    for (uint32_t k = 0; k < nside; k++) side_ch[k] = side + f;
     evs.n = 0;
     for (uint32_t k = 0; f == 0 && k < n; k++) {
       clap_event_param_value_t *e = &evs.ev[evs.n++];
@@ -143,15 +171,15 @@ static int render(const char *path, const clap_id *ids, const double *vals, uint
     clap_output_events_t out_ev = {NULL, ev_push};
     float *ins[2] = {(float *)in_l + f, (float *)in_r + f};
     float *outs[2] = {out_l + f, out_r + f};
-    clap_audio_buffer_t ain = {ins, NULL, 2, 0, 0};
+    ain[0] = (clap_audio_buffer_t){ins, NULL, 2, 0, 0};
     clap_audio_buffer_t aout = {outs, NULL, 2, 0, 0};
     clap_process_t pr;
     memset(&pr, 0, sizeof pr);
     pr.steady_time = f;
     pr.frames_count = BLOCK;
-    pr.audio_inputs = &ain;
+    pr.audio_inputs = ain;
     pr.audio_outputs = &aout;
-    pr.audio_inputs_count = 1;
+    pr.audio_inputs_count = nin;
     pr.audio_outputs_count = 1;
     pr.in_events = &in_ev;
     pr.out_events = &out_ev;
@@ -202,9 +230,10 @@ static int live(const char *path) {
   for (uint32_t i = 0; i < n; i++) c.params->get_info(c.plugin, i, &info[i]);
   clap_close(&c);
 
-  float **bufs[] = {&in_l, &in_r, &a_l, &a_r, &b_l, &b_r};
-  for (size_t k = 0; k < 6; k++) *bufs[k] = malloc(FRAMES * sizeof(float));
+  float **bufs[] = {&in_l, &in_r, &a_l, &a_r, &b_l, &b_r, &side};
+  for (size_t k = 0; k < 7; k++) *bufs[k] = malloc(FRAMES * sizeof(float));
   make_signal(in_l, in_r);
+  make_side(side);
   static const char *const SETTING[] = {"the others at their defaults", "every other toggle on", "the others at their far ends",
                                         "every other toggle on, the rest at their far ends"};
   int fails = 0, checked = 0;
@@ -226,7 +255,7 @@ static int live(const char *path) {
     }
   }
   free(info);
-  for (size_t k = 0; k < 6; k++) free(*bufs[k]);
+  for (size_t k = 0; k < 7; k++) free(*bufs[k]);
   if (checked == 0) return printf("FAIL live: no parameter to move\n"), 1;
   return fails ? 1 : 0;
 }

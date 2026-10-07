@@ -1,0 +1,92 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Copyright (C) 2026 Pau Aliagas <linuxnow@gmail.com>
+/*
+ * omx_gate_lv2.c — the LV2 face of omx-keyed-gate, in plain C: the generated declaration
+ * (generated/omx_gate_params.h) over omx-dsp's gate kernel, reached through omx_gate_core.h, the
+ * binding both faces share. No DSP of its own: flush denormals, read the ports, resolve, run.
+ *
+ * Ports (the console's keyed gate bundle's, index for index): in_l, in_r, the sidechain `key`
+ * (lv2:isSideChain, connectionOptional), out_l, out_r, `enabled` (lv2:enabled; below 0.5, or NaN,
+ * is the bypass), the declared parameters in order, then `latency`. A parameter port the host
+ * left unconnected reads its declared default; an unconnected key is the self-keyed gate.
+ */
+#include <stdint.h>
+#include <stdlib.h>
+
+#include <lv2/core/lv2.h>
+
+/* The generated table FIRST: its guard is omx-dsp's own, so the instance header reads this table. */
+#include "omx_gate_params.h"
+#include "omx_gate_core.h"
+#include <omxdsp/omx_denormal.h>
+
+typedef struct {
+  OmxGateCore core;
+  const float *in_l, *in_r, *key;
+  float *out_l, *out_r;
+  const float *param[OMX_GATE_PARAM_COUNT];
+  const float *enabled;
+  float *latency;
+} Face;
+
+static LV2_Handle instantiate(const LV2_Descriptor *d, double rate, const char *bundle,
+                              const LV2_Feature *const *features) {
+  (void)d;
+  (void)bundle;
+  (void)features;
+  if (!(rate > 0.0)) return NULL;
+  Face *s = (Face *)calloc(1, sizeof *s);
+  if (!s) return NULL;
+  if (!omx_gate_core_init(&s->core, (float)rate)) {
+    free(s);
+    return NULL;
+  }
+  return s;
+}
+
+static void connect_port(LV2_Handle h, uint32_t port, void *data) {
+  Face *s = (Face *)h;
+  switch (port) {
+  case OMX_GATE_LV2_PORT_IN_L: s->in_l = (const float *)data; return;
+  case OMX_GATE_LV2_PORT_IN_R: s->in_r = (const float *)data; return;
+  case OMX_GATE_LV2_PORT_KEY: s->key = (const float *)data; return;
+  case OMX_GATE_LV2_PORT_OUT_L: s->out_l = (float *)data; return;
+  case OMX_GATE_LV2_PORT_OUT_R: s->out_r = (float *)data; return;
+  case OMX_GATE_LV2_PORT_ENABLED: s->enabled = (const float *)data; return;
+  case OMX_GATE_LV2_PORT_LATENCY: s->latency = (float *)data; return;
+  default:
+    if (port >= OMX_GATE_LV2_PORT_FIRST_PARAM && port < OMX_GATE_LV2_PORT_FIRST_PARAM + OMX_GATE_PARAM_COUNT)
+      s->param[port - OMX_GATE_LV2_PORT_FIRST_PARAM] = (const float *)data;
+  }
+}
+
+static void activate(LV2_Handle h) {
+  Face *s = (Face *)h;
+  omx_gate_core_init(&s->core, s->core.rate);
+}
+
+static float value(const Face *s, uint32_t i) { return s->param[i] ? *s->param[i] : OMX_GATE_PARAMS[i].def; }
+
+static void run(LV2_Handle h, uint32_t frames) {
+  Face *s = (Face *)h;
+  omx_denormals_off();
+  /* enabled below 0.5 or NaN is off: the console bundle clamped a NaN to the travel's floor, 0 */
+  const int bypass = s->enabled && !(*s->enabled >= 0.5f);
+  float values[OMX_GATE_PARAM_COUNT];
+  for (uint32_t i = 0; i < OMX_GATE_PARAM_COUNT; ++i) values[i] = value(s, i);
+  omx_gate_core_resolve(&s->core, values, bypass);
+  omx_gate_core_run(&s->core, s->key, s->in_l, s->in_r, s->out_l, s->out_r, frames);
+  if (s->latency) *s->latency = (float)omx_gate_core_latency(&s->core);
+}
+
+static void cleanup(LV2_Handle h) { free(h); }
+
+static const void *extension_data(const char *uri) {
+  (void)uri;
+  return NULL;
+}
+
+static const LV2_Descriptor DESCRIPTOR = {OMX_GATE_LV2_URI, instantiate, connect_port, activate, run, NULL, cleanup,
+                                          extension_data};
+
+LV2_SYMBOL_EXPORT const LV2_Descriptor *lv2_descriptor(uint32_t index) { return index == 0 ? &DESCRIPTOR : NULL; }
