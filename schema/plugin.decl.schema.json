@@ -28,9 +28,9 @@
         },
         "stem": {
           "type": "string",
-          "pattern": "^omx-[a-z][a-z0-9]*$",
+          "pattern": "^omx-[a-z][a-z0-9]*(-[a-z][a-z0-9]*)*$",
           "title": "Stem",
-          "description": "The plugin's file name: omx-<short>, its directory under plugins/, its .clap and its .lv2 bundle. Unique."
+          "description": "The plugin's file name: omx-<short>, its directory under plugins/, its .clap and its .lv2 bundle. The short name is lower case, its words joined by hyphens (omx-keyed-gate). Unique."
         },
         "kernel": {
           "type": "string",
@@ -51,7 +51,7 @@
         },
         "name": {
           "type": "string",
-          "pattern": "^omx [a-z][a-z0-9]*$",
+          "pattern": "^omx [a-z][a-z0-9]*(-[a-z][a-z0-9]*)*$",
           "title": "Name",
           "description": "The name a host shows: 'omx <short>'."
         },
@@ -93,7 +93,7 @@
           "properties": {
             "id": {
               "type": "string",
-              "pattern": "^org\\.openmixer\\.[a-z][a-z0-9]*$",
+              "pattern": "^org\\.openmixer\\.[a-z][a-z0-9]*(-[a-z][a-z0-9]*)*$",
               "title": "CLAP id",
               "description": "org.openmixer.<short>. Unique."
             },
@@ -120,7 +120,7 @@
           "properties": {
             "uri": {
               "type": "string",
-              "pattern": "^urn:openmixer:[a-z][a-z0-9]*$",
+              "pattern": "^urn:openmixer:[a-z][a-z0-9]*(-[a-z][a-z0-9]*)*$",
               "title": "LV2 URI",
               "description": "urn:openmixer:<short>. Unique."
             },
