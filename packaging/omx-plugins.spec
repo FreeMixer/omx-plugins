@@ -92,5 +92,6 @@ so they sound like the desk.
 
 %changelog
 * Wed Oct 07 2026 Pau Aliagas <linuxnow@gmail.com> - 0.1.0-1
-- First package: omx delay, omx drive, omx eq8 and omx strip, each as CLAP and
-  LV2, over omx-dsp 0.1.4.
+- First package: the OpenMixer console's delay, drive, 8-band EQ and channel
+  strip, each as a CLAP and an LV2 plugin, running the same DSP as the console
+  (omx-dsp 0.1.4).
