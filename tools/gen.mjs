@@ -18,6 +18,7 @@ import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { PIN_FILE, locateContract, paramKernel, resolveParam } from './omx-contract.mjs';
 
 export const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -31,6 +32,7 @@ export function loadDecl(dir) {
   const d = JSON.parse(readFileSync(file, 'utf8'));
   if (d.stem !== stem) throw new Error(`${file}: stem '${d.stem}' is not the directory's '${stem}'`);
   if (!/^[a-z][a-z0-9_]*$/.test(d.kernel)) throw new Error(`${file}: kernel '${d.kernel}' is not a C identifier`);
+  d.params = resolveParams(file, d);
   const seen = new Set();
   for (const p of d.params) {
     if (!/^[A-Za-z][A-Za-z0-9_]*$/.test(p.symbol)) throw new Error(`${file}: symbol '${p.symbol}' is not an LV2 symbol`);
@@ -41,6 +43,29 @@ export function loadDecl(dir) {
     if (p.kind === 'toggle' && (p.min !== 0 || p.max !== 1)) throw new Error(`${file}: toggle '${p.symbol}' is not 0..1`);
   }
   return { ...d, dir: resolve(dir) };
+}
+
+/** The travel fields a parameter BY REFERENCE reads from omx-contract and must never retype. */
+export const TRAVEL_FIELDS = ['min', 'max', 'def', 'unit', 'kind'];
+
+/** Each parameter with its travel: as typed (a declaration from before references), or read from
+ * omx-contract at the pin through its `ref` (tools/omx-contract.mjs). */
+function resolveParams(file, d) {
+  if (!d.params.some((p) => p.ref !== undefined)) return d.params;
+  // the tree the declaration sits in; a declaration copied out of its tree (a test's scratch copy)
+  // reads this tree's pin
+  const tree = resolve(dirname(file), '..', '..');
+  const where = locateContract(existsSync(join(tree, PIN_FILE)) ? tree : ROOT);
+  if (!where.dir) throw new Error(`${file}: its parameters are by reference and ${where.why}`);
+  return d.params.map((p) => {
+    if (p.ref === undefined) throw new Error(`${file}: '${p.symbol}' has no ref; a declaration is by reference throughout or not at all`);
+    const typed = TRAVEL_FIELDS.filter((k) => k in p);
+    if (typed.length) throw new Error(`${file}: '${p.symbol}' is by reference and retypes ${typed.join(', ')}; omx-contract holds them`);
+    const t = resolveParam(where.dir, paramKernel(d, p), p);
+    const out = { ...p, min: t.min, max: t.max, def: t.def, unit: t.unit };
+    if (t.kind) out.kind = t.kind;
+    return out;
+  });
 }
 
 /** SHA-256 of the resolved parameter list: the org.openmixer.declaration/1 digest, the formula the
