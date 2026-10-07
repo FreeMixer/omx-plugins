@@ -4,7 +4,7 @@ Name: omx-plugins
 Version: 0.1.0
 Release: 1%{?dist}
 License: GPL-3.0-or-later
-Summary: The effects of the OpenMixer console as CLAP and LV2 plugins
+Summary: The OpenMixer console's delay, drive, EQ and channel strip, as plugins for your DAW
 URL: https://github.com/FreeMixer/omx-plugins
 
 Source0: %{url}/archive/v%{version}/%{name}-%{version}.tar.gz
@@ -28,32 +28,33 @@ Requires: %{name}-clap%{?_isa} = %{version}-%{release}
 Requires: %{name}-lv2%{?_isa} = %{version}-%{release}
 
 %description
-The effects of the OpenMixer console as plugins for any host: CLAP for
-Bitwig, REAPER, Carla and every other CLAP host, LV2 for Ardour, Carla, MOD
-and Zynthian. The DSP inside each one is the console's own (omx-dsp, linked
-in statically), so a plugin sounds the same in a DAW as on the desk, sample
-for sample. Each plugin is drawn from one declaration, so its CLAP
-parameters, its LV2 ports and its MOD GUI cannot disagree.
+Take the sound of the OpenMixer console into your DAW or onto your own rig:
+delay, drive, an 8-band EQ and the full channel strip, as CLAP plugins for
+Bitwig, REAPER and Carla, and as LV2 plugins for Ardour, Carla, MOD and
+Zynthian. Each one runs the same DSP as the console, so a track sounds the
+same in a session as it does on the desk, sample for sample. Every plugin
+comes in both formats with the same controls, MOD GUI included.
 
-Plugins: omx delay, omx drive, omx eq8 and omx strip. This package installs
-both formats; omx-plugins-clap and omx-plugins-lv2 install one each.
+This package installs both formats; omx-plugins-clap and omx-plugins-lv2
+install one each.
 
 %package clap
-Summary: The OpenMixer console's effects as CLAP plugins
+Summary: OpenMixer delay, drive, EQ and channel strip as CLAP plugins
 
 %description clap
-omx delay, omx drive, omx eq8 and omx strip as CLAP plugins, in
-%{_libdir}/clap where CLAP hosts find them. The DSP is the OpenMixer
-console's own.
+The OpenMixer console's delay, drive, 8-band EQ and channel strip as CLAP
+plugins, installed in %{_libdir}/clap where Bitwig, REAPER, Carla and other CLAP
+hosts find them. They run the console's own DSP, so they sound like the desk.
 
 %package lv2
-Summary: The OpenMixer console's effects as LV2 plugins
+Summary: OpenMixer delay, drive, EQ and channel strip as LV2 plugins
 Requires: lv2
 
 %description lv2
-omx delay, omx drive, omx eq8 and omx strip as LV2 plugins, in
-%{_libdir}/lv2 where LV2 hosts find them, with a MOD GUI where the plugin
-declares one. The DSP is the OpenMixer console's own.
+The OpenMixer console's delay, drive, 8-band EQ and channel strip as LV2
+plugins, installed in %{_libdir}/lv2 where Ardour, Carla, MOD and Zynthian find
+them, with a MOD GUI where the plugin has one. They run the console's own DSP,
+so they sound like the desk.
 
 %prep
 %autosetup
@@ -91,5 +92,6 @@ declares one. The DSP is the OpenMixer console's own.
 
 %changelog
 * Wed Oct 07 2026 Pau Aliagas <linuxnow@gmail.com> - 0.1.0-1
-- First package: omx delay, omx drive, omx eq8 and omx strip, each as CLAP and
-  LV2, over omx-dsp 0.1.4.
+- First package: the OpenMixer console's delay, drive, 8-band EQ and channel
+  strip, each as a CLAP and an LV2 plugin, running the same DSP as the console
+  (omx-dsp 0.1.4).
