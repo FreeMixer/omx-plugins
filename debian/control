@@ -21,12 +21,13 @@ Package: omx-plugins
 Section: metapackages
 Architecture: any
 Depends: omx-plugins-clap (= ${binary:Version}), omx-plugins-lv2 (= ${binary:Version}), ${misc:Depends}
-Description: OpenMixer delay, drive, EQ and channel strip for your DAW (CLAP, LV2)
+Description: OpenMixer delay, drive, EQ, channel strip and keyed gate (CLAP, LV2)
  Take the sound of the OpenMixer console into your DAW or onto your own rig:
- delay, drive, an 8-band EQ and the full channel strip, as CLAP plugins for
- Bitwig, REAPER and Carla, and as LV2 plugins for Ardour, Carla, MOD and
- Zynthian. Each one runs the same DSP as the console, so a track sounds the
- same in a session as it does on the desk, sample for sample.
+ delay, drive, an 8-band EQ, the full channel strip and the keyed gate with its
+ sidechain input, as CLAP plugins for Bitwig, REAPER and Carla, and as LV2
+ plugins for Ardour, Carla, MOD and Zynthian. Each one runs the same DSP as the
+ console, so a track sounds the same in a session as it does on the desk,
+ sample for sample.
  .
  This package installs both formats; omx-plugins-clap and omx-plugins-lv2
  install one each.
@@ -34,17 +35,17 @@ Description: OpenMixer delay, drive, EQ and channel strip for your DAW (CLAP, LV
 Package: omx-plugins-clap
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
-Description: OpenMixer delay, drive, EQ and channel strip as CLAP plugins
- The OpenMixer console's delay, drive, 8-band EQ and channel strip as CLAP
- plugins, installed in /usr/lib/clap where Bitwig, REAPER, Carla and other
- CLAP hosts find them. They run the console's own DSP, so they sound like the
- desk, sample for sample.
+Description: OpenMixer delay, drive, EQ, channel strip and keyed gate as CLAP plugins
+ The OpenMixer console's delay, drive, 8-band EQ, channel strip and keyed gate
+ as CLAP plugins, installed in /usr/lib/clap where Bitwig, REAPER, Carla and
+ other CLAP hosts find them. They run the console's own DSP, so they sound like
+ the desk, sample for sample.
 
 Package: omx-plugins-lv2
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
-Description: OpenMixer delay, drive, EQ and channel strip as LV2 plugins
- The OpenMixer console's delay, drive, 8-band EQ and channel strip as LV2
- plugins, installed in /usr/lib/lv2 where Ardour, Carla, MOD and Zynthian find
- them, with a MOD GUI where the plugin has one. They run the console's own
- DSP, so they sound like the desk, sample for sample.
+Description: OpenMixer delay, drive, EQ, channel strip and keyed gate as LV2 plugins
+ The OpenMixer console's delay, drive, 8-band EQ, channel strip and keyed gate
+ as LV2 plugins, installed in /usr/lib/lv2 where Ardour, Carla, MOD and
+ Zynthian find them, with a MOD GUI where the plugin has one. They run the
+ console's own DSP, so they sound like the desk, sample for sample.
