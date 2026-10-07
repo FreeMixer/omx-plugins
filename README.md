@@ -2,7 +2,7 @@
 <!-- Copyright (C) 2026 Pau Aliagas <linuxnow@gmail.com> -->
 # omx-plugins
 
-The effects of the [OpenMixer](https://github.com/FreeMixer/openmixer) console, as plugins you can load
+The effects of the OpenMixer console, as plugins you can load
 in any host: **CLAP** for Bitwig, REAPER, Carla, openmixer and every other CLAP host, and **LV2** for
 Ardour, Carla, MOD and Zynthian, the MOD GUI included.
 
