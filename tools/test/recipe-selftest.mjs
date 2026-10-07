@@ -24,7 +24,7 @@ import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { checkCommits, rangeCommits } from '../commit-plan-check.mjs';
 import { commitPlan, planPlugin, writePlugin } from '../omx-new-plugin.mjs';
-import { checkPlugin, debtVerdict, gapLines, loadDebt, loadRecipe, pluginStems, recipeErrors } from '../plugin-recipe.mjs';
+import { checkPlugin, debtGrowth, debtVerdict, gapLines, loadDebt, loadRecipe, pluginStems, recipeErrors } from '../plugin-recipe.mjs';
 
 const ROOT = resolve(fileURLToPath(import.meta.url), '..', '..', '..');
 const WORK = join(ROOT, 'build', 'selftest');
@@ -243,6 +243,27 @@ async function main() {
     cpSync(join(ROOT, 'omx-contract.pin.json'), join(empty, 'omx-contract.pin.json'));
     const run = spawnSync('node', [join(ROOT, 'tools', 'plugin-recipe.mjs')], { env: { ...process.env, OMX_PLUGINS_ROOT: empty }, encoding: 'utf8' });
     expect(run.status === 1 && /no plugin to check/.test(run.stdout + run.stderr), `sabotage: a run over no plugin fails (exit ${run.status})`);
+  }
+
+  {
+    // the debt against its merge-base: a throwaway repository whose origin/main holds today's debt
+    const repo = join(WORK, 'growth');
+    copyTree(repo);
+    git(repo, 'init', '-q');
+    git(repo, 'add', '-A');
+    git(repo, 'commit', '-q', '-m', 'main');
+    git(repo, 'update-ref', 'refs/remotes/origin/main', 'HEAD');
+    git(repo, 'checkout', '-q', '-b', 'topic');
+    const level = debtGrowth(repo, loadDebt(repo));
+    expect(level.base === loadDebt(repo).length && !level.grown, `the debt as main holds it has not grown (${level.base} entries at the merge-base)`);
+    const more = [...loadDebt(repo), { plugin: 'omx-drive', entry: 'changelog', owedBy: 'sabotage' }];
+    const grew = debtGrowth(repo, more);
+    expect(grew.grown && grew.added.join() === 'omx-drive changelog', `sabotage: a debt entry added since main fails the growth check (${grew.added.join()})`);
+    const fewer = debtGrowth(repo, loadDebt(repo).slice(1));
+    expect(!fewer.grown, 'a debt that shrank passes the growth check');
+    git(repo, 'update-ref', '-d', 'refs/remotes/origin/main');
+    const none = debtGrowth(repo, loadDebt(repo));
+    expect(none.base === undefined && /no merge-base/.test(none.why), `no main to compare to is reported, never a silent pass (${none.why?.slice(0, 60)})`);
   }
 
   // ---- 4. the recipe itself ----------------------------------------------------------------
