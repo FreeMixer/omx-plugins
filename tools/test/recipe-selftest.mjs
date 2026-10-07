@@ -129,6 +129,9 @@ async function main() {
   const two = applyPlan(join(WORK, 'plan-merged'), ROOT, tree, merged);
   expect(!two.ok && two.violations.some((v) => /2 concerns in one commit/.test(v)), 'sabotage: declaration and faces in one commit is refused');
 
+  const none = checkCommits(recipe, rangeCommits(join(WORK, 'plan-ok'), 'HEAD..HEAD'));
+  expect(!none.ok && none.violations.some((v) => /holds no commit/.test(v)), 'sabotage: an empty commit range fails the protocol check');
+
   // ---- 3. every checker family, broken on a copy of omx-drive --------------------------------
   delete process.env.OMX_CONTRACT_DIR;
   const t = join(WORK, 'sabotage');
