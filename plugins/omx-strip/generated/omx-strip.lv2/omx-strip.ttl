@@ -4,6 +4,7 @@
 @prefix doap:  <http://usefulinc.com/ns/doap#> .
 @prefix foaf:  <http://xmlns.com/foaf/0.1/> .
 @prefix lv2:   <http://lv2plug.in/ns/lv2core#> .
+@prefix pprops: <http://lv2plug.in/ns/ext/port-props#> .
 @prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix units: <http://lv2plug.in/ns/extensions/units#> .
 
@@ -53,7 +54,8 @@
         lv2:name "Trim" ;
         lv2:default 0 ;
         lv2:minimum -24 ;
-        lv2:maximum 24
+        lv2:maximum 24 ;
+        units:unit units:db
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -72,7 +74,9 @@
         lv2:name "HPF Freq" ;
         lv2:default 80 ;
         lv2:minimum 20 ;
-        lv2:maximum 1000
+        lv2:maximum 1000 ;
+        lv2:portProperty pprops:logarithmic ;
+        units:unit units:hz
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -101,7 +105,9 @@
         lv2:name "LPF Freq" ;
         lv2:default 18000 ;
         lv2:minimum 1000 ;
-        lv2:maximum 20000
+        lv2:maximum 20000 ;
+        lv2:portProperty pprops:logarithmic ;
+        units:unit units:hz
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -130,7 +136,8 @@
         lv2:name "Gate Threshold" ;
         lv2:default -40 ;
         lv2:minimum -80 ;
-        lv2:maximum 0
+        lv2:maximum 0 ;
+        units:unit units:db
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -148,7 +155,8 @@
         lv2:name "Gate Range" ;
         lv2:default -90 ;
         lv2:minimum -90 ;
-        lv2:maximum 0
+        lv2:maximum 0 ;
+        units:unit units:db
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -197,7 +205,9 @@
         lv2:name "EQ 1 Freq" ;
         lv2:default 100 ;
         lv2:minimum 20 ;
-        lv2:maximum 20000
+        lv2:maximum 20000 ;
+        lv2:portProperty pprops:logarithmic ;
+        units:unit units:hz
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -206,7 +216,8 @@
         lv2:name "EQ 1 Gain" ;
         lv2:default 0 ;
         lv2:minimum -15 ;
-        lv2:maximum 15
+        lv2:maximum 15 ;
+        units:unit units:db
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -244,7 +255,9 @@
         lv2:name "EQ 2 Freq" ;
         lv2:default 400 ;
         lv2:minimum 20 ;
-        lv2:maximum 20000
+        lv2:maximum 20000 ;
+        lv2:portProperty pprops:logarithmic ;
+        units:unit units:hz
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -253,7 +266,8 @@
         lv2:name "EQ 2 Gain" ;
         lv2:default 0 ;
         lv2:minimum -15 ;
-        lv2:maximum 15
+        lv2:maximum 15 ;
+        units:unit units:db
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -291,7 +305,9 @@
         lv2:name "EQ 3 Freq" ;
         lv2:default 2000 ;
         lv2:minimum 20 ;
-        lv2:maximum 20000
+        lv2:maximum 20000 ;
+        lv2:portProperty pprops:logarithmic ;
+        units:unit units:hz
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -300,7 +316,8 @@
         lv2:name "EQ 3 Gain" ;
         lv2:default 0 ;
         lv2:minimum -15 ;
-        lv2:maximum 15
+        lv2:maximum 15 ;
+        units:unit units:db
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -338,7 +355,9 @@
         lv2:name "EQ 4 Freq" ;
         lv2:default 8000 ;
         lv2:minimum 20 ;
-        lv2:maximum 20000
+        lv2:maximum 20000 ;
+        lv2:portProperty pprops:logarithmic ;
+        units:unit units:hz
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -347,7 +366,8 @@
         lv2:name "EQ 4 Gain" ;
         lv2:default 0 ;
         lv2:minimum -15 ;
-        lv2:maximum 15
+        lv2:maximum 15 ;
+        units:unit units:db
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -385,7 +405,8 @@
         lv2:name "Comp Threshold" ;
         lv2:default -18 ;
         lv2:minimum -60 ;
-        lv2:maximum 0
+        lv2:maximum 0 ;
+        units:unit units:db
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -403,7 +424,8 @@
         lv2:name "Comp Knee" ;
         lv2:default 6 ;
         lv2:minimum 0 ;
-        lv2:maximum 24
+        lv2:maximum 24 ;
+        units:unit units:db
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -432,7 +454,8 @@
         lv2:name "Comp Makeup" ;
         lv2:default 0 ;
         lv2:minimum 0 ;
-        lv2:maximum 24
+        lv2:maximum 24 ;
+        units:unit units:db
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -471,5 +494,6 @@
         lv2:symbol "latency" ;
         lv2:name "Latency" ;
         lv2:designation lv2:latency ;
-        lv2:portProperty lv2:reportsLatency , lv2:integer
+        lv2:portProperty lv2:reportsLatency , lv2:integer ;
+        units:unit units:frame
     ] .

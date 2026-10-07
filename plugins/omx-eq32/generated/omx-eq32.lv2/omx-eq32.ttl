@@ -4,6 +4,7 @@
 @prefix doap:  <http://usefulinc.com/ns/doap#> .
 @prefix foaf:  <http://xmlns.com/foaf/0.1/> .
 @prefix lv2:   <http://lv2plug.in/ns/lv2core#> .
+@prefix pprops: <http://lv2plug.in/ns/ext/port-props#> .
 @prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix units: <http://lv2plug.in/ns/extensions/units#> .
 
@@ -73,7 +74,9 @@
         lv2:name "HPF Frequency" ;
         lv2:default 80 ;
         lv2:minimum 20 ;
-        lv2:maximum 1000
+        lv2:maximum 1000 ;
+        lv2:portProperty pprops:logarithmic ;
+        units:unit units:hz
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -102,7 +105,9 @@
         lv2:name "LPF Frequency" ;
         lv2:default 18000 ;
         lv2:minimum 1000 ;
-        lv2:maximum 20000
+        lv2:maximum 20000 ;
+        lv2:portProperty pprops:logarithmic ;
+        units:unit units:hz
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -131,7 +136,9 @@
         lv2:name "Band 1 Frequency" ;
         lv2:default 22 ;
         lv2:minimum 20 ;
-        lv2:maximum 20000
+        lv2:maximum 20000 ;
+        lv2:portProperty pprops:logarithmic ;
+        units:unit units:hz
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -140,7 +147,8 @@
         lv2:name "Band 1 Gain" ;
         lv2:default 0 ;
         lv2:minimum -15 ;
-        lv2:maximum 15
+        lv2:maximum 15 ;
+        units:unit units:db
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -178,7 +186,9 @@
         lv2:name "Band 2 Frequency" ;
         lv2:default 28 ;
         lv2:minimum 20 ;
-        lv2:maximum 20000
+        lv2:maximum 20000 ;
+        lv2:portProperty pprops:logarithmic ;
+        units:unit units:hz
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -187,7 +197,8 @@
         lv2:name "Band 2 Gain" ;
         lv2:default 0 ;
         lv2:minimum -15 ;
-        lv2:maximum 15
+        lv2:maximum 15 ;
+        units:unit units:db
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -225,7 +236,9 @@
         lv2:name "Band 3 Frequency" ;
         lv2:default 34 ;
         lv2:minimum 20 ;
-        lv2:maximum 20000
+        lv2:maximum 20000 ;
+        lv2:portProperty pprops:logarithmic ;
+        units:unit units:hz
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -234,7 +247,8 @@
         lv2:name "Band 3 Gain" ;
         lv2:default 0 ;
         lv2:minimum -15 ;
-        lv2:maximum 15
+        lv2:maximum 15 ;
+        units:unit units:db
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -272,7 +286,9 @@
         lv2:name "Band 4 Frequency" ;
         lv2:default 43 ;
         lv2:minimum 20 ;
-        lv2:maximum 20000
+        lv2:maximum 20000 ;
+        lv2:portProperty pprops:logarithmic ;
+        units:unit units:hz
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -281,7 +297,8 @@
         lv2:name "Band 4 Gain" ;
         lv2:default 0 ;
         lv2:minimum -15 ;
-        lv2:maximum 15
+        lv2:maximum 15 ;
+        units:unit units:db
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -319,7 +336,9 @@
         lv2:name "Band 5 Frequency" ;
         lv2:default 53 ;
         lv2:minimum 20 ;
-        lv2:maximum 20000
+        lv2:maximum 20000 ;
+        lv2:portProperty pprops:logarithmic ;
+        units:unit units:hz
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -328,7 +347,8 @@
         lv2:name "Band 5 Gain" ;
         lv2:default 0 ;
         lv2:minimum -15 ;
-        lv2:maximum 15
+        lv2:maximum 15 ;
+        units:unit units:db
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -366,7 +386,9 @@
         lv2:name "Band 6 Frequency" ;
         lv2:default 66 ;
         lv2:minimum 20 ;
-        lv2:maximum 20000
+        lv2:maximum 20000 ;
+        lv2:portProperty pprops:logarithmic ;
+        units:unit units:hz
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -375,7 +397,8 @@
         lv2:name "Band 6 Gain" ;
         lv2:default 0 ;
         lv2:minimum -15 ;
-        lv2:maximum 15
+        lv2:maximum 15 ;
+        units:unit units:db
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -413,7 +436,9 @@
         lv2:name "Band 7 Frequency" ;
         lv2:default 81 ;
         lv2:minimum 20 ;
-        lv2:maximum 20000
+        lv2:maximum 20000 ;
+        lv2:portProperty pprops:logarithmic ;
+        units:unit units:hz
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -422,7 +447,8 @@
         lv2:name "Band 7 Gain" ;
         lv2:default 0 ;
         lv2:minimum -15 ;
-        lv2:maximum 15
+        lv2:maximum 15 ;
+        units:unit units:db
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -460,7 +486,9 @@
         lv2:name "Band 8 Frequency" ;
         lv2:default 101 ;
         lv2:minimum 20 ;
-        lv2:maximum 20000
+        lv2:maximum 20000 ;
+        lv2:portProperty pprops:logarithmic ;
+        units:unit units:hz
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -469,7 +497,8 @@
         lv2:name "Band 8 Gain" ;
         lv2:default 0 ;
         lv2:minimum -15 ;
-        lv2:maximum 15
+        lv2:maximum 15 ;
+        units:unit units:db
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -507,7 +536,9 @@
         lv2:name "Band 9 Frequency" ;
         lv2:default 125 ;
         lv2:minimum 20 ;
-        lv2:maximum 20000
+        lv2:maximum 20000 ;
+        lv2:portProperty pprops:logarithmic ;
+        units:unit units:hz
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -516,7 +547,8 @@
         lv2:name "Band 9 Gain" ;
         lv2:default 0 ;
         lv2:minimum -15 ;
-        lv2:maximum 15
+        lv2:maximum 15 ;
+        units:unit units:db
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -554,7 +586,9 @@
         lv2:name "Band 10 Frequency" ;
         lv2:default 155 ;
         lv2:minimum 20 ;
-        lv2:maximum 20000
+        lv2:maximum 20000 ;
+        lv2:portProperty pprops:logarithmic ;
+        units:unit units:hz
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -563,7 +597,8 @@
         lv2:name "Band 10 Gain" ;
         lv2:default 0 ;
         lv2:minimum -15 ;
-        lv2:maximum 15
+        lv2:maximum 15 ;
+        units:unit units:db
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -601,7 +636,9 @@
         lv2:name "Band 11 Frequency" ;
         lv2:default 193 ;
         lv2:minimum 20 ;
-        lv2:maximum 20000
+        lv2:maximum 20000 ;
+        lv2:portProperty pprops:logarithmic ;
+        units:unit units:hz
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -610,7 +647,8 @@
         lv2:name "Band 11 Gain" ;
         lv2:default 0 ;
         lv2:minimum -15 ;
-        lv2:maximum 15
+        lv2:maximum 15 ;
+        units:unit units:db
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -648,7 +686,9 @@
         lv2:name "Band 12 Frequency" ;
         lv2:default 239 ;
         lv2:minimum 20 ;
-        lv2:maximum 20000
+        lv2:maximum 20000 ;
+        lv2:portProperty pprops:logarithmic ;
+        units:unit units:hz
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -657,7 +697,8 @@
         lv2:name "Band 12 Gain" ;
         lv2:default 0 ;
         lv2:minimum -15 ;
-        lv2:maximum 15
+        lv2:maximum 15 ;
+        units:unit units:db
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -695,7 +736,9 @@
         lv2:name "Band 13 Frequency" ;
         lv2:default 297 ;
         lv2:minimum 20 ;
-        lv2:maximum 20000
+        lv2:maximum 20000 ;
+        lv2:portProperty pprops:logarithmic ;
+        units:unit units:hz
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -704,7 +747,8 @@
         lv2:name "Band 13 Gain" ;
         lv2:default 0 ;
         lv2:minimum -15 ;
-        lv2:maximum 15
+        lv2:maximum 15 ;
+        units:unit units:db
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -742,7 +786,9 @@
         lv2:name "Band 14 Frequency" ;
         lv2:default 369 ;
         lv2:minimum 20 ;
-        lv2:maximum 20000
+        lv2:maximum 20000 ;
+        lv2:portProperty pprops:logarithmic ;
+        units:unit units:hz
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -751,7 +797,8 @@
         lv2:name "Band 14 Gain" ;
         lv2:default 0 ;
         lv2:minimum -15 ;
-        lv2:maximum 15
+        lv2:maximum 15 ;
+        units:unit units:db
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -789,7 +836,9 @@
         lv2:name "Band 15 Frequency" ;
         lv2:default 458 ;
         lv2:minimum 20 ;
-        lv2:maximum 20000
+        lv2:maximum 20000 ;
+        lv2:portProperty pprops:logarithmic ;
+        units:unit units:hz
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -798,7 +847,8 @@
         lv2:name "Band 15 Gain" ;
         lv2:default 0 ;
         lv2:minimum -15 ;
-        lv2:maximum 15
+        lv2:maximum 15 ;
+        units:unit units:db
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -836,7 +886,9 @@
         lv2:name "Band 16 Frequency" ;
         lv2:default 568 ;
         lv2:minimum 20 ;
-        lv2:maximum 20000
+        lv2:maximum 20000 ;
+        lv2:portProperty pprops:logarithmic ;
+        units:unit units:hz
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -845,7 +897,8 @@
         lv2:name "Band 16 Gain" ;
         lv2:default 0 ;
         lv2:minimum -15 ;
-        lv2:maximum 15
+        lv2:maximum 15 ;
+        units:unit units:db
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -883,7 +936,9 @@
         lv2:name "Band 17 Frequency" ;
         lv2:default 705 ;
         lv2:minimum 20 ;
-        lv2:maximum 20000
+        lv2:maximum 20000 ;
+        lv2:portProperty pprops:logarithmic ;
+        units:unit units:hz
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -892,7 +947,8 @@
         lv2:name "Band 17 Gain" ;
         lv2:default 0 ;
         lv2:minimum -15 ;
-        lv2:maximum 15
+        lv2:maximum 15 ;
+        units:unit units:db
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -930,7 +986,9 @@
         lv2:name "Band 18 Frequency" ;
         lv2:default 874 ;
         lv2:minimum 20 ;
-        lv2:maximum 20000
+        lv2:maximum 20000 ;
+        lv2:portProperty pprops:logarithmic ;
+        units:unit units:hz
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -939,7 +997,8 @@
         lv2:name "Band 18 Gain" ;
         lv2:default 0 ;
         lv2:minimum -15 ;
-        lv2:maximum 15
+        lv2:maximum 15 ;
+        units:unit units:db
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -977,7 +1036,9 @@
         lv2:name "Band 19 Frequency" ;
         lv2:default 1085 ;
         lv2:minimum 20 ;
-        lv2:maximum 20000
+        lv2:maximum 20000 ;
+        lv2:portProperty pprops:logarithmic ;
+        units:unit units:hz
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -986,7 +1047,8 @@
         lv2:name "Band 19 Gain" ;
         lv2:default 0 ;
         lv2:minimum -15 ;
-        lv2:maximum 15
+        lv2:maximum 15 ;
+        units:unit units:db
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1024,7 +1086,9 @@
         lv2:name "Band 20 Frequency" ;
         lv2:default 1346 ;
         lv2:minimum 20 ;
-        lv2:maximum 20000
+        lv2:maximum 20000 ;
+        lv2:portProperty pprops:logarithmic ;
+        units:unit units:hz
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1033,7 +1097,8 @@
         lv2:name "Band 20 Gain" ;
         lv2:default 0 ;
         lv2:minimum -15 ;
-        lv2:maximum 15
+        lv2:maximum 15 ;
+        units:unit units:db
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1071,7 +1136,9 @@
         lv2:name "Band 21 Frequency" ;
         lv2:default 1671 ;
         lv2:minimum 20 ;
-        lv2:maximum 20000
+        lv2:maximum 20000 ;
+        lv2:portProperty pprops:logarithmic ;
+        units:unit units:hz
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1080,7 +1147,8 @@
         lv2:name "Band 21 Gain" ;
         lv2:default 0 ;
         lv2:minimum -15 ;
-        lv2:maximum 15
+        lv2:maximum 15 ;
+        units:unit units:db
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1118,7 +1186,9 @@
         lv2:name "Band 22 Frequency" ;
         lv2:default 2073 ;
         lv2:minimum 20 ;
-        lv2:maximum 20000
+        lv2:maximum 20000 ;
+        lv2:portProperty pprops:logarithmic ;
+        units:unit units:hz
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1127,7 +1197,8 @@
         lv2:name "Band 22 Gain" ;
         lv2:default 0 ;
         lv2:minimum -15 ;
-        lv2:maximum 15
+        lv2:maximum 15 ;
+        units:unit units:db
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1165,7 +1236,9 @@
         lv2:name "Band 23 Frequency" ;
         lv2:default 2573 ;
         lv2:minimum 20 ;
-        lv2:maximum 20000
+        lv2:maximum 20000 ;
+        lv2:portProperty pprops:logarithmic ;
+        units:unit units:hz
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1174,7 +1247,8 @@
         lv2:name "Band 23 Gain" ;
         lv2:default 0 ;
         lv2:minimum -15 ;
-        lv2:maximum 15
+        lv2:maximum 15 ;
+        units:unit units:db
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1212,7 +1286,9 @@
         lv2:name "Band 24 Frequency" ;
         lv2:default 3193 ;
         lv2:minimum 20 ;
-        lv2:maximum 20000
+        lv2:maximum 20000 ;
+        lv2:portProperty pprops:logarithmic ;
+        units:unit units:hz
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1221,7 +1297,8 @@
         lv2:name "Band 24 Gain" ;
         lv2:default 0 ;
         lv2:minimum -15 ;
-        lv2:maximum 15
+        lv2:maximum 15 ;
+        units:unit units:db
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1259,7 +1336,9 @@
         lv2:name "Band 25 Frequency" ;
         lv2:default 3962 ;
         lv2:minimum 20 ;
-        lv2:maximum 20000
+        lv2:maximum 20000 ;
+        lv2:portProperty pprops:logarithmic ;
+        units:unit units:hz
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1268,7 +1347,8 @@
         lv2:name "Band 25 Gain" ;
         lv2:default 0 ;
         lv2:minimum -15 ;
-        lv2:maximum 15
+        lv2:maximum 15 ;
+        units:unit units:db
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1306,7 +1386,9 @@
         lv2:name "Band 26 Frequency" ;
         lv2:default 4916 ;
         lv2:minimum 20 ;
-        lv2:maximum 20000
+        lv2:maximum 20000 ;
+        lv2:portProperty pprops:logarithmic ;
+        units:unit units:hz
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1315,7 +1397,8 @@
         lv2:name "Band 26 Gain" ;
         lv2:default 0 ;
         lv2:minimum -15 ;
-        lv2:maximum 15
+        lv2:maximum 15 ;
+        units:unit units:db
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1353,7 +1436,9 @@
         lv2:name "Band 27 Frequency" ;
         lv2:default 6101 ;
         lv2:minimum 20 ;
-        lv2:maximum 20000
+        lv2:maximum 20000 ;
+        lv2:portProperty pprops:logarithmic ;
+        units:unit units:hz
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1362,7 +1447,8 @@
         lv2:name "Band 27 Gain" ;
         lv2:default 0 ;
         lv2:minimum -15 ;
-        lv2:maximum 15
+        lv2:maximum 15 ;
+        units:unit units:db
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1400,7 +1486,9 @@
         lv2:name "Band 28 Frequency" ;
         lv2:default 7571 ;
         lv2:minimum 20 ;
-        lv2:maximum 20000
+        lv2:maximum 20000 ;
+        lv2:portProperty pprops:logarithmic ;
+        units:unit units:hz
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1409,7 +1497,8 @@
         lv2:name "Band 28 Gain" ;
         lv2:default 0 ;
         lv2:minimum -15 ;
-        lv2:maximum 15
+        lv2:maximum 15 ;
+        units:unit units:db
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1447,7 +1536,9 @@
         lv2:name "Band 29 Frequency" ;
         lv2:default 9395 ;
         lv2:minimum 20 ;
-        lv2:maximum 20000
+        lv2:maximum 20000 ;
+        lv2:portProperty pprops:logarithmic ;
+        units:unit units:hz
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1456,7 +1547,8 @@
         lv2:name "Band 29 Gain" ;
         lv2:default 0 ;
         lv2:minimum -15 ;
-        lv2:maximum 15
+        lv2:maximum 15 ;
+        units:unit units:db
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1494,7 +1586,9 @@
         lv2:name "Band 30 Frequency" ;
         lv2:default 11659 ;
         lv2:minimum 20 ;
-        lv2:maximum 20000
+        lv2:maximum 20000 ;
+        lv2:portProperty pprops:logarithmic ;
+        units:unit units:hz
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1503,7 +1597,8 @@
         lv2:name "Band 30 Gain" ;
         lv2:default 0 ;
         lv2:minimum -15 ;
-        lv2:maximum 15
+        lv2:maximum 15 ;
+        units:unit units:db
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1541,7 +1636,9 @@
         lv2:name "Band 31 Frequency" ;
         lv2:default 14468 ;
         lv2:minimum 20 ;
-        lv2:maximum 20000
+        lv2:maximum 20000 ;
+        lv2:portProperty pprops:logarithmic ;
+        units:unit units:hz
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1550,7 +1647,8 @@
         lv2:name "Band 31 Gain" ;
         lv2:default 0 ;
         lv2:minimum -15 ;
-        lv2:maximum 15
+        lv2:maximum 15 ;
+        units:unit units:db
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1588,7 +1686,9 @@
         lv2:name "Band 32 Frequency" ;
         lv2:default 17954 ;
         lv2:minimum 20 ;
-        lv2:maximum 20000
+        lv2:maximum 20000 ;
+        lv2:portProperty pprops:logarithmic ;
+        units:unit units:hz
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1597,7 +1697,8 @@
         lv2:name "Band 32 Gain" ;
         lv2:default 0 ;
         lv2:minimum -15 ;
-        lv2:maximum 15
+        lv2:maximum 15 ;
+        units:unit units:db
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1635,5 +1736,6 @@
         lv2:symbol "latency" ;
         lv2:name "Latency" ;
         lv2:designation lv2:latency ;
-        lv2:portProperty lv2:reportsLatency , lv2:integer
+        lv2:portProperty lv2:reportsLatency , lv2:integer ;
+        units:unit units:frame
     ] .
