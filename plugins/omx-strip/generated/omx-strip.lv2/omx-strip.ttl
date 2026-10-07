@@ -5,6 +5,7 @@
 @prefix foaf:  <http://xmlns.com/foaf/0.1/> .
 @prefix lv2:   <http://lv2plug.in/ns/lv2core#> .
 @prefix pprops: <http://lv2plug.in/ns/ext/port-props#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix units: <http://lv2plug.in/ns/extensions/units#> .
 
@@ -86,7 +87,10 @@
         lv2:default 12 ;
         lv2:minimum 12 ;
         lv2:maximum 24 ;
-        lv2:portProperty lv2:integer
+        lv2:portProperty lv2:integer , lv2:enumeration ;
+        lv2:scalePoint
+            [ rdfs:label "12 dB/oct" ; rdf:value 12 ] ,
+            [ rdfs:label "24 dB/oct" ; rdf:value 24 ]
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -117,7 +121,10 @@
         lv2:default 12 ;
         lv2:minimum 12 ;
         lv2:maximum 24 ;
-        lv2:portProperty lv2:integer
+        lv2:portProperty lv2:integer , lv2:enumeration ;
+        lv2:scalePoint
+            [ rdfs:label "12 dB/oct" ; rdf:value 12 ] ,
+            [ rdfs:label "24 dB/oct" ; rdf:value 24 ]
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -196,7 +203,14 @@
         lv2:default 1 ;
         lv2:minimum 0 ;
         lv2:maximum 5 ;
-        lv2:portProperty lv2:integer
+        lv2:portProperty lv2:integer , lv2:enumeration ;
+        lv2:scalePoint
+            [ rdfs:label "Bell" ; rdf:value 0 ] ,
+            [ rdfs:label "Low Shelf" ; rdf:value 1 ] ,
+            [ rdfs:label "High Shelf" ; rdf:value 2 ] ,
+            [ rdfs:label "Notch" ; rdf:value 3 ] ,
+            [ rdfs:label "All-pass 1st" ; rdf:value 4 ] ,
+            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ]
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -246,7 +260,14 @@
         lv2:default 0 ;
         lv2:minimum 0 ;
         lv2:maximum 5 ;
-        lv2:portProperty lv2:integer
+        lv2:portProperty lv2:integer , lv2:enumeration ;
+        lv2:scalePoint
+            [ rdfs:label "Bell" ; rdf:value 0 ] ,
+            [ rdfs:label "Low Shelf" ; rdf:value 1 ] ,
+            [ rdfs:label "High Shelf" ; rdf:value 2 ] ,
+            [ rdfs:label "Notch" ; rdf:value 3 ] ,
+            [ rdfs:label "All-pass 1st" ; rdf:value 4 ] ,
+            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ]
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -296,7 +317,14 @@
         lv2:default 0 ;
         lv2:minimum 0 ;
         lv2:maximum 5 ;
-        lv2:portProperty lv2:integer
+        lv2:portProperty lv2:integer , lv2:enumeration ;
+        lv2:scalePoint
+            [ rdfs:label "Bell" ; rdf:value 0 ] ,
+            [ rdfs:label "Low Shelf" ; rdf:value 1 ] ,
+            [ rdfs:label "High Shelf" ; rdf:value 2 ] ,
+            [ rdfs:label "Notch" ; rdf:value 3 ] ,
+            [ rdfs:label "All-pass 1st" ; rdf:value 4 ] ,
+            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ]
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -346,7 +374,14 @@
         lv2:default 2 ;
         lv2:minimum 0 ;
         lv2:maximum 5 ;
-        lv2:portProperty lv2:integer
+        lv2:portProperty lv2:integer , lv2:enumeration ;
+        lv2:scalePoint
+            [ rdfs:label "Bell" ; rdf:value 0 ] ,
+            [ rdfs:label "Low Shelf" ; rdf:value 1 ] ,
+            [ rdfs:label "High Shelf" ; rdf:value 2 ] ,
+            [ rdfs:label "Notch" ; rdf:value 3 ] ,
+            [ rdfs:label "All-pass 1st" ; rdf:value 4 ] ,
+            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ]
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;

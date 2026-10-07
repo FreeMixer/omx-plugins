@@ -1,5 +1,5 @@
 {
-  "$comment": "THE declaration of omx-eq32: the CLAP and LV2 faces and the parameter header are generated from this file by tools/gen.mjs. Parameter order is append-only. The travels are the console's own EQ_FREQ_RANGE, EQ_GAIN_RANGE, EQ_Q_RANGE (a notch's Q reaches EQ_NOTCH_Q_RANGE), HPF_FREQ_RANGE and LPF_FREQ_RANGE, read as omx-dsp's omx_contract_limits.h carries them. The band count is a compile-time 32; band types are 0 bell, 1 low shelf, 2 high shelf, 3 notch, 4 allpass1, 5 allpass2. Each band's frequency default is the console's own (defaultEqState(), log-spaced across the audio band), as the console's in-tree omx-eq32.lv2 declares it. No MOD GUI: tools/modgui-gen.mjs does not draw selectors.",
+  "$comment": "THE declaration of omx-eq32: the CLAP and LV2 faces and the parameter header are generated from this file by tools/gen.mjs. Parameter order is append-only. The travels are the console's own EQ_FREQ_RANGE, EQ_GAIN_RANGE, EQ_Q_RANGE (a notch's Q reaches EQ_NOTCH_Q_RANGE), HPF_FREQ_RANGE and LPF_FREQ_RANGE, read as omx-dsp's omx_contract_limits.h carries them. The band count is a compile-time 32; band types are 0 bell, 1 low shelf, 2 high shelf, 3 notch, 4 allpass1, 5 allpass2, labelled as the console's bundle labels them; a slope takes 12 or 24 dB/oct and nothing between. Each band's frequency default is the console's own (defaultEqState(), log-spaced across the audio band), as the console's in-tree omx-eq32.lv2 declares it. No MOD GUI: tools/modgui-gen.mjs does not draw selectors.",
   "stem": "omx-eq32",
   "kernel": "eq32",
   "name": "omx eq32",
@@ -54,7 +54,17 @@
       "min": 12,
       "max": 24,
       "def": 12,
-      "kind": "integer"
+      "kind": "integer",
+      "points": [
+        {
+          "value": 12,
+          "label": "12 dB/oct"
+        },
+        {
+          "value": 24,
+          "label": "24 dB/oct"
+        }
+      ]
     },
     {
       "symbol": "lpf_on",
@@ -80,7 +90,17 @@
       "min": 12,
       "max": 24,
       "def": 12,
-      "kind": "integer"
+      "kind": "integer",
+      "points": [
+        {
+          "value": 12,
+          "label": "12 dB/oct"
+        },
+        {
+          "value": 24,
+          "label": "24 dB/oct"
+        }
+      ]
     },
     {
       "symbol": "b1_type",
@@ -89,7 +109,15 @@
       "min": 0,
       "max": 5,
       "def": 0,
-      "kind": "integer"
+      "kind": "integer",
+      "values": [
+        "Bell",
+        "Low Shelf",
+        "High Shelf",
+        "Notch",
+        "All-pass 1st",
+        "All-pass 2nd"
+      ]
     },
     {
       "symbol": "b1_freq",
@@ -131,7 +159,15 @@
       "min": 0,
       "max": 5,
       "def": 0,
-      "kind": "integer"
+      "kind": "integer",
+      "values": [
+        "Bell",
+        "Low Shelf",
+        "High Shelf",
+        "Notch",
+        "All-pass 1st",
+        "All-pass 2nd"
+      ]
     },
     {
       "symbol": "b2_freq",
@@ -173,7 +209,15 @@
       "min": 0,
       "max": 5,
       "def": 0,
-      "kind": "integer"
+      "kind": "integer",
+      "values": [
+        "Bell",
+        "Low Shelf",
+        "High Shelf",
+        "Notch",
+        "All-pass 1st",
+        "All-pass 2nd"
+      ]
     },
     {
       "symbol": "b3_freq",
@@ -215,7 +259,15 @@
       "min": 0,
       "max": 5,
       "def": 0,
-      "kind": "integer"
+      "kind": "integer",
+      "values": [
+        "Bell",
+        "Low Shelf",
+        "High Shelf",
+        "Notch",
+        "All-pass 1st",
+        "All-pass 2nd"
+      ]
     },
     {
       "symbol": "b4_freq",
@@ -257,7 +309,15 @@
       "min": 0,
       "max": 5,
       "def": 0,
-      "kind": "integer"
+      "kind": "integer",
+      "values": [
+        "Bell",
+        "Low Shelf",
+        "High Shelf",
+        "Notch",
+        "All-pass 1st",
+        "All-pass 2nd"
+      ]
     },
     {
       "symbol": "b5_freq",
@@ -299,7 +359,15 @@
       "min": 0,
       "max": 5,
       "def": 0,
-      "kind": "integer"
+      "kind": "integer",
+      "values": [
+        "Bell",
+        "Low Shelf",
+        "High Shelf",
+        "Notch",
+        "All-pass 1st",
+        "All-pass 2nd"
+      ]
     },
     {
       "symbol": "b6_freq",
@@ -341,7 +409,15 @@
       "min": 0,
       "max": 5,
       "def": 0,
-      "kind": "integer"
+      "kind": "integer",
+      "values": [
+        "Bell",
+        "Low Shelf",
+        "High Shelf",
+        "Notch",
+        "All-pass 1st",
+        "All-pass 2nd"
+      ]
     },
     {
       "symbol": "b7_freq",
@@ -383,7 +459,15 @@
       "min": 0,
       "max": 5,
       "def": 0,
-      "kind": "integer"
+      "kind": "integer",
+      "values": [
+        "Bell",
+        "Low Shelf",
+        "High Shelf",
+        "Notch",
+        "All-pass 1st",
+        "All-pass 2nd"
+      ]
     },
     {
       "symbol": "b8_freq",
@@ -425,7 +509,15 @@
       "min": 0,
       "max": 5,
       "def": 0,
-      "kind": "integer"
+      "kind": "integer",
+      "values": [
+        "Bell",
+        "Low Shelf",
+        "High Shelf",
+        "Notch",
+        "All-pass 1st",
+        "All-pass 2nd"
+      ]
     },
     {
       "symbol": "b9_freq",
@@ -467,7 +559,15 @@
       "min": 0,
       "max": 5,
       "def": 0,
-      "kind": "integer"
+      "kind": "integer",
+      "values": [
+        "Bell",
+        "Low Shelf",
+        "High Shelf",
+        "Notch",
+        "All-pass 1st",
+        "All-pass 2nd"
+      ]
     },
     {
       "symbol": "b10_freq",
@@ -509,7 +609,15 @@
       "min": 0,
       "max": 5,
       "def": 0,
-      "kind": "integer"
+      "kind": "integer",
+      "values": [
+        "Bell",
+        "Low Shelf",
+        "High Shelf",
+        "Notch",
+        "All-pass 1st",
+        "All-pass 2nd"
+      ]
     },
     {
       "symbol": "b11_freq",
@@ -551,7 +659,15 @@
       "min": 0,
       "max": 5,
       "def": 0,
-      "kind": "integer"
+      "kind": "integer",
+      "values": [
+        "Bell",
+        "Low Shelf",
+        "High Shelf",
+        "Notch",
+        "All-pass 1st",
+        "All-pass 2nd"
+      ]
     },
     {
       "symbol": "b12_freq",
@@ -593,7 +709,15 @@
       "min": 0,
       "max": 5,
       "def": 0,
-      "kind": "integer"
+      "kind": "integer",
+      "values": [
+        "Bell",
+        "Low Shelf",
+        "High Shelf",
+        "Notch",
+        "All-pass 1st",
+        "All-pass 2nd"
+      ]
     },
     {
       "symbol": "b13_freq",
@@ -635,7 +759,15 @@
       "min": 0,
       "max": 5,
       "def": 0,
-      "kind": "integer"
+      "kind": "integer",
+      "values": [
+        "Bell",
+        "Low Shelf",
+        "High Shelf",
+        "Notch",
+        "All-pass 1st",
+        "All-pass 2nd"
+      ]
     },
     {
       "symbol": "b14_freq",
@@ -677,7 +809,15 @@
       "min": 0,
       "max": 5,
       "def": 0,
-      "kind": "integer"
+      "kind": "integer",
+      "values": [
+        "Bell",
+        "Low Shelf",
+        "High Shelf",
+        "Notch",
+        "All-pass 1st",
+        "All-pass 2nd"
+      ]
     },
     {
       "symbol": "b15_freq",
@@ -719,7 +859,15 @@
       "min": 0,
       "max": 5,
       "def": 0,
-      "kind": "integer"
+      "kind": "integer",
+      "values": [
+        "Bell",
+        "Low Shelf",
+        "High Shelf",
+        "Notch",
+        "All-pass 1st",
+        "All-pass 2nd"
+      ]
     },
     {
       "symbol": "b16_freq",
@@ -761,7 +909,15 @@
       "min": 0,
       "max": 5,
       "def": 0,
-      "kind": "integer"
+      "kind": "integer",
+      "values": [
+        "Bell",
+        "Low Shelf",
+        "High Shelf",
+        "Notch",
+        "All-pass 1st",
+        "All-pass 2nd"
+      ]
     },
     {
       "symbol": "b17_freq",
@@ -803,7 +959,15 @@
       "min": 0,
       "max": 5,
       "def": 0,
-      "kind": "integer"
+      "kind": "integer",
+      "values": [
+        "Bell",
+        "Low Shelf",
+        "High Shelf",
+        "Notch",
+        "All-pass 1st",
+        "All-pass 2nd"
+      ]
     },
     {
       "symbol": "b18_freq",
@@ -845,7 +1009,15 @@
       "min": 0,
       "max": 5,
       "def": 0,
-      "kind": "integer"
+      "kind": "integer",
+      "values": [
+        "Bell",
+        "Low Shelf",
+        "High Shelf",
+        "Notch",
+        "All-pass 1st",
+        "All-pass 2nd"
+      ]
     },
     {
       "symbol": "b19_freq",
@@ -887,7 +1059,15 @@
       "min": 0,
       "max": 5,
       "def": 0,
-      "kind": "integer"
+      "kind": "integer",
+      "values": [
+        "Bell",
+        "Low Shelf",
+        "High Shelf",
+        "Notch",
+        "All-pass 1st",
+        "All-pass 2nd"
+      ]
     },
     {
       "symbol": "b20_freq",
@@ -929,7 +1109,15 @@
       "min": 0,
       "max": 5,
       "def": 0,
-      "kind": "integer"
+      "kind": "integer",
+      "values": [
+        "Bell",
+        "Low Shelf",
+        "High Shelf",
+        "Notch",
+        "All-pass 1st",
+        "All-pass 2nd"
+      ]
     },
     {
       "symbol": "b21_freq",
@@ -971,7 +1159,15 @@
       "min": 0,
       "max": 5,
       "def": 0,
-      "kind": "integer"
+      "kind": "integer",
+      "values": [
+        "Bell",
+        "Low Shelf",
+        "High Shelf",
+        "Notch",
+        "All-pass 1st",
+        "All-pass 2nd"
+      ]
     },
     {
       "symbol": "b22_freq",
@@ -1013,7 +1209,15 @@
       "min": 0,
       "max": 5,
       "def": 0,
-      "kind": "integer"
+      "kind": "integer",
+      "values": [
+        "Bell",
+        "Low Shelf",
+        "High Shelf",
+        "Notch",
+        "All-pass 1st",
+        "All-pass 2nd"
+      ]
     },
     {
       "symbol": "b23_freq",
@@ -1055,7 +1259,15 @@
       "min": 0,
       "max": 5,
       "def": 0,
-      "kind": "integer"
+      "kind": "integer",
+      "values": [
+        "Bell",
+        "Low Shelf",
+        "High Shelf",
+        "Notch",
+        "All-pass 1st",
+        "All-pass 2nd"
+      ]
     },
     {
       "symbol": "b24_freq",
@@ -1097,7 +1309,15 @@
       "min": 0,
       "max": 5,
       "def": 0,
-      "kind": "integer"
+      "kind": "integer",
+      "values": [
+        "Bell",
+        "Low Shelf",
+        "High Shelf",
+        "Notch",
+        "All-pass 1st",
+        "All-pass 2nd"
+      ]
     },
     {
       "symbol": "b25_freq",
@@ -1139,7 +1359,15 @@
       "min": 0,
       "max": 5,
       "def": 0,
-      "kind": "integer"
+      "kind": "integer",
+      "values": [
+        "Bell",
+        "Low Shelf",
+        "High Shelf",
+        "Notch",
+        "All-pass 1st",
+        "All-pass 2nd"
+      ]
     },
     {
       "symbol": "b26_freq",
@@ -1181,7 +1409,15 @@
       "min": 0,
       "max": 5,
       "def": 0,
-      "kind": "integer"
+      "kind": "integer",
+      "values": [
+        "Bell",
+        "Low Shelf",
+        "High Shelf",
+        "Notch",
+        "All-pass 1st",
+        "All-pass 2nd"
+      ]
     },
     {
       "symbol": "b27_freq",
@@ -1223,7 +1459,15 @@
       "min": 0,
       "max": 5,
       "def": 0,
-      "kind": "integer"
+      "kind": "integer",
+      "values": [
+        "Bell",
+        "Low Shelf",
+        "High Shelf",
+        "Notch",
+        "All-pass 1st",
+        "All-pass 2nd"
+      ]
     },
     {
       "symbol": "b28_freq",
@@ -1265,7 +1509,15 @@
       "min": 0,
       "max": 5,
       "def": 0,
-      "kind": "integer"
+      "kind": "integer",
+      "values": [
+        "Bell",
+        "Low Shelf",
+        "High Shelf",
+        "Notch",
+        "All-pass 1st",
+        "All-pass 2nd"
+      ]
     },
     {
       "symbol": "b29_freq",
@@ -1307,7 +1559,15 @@
       "min": 0,
       "max": 5,
       "def": 0,
-      "kind": "integer"
+      "kind": "integer",
+      "values": [
+        "Bell",
+        "Low Shelf",
+        "High Shelf",
+        "Notch",
+        "All-pass 1st",
+        "All-pass 2nd"
+      ]
     },
     {
       "symbol": "b30_freq",
@@ -1349,7 +1609,15 @@
       "min": 0,
       "max": 5,
       "def": 0,
-      "kind": "integer"
+      "kind": "integer",
+      "values": [
+        "Bell",
+        "Low Shelf",
+        "High Shelf",
+        "Notch",
+        "All-pass 1st",
+        "All-pass 2nd"
+      ]
     },
     {
       "symbol": "b31_freq",
@@ -1391,7 +1659,15 @@
       "min": 0,
       "max": 5,
       "def": 0,
-      "kind": "integer"
+      "kind": "integer",
+      "values": [
+        "Bell",
+        "Low Shelf",
+        "High Shelf",
+        "Notch",
+        "All-pass 1st",
+        "All-pass 2nd"
+      ]
     },
     {
       "symbol": "b32_freq",
