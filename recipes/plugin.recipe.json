@@ -6,8 +6,14 @@
   "tree": {
     "pluginsDir": "plugins",
     "decl": "plugins/{stem}/{stem}.decl.json",
-    "versionFrom": { "file": "Makefile", "var": "VERSION" },
-    "omxdspMinFrom": { "file": "packaging/omx-plugins.spec", "pattern": "^BuildRequires: omx-dsp-devel >= ([0-9.]+)$" }
+    "versionFrom": {
+      "file": "Makefile",
+      "var": "VERSION"
+    },
+    "omxdspMinFrom": {
+      "file": "packaging/omx-plugins.spec",
+      "pattern": "^BuildRequires: omx-dsp-devel >= ([0-9.]+)$"
+    }
   },
   "contract": {
     "pin": "omx-contract.pin.json",
@@ -43,7 +49,7 @@
   },
   "steps": {
     "identity": "the plugin's declaration: stem, kernel, CLAP id, LV2 URI, parameters by reference, panel",
-    "kernel": "the kernel the parameters reference: its file in omx-contract at the pin (by the kernel recipe in omx-contract and omx-dsp when it is new), and the pin",
+    "kernel": "the kernels the parameters reference: their files in omx-contract at the pin (by the kernel recipe in omx-contract and omx-dsp when one is new), and the pin",
     "generate": "the files tools/gen.mjs and tools/modgui-gen.mjs write from the declaration",
     "faces": "the build and the CLAP and LV2 faces, plain C over omx-dsp, and their binding to the kernel",
     "tests": "the parameter test and the kernel-identity test",
@@ -51,14 +57,46 @@
     "docs": "the README's catalogue row and manual section, and the CHANGELOG entry"
   },
   "layers": [
-    { "id": "spec", "what": "the design the change follows", "message": "{name}: the design it follows" },
-    { "id": "contract", "what": "the declarations: the plugin's own declaration", "message": "{name}: its declaration, parameters by reference to the {kernel} kernel" },
-    { "id": "kernel", "what": "the kernel the declaration references: the omx-contract pin", "message": "omx-contract {contractRelease}: the {kernel} kernel the plugins reference" },
-    { "id": "generated", "what": "every file generated from the declaration", "message": "{name}: the generated parameter header and LV2 description" },
-    { "id": "code", "what": "the build and the faces", "message": "{name}: CLAP and LV2 faces in plain C over omx-dsp's {kernel} kernel" },
-    { "id": "consumer", "what": "what ships and installs the plugin: the packages and their checks", "message": "packaging: {name} in omx-plugins-clap and omx-plugins-lv2" },
-    { "id": "tests", "what": "the tests of the faces against the kernel", "message": "{name}: the kernel-identity test" },
-    { "id": "docs", "what": "the manual, the catalogue and the changelog", "message": "{name}: in the README's catalogue and the changelog" }
+    {
+      "id": "spec",
+      "what": "the design the change follows",
+      "message": "{name}: the design it follows"
+    },
+    {
+      "id": "contract",
+      "what": "the declarations: the plugin's own declaration",
+      "message": "{name}: its declaration, parameters by reference to the {kernel} kernel"
+    },
+    {
+      "id": "kernel",
+      "what": "the kernel the declaration references: the omx-contract pin",
+      "message": "omx-contract {contractRelease}: the {kernel} kernel the plugins reference"
+    },
+    {
+      "id": "generated",
+      "what": "every file generated from the declaration",
+      "message": "{name}: the generated parameter header and LV2 description"
+    },
+    {
+      "id": "code",
+      "what": "the build and the faces",
+      "message": "{name}: CLAP and LV2 faces in plain C over omx-dsp's {kernel} kernel"
+    },
+    {
+      "id": "consumer",
+      "what": "what ships and installs the plugin: the packages and their checks",
+      "message": "packaging: {name} in omx-plugins-clap and omx-plugins-lv2"
+    },
+    {
+      "id": "tests",
+      "what": "the tests of the faces against the kernel",
+      "message": "{name}: the kernel-identity test"
+    },
+    {
+      "id": "docs",
+      "what": "the manual, the catalogue and the changelog",
+      "message": "{name}: in the README's catalogue and the changelog"
+    }
   ],
   "artifacts": [
     {
@@ -68,24 +106,37 @@
       "layer": "contract",
       "made": "DECLARED",
       "target": "plugins/{stem}/{stem}.decl.json",
-      "paths": ["plugins/{stem}/{stem}.decl.json"],
-      "questions": ["/$defs/plugin"],
+      "paths": [
+        "plugins/{stem}/{stem}.decl.json"
+      ],
+      "questions": [
+        "/$defs/plugin"
+      ],
       "template": null,
       "when": "always",
-      "checker": { "fn": "declValid" }
+      "checker": {
+        "fn": "declValid"
+      }
     },
     {
       "id": "kernel-file",
-      "what": "the kernel's file in omx-contract at the pinned release, which the parameters reference (by the kernel recipe in omx-contract and omx-dsp when it is new); the pin moves to the release that carries it",
+      "what": "each kernel's file in omx-contract at the pinned release, which the parameters reference (by the kernel recipe in omx-contract and omx-dsp when it is new); the pin moves to the release that carries them",
       "step": "kernel",
       "layer": "kernel",
       "made": "EXTERNAL",
-      "target": "omx-contract:data/kernels/{kernel}.json at omx-contract.pin.json",
-      "paths": ["omx-contract.pin.json"],
-      "questions": ["/$defs/plugin/properties/kernel", "#/questions/contractRelease"],
+      "target": "omx-contract:data/kernels/{kernels}.json at omx-contract.pin.json",
+      "paths": [
+        "omx-contract.pin.json"
+      ],
+      "questions": [
+        "/$defs/plugin/properties/kernels",
+        "#/questions/contractRelease"
+      ],
       "template": null,
       "when": "byReference",
-      "checker": { "fn": "kernelFile" }
+      "checker": {
+        "fn": "kernelFile"
+      }
     },
     {
       "id": "params-header",
@@ -94,11 +145,18 @@
       "layer": "generated",
       "made": "GENERATED",
       "target": "plugins/{stem}/generated/omx_{kernel}_params.h",
-      "paths": ["plugins/{stem}/generated/omx_{kernel}_params.h"],
+      "paths": [
+        "plugins/{stem}/generated/omx_{kernel}_params.h"
+      ],
       "questions": [],
       "template": "tools/gen.mjs",
       "when": "always",
-      "checker": { "fn": "generatedFresh", "files": ["generated/omx_{kernel}_params.h"] }
+      "checker": {
+        "fn": "generatedFresh",
+        "files": [
+          "generated/omx_{kernel}_params.h"
+        ]
+      }
     },
     {
       "id": "lv2-description",
@@ -107,11 +165,20 @@
       "layer": "generated",
       "made": "GENERATED",
       "target": "plugins/{stem}/generated/{stem}.lv2/{manifest,{stem}}.ttl",
-      "paths": ["plugins/{stem}/generated/{stem}.lv2/manifest.ttl", "plugins/{stem}/generated/{stem}.lv2/{stem}.ttl"],
+      "paths": [
+        "plugins/{stem}/generated/{stem}.lv2/manifest.ttl",
+        "plugins/{stem}/generated/{stem}.lv2/{stem}.ttl"
+      ],
       "questions": [],
       "template": "tools/gen.mjs",
       "when": "always",
-      "checker": { "fn": "generatedFresh", "files": ["generated/{stem}.lv2/manifest.ttl", "generated/{stem}.lv2/{stem}.ttl"] }
+      "checker": {
+        "fn": "generatedFresh",
+        "files": [
+          "generated/{stem}.lv2/manifest.ttl",
+          "generated/{stem}.lv2/{stem}.ttl"
+        ]
+      }
     },
     {
       "id": "modgui",
@@ -120,11 +187,18 @@
       "layer": "generated",
       "made": "GENERATED",
       "target": "plugins/{stem}/generated/{stem}.lv2/modgui{.ttl,/}",
-      "paths": ["plugins/{stem}/generated/{stem}.lv2/modgui.ttl", "plugins/{stem}/generated/{stem}.lv2/modgui/**"],
-      "questions": ["/$defs/plugin/properties/panel"],
+      "paths": [
+        "plugins/{stem}/generated/{stem}.lv2/modgui.ttl",
+        "plugins/{stem}/generated/{stem}.lv2/modgui/**"
+      ],
+      "questions": [
+        "/$defs/plugin/properties/panel"
+      ],
       "template": "tools/modgui-gen.mjs",
       "when": "panel",
-      "checker": { "fn": "modguiFresh" }
+      "checker": {
+        "fn": "modguiFresh"
+      }
     },
     {
       "id": "makefile",
@@ -133,15 +207,30 @@
       "layer": "code",
       "made": "TEMPLATED",
       "target": "plugins/{stem}/Makefile",
-      "paths": ["plugins/{stem}/Makefile"],
-      "questions": ["#/questions/omxdspMin"],
+      "paths": [
+        "plugins/{stem}/Makefile"
+      ],
+      "questions": [
+        "#/questions/omxdspMin"
+      ],
       "template": "Makefile.tmpl",
       "when": "always",
       "checker": {
         "fn": "makefile",
         "path": "plugins/{stem}/Makefile",
-        "vars": { "NAME": "{stem}", "URI": "{uri}", "CLAP_ID": "{clapId}" },
-        "targets": ["all", "test", "gen", "check", "install", "clean"]
+        "vars": {
+          "NAME": "{stem}",
+          "URI": "{uri}",
+          "CLAP_ID": "{clapId}"
+        },
+        "targets": [
+          "all",
+          "test",
+          "gen",
+          "check",
+          "install",
+          "clean"
+        ]
       }
     },
     {
@@ -151,11 +240,20 @@
       "layer": "code",
       "made": "TEMPLATED",
       "target": "plugins/{stem}/omx_{kernel}_clap.c",
-      "paths": ["plugins/{stem}/omx_{kernel}_clap.c"],
+      "paths": [
+        "plugins/{stem}/omx_{kernel}_clap.c"
+      ],
       "questions": [],
       "template": "clap.c.tmpl",
       "when": "always",
-      "checker": { "fn": "face", "path": "plugins/{stem}/omx_{kernel}_clap.c", "includes": ["omx_{kernel}_params.h"], "exports": "clap_entry" }
+      "checker": {
+        "fn": "face",
+        "path": "plugins/{stem}/omx_{kernel}_clap.c",
+        "includes": [
+          "omx_{kernel}_params.h"
+        ],
+        "exports": "clap_entry"
+      }
     },
     {
       "id": "lv2-face",
@@ -164,11 +262,20 @@
       "layer": "code",
       "made": "TEMPLATED",
       "target": "plugins/{stem}/omx_{kernel}_lv2.c",
-      "paths": ["plugins/{stem}/omx_{kernel}_lv2.c"],
+      "paths": [
+        "plugins/{stem}/omx_{kernel}_lv2.c"
+      ],
       "questions": [],
       "template": "lv2.c.tmpl",
       "when": "always",
-      "checker": { "fn": "face", "path": "plugins/{stem}/omx_{kernel}_lv2.c", "includes": ["omx_{kernel}_params.h"], "exports": "lv2_descriptor" }
+      "checker": {
+        "fn": "face",
+        "path": "plugins/{stem}/omx_{kernel}_lv2.c",
+        "includes": [
+          "omx_{kernel}_params.h"
+        ],
+        "exports": "lv2_descriptor"
+      }
     },
     {
       "id": "kernel-binding",
@@ -177,11 +284,17 @@
       "layer": "code",
       "made": "HAND-WRITTEN",
       "target": "plugins/{stem}/omx_{kernel}_core.h",
-      "paths": ["plugins/{stem}/omx_{kernel}_core.h", "plugins/{stem}/*.h"],
+      "paths": [
+        "plugins/{stem}/omx_{kernel}_core.h",
+        "plugins/{stem}/*.h"
+      ],
       "questions": [],
       "template": "core.h.tmpl",
       "when": "always",
-      "checker": { "fn": "kernelBinding", "dir": "plugins/{stem}" }
+      "checker": {
+        "fn": "kernelBinding",
+        "dir": "plugins/{stem}"
+      }
     },
     {
       "id": "parameter-test",
@@ -194,7 +307,13 @@
       "questions": [],
       "template": "Makefile.tmpl",
       "when": "always",
-      "checker": { "fn": "makeTestRuns", "path": "plugins/{stem}/Makefile", "tokens": ["clap-params-check.mjs"] }
+      "checker": {
+        "fn": "makeTestRuns",
+        "path": "plugins/{stem}/Makefile",
+        "tokens": [
+          "clap-params-check.mjs"
+        ]
+      }
     },
     {
       "id": "kernel-identity-test",
@@ -203,11 +322,17 @@
       "layer": "tests",
       "made": "HAND-WRITTEN",
       "target": "plugins/{stem}/test/{kernel}-oracle.c",
-      "paths": ["plugins/{stem}/test/**"],
+      "paths": [
+        "plugins/{stem}/test/**"
+      ],
       "questions": [],
       "template": "oracle.c.tmpl",
       "when": "always",
-      "checker": { "fn": "oracle", "dir": "plugins/{stem}/test", "makefile": "plugins/{stem}/Makefile" }
+      "checker": {
+        "fn": "oracle",
+        "dir": "plugins/{stem}/test",
+        "makefile": "plugins/{stem}/Makefile"
+      }
     },
     {
       "id": "spec-files",
@@ -216,20 +341,31 @@
       "layer": "consumer",
       "made": "TEMPLATED",
       "target": "packaging/omx-plugins.spec#%files clap/lv2",
-      "paths": ["packaging/omx-plugins.spec"],
+      "paths": [
+        "packaging/omx-plugins.spec"
+      ],
       "questions": [],
       "template": {
         "file": "packaging/omx-plugins.spec",
         "lines": [
-          { "line": "%{_libdir}/clap/{stem}.clap", "among": "^%\\{_libdir\\}/clap/omx-[a-z0-9]+\\.clap$" },
-          { "line": "%{_libdir}/lv2/{stem}.lv2/", "among": "^%\\{_libdir\\}/lv2/omx-[a-z0-9]+\\.lv2/$" }
+          {
+            "line": "%{_libdir}/clap/{stem}.clap",
+            "among": "^%\\{_libdir\\}/clap/omx-[a-z0-9]+\\.clap$"
+          },
+          {
+            "line": "%{_libdir}/lv2/{stem}.lv2/",
+            "among": "^%\\{_libdir\\}/lv2/omx-[a-z0-9]+\\.lv2/$"
+          }
         ]
       },
       "when": "always",
       "checker": {
         "fn": "linesPresent",
         "file": "packaging/omx-plugins.spec",
-        "lines": ["%{_libdir}/clap/{stem}.clap", "%{_libdir}/lv2/{stem}.lv2/"]
+        "lines": [
+          "%{_libdir}/clap/{stem}.clap",
+          "%{_libdir}/lv2/{stem}.lv2/"
+        ]
       }
     },
     {
@@ -239,31 +375,49 @@
       "layer": "consumer",
       "made": "HAND-WRITTEN",
       "target": "debian/omx-plugins-{clap,lv2}.install",
-      "paths": ["debian/omx-plugins-clap.install", "debian/omx-plugins-lv2.install"],
+      "paths": [
+        "debian/omx-plugins-clap.install",
+        "debian/omx-plugins-lv2.install"
+      ],
       "questions": [],
       "template": null,
       "when": "always",
       "checker": {
         "fn": "installCovers",
-        "files": { "debian/omx-plugins-clap.install": "usr/lib/clap/{stem}.clap", "debian/omx-plugins-lv2.install": "usr/lib/lv2/{stem}.lv2" }
+        "files": {
+          "debian/omx-plugins-clap.install": "usr/lib/clap/{stem}.clap",
+          "debian/omx-plugins-lv2.install": "usr/lib/lv2/{stem}.lv2"
+        }
       }
     },
     {
       "id": "package-description",
-      "what": "the packages' descriptions name the plugin: the RPM's %description and the DEB metapackage's Description",
+      "what": "the packages' descriptions name the effect (its noun): the RPM's %description and the DEB metapackage's Description",
       "step": "packaging",
       "layer": "consumer",
       "made": "HAND-WRITTEN",
       "target": "packaging/omx-plugins.spec#%description, debian/control#Package: omx-plugins",
-      "paths": ["debian/control"],
-      "questions": [],
+      "paths": [
+        "debian/control"
+      ],
+      "questions": [
+        "/$defs/plugin/properties/noun"
+      ],
       "template": null,
       "when": "always",
       "checker": {
         "fn": "namedIn",
         "places": [
-          { "file": "packaging/omx-plugins.spec", "from": "^%description$", "to": "^%package " },
-          { "file": "debian/control", "from": "^Package: omx-plugins$", "to": "^Package: " }
+          {
+            "file": "packaging/omx-plugins.spec",
+            "from": "^%description$",
+            "to": "^%package "
+          },
+          {
+            "file": "debian/control",
+            "from": "^Package: omx-plugins$",
+            "to": "^Package: "
+          }
         ]
       }
     },
@@ -274,11 +428,17 @@
       "layer": "consumer",
       "made": "HAND-WRITTEN",
       "target": ".github/workflows/ci.yml#rpm, #deb",
-      "paths": [".github/workflows/ci.yml"],
+      "paths": [
+        ".github/workflows/ci.yml"
+      ],
       "questions": [],
       "template": null,
       "when": "always",
-      "checker": { "fn": "ciCovers", "file": ".github/workflows/ci.yml", "clap": "/usr/lib64/clap/{stem}.clap" }
+      "checker": {
+        "fn": "ciCovers",
+        "file": ".github/workflows/ci.yml",
+        "clap": "/usr/lib64/clap/{stem}.clap"
+      }
     },
     {
       "id": "catalogue-row",
@@ -287,11 +447,22 @@
       "layer": "docs",
       "made": "TEMPLATED",
       "target": "README.md#The plugins",
-      "paths": ["README.md"],
-      "questions": ["/$defs/plugin/properties/description"],
-      "template": { "file": "README.md", "insert": "readme-row.md.tmpl", "afterLast": "^\\| \\*\\*omx [a-z0-9]+\\*\\* \\|" },
+      "paths": [
+        "README.md"
+      ],
+      "questions": [
+        "/$defs/plugin/properties/description"
+      ],
+      "template": {
+        "file": "README.md",
+        "insert": "readme-row.md.tmpl",
+        "afterLast": "^\\| \\*\\*omx [a-z0-9]+\\*\\* \\|"
+      },
       "when": "always",
-      "checker": { "fn": "catalogueRow", "file": "README.md" }
+      "checker": {
+        "fn": "catalogueRow",
+        "file": "README.md"
+      }
     },
     {
       "id": "manual-section",
@@ -300,24 +471,49 @@
       "layer": "docs",
       "made": "TEMPLATED",
       "target": "README.md#{name}",
-      "paths": ["README.md"],
+      "paths": [
+        "README.md"
+      ],
       "questions": [],
-      "template": { "file": "README.md", "insert": "readme-section.md.tmpl", "before": "^## Install$" },
+      "template": {
+        "file": "README.md",
+        "insert": "readme-section.md.tmpl",
+        "before": "^## Install$"
+      },
       "when": "always",
-      "checker": { "fn": "heading", "file": "README.md", "heading": "### {name}" }
+      "checker": {
+        "fn": "heading",
+        "file": "README.md",
+        "heading": "### {name}"
+      }
     },
     {
       "id": "changelog",
-      "what": "the plugin's entry in CHANGELOG.md, the one human changelog a release copies into the packages",
+      "what": "the effect's entry in CHANGELOG.md, the one changelog the RPM and Debian changelogs and the release notes are generated from",
       "step": "docs",
       "layer": "docs",
       "made": "TEMPLATED",
       "target": "CHANGELOG.md#Unreleased",
-      "paths": ["CHANGELOG.md"],
+      "paths": [
+        "CHANGELOG.md"
+      ],
       "questions": [],
-      "template": { "file": "CHANGELOG.md", "insert": "changelog.md.tmpl", "after": "^## Unreleased$" },
+      "template": {
+        "file": "CHANGELOG.md",
+        "insert": "changelog.md.tmpl",
+        "after": "^## Unreleased$",
+        "create": "## Unreleased",
+        "createBefore": "^## "
+      },
       "when": "always",
-      "checker": { "fn": "namedIn", "places": [{ "file": "CHANGELOG.md" }] }
+      "checker": {
+        "fn": "namedIn",
+        "places": [
+          {
+            "file": "CHANGELOG.md"
+          }
+        ]
+      }
     }
   ],
   "laws": [
@@ -326,14 +522,38 @@
       "what": "plain C: no C++ source or header in the plugin",
       "step": "faces",
       "when": "always",
-      "checker": { "fn": "noFiles", "dir": "plugins/{stem}", "extensions": [".cpp", ".cc", ".cxx", ".c++", ".hpp", ".hh", ".hxx"] }
+      "checker": {
+        "fn": "noFiles",
+        "dir": "plugins/{stem}",
+        "extensions": [
+          ".cpp",
+          ".cc",
+          ".cxx",
+          ".c++",
+          ".hpp",
+          ".hh",
+          ".hxx"
+        ]
+      }
     },
     {
       "id": "no-dpf",
       "what": "no DPF: no DISTRHO header, macro or plugin-info file",
       "step": "faces",
       "when": "always",
-      "checker": { "fn": "noText", "dir": "plugins/{stem}", "patterns": ["DistrhoPlugin", "DISTRHO_", "#include\\s*[<\"]Distrho", "\\bdpf/"], "files": ["DistrhoPluginInfo.h"] }
+      "checker": {
+        "fn": "noText",
+        "dir": "plugins/{stem}",
+        "patterns": [
+          "DistrhoPlugin",
+          "DISTRHO_",
+          "#include\\s*[<\"]Distrho",
+          "\\bdpf/"
+        ],
+        "files": [
+          "DistrhoPluginInfo.h"
+        ]
+      }
     },
     {
       "id": "no-copied-dsp",
@@ -343,15 +563,21 @@
       "checker": {
         "fn": "noCopiedDsp",
         "dir": "plugins/{stem}",
-        "engineIncludes": ["#include\\s*\"mix_[a-z_]+\\.h\"", "pipewire-native", "#include\\s*<pipewire/"]
+        "engineIncludes": [
+          "#include\\s*\"mix_[a-z_]+\\.h\"",
+          "pipewire-native",
+          "#include\\s*<pipewire/"
+        ]
       }
     },
     {
       "id": "params-by-reference",
-      "what": "every parameter has a ref into omx-contract and retypes no travel; every ref resolves in the kernel's file at the pin",
+      "what": "every parameter has a ref into omx-contract and retypes no travel; every ref resolves in its kernel's file at the pin (a composite names each parameter's kernel)",
       "step": "identity",
       "when": "byReference",
-      "checker": { "fn": "paramsByReference" }
+      "checker": {
+        "fn": "paramsByReference"
+      }
     }
   ]
 }

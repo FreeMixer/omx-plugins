@@ -187,3 +187,20 @@ export function perturbCopy(src, dst, kernel, p) {
   writeFileSync(file, `${JSON.stringify(data, null, 2)}\n`);
   return where.file;
 }
+
+/** The omx-contract kernels a declaration's parameters reference: `kernels`, or `[kernel]`. */
+export const declKernels = (d) => (Array.isArray(d.kernels) && d.kernels.length ? d.kernels : [d.kernel]);
+
+/**
+ * The kernel one parameter's reference is read from: its own `kernel` (which must be one of the
+ * plugin's kernels), or the plugin's only kernel. A composite's parameter must name its kernel.
+ */
+export function paramKernel(d, p) {
+  const ks = declKernels(d);
+  if (p.kernel !== undefined) {
+    if (!ks.includes(p.kernel)) throw new Error(`param '${p.symbol}': kernel '${p.kernel}' is not one of the plugin's kernels (${ks.join(', ')})`);
+    return p.kernel;
+  }
+  if (ks.length > 1) throw new Error(`param '${p.symbol}': a composite (${ks.join(', ')}) names each parameter's kernel`);
+  return ks[0];
+}

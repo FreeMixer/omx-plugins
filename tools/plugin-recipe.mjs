@@ -12,8 +12,10 @@
  *   node tools/plugin-recipe.mjs [--all] [--json] [<stem> ...]     (`make completeness`)
  *
  * One line per owed artifact a plugin lacks, naming the recipe's wizard step and commit layer.
- * `--all` also prints what is not owed yet (with the rule) and every artifact present. Exit 0 every
- * plugin is complete; 1 a gap; 2 the recipe itself is broken (a rule or checker it names is missing).
+ * `--all` also prints what is not owed yet (with the rule) and every artifact present.
+ *
+ * Exit 0 every plugin is complete; 1 a gap; 2 the recipe itself is broken (a rule or checker it
+ * names is missing).
  *
  * Also the template renderer and the path-to-layer map the wizard and the commit-plan check share.
  */
@@ -21,7 +23,7 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { compareVersions, contractPin, findName, kernelExists, locateContract } from './omx-contract.mjs';
+import { compareVersions, contractPin, declKernels, findName, kernelExists, locateContract, paramKernel } from './omx-contract.mjs';
 
 export const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 export const RECIPE_PATH = 'recipes/plugin.recipe.json';
@@ -94,6 +96,7 @@ export function pluginFacts(root, stem) {
     short: stem.replace(/^omx-/, ''),
     kernel: decl.kernel,
     name: decl.name,
+    noun: decl.noun ?? stem.replace(/^omx-/, ''),
     uri: decl.lv2?.uri,
     clapId: decl.clap?.id,
     decl,
@@ -207,13 +210,16 @@ export const CHECKERS = {
     return errs.length ? missing(`plugins/${facts.stem}/${facts.stem}.decl.json: ${errs.join('; ')}`) : ok(`plugins/${facts.stem}/${facts.stem}.decl.json`);
   },
 
-  /** The kernel's file is in omx-contract at the pinned release. */
+  /** Each kernel's file is in omx-contract at the pinned release. */
   kernelFile(root, _recipe, facts) {
+    if (!facts.decl) return missing(facts.error);
     const where = locateContract(root);
     if (!where.dir) return missing(`cannot check: ${where.why}`);
-    return kernelExists(where.dir, facts.kernel)
-      ? ok(`omx-contract ${where.pin}: data/kernels/${facts.kernel}.json`)
-      : missing(`omx-contract ${where.pin} has no data/kernels/${facts.kernel}.json (a NEW kernel: the kernel recipe in omx-contract and omx-dsp, then move the pin)`);
+    const ks = declKernels(facts.decl);
+    const absent = ks.filter((k) => !kernelExists(where.dir, k));
+    return absent.length
+      ? missing(`omx-contract ${where.pin} has no ${absent.map((k) => `data/kernels/${k}.json`).join(', ')} (a NEW kernel: the kernel recipe in omx-contract and omx-dsp, then move the pin; a composite declares its kernels)`)
+      : ok(`omx-contract ${where.pin}: ${ks.map((k) => `data/kernels/${k}.json`).join(', ')}`);
   },
 
   /** The named generated files are what tools/gen.mjs writes now. */
@@ -333,13 +339,14 @@ export const CHECKERS = {
     return bad.length ? missing(bad.join('; ')) : ok(Object.keys(files).join(', '));
   },
 
-  /** The plugin's name appears in every place (a region of a file, whitespace-insensitive). */
+  /** The plugin's noun (its prose name: `noun`, else the short name) appears in every place (a
+   * region of a file, whitespace-insensitive). */
   namedIn(root, _recipe, facts, { places }) {
     const bad = [];
     for (const { file, from, to } of places) {
       const r = region(text(root, file), from, to);
       if (r === undefined) bad.push(`${file}: no ${from}`);
-      else if (!r.replace(/\s+/g, ' ').includes(facts.name)) bad.push(`${file}${from ? ` (${from})` : ''} does not name ${facts.name}`);
+      else if (!r.replace(/\s+/g, ' ').includes(facts.noun)) bad.push(`${file}${from ? ` (${from})` : ''} does not name the ${facts.noun}`);
     }
     return bad.length ? missing(bad.join('; ')) : ok(places.map((p) => p.file).join(', '));
   },
@@ -413,7 +420,14 @@ export const CHECKERS = {
       const where = locateContract(root);
       if (!where.dir) return missing(`cannot check: ${where.why}`);
       for (const p of facts.decl.params) {
-        const r = findName(where.dir, facts.kernel, p.ref);
+        let k;
+        try {
+          k = paramKernel(facts.decl, p);
+        } catch (e) {
+          bad.push(e.message);
+          continue;
+        }
+        const r = findName(where.dir, k, p.ref);
         if (r.error) bad.push(`'${p.symbol}': ${r.error}`);
       }
     }
