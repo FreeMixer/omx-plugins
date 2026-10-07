@@ -1,0 +1,239 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Copyright (C) 2026 Pau Aliagas <linuxnow@gmail.com>
+/*
+ * clap-probe.c — a minimal CLAP host over ANY built omx plugin: it knows no plugin, only CLAP.
+ *
+ *   clap-probe params <x.clap>
+ *       one line per parameter, as clap_plugin_params.get_info reports it:
+ *       `id<TAB>name<TAB>min<TAB>max<TAB>default<TAB>flags` — tools/clap-params-check.mjs compares
+ *       it with the declaration.
+ *   clap-probe live <x.clap>
+ *       every parameter but the host's bypass MOVES the output: a deterministic stereo signal is run
+ *       with the parameter at its default and at the far end of its travel, in four settings of
+ *       the others until one shows a difference: (a) all at their defaults; (b) every other toggle
+ *       on (a filter's frequency moves nothing while the filter is off); (c) every other parameter
+ *       at the far end of its travel (a bell's frequency moves nothing at 0 dB); (d) every other
+ *       toggle on and every other travel at its far end. A parameter whose output is
+ *       byte-identical in all four is one the face does not deliver to the kernel.
+ *       `PASS live <name>` / `FAIL live <name>` per parameter. A face still on the wizard's stub
+ *       binding is red here, by design.
+ */
+#include <dlfcn.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include "clap/entry.h"
+#include "clap/ext/params.h"
+#include "clap/factory/plugin-factory.h"
+#include "clap/host.h"
+
+#define RATE 48000.0
+#define BLOCK 256u
+#define FRAMES (282u * BLOCK) /* 1.5 s at 48 kHz in whole blocks: a delay's second repeat */
+#define MAX_PARAMS 256u
+
+static const void *host_get_extension(const clap_host_t *h, const char *id) {
+  (void)h, (void)id;
+  return NULL;
+}
+static void host_noop(const clap_host_t *h) { (void)h; }
+
+static const clap_host_t HOST = {
+    CLAP_VERSION_INIT, NULL, "omx clap-probe", "openmixer", "", "0.1",
+    host_get_extension, host_noop, host_noop, host_noop,
+};
+
+typedef struct {
+  clap_event_param_value_t ev[MAX_PARAMS];
+  uint32_t n;
+} EvList;
+
+static uint32_t ev_size(const clap_input_events_t *l) { return ((const EvList *)l->ctx)->n; }
+static const clap_event_header_t *ev_get(const clap_input_events_t *l, uint32_t i) {
+  return &((const EvList *)l->ctx)->ev[i].header;
+}
+static bool ev_push(const clap_output_events_t *l, const clap_event_header_t *e) {
+  (void)l, (void)e;
+  return true;
+}
+
+typedef struct {
+  void *so;
+  const clap_plugin_entry_t *entry;
+  const clap_plugin_t *plugin;
+  const clap_plugin_params_t *params;
+} Clap;
+
+static int clap_open(Clap *c, const char *path) {
+  memset(c, 0, sizeof *c);
+  c->so = dlopen(path, RTLD_NOW | RTLD_LOCAL);
+  if (!c->so) return fprintf(stderr, "dlopen %s: %s\n", path, dlerror()), 0;
+  c->entry = (const clap_plugin_entry_t *)dlsym(c->so, "clap_entry");
+  if (!c->entry || !c->entry->init(path)) return fprintf(stderr, "no clap_entry\n"), 0;
+  const clap_plugin_factory_t *fac = (const clap_plugin_factory_t *)c->entry->get_factory(CLAP_PLUGIN_FACTORY_ID);
+  if (!fac || fac->get_plugin_count(fac) != 1) return fprintf(stderr, "factory\n"), 0;
+  const clap_plugin_descriptor_t *d = fac->get_plugin_descriptor(fac, 0);
+  c->plugin = fac->create_plugin(fac, &HOST, d->id);
+  if (!c->plugin || !c->plugin->init(c->plugin)) return fprintf(stderr, "create/init\n"), 0;
+  c->params = (const clap_plugin_params_t *)c->plugin->get_extension(c->plugin, CLAP_EXT_PARAMS);
+  if (!c->params) return fprintf(stderr, "no params extension\n"), 0;
+  return 1;
+}
+
+static void clap_close(Clap *c) {
+  if (c->plugin) c->plugin->destroy(c->plugin);
+  if (c->entry) c->entry->deinit();
+  if (c->so) dlclose(c->so);
+}
+
+static int params_dump(const char *path) {
+  Clap c;
+  if (!clap_open(&c, path)) return 1;
+  uint32_t n = c.params->count(c.plugin);
+  for (uint32_t i = 0; i < n; i++) {
+    clap_param_info_t info;
+    if (!c.params->get_info(c.plugin, i, &info)) return fprintf(stderr, "get_info %u\n", i), 1;
+    printf("%u\t%s\t%.17g\t%.17g\t%.17g\t%u\n", info.id, info.name, info.min_value, info.max_value,
+           info.default_value, (unsigned)info.flags);
+  }
+  clap_close(&c);
+  return 0;
+}
+
+/** Deterministic stereo noise with sparse impulses, the legs different. */
+static void make_signal(float *l, float *r) {
+  uint32_t seed = 0x2545F491u;
+  for (uint32_t i = 0; i < FRAMES; i++) {
+    seed = seed * 1664525u + 1013904223u;
+    l[i] = ((float)(seed >> 8) / 16777216.0f - 0.5f) * 0.8f;
+    seed = seed * 1664525u + 1013904223u;
+    r[i] = ((float)(seed >> 8) / 16777216.0f - 0.5f) * 0.6f;
+    if (i % 4800u == 0) l[i] = r[i] = 0.9f;
+  }
+}
+
+/** One run from a fresh instance, the `n` (id, value) pairs set before the first block. */
+static int render(const char *path, const clap_id *ids, const double *vals, uint32_t n, const float *in_l,
+                  const float *in_r, float *out_l, float *out_r) {
+  Clap c;
+  if (!clap_open(&c, path)) return 0;
+  if (!c.plugin->activate(c.plugin, RATE, 1, BLOCK) || !c.plugin->start_processing(c.plugin)) {
+    clap_close(&c);
+    return fprintf(stderr, "activate\n"), 0;
+  }
+  static EvList evs;
+  for (uint32_t f = 0; f < FRAMES; f += BLOCK) {
+    evs.n = 0;
+    for (uint32_t k = 0; f == 0 && k < n; k++) {
+      clap_event_param_value_t *e = &evs.ev[evs.n++];
+      memset(e, 0, sizeof *e);
+      e->header.size = sizeof *e;
+      e->header.space_id = CLAP_CORE_EVENT_SPACE_ID;
+      e->header.type = CLAP_EVENT_PARAM_VALUE;
+      e->param_id = ids[k];
+      e->note_id = -1;
+      e->port_index = -1;
+      e->channel = -1;
+      e->key = -1;
+      e->value = vals[k];
+    }
+    clap_input_events_t in_ev = {&evs, ev_size, ev_get};
+    clap_output_events_t out_ev = {NULL, ev_push};
+    float *ins[2] = {(float *)in_l + f, (float *)in_r + f};
+    float *outs[2] = {out_l + f, out_r + f};
+    clap_audio_buffer_t ain = {ins, NULL, 2, 0, 0};
+    clap_audio_buffer_t aout = {outs, NULL, 2, 0, 0};
+    clap_process_t pr;
+    memset(&pr, 0, sizeof pr);
+    pr.steady_time = f;
+    pr.frames_count = BLOCK;
+    pr.audio_inputs = &ain;
+    pr.audio_outputs = &aout;
+    pr.audio_inputs_count = 1;
+    pr.audio_outputs_count = 1;
+    pr.in_events = &in_ev;
+    pr.out_events = &out_ev;
+    if (c.plugin->process(c.plugin, &pr) == CLAP_PROCESS_ERROR) {
+      clap_close(&c);
+      return fprintf(stderr, "process error\n"), 0;
+    }
+  }
+  c.plugin->stop_processing(c.plugin);
+  c.plugin->deactivate(c.plugin);
+  clap_close(&c);
+  return 1;
+}
+
+static double far_of(const clap_param_info_t *p) { return p->default_value == p->max_value ? p->min_value : p->max_value; }
+static int is_toggle(const clap_param_info_t *p) {
+  return (p->flags & CLAP_PARAM_IS_STEPPED) && p->min_value == 0.0 && p->max_value == 1.0;
+}
+
+static float *in_l, *in_r, *a_l, *a_r, *b_l, *b_r;
+
+/** Does moving parameter `i` from its default to its far value change the output, the others set by
+ * `setting` (0 defaults, 1 toggles on, 2 at their far values, 3 toggles on and the rest far)? -1 on a host error. */
+static int moves(const char *path, const clap_param_info_t *info, uint32_t n, uint32_t i, int setting) {
+  static clap_id ids[MAX_PARAMS];
+  static double vals[MAX_PARAMS];
+  uint32_t m = 0;
+  for (uint32_t k = 0; k < n; k++) {
+    if (k == i || (info[k].flags & CLAP_PARAM_IS_BYPASS)) continue;
+    if (setting == 1 && is_toggle(&info[k])) ids[m] = info[k].id, vals[m++] = 1.0;
+    if (setting == 2) ids[m] = info[k].id, vals[m++] = far_of(&info[k]);
+    if (setting == 3) ids[m] = info[k].id, vals[m++] = is_toggle(&info[k]) ? 1.0 : far_of(&info[k]);
+  }
+  ids[m] = info[i].id;
+  vals[m] = info[i].default_value;
+  if (!render(path, ids, vals, m + 1, in_l, in_r, a_l, a_r)) return -1;
+  vals[m] = far_of(&info[i]);
+  if (!render(path, ids, vals, m + 1, in_l, in_r, b_l, b_r)) return -1;
+  return memcmp(a_l, b_l, FRAMES * sizeof(float)) != 0 || memcmp(a_r, b_r, FRAMES * sizeof(float)) != 0;
+}
+
+static int live(const char *path) {
+  Clap c;
+  if (!clap_open(&c, path)) return 1;
+  const uint32_t n = c.params->count(c.plugin);
+  if (n > MAX_PARAMS) return fprintf(stderr, "%u parameters, more than %u\n", n, MAX_PARAMS), 1;
+  clap_param_info_t *info = calloc(n, sizeof *info);
+  for (uint32_t i = 0; i < n; i++) c.params->get_info(c.plugin, i, &info[i]);
+  clap_close(&c);
+
+  float **bufs[] = {&in_l, &in_r, &a_l, &a_r, &b_l, &b_r};
+  for (size_t k = 0; k < 6; k++) *bufs[k] = malloc(FRAMES * sizeof(float));
+  make_signal(in_l, in_r);
+  static const char *const SETTING[] = {"the others at their defaults", "every other toggle on", "the others at their far ends",
+                                        "every other toggle on, the rest at their far ends"};
+  int fails = 0, checked = 0;
+  for (uint32_t i = 0; i < n; i++) {
+    if (info[i].flags & CLAP_PARAM_IS_BYPASS) continue;
+    checked++;
+    int setting = 0, r = 0;
+    for (; setting < 4; setting++) {
+      r = moves(path, info, n, i, setting);
+      if (r != 0) break;
+    }
+    if (r < 0) return 1;
+    if (r) {
+      printf("PASS live %s moves the output (%s)\n", info[i].name, SETTING[setting]);
+    } else {
+      printf("FAIL live %s: %g leaves the output byte-identical in every setting; the face does not deliver it to the kernel\n",
+             info[i].name, far_of(&info[i]));
+      fails++;
+    }
+  }
+  free(info);
+  for (size_t k = 0; k < 6; k++) free(*bufs[k]);
+  if (checked == 0) return printf("FAIL live: no parameter to move\n"), 1;
+  return fails ? 1 : 0;
+}
+
+int main(int argc, char **argv) {
+  if (argc == 3 && strcmp(argv[1], "params") == 0) return params_dump(argv[2]);
+  if (argc == 3 && strcmp(argv[1], "live") == 0) return live(argv[2]);
+  fprintf(stderr, "usage: clap-probe params|live <x.clap>\n");
+  return 2;
+}
