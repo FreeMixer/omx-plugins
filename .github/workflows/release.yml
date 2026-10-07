@@ -48,10 +48,10 @@ jobs:
       channel-deps: true
     secrets: inherit
 
-  # after the RPMs: both publish into one tree, and a push that loses a race is refused
+  # after the RPMs, and only when they built: both publish into one tree, and a push that loses a race is refused
   deb:
     needs: rpm
-    if: ${{ !cancelled() }}
+    if: ${{ !cancelled() && needs.rpm.result == 'success' }}
     uses: FreeMixer/.github/.github/workflows/build-deb.yml@main
     with:
       package-name: omx-plugins
