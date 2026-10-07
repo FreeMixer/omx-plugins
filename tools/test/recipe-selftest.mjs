@@ -39,7 +39,10 @@ const expect = (cond, what) => (cond ? pass(what) : fail(what));
 /** A copy of this tree's files (tracked and new, never ignored) at `dst`. */
 function copyTree(dst) {
   mkdirSync(dst, { recursive: true });
-  execFileSync('sh', ['-c', 'git ls-files -co --exclude-standard -z | xargs -0 tar -cf - | tar -xf - -C "$1"', 'sh', dst], { cwd: ROOT });
+  // listed first, so a git that cannot read the tree fails here rather than copying nothing
+  const files = execFileSync('git', ['ls-files', '-co', '--exclude-standard', '-z'], { cwd: ROOT });
+  if (!files.length) throw new Error('git lists no file in this tree');
+  execFileSync('sh', ['-c', 'xargs -0 tar -cf - | tar -xf - -C "$1"', 'sh', dst], { cwd: ROOT, input: files });
 }
 
 /** A stand-in omx-contract release: the version, and the kernel files given. */
