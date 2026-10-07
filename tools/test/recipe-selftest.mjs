@@ -18,7 +18,7 @@
  *
  * Works in build/selftest/ (removed first). Needs git, and omx-dsp's headers as the build does.
  */
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
 import { cpSync, existsSync, mkdirSync, readFileSync, rmSync, unlinkSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -224,6 +224,23 @@ async function main() {
   const paid = await ratchet();
   undo();
   expect(paid.stale.some((x) => x.startsWith('omx-chorus changelog')), `sabotage: a debt entry now satisfied fails the ratchet as stale (${paid.stale.join(', ')})`);
+
+  const ghost = await (async () => {
+    const reports = [];
+    for (const st of pluginStems(t)) reports.push(await checkPlugin(t, recipe, st));
+    return debtVerdict(reports, [...loadDebt(t), { plugin: 'omx-ghost', entry: 'makefile', owedBy: 'nobody' }], pluginStems(t));
+  })();
+  expect((ghost.unknown ?? []).length === 1 && ghost.unknown[0].startsWith('omx-ghost makefile'), `sabotage: a debt entry for a plugin that does not exist fails the ratchet (${(ghost.unknown ?? []).join(', ')})`);
+  {
+    // an empty plugin set: the run itself fails, rather than passing over nothing
+    const empty = join(WORK, 'empty');
+    mkdirSync(join(empty, 'plugins'), { recursive: true });
+    cpSync(join(ROOT, 'recipes'), join(empty, 'recipes'), { recursive: true });
+    cpSync(join(ROOT, 'schema'), join(empty, 'schema'), { recursive: true });
+    cpSync(join(ROOT, 'omx-contract.pin.json'), join(empty, 'omx-contract.pin.json'));
+    const run = spawnSync('node', [join(ROOT, 'tools', 'plugin-recipe.mjs')], { env: { ...process.env, OMX_PLUGINS_ROOT: empty }, encoding: 'utf8' });
+    expect(run.status === 1 && /no plugin to check/.test(run.stdout + run.stderr), `sabotage: a run over no plugin fails (exit ${run.status})`);
+  }
 
   // ---- 4. the recipe itself ----------------------------------------------------------------
   const grown = JSON.parse(JSON.stringify(recipe));
