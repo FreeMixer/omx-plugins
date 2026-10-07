@@ -58,7 +58,10 @@ plugins/<name>/
   generated/              written by `make gen`, committed: the parameter header and the LV2 bundle
   test/                   the probe and the oracle
 include/                  shared C shapes (no DSP)
-tools/                    gen.mjs (header + TTL), modgui-gen.mjs (MOD GUI), the test helpers
+tools/                    gen.mjs (header + TTL), modgui-gen.mjs (MOD GUI), the test helpers,
+                          omx-new-plugin.mjs (the wizard), plugin-recipe.mjs (completeness)
+recipes/                  plugin.recipe.json, the templates the wizard writes from, examples
+schema/                   plugin.decl.schema.json, the shape of a declaration
 ```
 
 ## Changing a plugin
@@ -69,13 +72,33 @@ omx-dsp, never here.
 
 ## Adding a plugin
 
-Create `plugins/<name>/` with its declaration, its two faces and a Makefile with `all`, `test`,
-`install` and `clean`; the top-level Makefile picks it up. Add its files to the `%files` lists of
-`packaging/omx-plugins.spec`.
+A new plugin starts with the wizard, never by hand:
+
+```sh
+node tools/omx-new-plugin.mjs --answers my-plugin.answers.json   # or with no arguments, on a terminal
+```
+
+The answers are the plugin's declaration less what is derived (see
+`recipes/examples/omx-tremolo.answers.json`). Every parameter names its travel BY REFERENCE into
+the omx-dsp kernel's file in omx-contract (`"ref"`), at the release `omx-contract.pin.json` pins;
+no number is typed in a declaration. A kernel omx-contract does not carry yet is NEW: its kernel
+recipe in omx-contract and omx-dsp comes first. The data is read from `$OMX_CONTRACT_DIR` or a
+checkout of omx-contract beside this one.
+
+The wizard checks every answer before it writes anything, then writes every artifact of
+`recipes/plugin.recipe.json` from `recipes/templates/plugin/`: the declaration, the generated files,
+the Makefile, the CLAP and LV2 faces, the packaging lines, the README row and section and the
+CHANGELOG entry. The two pieces only a person can write, the binding of the faces to the kernel and
+the kernel-identity oracle, are written as stubs whose tests fail by name until they are done. It
+prints the commit plan (one concern per commit, in the recipe's layer order), runs the generators
+and the plugin's tests, and ends with the checklist of what is left.
+
+`make completeness` holds every plugin to the same recipe and names the wizard step for each gap;
+`node tools/commit-plan-check.mjs <base>..<head>` holds a plugin's commits to the plan's order.
 
 A directory with a declaration and no Makefile (omx-chorus and omx-deesser today) is not built or
-packaged yet: its CLAP and LV2 faces are still to come. `node tools/gen.mjs --check` still keeps
-its generated files fresh.
+packaged yet: `make completeness` lists what it still needs. `node tools/gen.mjs --check` still
+keeps its generated files fresh.
 
 ## Packages
 
