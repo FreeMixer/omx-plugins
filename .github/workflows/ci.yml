@@ -64,6 +64,14 @@ jobs:
           make test 2>&1 | tee test.log
           if grep -E '^SKIP' test.log; then echo "::error::a test was skipped"; exit 1; fi
 
+      - name: The recipe machinery, sabotaged arm by arm
+        id: handback-selftest
+        run: make selftest
+
+      - name: Every plugin has every artifact of the plugin recipe
+        id: handback-completeness
+        run: make completeness
+
   rpm:
     name: omx-plugins RPMs (fc44, ${{ matrix.arch }})
     runs-on: arc-freemixer
