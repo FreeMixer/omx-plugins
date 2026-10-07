@@ -595,6 +595,29 @@ export function debtVerdict(reports, debt, known = reports.map((r) => r.stem)) {
   };
 }
 
+/**
+ * The debt only shrinks: the entries it holds now against the ones at the merge-base with
+ * `origin/main` (OMX_DEBT_BASE_REF overrides the ref). `added` lists the entries the base did not
+ * hold; `grown` is set when the debt has MORE entries than the base, which fails (a gap paid and
+ * another added in the same change keeps the count and is caught as a new gap by debtVerdict).
+ * `base` is undefined, with `why`, when there is no base to compare to: a failure in CI, where
+ * the checkout must hold main, a note elsewhere.
+ */
+export function debtGrowth(root, debt) {
+  const ref = process.env.OMX_DEBT_BASE_REF || 'origin/main';
+  const git = (...a) => execFileSync('git', ['-C', root, ...a], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim();
+  let base;
+  try {
+    const point = git('merge-base', 'HEAD', ref);
+    base = JSON.parse(git('show', `${point}:${DEBT_PATH}`)).debt;
+  } catch (e) {
+    return { base: undefined, why: `no merge-base with ${ref} to read ${DEBT_PATH} at (${String(e.stderr || e.message).trim().split('\n')[0]})`, added: [], grown: false };
+  }
+  const held = new Set(base.map((d) => `${d.plugin} ${d.entry}`));
+  const added = debt.filter((d) => !held.has(`${d.plugin} ${d.entry}`)).map((d) => `${d.plugin} ${d.entry}`);
+  return { base: base.length, added, grown: debt.length > base.length };
+}
+
 // ---- the completeness test ------------------------------------------------------------------
 
 async function main(argv) {
@@ -638,7 +661,13 @@ async function main(argv) {
   for (const g of v.fresh) console.log(`FAIL new gap, not in ${DEBT_PATH}: ${g}`);
   for (const g of v.stale) console.log(`FAIL stale debt, now satisfied: ${g} (delete it from ${DEBT_PATH})`);
   for (const g of v.unknown) console.log(`FAIL debt for a plugin that does not exist: ${g} (delete it from ${DEBT_PATH})`);
-  const bad = v.fresh.length + v.stale.length + v.unknown.length;
+  const growth = debtGrowth(root, loadDebt(root));
+  if (growth.base === undefined) {
+    console.log(`${process.env.CI ? 'FAIL' : 'NOTE'} debt growth cannot be checked: ${growth.why}${process.env.CI ? ' (CI must fetch main: checkout with fetch-depth 0)' : ''}`);
+  } else if (growth.grown) {
+    console.log(`FAIL the debt grew: ${loadDebt(root).length} entries, ${growth.base} at the merge-base with main; added: ${growth.added.join(', ') || 'none by name'}. Nothing is added to ${DEBT_PATH} to make a gap pass`);
+  }
+  const bad = v.fresh.length + v.stale.length + v.unknown.length + (growth.grown ? 1 : 0) + (growth.base === undefined && process.env.CI ? 1 : 0);
   console.log(bad
     ? `completeness: ${v.fresh.length} new gap(s), ${v.stale.length} stale debt entr${v.stale.length === 1 ? 'y' : 'ies'}, ${v.unknown.length} debt entr${v.unknown.length === 1 ? 'y' : 'ies'} for no plugin`
     : `PASS completeness: every gap is held by ${DEBT_PATH} (${v.held.length}), no debt is stale`);
