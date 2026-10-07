@@ -24,7 +24,7 @@ import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { checkCommits, rangeCommits } from '../commit-plan-check.mjs';
 import { commitPlan, planPlugin, writePlugin } from '../omx-new-plugin.mjs';
-import { checkPlugin, gapLines, loadRecipe, recipeErrors } from '../plugin-recipe.mjs';
+import { checkPlugin, debtVerdict, gapLines, loadDebt, loadRecipe, pluginStems, recipeErrors } from '../plugin-recipe.mjs';
 
 const ROOT = resolve(fileURLToPath(import.meta.url), '..', '..', '..');
 const WORK = join(ROOT, 'build', 'selftest');
@@ -197,6 +197,24 @@ async function main() {
     const back = gapLines(await checkPlugin(t, recipe, 'omx-drive'));
     expect(line && back.length === 0, `sabotage ${family}: ${id} goes red naming step '${entry?.step}', green restored${line ? ` — ${line.slice(0, 140)}` : ''}`);
   }
+
+  // ---- 3b. the debt ratchet, both directions ---------------------------------------------------
+  const ratchet = async () => {
+    const reports = [];
+    for (const st of pluginStems(t)) reports.push(await checkPlugin(t, recipe, st));
+    return debtVerdict(reports, loadDebt(t));
+  };
+  const whole = await ratchet();
+  expect(!whole.fresh.length && !whole.stale.length && whole.held.length === loadDebt(t).length,
+    `the debt holds today's gaps exactly (${whole.held.length} held, ${whole.fresh.length} new, ${whole.stale.length} stale)`);
+  let undo = edit('README.md', (s) => s.replace('### omx drive\n', '### drive\n'));
+  const unheld = await ratchet();
+  undo();
+  expect(unheld.fresh.includes("omx-drive manual-section"), `sabotage: a gap the debt does not hold fails the ratchet (${unheld.fresh.join(", ")})`);
+  undo = edit('CHANGELOG.md', (s) => `${s}\n- The chorus, a note for the test.\n`);
+  const paid = await ratchet();
+  undo();
+  expect(paid.stale.some((x) => x.startsWith('omx-chorus changelog')), `sabotage: a debt entry now satisfied fails the ratchet as stale (${paid.stale.join(', ')})`);
 
   // ---- 4. the recipe itself ----------------------------------------------------------------
   const grown = JSON.parse(JSON.stringify(recipe));

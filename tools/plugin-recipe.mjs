@@ -9,13 +9,15 @@
  * plugins and no list of artifacts: it runs the recipe's entries over every plugin directory under
  * plugins/ that carries a declaration, the old ones too.
  *
- *   node tools/plugin-recipe.mjs [--all] [--json] [<stem> ...]     (`make completeness`)
+ *   node tools/plugin-recipe.mjs [--all] [--json] [--no-debt] [<stem> ...]     (`make completeness`)
  *
  * One line per owed artifact a plugin lacks, naming the recipe's wizard step and commit layer.
  * `--all` also prints what is not owed yet (with the rule) and every artifact present.
  *
- * Exit 0 every plugin is complete; 1 a gap; 2 the recipe itself is broken (a rule or checker it
- * names is missing).
+ * The gaps owed today are listed in recipes/completeness-debt.json, each with who owes it. It is a
+ * ratchet: a gap the debt does not hold fails, and so does a debt entry that is now satisfied (delete
+ * it). `--no-debt` fails on every gap. Exit 0 the ratchet holds; 1 it does not; 2 the recipe itself
+ * is broken (a rule or checker it names is missing).
  *
  * Also the template renderer and the path-to-layer map the wizard and the commit-plan check share.
  */
@@ -554,6 +556,27 @@ export function render(template, view) {
   return expand(t, view);
 }
 
+// ---- the debt: the gaps owed today, held as a ratchet ---------------------------------------
+
+export const DEBT_PATH = 'recipes/completeness-debt.json';
+export const loadDebt = (root = ROOT) => (existsSync(join(root, DEBT_PATH)) ? JSON.parse(readFileSync(join(root, DEBT_PATH), 'utf8')).debt : []);
+
+/**
+ * The ratchet over the reports: every gap must be a debt entry (`new`: a gap the debt does not
+ * hold), and every debt entry must still be a gap (`stale`: a paid debt, to delete). Both fail.
+ */
+export function debtVerdict(reports, debt) {
+  const gaps = new Set();
+  for (const r of reports) for (const x of r.results) if (x.required && !x.ok) gaps.add(`${r.stem} ${x.id}`);
+  const owed = new Set(debt.map((d) => `${d.plugin} ${d.entry}`));
+  const checked = new Set(reports.map((r) => r.stem));
+  return {
+    fresh: [...gaps].filter((g) => !owed.has(g)),
+    stale: debt.filter((d) => checked.has(d.plugin) && !gaps.has(`${d.plugin} ${d.entry}`)).map((d) => `${d.plugin} ${d.entry} (${d.owedBy})`),
+    held: [...gaps].filter((g) => owed.has(g)),
+  };
+}
+
 // ---- the completeness test ------------------------------------------------------------------
 
 async function main(argv) {
@@ -588,7 +611,14 @@ async function main(argv) {
   }
   const total = reports.reduce((n, r) => n + gapLines(r).length, 0);
   console.log(`completeness: ${reports.length} plugins, ${total} gaps (recipe ${RECIPE_PATH}: ${recipe.artifacts.length} artifacts, ${recipe.laws.length} laws)`);
-  process.exit(total ? 1 : 0);
+  if (argv.includes('--no-debt')) process.exit(total ? 1 : 0);
+  const v = debtVerdict(reports, loadDebt(root));
+  for (const g of v.fresh) console.log(`FAIL new gap, not in ${DEBT_PATH}: ${g}`);
+  for (const g of v.stale) console.log(`FAIL stale debt, now satisfied: ${g} (delete it from ${DEBT_PATH})`);
+  console.log(v.fresh.length || v.stale.length
+    ? `completeness: ${v.fresh.length} new gap(s), ${v.stale.length} stale debt entr${v.stale.length === 1 ? 'y' : 'ies'}`
+    : `PASS completeness: every gap is held by ${DEBT_PATH} (${v.held.length}), no debt is stale`);
+  process.exit(v.fresh.length || v.stale.length ? 1 : 0);
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) await main(process.argv.slice(2));

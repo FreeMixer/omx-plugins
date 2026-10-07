@@ -7,7 +7,8 @@
 #   make            build every plugin
 #   make test       every plugin's tests (what the package builds run)
 #   make recipe-test   the repository's own checks, run by CI beside `make test`:
-#     make completeness  every plugin against recipes/plugin.recipe.json, each gap naming its wizard step
+#     make completeness  every plugin against recipes/plugin.recipe.json, each gap naming its wizard step;
+#                        a gap not in recipes/completeness-debt.json fails, and so does a paid debt entry
 #     make selftest      the recipe's checkers, wizard and commit protocol, each sabotaged (needs git)
 #   make install    DESTDIR, PREFIX, LIBDIR: $(LIBDIR)/clap/<name>.clap and $(LIBDIR)/lv2/<name>.lv2/
 #   make version    the release version, the one packaging/omx-plugins.spec and debian/changelog carry
