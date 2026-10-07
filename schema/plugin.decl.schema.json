@@ -129,6 +129,14 @@
               "pattern": "^lv2:[A-Za-z]*Plugin$",
               "title": "LV2 class",
               "description": "The LV2 plugin class: lv2:DelayPlugin, lv2:ModulatorPlugin, lv2:Plugin, ..."
+            },
+            "enabledPort": {
+              "enum": [
+                "first",
+                "last"
+              ],
+              "title": "Enabled port",
+              "description": "Where the host's bypass port `enabled` sits among the LV2 control ports: before the parameters (first) or after them (last, the default). A plugin that replaces an existing bundle keeps that bundle's port order."
             }
           }
         },
@@ -140,6 +148,30 @@
           },
           "title": "Parameters",
           "description": "The parameters, in order. Append-only once released: the order is the CLAP param id and the LV2 port order."
+        },
+        "sidechain": {
+          "type": "object",
+          "required": [
+            "symbol",
+            "name"
+          ],
+          "additionalProperties": false,
+          "title": "Sidechain",
+          "description": "A key input beside the stereo main pair, for an effect whose detector a host may feed from another signal: in LV2 an optional lv2:isSideChain audio input right after in_r, in CLAP a second, mono, non-main input port. Leave it out for an effect with no key.",
+          "properties": {
+            "symbol": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_]*$",
+              "title": "Symbol",
+              "description": "The key port's LV2 symbol."
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1,
+              "title": "Name",
+              "description": "The label a host shows for the key input."
+            }
+          }
         },
         "panel": {
           "$ref": "#/$defs/panel"
@@ -218,6 +250,16 @@
           ],
           "title": "Scale",
           "description": "How a host should draw the travel."
+        },
+        "values": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 2,
+          "title": "Values",
+          "description": "For an integer parameter that picks one of a few choices: the label of each value from min up, one per step. LV2 then lists them as an enumeration of scale points."
         },
         "min": {
           "type": "number"
