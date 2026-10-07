@@ -18,6 +18,7 @@ drawn from one declaration: its CLAP parameters, its LV2 ports and its MOD GUI c
 | **omx drive** | `org.openmixer.drive` | `urn:openmixer:drive` | The console's drive: one waveshaper run inside the console's oversampler, with drive, character, band, wet/dry mix and trim. Stereo, real-time safe, 44.1 to 192 kHz. |
 | **omx eq8** | `org.openmixer.eq8` | `urn:openmixer:eq8` | The console's channel EQ in its eight-band form: eight parametric bands (bell, shelves, notch, all-pass) plus high- and low-pass filters at 12 or 24 dB/oct. Stereo, zero latency, 44.1 to 192 kHz. |
 | **omx strip** | `org.openmixer.strip` | `urn:openmixer:strip` | The console's channel strip in one plugin: input trim with HPF/LPF, gate, four-band EQ and compressor, in the desk's order or any other. Stereo, real-time safe, 44.1 to 192 kHz. |
+| **omx keyed-gate** | `org.openmixer.keyed-gate` | `urn:openmixer:keyed-gate` | The console's channel gate with a sidechain key: the detector listens to the key your host routes to it, or to the signal itself. One gain for both legs, so the stereo image never shifts. Real-time safe, 44.1 to 192 kHz. |
 
 ### omx delay
 
@@ -71,6 +72,26 @@ Four stages, each the console's own module, run one after the other:
 and the rest follow in lexicographic order (1 is input > gate > comp > EQ, 2 is input > EQ > gate >
 comp, ... 23 is comp > EQ > gate > input). Plus the host's bypass. The latency reported is the gate's
 and the compressor's 4x detector paths while they are engaged, else zero.
+
+### omx keyed-gate
+
+The console's gate, keyed: the stereo signal is gated while the detector listens to a second, mono
+input, the **key** (an LV2 sidechain port; in CLAP a second input port). With nothing routed to the
+key, or **Key** set to Self, it is the ordinary self-keyed gate.
+
+| Parameter | Range | Default |
+|---|---|---|
+| Key | Self / Sidechain | Sidechain |
+| Threshold | -80 to 0 dB | -40 dB |
+| Ratio | 1 to 100 | 16 |
+| Range | -90 to 0 dB | -90 dB |
+| Attack | 0 to 500 ms | 1 ms |
+| Release | 0 to 5000 ms | 100 ms |
+
+Plus the host's bypass. An attack under 0.5 ms engages the 4x detector path, which adds 72 frames
+of latency, reported to the host; otherwise the latency is zero. Its LV2 URI, ports and defaults
+are those of the keyed gate bundle the OpenMixer console used to ship, so a session saved with that
+bundle loads this one.
 
 ## Install
 
