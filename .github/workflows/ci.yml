@@ -26,7 +26,7 @@ jobs:
 
   test:
     name: make test (fedora:44, amd64)
-    runs-on: arc-freemixer
+    runs-on: ubuntu-latest
     timeout-minutes: 30
     container:
       image: fedora:44
@@ -79,7 +79,7 @@ jobs:
 
   rpm:
     name: omx-plugins RPMs (fc44, ${{ matrix.arch }})
-    runs-on: arc-freemixer
+    runs-on: ubuntu-latest
     timeout-minutes: 30
     strategy:
       fail-fast: false
@@ -112,6 +112,10 @@ jobs:
             /usr/share/doc/omx-plugins-clap /usr/share/doc/omx-plugins-clap/README.md \
             /usr/share/licenses/omx-plugins-clap /usr/share/licenses/omx-plugins-clap/LICENSE | sort > expected-clap.txt
           diff -u expected-clap.txt files-clap.txt
+          devel=$(ls rpms/omx-plugins-devel-[0-9]*.noarch.rpm rpms/omx-plugins-devel-[0-9]*.${{ matrix.arch }}.rpm 2>/dev/null | head -1)
+          rpm -qlp "$devel" | grep -qx /usr/include/omx-plugins/omx_delay_instance.h
+          rpm -qlp "$devel" | grep -qx /usr/include/omx-plugins/omx_plugin_param.h
+          for p in delay drive eq8 eq16 eq32 gate strip; do rpm -qlp "$devel" | grep -qx "/usr/include/omx-plugins/omx_${p}_params.h"; done
           for p in omx-delay omx-drive omx-eq8 omx-eq16 omx-eq32 omx-keyed-gate omx-strip; do
             for f in "$p.so" manifest.ttl "$p.ttl"; do grep -qx "/usr/lib64/lv2/$p.lv2/$f" files-lv2.txt; done
           done
@@ -142,7 +146,7 @@ jobs:
 
   deb:
     name: omx-plugins DEBs (${{ matrix.suite }}, ${{ matrix.arch }})
-    runs-on: arc-freemixer
+    runs-on: ubuntu-latest
     timeout-minutes: 30
     strategy:
       fail-fast: false
@@ -185,6 +189,7 @@ jobs:
           set -euo pipefail
           # the metapackage, with both formats beside it as the repository would offer them
           apt-get install -y --no-install-recommends ./debs/omx-plugins_*.deb ./debs/omx-plugins-clap_*.deb ./debs/omx-plugins-lv2_*.deb
+          dev=$(dpkg -c debs/omx-plugins-dev_*.deb); grep -q './usr/include/omx-plugins/omx_delay_instance.h' <<<"$dev"
           dep=$(dpkg -s omx-plugins); grep -q '^Depends: omx-plugins-clap (= .*), omx-plugins-lv2 (= .*)' <<<"$dep"
           for p in delay drive eq8 eq16 eq32 keyed-gate strip; do
             # captured first: grep -q leaving a pipe early would fail the step under pipefail
@@ -202,5 +207,4 @@ jobs:
     uses: ./.github/workflows/release.yml
     with:
       publish: false
-      runner: arc-freemixer
       arm: false  # arm64/aarch64 build at release only
