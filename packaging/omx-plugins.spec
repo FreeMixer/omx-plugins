@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # Copyright (C) 2026 Pau Aliagas <linuxnow@gmail.com>
 Name: omx-plugins
-Version: 0.1.0
+Version: 0.2.0
 Release: 1%{?dist}
 License: GPL-3.0-or-later
 Summary: The OpenMixer console's delay, drive, EQ, channel strip and keyed gate, as plugins for your DAW
@@ -12,7 +12,7 @@ Source0: %{url}/archive/v%{version}/%{name}-%{version}.tar.gz
 BuildRequires: gcc
 BuildRequires: make
 BuildRequires: pkgconf-pkg-config
-BuildRequires: omx-dsp-devel >= 0.1.4
+BuildRequires: omx-dsp-devel >= 0.1.8
 BuildRequires: omx-clap-core-devel
 BuildRequires: clap-devel
 BuildRequires: lv2-devel
@@ -58,6 +58,15 @@ keyed gate as LV2 plugins, installed in %{_libdir}/lv2 where Ardour, Carla, MOD
 and Zynthian find them, with a MOD GUI where the plugin has one. They run the
 console's own DSP, so they sound like the desk.
 
+%package devel
+Summary: Headers of the OpenMixer plugins, for projects that build on them
+Requires: omx-dsp-devel >= 0.1.8
+
+%description devel
+The headers other projects include to use the OpenMixer plugins' parameters and
+instance code, such as omx_delay_instance.h and each plugin's generated
+parameter header, installed in %{_includedir}/omx-plugins.
+
 %prep
 %autosetup
 
@@ -67,6 +76,7 @@ console's own DSP, so they sound like the desk.
 
 %install
 %make_install PREFIX=%{_prefix} LIBDIR=%{_libdir}
+%make_install install-devel PREFIX=%{_prefix}
 
 %check
 %make_build test
@@ -87,6 +97,10 @@ console's own DSP, so they sound like the desk.
 %{_libdir}/clap/omx-keyed-gate.clap
 %{_libdir}/clap/omx-strip.clap
 
+%files devel
+%license LICENSE
+%{_includedir}/omx-plugins/
+
 %files lv2
 %license LICENSE
 %doc README.md
@@ -99,7 +113,14 @@ console's own DSP, so they sound like the desk.
 %{_libdir}/lv2/omx-strip.lv2/
 
 %changelog
+* Thu Oct 08 2026 Pau Aliagas <linuxnow@gmail.com> - 0.2.0-1
+- New plugins: omx keyed-gate, omx eq16 and omx eq32, as CLAP and LV2 plugins.
+- Every LV2 plugin shows its controls with units, logarithmic frequency travel and
+  named choices for the EQ band types and filter slopes.
+- New omx-plugins-devel package with the headers other projects include.
+- Builds against omx-dsp 0.1.8 and omx-contract 1.2.1.
+
 * Wed Oct 07 2026 Pau Aliagas <linuxnow@gmail.com> - 0.1.0-1
 - First package: the OpenMixer console's delay, drive, 8-band EQ and channel
   strip, each as a CLAP and an LV2 plugin, running the same DSP as the console
-  (omx-dsp 0.1.4).
+  (omx-dsp 0.1.8).

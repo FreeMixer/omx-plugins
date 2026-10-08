@@ -21,7 +21,7 @@
 NAME       := omx-eq32
 URI        := urn:openmixer:eq32
 CLAP_ID    := org.openmixer.eq32
-OMXDSP_MIN ?= 0.1.4
+OMXDSP_MIN ?= 0.1.8
 ROOT       := $(abspath ../..)
 GEN        := generated
 B          := build

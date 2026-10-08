@@ -17,7 +17,7 @@
 NAME       := omx-keyed-gate
 URI        := urn:openmixer:keyed-gate
 CLAP_ID    := org.openmixer.keyed-gate
-OMXDSP_MIN ?= 0.1.4
+OMXDSP_MIN ?= 0.1.8
 ROOT       := $(abspath ../..)
 GEN        := generated
 B          := build
