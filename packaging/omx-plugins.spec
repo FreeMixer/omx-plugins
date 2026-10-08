@@ -141,6 +141,9 @@ parameter header, installed in %{_includedir}/omx-plugins.
   snapped to preferred frequencies, a low shelf first, a high shelf last and
   bells between. Every band still starts off, so a freshly loaded instance
   passes the signal untouched.
+- The CLAP plugins now install to /usr/lib/clap on every distribution, the
+  path the CLAP standard gives for Linux. The Fedora packages used
+  /usr/lib64/clap before.
 - Builds against omx-dsp 0.2.0 and omx-contract 1.3.0; CI runs on GitHub's
   ubuntu-latest runners.
 
