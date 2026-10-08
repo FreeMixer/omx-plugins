@@ -6,7 +6,7 @@
 
 | What | Fedora | Debian | Used for |
 |---|---|---|---|
-| omx-dsp ≥ 0.1.8 (`pkg-config omxdsp`) | `omx-dsp-devel` (channel) | `libomxdsp-dev` (channel) | the DSP: every kernel lives there, none here |
+| omx-dsp ≥ 0.2.0 (`pkg-config omxdsp`, which requires omx-contract 1.3.0) | `omx-dsp-devel` (channel) | `libomxdsp-dev` (channel) | the DSP: every kernel lives there, none here |
 | openmixer CLAP extensions | `omx-clap-core-devel` (channel) | `libomx-clap-core-dev` (channel) | `<omx-clap-host/omx_clap_ext.h>` |
 | CLAP 1.2 headers | `clap-devel` | `clap-headers` (built from the pinned CLAP, see FreeMixer/.github) | the CLAP face |
 | LV2 headers | `lv2-devel` | `lv2-dev` | the LV2 face |
@@ -80,10 +80,18 @@ node tools/omx-new-plugin.mjs --answers my-plugin.answers.json   # or with no ar
 
 The answers are the plugin's declaration less what is derived (see
 `recipes/examples/omx-tremolo.answers.json`). Every parameter names its travel BY REFERENCE into
-the omx-dsp kernel's file in omx-contract (`"ref"`), at the release `omx-contract.pin.json` pins;
-no number is typed in a declaration. A kernel omx-contract does not carry yet is NEW: its kernel
-recipe in omx-contract and omx-dsp comes first. The data is read from `$OMX_CONTRACT_DIR` or a
-checkout of omx-contract beside this one.
+the omx-dsp kernel's file in omx-contract (`"ref"`), at the release `omx-contract` names in
+`.github/pins.txt`; no number is typed in a declaration. The only parameters typed are `own` ones,
+with the reason: a `switch` of the plugin's face, which the contract declares nowhere, and the
+strip's `stage-order`. A set (the EQ band types, the filter slopes) is a reference too, and an EQ
+band's default type and centre come from the contract's one default rule for the strip type
+(`defaultBand`), never from here. A kernel omx-contract does not carry yet is NEW: its kernel
+recipe in omx-contract and omx-dsp comes first. The release is read from `$OMX_CONTRACT_DIR`, a
+checkout of omx-contract beside this one, or the release tarball (fetched once into
+`build/omx-contract-<version>/`, which needs `curl`).
+
+`tools/pins-check.sh` holds the packaging's requirement on omx-dsp, and the omx-contract the
+installed omx-dsp requires, equal to `.github/pins.txt`.
 
 The wizard checks every answer before it writes anything, then writes every artifact of
 `recipes/plugin.recipe.json` from `recipes/templates/plugin/`: the declaration, the generated files,

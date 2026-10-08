@@ -17,7 +17,13 @@ GitHub release notes are generated from this file.
 - New package **omx-plugins-devel** (RPM) and **omx-plugins-dev** (DEB): the headers other projects
   include, such as omx_delay_instance.h and each plugin's generated parameter header, so they stop
   copying them.
-- Builds against omx-dsp 0.1.8 and omx-contract 1.2.1; CI runs on GitHub's ubuntu-latest runners.
+- Every parameter's travel, default and choices now come from the OpenMixer contract (omx-contract
+  1.3.0), not from numbers typed in each plugin, so a plugin and the console cannot disagree about a
+  range. A fresh EQ (eq8, eq16, eq32) now starts with its bands where the console's one rule puts
+  them: four bands at 100, 400, 2000 and 8000 Hz, any other count spread evenly and snapped to
+  preferred frequencies, a low shelf first, a high shelf last and bells between. Every band still
+  starts off, so a freshly loaded instance passes the signal untouched.
+- Builds against omx-dsp 0.2.0 and omx-contract 1.3.0; CI runs on GitHub's ubuntu-latest runners.
 
 ## 0.1.0 - 2026-10-07
 

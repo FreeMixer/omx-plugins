@@ -54,6 +54,13 @@ jobs:
           grep -q "^Version: $v\$" packaging/omx-plugins.spec
           head -1 debian/changelog | grep -q "^omx-plugins ($v) "
 
+      - name: The pins agree with the packaging and with what omx-dsp requires
+        id: handback-pins
+        run: |
+          set -euo pipefail
+          tools/pins-check.sh
+          tools/pins-check.sh --self-test
+
       - name: Every source file carries its SPDX line
         id: handback-spdx
         run: tools/spdx-check.sh
