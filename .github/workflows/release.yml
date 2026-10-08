@@ -37,7 +37,7 @@ permissions:
 
 jobs:
   rpm:
-    uses: FreeMixer/.github/.github/workflows/build-rpm.yml@main
+    uses: FreeMixer/.github/.github/workflows/build-rpm.yml@v1
     with:
       package-name: omx-plugins
       binary-names: omx-plugins omx-plugins-clap omx-plugins-lv2
@@ -52,7 +52,7 @@ jobs:
   deb:
     needs: rpm
     if: ${{ !cancelled() && needs.rpm.result == 'success' }}
-    uses: FreeMixer/.github/.github/workflows/build-deb.yml@main
+    uses: FreeMixer/.github/.github/workflows/build-deb.yml@v1
     with:
       package-name: omx-plugins
       binary-names: omx-plugins omx-plugins-clap omx-plugins-lv2
