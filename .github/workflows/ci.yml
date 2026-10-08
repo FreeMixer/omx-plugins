@@ -113,9 +113,9 @@ jobs:
             rpm=$(ls rpms/omx-plugins-$sub-[0-9]*.${{ matrix.arch }}.rpm)
             rpm -qlp "$rpm" | grep -v '^/usr/lib/.build-id' | sort > files-$sub.txt
           done
-          printf '%s\n' /usr/lib64/clap /usr/lib64/clap/omx-delay.clap /usr/lib64/clap/omx-drive.clap \
-            /usr/lib64/clap/omx-eq8.clap /usr/lib64/clap/omx-eq16.clap /usr/lib64/clap/omx-eq32.clap \
-            /usr/lib64/clap/omx-keyed-gate.clap /usr/lib64/clap/omx-strip.clap \
+          printf '%s\n' /usr/lib/clap /usr/lib/clap/omx-delay.clap /usr/lib/clap/omx-drive.clap \
+            /usr/lib/clap/omx-eq8.clap /usr/lib/clap/omx-eq16.clap /usr/lib/clap/omx-eq32.clap \
+            /usr/lib/clap/omx-keyed-gate.clap /usr/lib/clap/omx-strip.clap \
             /usr/share/doc/omx-plugins-clap /usr/share/doc/omx-plugins-clap/README.md \
             /usr/share/licenses/omx-plugins-clap /usr/share/licenses/omx-plugins-clap/LICENSE | sort > expected-clap.txt
           diff -u expected-clap.txt files-clap.txt
@@ -139,7 +139,7 @@ jobs:
           grep -qE '^omx-plugins-lv2\([a-z0-9-]+\) = ' <<<"$req"
           for p in delay drive eq8 eq16 eq32 keyed-gate strip; do
             # captured first: grep -q leaving a pipe early would fail the step under pipefail
-            out=$(omx-clap-scan --json /usr/lib64/clap/omx-$p.clap); grep -q "\"id\":\"org.openmixer.$p\"" <<<"$out"
+            out=$(omx-clap-scan --json /usr/lib/clap/omx-$p.clap); grep -q "\"id\":\"org.openmixer.$p\"" <<<"$out"
             out=$(lv2ls); grep -qx "urn:openmixer:$p" <<<"$out"
             out=$(lv2info "urn:openmixer:$p"); grep -q 'Binary:' <<<"$out"
           done

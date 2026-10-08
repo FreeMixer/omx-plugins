@@ -10,7 +10,7 @@
 #                   the strip oracle (both faces = the modules called in sequence, every order, at
 #                   44.1/48/96/192 kHz), and the host checks (omx-clap-scan, lv2info) where installed
 #   make gen        regenerate generated/ from the declaration (commit the result)
-#   make install    DESTDIR/PREFIX/LIBDIR: $(LIBDIR)/clap/omx-strip.clap, $(LIBDIR)/lv2/omx-strip.lv2/
+#   make install    DESTDIR/PREFIX/LIBDIR/CLAPDIR: $(CLAPDIR)/omx-strip.clap, $(LIBDIR)/lv2/omx-strip.lv2/
 #
 # Build deps: omx-dsp (pkg-config omxdsp, >= OMXDSP_MIN), omx-clap-core (the CLAP ABI's openmixer
 # extensions), clap, lv2; for the tests lilv and node.
@@ -44,6 +44,8 @@ LDLIBS  := -Wl,-z,defs $(DSP_LIBS) -lm
 
 PREFIX  ?= /usr
 LIBDIR  ?= $(PREFIX)/lib
+# the path the CLAP specification gives Linux distributions, on every distribution and architecture
+CLAPDIR ?= $(PREFIX)/lib/clap
 
 TTL      := $(GEN)/$(NAME).lv2
 TTL_SRCS := $(shell find $(TTL) -type f 2>/dev/null)
@@ -85,7 +87,7 @@ test: all check $(B)/strip-oracle
 	sh $(ROOT)/tools/host-check.sh $(B)/$(NAME).clap $(BUNDLE) $(URI) $(CLAP_ID)
 
 install: all
-	install -Dm755 $(B)/$(NAME).clap $(DESTDIR)$(LIBDIR)/clap/$(NAME).clap
+	install -Dm755 $(B)/$(NAME).clap $(DESTDIR)$(CLAPDIR)/$(NAME).clap
 	mkdir -p $(DESTDIR)$(LIBDIR)/lv2
 	cp -r $(BUNDLE) $(DESTDIR)$(LIBDIR)/lv2/
 

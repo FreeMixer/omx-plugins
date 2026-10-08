@@ -144,8 +144,8 @@ sudo apt install omx-plugins
 
 `omx-plugins` installs both formats. To take only the one your host loads, install
 `omx-plugins-clap` (CLAP hosts) or `omx-plugins-lv2` (LV2 hosts) instead. The plugins land where
-hosts look without configuration (`/usr/lib64/clap` and `/usr/lib64/lv2` on Fedora, `/usr/lib/clap`
-and `/usr/lib/lv2` on Debian). Rescan plugins in your host and look for **omx delay**, **omx drive**, **omx eq8**,
+hosts look without configuration (`/usr/lib/clap` on every distribution, the path the CLAP specification gives; `/usr/lib64/lv2` on Fedora,
+`/usr/lib/lv2` on Debian). Rescan plugins in your host and look for **omx delay**, **omx drive**, **omx eq8**,
 **omx eq16**, **omx eq32**, **omx strip** and **omx keyed-gate** under openmixer.
 
 Every release also carries the packages on its

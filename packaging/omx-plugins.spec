@@ -48,7 +48,7 @@ Summary: OpenMixer delay, drive, EQ, channel strip and keyed gate as CLAP plugin
 
 %description clap
 The OpenMixer console's delay, drive, 8-, 16- and 32-band EQ, channel strip and
-keyed gate as CLAP plugins, installed in %{_libdir}/clap where Bitwig, REAPER,
+keyed gate as CLAP plugins, installed in /usr/lib/clap where Bitwig, REAPER,
 Carla and other CLAP hosts find them. They run the console's own DSP, so they
 sound like the desk.
 
@@ -79,7 +79,7 @@ parameter header, installed in %{_includedir}/omx-plugins.
 %make_build
 
 %install
-%make_install PREFIX=%{_prefix} LIBDIR=%{_libdir}
+%make_install PREFIX=%{_prefix} LIBDIR=%{_libdir} CLAPDIR=/usr/lib/clap
 %{__make} install-devel DESTDIR=%{buildroot} PREFIX=%{_prefix}
 
 %check
@@ -92,14 +92,14 @@ parameter header, installed in %{_includedir}/omx-plugins.
 %files clap
 %license LICENSE
 %doc README.md
-%dir %{_libdir}/clap
-%{_libdir}/clap/omx-delay.clap
-%{_libdir}/clap/omx-drive.clap
-%{_libdir}/clap/omx-eq8.clap
-%{_libdir}/clap/omx-eq16.clap
-%{_libdir}/clap/omx-eq32.clap
-%{_libdir}/clap/omx-keyed-gate.clap
-%{_libdir}/clap/omx-strip.clap
+%dir /usr/lib/clap
+/usr/lib/clap/omx-delay.clap
+/usr/lib/clap/omx-drive.clap
+/usr/lib/clap/omx-eq8.clap
+/usr/lib/clap/omx-eq16.clap
+/usr/lib/clap/omx-eq32.clap
+/usr/lib/clap/omx-keyed-gate.clap
+/usr/lib/clap/omx-strip.clap
 
 %files devel
 %license LICENSE

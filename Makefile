@@ -11,7 +11,7 @@
 #     make completeness  every plugin against recipes/plugin.recipe.json, each gap naming its wizard step;
 #                        a gap not in recipes/completeness-debt.json fails, and so does a paid debt entry
 #     make selftest      the recipe's checkers, wizard and commit protocol, each sabotaged (needs git)
-#   make install    DESTDIR, PREFIX, LIBDIR: $(LIBDIR)/clap/<name>.clap and $(LIBDIR)/lv2/<name>.lv2/
+#   make install    DESTDIR, PREFIX, LIBDIR, CLAPDIR: $(CLAPDIR)/<name>.clap and $(LIBDIR)/lv2/<name>.lv2/
 #   make install-devel   the public headers other projects include: $(INCLUDEDIR)/omx-plugins/*.h
 #   make version    the release version, the one packaging/omx-plugins.spec and debian/changelog carry
 VERSION := 0.2.0
