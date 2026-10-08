@@ -4,11 +4,15 @@ Priority: optional
 Maintainer: Pau Aliagas <linuxnow@gmail.com>
 Build-Depends: debhelper-compat (= 13),
                clap-headers,
-               libomxdsp-dev (>= 0.1.4),
+               libomxdsp-dev (>= 0.2.0),
                libomx-clap-core-dev,
                lv2-dev,
                pkgconf,
                nodejs <!nocheck>,
+               curl <!nocheck>,
+               ca-certificates <!nocheck>,
+               tar <!nocheck>,
+               gzip <!nocheck>,
                liblilv-dev <!nocheck>,
                lilv-utils <!nocheck>,
                sordi <!nocheck>,
@@ -40,6 +44,15 @@ Description: OpenMixer delay, drive, EQ, channel strip and keyed gate as CLAP pl
  and keyed gate as CLAP plugins, installed in /usr/lib/clap where Bitwig,
  REAPER, Carla and other CLAP hosts find them. They run the console's own DSP,
  so they sound like the desk, sample for sample.
+
+Package: omx-plugins-dev
+Section: libdevel
+Architecture: all
+Depends: libomxdsp-dev (>= 0.2.0), ${misc:Depends}
+Description: Headers of the OpenMixer plugins, for projects that build on them
+ The headers other projects include to use the OpenMixer plugins' parameters
+ and instance code, such as omx_delay_instance.h and each plugin's generated
+ parameter header, installed in /usr/include/omx-plugins.
 
 Package: omx-plugins-lv2
 Architecture: any

@@ -46,12 +46,12 @@
 
 #include <omxdsp/fx/omx_delay.h>
 #include <omxdsp/omx_denormal.h> /* omx_denormals_off */
-#include <omxdsp/omx_contract_limits.h> /* OMX_DECLARED_RATES */
+#include <omxcontract/omx_contract_limits.h> /* OMX_STANDARD_SAMPLE_RATES */
 
 /* ---- the scenario ------------------------------------------------------------------------ */
 
-#define RATES OMX_DECLARED_RATES /* the declared rates (R-094) */
-#define N_RATES OMX_DECLARED_RATE_COUNT
+static const float RATES[] = OMX_STANDARD_SAMPLE_RATES_INIT; /* the rates the console declares */
+#define N_RATES OMX_STANDARD_SAMPLE_RATES_COUNT
 
 /** Uneven block sizes, cycled — a host is free to hand any size up to its declared maximum. */
 static const uint32_t BLOCKS[] = {64, 257, 1024, 13, 512, 1000, 1};

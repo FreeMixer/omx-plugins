@@ -239,7 +239,7 @@ static const omx_plugin_param OMX_STRIP_PARAMS[OMX_STRIP_PARAM_COUNT] = {
 #define OMX_STRIP_NAME "omx strip"
 #define OMX_STRIP_VENDOR "openmixer"
 #define OMX_STRIP_URL "https://github.com/FreeMixer/omx-plugins"
-#define OMX_STRIP_VERSION "0.1.0"
+#define OMX_STRIP_VERSION "0.2.0"
 #define OMX_STRIP_DESCRIPTION "The OpenMixer console’s channel strip in one plugin: input trim with high- and low-pass filters, gate, four-band EQ and compressor, in the console’s default order or any other. No DSP of its own: each stage is omx-dsp’s strip module, called in order."
 #define OMX_STRIP_CLAP_ID "org.openmixer.strip"
 #define OMX_STRIP_CLAP_FEATURES "audio-effect", "mixing", "stereo"

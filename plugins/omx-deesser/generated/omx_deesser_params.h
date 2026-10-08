@@ -59,7 +59,7 @@ static const omx_plugin_param OMX_DEESSER_PARAMS[OMX_DEESSER_PARAM_COUNT] = {
 #define OMX_DEESSER_NAME "omx deesser"
 #define OMX_DEESSER_VENDOR "openmixer"
 #define OMX_DEESSER_URL "https://github.com/FreeMixer/omx-plugins"
-#define OMX_DEESSER_VERSION "0.1.0"
+#define OMX_DEESSER_VERSION "0.2.0"
 #define OMX_DEESSER_DESCRIPTION "the native DE-ESSER stage: a band-limited detector driving the COMPRESSOR's own gain computer."
 #define OMX_DEESSER_CLAP_ID "org.openmixer.deesser"
 #define OMX_DEESSER_CLAP_FEATURES "audio-effect", "stereo"

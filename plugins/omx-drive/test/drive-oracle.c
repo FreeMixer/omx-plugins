@@ -33,8 +33,9 @@
 
 #include <clap/clap.h>
 #include <lilv/lilv.h>
+#include <omxcontract/omx_contract_limits.h>
 
-static const double RATES[] = {44100.0, 48000.0, 96000.0, 192000.0};
+static const double RATES[] = OMX_ORACLE_FLOOR_RATES_INIT; /* the four rates every kernel is judged at */
 #define BLOCK 512u
 #define FRAMES 8192u
 

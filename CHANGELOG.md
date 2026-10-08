@@ -3,7 +3,7 @@
 What changed in each release of omx-plugins, in plain words. The RPM and Debian changelogs and the
 GitHub release notes are generated from this file.
 
-## Unreleased
+## 0.2.0 - 2026-10-08
 
 - New plugin, **omx keyed-gate** (CLAP and LV2): the console's keyed gate, its detector fed by a
   sidechain key the host routes to it, or by the signal itself. It takes over the keyed gate bundle
@@ -14,6 +14,16 @@ GitHub release notes are generated from this file.
 - Every LV2 plugin shows its controls as the console's bundles did: frequencies on a logarithmic
   travel in hertz, gains in dB, times, percentages and octaves in their units, the latency in
   frames, and the EQ band types and filter slopes as named choices instead of bare numbers.
+- New package **omx-plugins-devel** (RPM) and **omx-plugins-dev** (DEB): the headers other projects
+  include, such as omx_delay_instance.h and each plugin's generated parameter header, so they stop
+  copying them.
+- Every parameter's travel, default and choices now come from the OpenMixer contract (omx-contract
+  1.3.0), not from numbers typed in each plugin, so a plugin and the console cannot disagree about a
+  range. A fresh EQ (eq8, eq16, eq32) now starts with its bands where the console's one rule puts
+  them: four bands at 100, 400, 2000 and 8000 Hz, any other count spread evenly and snapped to
+  preferred frequencies, a low shelf first, a high shelf last and bells between. Every band still
+  starts off, so a freshly loaded instance passes the signal untouched.
+- Builds against omx-dsp 0.2.0 and omx-contract 1.3.0; CI runs on GitHub's ubuntu-latest runners.
 
 ## 0.1.0 - 2026-10-07
 

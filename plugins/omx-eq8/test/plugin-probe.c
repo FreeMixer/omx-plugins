@@ -44,12 +44,12 @@
 #define OMX_EQ_LV2_BANDS 8
 #include <omxdsp/fx/omx_eq_instance.h>
 #include <omxdsp/omx_denormal.h>        /* omx_denormals_off */
-#include <omxdsp/omx_contract_limits.h> /* OMX_DECLARED_RATES */
+#include <omxcontract/omx_contract_limits.h> /* OMX_STANDARD_SAMPLE_RATES */
 
 /* ---- the scenario ------------------------------------------------------------------------ */
 
-#define RATES OMX_DECLARED_RATES
-#define N_RATES OMX_DECLARED_RATE_COUNT
+static const float RATES[] = OMX_STANDARD_SAMPLE_RATES_INIT; /* the rates the console declares */
+#define N_RATES OMX_STANDARD_SAMPLE_RATES_COUNT
 #define NP OMX_EQ8_PARAM_COUNT
 
 static const uint32_t BLOCKS[] = {64, 257, 1024, 13, 512, 1000, 1};

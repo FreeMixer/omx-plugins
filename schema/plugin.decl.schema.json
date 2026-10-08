@@ -193,6 +193,7 @@
         },
         {
           "required": [
+            "own",
             "min",
             "max",
             "def",
@@ -217,7 +218,7 @@
           "type": "string",
           "pattern": "^[A-Z][A-Z0-9_]*$",
           "title": "Reference",
-          "description": "The omx-contract export that holds the travel: a name in the kernel's file (or in primitives.json/rates.json). The numbers are read from it, never typed here."
+          "description": "The omx-contract export that holds the travel: a name in the kernel's file (or in primitives.json/rates.json): a travel, a boolean, a list or a set. The numbers are read from it, never typed here."
         },
         "kernel": {
           "type": "string",
@@ -239,9 +240,9 @@
         },
         "defaultRef": {
           "type": "string",
-          "pattern": "^[A-Z][A-Z0-9_]*$",
+          "pattern": "^[A-Z][A-Z0-9_]*(\\.[A-Za-z][A-Za-z0-9]*)*$",
           "title": "Default reference",
-          "description": "For a reference to a list of values: the scalar export naming the value a fresh plugin comes up at."
+          "description": "Where a fresh plugin comes up when the export names no default of its own: for a list, the scalar export naming the value; for a travel, a number inside a sheet (NAME.field, as EQ_BAND_DEFAULTS.gainDb)."
         },
         "scale": {
           "enum": [
@@ -301,6 +302,44 @@
             "integer",
             "toggle"
           ]
+        },
+        "defaultId": {
+          "type": "string",
+          "title": "Default id",
+          "description": "For a reference to a set that names no default: the id a fresh plugin comes up at. Refused when the set names one."
+        },
+        "defaultBand": {
+          "type": "object",
+          "required": [
+            "strip",
+            "index",
+            "of"
+          ],
+          "additionalProperties": false,
+          "title": "Default band",
+          "description": "For an EQ band: the default of band `index` (0-based) in an EQ of the strip type `strip` (a key of EQ_BAND_COUNTS), by omx-contract's one default rule for a fresh EQ. `of` is `centre` for the band's frequency travel and `type` for its band type set.",
+          "properties": {
+            "strip": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9]*$"
+            },
+            "index": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "of": {
+              "enum": [
+                "centre",
+                "type"
+              ]
+            }
+          }
+        },
+        "own": {
+          "type": "string",
+          "pattern": "^[a-z][a-z-]*$",
+          "title": "Own",
+          "description": "Why this parameter is typed here and not by reference: `switch` is a switch of the plugin's face (an on/off the contract declares nowhere), `stage-order` the strip's own stage-order table. A parameter is by reference or own, never both."
         }
       }
     },

@@ -10,6 +10,7 @@ export DEB_BUILD_MAINT_OPTIONS = hardening=+all
 # CLAP and LV2 hosts look in /usr/lib/clap and /usr/lib/lv2, not in the multiarch directory
 override_dh_auto_install:
 	dh_auto_install -- PREFIX=/usr LIBDIR=/usr/lib
+	$(MAKE) install-devel DESTDIR=$(CURDIR)/debian/tmp PREFIX=/usr
 
 override_dh_auto_test:
 ifeq (,$(filter nocheck,$(DEB_BUILD_OPTIONS)))

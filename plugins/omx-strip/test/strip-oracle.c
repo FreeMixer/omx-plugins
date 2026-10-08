@@ -37,8 +37,9 @@
 #include <omxdsp/omx_denormal.h>
 #include <omxdsp/omx_ramp.h>
 #include <omxdsp/omx_units.h>
+#include <omxcontract/omx_contract_limits.h>
 
-static const double RATES[] = {44100.0, 48000.0, 96000.0, 192000.0};
+static const double RATES[] = OMX_ORACLE_FLOOR_RATES_INIT; /* the four rates every kernel is judged at */
 #define BLOCK 512u
 #define TOL 1e-6f
 #define N_PARAMS OMX_STRIP_PARAM_COUNT

@@ -19,7 +19,7 @@
     doap:name "omx eq16" ;
     doap:license <https://www.gnu.org/licenses/gpl-3.0.html> ;
     lv2:project <https://github.com/FreeMixer/omx-plugins> ;
-    lv2:minorVersion 1 ;
+    lv2:minorVersion 2 ;
     lv2:microVersion 0 ;
     rdfs:comment "The OpenMixer console's channel EQ, 16-band form: sixteen parametric bands (bell, shelves, notch, allpass) and a high-pass and a low-pass filter at 12 or 24 dB/oct, stereo, zero latency. The DSP is omx-dsp's <omxdsp/fx/omx_eq_instance.h>, the console's own EQ; every band ships off, so a racked instance is a wire." ;
     lv2:optionalFeature lv2:hardRTCapable ;
@@ -131,7 +131,7 @@
         lv2:index 11 ;
         lv2:symbol "b1_type" ;
         lv2:name "Band 1 Type" ;
-        lv2:default 0 ;
+        lv2:default 1 ;
         lv2:minimum 0 ;
         lv2:maximum 5 ;
         lv2:portProperty lv2:integer , lv2:enumeration ;
@@ -205,7 +205,7 @@
         lv2:index 17 ;
         lv2:symbol "b2_freq" ;
         lv2:name "Band 2 Frequency" ;
-        lv2:default 38 ;
+        lv2:default 40 ;
         lv2:minimum 20 ;
         lv2:maximum 20000 ;
         lv2:portProperty pprops:logarithmic ;
@@ -262,7 +262,7 @@
         lv2:index 22 ;
         lv2:symbol "b3_freq" ;
         lv2:name "Band 3 Frequency" ;
-        lv2:default 59 ;
+        lv2:default 63 ;
         lv2:minimum 20 ;
         lv2:maximum 20000 ;
         lv2:portProperty pprops:logarithmic ;
@@ -319,7 +319,7 @@
         lv2:index 27 ;
         lv2:symbol "b4_freq" ;
         lv2:name "Band 4 Frequency" ;
-        lv2:default 91 ;
+        lv2:default 100 ;
         lv2:minimum 20 ;
         lv2:maximum 20000 ;
         lv2:portProperty pprops:logarithmic ;
@@ -376,7 +376,7 @@
         lv2:index 32 ;
         lv2:symbol "b5_freq" ;
         lv2:name "Band 5 Frequency" ;
-        lv2:default 140 ;
+        lv2:default 125 ;
         lv2:minimum 20 ;
         lv2:maximum 20000 ;
         lv2:portProperty pprops:logarithmic ;
@@ -433,7 +433,7 @@
         lv2:index 37 ;
         lv2:symbol "b6_freq" ;
         lv2:name "Band 6 Frequency" ;
-        lv2:default 215 ;
+        lv2:default 200 ;
         lv2:minimum 20 ;
         lv2:maximum 20000 ;
         lv2:portProperty pprops:logarithmic ;
@@ -490,7 +490,7 @@
         lv2:index 42 ;
         lv2:symbol "b7_freq" ;
         lv2:name "Band 7 Frequency" ;
-        lv2:default 331 ;
+        lv2:default 315 ;
         lv2:minimum 20 ;
         lv2:maximum 20000 ;
         lv2:portProperty pprops:logarithmic ;
@@ -547,7 +547,7 @@
         lv2:index 47 ;
         lv2:symbol "b8_freq" ;
         lv2:name "Band 8 Frequency" ;
-        lv2:default 510 ;
+        lv2:default 500 ;
         lv2:minimum 20 ;
         lv2:maximum 20000 ;
         lv2:portProperty pprops:logarithmic ;
@@ -604,7 +604,7 @@
         lv2:index 52 ;
         lv2:symbol "b9_freq" ;
         lv2:name "Band 9 Frequency" ;
-        lv2:default 785 ;
+        lv2:default 800 ;
         lv2:minimum 20 ;
         lv2:maximum 20000 ;
         lv2:portProperty pprops:logarithmic ;
@@ -661,7 +661,7 @@
         lv2:index 57 ;
         lv2:symbol "b10_freq" ;
         lv2:name "Band 10 Frequency" ;
-        lv2:default 1209 ;
+        lv2:default 1250 ;
         lv2:minimum 20 ;
         lv2:maximum 20000 ;
         lv2:portProperty pprops:logarithmic ;
@@ -718,7 +718,7 @@
         lv2:index 62 ;
         lv2:symbol "b11_freq" ;
         lv2:name "Band 11 Frequency" ;
-        lv2:default 1861 ;
+        lv2:default 2000 ;
         lv2:minimum 20 ;
         lv2:maximum 20000 ;
         lv2:portProperty pprops:logarithmic ;
@@ -775,7 +775,7 @@
         lv2:index 67 ;
         lv2:symbol "b12_freq" ;
         lv2:name "Band 12 Frequency" ;
-        lv2:default 2866 ;
+        lv2:default 3150 ;
         lv2:minimum 20 ;
         lv2:maximum 20000 ;
         lv2:portProperty pprops:logarithmic ;
@@ -832,7 +832,7 @@
         lv2:index 72 ;
         lv2:symbol "b13_freq" ;
         lv2:name "Band 13 Frequency" ;
-        lv2:default 4413 ;
+        lv2:default 4000 ;
         lv2:minimum 20 ;
         lv2:maximum 20000 ;
         lv2:portProperty pprops:logarithmic ;
@@ -889,7 +889,7 @@
         lv2:index 77 ;
         lv2:symbol "b14_freq" ;
         lv2:name "Band 14 Frequency" ;
-        lv2:default 6796 ;
+        lv2:default 6300 ;
         lv2:minimum 20 ;
         lv2:maximum 20000 ;
         lv2:portProperty pprops:logarithmic ;
@@ -946,7 +946,7 @@
         lv2:index 82 ;
         lv2:symbol "b15_freq" ;
         lv2:name "Band 15 Frequency" ;
-        lv2:default 10466 ;
+        lv2:default 10000 ;
         lv2:minimum 20 ;
         lv2:maximum 20000 ;
         lv2:portProperty pprops:logarithmic ;
@@ -986,7 +986,7 @@
         lv2:index 86 ;
         lv2:symbol "b16_type" ;
         lv2:name "Band 16 Type" ;
-        lv2:default 0 ;
+        lv2:default 2 ;
         lv2:minimum 0 ;
         lv2:maximum 5 ;
         lv2:portProperty lv2:integer , lv2:enumeration ;
@@ -1003,7 +1003,7 @@
         lv2:index 87 ;
         lv2:symbol "b16_freq" ;
         lv2:name "Band 16 Frequency" ;
-        lv2:default 16117 ;
+        lv2:default 16000 ;
         lv2:minimum 20 ;
         lv2:maximum 20000 ;
         lv2:portProperty pprops:logarithmic ;

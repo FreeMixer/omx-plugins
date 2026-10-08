@@ -50,22 +50,24 @@ function copyTree(dst) {
   execFileSync('sh', ['-c', 'xargs -0 tar -cf - | tar -xf - -C "$1"', 'sh', dst], { cwd: ROOT, input: files });
 }
 
-/** A stand-in omx-contract release: the version, and the kernel files given. */
+/** A stand-in omx-contract release: the version, and the items of each kernel given, as the resolved
+ * render (share/omx-contract/omx-contract.json) carries them. */
 function fakeContract(dst, version, kernels) {
-  mkdirSync(join(dst, 'data', 'kernels'), { recursive: true });
+  mkdirSync(join(dst, 'share', 'omx-contract'), { recursive: true });
+  mkdirSync(join(dst, 'lib'), { recursive: true });
   writeFileSync(join(dst, 'package.json'), JSON.stringify({ name: '@openmixer/omx-contract', version }));
-  writeFileSync(join(dst, 'data', 'primitives.json'), '{}');
-  writeFileSync(join(dst, 'data', 'rates.json'), '{}');
-  for (const [k, v] of Object.entries(kernels)) writeFileSync(join(dst, 'data', 'kernels', `${k}.json`), JSON.stringify(v, null, 2));
+  writeFileSync(join(dst, 'lib', 'eq-defaults.mjs'), '// the stand-in has no EQ\n');
+  const items = {};
+  for (const [k, v] of Object.entries(kernels)) for (const [name, e] of Object.entries(v)) items[name] = { rel: `data/kernels/${k}.json`, ...e };
+  writeFileSync(join(dst, 'share', 'omx-contract', 'omx-contract.json'), JSON.stringify({ name: '@openmixer/omx-contract', version, items }, null, 2));
 }
 
-const travel = (min, max, step, unit, def) => ({ kind: 'travels', doc: '', travel: { min, max, step, unit, default: def, defaultFrom: 'desk' } });
+const travel = (min, max, step, unit, def) => ({ kind: 'travels', shape: 'travel', value: { min, max, step, unit, default: def, defaultFrom: 'desk' } });
 const TREMOLO = {
   TREMOLO_RATE_RANGE: travel(0.1, 20, 0.01, 'Hz', 4),
   TREMOLO_DEPTH_RANGE: travel(0, 100, 0.1, '%', 50),
   TREMOLO_MIX_RANGE: travel(0, 100, 0.1, '%', 100),
-  TREMOLO_MODES: { kind: 'list', doc: '', unit: '', values: ['tremolo', 'pan'] },
-  TREMOLO_MODE_DEFAULT: { kind: 'scalar', doc: '', unit: '', value: 'tremolo' },
+  TREMOLO_MODES: { kind: 'set', value: ['tremolo', 'pan'], default: 'tremolo' },
 };
 const DELAY = { FX_DELAY_TIME_RANGE: travel(0, 2000, 1, 'ms', 300) };
 
@@ -93,8 +95,8 @@ async function main() {
   mkdirSync(WORK, { recursive: true });
   const recipe = loadRecipe(ROOT);
   const answers = JSON.parse(readFileSync(join(ROOT, 'recipes', 'examples', 'omx-tremolo.answers.json'), 'utf8'));
-  const contract = join(WORK, 'omx-contract-1.1.0');
-  fakeContract(contract, '1.1.0', { tremolo: TREMOLO, delay: DELAY });
+  const contract = join(WORK, 'omx-contract-1.4.0');
+  fakeContract(contract, '1.4.0', { tremolo: TREMOLO, delay: DELAY });
   process.env.OMX_CONTRACT_DIR = contract;
 
   // ---- 1. the wizard -------------------------------------------------------------------------
@@ -193,17 +195,7 @@ async function main() {
     ['noText', 'no-dpf', () => add(`${P}/dpf_shell.h`, '#include "DistrhoPlugin.hpp"\n')],
     ['noCopiedDsp', 'no-copied-dsp', () => add(`${P}/copied.h`, `static inline float ${dspName}(float x) {\n  return x;\n}\n`)],
     ['noCopiedDsp', 'no-copied-dsp', () => add(`${P}/engine.h`, '#include "mix_drive.h"\n')],
-    ['paramsByReference', 'params-by-reference', () => {
-      // the pin moves to a release carrying parameters by reference; omx-drive still types its travels
-      const c = join(WORK, 'omx-contract-1.1.0-drive');
-      fakeContract(c, '1.1.0', { drive: { DRIVE_GAIN: travel(0, 36, 0.1, 'dB', 0) } });
-      process.env.OMX_CONTRACT_DIR = c;
-      const undo = edit('omx-contract.pin.json', (s) => s.replace('"1.0.0"', '"1.1.0"'));
-      return () => {
-        undo();
-        delete process.env.OMX_CONTRACT_DIR;
-      };
-    }],
+    ['paramsByReference', 'params-by-reference', () => edit(`${P}/omx-drive.decl.json`, (s) => s.replace('"ref": "DRIVE_AMOUNT_RANGE"', '"ref": "DRIVE_AMOUNT_RANGE", "min": 0'))],
   ];
   for (const [family, id, breakIt] of SABOTAGE) {
     const restore = breakIt();
@@ -245,7 +237,8 @@ async function main() {
     mkdirSync(join(empty, 'plugins'), { recursive: true });
     cpSync(join(ROOT, 'recipes'), join(empty, 'recipes'), { recursive: true });
     cpSync(join(ROOT, 'schema'), join(empty, 'schema'), { recursive: true });
-    cpSync(join(ROOT, 'omx-contract.pin.json'), join(empty, 'omx-contract.pin.json'));
+    mkdirSync(join(empty, '.github'), { recursive: true });
+    cpSync(join(ROOT, '.github', 'pins.txt'), join(empty, '.github', 'pins.txt'));
     const run = spawnSync('node', [join(ROOT, 'tools', 'plugin-recipe.mjs')], { env: { ...process.env, OMX_PLUGINS_ROOT: empty }, encoding: 'utf8' });
     expect(run.status === 1 && /no plugin to check/.test(run.stdout + run.stderr), `sabotage: a run over no plugin fails (exit ${run.status})`);
   }
@@ -319,6 +312,7 @@ async function main() {
   }, '/panel');
 
   // ---- 6. the port hints ---------------------------------------------------------------------
+  delete process.env.OMX_CONTRACT_DIR; // the real tree reads the release it pins
   {
     const hints = join(WORK, 'hints');
     copyTree(hints);
@@ -341,7 +335,7 @@ async function main() {
       writeFileSync(decl8, JSON.stringify(d, null, 2));
       writeFileSync(ttl8, emitPluginTtl(loadDecl(dir8)));
     };
-    regen((ps) => delete ps.find((p) => p.symbol === 'b1_type').values);
+    regen((ps) => ps.splice(ps.findIndex((p) => p.symbol === 'b1_type'), 1, { symbol: 'b1_type', name: 'Band 1 Type', own: 'switch', unit: '', min: 0, max: 5, def: 0, kind: 'integer' }));
     named('a declaration that drops a band type\'s labels', 'omx-eq8: port "b1_type" lost the scale point 0 Bell');
     regen((ps) => (ps.find((p) => p.symbol === 'hpf_freq').scale = 'linear'));
     named('a frequency declared linear', 'omx-eq8: port "hpf_freq" lost pprops:logarithmic');

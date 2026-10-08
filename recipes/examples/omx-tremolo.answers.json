@@ -35,10 +35,13 @@
       "symbol": "mode",
       "name": "Mode",
       "ref": "TREMOLO_MODES",
-      "defaultRef": "TREMOLO_MODE_DEFAULT",
-      "scale": "linear"
+      "scale": "linear",
+      "values": [
+        "Tremolo",
+        "Pan"
+      ]
     }
   ],
-  "omxdspMin": "0.1.5",
-  "contractRelease": "1.1.0"
+  "omxdspMin": "0.1.9",
+  "contractRelease": "1.4.0"
 }

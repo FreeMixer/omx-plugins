@@ -45,8 +45,9 @@
 #include "omx_gate_params.h"
 #include <omxdsp/fx/omx_gate_instance.h>
 #include <omxdsp/omx_denormal.h>
+#include <omxcontract/omx_contract_limits.h>
 
-static const float RATES[] = {44100.0f, 48000.0f, 96000.0f, 192000.0f};
+static const float RATES[] = OMX_ORACLE_FLOOR_RATES_INIT; /* the four rates every kernel is judged at */
 #define QUANTUM 256u
 #define SEGMENTS 7u
 #define SEG_FRAMES (QUANTUM * 150u) /* 38 400 frames: 0.2 s at 192 kHz, 0.87 s at 44.1 kHz */

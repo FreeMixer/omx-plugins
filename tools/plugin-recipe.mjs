@@ -423,32 +423,38 @@ export const CHECKERS = {
     return bad.length ? missing(bad.join('; ')) : ok(`no engine include, no omx-dsp function redefined (${dsp.size} known)`);
   },
 
-  /** Every parameter by reference, no travel retyped, every reference resolving. */
+  /** Every parameter by reference with no travel retyped, or `own` with its reason and its travel typed; every reference resolving. */
   paramsByReference(root, _recipe, facts) {
     if (!facts.decl) return missing(facts.error);
     const typed = ['min', 'max', 'def', 'unit', 'kind'];
     const bad = [];
     for (const p of facts.decl.params ?? []) {
-      if (p.ref === undefined) bad.push(`'${p.symbol}' has no ref`);
-      const t = typed.filter((k) => k in p);
+      if (p.ref === undefined) {
+        if (typeof p.own !== 'string' || !p.own) bad.push(`'${p.symbol}' has no ref and no "own" reason`);
+        continue;
+      }
+      if ('own' in p) bad.push(`'${p.symbol}' is by reference and "own"`);
+      const t = typed.filter((k) => k in p && k !== 'unit'); // a set's unit is face text; a travel's is checked when it resolves
       if (t.length) bad.push(`'${p.symbol}' retypes ${t.join(', ')}`);
     }
     if (!bad.length) {
       const where = locateContract(root);
       if (!where.dir) return missing(`cannot check: ${where.why}`);
       for (const p of facts.decl.params) {
+        if (p.ref === undefined) continue;
         let k;
         try {
-          k = paramKernel(facts.decl, p);
+          k = paramKernel(facts.decl, p, where.dir);
         } catch (e) {
           bad.push(e.message);
           continue;
         }
         const r = findName(where.dir, k, p.ref);
         if (r.error) bad.push(`'${p.symbol}': ${r.error}`);
+        else if ('unit' in p && r.entry.kind !== 'set') bad.push(`'${p.symbol}' retypes unit`);
       }
     }
-    return bad.length ? missing(`plugins/${facts.stem}/${facts.stem}.decl.json: ${bad.join('; ')}`) : ok('every parameter by reference');
+    return bad.length ? missing(`plugins/${facts.stem}/${facts.stem}.decl.json: ${bad.join('; ')}`) : ok('every parameter by reference or own');
   },
 };
 

@@ -1,4 +1,0 @@
-{
-  "$comment": "The omx-contract release whose data the plugin declarations reference (tools/omx-contract.mjs). Moving it is one commit of its own.",
-  "version": "1.0.0"
-}

@@ -52,10 +52,11 @@
 #include <omxdsp/fx/omx_eq_instance.h>
 #include <omxdsp/omx_biquad.h>
 #include <omxdsp/omx_denormal.h>
+#include <omxcontract/omx_contract_limits.h>
 #include <omxdsp/omx_eq_design.h>
 
 #define BANDS ((uint32_t)OMX_EQ_LV2_BANDS)
-static const float RATES[] = {32000.0f, 44100.0f, 48000.0f, 64000.0f, 88200.0f, 96000.0f, 128000.0f, 176400.0f, 192000.0f};
+static const float RATES[] = OMX_RME_RATES_INIT; /* the nine rates an RME interface clocks at */
 #define QUANTUM 256u
 #define SEGMENTS 7u
 #define SEG_FRAMES (QUANTUM * 100u) /* 25 600 frames: 0.13 s at 192 kHz, 0.8 s at 32 kHz */

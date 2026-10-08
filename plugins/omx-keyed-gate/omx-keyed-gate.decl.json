@@ -9,7 +9,7 @@
   "noun": "keyed gate",
   "vendor": "openmixer",
   "url": "https://github.com/FreeMixer/omx-plugins",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "The OpenMixer console's channel gate with an external key: the stereo signal is gated while the detector listens to the sidechain input the host routes to it, or to the signal itself with the key unconnected or set to Self. One gain drives both legs. An attack under 0.5 ms engages 4x detector oversampling, which adds 72 frames of latency, reported to the host. The DSP is omx-dsp's <omxdsp/fx/omx_gate_instance.h>, the console's own gate.",
   "clap": {
     "id": "org.openmixer.keyed-gate",
@@ -25,60 +25,12 @@
     "enabledPort": "first"
   },
   "params": [
-    {
-      "symbol": "key_external",
-      "name": "Key",
-      "min": 0,
-      "max": 1,
-      "def": 1,
-      "unit": "",
-      "kind": "integer",
-      "values": [
-        "Self",
-        "Sidechain"
-      ]
-    },
-    {
-      "symbol": "threshold",
-      "name": "Threshold",
-      "min": -80,
-      "max": 0,
-      "def": -40,
-      "unit": "dB"
-    },
-    {
-      "symbol": "ratio",
-      "name": "Ratio",
-      "scale": "log",
-      "min": 1,
-      "max": 100,
-      "def": 16,
-      "unit": ""
-    },
-    {
-      "symbol": "range",
-      "name": "Range",
-      "min": -90,
-      "max": 0,
-      "def": -90,
-      "unit": "dB"
-    },
-    {
-      "symbol": "attack",
-      "name": "Attack",
-      "min": 0,
-      "max": 500,
-      "def": 1,
-      "unit": "ms"
-    },
-    {
-      "symbol": "release",
-      "name": "Release",
-      "min": 0,
-      "max": 5000,
-      "def": 100,
-      "unit": "ms"
-    }
+    { "symbol": "key_external", "name": "Key", "ref": "GATE_KEY_SOURCES", "values": ["Self", "Sidechain"], "defaultId": "sidechain" },
+    { "symbol": "threshold", "name": "Threshold", "ref": "GATE_CONTINUOUS_TRAVELS", "field": "thresholdDb" },
+    { "symbol": "ratio", "name": "Ratio", "ref": "GATE_CONTINUOUS_TRAVELS", "field": "ratio", "scale": "log" },
+    { "symbol": "range", "name": "Range", "ref": "GATE_CONTINUOUS_TRAVELS", "field": "rangeDb" },
+    { "symbol": "attack", "name": "Attack", "ref": "GATE_LIMITS", "field": "attackMs" },
+    { "symbol": "release", "name": "Release", "ref": "GATE_CONTINUOUS_TRAVELS", "field": "releaseMs" }
   ],
   "sidechain": {
     "symbol": "key",

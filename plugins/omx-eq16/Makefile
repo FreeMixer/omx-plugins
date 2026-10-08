@@ -21,7 +21,7 @@
 NAME       := omx-eq16
 URI        := urn:openmixer:eq16
 CLAP_ID    := org.openmixer.eq16
-OMXDSP_MIN ?= 0.1.4
+OMXDSP_MIN ?= $(shell awk '$$1 == "omx-dsp" { print $$3 }' $(abspath ../..)/.github/pins.txt)
 ROOT       := $(abspath ../..)
 GEN        := generated
 B          := build
@@ -69,7 +69,7 @@ $(B)/plugin-probe: test/plugin-probe.c | $(B)
 	$(CC) $(CFLAGS) -std=gnu11 -Wall -Wextra -I$(GEN) -I$(ROOT)/include $(DSP_CFLAGS) $(ABI_CFLAGS) $(LV2_CFLAGS) -o $@ $< -ldl $(LDLIBS)
 
 $(B)/eq-oracle: test/eq-oracle.c | $(B)
-	$(CC) $(CFLAGS) $(WARN) $(ABI_CFLAGS) -o $@ $< $(LILV) -ldl $(LDLIBS)
+	$(CC) $(CFLAGS) $(WARN) $(DSP_CFLAGS) $(ABI_CFLAGS) -o $@ $< $(LILV) -ldl $(LDLIBS)
 
 # One source for the three EQs: the band count is the kernel's compile-time number.
 $(B)/eq-identity: $(ROOT)/tools/eq-identity.c | $(B)
