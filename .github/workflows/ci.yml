@@ -144,9 +144,11 @@ jobs:
             out=$(lv2info "urn:openmixer:$p"); grep -q 'Binary:' <<<"$out"
           done
 
+      # Not named omx-plugins-rpms-*: the release dry run in this same run downloads that pattern
+      # with merge-multiple, and two builds of one NEVRA collide in one directory.
       - uses: actions/upload-artifact@v4
         with:
-          name: omx-plugins-rpms-fc44-${{ matrix.arch }}
+          name: ci-check-omx-plugins-fc44-${{ matrix.arch }}
           path: rpms/*.rpm
           if-no-files-found: error
           retention-days: 7
