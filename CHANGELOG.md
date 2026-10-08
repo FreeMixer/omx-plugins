@@ -23,6 +23,8 @@ GitHub release notes are generated from this file.
   them: four bands at 100, 400, 2000 and 8000 Hz, any other count spread evenly and snapped to
   preferred frequencies, a low shelf first, a high shelf last and bells between. Every band still
   starts off, so a freshly loaded instance passes the signal untouched.
+- The CLAP plugins now install to /usr/lib/clap on every distribution, the path the CLAP
+  standard gives for Linux. The Fedora packages used /usr/lib64/clap before.
 - Builds against omx-dsp 0.2.0 and omx-contract 1.3.0; CI runs on GitHub's ubuntu-latest runners.
 
 ## 0.1.0 - 2026-10-07
