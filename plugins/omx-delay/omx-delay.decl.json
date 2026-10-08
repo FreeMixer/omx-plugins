@@ -10,11 +10,11 @@
   "clap": { "id": "org.openmixer.delay", "features": ["audio-effect", "delay", "stereo"] },
   "lv2": { "uri": "urn:openmixer:delay", "class": "lv2:DelayPlugin" },
   "params": [
-    { "symbol": "timeMs", "name": "Time", "unit": "ms", "min": 0, "max": 2000, "def": 300, "kind": "integer" },
-    { "symbol": "feedback", "name": "Feedback", "unit": "", "min": 0, "max": 0.99, "def": 0.3 },
-    { "symbol": "mix", "name": "Mix", "unit": "", "min": 0, "max": 1, "def": 0.3 },
-    { "symbol": "tone", "name": "Tone", "unit": "", "min": 0, "max": 1, "def": 0.3 },
-    { "symbol": "pingpong", "name": "Pingpong", "unit": "", "min": 0, "max": 1, "def": 0, "kind": "toggle" }
+    { "symbol": "timeMs", "name": "Time", "ref": "FX_DELAY_TIME_RANGE" },
+    { "symbol": "feedback", "name": "Feedback", "ref": "FX_DELAY_FEEDBACK_RANGE" },
+    { "symbol": "mix", "name": "Mix", "ref": "DELAY_MIX_RANGE" },
+    { "symbol": "tone", "name": "Tone", "ref": "DELAY_TONE_RANGE" },
+    { "symbol": "pingpong", "name": "Pingpong", "ref": "FX_DELAY_PINGPONG_DEFAULT" }
   ],
   "panel": {
     "family": "delay",

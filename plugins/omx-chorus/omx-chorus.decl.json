@@ -19,46 +19,10 @@
     "class": "lv2:Plugin"
   },
   "params": [
-    {
-      "symbol": "rateHz",
-      "name": "Rate",
-      "unit": "Hz",
-      "min": 0.05,
-      "max": 8,
-      "def": 0.6
-    },
-    {
-      "symbol": "depthMs",
-      "name": "Depth",
-      "unit": "ms",
-      "min": 0,
-      "max": 12,
-      "def": 4
-    },
-    {
-      "symbol": "voices",
-      "name": "Voices",
-      "unit": "",
-      "min": 1,
-      "max": 4,
-      "def": 3,
-      "kind": "integer"
-    },
-    {
-      "symbol": "mix",
-      "name": "Mix",
-      "unit": "%",
-      "min": 0,
-      "max": 100,
-      "def": 35
-    },
-    {
-      "symbol": "spread",
-      "name": "Spread",
-      "unit": "",
-      "min": 0,
-      "max": 0.5,
-      "def": 0
-    }
+    { "symbol": "rateHz", "name": "Rate", "ref": "CHORUS_RATE_RANGE" },
+    { "symbol": "depthMs", "name": "Depth", "ref": "CHORUS_DEPTH_RANGE" },
+    { "symbol": "voices", "name": "Voices", "ref": "CHORUS_VOICES_RANGE" },
+    { "symbol": "mix", "name": "Mix", "ref": "CHORUS_MIX_RANGE" },
+    { "symbol": "spread", "name": "Spread", "ref": "CHORUS_SPREAD_RANGE" }
   ]
 }

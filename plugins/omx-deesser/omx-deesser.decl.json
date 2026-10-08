@@ -19,63 +19,12 @@
     "class": "lv2:Plugin"
   },
   "params": [
-    {
-      "symbol": "freqHz",
-      "name": "Freq",
-      "unit": "Hz",
-      "min": 2000,
-      "max": 16000,
-      "def": 7000,
-      "kind": "integer"
-    },
-    {
-      "symbol": "widthOct",
-      "name": "Width",
-      "unit": "oct",
-      "min": 0.25,
-      "max": 4,
-      "def": 1
-    },
-    {
-      "symbol": "thresholdDb",
-      "name": "Threshold",
-      "unit": "dB",
-      "min": -60,
-      "max": 0,
-      "def": -30
-    },
-    {
-      "symbol": "ratio",
-      "name": "Ratio",
-      "unit": "",
-      "min": 1,
-      "max": 20,
-      "def": 4
-    },
-    {
-      "symbol": "rangeDb",
-      "name": "Range",
-      "unit": "dB",
-      "min": -24,
-      "max": 0,
-      "def": -12
-    },
-    {
-      "symbol": "attackMs",
-      "name": "Attack",
-      "unit": "ms",
-      "min": 0.1,
-      "max": 50,
-      "def": 1
-    },
-    {
-      "symbol": "releaseMs",
-      "name": "Release",
-      "unit": "ms",
-      "min": 5,
-      "max": 500,
-      "def": 60,
-      "kind": "integer"
-    }
+    { "symbol": "freqHz", "name": "Freq", "ref": "DEESS_FREQ_RANGE" },
+    { "symbol": "widthOct", "name": "Width", "ref": "DEESS_WIDTH_RANGE" },
+    { "symbol": "thresholdDb", "name": "Threshold", "ref": "DEESS_THRESHOLD_RANGE" },
+    { "symbol": "ratio", "name": "Ratio", "ref": "DEESS_RATIO_RANGE" },
+    { "symbol": "rangeDb", "name": "Range", "ref": "DEESS_RANGE_RANGE" },
+    { "symbol": "attackMs", "name": "Attack", "ref": "DEESS_ATTACK_RANGE" },
+    { "symbol": "releaseMs", "name": "Release", "ref": "DEESS_RELEASE_RANGE" }
   ]
 }

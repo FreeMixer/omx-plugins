@@ -110,83 +110,83 @@ static const omx_plugin_param OMX_EQ16_PARAMS[OMX_EQ16_PARAM_COUNT] = {
   { "lpf_on", "LPF On", "", 0.0f, 1.0f, 0.0f, OMX_PLUGIN_PARAM_TOGGLE },
   { "lpf_freq", "LPF Frequency", "Hz", 1000.0f, 20000.0f, 18000.0f, 0u },
   { "lpf_slope", "LPF Slope", "dB/oct", 12.0f, 24.0f, 12.0f, OMX_PLUGIN_PARAM_INTEGER },
-  { "b1_type", "Band 1 Type", "", 0.0f, 5.0f, 0.0f, OMX_PLUGIN_PARAM_INTEGER },
+  { "b1_type", "Band 1 Type", "", 0.0f, 5.0f, 1.0f, OMX_PLUGIN_PARAM_INTEGER },
   { "b1_freq", "Band 1 Frequency", "Hz", 20.0f, 20000.0f, 25.0f, 0u },
   { "b1_gain", "Band 1 Gain", "dB", -15.0f, 15.0f, 0.0f, 0u },
   { "b1_q", "Band 1 Q", "", 0.3f, 116.0f, 1.0f, 0u },
   { "b1_on", "Band 1 On", "", 0.0f, 1.0f, 0.0f, OMX_PLUGIN_PARAM_TOGGLE },
   { "b2_type", "Band 2 Type", "", 0.0f, 5.0f, 0.0f, OMX_PLUGIN_PARAM_INTEGER },
-  { "b2_freq", "Band 2 Frequency", "Hz", 20.0f, 20000.0f, 38.0f, 0u },
+  { "b2_freq", "Band 2 Frequency", "Hz", 20.0f, 20000.0f, 40.0f, 0u },
   { "b2_gain", "Band 2 Gain", "dB", -15.0f, 15.0f, 0.0f, 0u },
   { "b2_q", "Band 2 Q", "", 0.3f, 116.0f, 1.0f, 0u },
   { "b2_on", "Band 2 On", "", 0.0f, 1.0f, 0.0f, OMX_PLUGIN_PARAM_TOGGLE },
   { "b3_type", "Band 3 Type", "", 0.0f, 5.0f, 0.0f, OMX_PLUGIN_PARAM_INTEGER },
-  { "b3_freq", "Band 3 Frequency", "Hz", 20.0f, 20000.0f, 59.0f, 0u },
+  { "b3_freq", "Band 3 Frequency", "Hz", 20.0f, 20000.0f, 63.0f, 0u },
   { "b3_gain", "Band 3 Gain", "dB", -15.0f, 15.0f, 0.0f, 0u },
   { "b3_q", "Band 3 Q", "", 0.3f, 116.0f, 1.0f, 0u },
   { "b3_on", "Band 3 On", "", 0.0f, 1.0f, 0.0f, OMX_PLUGIN_PARAM_TOGGLE },
   { "b4_type", "Band 4 Type", "", 0.0f, 5.0f, 0.0f, OMX_PLUGIN_PARAM_INTEGER },
-  { "b4_freq", "Band 4 Frequency", "Hz", 20.0f, 20000.0f, 91.0f, 0u },
+  { "b4_freq", "Band 4 Frequency", "Hz", 20.0f, 20000.0f, 100.0f, 0u },
   { "b4_gain", "Band 4 Gain", "dB", -15.0f, 15.0f, 0.0f, 0u },
   { "b4_q", "Band 4 Q", "", 0.3f, 116.0f, 1.0f, 0u },
   { "b4_on", "Band 4 On", "", 0.0f, 1.0f, 0.0f, OMX_PLUGIN_PARAM_TOGGLE },
   { "b5_type", "Band 5 Type", "", 0.0f, 5.0f, 0.0f, OMX_PLUGIN_PARAM_INTEGER },
-  { "b5_freq", "Band 5 Frequency", "Hz", 20.0f, 20000.0f, 140.0f, 0u },
+  { "b5_freq", "Band 5 Frequency", "Hz", 20.0f, 20000.0f, 125.0f, 0u },
   { "b5_gain", "Band 5 Gain", "dB", -15.0f, 15.0f, 0.0f, 0u },
   { "b5_q", "Band 5 Q", "", 0.3f, 116.0f, 1.0f, 0u },
   { "b5_on", "Band 5 On", "", 0.0f, 1.0f, 0.0f, OMX_PLUGIN_PARAM_TOGGLE },
   { "b6_type", "Band 6 Type", "", 0.0f, 5.0f, 0.0f, OMX_PLUGIN_PARAM_INTEGER },
-  { "b6_freq", "Band 6 Frequency", "Hz", 20.0f, 20000.0f, 215.0f, 0u },
+  { "b6_freq", "Band 6 Frequency", "Hz", 20.0f, 20000.0f, 200.0f, 0u },
   { "b6_gain", "Band 6 Gain", "dB", -15.0f, 15.0f, 0.0f, 0u },
   { "b6_q", "Band 6 Q", "", 0.3f, 116.0f, 1.0f, 0u },
   { "b6_on", "Band 6 On", "", 0.0f, 1.0f, 0.0f, OMX_PLUGIN_PARAM_TOGGLE },
   { "b7_type", "Band 7 Type", "", 0.0f, 5.0f, 0.0f, OMX_PLUGIN_PARAM_INTEGER },
-  { "b7_freq", "Band 7 Frequency", "Hz", 20.0f, 20000.0f, 331.0f, 0u },
+  { "b7_freq", "Band 7 Frequency", "Hz", 20.0f, 20000.0f, 315.0f, 0u },
   { "b7_gain", "Band 7 Gain", "dB", -15.0f, 15.0f, 0.0f, 0u },
   { "b7_q", "Band 7 Q", "", 0.3f, 116.0f, 1.0f, 0u },
   { "b7_on", "Band 7 On", "", 0.0f, 1.0f, 0.0f, OMX_PLUGIN_PARAM_TOGGLE },
   { "b8_type", "Band 8 Type", "", 0.0f, 5.0f, 0.0f, OMX_PLUGIN_PARAM_INTEGER },
-  { "b8_freq", "Band 8 Frequency", "Hz", 20.0f, 20000.0f, 510.0f, 0u },
+  { "b8_freq", "Band 8 Frequency", "Hz", 20.0f, 20000.0f, 500.0f, 0u },
   { "b8_gain", "Band 8 Gain", "dB", -15.0f, 15.0f, 0.0f, 0u },
   { "b8_q", "Band 8 Q", "", 0.3f, 116.0f, 1.0f, 0u },
   { "b8_on", "Band 8 On", "", 0.0f, 1.0f, 0.0f, OMX_PLUGIN_PARAM_TOGGLE },
   { "b9_type", "Band 9 Type", "", 0.0f, 5.0f, 0.0f, OMX_PLUGIN_PARAM_INTEGER },
-  { "b9_freq", "Band 9 Frequency", "Hz", 20.0f, 20000.0f, 785.0f, 0u },
+  { "b9_freq", "Band 9 Frequency", "Hz", 20.0f, 20000.0f, 800.0f, 0u },
   { "b9_gain", "Band 9 Gain", "dB", -15.0f, 15.0f, 0.0f, 0u },
   { "b9_q", "Band 9 Q", "", 0.3f, 116.0f, 1.0f, 0u },
   { "b9_on", "Band 9 On", "", 0.0f, 1.0f, 0.0f, OMX_PLUGIN_PARAM_TOGGLE },
   { "b10_type", "Band 10 Type", "", 0.0f, 5.0f, 0.0f, OMX_PLUGIN_PARAM_INTEGER },
-  { "b10_freq", "Band 10 Frequency", "Hz", 20.0f, 20000.0f, 1209.0f, 0u },
+  { "b10_freq", "Band 10 Frequency", "Hz", 20.0f, 20000.0f, 1250.0f, 0u },
   { "b10_gain", "Band 10 Gain", "dB", -15.0f, 15.0f, 0.0f, 0u },
   { "b10_q", "Band 10 Q", "", 0.3f, 116.0f, 1.0f, 0u },
   { "b10_on", "Band 10 On", "", 0.0f, 1.0f, 0.0f, OMX_PLUGIN_PARAM_TOGGLE },
   { "b11_type", "Band 11 Type", "", 0.0f, 5.0f, 0.0f, OMX_PLUGIN_PARAM_INTEGER },
-  { "b11_freq", "Band 11 Frequency", "Hz", 20.0f, 20000.0f, 1861.0f, 0u },
+  { "b11_freq", "Band 11 Frequency", "Hz", 20.0f, 20000.0f, 2000.0f, 0u },
   { "b11_gain", "Band 11 Gain", "dB", -15.0f, 15.0f, 0.0f, 0u },
   { "b11_q", "Band 11 Q", "", 0.3f, 116.0f, 1.0f, 0u },
   { "b11_on", "Band 11 On", "", 0.0f, 1.0f, 0.0f, OMX_PLUGIN_PARAM_TOGGLE },
   { "b12_type", "Band 12 Type", "", 0.0f, 5.0f, 0.0f, OMX_PLUGIN_PARAM_INTEGER },
-  { "b12_freq", "Band 12 Frequency", "Hz", 20.0f, 20000.0f, 2866.0f, 0u },
+  { "b12_freq", "Band 12 Frequency", "Hz", 20.0f, 20000.0f, 3150.0f, 0u },
   { "b12_gain", "Band 12 Gain", "dB", -15.0f, 15.0f, 0.0f, 0u },
   { "b12_q", "Band 12 Q", "", 0.3f, 116.0f, 1.0f, 0u },
   { "b12_on", "Band 12 On", "", 0.0f, 1.0f, 0.0f, OMX_PLUGIN_PARAM_TOGGLE },
   { "b13_type", "Band 13 Type", "", 0.0f, 5.0f, 0.0f, OMX_PLUGIN_PARAM_INTEGER },
-  { "b13_freq", "Band 13 Frequency", "Hz", 20.0f, 20000.0f, 4413.0f, 0u },
+  { "b13_freq", "Band 13 Frequency", "Hz", 20.0f, 20000.0f, 4000.0f, 0u },
   { "b13_gain", "Band 13 Gain", "dB", -15.0f, 15.0f, 0.0f, 0u },
   { "b13_q", "Band 13 Q", "", 0.3f, 116.0f, 1.0f, 0u },
   { "b13_on", "Band 13 On", "", 0.0f, 1.0f, 0.0f, OMX_PLUGIN_PARAM_TOGGLE },
   { "b14_type", "Band 14 Type", "", 0.0f, 5.0f, 0.0f, OMX_PLUGIN_PARAM_INTEGER },
-  { "b14_freq", "Band 14 Frequency", "Hz", 20.0f, 20000.0f, 6796.0f, 0u },
+  { "b14_freq", "Band 14 Frequency", "Hz", 20.0f, 20000.0f, 6300.0f, 0u },
   { "b14_gain", "Band 14 Gain", "dB", -15.0f, 15.0f, 0.0f, 0u },
   { "b14_q", "Band 14 Q", "", 0.3f, 116.0f, 1.0f, 0u },
   { "b14_on", "Band 14 On", "", 0.0f, 1.0f, 0.0f, OMX_PLUGIN_PARAM_TOGGLE },
   { "b15_type", "Band 15 Type", "", 0.0f, 5.0f, 0.0f, OMX_PLUGIN_PARAM_INTEGER },
-  { "b15_freq", "Band 15 Frequency", "Hz", 20.0f, 20000.0f, 10466.0f, 0u },
+  { "b15_freq", "Band 15 Frequency", "Hz", 20.0f, 20000.0f, 10000.0f, 0u },
   { "b15_gain", "Band 15 Gain", "dB", -15.0f, 15.0f, 0.0f, 0u },
   { "b15_q", "Band 15 Q", "", 0.3f, 116.0f, 1.0f, 0u },
   { "b15_on", "Band 15 On", "", 0.0f, 1.0f, 0.0f, OMX_PLUGIN_PARAM_TOGGLE },
-  { "b16_type", "Band 16 Type", "", 0.0f, 5.0f, 0.0f, OMX_PLUGIN_PARAM_INTEGER },
-  { "b16_freq", "Band 16 Frequency", "Hz", 20.0f, 20000.0f, 16117.0f, 0u },
+  { "b16_type", "Band 16 Type", "", 0.0f, 5.0f, 2.0f, OMX_PLUGIN_PARAM_INTEGER },
+  { "b16_freq", "Band 16 Frequency", "Hz", 20.0f, 20000.0f, 16000.0f, 0u },
   { "b16_gain", "Band 16 Gain", "dB", -15.0f, 15.0f, 0.0f, 0u },
   { "b16_q", "Band 16 Q", "", 0.3f, 116.0f, 1.0f, 0u },
   { "b16_on", "Band 16 On", "", 0.0f, 1.0f, 0.0f, OMX_PLUGIN_PARAM_TOGGLE },
@@ -216,7 +216,7 @@ static const omx_plugin_param OMX_EQ16_PARAMS[OMX_EQ16_PARAM_COUNT] = {
 #define OMX_EQ16_PARAM_LPF_SLOPE_DEFAULT 12.0f
 #define OMX_EQ16_PARAM_B1_TYPE_MIN 0.0f
 #define OMX_EQ16_PARAM_B1_TYPE_MAX 5.0f
-#define OMX_EQ16_PARAM_B1_TYPE_DEFAULT 0.0f
+#define OMX_EQ16_PARAM_B1_TYPE_DEFAULT 1.0f
 #define OMX_EQ16_PARAM_B1_FREQ_MIN 20.0f
 #define OMX_EQ16_PARAM_B1_FREQ_MAX 20000.0f
 #define OMX_EQ16_PARAM_B1_FREQ_DEFAULT 25.0f
@@ -234,7 +234,7 @@ static const omx_plugin_param OMX_EQ16_PARAMS[OMX_EQ16_PARAM_COUNT] = {
 #define OMX_EQ16_PARAM_B2_TYPE_DEFAULT 0.0f
 #define OMX_EQ16_PARAM_B2_FREQ_MIN 20.0f
 #define OMX_EQ16_PARAM_B2_FREQ_MAX 20000.0f
-#define OMX_EQ16_PARAM_B2_FREQ_DEFAULT 38.0f
+#define OMX_EQ16_PARAM_B2_FREQ_DEFAULT 40.0f
 #define OMX_EQ16_PARAM_B2_GAIN_MIN -15.0f
 #define OMX_EQ16_PARAM_B2_GAIN_MAX 15.0f
 #define OMX_EQ16_PARAM_B2_GAIN_DEFAULT 0.0f
@@ -249,7 +249,7 @@ static const omx_plugin_param OMX_EQ16_PARAMS[OMX_EQ16_PARAM_COUNT] = {
 #define OMX_EQ16_PARAM_B3_TYPE_DEFAULT 0.0f
 #define OMX_EQ16_PARAM_B3_FREQ_MIN 20.0f
 #define OMX_EQ16_PARAM_B3_FREQ_MAX 20000.0f
-#define OMX_EQ16_PARAM_B3_FREQ_DEFAULT 59.0f
+#define OMX_EQ16_PARAM_B3_FREQ_DEFAULT 63.0f
 #define OMX_EQ16_PARAM_B3_GAIN_MIN -15.0f
 #define OMX_EQ16_PARAM_B3_GAIN_MAX 15.0f
 #define OMX_EQ16_PARAM_B3_GAIN_DEFAULT 0.0f
@@ -264,7 +264,7 @@ static const omx_plugin_param OMX_EQ16_PARAMS[OMX_EQ16_PARAM_COUNT] = {
 #define OMX_EQ16_PARAM_B4_TYPE_DEFAULT 0.0f
 #define OMX_EQ16_PARAM_B4_FREQ_MIN 20.0f
 #define OMX_EQ16_PARAM_B4_FREQ_MAX 20000.0f
-#define OMX_EQ16_PARAM_B4_FREQ_DEFAULT 91.0f
+#define OMX_EQ16_PARAM_B4_FREQ_DEFAULT 100.0f
 #define OMX_EQ16_PARAM_B4_GAIN_MIN -15.0f
 #define OMX_EQ16_PARAM_B4_GAIN_MAX 15.0f
 #define OMX_EQ16_PARAM_B4_GAIN_DEFAULT 0.0f
@@ -279,7 +279,7 @@ static const omx_plugin_param OMX_EQ16_PARAMS[OMX_EQ16_PARAM_COUNT] = {
 #define OMX_EQ16_PARAM_B5_TYPE_DEFAULT 0.0f
 #define OMX_EQ16_PARAM_B5_FREQ_MIN 20.0f
 #define OMX_EQ16_PARAM_B5_FREQ_MAX 20000.0f
-#define OMX_EQ16_PARAM_B5_FREQ_DEFAULT 140.0f
+#define OMX_EQ16_PARAM_B5_FREQ_DEFAULT 125.0f
 #define OMX_EQ16_PARAM_B5_GAIN_MIN -15.0f
 #define OMX_EQ16_PARAM_B5_GAIN_MAX 15.0f
 #define OMX_EQ16_PARAM_B5_GAIN_DEFAULT 0.0f
@@ -294,7 +294,7 @@ static const omx_plugin_param OMX_EQ16_PARAMS[OMX_EQ16_PARAM_COUNT] = {
 #define OMX_EQ16_PARAM_B6_TYPE_DEFAULT 0.0f
 #define OMX_EQ16_PARAM_B6_FREQ_MIN 20.0f
 #define OMX_EQ16_PARAM_B6_FREQ_MAX 20000.0f
-#define OMX_EQ16_PARAM_B6_FREQ_DEFAULT 215.0f
+#define OMX_EQ16_PARAM_B6_FREQ_DEFAULT 200.0f
 #define OMX_EQ16_PARAM_B6_GAIN_MIN -15.0f
 #define OMX_EQ16_PARAM_B6_GAIN_MAX 15.0f
 #define OMX_EQ16_PARAM_B6_GAIN_DEFAULT 0.0f
@@ -309,7 +309,7 @@ static const omx_plugin_param OMX_EQ16_PARAMS[OMX_EQ16_PARAM_COUNT] = {
 #define OMX_EQ16_PARAM_B7_TYPE_DEFAULT 0.0f
 #define OMX_EQ16_PARAM_B7_FREQ_MIN 20.0f
 #define OMX_EQ16_PARAM_B7_FREQ_MAX 20000.0f
-#define OMX_EQ16_PARAM_B7_FREQ_DEFAULT 331.0f
+#define OMX_EQ16_PARAM_B7_FREQ_DEFAULT 315.0f
 #define OMX_EQ16_PARAM_B7_GAIN_MIN -15.0f
 #define OMX_EQ16_PARAM_B7_GAIN_MAX 15.0f
 #define OMX_EQ16_PARAM_B7_GAIN_DEFAULT 0.0f
@@ -324,7 +324,7 @@ static const omx_plugin_param OMX_EQ16_PARAMS[OMX_EQ16_PARAM_COUNT] = {
 #define OMX_EQ16_PARAM_B8_TYPE_DEFAULT 0.0f
 #define OMX_EQ16_PARAM_B8_FREQ_MIN 20.0f
 #define OMX_EQ16_PARAM_B8_FREQ_MAX 20000.0f
-#define OMX_EQ16_PARAM_B8_FREQ_DEFAULT 510.0f
+#define OMX_EQ16_PARAM_B8_FREQ_DEFAULT 500.0f
 #define OMX_EQ16_PARAM_B8_GAIN_MIN -15.0f
 #define OMX_EQ16_PARAM_B8_GAIN_MAX 15.0f
 #define OMX_EQ16_PARAM_B8_GAIN_DEFAULT 0.0f
@@ -339,7 +339,7 @@ static const omx_plugin_param OMX_EQ16_PARAMS[OMX_EQ16_PARAM_COUNT] = {
 #define OMX_EQ16_PARAM_B9_TYPE_DEFAULT 0.0f
 #define OMX_EQ16_PARAM_B9_FREQ_MIN 20.0f
 #define OMX_EQ16_PARAM_B9_FREQ_MAX 20000.0f
-#define OMX_EQ16_PARAM_B9_FREQ_DEFAULT 785.0f
+#define OMX_EQ16_PARAM_B9_FREQ_DEFAULT 800.0f
 #define OMX_EQ16_PARAM_B9_GAIN_MIN -15.0f
 #define OMX_EQ16_PARAM_B9_GAIN_MAX 15.0f
 #define OMX_EQ16_PARAM_B9_GAIN_DEFAULT 0.0f
@@ -354,7 +354,7 @@ static const omx_plugin_param OMX_EQ16_PARAMS[OMX_EQ16_PARAM_COUNT] = {
 #define OMX_EQ16_PARAM_B10_TYPE_DEFAULT 0.0f
 #define OMX_EQ16_PARAM_B10_FREQ_MIN 20.0f
 #define OMX_EQ16_PARAM_B10_FREQ_MAX 20000.0f
-#define OMX_EQ16_PARAM_B10_FREQ_DEFAULT 1209.0f
+#define OMX_EQ16_PARAM_B10_FREQ_DEFAULT 1250.0f
 #define OMX_EQ16_PARAM_B10_GAIN_MIN -15.0f
 #define OMX_EQ16_PARAM_B10_GAIN_MAX 15.0f
 #define OMX_EQ16_PARAM_B10_GAIN_DEFAULT 0.0f
@@ -369,7 +369,7 @@ static const omx_plugin_param OMX_EQ16_PARAMS[OMX_EQ16_PARAM_COUNT] = {
 #define OMX_EQ16_PARAM_B11_TYPE_DEFAULT 0.0f
 #define OMX_EQ16_PARAM_B11_FREQ_MIN 20.0f
 #define OMX_EQ16_PARAM_B11_FREQ_MAX 20000.0f
-#define OMX_EQ16_PARAM_B11_FREQ_DEFAULT 1861.0f
+#define OMX_EQ16_PARAM_B11_FREQ_DEFAULT 2000.0f
 #define OMX_EQ16_PARAM_B11_GAIN_MIN -15.0f
 #define OMX_EQ16_PARAM_B11_GAIN_MAX 15.0f
 #define OMX_EQ16_PARAM_B11_GAIN_DEFAULT 0.0f
@@ -384,7 +384,7 @@ static const omx_plugin_param OMX_EQ16_PARAMS[OMX_EQ16_PARAM_COUNT] = {
 #define OMX_EQ16_PARAM_B12_TYPE_DEFAULT 0.0f
 #define OMX_EQ16_PARAM_B12_FREQ_MIN 20.0f
 #define OMX_EQ16_PARAM_B12_FREQ_MAX 20000.0f
-#define OMX_EQ16_PARAM_B12_FREQ_DEFAULT 2866.0f
+#define OMX_EQ16_PARAM_B12_FREQ_DEFAULT 3150.0f
 #define OMX_EQ16_PARAM_B12_GAIN_MIN -15.0f
 #define OMX_EQ16_PARAM_B12_GAIN_MAX 15.0f
 #define OMX_EQ16_PARAM_B12_GAIN_DEFAULT 0.0f
@@ -399,7 +399,7 @@ static const omx_plugin_param OMX_EQ16_PARAMS[OMX_EQ16_PARAM_COUNT] = {
 #define OMX_EQ16_PARAM_B13_TYPE_DEFAULT 0.0f
 #define OMX_EQ16_PARAM_B13_FREQ_MIN 20.0f
 #define OMX_EQ16_PARAM_B13_FREQ_MAX 20000.0f
-#define OMX_EQ16_PARAM_B13_FREQ_DEFAULT 4413.0f
+#define OMX_EQ16_PARAM_B13_FREQ_DEFAULT 4000.0f
 #define OMX_EQ16_PARAM_B13_GAIN_MIN -15.0f
 #define OMX_EQ16_PARAM_B13_GAIN_MAX 15.0f
 #define OMX_EQ16_PARAM_B13_GAIN_DEFAULT 0.0f
@@ -414,7 +414,7 @@ static const omx_plugin_param OMX_EQ16_PARAMS[OMX_EQ16_PARAM_COUNT] = {
 #define OMX_EQ16_PARAM_B14_TYPE_DEFAULT 0.0f
 #define OMX_EQ16_PARAM_B14_FREQ_MIN 20.0f
 #define OMX_EQ16_PARAM_B14_FREQ_MAX 20000.0f
-#define OMX_EQ16_PARAM_B14_FREQ_DEFAULT 6796.0f
+#define OMX_EQ16_PARAM_B14_FREQ_DEFAULT 6300.0f
 #define OMX_EQ16_PARAM_B14_GAIN_MIN -15.0f
 #define OMX_EQ16_PARAM_B14_GAIN_MAX 15.0f
 #define OMX_EQ16_PARAM_B14_GAIN_DEFAULT 0.0f
@@ -429,7 +429,7 @@ static const omx_plugin_param OMX_EQ16_PARAMS[OMX_EQ16_PARAM_COUNT] = {
 #define OMX_EQ16_PARAM_B15_TYPE_DEFAULT 0.0f
 #define OMX_EQ16_PARAM_B15_FREQ_MIN 20.0f
 #define OMX_EQ16_PARAM_B15_FREQ_MAX 20000.0f
-#define OMX_EQ16_PARAM_B15_FREQ_DEFAULT 10466.0f
+#define OMX_EQ16_PARAM_B15_FREQ_DEFAULT 10000.0f
 #define OMX_EQ16_PARAM_B15_GAIN_MIN -15.0f
 #define OMX_EQ16_PARAM_B15_GAIN_MAX 15.0f
 #define OMX_EQ16_PARAM_B15_GAIN_DEFAULT 0.0f
@@ -441,10 +441,10 @@ static const omx_plugin_param OMX_EQ16_PARAMS[OMX_EQ16_PARAM_COUNT] = {
 #define OMX_EQ16_PARAM_B15_ON_DEFAULT 0.0f
 #define OMX_EQ16_PARAM_B16_TYPE_MIN 0.0f
 #define OMX_EQ16_PARAM_B16_TYPE_MAX 5.0f
-#define OMX_EQ16_PARAM_B16_TYPE_DEFAULT 0.0f
+#define OMX_EQ16_PARAM_B16_TYPE_DEFAULT 2.0f
 #define OMX_EQ16_PARAM_B16_FREQ_MIN 20.0f
 #define OMX_EQ16_PARAM_B16_FREQ_MAX 20000.0f
-#define OMX_EQ16_PARAM_B16_FREQ_DEFAULT 16117.0f
+#define OMX_EQ16_PARAM_B16_FREQ_DEFAULT 16000.0f
 #define OMX_EQ16_PARAM_B16_GAIN_MIN -15.0f
 #define OMX_EQ16_PARAM_B16_GAIN_MAX 15.0f
 #define OMX_EQ16_PARAM_B16_GAIN_DEFAULT 0.0f
@@ -466,7 +466,7 @@ static const omx_plugin_param OMX_EQ16_PARAMS[OMX_EQ16_PARAM_COUNT] = {
 #define OMX_EQ16_LV2_URI "urn:openmixer:eq16"
 /* org.openmixer.declaration/1: the declaration's plain description and the digest of its parameters. */
 #define OMX_EQ16_DECL_SOURCE "omx eq16: EQ On 0 to 1, HPF On 0 to 1, HPF Frequency 20 to 1000 Hz, HPF Slope 12 to 24 dB/oct, LPF On 0 to 1, LPF Frequency 1000 to 20000 Hz, LPF Slope 12 to 24 dB/oct, Band 1 Type 0 to 5, Band 1 Frequency 20 to 20000 Hz, Band 1 Gain -15 to 15 dB, Band 1 Q 0.3 to 116, Band 1 On 0 to 1, Band 2 Type 0 to 5, Band 2 Frequency 20 to 20000 Hz, Band 2 Gain -15 to 15 dB, Band 2 Q 0.3 to 116, Band 2 On 0 to 1, Band 3 Type 0 to 5, Band 3 Frequency 20 to 20000 Hz, Band 3 Gain -15 to 15 dB, Band 3 Q 0.3 to 116, Band 3 On 0 to 1, Band 4 Type 0 to 5, Band 4 Frequency 20 to 20000 Hz, Band 4 Gain -15 to 15 dB, Band 4 Q 0.3 to 116, Band 4 On 0 to 1, Band 5 Type 0 to 5, Band 5 Frequency 20 to 20000 Hz, Band 5 Gain -15 to 15 dB, Band 5 Q 0.3 to 116, Band 5 On 0 to 1, Band 6 Type 0 to 5, Band 6 Frequency 20 to 20000 Hz, Band 6 Gain -15 to 15 dB, Band 6 Q 0.3 to 116, Band 6 On 0 to 1, Band 7 Type 0 to 5, Band 7 Frequency 20 to 20000 Hz, Band 7 Gain -15 to 15 dB, Band 7 Q 0.3 to 116, Band 7 On 0 to 1, Band 8 Type 0 to 5, Band 8 Frequency 20 to 20000 Hz, Band 8 Gain -15 to 15 dB, Band 8 Q 0.3 to 116, Band 8 On 0 to 1, Band 9 Type 0 to 5, Band 9 Frequency 20 to 20000 Hz, Band 9 Gain -15 to 15 dB, Band 9 Q 0.3 to 116, Band 9 On 0 to 1, Band 10 Type 0 to 5, Band 10 Frequency 20 to 20000 Hz, Band 10 Gain -15 to 15 dB, Band 10 Q 0.3 to 116, Band 10 On 0 to 1, Band 11 Type 0 to 5, Band 11 Frequency 20 to 20000 Hz, Band 11 Gain -15 to 15 dB, Band 11 Q 0.3 to 116, Band 11 On 0 to 1, Band 12 Type 0 to 5, Band 12 Frequency 20 to 20000 Hz, Band 12 Gain -15 to 15 dB, Band 12 Q 0.3 to 116, Band 12 On 0 to 1, Band 13 Type 0 to 5, Band 13 Frequency 20 to 20000 Hz, Band 13 Gain -15 to 15 dB, Band 13 Q 0.3 to 116, Band 13 On 0 to 1, Band 14 Type 0 to 5, Band 14 Frequency 20 to 20000 Hz, Band 14 Gain -15 to 15 dB, Band 14 Q 0.3 to 116, Band 14 On 0 to 1, Band 15 Type 0 to 5, Band 15 Frequency 20 to 20000 Hz, Band 15 Gain -15 to 15 dB, Band 15 Q 0.3 to 116, Band 15 On 0 to 1, Band 16 Type 0 to 5, Band 16 Frequency 20 to 20000 Hz, Band 16 Gain -15 to 15 dB, Band 16 Q 0.3 to 116, Band 16 On 0 to 1"
-#define OMX_EQ16_DECL_DIGEST "781ede768183ff324d3f1d0ce3dcc3c9a46c548792fecaa104027aba4e14c2b8"
+#define OMX_EQ16_DECL_DIGEST "9a4b849faa6276ee174cfed69660cd59ec61535b6ddf8c84cf9d218591975dfa"
 
 /* LV2 port indices (tools/gen.mjs lv2Ports): audio, then parameter i at FIRST_PARAM + i, then these. */
 #define OMX_EQ16_LV2_PORT_IN_L 0u

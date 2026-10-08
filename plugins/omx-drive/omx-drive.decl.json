@@ -19,47 +19,11 @@
     "class": "lv2:Plugin"
   },
   "params": [
-    {
-      "symbol": "driveDb",
-      "name": "Drive",
-      "unit": "dB",
-      "min": 0,
-      "max": 36,
-      "def": 0
-    },
-    {
-      "symbol": "character",
-      "name": "Character",
-      "unit": "",
-      "min": -1,
-      "max": 1,
-      "def": 0
-    },
-    {
-      "symbol": "bandHz",
-      "name": "Band",
-      "unit": "Hz",
-      "min": 20,
-      "max": 20000,
-      "def": 2000,
-      "kind": "integer"
-    },
-    {
-      "symbol": "mix",
-      "name": "Mix",
-      "unit": "%",
-      "min": 0,
-      "max": 100,
-      "def": 100
-    },
-    {
-      "symbol": "trimDb",
-      "name": "Trim",
-      "unit": "dB",
-      "min": -24,
-      "max": 12,
-      "def": 0
-    }
+    { "symbol": "driveDb", "name": "Drive", "ref": "DRIVE_AMOUNT_RANGE" },
+    { "symbol": "character", "name": "Character", "ref": "DRIVE_CHARACTER_RANGE" },
+    { "symbol": "bandHz", "name": "Band", "ref": "DRIVE_BAND_FREQ_RANGE" },
+    { "symbol": "mix", "name": "Mix", "ref": "DRIVE_MIX_RANGE" },
+    { "symbol": "trimDb", "name": "Trim", "ref": "DRIVE_TRIM_RANGE" }
   ],
   "panel": {
     "family": "drive",
