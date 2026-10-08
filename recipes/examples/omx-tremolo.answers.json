@@ -39,6 +39,6 @@
       "scale": "linear"
     }
   ],
-  "omxdspMin": "0.1.5",
-  "contractRelease": "1.1.0"
+  "omxdspMin": "0.1.9",
+  "contractRelease": "1.3.0"
 }
