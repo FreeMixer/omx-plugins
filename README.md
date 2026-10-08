@@ -146,10 +146,14 @@ sudo apt install omx-plugins
 `omx-plugins-clap` (CLAP hosts) or `omx-plugins-lv2` (LV2 hosts) instead. The plugins land where
 hosts look without configuration (`/usr/lib64/clap` and `/usr/lib64/lv2` on Fedora, `/usr/lib/clap`
 and `/usr/lib/lv2` on Debian). Rescan plugins in your host and look for **omx delay**, **omx drive**, **omx eq8**,
-**omx eq16**, **omx eq32** and **omx strip** under openmixer.
+**omx eq16**, **omx eq32**, **omx strip** and **omx keyed-gate** under openmixer.
 
 Every release also carries the packages on its
 [GitHub release page](https://github.com/FreeMixer/omx-plugins/releases).
+
+Projects that build on the plugins' parameters and instance code install the headers instead of
+copying them: `omx-plugins-devel` on Fedora, `omx-plugins-dev` on Debian (they land in
+`/usr/include/omx-plugins`).
 
 To build from source, see [BUILDING.md](BUILDING.md).
 

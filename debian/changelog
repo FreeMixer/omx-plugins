@@ -1,3 +1,14 @@
+omx-plugins (0.2.0) unstable; urgency=medium
+
+  * New plugins: omx keyed-gate, omx eq16 and omx eq32, as CLAP and LV2
+    plugins.
+  * Every LV2 plugin shows its controls with units, logarithmic frequency
+    travel and named choices for the EQ band types and filter slopes.
+  * New omx-plugins-dev package with the headers other projects include.
+  * Builds against omx-dsp 0.1.8 and omx-contract 1.2.1.
+
+ -- Pau Aliagas <linuxnow@gmail.com>  Thu, 08 Oct 2026 12:00:00 +0000
+
 omx-plugins (0.1.0) unstable; urgency=medium
 
   * First package: the OpenMixer console's delay, drive, 8-band EQ and channel
