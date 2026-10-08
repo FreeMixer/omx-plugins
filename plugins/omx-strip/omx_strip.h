@@ -74,7 +74,7 @@ static inline int omx_strip_init(OmxStrip *s, float sr) {
 static inline void omx_strip_resolve(OmxStrip *s, int bypass, const float *v) {
   if (!s->ready) return;
   s->bypass = bypass ? 1 : 0;
-  s->trim_tgt = omx_db_to_lin(omx_clampf(v[OMX_STRIP_PARAM_TRIM_DB], OMX_TRIM_RANGE_MIN_DB, OMX_TRIM_RANGE_MAX_DB));
+  s->trim_tgt = omx_db_to_lin(omx_clampf(v[OMX_STRIP_PARAM_TRIM_DB], OMX_STRIP_PARAM_TRIM_DB_MIN, OMX_STRIP_PARAM_TRIM_DB_MAX));
   for (int c = 0; c < 2; c++) {
     const struct omx_eq_lv2_controls f = {
         .hpf_on = &v[OMX_STRIP_PARAM_HPF_ON], .hpf_freq = &v[OMX_STRIP_PARAM_HPF_FREQ],

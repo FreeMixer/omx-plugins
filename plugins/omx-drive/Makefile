@@ -16,7 +16,7 @@
 NAME       := omx-drive
 URI        := urn:openmixer:drive
 CLAP_ID    := org.openmixer.drive
-OMXDSP_MIN ?= 0.1.8
+OMXDSP_MIN ?= $(shell awk '$$1 == "omx-dsp" { print $$3 }' $(abspath ../..)/.github/pins.txt)
 ROOT       := $(abspath ../..)
 GEN        := generated
 B          := build
@@ -65,7 +65,7 @@ $(B)/plugin-probe: test/plugin-probe.c | $(B)
 	$(CC) $(CFLAGS) -std=gnu11 -Wall -Wextra $(DSP_CFLAGS) $(ABI_CFLAGS) $(LV2_CFLAGS) -o $@ $< -ldl $(LDLIBS)
 
 $(B)/drive-oracle: test/drive-oracle.c | $(B)
-	$(CC) $(CFLAGS) $(WARN) $(ABI_CFLAGS) -o $@ $< $(LILV) -ldl $(LDLIBS)
+	$(CC) $(CFLAGS) $(WARN) $(DSP_CFLAGS) $(ABI_CFLAGS) -o $@ $< $(LILV) -ldl $(LDLIBS)
 
 gen:
 	node $(ROOT)/tools/gen.mjs $(CURDIR)
