@@ -93,8 +93,8 @@ async function main() {
   mkdirSync(WORK, { recursive: true });
   const recipe = loadRecipe(ROOT);
   const answers = JSON.parse(readFileSync(join(ROOT, 'recipes', 'examples', 'omx-tremolo.answers.json'), 'utf8'));
-  const contract = join(WORK, 'omx-contract-1.1.0');
-  fakeContract(contract, '1.1.0', { tremolo: TREMOLO, delay: DELAY });
+  const contract = join(WORK, 'omx-contract-1.3.0');
+  fakeContract(contract, '1.3.0', { tremolo: TREMOLO, delay: DELAY });
   process.env.OMX_CONTRACT_DIR = contract;
 
   // ---- 1. the wizard -------------------------------------------------------------------------
