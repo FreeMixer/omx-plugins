@@ -17,7 +17,7 @@
     doap:name "omx delay" ;
     doap:license <https://www.gnu.org/licenses/gpl-3.0.html> ;
     lv2:project <https://github.com/FreeMixer/omx-plugins> ;
-    lv2:minorVersion 1 ;
+    lv2:minorVersion 2 ;
     lv2:microVersion 0 ;
     rdfs:comment "The OpenMixer console's stereo delay: one time, feedback through a tone filter, ping-pong and a wet/dry mix. The DSP is omx-dsp's <omxdsp/fx/omx_delay.h>, the console's own delay." ;
     lv2:optionalFeature lv2:hardRTCapable ;

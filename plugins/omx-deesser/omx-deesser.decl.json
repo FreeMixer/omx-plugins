@@ -5,7 +5,7 @@
   "name": "omx deesser",
   "vendor": "openmixer",
   "url": "https://github.com/FreeMixer/omx-plugins",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "the native DE-ESSER stage: a band-limited detector driving the COMPRESSOR's own gain computer.",
   "clap": {
     "id": "org.openmixer.deesser",

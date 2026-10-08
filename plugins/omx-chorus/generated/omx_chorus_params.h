@@ -49,7 +49,7 @@ static const omx_plugin_param OMX_CHORUS_PARAMS[OMX_CHORUS_PARAM_COUNT] = {
 #define OMX_CHORUS_NAME "omx chorus"
 #define OMX_CHORUS_VENDOR "openmixer"
 #define OMX_CHORUS_URL "https://github.com/FreeMixer/omx-plugins"
-#define OMX_CHORUS_VERSION "0.1.0"
+#define OMX_CHORUS_VERSION "0.2.0"
 #define OMX_CHORUS_DESCRIPTION "the native CHORUS stage: N voices reading ONE modulated fractional delay line."
 #define OMX_CHORUS_CLAP_ID "org.openmixer.chorus"
 #define OMX_CHORUS_CLAP_FEATURES "audio-effect", "stereo"

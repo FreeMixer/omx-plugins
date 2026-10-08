@@ -18,7 +18,7 @@
     doap:name "omx drive" ;
     doap:license <https://www.gnu.org/licenses/gpl-3.0.html> ;
     lv2:project <https://github.com/FreeMixer/omx-plugins> ;
-    lv2:minorVersion 1 ;
+    lv2:minorVersion 2 ;
     lv2:microVersion 0 ;
     rdfs:comment "the native DRIVE stage: one waveshaper, run inside the console's ONE oversampler." ;
     lv2:optionalFeature lv2:hardRTCapable ;

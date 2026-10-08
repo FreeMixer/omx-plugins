@@ -6,7 +6,7 @@
   "noun": "16-band EQ",
   "vendor": "openmixer",
   "url": "https://github.com/FreeMixer/omx-plugins",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "The OpenMixer console's channel EQ, 16-band form: sixteen parametric bands (bell, shelves, notch, allpass) and a high-pass and a low-pass filter at 12 or 24 dB/oct, stereo, zero latency. The DSP is omx-dsp's <omxdsp/fx/omx_eq_instance.h>, the console's own EQ; every band ships off, so a racked instance is a wire.",
   "clap": {
     "id": "org.openmixer.eq16",

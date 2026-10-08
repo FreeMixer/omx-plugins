@@ -5,7 +5,7 @@
   "name": "omx delay",
   "vendor": "openmixer",
   "url": "https://github.com/FreeMixer/omx-plugins",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "The OpenMixer console's stereo delay: one time, feedback through a tone filter, ping-pong and a wet/dry mix. The DSP is omx-dsp's <omxdsp/fx/omx_delay.h>, the console's own delay.",
   "clap": { "id": "org.openmixer.delay", "features": ["audio-effect", "delay", "stereo"] },
   "lv2": { "uri": "urn:openmixer:delay", "class": "lv2:DelayPlugin" },
