@@ -13,7 +13,7 @@
 #                   (no MOD GUI: tools/modgui-gen.mjs does not draw selectors, and the band type and
 #                   the pass-filter slopes are selectors)
 #   make gen        regenerate generated/ from the declaration (commit the result)
-#   make install    DESTDIR/PREFIX/LIBDIR: $(LIBDIR)/clap/omx-eq8.clap, $(LIBDIR)/lv2/omx-eq8.lv2/
+#   make install    DESTDIR/PREFIX/LIBDIR/CLAPDIR: $(CLAPDIR)/omx-eq8.clap, $(LIBDIR)/lv2/omx-eq8.lv2/
 #
 # Build deps: omx-dsp (pkg-config omxdsp, >= OMXDSP_MIN), omx-clap-core (the CLAP ABI's openmixer
 # extensions), clap, lv2; for the tests lilv and node.
@@ -44,6 +44,8 @@ LDLIBS  := -lm
 
 PREFIX  ?= /usr
 LIBDIR  ?= $(PREFIX)/lib
+# the path the CLAP specification gives Linux distributions, on every distribution and architecture
+CLAPDIR ?= $(PREFIX)/lib/clap
 
 TTL      := $(GEN)/$(NAME).lv2
 TTL_SRCS := $(shell find $(TTL) -type f 2>/dev/null)
@@ -101,7 +103,7 @@ test: all check $(B)/plugin-probe $(B)/eq-oracle $(B)/eq-identity
 	sh $(ROOT)/tools/host-check.sh $(B)/$(NAME).clap $(BUNDLE) $(URI) $(CLAP_ID)
 
 install: all
-	install -Dm755 $(B)/$(NAME).clap $(DESTDIR)$(LIBDIR)/clap/$(NAME).clap
+	install -Dm755 $(B)/$(NAME).clap $(DESTDIR)$(CLAPDIR)/$(NAME).clap
 	mkdir -p $(DESTDIR)$(LIBDIR)/lv2
 	cp -r $(BUNDLE) $(DESTDIR)$(LIBDIR)/lv2/
 

@@ -25,7 +25,7 @@ for apt.
 ```sh
 make                      # every plugin: plugins/<name>/build/
 make test                 # every plugin's tests
-make install DESTDIR=/tmp/stage LIBDIR=/usr/lib64   # <LIBDIR>/clap/*.clap, <LIBDIR>/lv2/*.lv2/
+make install DESTDIR=/tmp/stage LIBDIR=/usr/lib64   # <CLAPDIR>/*.clap (default /usr/lib/clap, any LIBDIR), <LIBDIR>/lv2/*.lv2/
 make version              # the release version
 ```
 

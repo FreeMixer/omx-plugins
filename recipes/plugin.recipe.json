@@ -350,8 +350,8 @@
         "file": "packaging/omx-plugins.spec",
         "lines": [
           {
-            "line": "%{_libdir}/clap/{stem}.clap",
-            "among": "^%\\{_libdir\\}/clap/omx-[a-z0-9]+\\.clap$"
+            "line": "/usr/lib/clap/{stem}.clap",
+            "among": "^/usr/lib/clap/omx-[a-z0-9]+\\.clap$"
           },
           {
             "line": "%{_libdir}/lv2/{stem}.lv2/",
@@ -364,7 +364,7 @@
         "fn": "linesPresent",
         "file": "packaging/omx-plugins.spec",
         "lines": [
-          "%{_libdir}/clap/{stem}.clap",
+          "/usr/lib/clap/{stem}.clap",
           "%{_libdir}/lv2/{stem}.lv2/"
         ]
       }
@@ -438,7 +438,7 @@
       "checker": {
         "fn": "ciCovers",
         "file": ".github/workflows/ci.yml",
-        "clap": "/usr/lib64/clap/{stem}.clap"
+        "clap": "/usr/lib/clap/{stem}.clap"
       }
     },
     {
