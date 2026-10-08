@@ -198,7 +198,7 @@ async function main() {
       const c = join(WORK, 'omx-contract-1.1.0-drive');
       fakeContract(c, '1.1.0', { drive: { DRIVE_GAIN: travel(0, 36, 0.1, 'dB', 0) } });
       process.env.OMX_CONTRACT_DIR = c;
-      const undo = edit('omx-contract.pin.json', (s) => s.replace('"1.0.0"', '"1.1.0"'));
+      const undo = edit('omx-contract.pin.json', (s) => s.replace('"1.2.1"', '"1.1.0"'));
       return () => {
         undo();
         delete process.env.OMX_CONTRACT_DIR;
