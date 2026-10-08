@@ -80,7 +80,7 @@ parameter header, installed in %{_includedir}/omx-plugins.
 
 %install
 %make_install PREFIX=%{_prefix} LIBDIR=%{_libdir}
-%make_install install-devel PREFIX=%{_prefix}
+%{__make} install-devel DESTDIR=%{buildroot} PREFIX=%{_prefix}
 
 %check
 %make_build test
