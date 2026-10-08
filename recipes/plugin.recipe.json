@@ -16,7 +16,7 @@
     }
   },
   "contract": {
-    "pin": "omx-contract.pin.json",
+    "pin": ".github/pins.txt",
     "byReferenceSince": "1.1.0"
   },
   "derived": {
@@ -124,9 +124,9 @@
       "step": "kernel",
       "layer": "kernel",
       "made": "EXTERNAL",
-      "target": "omx-contract:data/kernels/{kernels}.json at omx-contract.pin.json",
+      "target": "omx-contract:data/kernels/{kernels}.json at .github/pins.txt",
       "paths": [
-        "omx-contract.pin.json"
+        ".github/pins.txt"
       ],
       "questions": [
         "/$defs/plugin/properties/kernels",
@@ -294,7 +294,7 @@
       "checker": {
         "fn": "kernelBinding",
         "dir": "plugins/{stem}",
-        "headerStems": { "eq8": "eq", "eq16": "eq", "eq32": "eq", "strip": ["gate", "eq", "dynamics"] }
+        "headerStems": { "comp": "dynamics" }
       }
     },
     {
@@ -573,7 +573,7 @@
     },
     {
       "id": "params-by-reference",
-      "what": "every parameter has a ref into omx-contract and retypes no travel; every ref resolves in its kernel's file at the pin (a composite names each parameter's kernel)",
+      "what": "every parameter has a ref into omx-contract and retypes no travel, or is `own` (a switch of the plugin's face, the strip's stage order) with its travel typed; every ref resolves in its kernel's file at the pin (a composite names each parameter's kernel)",
       "step": "identity",
       "when": "byReference",
       "checker": {

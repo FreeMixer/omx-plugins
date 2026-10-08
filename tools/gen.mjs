@@ -18,7 +18,7 @@ import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { PIN_FILE, locateContract, paramKernel, resolveParam } from './omx-contract.mjs';
+import { PIN_FILE, findName, locateContract, paramKernel, resolveParam } from './omx-contract.mjs';
 
 export const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -56,22 +56,38 @@ export function loadDecl(dir) {
 /** The travel fields a parameter BY REFERENCE reads from omx-contract and must never retype. */
 export const TRAVEL_FIELDS = ['min', 'max', 'def', 'unit', 'kind'];
 
-/** Each parameter with its travel: as typed (a declaration from before references), or read from
- * omx-contract at the pin through its `ref` (tools/omx-contract.mjs). */
+/** Each parameter with its travel: read from omx-contract at the pin through its `ref`
+ * (tools/omx-contract.mjs), or typed and marked `own` with the reason omx-contract declares no such
+ * control (a switch of the plugin's face, the strip's stage order). A parameter is one or the other. */
 function resolveParams(file, d) {
-  if (!d.params.some((p) => p.ref !== undefined)) return d.params;
   // the tree the declaration sits in; a declaration copied out of its tree (a test's scratch copy)
   // reads this tree's pin
   const tree = resolve(dirname(file), '..', '..');
-  const where = locateContract(existsSync(join(tree, PIN_FILE)) ? tree : ROOT);
-  if (!where.dir) throw new Error(`${file}: its parameters are by reference and ${where.why}`);
+  let where;
+  const contract = () => {
+    if (!where) {
+      where = locateContract(existsSync(join(tree, PIN_FILE)) ? tree : ROOT);
+      if (!where.dir) throw new Error(`${file}: its parameters are by reference and ${where.why}`);
+    }
+    return where.dir;
+  };
   return d.params.map((p) => {
-    if (p.ref === undefined) throw new Error(`${file}: '${p.symbol}' has no ref; a declaration is by reference throughout or not at all`);
-    const typed = TRAVEL_FIELDS.filter((k) => k in p);
+    if (p.ref === undefined) {
+      if (typeof p.own !== 'string' || !p.own) throw new Error(`${file}: '${p.symbol}' has no ref and no "own" reason; a parameter is by reference to omx-contract or says why it is the plugin's own`);
+      return p;
+    }
+    if (p.own !== undefined) throw new Error(`${file}: '${p.symbol}' is by reference and "own"; it is one or the other`);
+    const dir = contract();
+    const kernel = paramKernel(d, p, dir);
+    // a set's unit is face text the set does not declare (a slope's dB/oct); a travel's is the contract's
+    const isSet = findName(dir, kernel, p.ref).entry?.kind === 'set';
+    const typed = TRAVEL_FIELDS.filter((k) => k in p && !(isSet && k === 'unit'));
     if (typed.length) throw new Error(`${file}: '${p.symbol}' is by reference and retypes ${typed.join(', ')}; omx-contract holds them`);
-    const t = resolveParam(where.dir, paramKernel(d, p), p);
+    const t = resolveParam(dir, kernel, p);
     const out = { ...p, min: t.min, max: t.max, def: t.def, unit: t.unit };
     if (t.kind) out.kind = t.kind;
+    if (t.points) out.points = t.points;
+    if (t.values) out.values = t.values;
     return out;
   });
 }

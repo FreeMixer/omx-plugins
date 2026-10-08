@@ -150,9 +150,9 @@ export async function planPlugin(answers, { root = ROOT, recipe = loadRecipe(roo
   decl.params.forEach((p, i) => {
     if (symbols.has(p.symbol)) refuse(`/params/${i}/symbol`, `'${p.symbol}' declared twice`);
     symbols.add(p.symbol);
-    if (p.ref === undefined) refuse(`/params/${i}`, `'${p.symbol}' has no ref: a parameter is by reference to omx-contract, never typed`);
+    if (p.ref === undefined && !p.own) refuse(`/params/${i}`, `'${p.symbol}' has no ref: a parameter is by reference to omx-contract, never typed (or "own", a switch of the plugin's face)`);
     const typed = ['min', 'max', 'def', 'unit', 'kind'].filter((k) => k in p);
-    if (typed.length) refuse(`/params/${i}`, `'${p.symbol}' retypes ${typed.join(', ')}: omx-contract holds them`);
+    if (p.ref !== undefined && typed.length) refuse(`/params/${i}`, `'${p.symbol}' retypes ${typed.join(', ')}: omx-contract holds them`);
   });
   for (const s of decl.panel?.sections ?? []) for (const c of s.controls) if (!symbols.has(c)) refuse('/panel/sections', `section '${s.key}' names '${c}', which is no parameter`);
   for (const [role, sym] of Object.entries(decl.panel?.roles ?? {})) if (!symbols.has(sym)) refuse(`/panel/roles/${role}`, `'${sym}' is no parameter`);
@@ -183,9 +183,13 @@ export async function planPlugin(answers, { root = ROOT, recipe = loadRecipe(roo
   const resolved = [];
   const owedNames = new Map(kernels.map((k) => [k, new Set()]));
   for (const [i, p] of decl.params.entries()) {
+    if (p.ref === undefined) {
+      resolved.push(p); // an own parameter: typed, nothing to resolve
+      continue;
+    }
     let k;
     try {
-      k = paramKernel(decl, p);
+      k = paramKernel(decl, p, kernel.dir);
     } catch (e) {
       refuse(`/params/${i}/kernel`, e.message);
       continue;
@@ -312,9 +316,8 @@ export function writePlugin(plan, { root = ROOT, recipe = loadRecipe(root) } = {
     else if (a.id === 'kernel-file') {
       if (plan.extra.contractRelease) {
         const pinFile = join(root, PIN_FILE);
-        const pin = JSON.parse(readFileSync(pinFile, 'utf8'));
-        pin.version = plan.extra.contractRelease;
-        put(PIN_FILE, `${JSON.stringify(pin, null, 2)}\n`);
+        const lines = readFileSync(pinFile, 'utf8').split('\n').map((l) => (/^omx-contract\s/.test(l) ? l.replace(/\S+$/, plan.extra.contractRelease) : l));
+        put(PIN_FILE, lines.join('\n'));
       }
     } else if (typeof a.template === 'string' && a.template.endsWith('.tmpl')) {
       if (written.includes(fill(a.target.split('#')[0], facts))) continue; // one file, several entries

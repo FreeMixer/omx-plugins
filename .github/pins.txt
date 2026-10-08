@@ -1,0 +1,8 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 Pau Aliagas <linuxnow@gmail.com>
+# What this repository is built against, one line per source: name, git URL, release.
+# omx-contract: the release whose resolved data every plugin declaration references (tools/omx-contract.mjs);
+#   moving it is one commit of its own, with omx-dsp's when the pair moves (tools/pins-check.sh).
+# omx-dsp: the release whose kernels the faces call (pkg-config omxdsp); omx-dsp requires the same omx-contract.
+omx-contract https://github.com/FreeMixer/omx-contract 1.3.0
+omx-dsp https://github.com/FreeMixer/omx-dsp 0.2.0
