@@ -5,7 +5,7 @@
   "name": "omx chorus",
   "vendor": "openmixer",
   "url": "https://github.com/FreeMixer/omx-plugins",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "the native CHORUS stage: N voices reading ONE modulated fractional delay line.",
   "clap": {
     "id": "org.openmixer.chorus",

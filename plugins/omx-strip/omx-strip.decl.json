@@ -6,7 +6,7 @@
   "noun": "channel strip",
   "vendor": "openmixer",
   "url": "https://github.com/FreeMixer/omx-plugins",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "The OpenMixer console’s channel strip in one plugin: input trim with high- and low-pass filters, gate, four-band EQ and compressor, in the console’s default order or any other. No DSP of its own: each stage is omx-dsp’s strip module, called in order.",
   "clap": { "id": "org.openmixer.strip", "features": ["audio-effect", "mixing", "stereo"] },
   "lv2": { "uri": "urn:openmixer:strip", "class": "lv2:MixerPlugin" },

@@ -259,7 +259,7 @@ static const omx_plugin_param OMX_EQ8_PARAMS[OMX_EQ8_PARAM_COUNT] = {
 #define OMX_EQ8_NAME "omx eq8"
 #define OMX_EQ8_VENDOR "openmixer"
 #define OMX_EQ8_URL "https://github.com/FreeMixer/omx-plugins"
-#define OMX_EQ8_VERSION "0.1.0"
+#define OMX_EQ8_VERSION "0.2.0"
 #define OMX_EQ8_DESCRIPTION "The OpenMixer console's channel EQ, 8-band form: eight parametric bands (bell, shelves, notch, allpass) and a high-pass and a low-pass filter at 12 or 24 dB/oct, stereo, zero latency. The DSP is omx-dsp's <omxdsp/fx/omx_eq_instance.h>, the console's own EQ; every band ships off, so a racked instance is a wire."
 #define OMX_EQ8_CLAP_ID "org.openmixer.eq8"
 #define OMX_EQ8_CLAP_FEATURES "audio-effect", "equalizer", "stereo"

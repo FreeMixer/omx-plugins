@@ -49,7 +49,7 @@ static const omx_plugin_param OMX_DRIVE_PARAMS[OMX_DRIVE_PARAM_COUNT] = {
 #define OMX_DRIVE_NAME "omx drive"
 #define OMX_DRIVE_VENDOR "openmixer"
 #define OMX_DRIVE_URL "https://github.com/FreeMixer/omx-plugins"
-#define OMX_DRIVE_VERSION "0.1.0"
+#define OMX_DRIVE_VERSION "0.2.0"
 #define OMX_DRIVE_DESCRIPTION "the native DRIVE stage: one waveshaper, run inside the console's ONE oversampler."
 #define OMX_DRIVE_CLAP_ID "org.openmixer.drive"
 #define OMX_DRIVE_CLAP_FEATURES "audio-effect", "stereo"
