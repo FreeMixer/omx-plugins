@@ -119,7 +119,7 @@ jobs:
             /usr/share/doc/omx-plugins-clap /usr/share/doc/omx-plugins-clap/README.md \
             /usr/share/licenses/omx-plugins-clap /usr/share/licenses/omx-plugins-clap/LICENSE | sort > expected-clap.txt
           diff -u expected-clap.txt files-clap.txt
-          devel=$(ls rpms/omx-plugins-devel-[0-9]*.noarch.rpm rpms/omx-plugins-devel-[0-9]*.${{ matrix.arch }}.rpm 2>/dev/null | head -1)
+          devel=$(find rpms -maxdepth 1 -name "omx-plugins-devel-[0-9]*.rpm" ! -name "*.src.rpm" | head -1)
           rpm -qlp "$devel" | grep -qx /usr/include/omx-plugins/omx_delay_instance.h
           rpm -qlp "$devel" | grep -qx /usr/include/omx-plugins/omx_plugin_param.h
           for p in delay drive eq8 eq16 eq32 gate strip; do rpm -qlp "$devel" | grep -qx "/usr/include/omx-plugins/omx_${p}_params.h"; done
