@@ -20,6 +20,7 @@ drawn from one declaration: its CLAP parameters, its LV2 ports and its MOD GUI c
 | **omx eq16** | `org.openmixer.eq16` | `urn:openmixer:eq16` | The console's channel EQ in its 16-band form: sixteen parametric bands (bell, shelves, notch, all-pass) plus high- and low-pass filters at 12 or 24 dB/oct. Stereo, zero latency, 44.1 to 192 kHz. |
 | **omx eq32** | `org.openmixer.eq32` | `urn:openmixer:eq32` | The console's channel EQ in its 32-band form: thirty-two parametric bands (bell, shelves, notch, all-pass) plus high- and low-pass filters at 12 or 24 dB/oct. Stereo, zero latency, 44.1 to 192 kHz. |
 | **omx strip** | `org.openmixer.strip` | `urn:openmixer:strip` | The console's channel strip in one plugin: input trim with HPF/LPF, gate, four-band EQ and compressor, in the desk's order or any other. Stereo, real-time safe, 44.1 to 192 kHz. |
+| **omx geq** | `org.openmixer.geq` | `urn:openmixer:geq` | The 31-band graphic EQ kernel: {@link OMX_GEQ_BANDS} peaking sections at the ISO third-octave centres, in their OWN section array, run by the library's double cascade. |
 | **omx keyed-gate** | `org.openmixer.keyed-gate` | `urn:openmixer:keyed-gate` | The console's channel gate with a sidechain key: the detector listens to the key your host routes to it, or to the signal itself. One gain for both legs, so the stereo image never shifts. Real-time safe, 44.1 to 192 kHz. |
 
 ### omx delay
@@ -120,6 +121,44 @@ Plus the host's bypass. An attack under 0.5 ms engages the 4x detector path, whi
 of latency, reported to the host; otherwise the latency is zero. Its LV2 URI, ports and defaults
 are those of the keyed gate bundle the OpenMixer console used to ship, so a session saved with that
 bundle loads this one.
+
+### omx geq
+
+| Parameter | Range | Default |
+|---|---|---|
+| 20 Hz | -15 to 15 dB | 0 dB |
+| 25 Hz | -15 to 15 dB | 0 dB |
+| 31.5 Hz | -15 to 15 dB | 0 dB |
+| 40 Hz | -15 to 15 dB | 0 dB |
+| 50 Hz | -15 to 15 dB | 0 dB |
+| 63 Hz | -15 to 15 dB | 0 dB |
+| 80 Hz | -15 to 15 dB | 0 dB |
+| 100 Hz | -15 to 15 dB | 0 dB |
+| 125 Hz | -15 to 15 dB | 0 dB |
+| 160 Hz | -15 to 15 dB | 0 dB |
+| 200 Hz | -15 to 15 dB | 0 dB |
+| 250 Hz | -15 to 15 dB | 0 dB |
+| 315 Hz | -15 to 15 dB | 0 dB |
+| 400 Hz | -15 to 15 dB | 0 dB |
+| 500 Hz | -15 to 15 dB | 0 dB |
+| 630 Hz | -15 to 15 dB | 0 dB |
+| 800 Hz | -15 to 15 dB | 0 dB |
+| 1 kHz | -15 to 15 dB | 0 dB |
+| 1.25 kHz | -15 to 15 dB | 0 dB |
+| 1.6 kHz | -15 to 15 dB | 0 dB |
+| 2 kHz | -15 to 15 dB | 0 dB |
+| 2.5 kHz | -15 to 15 dB | 0 dB |
+| 3.15 kHz | -15 to 15 dB | 0 dB |
+| 4 kHz | -15 to 15 dB | 0 dB |
+| 5 kHz | -15 to 15 dB | 0 dB |
+| 6.3 kHz | -15 to 15 dB | 0 dB |
+| 8 kHz | -15 to 15 dB | 0 dB |
+| 10 kHz | -15 to 15 dB | 0 dB |
+| 12.5 kHz | -15 to 15 dB | 0 dB |
+| 16 kHz | -15 to 15 dB | 0 dB |
+| 20 kHz | -15 to 15 dB | 0 dB |
+
+Plus the host's bypass.
 
 ## Install
 
