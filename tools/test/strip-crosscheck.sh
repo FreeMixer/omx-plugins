@@ -6,12 +6,19 @@
 # §15.2) against the hand-ported omx-strip it replaced, bit for bit at the old plugin's settings, at
 # every rate the contract declares (tools/test/clap-crosscheck.c, tools/test/strip-0.2.0.map).
 #
-# The old plugin is built from <ref>, by default the last commit that holds its hand-written
-# omx_strip.h; the new one from this tree. Exit 0 when the two are the same plugin at every setting the
+# The old plugin is built from <ref>, by default the newest commit whose declaration is not yet a
+# chain (its hand-written omx_strip.h and its own generated header together); the new one from this
+# tree. Exit 0 when the two are the same plugin at every setting the
 # old one had, 1 on any difference, 2 when either cannot be built.
 set -eu
 ROOT=$(cd "$(dirname "$0")/../.." && pwd)
-REF=${1:-$(git -C "$ROOT" rev-list -n1 HEAD -- plugins/omx-strip/omx_strip.h)^}
+REF=${1:-}
+if [ -z "$REF" ]; then
+  for c in $(git -C "$ROOT" rev-list HEAD -- plugins/omx-strip/omx-strip.decl.json); do
+    git -C "$ROOT" show "$c:plugins/omx-strip/omx-strip.decl.json" | grep -q '"binding": "chain"' || { REF=$c; break; }
+  done
+fi
+[ -n "$REF" ] || { echo "strip-crosscheck: no commit holds the hand-ported omx-strip" >&2; exit 2; }
 W=$(mktemp -d)
 trap 'rm -rf "$W"' EXIT INT TERM
 git -C "$ROOT" archive "$REF" include plugins/omx-strip | tar -x -C "$W"
