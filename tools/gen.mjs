@@ -39,7 +39,7 @@ import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 
 import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { faceBinding } from './instance-face.mjs';
-import { PIN_FILE, controlOf, findName, kernelControls, locateContract, paramKernel, pinOf, resolveParam } from './omx-contract.mjs';
+import { PIN_FILE, controlOf, eqDefaultBands, findName, kernelControls, locateContract, paramKernel, pinOf, resolveParam } from './omx-contract.mjs';
 import { bandsMacro, baseOf, expandVariant, variantStems } from './variants.mjs';
 import { omxdspInclude, render } from './template.mjs';
 
@@ -360,7 +360,7 @@ export function emitParamsHeader(d) {
 ${d.variantOf ? `
 /* The band count of this variant of plugins/${d.variantOf.stem}: the instance face's compile-time count. */
 #define OMX_${(d.face ?? d.kernel).toUpperCase()}_INSTANCE_BANDS ${bandsMacro(d)}
-` : ''}${(d.chain ?? []).filter((el) => el.bands).map((el) => `
+` : ''}${(d.chain ?? []).filter((el, i, all) => el.bands && all.findIndex((o) => o.kernel === el.kernel) === i).map((el) => `
 /* The band count of the chain's ${el.id}: its instance face's compile-time count, omx-contract's ${chainBandsMacro(d, el)}. */
 #define OMX_${el.kernel.toUpperCase()}_INSTANCE_BANDS ${chainBandsMacro(d, el)}
 `).join('')}
@@ -565,8 +565,11 @@ function stepped(params, v, keep) {
   });
 }
 
-export function oraclePlan(params, controls = []) {
+export function oraclePlan(params, controls = [], { engaged = [] } = {}) {
   const held = new Set(params.map((_, i) => i).filter((i) => controls[i]?.rearms));
+  // a chain's element switches: on in the release and choice sections, so each element is heard
+  // there (an EQ switched off by the stepped row would hide every band's Q), and never stepped
+  const on = new Set(engaged);
   const row = (frames, ms, signal, v, bypass) => ({ row: `${frames}, ${cfloat(ms)}, ${signal}, {${v.map(cfloat).join(', ')}}, ${bypass}` });
   const moves = PLAN_FRAMES.map((frames, b) => {
     const v = params.map((p, i) => {
@@ -577,7 +580,7 @@ export function oraclePlan(params, controls = []) {
     return row(frames, 0, SIGNAL.moves, v, PLAN_BYPASS[b]);
   });
   const tail = tailMs(params);
-  const defaults = params.map((p) => p.def);
+  const defaults = params.map((p, i) => (on.has(i) ? 1 : p.def));
   const release = [row(0, BURST_MS, SIGNAL.burst, defaults, 0), row(0, tail, SIGNAL.tail, defaults, 0)];
   const choices = [];
   params.forEach((p, c) => {
@@ -585,7 +588,7 @@ export function oraclePlan(params, controls = []) {
     if (!vals || held.has(c)) return;
     for (const value of vals) {
       const v = defaults.map((d, i) => (i === c ? value : d));
-      const moved = stepped(params, v, new Set([...held, c]));
+      const moved = stepped(params, v, new Set([...held, ...on, c]));
       choices.push(row(0, BURST_MS, SIGNAL.burst, v, 0), row(0, tail, SIGNAL.tail, v, 0), row(0, tail, SIGNAL.tail, moved, 0));
     }
   });
@@ -642,10 +645,11 @@ export function generateInstance(d) {
 }
 
 /** The value a chain element's `fixed` control is passed at: a set's id as its index (a numeric
- * set's id as itself), a travel's number as given. */
+ * set's id as itself), a travel's number as given, `"default"` the control's declared default. */
 function fixedValue(d, el, control, v) {
   const where = locateContract(d.tree ?? ROOT);
   if (!where.dir) throw new Error(`plugins/${d.stem}: element '${el.id}' fixes '${control.name}' and ${where.why}`);
+  if (v === 'default') return resolveParam(where.dir, el.kernel, { symbol: `${el.id}.${control.name}`, ref: control.ref, ...(control.field ? { field: control.field } : {}) }).def;
   const e = findName(where.dir, el.kernel, control.ref).entry;
   if (e?.kind === 'set') {
     if (e.value.every((x) => typeof x === 'number')) {
@@ -656,8 +660,25 @@ function fixedValue(d, el, control, v) {
     if (k < 0) throw new Error(`plugins/${d.stem}: element '${el.id}' fixes '${control.name}' at ${JSON.stringify(v)}, not one of ${control.ref}'s ids ${JSON.stringify(e.value)}`);
     return k;
   }
-  if (typeof v !== 'number') throw new Error(`plugins/${d.stem}: element '${el.id}' fixes the travel '${control.name}' at ${JSON.stringify(v)}, not a number`);
+  if (typeof v !== 'number') throw new Error(`plugins/${d.stem}: element '${el.id}' fixes the travel '${control.name}' at ${JSON.stringify(v)}, not a number or "default"`);
   return v;
+}
+
+/** The values of a per-band control an element fixes, one per band of its `bands` count: `"default"`
+ * each band's own default by omx-contract's one default rule (its type, centre, gain and Q; a control
+ * the rule does not name, its declared default), else the one value for every band. */
+function fixedBands(d, el, control, v) {
+  const where = locateContract(d.tree ?? ROOT);
+  if (!el.bands) throw new Error(`plugins/${d.stem}: element '${el.id}' fixes '${control.name}', a control taken once per band; it declares its "bands"`);
+  const n = findName(where.dir, el.kernel, control.count).entry?.value?.[el.bands]?.max;
+  if (!Number.isInteger(n)) throw new Error(`plugins/${d.stem}: element '${el.id}': ${control.count} has no '${el.bands}' with a max`);
+  if (v !== 'default') return Array(n).fill(fixedValue(d, el, control, v));
+  const rule = eqDefaultBands(where.dir, n);
+  const name = control.name.toLowerCase();
+  return rule.map((band) => {
+    const key = Object.keys(band).find((k) => k.toLowerCase() === name || k.toLowerCase().startsWith(name) || name.endsWith(k.toLowerCase()));
+    return key === undefined ? fixedValue(d, el, control, 'default') : fixedValue(d, el, control, band[key]);
+  });
 }
 
 /**
@@ -671,21 +692,28 @@ export function chainBindings(d) {
   const inc = omxdspInclude();
   const where = locateContract(d.tree ?? ROOT);
   const errors = [];
+  for (const el of d.chain) {
+    const other = d.chain.find((o) => o !== el && o.kernel === el.kernel && o.bands !== el.bands);
+    if (other) errors.push(`elements '${el.id}' and '${other.id}' run one ${el.kernel} face, compiled once: they declare the same "bands"`);
+  }
   const out = d.chain.map((el) => {
     const idx = d.params.map((p, i) => i).filter((i) => d.params[i].element === el.id && d.params[i].own === undefined);
     const params = idx.map((i) => d.params[i]), controls = idx.map((i) => d.controls[i]);
-    const fixed = Object.entries(el.fixed ?? {}).map(([name, v]) => {
+    const fixed = Object.entries(el.fixed ?? {}).flatMap(([name, v]) => {
       const c = where.dir ? kernelControls(where.dir, el.kernel).find((x) => x.name === name) : undefined;
       if (!c) {
         errors.push(`element '${el.id}' fixes '${name}', no control of the ${el.kernel} kernel`);
-        return undefined;
+        return [];
       }
-      if (c.count) {
-        errors.push(`element '${el.id}' fixes '${name}', a control taken once per band; expose it`);
-        return undefined;
+      try {
+        // a per-band control: one fixed value per band, bound as the face's array argument
+        if (c.count) return fixedBands(d, el, c, v).map((x, k) => ({ p: { symbol: `${el.id}.${name}[${k}]`, fixed: x }, c: { name } }));
+        return [{ p: { symbol: `${el.id}.${name}`, fixed: fixedValue(d, el, c, v) }, c: { name } }];
+      } catch (e) {
+        errors.push(e.message);
+        return [];
       }
-      return { p: { symbol: `${el.id}.${name}`, fixed: fixedValue(d, el, c, v) }, c: { name } };
-    }).filter(Boolean);
+    });
     const b = faceBinding(inc, el.kernel, [...params, ...fixed.map((f) => f.p)], [...controls, ...fixed.map((f) => f.c)]);
     for (const e of b.errors) errors.push(`element '${el.id}' (${el.kernel}): ${e}`);
     if (b.face && !b.face.keyed && d.key === el.id) errors.push(`"key" names '${el.id}', and omx_${el.kernel}_instance_run takes no key`);
@@ -727,7 +755,8 @@ export function generateChain(d) {
     sequence: elements.map((e) => e.name).join(' > '),
     latency: elements.map((e) => `(float)(${e.latency})`).join(' + '), refLatency: elements.map((e) => `(float)(${e.refLatency})`).join(' + '),
     keyed, keyPort: keyed ? macro(d.sidechain.symbol) : '', keySymbol: keyed ? d.sidechain.symbol : '',
-    plan: oraclePlan(d.params, d.controls ?? []), held: heldOf(d), stretch: keyed ? 64 : 1, steps: d.params.map((p) => cfloat(stepOf(p))).join(', '),
+    plan: oraclePlan(d.params, d.controls ?? [], { engaged: d.params.map((p, i) => i).filter((i) => d.params[i].own === 'switch' && d.params[i].element) }),
+    held: heldOf(d), stretch: keyed ? 64 : 1, steps: d.params.map((p) => cfloat(stepOf(p))).join(', '),
     // the single-face fields the shared templates read, empty for a chain
     faceType: '', srType: '', binding: [], arrays: [], renames: [],
   };
