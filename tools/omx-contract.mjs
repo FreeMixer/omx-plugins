@@ -297,3 +297,55 @@ export function paramKernel(d, p, dir) {
   if (ks.length > 1) throw new Error(`param '${p.symbol}': a composite (${ks.join(', ')}) names each parameter's kernel`);
   return ks[0];
 }
+
+const camel = (s) => s.toLowerCase().replace(/_([a-z0-9])/g, (_m, c) => c.toUpperCase());
+const sameTravel = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+
+/**
+ * The controls of one kernel, in the kernel file's order, read from the resolved render alone (it
+ * carries items, not the file's `controls` list): `[{ name, ref, field?, kind: 'travel'|'choice' }]`.
+ *
+ * A control's name is what omx-contract 2.0.0 derives its item name from, run backwards: a single
+ * travel `<KERNEL>_<NAME>_RANGE` and a set `<KERNEL>_<NAME>S` are `<name>` in camel case (an item
+ * without the kernel prefix keeps its whole name: FX_DELAY_TIME_RANGE is fxDelayTime). A travels
+ * table whose every field repeats a single travel is an AGGREGATE, and its field names are the true
+ * names of those singles (TREMOLO_TRAVELS.rateHz names TREMOLO_RATE_RANGE); any other table's
+ * fields are controls of their own (TRANSIENT_LIMITS.attackDb).
+ */
+export function kernelControls(dir, kernel) {
+  const rel = kernelFile(kernel);
+  const its = Object.entries(items(dir)).filter(([, e]) => e.rel === rel);
+  const prefix = `${kernel.toUpperCase()}_`;
+  const nameOf = (n, suffix) => {
+    const base = n.slice(0, -suffix.length);
+    return camel(base.startsWith(prefix) ? base.slice(prefix.length) : base);
+  };
+  const singles = [];
+  for (const [n, e] of its) {
+    if (e.kind === 'travels' && e.shape === 'travel' && n.endsWith('_RANGE')) singles.push({ name: nameOf(n, '_RANGE'), ref: n, kind: 'travel', travel: e.value });
+    else if (e.kind === 'set' && n.endsWith('S')) singles.push({ name: nameOf(n, 'S'), ref: n, kind: 'choice' });
+  }
+  const tables = [];
+  for (const [n, e] of its) {
+    if (e.kind !== 'travels' || e.shape !== 'table') continue;
+    const fields = Object.entries(e.value);
+    const free = singles.filter((s) => s.kind === 'travel');
+    const hits = [];
+    for (const [f, t] of fields) {
+      const at = free.findIndex((s) => sameTravel(s.travel, t));
+      if (at < 0) break;
+      hits.push([free.splice(at, 1)[0], f]);
+    }
+    if (fields.length && hits.length === fields.length) for (const [s, f] of hits) s.name = f; // an aggregate
+    else for (const [f] of fields) tables.push({ name: f, ref: n, field: f, kind: 'travel' });
+  }
+  return [...singles.map(({ name, ref, kind }) => ({ name, ref, kind })), ...tables];
+}
+
+/** The contract control a by-reference parameter reads: its `field`, or the control its `ref` is. */
+export function controlOf(dir, kernel, p) {
+  if (p.ref === undefined) return undefined;
+  const cs = kernelControls(dir, kernel);
+  const c = p.field ? cs.find((x) => x.name === p.field && (x.ref === p.ref || !x.field)) : cs.find((x) => x.ref === p.ref);
+  return c ? { ...c, ...(p.field ? { name: p.field } : {}) } : undefined;
+}
