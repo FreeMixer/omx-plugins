@@ -26,6 +26,10 @@
  *   6. The port hints (tools/port-hints.mjs): a TTL that drops a hint, a declaration that drops a
  *      band type's labels or declares a frequency linear, and a plugin with no pin are each named;
  *      the whole tree is green.
+ *   7. The identity oracle: a wobble control the stand-in render lists with `rearms` (its
+ *      `kernels`) is held at its default in every block of the plan, and named in the oracle's
+ *      comment, while the rest move; the same render without the flag moves it again; a render
+ *      that does not list the kernel is refused, never read some other way.
  *
  * Works in build/selftest/ (removed first). Needs git, and omx-dsp's headers as the build does.
  * Exit 1 when any check failed, including an arm that stopped early.
@@ -37,9 +41,9 @@ import { fileURLToPath } from 'node:url';
 import { checkCommits, rangeCommits } from '../commit-plan-check.mjs';
 import { commitPlan, draftDeclaration, kernelSources, planPlugin, reviewMarks, writePlugin } from '../omx-new-plugin.mjs';
 import { bindFace, parseFace } from '../instance-face.mjs';
-import { locateContract } from '../omx-contract.mjs';
+import { kernelControls, locateContract } from '../omx-contract.mjs';
 import { omxdspInclude } from '../template.mjs';
-import { emitPluginTtl, loadDecl } from '../gen.mjs';
+import { emitPluginTtl, generateInstance, loadDecl } from '../gen.mjs';
 import { hintErrors } from '../port-hints.mjs';
 import { checkPlugin, debtGrowth, debtVerdict, gapLines, loadDebt, loadRecipe, pluginStems, recipeErrors } from '../plugin-recipe.mjs';
 
@@ -63,8 +67,9 @@ function copyTree(dst) {
 }
 
 /** A stand-in omx-contract release: the pinned release's resolved render, with the items of each
- * kernel given in place of that kernel's own (the rest of the tree still resolves against it). */
-function fakeContract(dst, kernels) {
+ * kernel given in place of that kernel's own (the rest of the tree still resolves against it), and
+ * `listed` added to the render's `kernels` (each kernel's ordered controls). */
+function fakeContract(dst, kernels, listed) {
   const real = locateContract(ROOT);
   if (!real.dir) throw new Error(`the stand-in starts from the pinned omx-contract: ${real.why}`);
   mkdirSync(join(dst, 'share', 'omx-contract'), { recursive: true });
@@ -75,6 +80,7 @@ function fakeContract(dst, kernels) {
     for (const [name, e] of Object.entries(render.items)) if (e.rel === `data/kernels/${k}.json`) delete render.items[name];
     for (const [name, e] of Object.entries(v)) render.items[name] = { rel: `data/kernels/${k}.json`, ...e };
   }
+  if (listed) render.kernels = { ...(render.kernels ?? {}), ...listed };
   writeFileSync(join(dst, 'share', 'omx-contract', 'omx-contract.json'), JSON.stringify(render, null, 2));
 }
 
@@ -87,6 +93,18 @@ const WOBBLE = {
   // the aggregate: its field names are the controls' names (rateHz, not rate)
   WOBBLE_TRAVELS: { kind: 'travels', shape: 'table', value: { rateHz: travel(0.1, 20, 0.01, 'Hz', 4).value, depth: travel(0, 100, 0.1, '%', 50).value, mix: travel(0, 100, 0.1, '%', 100).value } },
 };
+
+/** The render's `kernels` entry for wobble: its controls in order, `depth` re-arming when asked. */
+const wobbleControls = (rearms) => ({
+  wobble: {
+    controls: [
+      { name: 'rateHz', kind: 'travel', global: 'WOBBLE_RATE_RANGE' },
+      { name: 'depth', kind: 'travel', global: 'WOBBLE_DEPTH_RANGE', ...(rearms ? { rearms: true } : {}) },
+      { name: 'mix', kind: 'travel', global: 'WOBBLE_MIX_RANGE' },
+      { name: 'mode', kind: 'choice', global: 'WOBBLE_MODES' },
+    ],
+  },
+});
 
 /** A stand-in omx-dsp: the real headers, plus a wobble instance face of the generated shape. */
 function fakeOmxdsp(dst, args = 'float rate_hz, float depth, float mix, int mode') {
@@ -133,7 +151,7 @@ async function main() {
   const recipe = loadRecipe(ROOT);
   const realInc = omxdspInclude();
   const contract = join(WORK, 'omx-contract');
-  fakeContract(contract, { wobble: WOBBLE });
+  fakeContract(contract, { wobble: WOBBLE }, wobbleControls(false));
   const inc = join(WORK, 'omxdsp-include');
   const face = fakeOmxdsp(inc);
   process.env.OMX_CONTRACT_DIR = contract;
@@ -455,6 +473,40 @@ static inline void omx_wobble_instance_run(OmxWobbleInstance *s, const float *in
     d9.stem = 'omx-eq9';
     writeFileSync(join(hints, 'plugins/omx-eq9/omx-eq9.decl.json'), JSON.stringify(d9, null, 2));
     named('a plugin with no pin', 'omx-eq9: no pinned hints');
+  }
+
+  // ---- 7. the identity oracle holds a control that re-arms ---------------------------------------
+  {
+    // the oracle's plan, one column per parameter in declaration order
+    const planOf = (dir) => {
+      process.env.OMX_CONTRACT_DIR = dir;
+      process.env.OMXDSP_INCLUDE = inc; // the stand-in wobble face
+      try {
+        const oracle = generateInstance(loadDecl(join(tree, P_)))['test/wobble-oracle.c'];
+        const rows = [...oracle.matchAll(/^ *\{ \d+, \{([^}]*)\}, [01] \},$/gm)].map((m) => m[1].split(',').map((x) => x.trim()));
+        return { oracle, cols: rows.length ? rows[0].map((_, i) => rows.map((r) => r[i])) : [] };
+      } finally {
+        delete process.env.OMX_CONTRACT_DIR; // as arm 6 left them: the real tree reads what it pins
+        delete process.env.OMXDSP_INCLUDE;
+      }
+    };
+    const varies = (col) => new Set(col).size > 1;
+    const held = join(WORK, 'omx-contract-rearms');
+    fakeContract(held, { wobble: WOBBLE }, wobbleControls(true));
+    const h = planOf(held);
+    expect(h.cols.length === 4, `oracle: the plan has one column per parameter (${h.cols.length})`);
+    expect(h.cols[1]?.every((v) => v === '50.0f'), `oracle: depth, which re-arms, is held at its default 50 in every block (${[...new Set(h.cols[1] ?? [])].join(' ')})`);
+    expect(varies(h.cols[0] ?? []) && varies(h.cols[2] ?? []) && varies(h.cols[3] ?? []), 'oracle: rateHz, mix and mode still move across their travels');
+    expect(/Held at its default in every block[^]*`rearms`\): depth\./.test(h.oracle), "oracle: the comment names the held parameter");
+    const moving = join(WORK, 'omx-contract-no-rearms');
+    fakeContract(moving, { wobble: WOBBLE }, wobbleControls(false));
+    const m = planOf(moving);
+    expect(varies(m.cols[1] ?? []) && !/Held at its default/.test(m.oracle), 'sabotage oracle: without rearms, depth moves again and nothing is named held');
+    const unlisted = join(WORK, 'omx-contract-unlisted');
+    fakeContract(unlisted, { wobble: WOBBLE });
+    let why = '';
+    try { kernelControls(unlisted, 'wobble'); } catch (e) { why = e.message; }
+    expect(why.includes("lists no kernel 'wobble'"), `oracle: a render that does not list the kernel is refused (${why || 'READ ANYWAY'})`);
   }
 
 }
