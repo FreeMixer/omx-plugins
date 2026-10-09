@@ -80,5 +80,32 @@
         ]
       }
     ]
+  },
+  "console": {
+    "$comment": "As FreeMixer/openmixer integration/waves-2026-10 draws its precision limiter (channel-contract.ts limiter, BUS_AND_MAIN kinds, the chain's fixed tail after the plugin rack): LimiterPanel.vue (ceilingDb, lookaheadMs, releaseMs, then GR and true-peak readouts the contract does not declare yet). Its chip is an engage lamp with no text; it has no overview card.",
+    "placement": {
+      "strips": [
+        "aux",
+        "mix",
+        "matrix",
+        "main"
+      ],
+      "group": "tail",
+      "stage": "limiter",
+      "after": "plugins"
+    },
+    "panel": {
+      "sections": [
+        {
+          "key": "limiter",
+          "label": "Limiter",
+          "controls": [
+            "ceilingDb",
+            "lookaheadMs",
+            "releaseMs"
+          ]
+        }
+      ]
+    }
   }
 }

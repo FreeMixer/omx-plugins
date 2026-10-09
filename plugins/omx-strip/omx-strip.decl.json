@@ -177,6 +177,20 @@
       }
     ]
   },
+  "console": {
+    "$comment": "FreeMixer/openmixer integration/waves-2026-10 has no channel-strip stage: its strip is the trim, the EQ (with the HPF and LPF), the gate and the dynamics stages themselves. Racked as a plugin (the insert rack's kinds, channel-contract.ts INSERT_RACK_KINDS) it is drawn by the generic plugin editor.",
+    "placement": {
+      "strips": [
+        "input",
+        "fxReturn",
+        "main",
+        "aux",
+        "mix",
+        "matrix"
+      ],
+      "group": "plugins"
+    }
+  },
   "manual": [
     "Four stages, each the console's own module, run one after the other:",
     "",

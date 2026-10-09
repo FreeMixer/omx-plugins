@@ -331,5 +331,24 @@
         ]
       }
     ]
+  },
+  "console": {
+    "$comment": "The console has the geq stage in its walk (packages/declarations/stages/geq.json, \"contract\": null) and draws no panel, chip or card for it today; racked as a plugin it is drawn by the generic plugin editor.",
+    "placement": {
+      "strips": [
+        "input",
+        "fxReturn",
+        "aux",
+        "mix",
+        "matrix",
+        "main",
+        "fxSend",
+        "mixMinus"
+      ],
+      "group": "walk",
+      "stage": "geq",
+      "after": "reverb",
+      "fxGroup": "eq"
+    }
   }
 }

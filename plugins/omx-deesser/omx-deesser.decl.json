@@ -138,5 +138,43 @@
         ]
       }
     ]
+  },
+  "console": {
+    "$comment": "As FreeMixer/openmixer integration/waves-2026-10 draws its deEsser stage: DeEsserPanel.vue (mode select, then freqHz, widthOct, thresholdDb, ratio, rangeDb, attackMs, releaseMs, then a gain-reduction bar, a readout the contract does not declare yet); its band and GR are drawn over the EQ curve, not in its panel. Chip: STAGE_CHIP_PARAMS.deEsser. Its overview card has no controls.",
+    "placement": {
+      "strips": [
+        "input",
+        "fxReturn",
+        "aux",
+        "mix",
+        "matrix",
+        "main",
+        "fxSend",
+        "mixMinus"
+      ],
+      "group": "walk",
+      "stage": "deEsser",
+      "after": "eq",
+      "fxGroup": "dynamics"
+    },
+    "chip": "FREQ {deessFreq} · THR {deessThreshold}",
+    "panel": {
+      "sections": [
+        {
+          "key": "deEsser",
+          "label": "De-esser",
+          "controls": [
+            "deessMode",
+            "deessFreq",
+            "deessWidth",
+            "deessThreshold",
+            "deessRatio",
+            "deessRange",
+            "deessAttack",
+            "deessRelease"
+          ]
+        }
+      ]
+    }
   }
 }

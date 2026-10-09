@@ -32,7 +32,7 @@ import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { bindFace, instanceHeader, parseFace } from './instance-face.mjs';
 import { PIN_FILE, contractPin, controlOf, items, kernelControls, kernelExists, locateContract, resolveParam } from './omx-contract.mjs';
-import { ROOT, checkPlugin, gapLines, layerOfPath, loadRecipe, loadSchema, pluginFacts, pluginStems, validate } from './plugin-recipe.mjs';
+import { ROOT, checkPlugin, consoleErrors, gapLines, layerOfPath, loadRecipe, loadSchema, pluginFacts, pluginStems, validate } from './plugin-recipe.mjs';
 import { defaultPanel } from './gen.mjs';
 import { pinOfTtl } from './port-hints.mjs';
 import { omxdspInclude } from './template.mjs';
@@ -164,8 +164,10 @@ export function draftDeclaration(kernel, src, { root = ROOT, recipe = loadRecipe
     };
   }
   fillDerived(decl, { schema, version: treeVersion(root, recipe) }, recipe);
-  // every plugin declares its panel: the MOD GUI, one section of every parameter until a person groups them
+  // every plugin declares its panel (the MOD GUI: one section of every parameter until a person
+  // groups them) and its console block (where the console may place it: a person's choice)
   decl.panel = defaultPanel(decl);
+  decl.console = { placement: { strips: [`${REVIEW}: the strip kinds that may host it (input, fxReturn, aux, mix, matrix, main, ...)`], group: `${REVIEW}: walk, tail or plugins (the console's channel layout)` } };
   return { refusals: [], decl: canonical(schema, decl), unbound: controls.filter((c) => !bound.binding.some((b) => b.param.symbol === c.name)).map((c) => c.name) };
 }
 
@@ -181,8 +183,6 @@ function fillDerived(decl, ctx, recipe, refuse) {
 }
 
 // ---- step 3: the plan: validate everything, write nothing ----------------------------------------
-
-const holes = (t) => [...(t ?? '').matchAll(/\{([A-Za-z][A-Za-z0-9_]*)\}/g)].map((m) => m[1]);
 
 export async function planPlugin(declIn, src, { root = ROOT, recipe = loadRecipe(root) } = {}) {
   const schema = loadSchema(root, recipe);
@@ -236,9 +236,7 @@ export async function planPlugin(declIn, src, { root = ROOT, recipe = loadRecipe
   for (const s of decl.panel?.sections ?? []) for (const c of s.controls) if (!symbols.has(c)) refuse('/panel/sections', `section '${s.key}' names '${c}', which is no parameter`);
   for (const [role, sym] of Object.entries(decl.panel?.roles ?? {})) if (!symbols.has(sym)) refuse(`/panel/roles/${role}`, `'${sym}' is no parameter`);
   for (const sym of Object.keys(decl.panel?.widgets ?? {})) if (!symbols.has(sym)) refuse(`/panel/widgets/${sym}`, 'is no parameter');
-  for (const sym of decl.console?.card?.show ?? []) if (!sym.startsWith('readout:') && !symbols.has(sym)) refuse('/console/card/show', `'${sym}' is no parameter`);
-  for (const [at, t] of [['/console/chip', decl.console?.chip], ['/console/card/summary', decl.console?.card?.summary]])
-    for (const h of holes(t)) if (!symbols.has(h)) refuse(at, `{${h}} is no parameter`);
+  for (const e of consoleErrors(decl, symbols)) refuse(e.split(':')[0], e.slice(e.indexOf(':') + 2));
 
   // the panel, drawn as the MOD GUI generator will draw it (every parameter on it, selectors included)
   if (decl.panel && !refusals.length) {
@@ -360,7 +358,7 @@ async function main(argv) {
     if (draft.unbound.length) console.log(`note: contract controls the face takes no argument for, left out: ${draft.unbound.join(', ')}`);
     console.log('settle each mark, then run the same command again:');
     for (const m of reviewMarks(draft.decl)) console.log(`  [ ] ${m}`);
-    console.log('  [ ] review each parameter\'s name; add "summary", "manual", "panel" or "console" where wanted');
+    console.log('  [ ] review each parameter\'s name; group the "panel" into sections, add the "console" card, chip and panel the console draws, "summary" or "manual" where wanted');
     return;
   }
 

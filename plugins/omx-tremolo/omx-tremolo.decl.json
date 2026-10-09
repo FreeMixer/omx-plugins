@@ -100,5 +100,24 @@
         ]
       }
     ]
+  },
+  "console": {
+    "$comment": "The console has the tremolo stage in its walk (packages/declarations/stages/tremolo.json, \"contract\": null) and draws no panel, chip or card for it today; racked as a plugin it is drawn by the generic plugin editor.",
+    "placement": {
+      "strips": [
+        "input",
+        "fxReturn",
+        "aux",
+        "mix",
+        "matrix",
+        "main",
+        "fxSend",
+        "mixMinus"
+      ],
+      "group": "walk",
+      "stage": "tremolo",
+      "after": "phaser",
+      "fxGroup": "modulation"
+    }
   }
 }

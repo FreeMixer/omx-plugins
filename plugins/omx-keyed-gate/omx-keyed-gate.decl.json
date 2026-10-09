@@ -209,5 +209,57 @@
     "of latency, reported to the host; otherwise the latency is zero. Its LV2 URI, ports and defaults",
     "are those of the keyed gate bundle the OpenMixer console used to ship, so a session saved with that",
     "bundle loads this one."
-  ]
+  ],
+  "console": {
+    "$comment": "As FreeMixer/openmixer integration/waves-2026-10 draws its gate stage and its key (ProcessingStrip.vue): GateCurve beside the gate's encoders (thresholdDb, rangeDb, ratio, attackMs, holdMs, releaseMs, hysteresisDb), the knee as readouts (knee_start, knee_end are not drawn as controls), then the KEY section (key source select; the voice-band button, key HP/LP and listen have no parameter here). Chip: STAGE_CHIP_PARAMS.gate. Card: useStripOverview's gate controls.",
+    "placement": {
+      "strips": [
+        "input",
+        "fxReturn",
+        "aux",
+        "mix",
+        "matrix",
+        "main",
+        "fxSend",
+        "mixMinus"
+      ],
+      "group": "walk",
+      "stage": "gate",
+      "fxGroup": "dynamics"
+    },
+    "card": {
+      "show": [
+        "threshold",
+        "range",
+        "attack",
+        "release"
+      ]
+    },
+    "chip": "THR {threshold}",
+    "panel": {
+      "sections": [
+        {
+          "key": "gate",
+          "label": "Gate",
+          "controls": [
+            "threshold",
+            "range",
+            "ratio",
+            "attack",
+            "hold",
+            "release",
+            "hysteresis"
+          ],
+          "graph": "dynamics-curve"
+        },
+        {
+          "key": "key",
+          "label": "Key",
+          "controls": [
+            "key_external"
+          ]
+        }
+      ]
+    }
+  }
 }

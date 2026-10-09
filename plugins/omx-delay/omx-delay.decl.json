@@ -110,5 +110,48 @@
     "",
     "Plus the host's bypass. The tone filter holds the same corner at every sample rate, so a session",
     "moved from 48 to 96 kHz sounds the same."
-  ]
+  ],
+  "console": {
+    "$comment": "As FreeMixer/openmixer integration/waves-2026-10 draws its delay stage: FxPanel's StageTimeCurve (taps) over DelayPanel.vue (pingpong and sync latches, timeMs or a synced division, then feedback, mix, tone; sync and division have no parameter here). Chip: FxSummaryValue of STAGE_KEY_FIELD.delay (timeMs). Card: useStripOverview's delay controls.",
+    "placement": {
+      "strips": [
+        "input",
+        "fxReturn",
+        "aux",
+        "mix",
+        "matrix",
+        "main",
+        "fxSend",
+        "mixMinus"
+      ],
+      "group": "walk",
+      "stage": "delay",
+      "after": "tremolo",
+      "fxGroup": "delay"
+    },
+    "card": {
+      "show": [
+        "fxDelayTime",
+        "fxDelayFeedback",
+        "mix"
+      ]
+    },
+    "chip": "{fxDelayTime}",
+    "panel": {
+      "sections": [
+        {
+          "key": "delay",
+          "label": "Delay",
+          "controls": [
+            "pingpong",
+            "fxDelayTime",
+            "fxDelayFeedback",
+            "mix",
+            "tone"
+          ],
+          "graph": "delay-taps"
+        }
+      ]
+    }
+  }
 }

@@ -110,5 +110,24 @@
         ]
       }
     ]
+  },
+  "console": {
+    "$comment": "The console has the phaser stage in its walk (packages/declarations/stages/phaser.json, \"contract\": null) and draws no panel, chip or card for it today; racked as a plugin it is drawn by the generic plugin editor.",
+    "placement": {
+      "strips": [
+        "input",
+        "fxReturn",
+        "aux",
+        "mix",
+        "matrix",
+        "main",
+        "fxSend",
+        "mixMinus"
+      ],
+      "group": "walk",
+      "stage": "phaser",
+      "after": "pitch",
+      "fxGroup": "modulation"
+    }
   }
 }

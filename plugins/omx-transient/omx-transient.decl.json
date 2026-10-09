@@ -103,5 +103,19 @@
         ]
       }
     ]
+  },
+  "console": {
+    "$comment": "FreeMixer/openmixer integration/waves-2026-10 has no transient stage. Racked as a plugin (the insert rack's kinds, channel-contract.ts INSERT_RACK_KINDS) it is drawn by the generic plugin editor.",
+    "placement": {
+      "strips": [
+        "input",
+        "fxReturn",
+        "main",
+        "aux",
+        "mix",
+        "matrix"
+      ],
+      "group": "plugins"
+    }
   }
 }

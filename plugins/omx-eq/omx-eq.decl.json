@@ -235,5 +235,65 @@
     "",
     "Plus the host's bypass, which is the whole EQ's switch. Every band and filter starts off, so a freshly loaded instance passes the",
     "signal untouched."
-  ]
+  ],
+  "console": {
+    "$comment": "As FreeMixer/openmixer integration/waves-2026-10 draws its eq stage: EqCurve over EqEncoderBank.vue, a chip per band (on, type, freq, gain, q) plus the HPF and LPF (on, slope, cutoff); the console's bands are a list the operator adds to, these variants' are fixed. Chip: STAGE_CHIP_PARAMS.eq, shown while the HPF is on. Card: one gain per band, then the HPF frequency (useStripOverview).",
+    "placement": {
+      "strips": [
+        "input",
+        "fxReturn",
+        "aux",
+        "mix",
+        "matrix",
+        "main",
+        "fxSend",
+        "mixMinus"
+      ],
+      "group": "walk",
+      "stage": "eq",
+      "after": "gate",
+      "fxGroup": "eq"
+    },
+    "card": {
+      "show": [
+        "gain",
+        "hpf_freq"
+      ]
+    },
+    "chip": "HPF {hpf_freq}",
+    "panel": {
+      "sections": [
+        {
+          "key": "bands",
+          "label": "Bands",
+          "controls": [
+            "on",
+            "type",
+            "freq",
+            "gain",
+            "q"
+          ],
+          "graph": "eq-curve"
+        },
+        {
+          "key": "hpf",
+          "label": "HPF",
+          "controls": [
+            "hpf_on",
+            "hpf_slope",
+            "hpf_freq"
+          ]
+        },
+        {
+          "key": "lpf",
+          "label": "LPF",
+          "controls": [
+            "lpf_on",
+            "lpf_slope",
+            "lpf_freq"
+          ]
+        }
+      ]
+    }
+  }
 }
