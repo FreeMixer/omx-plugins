@@ -20,6 +20,7 @@ drawn from one declaration: its CLAP parameters, its LV2 ports and its MOD GUI c
 | **omx eq16** | `org.openmixer.eq16` | `urn:openmixer:eq16` | The console's channel EQ in its 16-band form: sixteen parametric bands (bell, shelves, notch, all-pass) plus high- and low-pass filters at 12 or 24 dB/oct. Stereo, zero latency, 44.1 to 192 kHz. |
 | **omx eq32** | `org.openmixer.eq32` | `urn:openmixer:eq32` | The console's channel EQ in its 32-band form: thirty-two parametric bands (bell, shelves, notch, all-pass) plus high- and low-pass filters at 12 or 24 dB/oct. Stereo, zero latency, 44.1 to 192 kHz. |
 | **omx strip** | `org.openmixer.strip` | `urn:openmixer:strip` | The console's channel strip in one plugin: input trim with HPF/LPF, gate, four-band EQ and compressor, in the desk's order or any other. Stereo, real-time safe, 44.1 to 192 kHz. |
+| **omx deesser** | `org.openmixer.deesser` | `urn:openmixer:deesser` | the native DE-ESSER stage: a band-limited detector driving the COMPRESSOR's own gain computer. |
 | **omx keyed-gate** | `org.openmixer.keyed-gate` | `urn:openmixer:keyed-gate` | The console's channel gate with a sidechain key: the detector listens to the key your host routes to it, or to the signal itself. One gain for both legs, so the stereo image never shifts. Real-time safe, 44.1 to 192 kHz. |
 
 ### omx delay
@@ -120,6 +121,20 @@ Plus the host's bypass. An attack under 0.5 ms engages the 4x detector path, whi
 of latency, reported to the host; otherwise the latency is zero. Its LV2 URI, ports and defaults
 are those of the keyed gate bundle the OpenMixer console used to ship, so a session saved with that
 bundle loads this one.
+
+### omx deesser
+
+| Parameter | Range | Default |
+|---|---|---|
+| Freq | 2000 to 16000 Hz, whole steps | 7000 Hz |
+| Width | 0.25 to 4 oct | 1 oct |
+| Threshold | -60 to 0 dB | -30 dB |
+| Ratio | 1 to 20 | 4 |
+| Range | -24 to 0 dB | -12 dB |
+| Attack | 0.1 to 50 ms | 1 ms |
+| Release | 5 to 500 ms, whole steps | 60 ms |
+
+Plus the host's bypass.
 
 ## Install
 
