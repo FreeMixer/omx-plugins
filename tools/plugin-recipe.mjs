@@ -26,6 +26,9 @@ import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { compareVersions, contractPin, declKernels, findName, kernelExists, locateContract, paramKernel } from './omx-contract.mjs';
+import { omxdspInclude, render } from './template.mjs';
+
+export { omxdspInclude, render };
 
 export const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 export const RECIPE_PATH = 'recipes/plugin.recipe.json';
@@ -115,6 +118,7 @@ const escapeRe = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
 export const RULES = {
   always: () => true,
+  instance: (_root, _recipe, facts) => facts.decl?.binding === 'instance',
   panel: (_root, _recipe, facts) => Boolean(facts.decl?.panel),
   byReference: (root, recipe) => compareVersions(contractPin(root), recipe.contract.byReferenceSince) >= 0,
 };
@@ -338,13 +342,6 @@ export const CHECKERS = {
     return run.length ? ok(`${run.join(', ')}, run by make test`) : missing(`${oracles.join(', ')}: not run by ${mk}'s test target`);
   },
 
-  /** Every line is a line of the file. */
-  linesPresent(root, _recipe, facts, { file, lines }) {
-    const t = text(root, file).split('\n');
-    const absent = lines.map((l) => fill(l, facts)).filter((l) => !t.includes(l));
-    return absent.length ? missing(`${file}: no line ${absent.map((l) => `'${l}'`).join(', ')}`) : ok(file);
-  },
-
   /** Each install list has a line (glob) covering the plugin's installed path. */
   installCovers(root, _recipe, facts, { files }) {
     const bad = [];
@@ -368,24 +365,30 @@ export const CHECKERS = {
     return bad.length ? missing(bad.join('; ')) : ok(places.map((p) => p.file).join(', '));
   },
 
-  /** CI's package checks name the plugin's installed .clap. */
-  ciCovers(root, _recipe, facts, { file, clap }) {
-    const want = fill(clap, facts);
-    return text(root, file).includes(want) ? ok(`${file}: ${want}`) : missing(`${file}: its package checks do not expect ${want}`);
-  },
-
-  /** The README's catalogue has the plugin's row with its CLAP id and LV2 URI. */
-  catalogueRow(root, _recipe, facts, { file }) {
-    const row = text(root, file).split('\n').find((l) => l.startsWith(`| **${facts.name}** |`));
-    if (!row) return missing(`${file}: no catalogue row for **${facts.name}**`);
-    const bad = [facts.clapId, facts.uri].filter((x) => !row.includes(`\`${x}\``));
-    return bad.length ? missing(`${file}: the row of ${facts.name} lacks ${bad.join(', ')}`) : ok(`${file}: catalogue row`);
-  },
-
-  /** The file has the heading. */
-  heading(root, _recipe, facts, { file, heading }) {
-    const h = fill(heading, facts);
-    return text(root, file).split('\n').includes(h) ? ok(`${file}: ${h}`) : missing(`${file}: no heading '${h}'`);
+  /**
+   * A shared file lists the plugin inside its generated region `region` (tools/gen.mjs SHARED),
+   * `needle` standing as a whole there, and the file is what tools/gen.mjs generates now from every
+   * plugin folder. A plugin is listed once it ships: its folder has a Makefile, or its declaration
+   * says `binding: instance`.
+   */
+  async sharedListed(root, _recipe, facts, { file, region: name, needle }) {
+    const gen = await import(join(root, 'tools', 'gen.mjs'));
+    let d, shared;
+    try {
+      d = gen.loadDecl(join(root, 'plugins', facts.stem));
+      shared = gen.generateShared(root);
+    } catch (e) {
+      return missing(`cannot generate: ${e.message}`);
+    }
+    if (!gen.ships(d)) return missing(`${facts.stem} does not ship yet: its folder has no Makefile and its declaration no "binding": "instance"`);
+    const want = fill(needle, facts);
+    const lines = shared[file].split('\n');
+    const from = lines.findIndex((l) => new RegExp(`\\bBEGIN GENERATED ${name}\\b`).test(l));
+    const to = lines.findIndex((l, i) => i > from && new RegExp(`\\bEND GENERATED ${name}\\b`).test(l));
+    const inside = lines.slice(from + 1, to).join('\n');
+    if (from < 0 || !new RegExp(`(?<![\\w-])${escapeRe(want)}(?![\\w-])`).test(inside)) return missing(`${file}: the region '${name}' does not list ${want}`);
+    if (text(root, file) !== shared[file]) return missing(`${file} is stale: its generated regions are not what the declarations generate (node tools/gen.mjs)`);
+    return ok(`${file}: '${name}' lists ${want}`);
   },
 
   // ---- the laws ----
@@ -459,18 +462,6 @@ export const CHECKERS = {
 };
 
 let dspCache;
-/** omx-dsp's include directory (the one holding omxdsp/): OMXDSP_INCLUDE, or pkg-config's includedir. */
-export function omxdspInclude() {
-  if (process.env.OMXDSP_INCLUDE) return process.env.OMXDSP_INCLUDE;
-  let dir;
-  try {
-    dir = execFileSync('pkg-config', ['--variable=includedir', 'omxdsp'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
-  } catch {
-    return undefined;
-  }
-  return dir && existsSync(join(dir, 'omxdsp')) ? dir : undefined;
-}
-
 /** Every function omx-dsp's headers define: name → header. */
 function dspFunctions(inc) {
   if (dspCache) return dspCache;
@@ -552,30 +543,6 @@ export function layerOfPath(recipe, path) {
 }
 
 // ---- templates ---------------------------------------------------------------------------------
-
-/**
- * A minimal mustache: `{{x}}`, `{{#x}}…{{/x}}` (a list repeats with each item's fields in scope, a
- * truthy value renders once), `{{^x}}…{{/x}}` (renders when x is falsy or empty), `{{! … }}` (dropped
- * with its line). An unknown `{{x}}` is an error, so a template cannot silently print nothing.
- */
-export function render(template, view) {
-  const t = template.replace(/^\{\{![\s\S]*?\}\}\n?/gm, '');
-  const section = /\{\{([#^])(\w+)\}\}([\s\S]*?)\{\{\/\2\}\}/g;
-  const expand = (src, scope) =>
-    src
-      .replace(section, (_, kind, key, body) => {
-        const v = scope[key];
-        const truthy = Array.isArray(v) ? v.length > 0 : Boolean(v);
-        if (kind === '^') return truthy ? '' : expand(body, scope);
-        if (!truthy) return '';
-        return Array.isArray(v) ? v.map((item) => expand(body, { ...scope, ...item })).join('') : expand(body, scope);
-      })
-      .replace(/\{\{(\w+)\}\}/g, (_, key) => {
-        if (!(key in scope)) throw new Error(`template: no value for {{${key}}}`);
-        return String(scope[key]);
-      });
-  return expand(t, view);
-}
 
 // ---- the debt: the gaps owed today, held as a ratchet ---------------------------------------
 

@@ -7,6 +7,7 @@
   "url": "https://github.com/FreeMixer/omx-plugins",
   "version": "0.2.0",
   "description": "The OpenMixer console's stereo delay: one time, feedback through a tone filter, ping-pong and a wet/dry mix. The DSP is omx-dsp's <omxdsp/fx/omx_delay.h>, the console's own delay.",
+  "summary": "Stereo delay up to 2 s: feedback through a tone filter that darkens each repeat, ping-pong, wet/dry mix. Zero latency, real-time safe, 44.1 to 192 kHz.",
   "clap": { "id": "org.openmixer.delay", "features": ["audio-effect", "delay", "stereo"] },
   "lv2": { "uri": "urn:openmixer:delay", "class": "lv2:DelayPlugin" },
   "params": [
@@ -20,5 +21,17 @@
     "family": "delay",
     "roles": { "time": "timeMs", "feedback": "feedback", "tone": "tone", "pingpong": "pingpong", "mix": "mix" },
     "sections": [{ "key": "delay", "label": "Delay", "controls": ["timeMs", "feedback", "tone", "pingpong", "mix"] }]
-  }
+  },
+  "manual": [
+    "| Parameter | Range | Default |",
+    "|---|---|---|",
+    "| Time | 0 to 2000 ms, whole ms | 300 ms |",
+    "| Feedback | 0 to 0.99 | 0.3 |",
+    "| Mix (wet) | 0 to 1 | 0.3 |",
+    "| Tone (0 bright, 1 dark repeats) | 0 to 1 | 0.3 |",
+    "| Ping-pong | off / on | off |",
+    "",
+    "Plus the host's bypass. The tone filter holds the same corner at every sample rate, so a session",
+    "moved from 48 to 96 kHz sounds the same."
+  ]
 }

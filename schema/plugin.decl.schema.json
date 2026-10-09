@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/FreeMixer/omx-plugins/schema/plugin.decl.schema.json",
-  "$comment": "The shape of one plugin's declaration, plugins/<stem>/<stem>.decl.json. tools/omx-new-plugin.mjs asks its questions from the titles and descriptions here; tools/plugin-recipe.mjs validates every declaration against it.",
+  "$comment": "The shape of one plugin's declaration, plugins/<stem>/<stem>.decl.json: the plugin folder's one hand-written file. tools/omx-new-plugin.mjs drafts it and explains its fields from the titles and descriptions here; tools/gen.mjs generates everything else from it; tools/plugin-recipe.mjs validates every declaration against it. The vocabularies a renderer reads (widgets, graph kinds) are defined once, in $defs.",
   "$ref": "#/$defs/plugin",
   "$defs": {
     "plugin": {
@@ -83,6 +83,12 @@
           "title": "Description",
           "description": "One plain sentence a host shows: what the effect does for you."
         },
+        "summary": {
+          "type": "string",
+          "minLength": 20,
+          "title": "Summary",
+          "description": "The plugin's row in the README's catalogue, when it says more than the description (ranges, latency, rates). Left out, the row reads the description."
+        },
         "clap": {
           "type": "object",
           "required": [
@@ -140,6 +146,13 @@
             }
           }
         },
+        "binding": {
+          "enum": [
+            "instance"
+          ],
+          "title": "Binding",
+          "description": "`instance`: the plugin runs omx-dsp's instance face of its kernel (<omxdsp/fx/omx_<kernel>_instance.h>), and tools/gen.mjs generates the kernel binding, the kernel-identity test, both faces and the Makefile from this declaration; each parameter binds to the `resolve` argument named after its contract control. Left out, those files are the plugin's own (a composite, a face omx-dsp does not have)."
+        },
         "params": {
           "type": "array",
           "minItems": 1,
@@ -175,6 +188,18 @@
         },
         "panel": {
           "$ref": "#/$defs/panel"
+        },
+        "manual": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Manual",
+          "description": "The plugin's section of the README below its heading, one Markdown line per entry. Left out, the section is the parameter table generated from the resolved parameters, and \"Plus the host's bypass.\""
+        },
+        "console": {
+          "$ref": "#/$defs/console"
         }
       }
     },
@@ -352,7 +377,7 @@
       ],
       "additionalProperties": false,
       "title": "Panel",
-      "description": "The MOD GUI and house-view panel: a family, each control's role, and the sections drawn. Leave it out for a plugin with no panel yet.",
+      "description": "How the plugin's controls are drawn, by every renderer (the console's processing panel, the MOD GUI, a native window): a family, each control's role, each control's widget, and the sections drawn. Leave it out for a plugin with no panel yet.",
       "properties": {
         "family": {
           "type": "string",
@@ -390,9 +415,134 @@
                 "items": {
                   "type": "string"
                 }
+              },
+              "graph": {
+                "$ref": "#/$defs/graph"
               }
             }
           }
+        },
+        "widgets": {
+          "type": "object",
+          "title": "Widgets",
+          "description": "Each control's widget, by parameter symbol: one of the shared widgets every renderer has. A control left out takes its renderer's default for its kind (a toggle a switch, a labelled integer a choice, a travel a knob).",
+          "propertyNames": {
+            "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/widget"
+          }
+        }
+      }
+    },
+    "widget": {
+      "enum": [
+        "knob",
+        "fader",
+        "switch",
+        "choice"
+      ],
+      "title": "Widget",
+      "description": "The shared widgets a control is drawn with. A new one is added here once, and in each renderer, for every plugin."
+    },
+    "graph": {
+      "enum": [
+        "eq-curve",
+        "dynamics-curve",
+        "lfo",
+        "delay-taps"
+      ],
+      "title": "Graph",
+      "description": "The graph kinds a panel section may draw, computed by the renderer from the section's controls. A new kind is added here once, and in each renderer."
+    },
+    "console": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "placement"
+      ],
+      "title": "Console",
+      "description": "How the plugin shows in the OpenMixer console (spec 2026-10-09-plugin-from-contract §8): where it may go, its overview card and its FX chip. The console's placement rules refuse a declaration that breaks them; the plugin cannot widen them.",
+      "properties": {
+        "$comment": {
+          "type": "string"
+        },
+        "placement": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "strips",
+            "group"
+          ],
+          "title": "Placement",
+          "description": "Where the plugin may go in a strip's chain.",
+          "properties": {
+            "strips": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9-]*$"
+              },
+              "title": "Strip kinds",
+              "description": "The strip kinds that may host the plugin (the console's names: input, aux, fx, group, matrix, main, ...)."
+            },
+            "group": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9-]*$",
+              "title": "Chain position group",
+              "description": "The console's chain position group the plugin is placed in (pre, insert, post, ...)."
+            },
+            "fxGroup": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9-]*$",
+              "title": "FX group",
+              "description": "The FX group the console's menus list the plugin under (modulation, dynamics, space, ...)."
+            },
+            "order": {
+              "type": "integer",
+              "minimum": 0,
+              "title": "Default order",
+              "description": "Its default position among the plugins of its FX group."
+            }
+          }
+        },
+        "card": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "show"
+          ],
+          "title": "Overview card",
+          "description": "What the strip's overview card shows.",
+          "properties": {
+            "show": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 3,
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "pattern": "^([A-Za-z][A-Za-z0-9_]*|readout:[a-z][A-Za-z0-9]*)$"
+              },
+              "description": "One to three parameter symbols, or `readout:<name>` for a readout the contract declares."
+            },
+            "summary": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "^[^{}]*(\\{[A-Za-z][A-Za-z0-9_]*\\}[^{}]*)*$",
+              "description": "Text with `{symbol}` holes, each naming a declared parameter, filled with its value and unit by the console.",
+              "title": "Summary line"
+            }
+          }
+        },
+        "chip": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[^{}]*(\\{[A-Za-z][A-Za-z0-9_]*\\}[^{}]*)*$",
+          "description": "The summary text of the strip's FX chip that opens the panel, e.g. `{timeMs} · {feedback}`; `{symbol}` names a declared parameter.",
+          "title": "Chip"
         }
       }
     }
