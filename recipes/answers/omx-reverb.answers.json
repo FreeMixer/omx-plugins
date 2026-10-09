@@ -1,0 +1,91 @@
+{
+  "stem": "omx-reverb",
+  "kernel": "reverb",
+  "description": "native algorithmic reverb, ONE Schroeder-Moorer comb+allpass kernel (Freeverb lineage) serving TWO configurations (OMX_REVERB_ROOM, OMX_REVERB_HALL — same omx_fv_comb / omx_fv_allpass functions, each with its own delay-line lengths + feedback/damping curve) plus a second, structurally different kernel, OMX_REVERB_PLATE (Dattorro figure-8 plate tank: input diffusers -> a damped delay-network tank).",
+  "clap": {
+    "features": [
+      "audio-effect",
+      "reverb",
+      "stereo"
+    ]
+  },
+  "lv2": {
+    "class": "lv2:ReverbPlugin"
+  },
+  "params": [
+    {
+      "symbol": "plateModDepth",
+      "name": "Plate Mod Depth",
+      "ref": "REVERB_PLATE_MOD_DEPTH_RANGE"
+    },
+    {
+      "symbol": "mix",
+      "name": "Mix",
+      "ref": "REVERB_MIX_RANGE"
+    },
+    {
+      "symbol": "size",
+      "name": "Size",
+      "ref": "REVERB_SIZE_RANGE"
+    },
+    {
+      "symbol": "damping",
+      "name": "Damping",
+      "ref": "REVERB_DAMPING_RANGE"
+    },
+    {
+      "symbol": "width",
+      "name": "Width",
+      "ref": "REVERB_WIDTH_RANGE"
+    },
+    {
+      "symbol": "predelay",
+      "name": "Predelay",
+      "ref": "REVERB_PREDELAY_RANGE"
+    },
+    {
+      "symbol": "lowcut",
+      "name": "Lowcut",
+      "ref": "REVERB_LOWCUT_RANGE"
+    },
+    {
+      "symbol": "highcut",
+      "name": "Highcut",
+      "ref": "REVERB_HIGHCUT_RANGE"
+    },
+    {
+      "symbol": "reverse",
+      "name": "Reverse",
+      "ref": "REVERB_REVERSE_RANGE"
+    },
+    {
+      "symbol": "hold",
+      "name": "Hold",
+      "ref": "REVERB_HOLD_RANGE"
+    },
+    {
+      "symbol": "release",
+      "name": "Release",
+      "ref": "REVERB_RELEASE_RANGE"
+    },
+    {
+      "symbol": "gateThreshold",
+      "name": "Gate Threshold",
+      "ref": "REVERB_GATE_THRESHOLD_RANGE"
+    },
+    {
+      "symbol": "algorithm",
+      "name": "Algorithm",
+      "ref": "REVERB_ALGORITHMS",
+      "values": [
+        "Room",
+        "Plate",
+        "Hall",
+        "Reverse",
+        "Gated"
+      ]
+    }
+  ],
+  "omxdspMin": "0.2.0",
+  "contractRelease": "1.3.0"
+}

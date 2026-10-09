@@ -1,0 +1,99 @@
+{
+  "$comment": "THE declaration of omx-reverb. Every face and the parameter header are generated from this file by tools/gen.mjs. Its parameters are by reference to omx-contract's reverb kernel. Parameter order is append-only.",
+  "stem": "omx-reverb",
+  "kernel": "reverb",
+  "kernels": [
+    "reverb"
+  ],
+  "name": "omx reverb",
+  "vendor": "openmixer",
+  "url": "https://github.com/FreeMixer/omx-plugins",
+  "version": "0.2.0",
+  "description": "native algorithmic reverb, ONE Schroeder-Moorer comb+allpass kernel (Freeverb lineage) serving TWO configurations (OMX_REVERB_ROOM, OMX_REVERB_HALL — same omx_fv_comb / omx_fv_allpass functions, each with its own delay-line lengths + feedback/damping curve) plus a second, structurally different kernel, OMX_REVERB_PLATE (Dattorro figure-8 plate tank: input diffusers -> a damped delay-network tank).",
+  "clap": {
+    "id": "org.openmixer.reverb",
+    "features": [
+      "audio-effect",
+      "reverb",
+      "stereo"
+    ]
+  },
+  "lv2": {
+    "uri": "urn:openmixer:reverb",
+    "class": "lv2:ReverbPlugin"
+  },
+  "params": [
+    {
+      "symbol": "plateModDepth",
+      "name": "Plate Mod Depth",
+      "ref": "REVERB_PLATE_MOD_DEPTH_RANGE"
+    },
+    {
+      "symbol": "mix",
+      "name": "Mix",
+      "ref": "REVERB_MIX_RANGE"
+    },
+    {
+      "symbol": "size",
+      "name": "Size",
+      "ref": "REVERB_SIZE_RANGE"
+    },
+    {
+      "symbol": "damping",
+      "name": "Damping",
+      "ref": "REVERB_DAMPING_RANGE"
+    },
+    {
+      "symbol": "width",
+      "name": "Width",
+      "ref": "REVERB_WIDTH_RANGE"
+    },
+    {
+      "symbol": "predelay",
+      "name": "Predelay",
+      "ref": "REVERB_PREDELAY_RANGE"
+    },
+    {
+      "symbol": "lowcut",
+      "name": "Lowcut",
+      "ref": "REVERB_LOWCUT_RANGE"
+    },
+    {
+      "symbol": "highcut",
+      "name": "Highcut",
+      "ref": "REVERB_HIGHCUT_RANGE"
+    },
+    {
+      "symbol": "reverse",
+      "name": "Reverse",
+      "ref": "REVERB_REVERSE_RANGE"
+    },
+    {
+      "symbol": "hold",
+      "name": "Hold",
+      "ref": "REVERB_HOLD_RANGE"
+    },
+    {
+      "symbol": "release",
+      "name": "Release",
+      "ref": "REVERB_RELEASE_RANGE"
+    },
+    {
+      "symbol": "gateThreshold",
+      "name": "Gate Threshold",
+      "ref": "REVERB_GATE_THRESHOLD_RANGE"
+    },
+    {
+      "symbol": "algorithm",
+      "name": "Algorithm",
+      "ref": "REVERB_ALGORITHMS",
+      "values": [
+        "Room",
+        "Plate",
+        "Hall",
+        "Reverse",
+        "Gated"
+      ]
+    }
+  ]
+}
