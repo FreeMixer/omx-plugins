@@ -8,7 +8,8 @@
  *       `id<TAB>name<TAB>min<TAB>max<TAB>default<TAB>flags` — tools/clap-params-check.mjs compares
  *       it with the declaration.
  *   clap-probe live <x.clap>
- *       every parameter but the host's bypass MOVES the output: a deterministic stereo signal is run
+ *       every parameter but the host's bypass MOVES the output: a deterministic stereo signal (noise
+ *       bursts with quiet gaps) is run
  *       with the parameter at its default and at the far end of its travel, in four settings of
  *       the others until one shows a difference: (a) all at their defaults; (b) every other toggle
  *       on (a filter's frequency moves nothing while the filter is off); (c) every other parameter
@@ -17,7 +18,8 @@
  *       to at most 15, not a toggle) at its far value, the rest at their defaults: a choice that selects which of
  *       several controls is heard (a speed switch) hides them until it is moved, and a far
  *       value of another travel (a mix at 0) can hide them again. A parameter whose output is
- *       byte-identical in all five is one the face does not deliver to the kernel.
+ *       byte-identical in all five, and under every value of every other choice or toggle in turn (the
+ *       rest at their defaults: a control read only under one mode), is one the face does not deliver.
  *       `PASS live <name>` / `FAIL live <name>` per parameter. A face still on the wizard's stub
  *       binding is red here, by design. Every input port past the main one (a sidechain key) is
  *       connected too, fed a signal of its own: square-wave bursts the main signal does not have, so a
@@ -109,15 +111,17 @@ static int params_dump(const char *path) {
   return 0;
 }
 
-/** Deterministic stereo noise with sparse impulses, the legs different. */
+/** Deterministic stereo noise with sparse impulses, the legs different, in 0.25 s bursts each followed
+ * by 0.5 s of a quiet bed: a gate closes, a dynamics stage releases, a reverb's tail is heard. */
 static void make_signal(float *l, float *r) {
   uint32_t seed = 0x2545F491u;
   for (uint32_t i = 0; i < FRAMES; i++) {
+    const float g = (i % 36000u) < 12000u ? 1.0f : 0.025f;
     seed = seed * 1664525u + 1013904223u;
-    l[i] = ((float)(seed >> 8) / 16777216.0f - 0.5f) * 0.8f;
+    l[i] = ((float)(seed >> 8) / 16777216.0f - 0.5f) * 0.8f * g;
     seed = seed * 1664525u + 1013904223u;
-    r[i] = ((float)(seed >> 8) / 16777216.0f - 0.5f) * 0.6f;
-    if (i % 4800u == 0) l[i] = r[i] = 0.9f;
+    r[i] = ((float)(seed >> 8) / 16777216.0f - 0.5f) * 0.6f * g;
+    if (i % 4800u == 0 && g == 1.0f) l[i] = r[i] = 0.9f;
   }
 }
 
@@ -211,8 +215,10 @@ static float *in_l, *in_r, *a_l, *a_r, *b_l, *b_r;
 
 /** Does moving parameter `i` from its default to its far value change the output, the others set by
  * `setting` (0 defaults, 1 toggles on, 2 at their far values, 3 toggles on and the rest far, 4 the
- * other stepped choices far and the rest at their defaults)? -1 on a host error. */
-static int moves(const char *path, const clap_param_info_t *info, uint32_t n, uint32_t i, int setting) {
+ * other stepped choices far and the rest at their defaults, 5 the other choice or toggle `k` at
+ * `kv` and the rest at their defaults)? -1 on a host error. */
+static int moves(const char *path, const clap_param_info_t *info, uint32_t n, uint32_t i, int setting, uint32_t k_at,
+                 double kv) {
   static clap_id ids[MAX_PARAMS];
   static double vals[MAX_PARAMS];
   uint32_t m = 0;
@@ -222,6 +228,7 @@ static int moves(const char *path, const clap_param_info_t *info, uint32_t n, ui
     if (setting == 2) ids[m] = info[k].id, vals[m++] = far_of(&info[k]);
     if (setting == 3) ids[m] = info[k].id, vals[m++] = is_toggle(&info[k]) ? 1.0 : far_of(&info[k]);
     if (setting == 4 && is_choice(&info[k])) ids[m] = info[k].id, vals[m++] = far_of(&info[k]);
+    if (setting == 5 && k == k_at) ids[m] = info[k].id, vals[m++] = kv;
   }
   ids[m] = info[i].id;
   vals[m] = info[i].default_value;
@@ -253,12 +260,26 @@ static int live(const char *path) {
     checked++;
     int setting = 0, r = 0;
     for (; setting < 5; setting++) {
-      r = moves(path, info, n, i, setting);
+      r = moves(path, info, n, i, setting, 0, 0.0);
       if (r != 0) break;
     }
+    /* then each value of every other choice or toggle in turn: a control read only under one value
+     * (a reverb's plate depth under the plate algorithm) is moved where it is read */
+    uint32_t k_at = 0;
+    double kv = 0.0;
+    for (uint32_t k = 0; r == 0 && k < n; k++) {
+      if (k == i || !(is_choice(&info[k]) || is_toggle(&info[k]))) continue;
+      for (double v = info[k].min_value; r == 0 && v <= info[k].max_value; v += 1.0) {
+        if (v == info[k].default_value) continue;
+        r = moves(path, info, n, i, 5, k, v);
+        k_at = k, kv = v;
+      }
+    }
     if (r < 0) return 1;
-    if (r) {
+    if (r && setting < 5) {
       printf("PASS live %s moves the output (%s)\n", info[i].name, SETTING[setting]);
+    } else if (r) {
+      printf("PASS live %s moves the output (%s at %g, the rest at their defaults)\n", info[i].name, info[k_at].name, kv);
     } else {
       printf("FAIL live %s: %g leaves the output byte-identical in every setting; the face does not deliver it to the kernel\n",
              info[i].name, far_of(&info[i]));
