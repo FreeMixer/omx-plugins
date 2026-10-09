@@ -1,28 +1,53 @@
 {
-  "$comment": "THE declaration of omx-chorus. Every face and the parameter header are generated from this file by tools/gen.mjs. Parameter order is append-only.",
+  "$comment": "THE declaration of omx-chorus, the folder's one hand-written file. Every other file of the folder is generated from it by tools/gen.mjs. Its parameters are by reference to omx-contract's chorus kernel and bind by name to omx-dsp's instance face. Parameter order is append-only.",
   "stem": "omx-chorus",
   "kernel": "chorus",
+  "kernels": [
+    "chorus"
+  ],
   "name": "omx chorus",
   "vendor": "openmixer",
   "url": "https://github.com/FreeMixer/omx-plugins",
   "version": "0.2.0",
-  "description": "the native CHORUS stage: N voices reading ONE modulated fractional delay line.",
+  "description": "The console's chorus: up to four voices read one modulated delay line, the right leg's sweep offset by the spread, mixed with the dry signal.",
   "clap": {
     "id": "org.openmixer.chorus",
     "features": [
       "audio-effect",
+      "chorus",
       "stereo"
     ]
   },
   "lv2": {
     "uri": "urn:openmixer:chorus",
-    "class": "lv2:Plugin"
+    "class": "lv2:ChorusPlugin"
   },
+  "binding": "instance",
   "params": [
-    { "symbol": "rateHz", "name": "Rate", "ref": "CHORUS_RATE_RANGE" },
-    { "symbol": "depthMs", "name": "Depth", "ref": "CHORUS_DEPTH_RANGE" },
-    { "symbol": "voices", "name": "Voices", "ref": "CHORUS_VOICES_RANGE" },
-    { "symbol": "mix", "name": "Mix", "ref": "CHORUS_MIX_RANGE" },
-    { "symbol": "spread", "name": "Spread", "ref": "CHORUS_SPREAD_RANGE" }
+    {
+      "symbol": "spread",
+      "name": "Spread",
+      "ref": "CHORUS_SPREAD_RANGE"
+    },
+    {
+      "symbol": "rate",
+      "name": "Rate",
+      "ref": "CHORUS_RATE_RANGE"
+    },
+    {
+      "symbol": "depth",
+      "name": "Depth",
+      "ref": "CHORUS_DEPTH_RANGE"
+    },
+    {
+      "symbol": "voices",
+      "name": "Voices",
+      "ref": "CHORUS_VOICES_RANGE"
+    },
+    {
+      "symbol": "mix",
+      "name": "Mix",
+      "ref": "CHORUS_MIX_RANGE"
+    }
   ]
 }
