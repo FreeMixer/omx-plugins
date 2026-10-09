@@ -74,7 +74,7 @@ Requires: omx-dsp-devel >= 0.5.0
 
 %description devel
 The headers other projects include to use the OpenMixer plugins' parameters and
-instance code, such as omx_delay_instance.h and each plugin's generated
+instance code, such as omx_delay_core.h and each plugin's generated
 parameter header, installed in %{_includedir}/omx-plugins.
 
 %prep

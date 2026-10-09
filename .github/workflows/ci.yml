@@ -114,7 +114,7 @@ jobs:
             for p in $shorts; do echo "/usr/lib/clap/omx-$p.clap"; done; } | sort > expected-clap.txt
           diff -u expected-clap.txt files-clap.txt
           devel=$(find rpms -maxdepth 1 -name "omx-plugins-devel-[0-9]*.rpm" ! -name "*.src.rpm" | head -1)
-          rpm -qlp "$devel" | grep -qx /usr/include/omx-plugins/omx_delay_instance.h
+          rpm -qlp "$devel" | grep -qx /usr/include/omx-plugins/omx_delay_core.h
           rpm -qlp "$devel" | grep -qx /usr/include/omx-plugins/omx_plugin_param.h
           for k in $kernels; do rpm -qlp "$devel" | grep -qx "/usr/include/omx-plugins/omx_${k}_params.h"; done
           for p in $shorts; do
@@ -196,7 +196,7 @@ jobs:
           set -euo pipefail
           # the metapackage, with both formats beside it as the repository would offer them
           apt-get install -y --no-install-recommends ./debs/omx-plugins_*.deb ./debs/omx-plugins-clap_*.deb ./debs/omx-plugins-lv2_*.deb
-          dev=$(dpkg -c debs/omx-plugins-dev_*.deb); grep -q './usr/include/omx-plugins/omx_delay_instance.h' <<<"$dev"
+          dev=$(dpkg -c debs/omx-plugins-dev_*.deb); grep -q './usr/include/omx-plugins/omx_delay_core.h' <<<"$dev"
           dep=$(dpkg -s omx-plugins); grep -q '^Depends: omx-plugins-clap (= .*), omx-plugins-lv2 (= .*)' <<<"$dep"
           # BEGIN GENERATED plugins: tools/gen.mjs, the shipped plugins' short names and kernels
           shorts="delay drive eq8 eq16 eq32 keyed-gate limiter phaser pitch rotary strip transient tremolo"

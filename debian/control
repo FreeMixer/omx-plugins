@@ -56,7 +56,7 @@ Architecture: all
 Depends: libomxdsp-dev (>= 0.5.0), ${misc:Depends}
 Description: Headers of the OpenMixer plugins, for projects that build on them
  The headers other projects include to use the OpenMixer plugins' parameters
- and instance code, such as omx_delay_instance.h and each plugin's generated
+ and instance code, such as omx_delay_core.h and each plugin's generated
  parameter header, installed in /usr/include/omx-plugins.
 
 Package: omx-plugins-lv2
