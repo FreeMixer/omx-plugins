@@ -330,10 +330,12 @@ async function main() {
   const unheld = await ratchet();
   undo();
   expect(unheld.fresh.includes("omx-drive manual-section"), `sabotage: a gap the debt does not hold fails the ratchet (${unheld.fresh.join(", ")})`);
-  undo = add('plugins/omx-chorus/Makefile', readFileSync(join(t, 'plugins/omx-drive/Makefile'), 'utf8').replace(/omx-drive/g, 'omx-chorus').replace(/urn:openmixer:drive/g, 'urn:openmixer:chorus').replace(/org\.openmixer\.drive/g, 'org.openmixer.chorus'));
+  // An entry owed by a plugin that has the artifact: written here, so the arm does not depend on
+  // which plugin still owes something.
+  undo = edit('recipes/completeness-debt.json', (s) => s.replace('"debt": [', '"debt": [\n    { "plugin": "omx-drive", "entry": "makefile", "owedBy": "selftest" },'));
   const paid = await ratchet();
   undo();
-  expect(paid.stale.some((x) => x.startsWith('omx-chorus makefile')), `sabotage: a debt entry now satisfied fails the ratchet as stale (${paid.stale.join(', ')})`);
+  expect(paid.stale.some((x) => x.startsWith('omx-drive makefile')), `sabotage: a debt entry now satisfied fails the ratchet as stale (${paid.stale.join(', ')})`);
 
   const ghost = await (async () => {
     const reports = [];
@@ -410,9 +412,10 @@ async function main() {
   // balance: a contract kernel omx-dsp gives no instance face (delay, chorus and the rest have one now)
   sourceRefused('a kernel with no instance face', 'balance', 'omx-dsp', 'has no <omxdsp/fx/omx_balance_instance.h>');
   {
-    // every face omx-dsp ships is of the generated shape; a ring-handing init stands in for another
+    // A face whose init is handed the rings, the shape the faces had before the generator's: written
+    // here, so the arm does not depend on which of omx-dsp's faces still has it.
     const f = parseFace(`static inline int omx_wobble_instance_init(OmxWobbleInstance *s, float sr, float *ring_l, float *ring_r, uint32_t cap) { return 1; }
-static inline void omx_wobble_instance_resolve(OmxWobbleInstance *s, int bypass, float rate) { }
+static inline void omx_wobble_instance_resolve(OmxWobbleInstance *s, int bypass, float rate, float depth) { }
 static inline void omx_wobble_instance_run(OmxWobbleInstance *s, const float *in_l, const float *in_r, float *out_l, float *out_r, uint32_t n) { }
 #define OMX_WOBBLE_INSTANCE_LATENCY_FRAMES 0.0f`, 'wobble');
     expect(/hands in/.test(f.error ?? ''), `a face of another shape is named, not guessed (rings handed to init: ${f.error ?? 'ACCEPTED'})`);
