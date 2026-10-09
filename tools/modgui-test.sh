@@ -61,6 +61,26 @@ else
   fail "template draws exactly the declared parameters (declared $n, drawn $drawn)"
 fi
 
+# (b2) every parameter with labelled values is a selector: MOD's custom-select on its port, with one
+# enumeration option per value, each at the port value the TTL's scale point carries.
+node --input-type=module -e '
+const { loadDecl, choicesOf } = await import(process.argv[1]);
+const d = loadDecl(process.argv[2]);
+for (const p of d.params) { const c = choicesOf(p); if (c) console.log(`${p.symbol} ${c.map((x) => x.value).join(" ")}`); }
+' "$ROOT/tools/gen.mjs" "$PDIR" >"$TMP/choices" || fail "read the choices of $DECL"
+while read -r sym values; do
+  [ -n "$sym" ] || continue
+  block=$(awk -v s="mod-port-symbol=\"$sym\" mod-widget=\"custom-select\"" 'index($0, s) { on = 1 } on { print } on && /<\/div>$/ && !/enumeration-option|input-control-value/ { n++ } on && n == 2 { exit }' "$TEMPLATE" 2>/dev/null)
+  missing=""
+  for v in $values; do printf '%s\n' "$block" | grep -qF "mod-role=\"enumeration-option\" mod-port-value=\"$v\"" || missing="$missing $v"; done
+  if [ -n "$block" ] && [ -z "$missing" ]; then
+    pass "template draws $sym as a selector with every value"
+  else
+    if [ -n "$block" ]; then why="missing value(s):$missing"; else why="no custom-select"; fi
+    fail "template draws $sym as a selector with every value ($why)"
+  fi
+done <"$TMP/choices"
+
 # (c) sord_validate over the LV2 spec bundles and schemas
 # and the closed modgui term list, over the whole generated bundle (manifest, plugin TTL, modgui).
 if command -v sord_validate >/dev/null 2>&1; then

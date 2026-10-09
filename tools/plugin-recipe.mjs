@@ -119,7 +119,7 @@ const escapeRe = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 export const RULES = {
   always: () => true,
   instance: (_root, _recipe, facts) => facts.decl?.binding === 'instance',
-  panel: (_root, _recipe, facts) => Boolean(facts.decl?.panel),
+  panel: (_root, _recipe, facts) => Boolean(facts.decl?.panel) || facts.decl?.binding === 'instance',
   byReference: (root, recipe) => compareVersions(contractPin(root), recipe.contract.byReferenceSince) >= 0,
 };
 

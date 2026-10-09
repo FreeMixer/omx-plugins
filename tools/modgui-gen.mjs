@@ -2,8 +2,9 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Pau Aliagas <linuxnow@gmail.com>
 /*
- * modgui-gen.mjs — a MOD modgui for every plugin whose declaration carries a `panel` block, so MOD
- * and Zynthian draw our plugins properly.
+ * modgui-gen.mjs — a MOD modgui for every plugin whose declaration carries a `panel` block, and for
+ * every plugin generated from its instance face (gen.mjs gives one with no panel a section of every
+ * parameter), so MOD and Zynthian draw our plugins properly.
  *
  * ONE declaration: plugins/<stem>/<stem>.decl.json, read by tools/gen.mjs's loadDecl. Its `panel`
  * block gives the family and the sections; every control's symbol, travel, default and label is its
@@ -22,7 +23,7 @@ import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { loadDecl, lv2Ports, pluginDirs } from './gen.mjs';
+import { choicesOf, loadDecl, lv2Ports, pluginDirs } from './gen.mjs';
 import { canvas, disc, encodePng, rgbOf, roundRect, segment } from './raster.mjs';
 
 const TOOLS = dirname(fileURLToPath(import.meta.url));
@@ -31,11 +32,14 @@ export const MODGUI_TTL = 'modgui.ttl';
 export const MODGUI_DIR = 'modgui';
 /** An integer travel with more steps than this is a continuous knob; fewer is a selector. */
 export const MAX_SELECTOR_STEPS = 16;
+/** The controls of one row of a section; a section with more wraps onto further rows. */
+export const ROW_CONTROLS = 8;
 
 /** The geometry, in CSS px: one set of numbers the template, the stylesheet and the raster read. */
 export const GEOMETRY = Object.freeze({
   pad: 16, headH: 40, sectionTop: 52, sectionGap: 10, sectionPad: 8, sectionTitleH: 18,
   cellW: 72, cellH: 76, knob: 48, knobTop: 4, switchW: 40, switchH: 20, switchTop: 18,
+  selectW: 64, selectH: 22, selectTop: 17,
   radius: 10, sectionRadius: 6, filmFrames: 65, thumbScale: 0.5,
 });
 
@@ -43,17 +47,20 @@ const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replac
 const ttlStr = (s) => `"${String(s).replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`;
 
 /**
- * The widget AUTO resolves to for a declared parameter: a toggle is a switch; an integer with
- * a wide travel (more than MAX_SELECTOR_STEPS steps, e.g. a time in ms) is a knob; an enumeration,
- * or an integer with a few steps, would be a selector, which this export does not draw: refused.
+ * The widget AUTO resolves to for a declared parameter: a toggle is a switch; a parameter with
+ * labelled values (a choice, an enumeration port) or an integer with a few steps is a selector,
+ * MOD's own `custom-select` over the port's values; an integer with a wide travel (more than
+ * MAX_SELECTOR_STEPS steps, e.g. a time in ms) and every other travel is a knob.
  */
 export function widgetOf(p) {
   if (p.kind === 'toggle') return 'switch';
-  const steps = p.max - p.min;
-  if (p.enumeration || p.scalePoints || (p.kind === 'integer' && steps <= MAX_SELECTOR_STEPS)) {
-    throw new Error(`modgui-gen: '${p.symbol}' is a selector, which the modgui export does not draw`);
-  }
+  if (choicesOf(p) || (p.kind === 'integer' && p.max - p.min <= MAX_SELECTOR_STEPS)) return 'select';
   return 'knob';
+}
+
+/** A selector's options, `{value, label}` from min up: the labelled values, else every step. */
+export function optionsOf(p) {
+  return choicesOf(p) ?? Array.from({ length: p.max - p.min + 1 }, (_x, k) => ({ value: p.min + k, label: `${p.min + k}` }));
 }
 
 /** Where a value sits on its travel, 0..1 (every declared travel is linear). */
@@ -78,7 +85,8 @@ export function resolvePanel(d) {
         throw new Error(`modgui-gen: '${symbol}' is not a declared control input with a travel`);
       }
       const q = port.param;
-      return { symbol, name: port.name, index: port.index, widget: widgetOf(q), min: q.min, max: q.max, def: q.def };
+      const widget = widgetOf(q);
+      return { symbol, name: port.name, index: port.index, widget, min: q.min, max: q.max, def: q.def, ...(widget === 'select' ? { options: optionsOf(q) } : {}) };
     }),
   }));
   if (sections.length === 0 || sections[0].controls.length === 0) throw new Error(`modgui-gen: '${d.stem}' has an empty first section`);
@@ -88,15 +96,18 @@ export function resolvePanel(d) {
 /** Every box of the face, in px at scale 1: what the template positions and the raster paints. */
 export function layout(panel) {
   const g = GEOMETRY;
-  const most = Math.max(...panel.sections.map((s) => s.controls.length));
+  const most = Math.min(ROW_CONTROLS, Math.max(...panel.sections.map((s) => s.controls.length)));
   const sectionW = most * g.cellW + 2 * g.sectionPad;
-  const sectionH = g.sectionTitleH + g.cellH + g.sectionPad / 2;
-  const sections = panel.sections.map((s, i) => {
-    const y = g.sectionTop + i * (sectionH + g.sectionGap);
-    return {
-      ...s, x: g.pad, y, w: sectionW, h: sectionH,
-      controls: s.controls.map((c, j) => ({ ...c, x: g.sectionPad + j * g.cellW, y: g.sectionTitleH })),
+  let y = g.sectionTop;
+  const sections = panel.sections.map((s) => {
+    const rows = Math.ceil(s.controls.length / ROW_CONTROLS);
+    const h = g.sectionTitleH + rows * g.cellH + g.sectionPad / 2;
+    const sec = {
+      ...s, x: g.pad, y, w: sectionW, h,
+      controls: s.controls.map((c, j) => ({ ...c, x: g.sectionPad + (j % ROW_CONTROLS) * g.cellW, y: g.sectionTitleH + Math.floor(j / ROW_CONTROLS) * g.cellH })),
     };
+    y += h + g.sectionGap;
+    return sec;
   });
   const last = sections[sections.length - 1];
   return { w: sectionW + 2 * g.pad, h: last.y + last.h + g.pad, sections };
@@ -130,6 +141,14 @@ function drawKnob(c, cx, cy, r, f, col) {
   segment(c, cx + sx * r * 0.28, cy + sy * r * 0.28, cx + sx * r * 0.78, cy + sy * r * 0.78, Math.max(0.75, r * 0.08), col.accent);
 }
 
+/** A selector: a box, and a mark along its foot at the selected option's place among `n`. */
+function drawSelect(c, x, y, w, h, at, n, col) {
+  roundRect(c, x, y, w, h, Math.min(4, h / 4), col.rim);
+  roundRect(c, x + 1, y + 1, w - 2, h - 2, Math.min(3, h / 4), col.body);
+  const seg = (w - 4) / Math.max(1, n);
+  roundRect(c, x + 2 + at * seg, y + h - 4, Math.max(1, seg), 2, 0, col.accent);
+}
+
 function drawSwitch(c, x, y, w, h, on, col) {
   roundRect(c, x, y, w, h, h / 2, on ? col.accent : col.body);
   const r = h / 2 - h * 0.15;
@@ -155,6 +174,9 @@ export function renderFace(lay, tok, scale) {
       const x = sec.x + k.x, y = sec.y + k.y;
       if (k.widget === 'switch') {
         drawSwitch(c, (x + (g.cellW - g.switchW) / 2) * s, (y + g.switchTop) * s, g.switchW * s, g.switchH * s, k.def >= 0.5, col);
+      } else if (k.widget === 'select') {
+        const at = Math.max(0, k.options.findIndex((o) => o.value === k.def));
+        drawSelect(c, (x + (g.cellW - g.selectW) / 2) * s, (y + g.selectTop) * s, g.selectW * s, g.selectH * s, at, k.options.length, col);
       } else {
         drawKnob(c, (x + g.cellW / 2) * s, (y + g.knobTop + g.knob / 2) * s, (g.knob / 2) * s, travelFraction(k, k.def), col);
       }
@@ -220,9 +242,17 @@ export function emitTemplate(panel, lay, source) {
   const g = GEOMETRY;
   const control = (k) => {
     const data = `data-symbol="${k.symbol}" data-min="${k.min}" data-max="${k.max}" data-default="${k.def}"`;
+    // a selector is MOD's custom-select over the port's values: the shown value and one option each
+    const options = (k.options ?? []).map((o) => `\n                    <div class="omx-select-option" mod-role="enumeration-option" mod-port-value="${o.value}">${esc(o.label)}</div>`).join('');
     const image = k.widget === 'switch'
       ? `<div class="omx-switch-image" mod-role="input-control-port" mod-port-symbol="${k.symbol}" mod-widget="switch"></div>`
-      : `<div class="omx-knob-image" mod-role="input-control-port" mod-port-symbol="${k.symbol}"></div>`;
+      : k.widget === 'select'
+        ? `<div class="omx-select-image" mod-role="input-control-port" mod-port-symbol="${k.symbol}" mod-widget="custom-select">
+                    <div class="omx-select-value" mod-role="input-control-value" mod-port-symbol="${k.symbol}"></div>
+                    <div class="omx-select-list">${options}
+                    </div>
+                </div>`
+        : `<div class="omx-knob-image" mod-role="input-control-port" mod-port-symbol="${k.symbol}"></div>`;
     return `            <div class="omx-control omx-${k.widget}" style="left:${k.x}px;top:${k.y}px" title="${esc(k.name)}" ${data}>
                 ${image}
                 <span class="omx-control-title">${esc(k.name)}</span>
@@ -284,7 +314,13 @@ ${P} .omx-switch-image::after { content: ''; position: absolute; top: 3px; left:
 ${P} .omx-switch-image.on { background: ${tok['--accent']}; }
 ${P} .omx-switch-image.on::after { left: ${g.switchW - g.switchH + 3}px; background: ${tok['--ink']}; }
 ${P} .omx-control-title { display: block; margin-top: 6px; font-size: 10px; color: ${tok['--ink-dim']}; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-`;
+${panel.sections.some((x) => x.controls.some((k) => k.widget === 'select')) ? `${P} .omx-select-image { position: relative; box-sizing: border-box; width: ${g.selectW}px; height: ${g.selectH}px; margin: ${g.selectTop}px auto ${g.knob + g.knobTop - g.selectTop - g.selectH}px; border: 1px solid ${tok['--border-strong']}; border-radius: 4px; background: ${tok['--surface-3']}; cursor: pointer; }
+${P} .omx-select-value { font-size: 10px; line-height: ${g.selectH - 2}px; color: ${tok['--ink']}; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+${P} .omx-select-list { display: none; position: absolute; left: 0; top: ${g.selectH}px; z-index: 10; min-width: 100%; background: ${tok['--surface-3']}; border: 1px solid ${tok['--border-strong']}; border-radius: 4px; }
+${P} .omx-select-image.selecting .omx-select-list, ${P} .omx-select-image.open .omx-select-list { display: block; }
+${P} .omx-select-option { padding: 2px 6px; font-size: 10px; text-align: left; white-space: nowrap; }
+${P} .omx-select-option.selected { color: ${tok['--accent']}; }
+` : ''}`;
 }
 
 /** Every file of a declaration's modgui, as [path relative to the LV2 bundle, bytes], in a fixed order. */
@@ -321,7 +357,7 @@ function main(argv) {
   let stale = 0;
   for (const pdir of dirs.length ? dirs : pluginDirs()) {
     const d = loadDecl(pdir);
-    if (!d.panel) continue;
+    if (!d.panel) continue; // a hand-written plugin with no panel yet; a generated one always has one
     const dir = bundleDir(d);
     const shown = (p) => relative(process.cwd(), join(dir, p));
     const out = generateModgui(d, look);
