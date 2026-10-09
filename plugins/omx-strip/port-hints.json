@@ -1,0 +1,288 @@
+{
+  "trimDb": {
+    "props": [],
+    "unit": "units:db",
+    "points": []
+  },
+  "hpfOn": {
+    "props": [
+      "lv2:toggled"
+    ],
+    "unit": null,
+    "points": []
+  },
+  "hpfFreq": {
+    "props": [
+      "pprops:logarithmic"
+    ],
+    "unit": "units:hz",
+    "points": []
+  },
+  "hpfSlope": {
+    "props": [
+      "lv2:enumeration",
+      "lv2:integer"
+    ],
+    "unit": null,
+    "points": [
+      "12 12 dB/oct",
+      "24 24 dB/oct"
+    ]
+  },
+  "lpfOn": {
+    "props": [
+      "lv2:toggled"
+    ],
+    "unit": null,
+    "points": []
+  },
+  "lpfFreq": {
+    "props": [
+      "pprops:logarithmic"
+    ],
+    "unit": "units:hz",
+    "points": []
+  },
+  "lpfSlope": {
+    "props": [
+      "lv2:enumeration",
+      "lv2:integer"
+    ],
+    "unit": null,
+    "points": [
+      "12 12 dB/oct",
+      "24 24 dB/oct"
+    ]
+  },
+  "gateOn": {
+    "props": [
+      "lv2:toggled"
+    ],
+    "unit": null,
+    "points": []
+  },
+  "gateThreshold": {
+    "props": [],
+    "unit": "units:db",
+    "points": []
+  },
+  "gateRange": {
+    "props": [],
+    "unit": "units:db",
+    "points": []
+  },
+  "gateAttack": {
+    "props": [],
+    "unit": "units:ms",
+    "points": []
+  },
+  "gateRelease": {
+    "props": [],
+    "unit": "units:ms",
+    "points": []
+  },
+  "eqOn": {
+    "props": [
+      "lv2:toggled"
+    ],
+    "unit": null,
+    "points": []
+  },
+  "eq1Type": {
+    "props": [
+      "lv2:enumeration",
+      "lv2:integer"
+    ],
+    "unit": null,
+    "points": [
+      "0 Bell",
+      "1 Low Shelf",
+      "2 High Shelf",
+      "3 Notch",
+      "4 All-pass 1st",
+      "5 All-pass 2nd"
+    ]
+  },
+  "eq1Freq": {
+    "props": [
+      "pprops:logarithmic"
+    ],
+    "unit": "units:hz",
+    "points": []
+  },
+  "eq1Gain": {
+    "props": [],
+    "unit": "units:db",
+    "points": []
+  },
+  "eq1On": {
+    "props": [
+      "lv2:toggled"
+    ],
+    "unit": null,
+    "points": []
+  },
+  "eq2Type": {
+    "props": [
+      "lv2:enumeration",
+      "lv2:integer"
+    ],
+    "unit": null,
+    "points": [
+      "0 Bell",
+      "1 Low Shelf",
+      "2 High Shelf",
+      "3 Notch",
+      "4 All-pass 1st",
+      "5 All-pass 2nd"
+    ]
+  },
+  "eq2Freq": {
+    "props": [
+      "pprops:logarithmic"
+    ],
+    "unit": "units:hz",
+    "points": []
+  },
+  "eq2Gain": {
+    "props": [],
+    "unit": "units:db",
+    "points": []
+  },
+  "eq2On": {
+    "props": [
+      "lv2:toggled"
+    ],
+    "unit": null,
+    "points": []
+  },
+  "eq3Type": {
+    "props": [
+      "lv2:enumeration",
+      "lv2:integer"
+    ],
+    "unit": null,
+    "points": [
+      "0 Bell",
+      "1 Low Shelf",
+      "2 High Shelf",
+      "3 Notch",
+      "4 All-pass 1st",
+      "5 All-pass 2nd"
+    ]
+  },
+  "eq3Freq": {
+    "props": [
+      "pprops:logarithmic"
+    ],
+    "unit": "units:hz",
+    "points": []
+  },
+  "eq3Gain": {
+    "props": [],
+    "unit": "units:db",
+    "points": []
+  },
+  "eq3On": {
+    "props": [
+      "lv2:toggled"
+    ],
+    "unit": null,
+    "points": []
+  },
+  "eq4Type": {
+    "props": [
+      "lv2:enumeration",
+      "lv2:integer"
+    ],
+    "unit": null,
+    "points": [
+      "0 Bell",
+      "1 Low Shelf",
+      "2 High Shelf",
+      "3 Notch",
+      "4 All-pass 1st",
+      "5 All-pass 2nd"
+    ]
+  },
+  "eq4Freq": {
+    "props": [
+      "pprops:logarithmic"
+    ],
+    "unit": "units:hz",
+    "points": []
+  },
+  "eq4Gain": {
+    "props": [],
+    "unit": "units:db",
+    "points": []
+  },
+  "eq4On": {
+    "props": [
+      "lv2:toggled"
+    ],
+    "unit": null,
+    "points": []
+  },
+  "compOn": {
+    "props": [
+      "lv2:toggled"
+    ],
+    "unit": null,
+    "points": []
+  },
+  "compThreshold": {
+    "props": [],
+    "unit": "units:db",
+    "points": []
+  },
+  "compKnee": {
+    "props": [],
+    "unit": "units:db",
+    "points": []
+  },
+  "compAttack": {
+    "props": [],
+    "unit": "units:ms",
+    "points": []
+  },
+  "compRelease": {
+    "props": [],
+    "unit": "units:ms",
+    "points": []
+  },
+  "compMakeup": {
+    "props": [],
+    "unit": "units:db",
+    "points": []
+  },
+  "compRms": {
+    "props": [
+      "lv2:toggled"
+    ],
+    "unit": null,
+    "points": []
+  },
+  "order": {
+    "props": [
+      "lv2:integer"
+    ],
+    "unit": null,
+    "points": []
+  },
+  "enabled": {
+    "props": [
+      "lv2:toggled"
+    ],
+    "unit": null,
+    "points": []
+  },
+  "latency": {
+    "props": [
+      "lv2:integer",
+      "lv2:reportsLatency"
+    ],
+    "unit": "units:frame",
+    "points": []
+  }
+}

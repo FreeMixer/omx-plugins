@@ -23,6 +23,9 @@
  * and sections, the RPM %files lists and CI's installed-file lists. Adding a plugin touches only its
  * folder; two plugins' changes merge in either order.
  *
+ * and the hint view tools/test/port-hints.json (git-ignored), assembled from every plugin's own
+ * plugins/<stem>/port-hints.json for tools/port-hints.mjs.
+ *
  * The MOD GUI of the same bundle is tools/modgui-gen.mjs's, which reads the port list from here.
  *
  * Usage: `node tools/gen.mjs [--check] [plugins/<stem> ...]` — `--check` writes nothing and fails on a
@@ -541,6 +544,19 @@ export function generateShared(root = ROOT, decls = pluginDirs(root).map((p) => 
   return Object.fromEntries(Object.entries(SHARED).map(([file, producers]) => [file, fillRegions(file, readFileSync(join(root, file), 'utf8'), producers, ds)]));
 }
 
+/** The shared view the hint check reads: every plugin's own plugins/<stem>/port-hints.json by stem.
+ * A build product (tools/test/port-hints.json, git-ignored), never hand-edited. */
+export const HINTS_VIEW = 'tools/test/port-hints.json';
+export function hintsView(root = ROOT) {
+  const view = {};
+  for (const dir of pluginDirs(root)) {
+    const stem = basename(dir), file = join(dir, 'port-hints.json');
+    if (existsSync(file)) view[stem] = JSON.parse(readFileSync(file, 'utf8'));
+  }
+  return view;
+}
+export const hintsViewText = (root = ROOT) => `${JSON.stringify(hintsView(root), null, 2)}\n`;
+
 function main(argv) {
   const check = argv.includes('--check');
   const dirs = argv.filter((a) => !a.startsWith('--'));
@@ -562,6 +578,15 @@ function main(argv) {
     for (const [rel, text] of Object.entries(generate(d))) put(join(d.dir, rel), join('plugins', d.stem, rel), text, `make -C plugins/${d.stem} gen`);
   }
   if (!dirs.length) for (const [rel, text] of Object.entries(generateShared(ROOT, decls))) put(join(ROOT, rel), rel, text, 'node tools/gen.mjs');
+  if (!dirs.length) {
+    const viewPath = join(ROOT, HINTS_VIEW);
+    // absent is fine (it is built by `make hints`); present must be fresh, so a hand edit goes stale
+    const text = hintsViewText(), now = existsSync(viewPath) ? readFileSync(viewPath, 'utf8') : null;
+    if (check && now !== null && now !== text) {
+      console.error(`gen: STALE ${HINTS_VIEW} (run \`node tools/gen.mjs\`)`);
+      stale++;
+    } else if (!check && now !== text) writeFileSync(viewPath, text); // a build product, not a file the wizard commits
+  }
   if (stale) process.exit(1);
   if (check) console.log(`gen: every generated file is fresh${dirs.length ? '' : ', the shared files too'}`);
 }

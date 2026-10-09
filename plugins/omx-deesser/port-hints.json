@@ -1,0 +1,52 @@
+{
+  "freqHz": {
+    "props": [
+      "lv2:integer",
+      "pprops:logarithmic"
+    ],
+    "unit": "units:hz",
+    "points": []
+  },
+  "widthOct": {
+    "props": [],
+    "unit": "units:oct",
+    "points": []
+  },
+  "thresholdDb": {
+    "props": [],
+    "unit": "units:db",
+    "points": []
+  },
+  "rangeDb": {
+    "props": [],
+    "unit": "units:db",
+    "points": []
+  },
+  "attackMs": {
+    "props": [],
+    "unit": "units:ms",
+    "points": []
+  },
+  "releaseMs": {
+    "props": [
+      "lv2:integer"
+    ],
+    "unit": "units:ms",
+    "points": []
+  },
+  "enabled": {
+    "props": [
+      "lv2:toggled"
+    ],
+    "unit": null,
+    "points": []
+  },
+  "latency": {
+    "props": [
+      "lv2:integer",
+      "lv2:reportsLatency"
+    ],
+    "unit": "units:frame",
+    "points": []
+  }
+}

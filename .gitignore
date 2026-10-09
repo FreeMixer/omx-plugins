@@ -4,3 +4,4 @@
 *.so
 *.clap
 build/
+tools/test/port-hints.json

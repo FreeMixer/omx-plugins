@@ -6,7 +6,7 @@
 #
 #   make            build every plugin
 #   make test       every plugin's tests (what the package builds run), then `make hints`
-#   make hints      no LV2 face lost a port hint: tools/port-hints.mjs against tools/test/port-hints.json
+#   make hints      no LV2 face lost a port hint: tools/port-hints.mjs against each plugin's plugins/<id>/port-hints.json
 #   make recipe-test   the repository's own checks, run by CI beside `make test`:
 #     make completeness  every plugin against recipes/plugin.recipe.json, each gap naming its wizard step;
 #                        a gap not in recipes/completeness-debt.json fails, and so does a paid debt entry
@@ -31,6 +31,8 @@ test:
 	@for p in $(PLUGINS); do $(MAKE) -C $$p test || exit 1; done
 	@$(MAKE) -s hints
 hints:
+	node tools/gen.mjs --check
+	node tools/gen.mjs
 	node tools/port-hints.mjs
 # A plugin is complete when it has every artifact the recipe lists and keeps every law; a new plugin
 # starts with `node tools/omx-new-plugin.mjs --from-contract <kernel>` (docs/new-plugin-from-contract.md).

@@ -474,7 +474,24 @@ static inline void omx_wobble_instance_run(OmxWobbleInstance *s, const float *in
     const d9 = JSON.parse(readFileSync(join(hints, 'plugins/omx-eq9/omx-eq9.decl.json'), 'utf8'));
     d9.stem = 'omx-eq9';
     writeFileSync(join(hints, 'plugins/omx-eq9/omx-eq9.decl.json'), JSON.stringify(d9, null, 2));
+    rmSync(join(hints, 'plugins/omx-eq9/port-hints.json')); // the copy brought eq8's pin along
     named('a plugin with no pin', 'omx-eq9: no pinned hints');
+    // the per-plugin file is the pin: a hint moved there moves the assembled view, a hand edit of the view goes stale
+    const f16 = join(hints, 'plugins/omx-eq16/port-hints.json'), p16 = readFileSync(f16, 'utf8');
+    const view = () => readFileSync(join(hints, 'tools/test/port-hints.json'), 'utf8');
+    const gen = (...a) => spawnSync('node', ['tools/gen.mjs', ...a], { cwd: hints, encoding: 'utf8' });
+    gen();
+    const v0 = view();
+    writeFileSync(f16, p16.replace('units:db', 'units:pc'));
+    expect(gen('--check').status === 1, 'port hints: a hint moved in one plugin\'s file leaves the view stale');
+    gen();
+    expect(view() !== v0 && JSON.parse(view())['omx-eq16'].b1_gain.unit === 'units:pc' && gen('--check').status === 0, 'port hints: and regenerating moves the view');
+    writeFileSync(f16, p16);
+    gen();
+    writeFileSync(join(hints, 'tools/test/port-hints.json'), v0.replace('units:db', 'units:pc'));
+    expect(gen('--check').status === 1, 'port hints: a hand edit of the generated view goes stale');
+    gen();
+    expect(view() === v0 && gen('--check').status === 0, 'port hints: restored, the view is whole again');
   }
 
   // ---- 7. the identity oracle holds a control that re-arms ---------------------------------------

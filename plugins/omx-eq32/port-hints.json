@@ -1,0 +1,1162 @@
+{
+  "on": {
+    "props": [
+      "lv2:toggled"
+    ],
+    "unit": null,
+    "points": []
+  },
+  "hpf_on": {
+    "props": [
+      "lv2:toggled"
+    ],
+    "unit": null,
+    "points": []
+  },
+  "hpf_freq": {
+    "props": [
+      "pprops:logarithmic"
+    ],
+    "unit": "units:hz",
+    "points": []
+  },
+  "hpf_slope": {
+    "props": [
+      "lv2:enumeration",
+      "lv2:integer"
+    ],
+    "unit": null,
+    "points": [
+      "12 12 dB/oct",
+      "24 24 dB/oct"
+    ]
+  },
+  "lpf_on": {
+    "props": [
+      "lv2:toggled"
+    ],
+    "unit": null,
+    "points": []
+  },
+  "lpf_freq": {
+    "props": [
+      "pprops:logarithmic"
+    ],
+    "unit": "units:hz",
+    "points": []
+  },
+  "lpf_slope": {
+    "props": [
+      "lv2:enumeration",
+      "lv2:integer"
+    ],
+    "unit": null,
+    "points": [
+      "12 12 dB/oct",
+      "24 24 dB/oct"
+    ]
+  },
+  "b1_type": {
+    "props": [
+      "lv2:enumeration",
+      "lv2:integer"
+    ],
+    "unit": null,
+    "points": [
+      "0 Bell",
+      "1 Low Shelf",
+      "2 High Shelf",
+      "3 Notch",
+      "4 All-pass 1st",
+      "5 All-pass 2nd"
+    ]
+  },
+  "b1_freq": {
+    "props": [
+      "pprops:logarithmic"
+    ],
+    "unit": "units:hz",
+    "points": []
+  },
+  "b1_gain": {
+    "props": [],
+    "unit": "units:db",
+    "points": []
+  },
+  "b1_on": {
+    "props": [
+      "lv2:toggled"
+    ],
+    "unit": null,
+    "points": []
+  },
+  "b2_type": {
+    "props": [
+      "lv2:enumeration",
+      "lv2:integer"
+    ],
+    "unit": null,
+    "points": [
+      "0 Bell",
+      "1 Low Shelf",
+      "2 High Shelf",
+      "3 Notch",
+      "4 All-pass 1st",
+      "5 All-pass 2nd"
+    ]
+  },
+  "b2_freq": {
+    "props": [
+      "pprops:logarithmic"
+    ],
+    "unit": "units:hz",
+    "points": []
+  },
+  "b2_gain": {
+    "props": [],
+    "unit": "units:db",
+    "points": []
+  },
+  "b2_on": {
+    "props": [
+      "lv2:toggled"
+    ],
+    "unit": null,
+    "points": []
+  },
+  "b3_type": {
+    "props": [
+      "lv2:enumeration",
+      "lv2:integer"
+    ],
+    "unit": null,
+    "points": [
+      "0 Bell",
+      "1 Low Shelf",
+      "2 High Shelf",
+      "3 Notch",
+      "4 All-pass 1st",
+      "5 All-pass 2nd"
+    ]
+  },
+  "b3_freq": {
+    "props": [
+      "pprops:logarithmic"
+    ],
+    "unit": "units:hz",
+    "points": []
+  },
+  "b3_gain": {
+    "props": [],
+    "unit": "units:db",
+    "points": []
+  },
+  "b3_on": {
+    "props": [
+      "lv2:toggled"
+    ],
+    "unit": null,
+    "points": []
+  },
+  "b4_type": {
+    "props": [
+      "lv2:enumeration",
+      "lv2:integer"
+    ],
+    "unit": null,
+    "points": [
+      "0 Bell",
+      "1 Low Shelf",
+      "2 High Shelf",
+      "3 Notch",
+      "4 All-pass 1st",
+      "5 All-pass 2nd"
+    ]
+  },
+  "b4_freq": {
+    "props": [
+      "pprops:logarithmic"
+    ],
+    "unit": "units:hz",
+    "points": []
+  },
+  "b4_gain": {
+    "props": [],
+    "unit": "units:db",
+    "points": []
+  },
+  "b4_on": {
+    "props": [
+      "lv2:toggled"
+    ],
+    "unit": null,
+    "points": []
+  },
+  "b5_type": {
+    "props": [
+      "lv2:enumeration",
+      "lv2:integer"
+    ],
+    "unit": null,
+    "points": [
+      "0 Bell",
+      "1 Low Shelf",
+      "2 High Shelf",
+      "3 Notch",
+      "4 All-pass 1st",
+      "5 All-pass 2nd"
+    ]
+  },
+  "b5_freq": {
+    "props": [
+      "pprops:logarithmic"
+    ],
+    "unit": "units:hz",
+    "points": []
+  },
+  "b5_gain": {
+    "props": [],
+    "unit": "units:db",
+    "points": []
+  },
+  "b5_on": {
+    "props": [
+      "lv2:toggled"
+    ],
+    "unit": null,
+    "points": []
+  },
+  "b6_type": {
+    "props": [
+      "lv2:enumeration",
+      "lv2:integer"
+    ],
+    "unit": null,
+    "points": [
+      "0 Bell",
+      "1 Low Shelf",
+      "2 High Shelf",
+      "3 Notch",
+      "4 All-pass 1st",
+      "5 All-pass 2nd"
+    ]
+  },
+  "b6_freq": {
+    "props": [
+      "pprops:logarithmic"
+    ],
+    "unit": "units:hz",
+    "points": []
+  },
+  "b6_gain": {
+    "props": [],
+    "unit": "units:db",
+    "points": []
+  },
+  "b6_on": {
+    "props": [
+      "lv2:toggled"
+    ],
+    "unit": null,
+    "points": []
+  },
+  "b7_type": {
+    "props": [
+      "lv2:enumeration",
+      "lv2:integer"
+    ],
+    "unit": null,
+    "points": [
+      "0 Bell",
+      "1 Low Shelf",
+      "2 High Shelf",
+      "3 Notch",
+      "4 All-pass 1st",
+      "5 All-pass 2nd"
+    ]
+  },
+  "b7_freq": {
+    "props": [
+      "pprops:logarithmic"
+    ],
+    "unit": "units:hz",
+    "points": []
+  },
+  "b7_gain": {
+    "props": [],
+    "unit": "units:db",
+    "points": []
+  },
+  "b7_on": {
+    "props": [
+      "lv2:toggled"
+    ],
+    "unit": null,
+    "points": []
+  },
+  "b8_type": {
+    "props": [
+      "lv2:enumeration",
+      "lv2:integer"
+    ],
+    "unit": null,
+    "points": [
+      "0 Bell",
+      "1 Low Shelf",
+      "2 High Shelf",
+      "3 Notch",
+      "4 All-pass 1st",
+      "5 All-pass 2nd"
+    ]
+  },
+  "b8_freq": {
+    "props": [
+      "pprops:logarithmic"
+    ],
+    "unit": "units:hz",
+    "points": []
+  },
+  "b8_gain": {
+    "props": [],
+    "unit": "units:db",
+    "points": []
+  },
+  "b8_on": {
+    "props": [
+      "lv2:toggled"
+    ],
+    "unit": null,
+    "points": []
+  },
+  "b9_type": {
+    "props": [
+      "lv2:enumeration",
+      "lv2:integer"
+    ],
+    "unit": null,
+    "points": [
+      "0 Bell",
+      "1 Low Shelf",
+      "2 High Shelf",
+      "3 Notch",
+      "4 All-pass 1st",
+      "5 All-pass 2nd"
+    ]
+  },
+  "b9_freq": {
+    "props": [
+      "pprops:logarithmic"
+    ],
+    "unit": "units:hz",
+    "points": []
+  },
+  "b9_gain": {
+    "props": [],
+    "unit": "units:db",
+    "points": []
+  },
+  "b9_on": {
+    "props": [
+      "lv2:toggled"
+    ],
+    "unit": null,
+    "points": []
+  },
+  "b10_type": {
+    "props": [
+      "lv2:enumeration",
+      "lv2:integer"
+    ],
+    "unit": null,
+    "points": [
+      "0 Bell",
+      "1 Low Shelf",
+      "2 High Shelf",
+      "3 Notch",
+      "4 All-pass 1st",
+      "5 All-pass 2nd"
+    ]
+  },
+  "b10_freq": {
+    "props": [
+      "pprops:logarithmic"
+    ],
+    "unit": "units:hz",
+    "points": []
+  },
+  "b10_gain": {
+    "props": [],
+    "unit": "units:db",
+    "points": []
+  },
+  "b10_on": {
+    "props": [
+      "lv2:toggled"
+    ],
+    "unit": null,
+    "points": []
+  },
+  "b11_type": {
+    "props": [
+      "lv2:enumeration",
+      "lv2:integer"
+    ],
+    "unit": null,
+    "points": [
+      "0 Bell",
+      "1 Low Shelf",
+      "2 High Shelf",
+      "3 Notch",
+      "4 All-pass 1st",
+      "5 All-pass 2nd"
+    ]
+  },
+  "b11_freq": {
+    "props": [
+      "pprops:logarithmic"
+    ],
+    "unit": "units:hz",
+    "points": []
+  },
+  "b11_gain": {
+    "props": [],
+    "unit": "units:db",
+    "points": []
+  },
+  "b11_on": {
+    "props": [
+      "lv2:toggled"
+    ],
+    "unit": null,
+    "points": []
+  },
+  "b12_type": {
+    "props": [
+      "lv2:enumeration",
+      "lv2:integer"
+    ],
+    "unit": null,
+    "points": [
+      "0 Bell",
+      "1 Low Shelf",
+      "2 High Shelf",
+      "3 Notch",
+      "4 All-pass 1st",
+      "5 All-pass 2nd"
+    ]
+  },
+  "b12_freq": {
+    "props": [
+      "pprops:logarithmic"
+    ],
+    "unit": "units:hz",
+    "points": []
+  },
+  "b12_gain": {
+    "props": [],
+    "unit": "units:db",
+    "points": []
+  },
+  "b12_on": {
+    "props": [
+      "lv2:toggled"
+    ],
+    "unit": null,
+    "points": []
+  },
+  "b13_type": {
+    "props": [
+      "lv2:enumeration",
+      "lv2:integer"
+    ],
+    "unit": null,
+    "points": [
+      "0 Bell",
+      "1 Low Shelf",
+      "2 High Shelf",
+      "3 Notch",
+      "4 All-pass 1st",
+      "5 All-pass 2nd"
+    ]
+  },
+  "b13_freq": {
+    "props": [
+      "pprops:logarithmic"
+    ],
+    "unit": "units:hz",
+    "points": []
+  },
+  "b13_gain": {
+    "props": [],
+    "unit": "units:db",
+    "points": []
+  },
+  "b13_on": {
+    "props": [
+      "lv2:toggled"
+    ],
+    "unit": null,
+    "points": []
+  },
+  "b14_type": {
+    "props": [
+      "lv2:enumeration",
+      "lv2:integer"
+    ],
+    "unit": null,
+    "points": [
+      "0 Bell",
+      "1 Low Shelf",
+      "2 High Shelf",
+      "3 Notch",
+      "4 All-pass 1st",
+      "5 All-pass 2nd"
+    ]
+  },
+  "b14_freq": {
+    "props": [
+      "pprops:logarithmic"
+    ],
+    "unit": "units:hz",
+    "points": []
+  },
+  "b14_gain": {
+    "props": [],
+    "unit": "units:db",
+    "points": []
+  },
+  "b14_on": {
+    "props": [
+      "lv2:toggled"
+    ],
+    "unit": null,
+    "points": []
+  },
+  "b15_type": {
+    "props": [
+      "lv2:enumeration",
+      "lv2:integer"
+    ],
+    "unit": null,
+    "points": [
+      "0 Bell",
+      "1 Low Shelf",
+      "2 High Shelf",
+      "3 Notch",
+      "4 All-pass 1st",
+      "5 All-pass 2nd"
+    ]
+  },
+  "b15_freq": {
+    "props": [
+      "pprops:logarithmic"
+    ],
+    "unit": "units:hz",
+    "points": []
+  },
+  "b15_gain": {
+    "props": [],
+    "unit": "units:db",
+    "points": []
+  },
+  "b15_on": {
+    "props": [
+      "lv2:toggled"
+    ],
+    "unit": null,
+    "points": []
+  },
+  "b16_type": {
+    "props": [
+      "lv2:enumeration",
+      "lv2:integer"
+    ],
+    "unit": null,
+    "points": [
+      "0 Bell",
+      "1 Low Shelf",
+      "2 High Shelf",
+      "3 Notch",
+      "4 All-pass 1st",
+      "5 All-pass 2nd"
+    ]
+  },
+  "b16_freq": {
+    "props": [
+      "pprops:logarithmic"
+    ],
+    "unit": "units:hz",
+    "points": []
+  },
+  "b16_gain": {
+    "props": [],
+    "unit": "units:db",
+    "points": []
+  },
+  "b16_on": {
+    "props": [
+      "lv2:toggled"
+    ],
+    "unit": null,
+    "points": []
+  },
+  "b17_type": {
+    "props": [
+      "lv2:enumeration",
+      "lv2:integer"
+    ],
+    "unit": null,
+    "points": [
+      "0 Bell",
+      "1 Low Shelf",
+      "2 High Shelf",
+      "3 Notch",
+      "4 All-pass 1st",
+      "5 All-pass 2nd"
+    ]
+  },
+  "b17_freq": {
+    "props": [
+      "pprops:logarithmic"
+    ],
+    "unit": "units:hz",
+    "points": []
+  },
+  "b17_gain": {
+    "props": [],
+    "unit": "units:db",
+    "points": []
+  },
+  "b17_on": {
+    "props": [
+      "lv2:toggled"
+    ],
+    "unit": null,
+    "points": []
+  },
+  "b18_type": {
+    "props": [
+      "lv2:enumeration",
+      "lv2:integer"
+    ],
+    "unit": null,
+    "points": [
+      "0 Bell",
+      "1 Low Shelf",
+      "2 High Shelf",
+      "3 Notch",
+      "4 All-pass 1st",
+      "5 All-pass 2nd"
+    ]
+  },
+  "b18_freq": {
+    "props": [
+      "pprops:logarithmic"
+    ],
+    "unit": "units:hz",
+    "points": []
+  },
+  "b18_gain": {
+    "props": [],
+    "unit": "units:db",
+    "points": []
+  },
+  "b18_on": {
+    "props": [
+      "lv2:toggled"
+    ],
+    "unit": null,
+    "points": []
+  },
+  "b19_type": {
+    "props": [
+      "lv2:enumeration",
+      "lv2:integer"
+    ],
+    "unit": null,
+    "points": [
+      "0 Bell",
+      "1 Low Shelf",
+      "2 High Shelf",
+      "3 Notch",
+      "4 All-pass 1st",
+      "5 All-pass 2nd"
+    ]
+  },
+  "b19_freq": {
+    "props": [
+      "pprops:logarithmic"
+    ],
+    "unit": "units:hz",
+    "points": []
+  },
+  "b19_gain": {
+    "props": [],
+    "unit": "units:db",
+    "points": []
+  },
+  "b19_on": {
+    "props": [
+      "lv2:toggled"
+    ],
+    "unit": null,
+    "points": []
+  },
+  "b20_type": {
+    "props": [
+      "lv2:enumeration",
+      "lv2:integer"
+    ],
+    "unit": null,
+    "points": [
+      "0 Bell",
+      "1 Low Shelf",
+      "2 High Shelf",
+      "3 Notch",
+      "4 All-pass 1st",
+      "5 All-pass 2nd"
+    ]
+  },
+  "b20_freq": {
+    "props": [
+      "pprops:logarithmic"
+    ],
+    "unit": "units:hz",
+    "points": []
+  },
+  "b20_gain": {
+    "props": [],
+    "unit": "units:db",
+    "points": []
+  },
+  "b20_on": {
+    "props": [
+      "lv2:toggled"
+    ],
+    "unit": null,
+    "points": []
+  },
+  "b21_type": {
+    "props": [
+      "lv2:enumeration",
+      "lv2:integer"
+    ],
+    "unit": null,
+    "points": [
+      "0 Bell",
+      "1 Low Shelf",
+      "2 High Shelf",
+      "3 Notch",
+      "4 All-pass 1st",
+      "5 All-pass 2nd"
+    ]
+  },
+  "b21_freq": {
+    "props": [
+      "pprops:logarithmic"
+    ],
+    "unit": "units:hz",
+    "points": []
+  },
+  "b21_gain": {
+    "props": [],
+    "unit": "units:db",
+    "points": []
+  },
+  "b21_on": {
+    "props": [
+      "lv2:toggled"
+    ],
+    "unit": null,
+    "points": []
+  },
+  "b22_type": {
+    "props": [
+      "lv2:enumeration",
+      "lv2:integer"
+    ],
+    "unit": null,
+    "points": [
+      "0 Bell",
+      "1 Low Shelf",
+      "2 High Shelf",
+      "3 Notch",
+      "4 All-pass 1st",
+      "5 All-pass 2nd"
+    ]
+  },
+  "b22_freq": {
+    "props": [
+      "pprops:logarithmic"
+    ],
+    "unit": "units:hz",
+    "points": []
+  },
+  "b22_gain": {
+    "props": [],
+    "unit": "units:db",
+    "points": []
+  },
+  "b22_on": {
+    "props": [
+      "lv2:toggled"
+    ],
+    "unit": null,
+    "points": []
+  },
+  "b23_type": {
+    "props": [
+      "lv2:enumeration",
+      "lv2:integer"
+    ],
+    "unit": null,
+    "points": [
+      "0 Bell",
+      "1 Low Shelf",
+      "2 High Shelf",
+      "3 Notch",
+      "4 All-pass 1st",
+      "5 All-pass 2nd"
+    ]
+  },
+  "b23_freq": {
+    "props": [
+      "pprops:logarithmic"
+    ],
+    "unit": "units:hz",
+    "points": []
+  },
+  "b23_gain": {
+    "props": [],
+    "unit": "units:db",
+    "points": []
+  },
+  "b23_on": {
+    "props": [
+      "lv2:toggled"
+    ],
+    "unit": null,
+    "points": []
+  },
+  "b24_type": {
+    "props": [
+      "lv2:enumeration",
+      "lv2:integer"
+    ],
+    "unit": null,
+    "points": [
+      "0 Bell",
+      "1 Low Shelf",
+      "2 High Shelf",
+      "3 Notch",
+      "4 All-pass 1st",
+      "5 All-pass 2nd"
+    ]
+  },
+  "b24_freq": {
+    "props": [
+      "pprops:logarithmic"
+    ],
+    "unit": "units:hz",
+    "points": []
+  },
+  "b24_gain": {
+    "props": [],
+    "unit": "units:db",
+    "points": []
+  },
+  "b24_on": {
+    "props": [
+      "lv2:toggled"
+    ],
+    "unit": null,
+    "points": []
+  },
+  "b25_type": {
+    "props": [
+      "lv2:enumeration",
+      "lv2:integer"
+    ],
+    "unit": null,
+    "points": [
+      "0 Bell",
+      "1 Low Shelf",
+      "2 High Shelf",
+      "3 Notch",
+      "4 All-pass 1st",
+      "5 All-pass 2nd"
+    ]
+  },
+  "b25_freq": {
+    "props": [
+      "pprops:logarithmic"
+    ],
+    "unit": "units:hz",
+    "points": []
+  },
+  "b25_gain": {
+    "props": [],
+    "unit": "units:db",
+    "points": []
+  },
+  "b25_on": {
+    "props": [
+      "lv2:toggled"
+    ],
+    "unit": null,
+    "points": []
+  },
+  "b26_type": {
+    "props": [
+      "lv2:enumeration",
+      "lv2:integer"
+    ],
+    "unit": null,
+    "points": [
+      "0 Bell",
+      "1 Low Shelf",
+      "2 High Shelf",
+      "3 Notch",
+      "4 All-pass 1st",
+      "5 All-pass 2nd"
+    ]
+  },
+  "b26_freq": {
+    "props": [
+      "pprops:logarithmic"
+    ],
+    "unit": "units:hz",
+    "points": []
+  },
+  "b26_gain": {
+    "props": [],
+    "unit": "units:db",
+    "points": []
+  },
+  "b26_on": {
+    "props": [
+      "lv2:toggled"
+    ],
+    "unit": null,
+    "points": []
+  },
+  "b27_type": {
+    "props": [
+      "lv2:enumeration",
+      "lv2:integer"
+    ],
+    "unit": null,
+    "points": [
+      "0 Bell",
+      "1 Low Shelf",
+      "2 High Shelf",
+      "3 Notch",
+      "4 All-pass 1st",
+      "5 All-pass 2nd"
+    ]
+  },
+  "b27_freq": {
+    "props": [
+      "pprops:logarithmic"
+    ],
+    "unit": "units:hz",
+    "points": []
+  },
+  "b27_gain": {
+    "props": [],
+    "unit": "units:db",
+    "points": []
+  },
+  "b27_on": {
+    "props": [
+      "lv2:toggled"
+    ],
+    "unit": null,
+    "points": []
+  },
+  "b28_type": {
+    "props": [
+      "lv2:enumeration",
+      "lv2:integer"
+    ],
+    "unit": null,
+    "points": [
+      "0 Bell",
+      "1 Low Shelf",
+      "2 High Shelf",
+      "3 Notch",
+      "4 All-pass 1st",
+      "5 All-pass 2nd"
+    ]
+  },
+  "b28_freq": {
+    "props": [
+      "pprops:logarithmic"
+    ],
+    "unit": "units:hz",
+    "points": []
+  },
+  "b28_gain": {
+    "props": [],
+    "unit": "units:db",
+    "points": []
+  },
+  "b28_on": {
+    "props": [
+      "lv2:toggled"
+    ],
+    "unit": null,
+    "points": []
+  },
+  "b29_type": {
+    "props": [
+      "lv2:enumeration",
+      "lv2:integer"
+    ],
+    "unit": null,
+    "points": [
+      "0 Bell",
+      "1 Low Shelf",
+      "2 High Shelf",
+      "3 Notch",
+      "4 All-pass 1st",
+      "5 All-pass 2nd"
+    ]
+  },
+  "b29_freq": {
+    "props": [
+      "pprops:logarithmic"
+    ],
+    "unit": "units:hz",
+    "points": []
+  },
+  "b29_gain": {
+    "props": [],
+    "unit": "units:db",
+    "points": []
+  },
+  "b29_on": {
+    "props": [
+      "lv2:toggled"
+    ],
+    "unit": null,
+    "points": []
+  },
+  "b30_type": {
+    "props": [
+      "lv2:enumeration",
+      "lv2:integer"
+    ],
+    "unit": null,
+    "points": [
+      "0 Bell",
+      "1 Low Shelf",
+      "2 High Shelf",
+      "3 Notch",
+      "4 All-pass 1st",
+      "5 All-pass 2nd"
+    ]
+  },
+  "b30_freq": {
+    "props": [
+      "pprops:logarithmic"
+    ],
+    "unit": "units:hz",
+    "points": []
+  },
+  "b30_gain": {
+    "props": [],
+    "unit": "units:db",
+    "points": []
+  },
+  "b30_on": {
+    "props": [
+      "lv2:toggled"
+    ],
+    "unit": null,
+    "points": []
+  },
+  "b31_type": {
+    "props": [
+      "lv2:enumeration",
+      "lv2:integer"
+    ],
+    "unit": null,
+    "points": [
+      "0 Bell",
+      "1 Low Shelf",
+      "2 High Shelf",
+      "3 Notch",
+      "4 All-pass 1st",
+      "5 All-pass 2nd"
+    ]
+  },
+  "b31_freq": {
+    "props": [
+      "pprops:logarithmic"
+    ],
+    "unit": "units:hz",
+    "points": []
+  },
+  "b31_gain": {
+    "props": [],
+    "unit": "units:db",
+    "points": []
+  },
+  "b31_on": {
+    "props": [
+      "lv2:toggled"
+    ],
+    "unit": null,
+    "points": []
+  },
+  "b32_type": {
+    "props": [
+      "lv2:enumeration",
+      "lv2:integer"
+    ],
+    "unit": null,
+    "points": [
+      "0 Bell",
+      "1 Low Shelf",
+      "2 High Shelf",
+      "3 Notch",
+      "4 All-pass 1st",
+      "5 All-pass 2nd"
+    ]
+  },
+  "b32_freq": {
+    "props": [
+      "pprops:logarithmic"
+    ],
+    "unit": "units:hz",
+    "points": []
+  },
+  "b32_gain": {
+    "props": [],
+    "unit": "units:db",
+    "points": []
+  },
+  "b32_on": {
+    "props": [
+      "lv2:toggled"
+    ],
+    "unit": null,
+    "points": []
+  },
+  "enabled": {
+    "props": [
+      "lv2:toggled"
+    ],
+    "unit": null,
+    "points": []
+  },
+  "latency": {
+    "props": [
+      "lv2:integer",
+      "lv2:reportsLatency"
+    ],
+    "unit": "units:frame",
+    "points": []
+  }
+}
