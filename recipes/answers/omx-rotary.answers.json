@@ -1,0 +1,63 @@
+{
+  "stem": "omx-rotary",
+  "kernel": "rotary",
+  "description": "The ROTARY SPEAKER stage: a drum rotor on the low band and a horn rotor on the high band of one complementary split, weighed by the balance law, mixed with the dry signal.",
+  "clap": {
+    "features": [
+      "audio-effect",
+      "stereo"
+    ]
+  },
+  "lv2": {
+    "class": "lv2:Plugin"
+  },
+  "params": [
+    {
+      "symbol": "hornSlow",
+      "name": "Horn Slow",
+      "ref": "ROTARY_HORN_SLOW_RANGE"
+    },
+    {
+      "symbol": "hornFast",
+      "name": "Horn Fast",
+      "ref": "ROTARY_HORN_FAST_RANGE"
+    },
+    {
+      "symbol": "drumSlow",
+      "name": "Drum Slow",
+      "ref": "ROTARY_DRUM_SLOW_RANGE"
+    },
+    {
+      "symbol": "drumFast",
+      "name": "Drum Fast",
+      "ref": "ROTARY_DRUM_FAST_RANGE"
+    },
+    {
+      "symbol": "accel",
+      "name": "Accel",
+      "ref": "ROTARY_ACCEL_RANGE"
+    },
+    {
+      "symbol": "balance",
+      "name": "Balance",
+      "ref": "ROTARY_BALANCE_RANGE"
+    },
+    {
+      "symbol": "mix",
+      "name": "Mix",
+      "ref": "ROTARY_MIX_RANGE"
+    },
+    {
+      "symbol": "speed",
+      "name": "Speed",
+      "ref": "ROTARY_SPEEDS",
+      "values": [
+        "Stop",
+        "Slow",
+        "Fast"
+      ]
+    }
+  ],
+  "omxdspMin": "0.2.0",
+  "contractRelease": "1.3.0"
+}
