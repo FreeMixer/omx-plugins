@@ -100,6 +100,7 @@ parameter header, installed in %{_includedir}/omx-plugins.
 /usr/lib/clap/omx-eq32.clap
 /usr/lib/clap/omx-keyed-gate.clap
 /usr/lib/clap/omx-strip.clap
+/usr/lib/clap/omx-tremolo.clap
 
 %files devel
 %license LICENSE
@@ -115,6 +116,7 @@ parameter header, installed in %{_includedir}/omx-plugins.
 %{_libdir}/lv2/omx-eq32.lv2/
 %{_libdir}/lv2/omx-keyed-gate.lv2/
 %{_libdir}/lv2/omx-strip.lv2/
+%{_libdir}/lv2/omx-tremolo.lv2/
 
 %changelog
 * Thu Oct 08 2026 Pau Aliagas <linuxnow@gmail.com> - 0.2.0-1
