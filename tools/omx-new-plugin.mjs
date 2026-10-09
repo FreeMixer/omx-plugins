@@ -19,7 +19,7 @@
  * 3. It writes every artifact from the recipe's templates: the declaration, the Makefile, the CLAP
  *    and LV2 faces, the kernel binding and the kernel-identity test as RED-FIRST stubs (each marked
  *    OMX_WIZARD_STUB, each failing a named test until it is written), the packaging lines, the
- *    README row and section and the CHANGELOG entry; then the generated files through tools/gen.mjs.
+ *    README row and section; then the generated files through tools/gen.mjs.
  * 4. It prints the COMMIT PLAN: one concern per commit, in the recipe's layer order, each with its
  *    files and a plain message (tools/commit-plan-check.mjs holds a range to the same order).
  * 5. It runs `gen.mjs --check`, the plugin's `make test` and the completeness test for the plugin,

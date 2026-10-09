@@ -190,7 +190,6 @@ async function main() {
     ['ciCovers', 'ci-installed-files', () => edit('.github/workflows/ci.yml', (s) => s.replaceAll('/usr/lib/clap/omx-drive.clap', ''))],
     ['catalogueRow', 'catalogue-row', () => edit('README.md', (s) => s.replace('`org.openmixer.drive`', '`org.openmixer.x`'))],
     ['heading', 'manual-section', () => edit('README.md', (s) => s.replace('### omx drive\n', '### drive\n'))],
-    ['namedIn', 'changelog', () => edit('CHANGELOG.md', (s) => s.replace('delay, drive,', 'delay,'))],
     ['noFiles', 'no-cpp', () => add(`${P}/shell.cpp`, '// SPDX-License-Identifier: GPL-3.0-or-later\n')],
     ['noText', 'no-dpf', () => add(`${P}/dpf_shell.h`, '#include "DistrhoPlugin.hpp"\n')],
     ['noCopiedDsp', 'no-copied-dsp', () => add(`${P}/copied.h`, `static inline float ${dspName}(float x) {\n  return x;\n}\n`)],
@@ -220,10 +219,10 @@ async function main() {
   const unheld = await ratchet();
   undo();
   expect(unheld.fresh.includes("omx-drive manual-section"), `sabotage: a gap the debt does not hold fails the ratchet (${unheld.fresh.join(", ")})`);
-  undo = edit('CHANGELOG.md', (s) => `${s}\n- The chorus, a note for the test.\n`);
+  undo = edit('README.md', (s) => `${s}\n### omx chorus\n`);
   const paid = await ratchet();
   undo();
-  expect(paid.stale.some((x) => x.startsWith('omx-chorus changelog')), `sabotage: a debt entry now satisfied fails the ratchet as stale (${paid.stale.join(', ')})`);
+  expect(paid.stale.some((x) => x.startsWith('omx-chorus manual-section')), `sabotage: a debt entry now satisfied fails the ratchet as stale (${paid.stale.join(', ')})`);
 
   const ghost = await (async () => {
     const reports = [];
@@ -254,9 +253,9 @@ async function main() {
     git(repo, 'checkout', '-q', '-b', 'topic');
     const level = debtGrowth(repo, loadDebt(repo));
     expect(level.base === loadDebt(repo).length && !level.grown, `the debt as main holds it has not grown (${level.base} entries at the merge-base)`);
-    const more = [...loadDebt(repo), { plugin: 'omx-drive', entry: 'changelog', owedBy: 'sabotage' }];
+    const more = [...loadDebt(repo), { plugin: 'omx-drive', entry: 'manual-section', owedBy: 'sabotage' }];
     const grew = debtGrowth(repo, more);
-    expect(grew.grown && grew.added.join() === 'omx-drive changelog', `sabotage: a debt entry added since main fails the growth check (${grew.added.join()})`);
+    expect(grew.grown && grew.added.join() === 'omx-drive manual-section', `sabotage: a debt entry added since main fails the growth check (${grew.added.join()})`);
     const fewer = debtGrowth(repo, loadDebt(repo).slice(1));
     expect(!fewer.grown, 'a debt that shrank passes the growth check');
     git(repo, 'update-ref', '-d', 'refs/remotes/origin/main');
