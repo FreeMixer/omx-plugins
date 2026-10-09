@@ -288,5 +288,48 @@
       ],
       "unit": "units:frame"
     }
+  },
+  "panel": {
+    "family": "geq",
+    "roles": {},
+    "sections": [
+      {
+        "key": "geq",
+        "label": "Geq",
+        "controls": [
+          "band01",
+          "band02",
+          "band03",
+          "band04",
+          "band05",
+          "band06",
+          "band07",
+          "band08",
+          "band09",
+          "band10",
+          "band11",
+          "band12",
+          "band13",
+          "band14",
+          "band15",
+          "band16",
+          "band17",
+          "band18",
+          "band19",
+          "band20",
+          "band21",
+          "band22",
+          "band23",
+          "band24",
+          "band25",
+          "band26",
+          "band27",
+          "band28",
+          "band29",
+          "band30",
+          "band31"
+        ]
+      }
+    ]
   }
 }

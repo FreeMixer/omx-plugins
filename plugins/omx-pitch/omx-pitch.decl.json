@@ -56,5 +56,20 @@
       ],
       "unit": "units:frame"
     }
+  },
+  "panel": {
+    "family": "pitch",
+    "roles": {},
+    "sections": [
+      {
+        "key": "pitch",
+        "label": "Pitch",
+        "controls": [
+          "semitones",
+          "cents",
+          "mix"
+        ]
+      }
+    ]
   }
 }

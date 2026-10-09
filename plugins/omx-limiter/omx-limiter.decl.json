@@ -65,5 +65,20 @@
       ],
       "unit": "units:frame"
     }
+  },
+  "panel": {
+    "family": "limiter",
+    "roles": {},
+    "sections": [
+      {
+        "key": "limiter",
+        "label": "Limiter",
+        "controls": [
+          "ceilingDb",
+          "lookaheadMs",
+          "releaseMs"
+        ]
+      }
+    ]
   }
 }

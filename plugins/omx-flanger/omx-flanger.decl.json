@@ -70,5 +70,21 @@
       ],
       "unit": "units:frame"
     }
+  },
+  "panel": {
+    "family": "flanger",
+    "roles": {},
+    "sections": [
+      {
+        "key": "flanger",
+        "label": "Flanger",
+        "controls": [
+          "rate",
+          "depth",
+          "feedback",
+          "mix"
+        ]
+      }
+    ]
   }
 }

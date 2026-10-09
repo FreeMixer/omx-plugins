@@ -98,6 +98,85 @@
     "enabled": { "props": ["lv2:toggled"] },
     "latency": { "props": ["lv2:integer", "lv2:reportsLatency"], "unit": "units:frame" }
   },
+  "panel": {
+    "family": "strip",
+    "roles": {},
+    "sections": [
+      {
+        "key": "input",
+        "label": "Input",
+        "controls": [
+          "trimDb",
+          "hpfOn",
+          "hpfFreq",
+          "hpfSlope",
+          "lpfOn",
+          "lpfFreq",
+          "lpfSlope"
+        ]
+      },
+      {
+        "key": "gate",
+        "label": "Gate",
+        "controls": [
+          "gateOn",
+          "gateThreshold",
+          "gateRatio",
+          "gateRange",
+          "gateAttack",
+          "gateRelease"
+        ]
+      },
+      {
+        "key": "eq",
+        "label": "EQ",
+        "controls": [
+          "eqOn",
+          "eq1Type",
+          "eq1Freq",
+          "eq1Gain",
+          "eq1Q",
+          "eq1On",
+          "eq2Type",
+          "eq2Freq",
+          "eq2Gain",
+          "eq2Q",
+          "eq2On",
+          "eq3Type",
+          "eq3Freq",
+          "eq3Gain",
+          "eq3Q",
+          "eq3On",
+          "eq4Type",
+          "eq4Freq",
+          "eq4Gain",
+          "eq4Q",
+          "eq4On"
+        ]
+      },
+      {
+        "key": "comp",
+        "label": "Comp",
+        "controls": [
+          "compOn",
+          "compThreshold",
+          "compRatio",
+          "compKnee",
+          "compAttack",
+          "compRelease",
+          "compMakeup",
+          "compRms"
+        ]
+      },
+      {
+        "key": "order",
+        "label": "Order",
+        "controls": [
+          "order"
+        ]
+      }
+    ]
+  },
   "manual": [
     "Four stages, each the console's own module, run one after the other:",
     "",

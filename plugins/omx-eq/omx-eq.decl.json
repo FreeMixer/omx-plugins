@@ -203,6 +203,29 @@
       "unit": "units:frame"
     }
   },
+  "panel": {
+    "family": "eq",
+    "roles": {},
+    "sections": [
+      {
+        "key": "eq",
+        "label": "EQ",
+        "controls": [
+          "hpf_on",
+          "hpf_freq",
+          "hpf_slope",
+          "lpf_on",
+          "lpf_freq",
+          "lpf_slope",
+          "type",
+          "freq",
+          "gain",
+          "q",
+          "on"
+        ]
+      }
+    ]
+  },
   "manual": [
     "| Section | Parameters |",
     "|---|---|",

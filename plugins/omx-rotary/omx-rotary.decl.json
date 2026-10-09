@@ -127,5 +127,25 @@
       ],
       "unit": "units:frame"
     }
+  },
+  "panel": {
+    "family": "rotary",
+    "roles": {},
+    "sections": [
+      {
+        "key": "rotary",
+        "label": "Rotary",
+        "controls": [
+          "hornSlowHz",
+          "hornFastHz",
+          "drumSlowHz",
+          "drumFastHz",
+          "accel",
+          "balance",
+          "mix",
+          "speed"
+        ]
+      }
+    ]
   }
 }

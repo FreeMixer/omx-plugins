@@ -80,5 +80,22 @@
       ],
       "unit": "units:frame"
     }
+  },
+  "panel": {
+    "family": "chorus",
+    "roles": {},
+    "sections": [
+      {
+        "key": "chorus",
+        "label": "Chorus",
+        "controls": [
+          "spread",
+          "rate",
+          "depth",
+          "voices",
+          "mix"
+        ]
+      }
+    ]
   }
 }

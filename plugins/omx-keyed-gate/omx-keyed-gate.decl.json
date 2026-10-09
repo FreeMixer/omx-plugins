@@ -165,6 +165,28 @@
       "unit": "units:frame"
     }
   },
+  "panel": {
+    "family": "gate",
+    "roles": {},
+    "sections": [
+      {
+        "key": "gate",
+        "label": "Keyed-gate",
+        "controls": [
+          "key_external",
+          "threshold",
+          "ratio",
+          "range",
+          "attack",
+          "release",
+          "knee_start",
+          "knee_end",
+          "hold",
+          "hysteresis"
+        ]
+      }
+    ]
+  },
   "manual": [
     "The console's gate, keyed: the stereo signal is gated while the detector listens to a second, mono",
     "input, the **key** (an LV2 sidechain port; in CLAP a second input port). With nothing routed to the",

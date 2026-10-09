@@ -118,5 +118,25 @@
       ],
       "unit": "units:frame"
     }
+  },
+  "panel": {
+    "family": "deesser",
+    "roles": {},
+    "sections": [
+      {
+        "key": "deesser",
+        "label": "Deesser",
+        "controls": [
+          "deessFreq",
+          "deessWidth",
+          "deessThreshold",
+          "deessRatio",
+          "deessRange",
+          "deessAttack",
+          "deessRelease",
+          "deessMode"
+        ]
+      }
+    ]
   }
 }

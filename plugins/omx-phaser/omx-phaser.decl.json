@@ -92,5 +92,23 @@
       ],
       "unit": "units:frame"
     }
+  },
+  "panel": {
+    "family": "phaser",
+    "roles": {},
+    "sections": [
+      {
+        "key": "phaser",
+        "label": "Phaser",
+        "controls": [
+          "rateHz",
+          "baseHz",
+          "depthOct",
+          "stages",
+          "feedback",
+          "mix"
+        ]
+      }
+    ]
   }
 }

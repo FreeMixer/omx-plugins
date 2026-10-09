@@ -33,6 +33,7 @@ import { fileURLToPath } from 'node:url';
 import { bindFace, instanceHeader, parseFace } from './instance-face.mjs';
 import { PIN_FILE, contractPin, controlOf, items, kernelControls, kernelExists, locateContract, resolveParam } from './omx-contract.mjs';
 import { ROOT, checkPlugin, gapLines, layerOfPath, loadRecipe, loadSchema, pluginFacts, pluginStems, validate } from './plugin-recipe.mjs';
+import { defaultPanel } from './gen.mjs';
 import { pinOfTtl } from './port-hints.mjs';
 import { omxdspInclude } from './template.mjs';
 import { expandVariant } from './variants.mjs';
@@ -163,6 +164,8 @@ export function draftDeclaration(kernel, src, { root = ROOT, recipe = loadRecipe
     };
   }
   fillDerived(decl, { schema, version: treeVersion(root, recipe) }, recipe);
+  // every plugin declares its panel: the MOD GUI, one section of every parameter until a person groups them
+  decl.panel = defaultPanel(decl);
   return { refusals: [], decl: canonical(schema, decl), unbound: controls.filter((c) => !bound.binding.some((b) => b.param.symbol === c.name)).map((c) => c.name) };
 }
 

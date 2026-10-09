@@ -83,15 +83,12 @@ export function loadDecl(dir) {
     }
   }
   if (d.sidechain && (seen.has(d.sidechain.symbol) || FIXED_PORTS.includes(d.sidechain.symbol))) throw new Error(`${file}: sidechain symbol '${d.sidechain.symbol}' is taken`);
-  d.panel ??= defaultPanel(d);
   return { ...d, dir: resolve(dir), tree: treeOf(file) };
 }
 
-/** The panel of a plugin generated from its instance face that declares none: one section, every
- * parameter in declaration order, so every generated plugin has its MOD GUI. A hand-written plugin
- * with no panel still owes none. */
+/** The panel the wizard drafts for a plugin generated from its instance face: one section, every
+ * parameter in declaration order (the MOD GUI every generated plugin had before declaring one). */
 export function defaultPanel(d) {
-  if (d.binding !== 'instance') return undefined;
   const label = d.name.replace(/^omx /, '');
   return { family: d.kernel, roles: {}, sections: [{ key: d.kernel, label: label[0].toUpperCase() + label.slice(1), controls: d.params.map((p) => p.symbol) }] };
 }

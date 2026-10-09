@@ -84,5 +84,21 @@
       ],
       "unit": "units:frame"
     }
+  },
+  "panel": {
+    "family": "tremolo",
+    "roles": {},
+    "sections": [
+      {
+        "key": "tremolo",
+        "label": "Tremolo",
+        "controls": [
+          "rateHz",
+          "depth",
+          "mix",
+          "mode"
+        ]
+      }
+    ]
   }
 }

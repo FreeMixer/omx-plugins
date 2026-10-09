@@ -86,5 +86,22 @@
       ],
       "unit": "units:frame"
     }
+  },
+  "panel": {
+    "family": "transient",
+    "roles": {},
+    "sections": [
+      {
+        "key": "transient",
+        "label": "Transient",
+        "controls": [
+          "attackDb",
+          "sustainDb",
+          "attackTimeMs",
+          "sustainTimeMs",
+          "outputDb"
+        ]
+      }
+    ]
   }
 }

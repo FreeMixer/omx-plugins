@@ -172,5 +172,30 @@
       ],
       "unit": "units:frame"
     }
+  },
+  "panel": {
+    "family": "reverb",
+    "roles": {},
+    "sections": [
+      {
+        "key": "reverb",
+        "label": "Reverb",
+        "controls": [
+          "plateModDepth",
+          "mix",
+          "size",
+          "damping",
+          "width",
+          "predelay",
+          "lowcut",
+          "highcut",
+          "reverse",
+          "hold",
+          "release",
+          "gateThreshold",
+          "algorithm"
+        ]
+      }
+    ]
   }
 }
