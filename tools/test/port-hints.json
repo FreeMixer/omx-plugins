@@ -41,7 +41,7 @@
     }
   },
   "omx-deesser": {
-    "freqHz": {
+    "deessFreq": {
       "props": [
         "lv2:integer",
         "pprops:logarithmic"
@@ -49,32 +49,43 @@
       "unit": "units:hz",
       "points": []
     },
-    "widthOct": {
+    "deessWidth": {
       "props": [],
       "unit": "units:oct",
       "points": []
     },
-    "thresholdDb": {
+    "deessThreshold": {
       "props": [],
       "unit": "units:db",
       "points": []
     },
-    "rangeDb": {
+    "deessRange": {
       "props": [],
       "unit": "units:db",
       "points": []
     },
-    "attackMs": {
+    "deessAttack": {
       "props": [],
       "unit": "units:ms",
       "points": []
     },
-    "releaseMs": {
+    "deessRelease": {
       "props": [
         "lv2:integer"
       ],
       "unit": "units:ms",
       "points": []
+    },
+    "deessMode": {
+      "props": [
+        "lv2:enumeration",
+        "lv2:integer"
+      ],
+      "unit": null,
+      "points": [
+        "0 Split",
+        "1 Wideband"
+      ]
     },
     "enabled": {
       "props": [
