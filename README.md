@@ -24,6 +24,7 @@ drawn from one declaration: its CLAP parameters, its LV2 ports and its MOD GUI c
 | **omx keyed-gate** | `org.openmixer.keyed-gate` | `urn:openmixer:keyed-gate` | The console's channel gate with a sidechain key: the detector listens to the key your host routes to it, or to the signal itself. One gain for both legs, so the stereo image never shifts. Real-time safe, 44.1 to 192 kHz. |
 | **omx strip** | `org.openmixer.strip` | `urn:openmixer:strip` | The console's channel strip in one plugin: input trim with HPF/LPF, gate, four-band EQ and compressor, in the desk's order or any other. Stereo, real-time safe, 44.1 to 192 kHz. |
 | **omx transient** | `org.openmixer.transient` | `urn:openmixer:transient` | The console's transient designer: more or less attack and sustain, from two envelope contrasts, with no threshold to set. |
+| **omx tremolo** | `org.openmixer.tremolo` | `urn:openmixer:tremolo` | The console's tremolo and auto-pan: one oscillator turned into a level change on both legs, or into a left-right pan. |
 
 <!-- END GENERATED catalogue -->
 
@@ -137,6 +138,17 @@ and the compressor's 4x detector paths while they are engaged, else zero.
 | Attack Time | 2 to 50 ms | 10 ms |
 | Sustain Time | 50 to 2000 ms, whole steps | 250 ms |
 | Output | -24 to 12 dB | 0 dB |
+
+Plus the host's bypass.
+
+### omx tremolo
+
+| Parameter | Range | Default |
+|---|---|---|
+| Rate | 0.1 to 20 Hz | 4 Hz |
+| Depth | 0 to 100 % | 50 % |
+| Mix | 0 to 100 % | 100 % |
+| Mode | Tremolo / Pan | Tremolo |
 
 Plus the host's bypass.
 
