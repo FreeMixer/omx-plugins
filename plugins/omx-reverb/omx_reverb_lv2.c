@@ -1,0 +1,84 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Copyright (C) 2026 Pau Aliagas <linuxnow@gmail.com>
+/*
+ * omx_reverb_lv2.c — the LV2 face of omx-reverb, in plain C: the generated declaration
+ * (generated/omx_reverb_params.h) over omx-dsp's reverb kernel, reached through
+ * omx_reverb_core.h, the binding both faces share. No DSP of its own: flush denormals, read the
+ * ports, resolve, run.
+ *
+ * Ports: in_l, in_r, out_l, out_r, then the declared parameters in order, then `enabled`
+ * (lv2:enabled; 0 is the bypass) and `latency`. A parameter port the host left unconnected reads
+ * its declared default.
+ */
+#include <stdint.h>
+#include <stdlib.h>
+
+#include <lv2/core/lv2.h>
+
+/* The generated table FIRST: its guard is omx-dsp's own, so the instance header reads this table. */
+#include "omx_reverb_params.h"
+#include "omx_reverb_core.h"
+#include <omxdsp/omx_denormal.h>
+
+typedef struct {
+  OmxReverbCore core;
+  const float *in_l, *in_r;
+  float *out_l, *out_r;
+  const float *param[OMX_REVERB_PARAM_COUNT];
+  const float *enabled;
+  float *latency;
+} Face;
+
+static LV2_Handle instantiate(const LV2_Descriptor *d, double rate, const char *bundle,
+                              const LV2_Feature *const *features) {
+  (void)d;
+  (void)bundle;
+  (void)features;
+  if (!(rate > 0.0)) return NULL;
+  Face *s = (Face *)calloc(1, sizeof *s);
+  if (!s) return NULL;
+  omx_reverb_core_init(&s->core, (uint32_t)rate);
+  return s;
+}
+
+static void connect_port(LV2_Handle h, uint32_t port, void *data) {
+  Face *s = (Face *)h;
+  switch (port) {
+  case OMX_REVERB_LV2_PORT_IN_L: s->in_l = (const float *)data; return;
+  case OMX_REVERB_LV2_PORT_IN_R: s->in_r = (const float *)data; return;
+  case OMX_REVERB_LV2_PORT_OUT_L: s->out_l = (float *)data; return;
+  case OMX_REVERB_LV2_PORT_OUT_R: s->out_r = (float *)data; return;
+  case OMX_REVERB_LV2_PORT_ENABLED: s->enabled = (const float *)data; return;
+  case OMX_REVERB_LV2_PORT_LATENCY: s->latency = (float *)data; return;
+  default:
+    if (port >= OMX_REVERB_LV2_PORT_FIRST_PARAM && port < OMX_REVERB_LV2_PORT_FIRST_PARAM + OMX_REVERB_PARAM_COUNT)
+      s->param[port - OMX_REVERB_LV2_PORT_FIRST_PARAM] = (const float *)data;
+  }
+}
+
+static void activate(LV2_Handle h) { omx_reverb_core_init(&((Face *)h)->core, ((Face *)h)->core.rate); }
+
+static float value(const Face *s, uint32_t i) { return s->param[i] ? *s->param[i] : OMX_REVERB_PARAMS[i].def; }
+
+static void run(LV2_Handle h, uint32_t frames) {
+  Face *s = (Face *)h;
+  omx_denormals_off();
+  const int bypass = s->enabled && *s->enabled < 0.5f;
+  float values[OMX_REVERB_PARAM_COUNT];
+  for (uint32_t i = 0; i < OMX_REVERB_PARAM_COUNT; ++i) values[i] = value(s, i);
+  omx_reverb_core_resolve(&s->core, values, bypass);
+  if (s->latency) *s->latency = (float)omx_reverb_core_latency(&s->core);
+  omx_reverb_core_run(&s->core, s->in_l, s->in_r, s->out_l, s->out_r, frames);
+}
+
+static void cleanup(LV2_Handle h) { free(h); }
+
+static const void *extension_data(const char *uri) {
+  (void)uri;
+  return NULL;
+}
+
+static const LV2_Descriptor DESCRIPTOR = {OMX_REVERB_LV2_URI, instantiate, connect_port, activate, run, NULL, cleanup,
+                                          extension_data};
+
+LV2_SYMBOL_EXPORT const LV2_Descriptor *lv2_descriptor(uint32_t index) { return index == 0 ? &DESCRIPTOR : NULL; }
