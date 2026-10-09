@@ -74,8 +74,28 @@ const DELAY = { FX_DELAY_TIME_RANGE: travel(0, 2000, 1, 'ms', 300) };
 const git = (repo, ...args) => execFileSync('git', ['-C', repo, '-c', 'user.name=selftest', '-c', 'user.email=selftest@invalid', '-c', 'commit.gpgsign=false', ...args], { encoding: 'utf8' });
 
 /** A throwaway repository holding `base`, then each commit of `commits` copied from `from`. */
+/** A tree without one plugin: its directory, its packaging lines, its README row and section. The
+ * example answers describe a NEW plugin, so once the real one lands every copy drops it first. */
+function dropPlugin(dir, stem) {
+  rmSync(join(dir, 'plugins', stem), { recursive: true, force: true });
+  const shown = stem.replace(/-/g, ' ');
+  const spec = join(dir, 'packaging', 'omx-plugins.spec');
+  writeFileSync(spec, readFileSync(spec, 'utf8').split('\n').filter((l) => !l.includes(`/${stem}.`)).join('\n'));
+  const readme = join(dir, 'README.md');
+  const lines = readFileSync(readme, 'utf8').split('\n');
+  const kept = [];
+  for (let i = 0; i < lines.length; i++) {
+    if (lines[i].startsWith(`| **${shown}** |`)) continue;
+    if (lines[i] === `### ${shown}`) { while (i + 1 < lines.length && !/^#{1,3} /.test(lines[i + 1])) i++; continue; }
+    kept.push(lines[i]);
+  }
+  writeFileSync(readme, kept.join('\n'));
+}
+let dropExample = () => {};
+
 function applyPlan(repo, base, from, commits) {
   copyTree(repo);
+  dropExample(repo);
   git(repo, 'init', '-q');
   git(repo, 'add', '-A');
   git(repo, 'commit', '-q', '-m', 'base');
@@ -102,6 +122,9 @@ async function main() {
   // ---- 1. the wizard -------------------------------------------------------------------------
   const tree = join(WORK, 'wizard');
   copyTree(tree);
+  // The example answers describe a NEW plugin: once the real one lands, the copy drops it first.
+  dropExample = (dir) => dropPlugin(dir, answers.stem);
+  dropExample(tree);
   const plan = await planPlugin(answers, { root: tree, recipe });
   expect(plan.ok, `wizard accepts the tremolo answers${plan.ok ? '' : `: ${plan.refusals.map((r) => `${r.field} ${r.reason}`).join('; ')}`}`);
   if (!plan.ok) return;
@@ -282,6 +305,7 @@ async function main() {
   process.env.OMX_CONTRACT_DIR = contract;
   const fresh = join(WORK, 'refusals');
   copyTree(fresh);
+  dropExample(fresh);
   const refused = async (what, mutate, field) => {
     const a = JSON.parse(JSON.stringify(answers));
     mutate(a);
