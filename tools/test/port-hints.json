@@ -1,13 +1,13 @@
 {
   "omx-chorus": {
-    "rateHz": {
+    "rate": {
       "props": [
         "pprops:logarithmic"
       ],
       "unit": "units:hz",
       "points": []
     },
-    "depthMs": {
+    "depth": {
       "props": [],
       "unit": "units:ms",
       "points": []
@@ -41,7 +41,7 @@
     }
   },
   "omx-deesser": {
-    "freqHz": {
+    "deessFreq": {
       "props": [
         "lv2:integer",
         "pprops:logarithmic"
@@ -49,32 +49,43 @@
       "unit": "units:hz",
       "points": []
     },
-    "widthOct": {
+    "deessWidth": {
       "props": [],
       "unit": "units:oct",
       "points": []
     },
-    "thresholdDb": {
+    "deessThreshold": {
       "props": [],
       "unit": "units:db",
       "points": []
     },
-    "rangeDb": {
+    "deessRange": {
       "props": [],
       "unit": "units:db",
       "points": []
     },
-    "attackMs": {
+    "deessAttack": {
       "props": [],
       "unit": "units:ms",
       "points": []
     },
-    "releaseMs": {
+    "deessRelease": {
       "props": [
         "lv2:integer"
       ],
       "unit": "units:ms",
       "points": []
+    },
+    "deessMode": {
+      "props": [
+        "lv2:enumeration",
+        "lv2:integer"
+      ],
+      "unit": null,
+      "points": [
+        "0 Split",
+        "1 Wideband"
+      ]
     },
     "enabled": {
       "props": [
@@ -2382,6 +2393,212 @@
       "points": []
     }
   },
+  "omx-flanger": {
+    "rate": {
+      "props": [
+        "pprops:logarithmic"
+      ],
+      "unit": "units:hz",
+      "points": []
+    },
+    "depth": {
+      "props": [],
+      "unit": "units:ms",
+      "points": []
+    },
+    "mix": {
+      "props": [],
+      "unit": "units:pc",
+      "points": []
+    },
+    "enabled": {
+      "props": [
+        "lv2:toggled"
+      ],
+      "unit": null,
+      "points": []
+    },
+    "latency": {
+      "props": [
+        "lv2:integer",
+        "lv2:reportsLatency"
+      ],
+      "unit": "units:frame",
+      "points": []
+    }
+  },
+  "omx-geq": {
+    "band01": {
+      "props": [],
+      "unit": "units:db",
+      "points": []
+    },
+    "band02": {
+      "props": [],
+      "unit": "units:db",
+      "points": []
+    },
+    "band03": {
+      "props": [],
+      "unit": "units:db",
+      "points": []
+    },
+    "band04": {
+      "props": [],
+      "unit": "units:db",
+      "points": []
+    },
+    "band05": {
+      "props": [],
+      "unit": "units:db",
+      "points": []
+    },
+    "band06": {
+      "props": [],
+      "unit": "units:db",
+      "points": []
+    },
+    "band07": {
+      "props": [],
+      "unit": "units:db",
+      "points": []
+    },
+    "band08": {
+      "props": [],
+      "unit": "units:db",
+      "points": []
+    },
+    "band09": {
+      "props": [],
+      "unit": "units:db",
+      "points": []
+    },
+    "band10": {
+      "props": [],
+      "unit": "units:db",
+      "points": []
+    },
+    "band11": {
+      "props": [],
+      "unit": "units:db",
+      "points": []
+    },
+    "band12": {
+      "props": [],
+      "unit": "units:db",
+      "points": []
+    },
+    "band13": {
+      "props": [],
+      "unit": "units:db",
+      "points": []
+    },
+    "band14": {
+      "props": [],
+      "unit": "units:db",
+      "points": []
+    },
+    "band15": {
+      "props": [],
+      "unit": "units:db",
+      "points": []
+    },
+    "band16": {
+      "props": [],
+      "unit": "units:db",
+      "points": []
+    },
+    "band17": {
+      "props": [],
+      "unit": "units:db",
+      "points": []
+    },
+    "band18": {
+      "props": [],
+      "unit": "units:db",
+      "points": []
+    },
+    "band19": {
+      "props": [],
+      "unit": "units:db",
+      "points": []
+    },
+    "band20": {
+      "props": [],
+      "unit": "units:db",
+      "points": []
+    },
+    "band21": {
+      "props": [],
+      "unit": "units:db",
+      "points": []
+    },
+    "band22": {
+      "props": [],
+      "unit": "units:db",
+      "points": []
+    },
+    "band23": {
+      "props": [],
+      "unit": "units:db",
+      "points": []
+    },
+    "band24": {
+      "props": [],
+      "unit": "units:db",
+      "points": []
+    },
+    "band25": {
+      "props": [],
+      "unit": "units:db",
+      "points": []
+    },
+    "band26": {
+      "props": [],
+      "unit": "units:db",
+      "points": []
+    },
+    "band27": {
+      "props": [],
+      "unit": "units:db",
+      "points": []
+    },
+    "band28": {
+      "props": [],
+      "unit": "units:db",
+      "points": []
+    },
+    "band29": {
+      "props": [],
+      "unit": "units:db",
+      "points": []
+    },
+    "band30": {
+      "props": [],
+      "unit": "units:db",
+      "points": []
+    },
+    "band31": {
+      "props": [],
+      "unit": "units:db",
+      "points": []
+    },
+    "enabled": {
+      "props": [
+        "lv2:toggled"
+      ],
+      "unit": null,
+      "points": []
+    },
+    "latency": {
+      "props": [
+        "lv2:integer",
+        "lv2:reportsLatency"
+      ],
+      "unit": "units:frame",
+      "points": []
+    }
+  },
   "omx-keyed-gate": {
     "key": {
       "props": [
@@ -2434,6 +2651,32 @@
     "release": {
       "props": [],
       "unit": "units:ms",
+      "points": []
+    },
+    "knee_start": {
+      "props": [
+        "lv2:integer"
+      ],
+      "unit": "units:db",
+      "points": []
+    },
+    "knee_end": {
+      "props": [
+        "lv2:integer"
+      ],
+      "unit": "units:db",
+      "points": []
+    },
+    "hold": {
+      "props": [
+        "lv2:integer"
+      ],
+      "unit": "units:ms",
+      "points": []
+    },
+    "hysteresis": {
+      "props": [],
+      "unit": "units:db",
       "points": []
     },
     "latency": {
@@ -2524,6 +2767,95 @@
     }
   },
   "omx-pitch": {
+    "enabled": {
+      "props": [
+        "lv2:toggled"
+      ],
+      "unit": null,
+      "points": []
+    },
+    "latency": {
+      "props": [
+        "lv2:integer",
+        "lv2:reportsLatency"
+      ],
+      "unit": "units:frame",
+      "points": []
+    }
+  },
+  "omx-reverb": {
+    "plateModDepth": {
+      "props": [
+        "lv2:integer"
+      ],
+      "unit": "units:pc",
+      "points": []
+    },
+    "predelay": {
+      "props": [
+        "lv2:integer"
+      ],
+      "unit": "units:ms",
+      "points": []
+    },
+    "lowcut": {
+      "props": [
+        "lv2:integer",
+        "pprops:logarithmic"
+      ],
+      "unit": "units:hz",
+      "points": []
+    },
+    "highcut": {
+      "props": [
+        "lv2:integer",
+        "pprops:logarithmic"
+      ],
+      "unit": "units:hz",
+      "points": []
+    },
+    "reverse": {
+      "props": [
+        "lv2:integer"
+      ],
+      "unit": "units:ms",
+      "points": []
+    },
+    "hold": {
+      "props": [
+        "lv2:integer"
+      ],
+      "unit": "units:ms",
+      "points": []
+    },
+    "release": {
+      "props": [
+        "lv2:integer"
+      ],
+      "unit": "units:ms",
+      "points": []
+    },
+    "gateThreshold": {
+      "props": [
+        "lv2:integer"
+      ],
+      "unit": null,
+      "points": []
+    },
+    "algorithm": {
+      "props": [
+        "lv2:enumeration",
+        "lv2:integer"
+      ],
+      "unit": null,
+      "points": [
+        "0 Room",
+        "1 Plate",
+        "2 Hall",
+        "3 Reverse",
+        "4 Gated"
+      ]
+    },
     "enabled": {
       "props": [
         "lv2:toggled"

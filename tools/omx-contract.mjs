@@ -29,7 +29,7 @@ import { fileURLToPath } from 'node:url';
 
 export const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 export const PIN_FILE = '.github/pins.txt';
-const RESOLVED = join('share', 'omx-contract', 'omx-contract.json');
+export const RESOLVED = join('share', 'omx-contract', 'omx-contract.json');
 const RELEASE_URL = (v) => `https://github.com/FreeMixer/omx-contract/releases/download/v${v}/openmixer-omx-contract-${v}.tgz`;
 
 /** The pinned version of one source in .github/pins.txt (`name url version`), or undefined. */

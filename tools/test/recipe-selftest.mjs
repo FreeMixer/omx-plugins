@@ -332,7 +332,8 @@ async function main() {
   expect(unheld.fresh.includes("omx-drive manual-section"), `sabotage: a gap the debt does not hold fails the ratchet (${unheld.fresh.join(", ")})`);
   // An entry owed by a plugin that has the artifact: written here, so the arm does not depend on
   // which plugin still owes something.
-  undo = edit('recipes/completeness-debt.json', (s) => s.replace('"debt": [', '"debt": [\n    { "plugin": "omx-drive", "entry": "makefile", "owedBy": "selftest" },'));
+  const owedEntry = '{ "plugin": "omx-drive", "entry": "makefile", "owedBy": "selftest" }';
+  undo = edit('recipes/completeness-debt.json', (s) => (/"debt": \[\s*\]/.test(s) ? s.replace(/"debt": \[\s*\]/, `"debt": [\n    ${owedEntry}\n  ]`) : s.replace('"debt": [', `"debt": [\n    ${owedEntry},`)));
   const paid = await ratchet();
   undo();
   expect(paid.stale.some((x) => x.startsWith('omx-drive makefile')), `sabotage: a debt entry now satisfied fails the ratchet as stale (${paid.stale.join(', ')})`);

@@ -18,7 +18,7 @@
 NAME       := omx-chorus
 URI        := urn:openmixer:chorus
 CLAP_ID    := org.openmixer.chorus
-OMXDSP_MIN ?= 0.5.0
+OMXDSP_MIN ?= 0.5.1
 ROOT       := $(abspath ../..)
 GEN        := generated
 B          := build

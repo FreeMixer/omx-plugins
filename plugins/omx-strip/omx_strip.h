@@ -9,7 +9,7 @@
  *          (<omxdsp/fx/omx_eq_instance.h> with no band on: the EQ's own pass filters, per leg)
  *   GATE   <omxdsp/fx/omx_gate_instance.h>, self-keyed
  *   EQ     <omxdsp/fx/omx_eq_instance.h>, OMX_STRIP_EQ_BANDS parametric bands, per leg
- *   COMP   <omxdsp/fx/omx_dynamics_instance.h>
+ *   COMP   <omxdsp/fx/omx_comp_instance.h>
  *
  * The strip's default order is INPUT, GATE, EQ, COMP. The `order` parameter picks any of the 24
  * orders: its value is the index of the permutation in lexicographic order over the four stage
@@ -29,9 +29,8 @@
 /* The generated table FIRST, then the modules. */
 #include "omx_strip_params.h"
 
-#define OMX_STRIP_EQ_BANDS 4
-#define OMX_EQ_LV2_BANDS OMX_STRIP_EQ_BANDS
-#include <omxdsp/fx/omx_dynamics_instance.h>
+#define OMX_STRIP_EQ_BANDS 4 /* the strip drives the first four of the eq face's eight (the rest stay at their identity defaults) */
+#include <omxdsp/fx/omx_comp_instance.h>
 #include <omxdsp/fx/omx_eq_instance.h>
 #include <omxdsp/fx/omx_gate_instance.h>
 #include <omxdsp/omx_ramp.h>
@@ -52,7 +51,7 @@ typedef struct {
   float trim_cur, trim_tgt; /* linear: the gain applied at the end of the last block, the target */
   struct omx_eq_lv2 filter[2], eq[2]; /* per leg */
   OmxGateInstance gate;
-  OmxDynamicsInstance comp;
+  OmxCompInstance comp;
   uint32_t order;
   int bypass, ready;
 } OmxStrip;
@@ -63,7 +62,7 @@ static inline int omx_strip_init(OmxStrip *s, float sr) {
   memset(s, 0, sizeof *s);
   if (!(sr > 0.0f)) return 0;
   for (int c = 0; c < 2; c++) omx_eq_lv2_init(&s->filter[c], sr), omx_eq_lv2_init(&s->eq[c], sr);
-  if (!omx_gate_instance_init(&s->gate, sr) || !omx_dynamics_instance_init(&s->comp, sr)) return 0;
+  if (!omx_gate_instance_init(&s->gate, sr) || !omx_comp_instance_init(&s->comp, sr)) return 0;
   s->trim_cur = s->trim_tgt = 1.0f;
   s->ready = 1;
   return 1;
@@ -86,20 +85,18 @@ static inline void omx_strip_resolve(OmxStrip *s, int bypass, const float *v) {
       for (uint32_t k = 0; k < 5; k++) e.band[b][k] = &v[OMX_STRIP_PARAM_EQ1_TYPE + 5u * b + k];
     omx_eq_lv2_set_controls(&s->eq[c], &e);
   }
-  omx_gate_instance_resolve(&s->gate, v[OMX_STRIP_PARAM_GATE_ON] < 0.5f, 0, v[OMX_STRIP_PARAM_GATE_THRESHOLD],
-                            v[OMX_STRIP_PARAM_GATE_RATIO], v[OMX_STRIP_PARAM_GATE_RANGE],
-                            v[OMX_STRIP_PARAM_GATE_ATTACK], v[OMX_STRIP_PARAM_GATE_RELEASE]);
-  omx_dynamics_instance_resolve(&s->comp, v[OMX_STRIP_PARAM_COMP_ON] < 0.5f, v[OMX_STRIP_PARAM_COMP_THRESHOLD],
+  omx_gate_instance_resolve(&s->gate, v[OMX_STRIP_PARAM_GATE_ON] < 0.5f, 0, v[OMX_STRIP_PARAM_GATE_THRESHOLD], v[OMX_STRIP_PARAM_GATE_RANGE], v[OMX_STRIP_PARAM_GATE_THRESHOLD], v[OMX_STRIP_PARAM_GATE_THRESHOLD], v[OMX_STRIP_PARAM_GATE_ATTACK], 0.0f, v[OMX_STRIP_PARAM_GATE_RELEASE], 0.0f, v[OMX_STRIP_PARAM_GATE_RATIO]);
+  omx_comp_instance_resolve(&s->comp, v[OMX_STRIP_PARAM_COMP_ON] < 0.5f, v[OMX_STRIP_PARAM_COMP_THRESHOLD],
                                 v[OMX_STRIP_PARAM_COMP_RATIO], v[OMX_STRIP_PARAM_COMP_KNEE],
                                 v[OMX_STRIP_PARAM_COMP_ATTACK], v[OMX_STRIP_PARAM_COMP_RELEASE],
-                                v[OMX_STRIP_PARAM_COMP_MAKEUP], v[OMX_STRIP_PARAM_COMP_RMS] >= 0.5f,
-                                OMX_DYN_OVS_AUTO);
+                                v[OMX_STRIP_PARAM_COMP_MAKEUP], OMX_COMP_MIX_PCT_DEFAULT,
+      v[OMX_STRIP_PARAM_COMP_RMS] >= 0.5f ? (int)OMX_COMP_KINDS_COMP : (int)OMX_COMP_KINDS_LIMITER, (int)OMX_DETECTOR_OVERSAMPLINGS_DEFAULT);
   s->order = (uint32_t)omx_eq_lv2_word_int(&v[OMX_STRIP_PARAM_ORDER], 0, OMX_STRIP_ORDERS - 1, 0);
 }
 
 /** The frames of latency the strip reports now. */
 static inline float omx_strip_latency(const OmxStrip *s) {
-  return omx_gate_instance_latency(&s->gate) + omx_dynamics_instance_latency(&s->comp);
+  return omx_gate_instance_latency(&s->gate) + omx_comp_instance_latency(&s->comp);
 }
 
 /** One stage over the block, in place on both legs. */
@@ -118,7 +115,7 @@ static inline void omx_strip_stage(OmxStrip *s, uint32_t stage, float *l, float 
     omx_eq_lv2_run(&s->eq[0], l, l, n);
     omx_eq_lv2_run(&s->eq[1], r, r, n);
     return;
-  case OMX_STRIP_COMP: omx_dynamics_instance_run(&s->comp, l, r, l, r, n); return;
+  case OMX_STRIP_COMP: omx_comp_instance_run(&s->comp, l, r, l, r, n); return;
   }
 }
 

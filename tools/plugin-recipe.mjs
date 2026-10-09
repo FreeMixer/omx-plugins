@@ -317,7 +317,7 @@ export const CHECKERS = {
    * The plugin's own sources include the omx-dsp header of EACH kernel it declares (`kernel`, or
    * every one of `kernels`): <omxdsp/fx/omx_<kernel>.h> or its instance core. Another omx-dsp
    * header (omx_denormal.h) binds nothing. `headerStems` names the headers of a kernel whose omx-dsp
-   * modules are not named like it (eq8, eq16 and eq32 are omx-dsp's eq; strip is its gate, eq and dynamics). None
+   * modules are not named like it (eq8, eq16 and eq32 are omx-dsp's eq; ). None
    * of the sources may still be the wizard's stub.
    */
   kernelBinding(root, _recipe, facts, { dir, headerStems = {} }) {

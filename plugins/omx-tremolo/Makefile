@@ -18,7 +18,7 @@
 NAME       := omx-tremolo
 URI        := urn:openmixer:tremolo
 CLAP_ID    := org.openmixer.tremolo
-OMXDSP_MIN ?= 0.5.0
+OMXDSP_MIN ?= 0.5.1
 ROOT       := $(abspath ../..)
 GEN        := generated
 B          := build

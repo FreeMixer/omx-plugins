@@ -18,7 +18,7 @@
 NAME       := omx-geq
 URI        := urn:openmixer:geq
 CLAP_ID    := org.openmixer.geq
-OMXDSP_MIN ?= 0.5.0
+OMXDSP_MIN ?= 0.5.1
 ROOT       := $(abspath ../..)
 GEN        := generated
 B          := build

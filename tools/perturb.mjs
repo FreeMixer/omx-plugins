@@ -9,7 +9,7 @@
  */
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { basename, join, resolve } from 'node:path';
-import { ROOT, locateContract, paramKernel, perturbCopy } from './omx-contract.mjs';
+import { RESOLVED, ROOT, locateContract, paramKernel, perturbCopy } from './omx-contract.mjs';
 import { baseOf } from './variants.mjs';
 
 const [pdir, scratch] = process.argv.slice(2);
@@ -21,6 +21,17 @@ const p = d.params?.[0];
 if (!p) process.exit(3);
 if (p.ref === undefined) {
   p.def = p.def === p.max ? p.min : p.max;
+  writeFileSync(file, `${JSON.stringify(d, null, 2)}\n`);
+} else if (p.defaultId !== undefined) {
+  // a set whose default the declaration names (the contract names none): it moves there, to another id
+  const where = locateContract(ROOT);
+  if (!where.dir) {
+    console.error(`perturb: ${where.why}`);
+    process.exit(2);
+  }
+  const ids = JSON.parse(readFileSync(join(where.dir, RESOLVED), 'utf8')).items[p.ref]?.value;
+  if (!Array.isArray(ids) || ids.length < 2) process.exit(3);
+  p.defaultId = ids.find((x) => x !== p.defaultId);
   writeFileSync(file, `${JSON.stringify(d, null, 2)}\n`);
 } else {
   const where = locateContract(ROOT);

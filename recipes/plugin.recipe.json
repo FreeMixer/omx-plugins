@@ -297,10 +297,7 @@
       "when": "always",
       "checker": {
         "fn": "kernelBinding",
-        "dir": "plugins/{stem}",
-        "headerStems": {
-          "comp": "dynamics"
-        }
+        "dir": "plugins/{stem}"
       }
     },
     {
