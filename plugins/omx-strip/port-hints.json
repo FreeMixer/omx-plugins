@@ -1,7 +1,21 @@
 {
+  "trimOn": {
+    "props": [
+      "lv2:toggled"
+    ],
+    "unit": null,
+    "points": []
+  },
   "trimDb": {
     "props": [],
     "unit": "units:db",
+    "points": []
+  },
+  "filterOn": {
+    "props": [
+      "lv2:toggled"
+    ],
+    "unit": null,
     "points": []
   },
   "hpfOn": {
@@ -13,6 +27,7 @@
   },
   "hpfFreq": {
     "props": [
+      "lv2:integer",
       "pprops:logarithmic"
     ],
     "unit": "units:hz",
@@ -38,6 +53,7 @@
   },
   "lpfFreq": {
     "props": [
+      "lv2:integer",
       "pprops:logarithmic"
     ],
     "unit": "units:hz",
@@ -81,6 +97,32 @@
     "unit": "units:ms",
     "points": []
   },
+  "gateKneeStart": {
+    "props": [
+      "lv2:integer"
+    ],
+    "unit": "units:db",
+    "points": []
+  },
+  "gateKneeEnd": {
+    "props": [
+      "lv2:integer"
+    ],
+    "unit": "units:db",
+    "points": []
+  },
+  "gateHold": {
+    "props": [
+      "lv2:integer"
+    ],
+    "unit": "units:ms",
+    "points": []
+  },
+  "gateHysteresis": {
+    "props": [],
+    "unit": "units:db",
+    "points": []
+  },
   "eqOn": {
     "props": [
       "lv2:toggled"
@@ -105,6 +147,7 @@
   },
   "eq1Freq": {
     "props": [
+      "lv2:integer",
       "pprops:logarithmic"
     ],
     "unit": "units:hz",
@@ -139,6 +182,7 @@
   },
   "eq2Freq": {
     "props": [
+      "lv2:integer",
       "pprops:logarithmic"
     ],
     "unit": "units:hz",
@@ -173,6 +217,7 @@
   },
   "eq3Freq": {
     "props": [
+      "lv2:integer",
       "pprops:logarithmic"
     ],
     "unit": "units:hz",
@@ -207,6 +252,7 @@
   },
   "eq4Freq": {
     "props": [
+      "lv2:integer",
       "pprops:logarithmic"
     ],
     "unit": "units:hz",
@@ -218,6 +264,146 @@
     "points": []
   },
   "eq4On": {
+    "props": [
+      "lv2:toggled"
+    ],
+    "unit": null,
+    "points": []
+  },
+  "eq5Type": {
+    "props": [
+      "lv2:enumeration",
+      "lv2:integer"
+    ],
+    "unit": null,
+    "points": [
+      "0 Bell",
+      "1 Low Shelf",
+      "2 High Shelf",
+      "3 Notch",
+      "4 All-pass 1st",
+      "5 All-pass 2nd"
+    ]
+  },
+  "eq5Freq": {
+    "props": [
+      "lv2:integer",
+      "pprops:logarithmic"
+    ],
+    "unit": "units:hz",
+    "points": []
+  },
+  "eq5Gain": {
+    "props": [],
+    "unit": "units:db",
+    "points": []
+  },
+  "eq5On": {
+    "props": [
+      "lv2:toggled"
+    ],
+    "unit": null,
+    "points": []
+  },
+  "eq6Type": {
+    "props": [
+      "lv2:enumeration",
+      "lv2:integer"
+    ],
+    "unit": null,
+    "points": [
+      "0 Bell",
+      "1 Low Shelf",
+      "2 High Shelf",
+      "3 Notch",
+      "4 All-pass 1st",
+      "5 All-pass 2nd"
+    ]
+  },
+  "eq6Freq": {
+    "props": [
+      "lv2:integer",
+      "pprops:logarithmic"
+    ],
+    "unit": "units:hz",
+    "points": []
+  },
+  "eq6Gain": {
+    "props": [],
+    "unit": "units:db",
+    "points": []
+  },
+  "eq6On": {
+    "props": [
+      "lv2:toggled"
+    ],
+    "unit": null,
+    "points": []
+  },
+  "eq7Type": {
+    "props": [
+      "lv2:enumeration",
+      "lv2:integer"
+    ],
+    "unit": null,
+    "points": [
+      "0 Bell",
+      "1 Low Shelf",
+      "2 High Shelf",
+      "3 Notch",
+      "4 All-pass 1st",
+      "5 All-pass 2nd"
+    ]
+  },
+  "eq7Freq": {
+    "props": [
+      "lv2:integer",
+      "pprops:logarithmic"
+    ],
+    "unit": "units:hz",
+    "points": []
+  },
+  "eq7Gain": {
+    "props": [],
+    "unit": "units:db",
+    "points": []
+  },
+  "eq7On": {
+    "props": [
+      "lv2:toggled"
+    ],
+    "unit": null,
+    "points": []
+  },
+  "eq8Type": {
+    "props": [
+      "lv2:enumeration",
+      "lv2:integer"
+    ],
+    "unit": null,
+    "points": [
+      "0 Bell",
+      "1 Low Shelf",
+      "2 High Shelf",
+      "3 Notch",
+      "4 All-pass 1st",
+      "5 All-pass 2nd"
+    ]
+  },
+  "eq8Freq": {
+    "props": [
+      "lv2:integer",
+      "pprops:logarithmic"
+    ],
+    "unit": "units:hz",
+    "points": []
+  },
+  "eq8Gain": {
+    "props": [],
+    "unit": "units:db",
+    "points": []
+  },
+  "eq8On": {
     "props": [
       "lv2:toggled"
     ],
@@ -256,12 +442,35 @@
     "unit": "units:db",
     "points": []
   },
-  "compRms": {
+  "compKind": {
     "props": [
-      "lv2:toggled"
+      "lv2:enumeration",
+      "lv2:integer"
     ],
     "unit": null,
+    "points": [
+      "0 Compressor",
+      "1 Limiter"
+    ]
+  },
+  "compMix": {
+    "props": [
+      "lv2:integer"
+    ],
+    "unit": "units:pc",
     "points": []
+  },
+  "compDetectorOversampling": {
+    "props": [
+      "lv2:enumeration",
+      "lv2:integer"
+    ],
+    "unit": null,
+    "points": [
+      "0 Auto",
+      "1 Off",
+      "2 4x"
+    ]
   },
   "order": {
     "props": [
