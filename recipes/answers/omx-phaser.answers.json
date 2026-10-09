@@ -1,0 +1,49 @@
+{
+  "stem": "omx-phaser",
+  "kernel": "phaser",
+  "description": "The native PHASER stage: `N` identical first-order all-pass sections swept in octaves by one LFO, a feedback path with a unit delay around the chain, and a convex wet/dry.",
+  "clap": {
+    "features": [
+      "audio-effect",
+      "phaser",
+      "stereo"
+    ]
+  },
+  "lv2": {
+    "class": "lv2:PhaserPlugin"
+  },
+  "params": [
+    {
+      "symbol": "rate",
+      "name": "Rate",
+      "ref": "PHASER_RATE_RANGE"
+    },
+    {
+      "symbol": "base",
+      "name": "Base",
+      "ref": "PHASER_BASE_RANGE"
+    },
+    {
+      "symbol": "depth",
+      "name": "Depth",
+      "ref": "PHASER_DEPTH_RANGE"
+    },
+    {
+      "symbol": "stages",
+      "name": "Stages",
+      "ref": "PHASER_STAGES_RANGE"
+    },
+    {
+      "symbol": "feedback",
+      "name": "Feedback",
+      "ref": "PHASER_FEEDBACK_RANGE"
+    },
+    {
+      "symbol": "mix",
+      "name": "Mix",
+      "ref": "PHASER_MIX_RANGE"
+    }
+  ],
+  "omxdspMin": "0.2.0",
+  "contractRelease": "1.3.0"
+}
