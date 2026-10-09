@@ -1,0 +1,43 @@
+{
+  "stem": "omx-tremolo",
+  "kernel": "tremolo",
+  "description": "The native TREMOLO / AUTO-PAN kernel: one `omx_lfo` read per sample, turned into a gain.",
+  "clap": {
+    "features": [
+      "audio-effect",
+      "tremolo",
+      "stereo"
+    ]
+  },
+  "lv2": {
+    "class": "lv2:ModulatorPlugin"
+  },
+  "params": [
+    {
+      "symbol": "rate",
+      "name": "Rate",
+      "ref": "TREMOLO_RATE_RANGE"
+    },
+    {
+      "symbol": "depth",
+      "name": "Depth",
+      "ref": "TREMOLO_DEPTH_RANGE"
+    },
+    {
+      "symbol": "mix",
+      "name": "Mix",
+      "ref": "TREMOLO_MIX_RANGE"
+    },
+    {
+      "symbol": "mode",
+      "name": "Mode",
+      "ref": "TREMOLO_MODES",
+      "values": [
+        "Tremolo",
+        "Pan"
+      ]
+    }
+  ],
+  "omxdspMin": "0.2.0",
+  "contractRelease": "1.3.0"
+}
