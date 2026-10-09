@@ -2777,5 +2777,74 @@
       "unit": "units:frame",
       "points": []
     }
+  },
+  "omx-rotary": {
+    "hornSlowHz": {
+      "props": [
+        "pprops:logarithmic"
+      ],
+      "unit": "units:hz",
+      "points": []
+    },
+    "hornFastHz": {
+      "props": [
+        "pprops:logarithmic"
+      ],
+      "unit": "units:hz",
+      "points": []
+    },
+    "drumSlowHz": {
+      "props": [
+        "pprops:logarithmic"
+      ],
+      "unit": "units:hz",
+      "points": []
+    },
+    "drumFastHz": {
+      "props": [
+        "pprops:logarithmic"
+      ],
+      "unit": "units:hz",
+      "points": []
+    },
+    "balance": {
+      "props": [
+        "lv2:integer"
+      ],
+      "unit": "units:pc",
+      "points": []
+    },
+    "mix": {
+      "props": [],
+      "unit": "units:pc",
+      "points": []
+    },
+    "speed": {
+      "props": [
+        "lv2:enumeration",
+        "lv2:integer"
+      ],
+      "unit": null,
+      "points": [
+        "0 Stop",
+        "1 Slow",
+        "2 Fast"
+      ]
+    },
+    "enabled": {
+      "props": [
+        "lv2:toggled"
+      ],
+      "unit": null,
+      "points": []
+    },
+    "latency": {
+      "props": [
+        "lv2:integer",
+        "lv2:reportsLatency"
+      ],
+      "unit": "units:frame",
+      "points": []
+    }
   }
 }

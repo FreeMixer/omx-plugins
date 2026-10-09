@@ -1,0 +1,86 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Copyright (C) 2026 Pau Aliagas <linuxnow@gmail.com>
+#ifndef OMX_ROTARY_PARAMS_H
+#define OMX_ROTARY_PARAMS_H
+/*
+ * GENERATED — DO NOT EDIT BY HAND.
+ * Produced by tools/gen.mjs from plugins/omx-rotary/omx-rotary.decl.json.
+ * Regenerate: `make -C plugins/omx-rotary gen`, then commit the result. Order is append-only.
+ * The include guard is omx-dsp's own <omxdsp/params/omx_rotary_params.h>: included first, this
+ * table is the one the kernel's instance header reads.
+ */
+#include "omx_plugin_param.h"
+
+enum {
+  OMX_ROTARY_PARAM_HORN_SLOW_HZ = 0,
+  OMX_ROTARY_PARAM_HORN_FAST_HZ = 1,
+  OMX_ROTARY_PARAM_DRUM_SLOW_HZ = 2,
+  OMX_ROTARY_PARAM_DRUM_FAST_HZ = 3,
+  OMX_ROTARY_PARAM_ACCEL = 4,
+  OMX_ROTARY_PARAM_BALANCE = 5,
+  OMX_ROTARY_PARAM_MIX = 6,
+  OMX_ROTARY_PARAM_SPEED = 7,
+  OMX_ROTARY_PARAM_COUNT = 8
+};
+
+static const omx_plugin_param OMX_ROTARY_PARAMS[OMX_ROTARY_PARAM_COUNT] = {
+  { "hornSlowHz", "Horn Slow", "Hz", 0.1f, 2.0f, 0.8f, 0u },
+  { "hornFastHz", "Horn Fast", "Hz", 3.0f, 10.0f, 6.8f, 0u },
+  { "drumSlowHz", "Drum Slow", "Hz", 0.1f, 2.0f, 0.7f, 0u },
+  { "drumFastHz", "Drum Fast", "Hz", 3.0f, 10.0f, 5.9f, 0u },
+  { "accel", "Accel", "x", 0.25f, 4.0f, 1.0f, 0u },
+  { "balance", "Balance", "%", -100.0f, 100.0f, 0.0f, OMX_PLUGIN_PARAM_INTEGER },
+  { "mix", "Mix", "%", 0.0f, 100.0f, 100.0f, 0u },
+  { "speed", "Speed", "", 0.0f, 2.0f, 1.0f, OMX_PLUGIN_PARAM_INTEGER },
+};
+
+/* One macro per declared bound: what a C face reads where a constant is needed. */
+#define OMX_ROTARY_PARAM_HORN_SLOW_HZ_MIN 0.1f
+#define OMX_ROTARY_PARAM_HORN_SLOW_HZ_MAX 2.0f
+#define OMX_ROTARY_PARAM_HORN_SLOW_HZ_DEFAULT 0.8f
+#define OMX_ROTARY_PARAM_HORN_FAST_HZ_MIN 3.0f
+#define OMX_ROTARY_PARAM_HORN_FAST_HZ_MAX 10.0f
+#define OMX_ROTARY_PARAM_HORN_FAST_HZ_DEFAULT 6.8f
+#define OMX_ROTARY_PARAM_DRUM_SLOW_HZ_MIN 0.1f
+#define OMX_ROTARY_PARAM_DRUM_SLOW_HZ_MAX 2.0f
+#define OMX_ROTARY_PARAM_DRUM_SLOW_HZ_DEFAULT 0.7f
+#define OMX_ROTARY_PARAM_DRUM_FAST_HZ_MIN 3.0f
+#define OMX_ROTARY_PARAM_DRUM_FAST_HZ_MAX 10.0f
+#define OMX_ROTARY_PARAM_DRUM_FAST_HZ_DEFAULT 5.9f
+#define OMX_ROTARY_PARAM_ACCEL_MIN 0.25f
+#define OMX_ROTARY_PARAM_ACCEL_MAX 4.0f
+#define OMX_ROTARY_PARAM_ACCEL_DEFAULT 1.0f
+#define OMX_ROTARY_PARAM_BALANCE_MIN -100.0f
+#define OMX_ROTARY_PARAM_BALANCE_MAX 100.0f
+#define OMX_ROTARY_PARAM_BALANCE_DEFAULT 0.0f
+#define OMX_ROTARY_PARAM_MIX_MIN 0.0f
+#define OMX_ROTARY_PARAM_MIX_MAX 100.0f
+#define OMX_ROTARY_PARAM_MIX_DEFAULT 100.0f
+#define OMX_ROTARY_PARAM_SPEED_MIN 0.0f
+#define OMX_ROTARY_PARAM_SPEED_MAX 2.0f
+#define OMX_ROTARY_PARAM_SPEED_DEFAULT 1.0f
+
+/* The identity every face publishes. */
+#define OMX_ROTARY_NAME "omx rotary"
+#define OMX_ROTARY_VENDOR "openmixer"
+#define OMX_ROTARY_URL "https://github.com/FreeMixer/omx-plugins"
+#define OMX_ROTARY_VERSION "0.2.0"
+#define OMX_ROTARY_DESCRIPTION "The console's rotary speaker: a drum rotor on the low band and a horn rotor on the high band, with stop, slow and fast speeds, mixed with the dry signal."
+#define OMX_ROTARY_CLAP_ID "org.openmixer.rotary"
+#define OMX_ROTARY_CLAP_FEATURES "audio-effect", "stereo"
+#define OMX_ROTARY_LV2_URI "urn:openmixer:rotary"
+/* org.openmixer.declaration/1: the declaration's plain description and the digest of its parameters. */
+#define OMX_ROTARY_DECL_SOURCE "omx rotary: Horn Slow 0.1 to 2 Hz, Horn Fast 3 to 10 Hz, Drum Slow 0.1 to 2 Hz, Drum Fast 3 to 10 Hz, Accel 0.25 to 4 x, Balance -100 to 100 %, Mix 0 to 100 %, Speed 0 to 2"
+#define OMX_ROTARY_DECL_DIGEST "0f1ffd01a7af4af40fdfb19f71a56ccec05cd0ed038c21237374b29ea4d347e3"
+
+/* LV2 port indices (tools/gen.mjs lv2Ports): audio, then parameter i at FIRST_PARAM + i, then these. */
+#define OMX_ROTARY_LV2_PORT_IN_L 0u
+#define OMX_ROTARY_LV2_PORT_IN_R 1u
+#define OMX_ROTARY_LV2_PORT_OUT_L 2u
+#define OMX_ROTARY_LV2_PORT_OUT_R 3u
+#define OMX_ROTARY_LV2_PORT_ENABLED 12u
+#define OMX_ROTARY_LV2_PORT_LATENCY 13u
+#define OMX_ROTARY_LV2_PORT_FIRST_PARAM 4u
+#define OMX_ROTARY_LV2_PORT_COUNT 14u
+
+#endif /* OMX_ROTARY_PARAMS_H */

@@ -13,8 +13,11 @@
  *       the others until one shows a difference: (a) all at their defaults; (b) every other toggle
  *       on (a filter's frequency moves nothing while the filter is off); (c) every other parameter
  *       at the far end of its travel (a bell's frequency moves nothing at 0 dB); (d) every other
- *       toggle on and every other travel at its far end. A parameter whose output is
- *       byte-identical in all four is one the face does not deliver to the kernel.
+ *       toggle on and every other travel at its far end; (e) every other choice (stepped from 0
+ *       to at most 15, not a toggle) at its far value, the rest at their defaults: a choice that selects which of
+ *       several controls is heard (a speed switch) hides them until it is moved, and a far
+ *       value of another travel (a mix at 0) can hide them again. A parameter whose output is
+ *       byte-identical in all five is one the face does not deliver to the kernel.
  *       `PASS live <name>` / `FAIL live <name>` per parameter. A face still on the wizard's stub
  *       binding is red here, by design. Every input port past the main one (a sidechain key) is
  *       connected too, fed a signal of its own: square-wave bursts the main signal does not have, so a
@@ -195,6 +198,11 @@ static int render(const char *path, const clap_id *ids, const double *vals, uint
 }
 
 static double far_of(const clap_param_info_t *p) { return p->default_value == p->max_value ? p->min_value : p->max_value; }
+/** A choice: stepped, counting from 0 to at most 15 (a mode, a speed), not a toggle. A stepped travel in
+ * whole units (a balance in percent) is not one. */
+static int is_choice(const clap_param_info_t *p) {
+  return (p->flags & CLAP_PARAM_IS_STEPPED) && p->min_value == 0.0 && p->max_value >= 2.0 && p->max_value <= 15.0;
+}
 static int is_toggle(const clap_param_info_t *p) {
   return (p->flags & CLAP_PARAM_IS_STEPPED) && p->min_value == 0.0 && p->max_value == 1.0;
 }
@@ -202,7 +210,8 @@ static int is_toggle(const clap_param_info_t *p) {
 static float *in_l, *in_r, *a_l, *a_r, *b_l, *b_r;
 
 /** Does moving parameter `i` from its default to its far value change the output, the others set by
- * `setting` (0 defaults, 1 toggles on, 2 at their far values, 3 toggles on and the rest far)? -1 on a host error. */
+ * `setting` (0 defaults, 1 toggles on, 2 at their far values, 3 toggles on and the rest far, 4 the
+ * other stepped choices far and the rest at their defaults)? -1 on a host error. */
 static int moves(const char *path, const clap_param_info_t *info, uint32_t n, uint32_t i, int setting) {
   static clap_id ids[MAX_PARAMS];
   static double vals[MAX_PARAMS];
@@ -212,6 +221,7 @@ static int moves(const char *path, const clap_param_info_t *info, uint32_t n, ui
     if (setting == 1 && is_toggle(&info[k])) ids[m] = info[k].id, vals[m++] = 1.0;
     if (setting == 2) ids[m] = info[k].id, vals[m++] = far_of(&info[k]);
     if (setting == 3) ids[m] = info[k].id, vals[m++] = is_toggle(&info[k]) ? 1.0 : far_of(&info[k]);
+    if (setting == 4 && is_choice(&info[k])) ids[m] = info[k].id, vals[m++] = far_of(&info[k]);
   }
   ids[m] = info[i].id;
   vals[m] = info[i].default_value;
@@ -235,13 +245,14 @@ static int live(const char *path) {
   make_signal(in_l, in_r);
   make_side(side);
   static const char *const SETTING[] = {"the others at their defaults", "every other toggle on", "the others at their far ends",
-                                        "every other toggle on, the rest at their far ends"};
+                                        "every other toggle on, the rest at their far ends",
+                                        "the other choices at their far values"};
   int fails = 0, checked = 0;
   for (uint32_t i = 0; i < n; i++) {
     if (info[i].flags & CLAP_PARAM_IS_BYPASS) continue;
     checked++;
     int setting = 0, r = 0;
-    for (; setting < 4; setting++) {
+    for (; setting < 5; setting++) {
       r = moves(path, info, n, i, setting);
       if (r != 0) break;
     }
