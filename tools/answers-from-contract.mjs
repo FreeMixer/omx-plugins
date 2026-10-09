@@ -34,6 +34,9 @@ export const KIND = {
   transient: ['transient-shaper', 'lv2:DynamicsPlugin'],
 };
 
+/** The prose name, where the short name is not a word a description can use (the package texts name it). */
+export const NOUN = { geq: 'graphic EQ' };
+
 /** Controls repeated once per entry of a contract list. Names contract entries only; no number here. */
 export const EXPANSIONS = { geq: { ref: 'GEQ_BAND_RANGE', over: 'ISO_THIRD_OCTAVE_CENTRES_HZ' } };
 const hzName = (hz) => (hz >= 1000 ? `${+(hz / 1000).toFixed(2)} kHz` : `${hz} Hz`);
@@ -125,6 +128,7 @@ export function draft(kernel) {
   const answers = {
     stem: `omx-${kernel}`,
     kernel,
+    ...(NOUN[kernel] ? { noun: NOUN[kernel] } : {}),
     description,
     clap: { features: ['audio-effect', ...(kind ? [kind[0]] : []), 'stereo'] },
     lv2: { class: kind ? kind[1] : 'lv2:Plugin' },
