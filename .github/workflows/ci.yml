@@ -115,18 +115,18 @@ jobs:
           done
           printf '%s\n' /usr/lib/clap /usr/lib/clap/omx-delay.clap /usr/lib/clap/omx-drive.clap \
             /usr/lib/clap/omx-eq8.clap /usr/lib/clap/omx-eq16.clap /usr/lib/clap/omx-eq32.clap \
-            /usr/lib/clap/omx-keyed-gate.clap /usr/lib/clap/omx-strip.clap \
+            /usr/lib/clap/omx-keyed-gate.clap /usr/lib/clap/omx-strip.clap /usr/lib/clap/omx-limiter.clap \
             /usr/share/doc/omx-plugins-clap /usr/share/doc/omx-plugins-clap/README.md \
             /usr/share/licenses/omx-plugins-clap /usr/share/licenses/omx-plugins-clap/LICENSE | sort > expected-clap.txt
           diff -u expected-clap.txt files-clap.txt
           devel=$(find rpms -maxdepth 1 -name "omx-plugins-devel-[0-9]*.rpm" ! -name "*.src.rpm" | head -1)
           rpm -qlp "$devel" | grep -qx /usr/include/omx-plugins/omx_delay_instance.h
           rpm -qlp "$devel" | grep -qx /usr/include/omx-plugins/omx_plugin_param.h
-          for p in delay drive eq8 eq16 eq32 gate strip; do rpm -qlp "$devel" | grep -qx "/usr/include/omx-plugins/omx_${p}_params.h"; done
-          for p in omx-delay omx-drive omx-eq8 omx-eq16 omx-eq32 omx-keyed-gate omx-strip; do
+          for p in delay drive eq8 eq16 eq32 gate strip limiter; do rpm -qlp "$devel" | grep -qx "/usr/include/omx-plugins/omx_${p}_params.h"; done
+          for p in omx-delay omx-drive omx-eq8 omx-eq16 omx-eq32 omx-keyed-gate omx-strip omx-limiter; do
             for f in "$p.so" manifest.ttl "$p.ttl"; do grep -qx "/usr/lib64/lv2/$p.lv2/$f" files-lv2.txt; done
           done
-          ! grep -vE '^/usr/lib64/lv2/omx-(delay|drive|eq8|eq16|eq32|keyed-gate|strip)\.lv2(/|$)|^/usr/share/(doc|licenses)/omx-plugins-lv2(/|$)' files-lv2.txt
+          ! grep -vE '^/usr/lib64/lv2/omx-(delay|drive|eq8|eq16|eq32|keyed-gate|strip|limiter)\.lv2(/|$)|^/usr/share/(doc|licenses)/omx-plugins-lv2(/|$)' files-lv2.txt
 
       - name: The packages install and their plugins load
         run: |
