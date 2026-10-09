@@ -328,7 +328,7 @@ function withBanner(text, d, comment) {
 /**
  * The block plan of the identity test: every parameter moved across its travel, the bypass toggled.
  * A parameter whose contract control `rearms` (`controls[i].rearms`: changing it re-arms the kernel's
- * state, omx-contract 2.1.0) is held at its default in every block: moving it would test the re-arm,
+ * state) is held at its default in every block: moving it would test the re-arm,
  * not the identity of the faces and the kernel. The sabotage arm still moves it, by one step.
  */
 const PLAN_FRAMES = [64, 1, 333, 512, 17, 480, 129, 1024, 7, 2500, 600, 3000];

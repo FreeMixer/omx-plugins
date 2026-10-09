@@ -78,8 +78,7 @@ A parameter whose contract control declares `rearms` is held at its default in e
 control re-arms the kernel's state when it changes, so it is not a smooth parameter: the limiter's
 look-ahead, for example, rebuilds the rings and restarts the gain at unity. Moving it between blocks
 would test the re-arm, not the identity. The flag is read from omx-contract's JSON render, where
-`kernels.<kernel>.controls` lists each kernel's controls in declared order (omx-contract 2.1.0 and
-later). The oracle's header comment names each held parameter, and the sabotage arm still moves it
+`kernels.<kernel>.controls` lists each kernel's controls in declared order. The oracle's header comment names each held parameter, and the sabotage arm still moves it
 by one step. The other parameters move as before.
 
 ## What it does not do

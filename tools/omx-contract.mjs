@@ -298,69 +298,30 @@ export function paramKernel(d, p, dir) {
   return ks[0];
 }
 
-const camel = (s) => s.toLowerCase().replace(/_([a-z0-9])/g, (_m, c) => c.toUpperCase());
-const sameTravel = (a, b) => JSON.stringify(a) === JSON.stringify(b);
-
+/** The render's `kernels`: kernel -> { controls: [{ name, kind, global, table?, rearms? }] }. */
 const kernelsCache = new Map();
-/** The render's `kernels` (omx-contract 2.1.0 on): kernel -> { controls: [{ name, kind, global, table?, rearms? }] }, or {}. */
 export function renderKernels(dir) {
   if (!kernelsCache.has(dir)) kernelsCache.set(dir, JSON.parse(readFileSync(join(dir, RESOLVED), 'utf8')).kernels ?? {});
   return kernelsCache.get(dir);
 }
 
 /**
- * The controls of one kernel, in the kernel file's order: `[{ name, ref, field?, kind: 'travel'|'choice', rearms? }]`.
- * `rearms` is true on a control whose change re-arms the kernel's state (omx-contract's flag).
- *
- * From omx-contract 2.1.0 the render lists them, in order, under `kernels`: each control's `global`
- * is its `ref`, and a table field's name is its `field`. A render that does not list the kernel
- * (2.0.0, or a stand-in that adds a kernel) is read as below, from its items alone, with no `rearms`.
- *
- * A control's name is what omx-contract 2.0.0 derives its item name from, run backwards: a single
- * travel `<KERNEL>_<NAME>_RANGE` and a set `<KERNEL>_<NAME>S` are `<name>` in camel case (an item
- * without the kernel prefix keeps its whole name: FX_DELAY_TIME_RANGE is fxDelayTime). A travels
- * table whose every field repeats a single travel is an AGGREGATE, and its field names are the true
- * names of those singles (TREMOLO_TRAVELS.rateHz names TREMOLO_RATE_RANGE); any other table's
- * fields are controls of their own (TRANSIENT_LIMITS.attackDb).
+ * The controls of one kernel, in the kernel file's order, as omx-contract's render lists them under
+ * `kernels`: `[{ name, ref, field?, kind: 'travel'|'choice', rearms? }]`. A control's `global` is its
+ * `ref`; a table field's name is its `field`; `rearms` is true on a control whose change re-arms the
+ * kernel's state.
+ * @throws when the render lists no such kernel.
  */
 export function kernelControls(dir, kernel) {
   const listed = renderKernels(dir)[kernel];
-  if (listed) {
-    return listed.controls.map((c) => ({
-      name: c.name,
-      ref: c.global,
-      ...(c.table ? { field: c.name } : {}),
-      kind: c.kind,
-      ...(c.rearms === true ? { rearms: true } : {}),
-    }));
-  }
-  const rel = kernelFile(kernel);
-  const its = Object.entries(items(dir)).filter(([, e]) => e.rel === rel);
-  const prefix = `${kernel.toUpperCase()}_`;
-  const nameOf = (n, suffix) => {
-    const base = n.slice(0, -suffix.length);
-    return camel(base.startsWith(prefix) ? base.slice(prefix.length) : base);
-  };
-  const singles = [];
-  for (const [n, e] of its) {
-    if (e.kind === 'travels' && e.shape === 'travel' && n.endsWith('_RANGE')) singles.push({ name: nameOf(n, '_RANGE'), ref: n, kind: 'travel', travel: e.value });
-    else if (e.kind === 'set' && n.endsWith('S')) singles.push({ name: nameOf(n, 'S'), ref: n, kind: 'choice' });
-  }
-  const tables = [];
-  for (const [n, e] of its) {
-    if (e.kind !== 'travels' || e.shape !== 'table') continue;
-    const fields = Object.entries(e.value);
-    const free = singles.filter((s) => s.kind === 'travel');
-    const hits = [];
-    for (const [f, t] of fields) {
-      const at = free.findIndex((s) => sameTravel(s.travel, t));
-      if (at < 0) break;
-      hits.push([free.splice(at, 1)[0], f]);
-    }
-    if (fields.length && hits.length === fields.length) for (const [s, f] of hits) s.name = f; // an aggregate
-    else for (const [f] of fields) tables.push({ name: f, ref: n, field: f, kind: 'travel' });
-  }
-  return [...singles.map(({ name, ref, kind }) => ({ name, ref, kind })), ...tables];
+  if (!listed) throw new Error(`omx-contract's render (${join(dir, RESOLVED)}) lists no kernel '${kernel}' under "kernels"`);
+  return listed.controls.map((c) => ({
+    name: c.name,
+    ref: c.global,
+    ...(c.table ? { field: c.name } : {}),
+    kind: c.kind,
+    ...(c.rearms === true ? { rearms: true } : {}),
+  }));
 }
 
 /** The contract control a by-reference parameter reads: its `field`, or the control its `ref` is. */
