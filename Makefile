@@ -33,7 +33,7 @@ test:
 hints:
 	node tools/port-hints.mjs
 # A plugin is complete when it has every artifact the recipe lists and keeps every law; a new plugin
-# starts with `node tools/omx-new-plugin.mjs --answers <file>`, which writes them.
+# starts with `node tools/omx-new-plugin.mjs --from-contract <kernel>` (docs/new-plugin-from-contract.md).
 recipe-test: selftest completeness
 completeness:
 	node tools/plugin-recipe.mjs

@@ -12,6 +12,8 @@ drawn from one declaration: its CLAP parameters, its LV2 ports and its MOD GUI c
 
 ## The plugins
 
+<!-- BEGIN GENERATED catalogue: tools/gen.mjs, from each shipped plugin's declaration -->
+
 | Plugin | CLAP id | LV2 URI | What it does |
 |---|---|---|---|
 | **omx delay** | `org.openmixer.delay` | `urn:openmixer:delay` | Stereo delay up to 2 s: feedback through a tone filter that darkens each repeat, ping-pong, wet/dry mix. Zero latency, real-time safe, 44.1 to 192 kHz. |
@@ -19,8 +21,12 @@ drawn from one declaration: its CLAP parameters, its LV2 ports and its MOD GUI c
 | **omx eq8** | `org.openmixer.eq8` | `urn:openmixer:eq8` | The console's channel EQ in its eight-band form: eight parametric bands (bell, shelves, notch, all-pass) plus high- and low-pass filters at 12 or 24 dB/oct. Stereo, zero latency, 44.1 to 192 kHz. |
 | **omx eq16** | `org.openmixer.eq16` | `urn:openmixer:eq16` | The console's channel EQ in its 16-band form: sixteen parametric bands (bell, shelves, notch, all-pass) plus high- and low-pass filters at 12 or 24 dB/oct. Stereo, zero latency, 44.1 to 192 kHz. |
 | **omx eq32** | `org.openmixer.eq32` | `urn:openmixer:eq32` | The console's channel EQ in its 32-band form: thirty-two parametric bands (bell, shelves, notch, all-pass) plus high- and low-pass filters at 12 or 24 dB/oct. Stereo, zero latency, 44.1 to 192 kHz. |
-| **omx strip** | `org.openmixer.strip` | `urn:openmixer:strip` | The console's channel strip in one plugin: input trim with HPF/LPF, gate, four-band EQ and compressor, in the desk's order or any other. Stereo, real-time safe, 44.1 to 192 kHz. |
 | **omx keyed-gate** | `org.openmixer.keyed-gate` | `urn:openmixer:keyed-gate` | The console's channel gate with a sidechain key: the detector listens to the key your host routes to it, or to the signal itself. One gain for both legs, so the stereo image never shifts. Real-time safe, 44.1 to 192 kHz. |
+| **omx strip** | `org.openmixer.strip` | `urn:openmixer:strip` | The console's channel strip in one plugin: input trim with HPF/LPF, gate, four-band EQ and compressor, in the desk's order or any other. Stereo, real-time safe, 44.1 to 192 kHz. |
+
+<!-- END GENERATED catalogue -->
+
+<!-- BEGIN GENERATED sections: tools/gen.mjs, from each shipped plugin's declaration (its manual, else its parameters) -->
 
 ### omx delay
 
@@ -85,22 +91,6 @@ Plus the host's bypass. Every band and filter starts off, so a freshly loaded in
 signal untouched. The bands' frequencies start spread from 22 Hz to 18 kHz, as on
 the console.
 
-### omx strip
-
-Four stages, each the console's own module, run one after the other:
-
-| Stage | Parameters |
-|---|---|
-| Input | Trim (-24 to +24 dB); HPF (20 to 1000 Hz) and LPF (1 to 20 kHz), each on/off, 12 or 24 dB/oct |
-| Gate | on/off, threshold, ratio, range, attack, release |
-| EQ | on/off; four bands, each on/off, type (bell, low/high shelf, notch, all-pass), frequency, gain (±15 dB), Q |
-| Comp | on/off, threshold, ratio, knee, attack, release, make-up, RMS/peak |
-
-**Order** (0 to 23) picks the order of the four stages: 0 is the desk's input > gate > EQ > comp,
-and the rest follow in lexicographic order (1 is input > gate > comp > EQ, 2 is input > EQ > gate >
-comp, ... 23 is comp > EQ > gate > input). Plus the host's bypass. The latency reported is the gate's
-and the compressor's 4x detector paths while they are engaged, else zero.
-
 ### omx keyed-gate
 
 The console's gate, keyed: the stereo signal is gated while the detector listens to a second, mono
@@ -120,6 +110,24 @@ Plus the host's bypass. An attack under 0.5 ms engages the 4x detector path, whi
 of latency, reported to the host; otherwise the latency is zero. Its LV2 URI, ports and defaults
 are those of the keyed gate bundle the OpenMixer console used to ship, so a session saved with that
 bundle loads this one.
+
+### omx strip
+
+Four stages, each the console's own module, run one after the other:
+
+| Stage | Parameters |
+|---|---|
+| Input | Trim (-24 to +24 dB); HPF (20 to 1000 Hz) and LPF (1 to 20 kHz), each on/off, 12 or 24 dB/oct |
+| Gate | on/off, threshold, ratio, range, attack, release |
+| EQ | on/off; four bands, each on/off, type (bell, low/high shelf, notch, all-pass), frequency, gain (±15 dB), Q |
+| Comp | on/off, threshold, ratio, knee, attack, release, make-up, RMS/peak |
+
+**Order** (0 to 23) picks the order of the four stages: 0 is the desk's input > gate > EQ > comp,
+and the rest follow in lexicographic order (1 is input > gate > comp > EQ, 2 is input > EQ > gate >
+comp, ... 23 is comp > EQ > gate > input). Plus the host's bypass. The latency reported is the gate's
+and the compressor's 4x detector paths while they are engaged, else zero.
+
+<!-- END GENERATED sections -->
 
 ## Install
 
@@ -145,8 +153,7 @@ sudo apt install omx-plugins
 `omx-plugins` installs both formats. To take only the one your host loads, install
 `omx-plugins-clap` (CLAP hosts) or `omx-plugins-lv2` (LV2 hosts) instead. The plugins land where
 hosts look without configuration (`/usr/lib/clap` on every distribution, the path the CLAP specification gives; `/usr/lib64/lv2` on Fedora,
-`/usr/lib/lv2` on Debian). Rescan plugins in your host and look for **omx delay**, **omx drive**, **omx eq8**,
-**omx eq16**, **omx eq32**, **omx strip** and **omx keyed-gate** under openmixer.
+`/usr/lib/lv2` on Debian). Rescan plugins in your host and look for the **omx** plugins under openmixer.
 
 Every release also carries the packages on its
 [GitHub release page](https://github.com/FreeMixer/omx-plugins/releases).

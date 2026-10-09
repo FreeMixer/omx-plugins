@@ -2,58 +2,56 @@
 // Copyright (C) 2026 Pau Aliagas <linuxnow@gmail.com>
 /*
  * omx_{{kernel}}_core.h — {{stem}}'s binding to omx-dsp's {{kernel}} kernel: the ONE place both faces
- * (omx_{{kernel}}_clap.c, omx_{{kernel}}_lv2.c) reach the DSP. It holds no DSP of its own: it fills the
- * kernel's controls from the declared parameter values and calls the kernel.
+ * (omx_{{kernel}}_clap.c, omx_{{kernel}}_lv2.c) reach the DSP. It holds no DSP of its own: it hands the
+ * declared parameter values, by name, to omx-dsp's instance face (<omxdsp/fx/omx_{{kernel}}_instance.h>)
+ * and runs it. The instance is plain inline state: nothing is allocated, locked or called into the
+ * system, in process or at activate.
  *
- * OMX_WIZARD_STUB: written by tools/omx-new-plugin.mjs. Until it is replaced, the binding passes the
- * input through and no parameter reaches a kernel, so `clap-probe live` and test/{{kernel}}-oracle.c
- * are red. Replace the body of each function with the calls into omx-dsp's {{kernel}} kernel
- * (<omxdsp/fx/omx_{{kernel}}.h>, or its instance core), then delete this paragraph and the marker
- * line below.
- */
+ * GENERATED — DO NOT EDIT BY HAND. Produced by tools/gen.mjs from plugins/{{stem}}/{{stem}}.decl.json and
+ * the face's resolve() prototype: each argument takes the parameter whose contract control it names.
+{{#renames}} * RENAME OWED by omx-dsp's name conformance: resolve argument `{{arg}}` is the contract's `{{rename}}`.
+{{/renames}} */
 #ifndef OMX_{{K}}_CORE_H
 #define OMX_{{K}}_CORE_H
 
-#define OMX_WIZARD_STUB 1
-
+#include <math.h>
 #include <stdint.h>
 #include <string.h>
 
-/* The generated table FIRST: its guard is omx-dsp's own, so a kernel header reads this table. */
+/* The generated table FIRST: its guard is omx-dsp's own, so the instance header reads this table. */
 #include "omx_{{kernel}}_params.h"
+
+#include <omxdsp/fx/omx_{{kernel}}_instance.h>
 
 /** The kernel's state and what a block runs with. */
 typedef struct {
   uint32_t rate;
-  float values[OMX_{{K}}_PARAM_COUNT]; /* the declared parameters, resolved once per block */
-  int bypass;
+  {{faceType}} inst;
 } Omx{{Kernel}}Core;
 
-/** A fresh instance at `rate`: every state word zero, the parameters at their declared defaults. */
+/** A fresh instance at `rate`: every state word zero. A rate the kernel does not declare leaves it a wire. */
 static inline void omx_{{kernel}}_core_init(Omx{{Kernel}}Core *c, uint32_t rate) {
   memset(c, 0, sizeof *c);
   c->rate = rate;
-  for (uint32_t i = 0; i < OMX_{{K}}_PARAM_COUNT; ++i) c->values[i] = OMX_{{K}}_PARAMS[i].def;
+  (void)omx_{{kernel}}_instance_init(&c->inst, ({{srType}})rate);
 }
 
-/** The block's parameters (declaration order) and the host's bypass. */
+/** The block's parameters (declaration order) and the host's bypass, each to its resolve() argument. */
 static inline void omx_{{kernel}}_core_resolve(Omx{{Kernel}}Core *c, const float *values, int bypass) {
-  memcpy(c->values, values, sizeof c->values);
-  c->bypass = bypass;
+  omx_{{kernel}}_instance_resolve(&c->inst, bypass{{#binding}},
+                                  /* {{arg}} */ {{value}}{{/binding}});
 }
 
 /** The latency the kernel adds, in samples. */
 static inline uint32_t omx_{{kernel}}_core_latency(const Omx{{Kernel}}Core *c) {
   (void)c;
-  return 0;
+  return (uint32_t)lrintf((float)({{latency}}));
 }
 
 /** One block, stereo; the outputs may alias the inputs. */
 static inline void omx_{{kernel}}_core_run(Omx{{Kernel}}Core *c, const float *in_l, const float *in_r, float *out_l,
                                          float *out_r, uint32_t frames) {
-  (void)c;
-  if (out_l != in_l) memmove(out_l, in_l, frames * sizeof(float));
-  if (out_r != in_r) memmove(out_r, in_r, frames * sizeof(float));
+  omx_{{kernel}}_instance_run(&c->inst, in_l, in_r, out_l, out_r, frames);
 }
 
 #endif /* OMX_{{K}}_CORE_H */
