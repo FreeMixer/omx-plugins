@@ -1,26 +1,78 @@
 {
-  "$comment": "THE declaration of omx-delay: every face (CLAP, LV2, the MOD GUI) and the parameter header are generated from this file by tools/gen.mjs and tools/modgui-gen.mjs. Parameter order is append-only. The travels are the OpenMixer console's delay travels.",
+  "$comment": "THE declaration of omx-delay, the folder's one hand-written file. Every other file of the folder is generated from it by tools/gen.mjs. Its parameters are by reference to omx-contract's delay kernel and bind by name to omx-dsp's instance face. Parameter order is append-only.",
   "stem": "omx-delay",
   "kernel": "delay",
+  "kernels": [
+    "delay"
+  ],
   "name": "omx delay",
   "vendor": "openmixer",
   "url": "https://github.com/FreeMixer/omx-plugins",
   "version": "0.2.0",
-  "description": "The OpenMixer console's stereo delay: one time, feedback through a tone filter, ping-pong and a wet/dry mix. The DSP is omx-dsp's <omxdsp/fx/omx_delay.h>, the console's own delay.",
+  "description": "The OpenMixer console's stereo delay: one time, feedback through a tone filter, ping-pong and a wet/dry mix.",
   "summary": "Stereo delay up to 2 s: feedback through a tone filter that darkens each repeat, ping-pong, wet/dry mix. Zero latency, real-time safe, 44.1 to 192 kHz.",
-  "clap": { "id": "org.openmixer.delay", "features": ["audio-effect", "delay", "stereo"] },
-  "lv2": { "uri": "urn:openmixer:delay", "class": "lv2:DelayPlugin" },
+  "clap": {
+    "id": "org.openmixer.delay",
+    "features": [
+      "audio-effect",
+      "delay",
+      "stereo"
+    ]
+  },
+  "lv2": {
+    "uri": "urn:openmixer:delay",
+    "class": "lv2:DelayPlugin"
+  },
+  "binding": "instance",
   "params": [
-    { "symbol": "timeMs", "name": "Time", "ref": "FX_DELAY_TIME_RANGE" },
-    { "symbol": "feedback", "name": "Feedback", "ref": "FX_DELAY_FEEDBACK_RANGE" },
-    { "symbol": "mix", "name": "Mix", "ref": "DELAY_MIX_RANGE" },
-    { "symbol": "tone", "name": "Tone", "ref": "DELAY_TONE_RANGE" },
-    { "symbol": "pingpong", "name": "Pingpong", "ref": "FX_DELAY_PINGPONG_DEFAULT" }
+    {
+      "symbol": "fxDelayTime",
+      "name": "Time",
+      "ref": "FX_DELAY_TIME_RANGE"
+    },
+    {
+      "symbol": "fxDelayFeedback",
+      "name": "Feedback",
+      "ref": "FX_DELAY_FEEDBACK_RANGE"
+    },
+    {
+      "symbol": "tone",
+      "name": "Tone",
+      "ref": "DELAY_TONE_RANGE"
+    },
+    {
+      "symbol": "mix",
+      "name": "Mix",
+      "ref": "DELAY_MIX_RANGE"
+    },
+    {
+      "symbol": "pingpong",
+      "name": "Pingpong",
+      "ref": "DELAY_PINGPONGS"
+    }
   ],
   "panel": {
     "family": "delay",
-    "roles": { "time": "timeMs", "feedback": "feedback", "tone": "tone", "pingpong": "pingpong", "mix": "mix" },
-    "sections": [{ "key": "delay", "label": "Delay", "controls": ["timeMs", "feedback", "tone", "pingpong", "mix"] }]
+    "roles": {
+      "time": "fxDelayTime",
+      "feedback": "fxDelayFeedback",
+      "tone": "tone",
+      "pingpong": "pingpong",
+      "mix": "mix"
+    },
+    "sections": [
+      {
+        "key": "delay",
+        "label": "Delay",
+        "controls": [
+          "fxDelayTime",
+          "fxDelayFeedback",
+          "tone",
+          "pingpong",
+          "mix"
+        ]
+      }
+    ]
   },
   "manual": [
     "| Parameter | Range | Default |",
