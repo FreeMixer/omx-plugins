@@ -1,11 +1,4 @@
 {
-  "on": {
-    "props": [
-      "lv2:toggled"
-    ],
-    "unit": null,
-    "points": []
-  },
   "hpf_on": {
     "props": [
       "lv2:toggled"
@@ -15,6 +8,7 @@
   },
   "hpf_freq": {
     "props": [
+      "lv2:integer",
       "pprops:logarithmic"
     ],
     "unit": "units:hz",
@@ -40,6 +34,7 @@
   },
   "lpf_freq": {
     "props": [
+      "lv2:integer",
       "pprops:logarithmic"
     ],
     "unit": "units:hz",
@@ -73,6 +68,7 @@
   },
   "b1_freq": {
     "props": [
+      "lv2:integer",
       "pprops:logarithmic"
     ],
     "unit": "units:hz",
@@ -107,6 +103,7 @@
   },
   "b2_freq": {
     "props": [
+      "lv2:integer",
       "pprops:logarithmic"
     ],
     "unit": "units:hz",
@@ -141,6 +138,7 @@
   },
   "b3_freq": {
     "props": [
+      "lv2:integer",
       "pprops:logarithmic"
     ],
     "unit": "units:hz",
@@ -175,6 +173,7 @@
   },
   "b4_freq": {
     "props": [
+      "lv2:integer",
       "pprops:logarithmic"
     ],
     "unit": "units:hz",
@@ -209,6 +208,7 @@
   },
   "b5_freq": {
     "props": [
+      "lv2:integer",
       "pprops:logarithmic"
     ],
     "unit": "units:hz",
@@ -243,6 +243,7 @@
   },
   "b6_freq": {
     "props": [
+      "lv2:integer",
       "pprops:logarithmic"
     ],
     "unit": "units:hz",
@@ -277,6 +278,7 @@
   },
   "b7_freq": {
     "props": [
+      "lv2:integer",
       "pprops:logarithmic"
     ],
     "unit": "units:hz",
@@ -311,6 +313,7 @@
   },
   "b8_freq": {
     "props": [
+      "lv2:integer",
       "pprops:logarithmic"
     ],
     "unit": "units:hz",
@@ -345,6 +348,7 @@
   },
   "b9_freq": {
     "props": [
+      "lv2:integer",
       "pprops:logarithmic"
     ],
     "unit": "units:hz",
@@ -379,6 +383,7 @@
   },
   "b10_freq": {
     "props": [
+      "lv2:integer",
       "pprops:logarithmic"
     ],
     "unit": "units:hz",
@@ -413,6 +418,7 @@
   },
   "b11_freq": {
     "props": [
+      "lv2:integer",
       "pprops:logarithmic"
     ],
     "unit": "units:hz",
@@ -447,6 +453,7 @@
   },
   "b12_freq": {
     "props": [
+      "lv2:integer",
       "pprops:logarithmic"
     ],
     "unit": "units:hz",
@@ -481,6 +488,7 @@
   },
   "b13_freq": {
     "props": [
+      "lv2:integer",
       "pprops:logarithmic"
     ],
     "unit": "units:hz",
@@ -515,6 +523,7 @@
   },
   "b14_freq": {
     "props": [
+      "lv2:integer",
       "pprops:logarithmic"
     ],
     "unit": "units:hz",
@@ -549,6 +558,7 @@
   },
   "b15_freq": {
     "props": [
+      "lv2:integer",
       "pprops:logarithmic"
     ],
     "unit": "units:hz",
@@ -583,6 +593,7 @@
   },
   "b16_freq": {
     "props": [
+      "lv2:integer",
       "pprops:logarithmic"
     ],
     "unit": "units:hz",
@@ -617,6 +628,7 @@
   },
   "b17_freq": {
     "props": [
+      "lv2:integer",
       "pprops:logarithmic"
     ],
     "unit": "units:hz",
@@ -651,6 +663,7 @@
   },
   "b18_freq": {
     "props": [
+      "lv2:integer",
       "pprops:logarithmic"
     ],
     "unit": "units:hz",
@@ -685,6 +698,7 @@
   },
   "b19_freq": {
     "props": [
+      "lv2:integer",
       "pprops:logarithmic"
     ],
     "unit": "units:hz",
@@ -719,6 +733,7 @@
   },
   "b20_freq": {
     "props": [
+      "lv2:integer",
       "pprops:logarithmic"
     ],
     "unit": "units:hz",
@@ -753,6 +768,7 @@
   },
   "b21_freq": {
     "props": [
+      "lv2:integer",
       "pprops:logarithmic"
     ],
     "unit": "units:hz",
@@ -787,6 +803,7 @@
   },
   "b22_freq": {
     "props": [
+      "lv2:integer",
       "pprops:logarithmic"
     ],
     "unit": "units:hz",
@@ -821,6 +838,7 @@
   },
   "b23_freq": {
     "props": [
+      "lv2:integer",
       "pprops:logarithmic"
     ],
     "unit": "units:hz",
@@ -855,6 +873,7 @@
   },
   "b24_freq": {
     "props": [
+      "lv2:integer",
       "pprops:logarithmic"
     ],
     "unit": "units:hz",
@@ -889,6 +908,7 @@
   },
   "b25_freq": {
     "props": [
+      "lv2:integer",
       "pprops:logarithmic"
     ],
     "unit": "units:hz",
@@ -923,6 +943,7 @@
   },
   "b26_freq": {
     "props": [
+      "lv2:integer",
       "pprops:logarithmic"
     ],
     "unit": "units:hz",
@@ -957,6 +978,7 @@
   },
   "b27_freq": {
     "props": [
+      "lv2:integer",
       "pprops:logarithmic"
     ],
     "unit": "units:hz",
@@ -991,6 +1013,7 @@
   },
   "b28_freq": {
     "props": [
+      "lv2:integer",
       "pprops:logarithmic"
     ],
     "unit": "units:hz",
@@ -1025,6 +1048,7 @@
   },
   "b29_freq": {
     "props": [
+      "lv2:integer",
       "pprops:logarithmic"
     ],
     "unit": "units:hz",
@@ -1059,6 +1083,7 @@
   },
   "b30_freq": {
     "props": [
+      "lv2:integer",
       "pprops:logarithmic"
     ],
     "unit": "units:hz",
@@ -1093,6 +1118,7 @@
   },
   "b31_freq": {
     "props": [
+      "lv2:integer",
       "pprops:logarithmic"
     ],
     "unit": "units:hz",
@@ -1127,6 +1153,7 @@
   },
   "b32_freq": {
     "props": [
+      "lv2:integer",
       "pprops:logarithmic"
     ],
     "unit": "units:hz",

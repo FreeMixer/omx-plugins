@@ -1,11 +1,4 @@
 {
-  "on": {
-    "props": [
-      "lv2:toggled"
-    ],
-    "unit": null,
-    "points": []
-  },
   "hpf_on": {
     "props": [
       "lv2:toggled"
@@ -15,6 +8,7 @@
   },
   "hpf_freq": {
     "props": [
+      "lv2:integer",
       "pprops:logarithmic"
     ],
     "unit": "units:hz",
@@ -40,6 +34,7 @@
   },
   "lpf_freq": {
     "props": [
+      "lv2:integer",
       "pprops:logarithmic"
     ],
     "unit": "units:hz",
@@ -73,6 +68,7 @@
   },
   "b1_freq": {
     "props": [
+      "lv2:integer",
       "pprops:logarithmic"
     ],
     "unit": "units:hz",
@@ -107,6 +103,7 @@
   },
   "b2_freq": {
     "props": [
+      "lv2:integer",
       "pprops:logarithmic"
     ],
     "unit": "units:hz",
@@ -141,6 +138,7 @@
   },
   "b3_freq": {
     "props": [
+      "lv2:integer",
       "pprops:logarithmic"
     ],
     "unit": "units:hz",
@@ -175,6 +173,7 @@
   },
   "b4_freq": {
     "props": [
+      "lv2:integer",
       "pprops:logarithmic"
     ],
     "unit": "units:hz",
@@ -209,6 +208,7 @@
   },
   "b5_freq": {
     "props": [
+      "lv2:integer",
       "pprops:logarithmic"
     ],
     "unit": "units:hz",
@@ -243,6 +243,7 @@
   },
   "b6_freq": {
     "props": [
+      "lv2:integer",
       "pprops:logarithmic"
     ],
     "unit": "units:hz",
@@ -277,6 +278,7 @@
   },
   "b7_freq": {
     "props": [
+      "lv2:integer",
       "pprops:logarithmic"
     ],
     "unit": "units:hz",
@@ -311,6 +313,7 @@
   },
   "b8_freq": {
     "props": [
+      "lv2:integer",
       "pprops:logarithmic"
     ],
     "unit": "units:hz",
