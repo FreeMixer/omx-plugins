@@ -16,6 +16,7 @@ drawn from one declaration: its CLAP parameters, its LV2 ports and its MOD GUI c
 
 | Plugin | CLAP id | LV2 URI | What it does |
 |---|---|---|---|
+| **omx deesser** | `org.openmixer.deesser` | `urn:openmixer:deesser` | The console's de-esser: a detector on a band around the sibilance drives the compressor's gain computer, and the reduction lands on that band alone or on the whole signal. |
 | **omx delay** | `org.openmixer.delay` | `urn:openmixer:delay` | Stereo delay up to 2 s: feedback through a tone filter that darkens each repeat, ping-pong, wet/dry mix. Zero latency, real-time safe, 44.1 to 192 kHz. |
 | **omx drive** | `org.openmixer.drive` | `urn:openmixer:drive` | The console's drive: one waveshaper run inside the console's oversampler, with drive, character, band, wet/dry mix and trim. Stereo, real-time safe, 44.1 to 192 kHz. |
 | **omx eq8** | `org.openmixer.eq8` | `urn:openmixer:eq8` | The console's channel EQ in its eight-band form: eight parametric bands (bell, shelves, notch, all-pass) plus high- and low-pass filters at 12 or 24 dB/oct. Stereo, zero latency, 44.1 to 192 kHz. |
@@ -32,6 +33,21 @@ drawn from one declaration: its CLAP parameters, its LV2 ports and its MOD GUI c
 <!-- END GENERATED catalogue -->
 
 <!-- BEGIN GENERATED sections: tools/gen.mjs, from each shipped plugin's declaration (its manual, else its parameters) -->
+
+### omx deesser
+
+| Parameter | Range | Default |
+|---|---|---|
+| Freq | 2000 to 16000 Hz, whole steps | 7000 Hz |
+| Width | 0.25 to 4 oct | 1 oct |
+| Threshold | -60 to 0 dB | -30 dB |
+| Ratio | 1 to 20 | 4 |
+| Range | -24 to 0 dB | -12 dB |
+| Attack | 0.1 to 50 ms | 1 ms |
+| Release | 5 to 500 ms, whole steps | 60 ms |
+| Mode | Split / Wideband | Split |
+
+Plus the host's bypass.
 
 ### omx delay
 
