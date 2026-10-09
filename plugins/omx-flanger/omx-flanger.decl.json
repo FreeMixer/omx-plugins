@@ -1,0 +1,47 @@
+{
+  "$comment": "THE declaration of omx-flanger. Every face and the parameter header are generated from this file by tools/gen.mjs. Its parameters are by reference to omx-contract's flanger kernel. Parameter order is append-only.",
+  "stem": "omx-flanger",
+  "kernel": "flanger",
+  "kernels": [
+    "flanger"
+  ],
+  "name": "omx flanger",
+  "vendor": "openmixer",
+  "url": "https://github.com/FreeMixer/omx-plugins",
+  "version": "0.2.0",
+  "description": "the native FLANGER stage: one modulated fractional delay with FEEDBACK.",
+  "clap": {
+    "id": "org.openmixer.flanger",
+    "features": [
+      "audio-effect",
+      "flanger",
+      "stereo"
+    ]
+  },
+  "lv2": {
+    "uri": "urn:openmixer:flanger",
+    "class": "lv2:FlangerPlugin"
+  },
+  "params": [
+    {
+      "symbol": "rate",
+      "name": "Rate",
+      "ref": "FLANGER_RATE_RANGE"
+    },
+    {
+      "symbol": "depth",
+      "name": "Depth",
+      "ref": "FLANGER_DEPTH_RANGE"
+    },
+    {
+      "symbol": "feedback",
+      "name": "Feedback",
+      "ref": "FLANGER_FEEDBACK_RANGE"
+    },
+    {
+      "symbol": "mix",
+      "name": "Mix",
+      "ref": "FLANGER_MIX_RANGE"
+    }
+  ]
+}
