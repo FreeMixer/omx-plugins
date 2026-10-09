@@ -60,7 +60,7 @@ plugins/<name>/
 include/                  shared C shapes (no DSP)
 tools/                    gen.mjs (header + TTL), modgui-gen.mjs (MOD GUI), the test helpers,
                           omx-new-plugin.mjs (the wizard), plugin-recipe.mjs (completeness)
-recipes/                  plugin.recipe.json, the templates the wizard writes from, examples
+recipes/                  plugin.recipe.json, the templates tools/gen.mjs writes from
 schema/                   plugin.decl.schema.json, the shape of a declaration
 ```
 
@@ -72,33 +72,33 @@ omx-dsp, never here.
 
 ## Adding a plugin
 
-A new plugin starts with the wizard, never by hand:
+A plugin over an omx-dsp effect kernel starts with the wizard, never by hand
+([docs/new-plugin-from-contract.md](docs/new-plugin-from-contract.md)):
 
 ```sh
-node tools/omx-new-plugin.mjs --answers my-plugin.answers.json   # or with no arguments, on a terminal
+node tools/omx-new-plugin.mjs --from-contract <kernel>   # drafts plugins/omx-<kernel>/omx-<kernel>.decl.json
+$EDITOR plugins/omx-<kernel>/omx-<kernel>.decl.json      # settle every REVIEW mark
+node tools/omx-new-plugin.mjs --from-contract <kernel>   # validates, generates everything, runs make test
 ```
 
-The answers are the plugin's declaration less what is derived (see
-`recipes/examples/omx-tremolo.answers.json`). Every parameter names its travel BY REFERENCE into
-the omx-dsp kernel's file in omx-contract (`"ref"`), at the release `omx-contract` names in
-`.github/pins.txt`; no number is typed in a declaration. The only parameters typed are `own` ones,
-with the reason: a `switch` of the plugin's face, which the contract declares nowhere, and the
-strip's `stage-order`. A set (the EQ band types, the filter slopes) is a reference too, and an EQ
-band's default type and centre come from the contract's one default rule for the strip type
-(`defaultBand`), never from here. A kernel omx-contract does not carry yet is NEW: its kernel
-recipe in omx-contract and omx-dsp comes first. The release is read from `$OMX_CONTRACT_DIR`, a
-checkout of omx-contract beside this one, or the release tarball (fetched once into
-`build/omx-contract-<version>/`, which needs `curl`).
+The declaration is the folder's one hand-written file. Every parameter names its travel BY
+REFERENCE into the kernel's file in omx-contract (`"ref"`, `"field"`), at the release `omx-contract`
+names in `.github/pins.txt`; no number is typed in a declaration. The release is read through its
+JSON render from `$OMX_CONTRACT_DIR`, a checkout of omx-contract beside this one, or the release
+tarball (fetched once into `build/omx-contract-<version>/`, which needs `curl`). The kernel must
+have its instance face in omx-dsp (`<omxdsp/fx/omx_<kernel>_instance.h>`): each parameter binds to
+the `resolve()` argument named after its contract control, and `"binding": "instance"` makes
+`tools/gen.mjs` write the binding, the kernel-identity test, both faces and the Makefile. A kernel
+missing from omx-contract, or without a face of that shape, is refused with the work named.
 
 `tools/pins-check.sh` holds the packaging's requirement on omx-dsp, and the omx-contract the
 installed omx-dsp requires, equal to `.github/pins.txt`.
 
-The wizard checks every answer before it writes anything, then writes every artifact of
-`recipes/plugin.recipe.json` from `recipes/templates/plugin/`: the declaration, the generated files,
-the Makefile, the CLAP and LV2 faces, the packaging lines and the README row and section. The two pieces only a person can write, the binding of the faces to the kernel and
-the kernel-identity oracle, are written as stubs whose tests fail by name until they are done. It
-prints the commit plan (one concern per commit, in the recipe's layer order), runs the generators
-and the plugin's tests, and ends with the checklist of what is left.
+`node tools/gen.mjs` also refills the shared files' generated regions from every plugin folder: the
+README's catalogue and sections (a declaration's `summary` and `manual`, else its description and
+parameters), the RPM `%files` lists and CI's installed-file lists. The package descriptions are
+prose; the completeness test checks they name every shipped plugin. The older plugins (delay,
+drive, the EQs, strip, keyed gate) keep their hand-written faces and bindings.
 
 `make completeness` holds every plugin to the same recipe and names the wizard step for each gap;
 `node tools/commit-plan-check.mjs <base>..<head>` holds a plugin's commits to the plan's order.
