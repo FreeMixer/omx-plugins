@@ -108,6 +108,7 @@ parameter header, installed in %{_includedir}/omx-plugins.
 /usr/lib/clap/omx-eq16.clap
 /usr/lib/clap/omx-eq32.clap
 /usr/lib/clap/omx-flanger.clap
+/usr/lib/clap/omx-geq.clap
 /usr/lib/clap/omx-keyed-gate.clap
 /usr/lib/clap/omx-limiter.clap
 /usr/lib/clap/omx-phaser.clap
@@ -135,6 +136,7 @@ parameter header, installed in %{_includedir}/omx-plugins.
 %{_libdir}/lv2/omx-eq16.lv2/
 %{_libdir}/lv2/omx-eq32.lv2/
 %{_libdir}/lv2/omx-flanger.lv2/
+%{_libdir}/lv2/omx-geq.lv2/
 %{_libdir}/lv2/omx-keyed-gate.lv2/
 %{_libdir}/lv2/omx-limiter.lv2/
 %{_libdir}/lv2/omx-phaser.lv2/
