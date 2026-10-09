@@ -9,7 +9,9 @@
  * Ports: in_l, in_r, out_l, out_r, then the declared parameters in order, then `enabled`
  * (lv2:enabled; 0 is the bypass) and `latency`. A parameter port the host left unconnected reads
  * its declared default.
- */
+{{#keyed}} * The sidechain `{{keySymbol}}` (lv2:isSideChain, connectionOptional) follows in_l and in_r; an
+ * unconnected key is the kernel's own detector.
+{{/keyed}} */
 #include <stdint.h>
 #include <stdlib.h>
 
@@ -23,7 +25,8 @@
 typedef struct {
   Omx{{Kernel}}Core core;
   const float *in_l, *in_r;
-  float *out_l, *out_r;
+{{#keyed}}  const float *key;
+{{/keyed}}  float *out_l, *out_r;
   const float *param[OMX_{{K}}_PARAM_COUNT];
   const float *enabled;
   float *latency;
@@ -46,7 +49,8 @@ static void connect_port(LV2_Handle h, uint32_t port, void *data) {
   switch (port) {
   case OMX_{{K}}_LV2_PORT_IN_L: s->in_l = (const float *)data; return;
   case OMX_{{K}}_LV2_PORT_IN_R: s->in_r = (const float *)data; return;
-  case OMX_{{K}}_LV2_PORT_OUT_L: s->out_l = (float *)data; return;
+{{#keyed}}  case OMX_{{K}}_LV2_PORT_{{keyPort}}: s->key = (const float *)data; return;
+{{/keyed}}  case OMX_{{K}}_LV2_PORT_OUT_L: s->out_l = (float *)data; return;
   case OMX_{{K}}_LV2_PORT_OUT_R: s->out_r = (float *)data; return;
   case OMX_{{K}}_LV2_PORT_ENABLED: s->enabled = (const float *)data; return;
   case OMX_{{K}}_LV2_PORT_LATENCY: s->latency = (float *)data; return;
@@ -68,7 +72,7 @@ static void run(LV2_Handle h, uint32_t frames) {
   for (uint32_t i = 0; i < OMX_{{K}}_PARAM_COUNT; ++i) values[i] = value(s, i);
   omx_{{kernel}}_core_resolve(&s->core, values, bypass);
   if (s->latency) *s->latency = (float)omx_{{kernel}}_core_latency(&s->core);
-  omx_{{kernel}}_core_run(&s->core, s->in_l, s->in_r, s->out_l, s->out_r, frames);
+  omx_{{kernel}}_core_run(&s->core, {{#keyed}}s->key, {{/keyed}}s->in_l, s->in_r, s->out_l, s->out_r, frames);
 }
 
 static void cleanup(LV2_Handle h) { free(h); }

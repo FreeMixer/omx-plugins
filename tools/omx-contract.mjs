@@ -342,10 +342,13 @@ export function kernelControls(dir, kernel) {
   return [...singles.map(({ name, ref, kind }) => ({ name, ref, kind })), ...tables];
 }
 
-/** The contract control a by-reference parameter reads: its `field`, or the control its `ref` is. */
+/** The contract control a by-reference parameter reads: its `field`, or the control its `ref` is. A
+ * field of a shared table (the primitives' GATE_CONTINUOUS_TRAVELS: the same control's travel
+ * without its step) names the kernel's control of that name. */
 export function controlOf(dir, kernel, p) {
   if (p.ref === undefined) return undefined;
   const cs = kernelControls(dir, kernel);
-  const c = p.field ? cs.find((x) => x.name === p.field && (x.ref === p.ref || !x.field)) : cs.find((x) => x.ref === p.ref);
+  const shared = SHARED.includes(items(dir)[p.ref]?.rel);
+  const c = p.field ? cs.find((x) => x.name === p.field && (x.ref === p.ref || !x.field || shared)) : cs.find((x) => x.ref === p.ref);
   return c ? { ...c, ...(p.field ? { name: p.field } : {}) } : undefined;
 }

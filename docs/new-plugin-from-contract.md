@@ -31,7 +31,10 @@ Step 1 checks before it writes:
 - omx-dsp has the kernel's instance face, in the shape the generated binding calls (`init(s, sr)`,
   `resolve(s, bypass, <one scalar per control>)`, `run(s, in_l, in_r, out_l, out_r, n)`); a kernel
   without one, or with a face of another shape (ring buffers handed in, a ports struct), is refused
-  with the omx-dsp work named;
+  with the omx-dsp work named. A keyed face takes the sidechain block first,
+  `run(s, key, in_l, in_r, out_l, out_r, n)` (`NULL`: nothing routed, the kernel's own detector); its
+  declaration names the key port in `sidechain`, and the faces and the identity test carry the key
+  (spec §15.1);
 - every `resolve` argument binds to exactly one contract control BY NAME: the argument is the
   control's name in snake case (`attackDb` → `attack_db`). An argument that still carries an older
   short name (`attack_ms` for `attackTimeMs`) binds when its words are, in order, a unique subset
@@ -70,7 +73,9 @@ settled it fills the derived fields and runs `tools/gen.mjs`, which writes:
 One template, filled from the declaration: a deterministic stimulus in uneven blocks, every
 parameter moving between blocks across its declared travel, the bypass toggled. The CLAP and LV2
 builds must equal omx-dsp's instance face called directly, bit for bit, at every rate in
-`OMX_DECLARED_RATES`, and publish its latency. Two guards keep it honest: the reference must move
+`OMX_DECLARED_RATES`, and publish its latency. A keyed face runs the plan twice, with a key that
+differs from the main signal and with none, each block 64 times in a row so a detector has time to
+release through every threshold; the key must change the output. Two guards keep it honest: the reference must move
 the signal, and a reference rendered with one parameter one step off must differ from the faces
 (the sabotage arm), so a test that could not see a wrong coefficient fails.
 

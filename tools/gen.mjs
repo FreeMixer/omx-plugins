@@ -344,6 +344,11 @@ export function oraclePlan(params) {
   });
 }
 
+/** How many times the identity test runs each block of the plan in a row: 1, or for a keyed face 64,
+ * so a detector has the time its declared release travel spans (up to seconds) to fall through
+ * every threshold of the plan: a wrong ratio or release is then seen, not hidden by a gate held open. */
+export const oracleStretch = (face) => (face.keyed ? 64 : 1);
+
 /** One step of each parameter, the sabotage arm's move: 1 % of a travel, the next value of a choice. */
 const stepOf = (p) => (p.kind === 'toggle' || p.kind === 'integer' ? 1 : (p.max - p.min) / 100);
 
@@ -357,6 +362,8 @@ export function bindingOf(d) {
 /** The files of a `binding: instance` plugin beyond generated/: path relative to the plugin dir -> text. */
 export function generateInstance(d) {
   const { face, binding, renames } = bindingOf(d);
+  if (face.keyed && !d.sidechain) throw new Error(`plugins/${d.stem}: omx_${d.kernel}_instance_run takes a key; the declaration names its port in "sidechain"`);
+  if (!face.keyed && d.sidechain) throw new Error(`plugins/${d.stem}: declares a "sidechain", and omx_${d.kernel}_instance_run takes no key`);
   const K = d.kernel.toUpperCase();
   const macro_ = (sym) => `OMX_${K}_PARAM_${macro(sym)}`;
   const value = (b) => (b.type === 'int' ? `(int)lrintf(values[${macro_(b.param.symbol)}])` : `values[${macro_(b.param.symbol)}]`);
@@ -367,7 +374,8 @@ export function generateInstance(d) {
     binding: binding.map((b) => ({ arg: b.arg, value: value(b) })),
     renames: renames.map((b) => ({ arg: b.arg, rename: b.rename })),
     latency: lat('&c->inst'), refLatency: lat('&inst'),
-    plan: oraclePlan(d.params), steps: d.params.map((p) => cfloat(stepOf(p))).join(', '),
+    keyed: face.keyed, keyPort: face.keyed ? macro(d.sidechain.symbol) : '', keySymbol: face.keyed ? d.sidechain.symbol : '',
+    plan: oraclePlan(d.params), stretch: oracleStretch(face), steps: d.params.map((p) => cfloat(stepOf(p))).join(', '),
   };
   return {
     Makefile: withBanner(render(template('Makefile.tmpl'), view), d, '#'),
