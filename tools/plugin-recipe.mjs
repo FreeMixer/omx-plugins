@@ -26,6 +26,9 @@ import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { compareVersions, contractPin, declKernels, findName, kernelExists, locateContract, paramKernel } from './omx-contract.mjs';
+import { omxdspInclude, render } from './template.mjs';
+
+export { omxdspInclude, render };
 
 export const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 export const RECIPE_PATH = 'recipes/plugin.recipe.json';
@@ -459,18 +462,6 @@ export const CHECKERS = {
 };
 
 let dspCache;
-/** omx-dsp's include directory (the one holding omxdsp/): OMXDSP_INCLUDE, or pkg-config's includedir. */
-export function omxdspInclude() {
-  if (process.env.OMXDSP_INCLUDE) return process.env.OMXDSP_INCLUDE;
-  let dir;
-  try {
-    dir = execFileSync('pkg-config', ['--variable=includedir', 'omxdsp'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
-  } catch {
-    return undefined;
-  }
-  return dir && existsSync(join(dir, 'omxdsp')) ? dir : undefined;
-}
-
 /** Every function omx-dsp's headers define: name → header. */
 function dspFunctions(inc) {
   if (dspCache) return dspCache;
@@ -552,30 +543,6 @@ export function layerOfPath(recipe, path) {
 }
 
 // ---- templates ---------------------------------------------------------------------------------
-
-/**
- * A minimal mustache: `{{x}}`, `{{#x}}…{{/x}}` (a list repeats with each item's fields in scope, a
- * truthy value renders once), `{{^x}}…{{/x}}` (renders when x is falsy or empty), `{{! … }}` (dropped
- * with its line). An unknown `{{x}}` is an error, so a template cannot silently print nothing.
- */
-export function render(template, view) {
-  const t = template.replace(/^\{\{![\s\S]*?\}\}\n?/gm, '');
-  const section = /\{\{([#^])(\w+)\}\}([\s\S]*?)\{\{\/\2\}\}/g;
-  const expand = (src, scope) =>
-    src
-      .replace(section, (_, kind, key, body) => {
-        const v = scope[key];
-        const truthy = Array.isArray(v) ? v.length > 0 : Boolean(v);
-        if (kind === '^') return truthy ? '' : expand(body, scope);
-        if (!truthy) return '';
-        return Array.isArray(v) ? v.map((item) => expand(body, { ...scope, ...item })).join('') : expand(body, scope);
-      })
-      .replace(/\{\{(\w+)\}\}/g, (_, key) => {
-        if (!(key in scope)) throw new Error(`template: no value for {{${key}}}`);
-        return String(scope[key]);
-      });
-  return expand(t, view);
-}
 
 // ---- the debt: the gaps owed today, held as a ratchet ---------------------------------------
 

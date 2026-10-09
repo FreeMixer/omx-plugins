@@ -35,7 +35,7 @@ import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { faceBinding } from './instance-face.mjs';
 import { PIN_FILE, controlOf, findName, locateContract, paramKernel, pinOf, resolveParam } from './omx-contract.mjs';
-import { omxdspInclude, render } from './plugin-recipe.mjs';
+import { omxdspInclude, render } from './template.mjs';
 
 export const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
