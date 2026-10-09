@@ -1,10 +1,10 @@
 {
-  "driveDb": {
+  "amount": {
     "props": [],
     "unit": "units:db",
     "points": []
   },
-  "bandHz": {
+  "bandFreq": {
     "props": [
       "lv2:integer",
       "pprops:logarithmic"
@@ -17,10 +17,62 @@
     "unit": "units:pc",
     "points": []
   },
-  "trimDb": {
+  "trim": {
     "props": [],
     "unit": "units:db",
     "points": []
+  },
+  "curve": {
+    "props": [
+      "lv2:enumeration",
+      "lv2:integer"
+    ],
+    "unit": null,
+    "points": [
+      "0 Soft",
+      "1 Tape",
+      "2 Tube",
+      "3 Exciter"
+    ]
+  },
+  "band": {
+    "props": [
+      "lv2:enumeration",
+      "lv2:integer"
+    ],
+    "unit": null,
+    "points": [
+      "0 Full",
+      "1 Low",
+      "2 High",
+      "3 Tilt"
+    ]
+  },
+  "autoGain": {
+    "props": [
+      "lv2:toggled"
+    ],
+    "unit": null,
+    "points": []
+  },
+  "stereoLink": {
+    "props": [
+      "lv2:toggled"
+    ],
+    "unit": null,
+    "points": []
+  },
+  "hfRolloff": {
+    "props": [
+      "lv2:enumeration",
+      "lv2:integer"
+    ],
+    "unit": null,
+    "points": [
+      "0 0",
+      "12000 12000",
+      "16000 16000"
+    ]
   },
   "enabled": {
     "props": [
