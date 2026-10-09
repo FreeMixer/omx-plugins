@@ -8,7 +8,7 @@
 # listed here and nowhere else.
 set -euo pipefail
 cd "$(dirname "$0")/.."
-exempt='^(LICENSE|CHANGELOG\.md|debian/(changelog|control|copyright|source/format|[^/]+\.(docs|install))|.*\.json|.*\.png)$'
+exempt='^(LICENSE|debian/(changelog|control|copyright|source/format|[^/]+\.(docs|install))|.*\.json|.*\.png)$'
 # Listed first, so a git that cannot read the tree (a checkout another user owns) fails here
 # instead of handing the loop an empty list that passes.
 files=$(git ls-files)
