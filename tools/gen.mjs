@@ -325,13 +325,19 @@ function withBanner(text, d, comment) {
   return lines.join('\n');
 }
 
-/** The block plan of the identity test: every parameter moved across its travel, the bypass toggled. */
+/**
+ * The block plan of the identity test: every parameter moved across its travel, the bypass toggled.
+ * A parameter whose contract control `rearms` (`controls[i].rearms`: changing it re-arms the kernel's
+ * state, omx-contract 2.1.0) is held at its default in every block: moving it would test the re-arm,
+ * not the identity of the faces and the kernel. The sabotage arm still moves it, by one step.
+ */
 const PLAN_FRAMES = [64, 1, 333, 512, 17, 480, 129, 1024, 7, 2500, 600, 3000];
 const PLAN_BYPASS = [0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0];
 const PLAN_AT = ['def', 0.25, 1, 0, 0.75, 'def', 0.5, 0.9, 0.1, 0.6, 0.35, 'def'];
-export function oraclePlan(params) {
+export function oraclePlan(params, controls = []) {
   return PLAN_FRAMES.map((frames, b) => {
     const v = params.map((p, i) => {
+      if (controls[i]?.rearms) return p.def;
       if (p.kind === 'toggle') return (b + i) % 2;
       const at = PLAN_AT[(b + 2 * i) % PLAN_AT.length];
       if (at === 'def') return p.def;
@@ -343,6 +349,9 @@ export function oraclePlan(params) {
     return { row: `${frames}, {${v.map(cfloat).join(', ')}}, ${PLAN_BYPASS[b]}` };
   });
 }
+
+/** The parameters the plan holds at their default, for the oracle's comment: `[{ symbol }]`. */
+const heldOf = (d) => d.params.filter((p, i) => d.controls?.[i]?.rearms).map((p) => ({ symbol: p.symbol }));
 
 /** One step of each parameter, the sabotage arm's move: 1 % of a travel, the next value of a choice. */
 const stepOf = (p) => (p.kind === 'toggle' || p.kind === 'integer' ? 1 : (p.max - p.min) / 100);
@@ -367,7 +376,7 @@ export function generateInstance(d) {
     binding: binding.map((b) => ({ arg: b.arg, value: value(b) })),
     renames: renames.map((b) => ({ arg: b.arg, rename: b.rename })),
     latency: lat('&c->inst'), refLatency: lat('&inst'),
-    plan: oraclePlan(d.params), steps: d.params.map((p) => cfloat(stepOf(p))).join(', '),
+    plan: oraclePlan(d.params, d.controls ?? []), held: heldOf(d), steps: d.params.map((p) => cfloat(stepOf(p))).join(', '),
   };
   return {
     Makefile: withBanner(render(template('Makefile.tmpl'), view), d, '#'),

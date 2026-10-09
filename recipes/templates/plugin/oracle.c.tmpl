@@ -14,7 +14,9 @@
  * SYMBOL (LV2, through lilv), so a renumbered face cannot pass by accident. Two guards keep the test
  * honest: the reference must move the signal, and a reference with any ONE parameter one step off must
  * differ from the face (the sabotage arm), so a wrong or dead coefficient is seen.
- */
+{{#held}} * Held at its default in every block, because changing it re-arms the kernel's state (omx-contract
+ * `rearms`): {{symbol}}.
+{{/held}} */
 #include <dlfcn.h>
 #include <math.h>
 #include <stdbool.h>
