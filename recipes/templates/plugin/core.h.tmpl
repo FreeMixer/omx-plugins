@@ -50,10 +50,16 @@ static inline uint32_t omx_{{kernel}}_core_latency(const Omx{{Kernel}}Core *c) {
   return (uint32_t)lrintf((float)({{latency}}));
 }
 
-/** One block, stereo; the outputs may alias the inputs. */
+{{^keyed}}/** One block, stereo; the outputs may alias the inputs. */
 static inline void omx_{{kernel}}_core_run(Omx{{Kernel}}Core *c, const float *in_l, const float *in_r, float *out_l,
                                          float *out_r, uint32_t frames) {
   omx_{{face}}_instance_run(&c->inst, in_l, in_r, out_l, out_r, frames);
 }
-
+{{/keyed}}{{#keyed}}/** One block, stereo, keyed by `key` (NULL: nothing routed to the key, the kernel's own detector);
+ * the outputs may alias the inputs or the key. */
+static inline void omx_{{kernel}}_core_run(Omx{{Kernel}}Core *c, const float *key, const float *in_l, const float *in_r,
+                                         float *out_l, float *out_r, uint32_t frames) {
+  omx_{{kernel}}_instance_run(&c->inst, key, in_l, in_r, out_l, out_r, frames);
+}
+{{/keyed}}
 #endif /* OMX_{{K}}_CORE_H */

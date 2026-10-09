@@ -7,7 +7,11 @@
  * Every number comes from generated/omx_{{kernel}}_params.h (tools/gen.mjs, from {{stem}}.decl.json);
  * the DSP is omx-dsp's {{kernel}} kernel, reached through omx_{{kernel}}_core.h, the binding both faces
  * share. This file adds no arithmetic on the audio path: drain the events, resolve, run.
- */
+{{#keyed}} *
+ * Audio ports: the main stereo pair in and out, and a second, mono, non-main input, the sidechain
+ * key. A host that routes nothing to the key (no second port in the process call, no channel, or
+ * no buffer) gets the kernel's own detector, as the face's NULL key is.
+{{/keyed}} */
 #include <stdatomic.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -45,6 +49,7 @@ typedef struct {
   Omx{{Kernel}}Core core;
   float values[G_PARAMS];          /* audio-thread owned */
   _Atomic float applied[G_PARAMS]; /* the APPLIED values, published after each drain */
+  _Atomic uint32_t latency;        /* the frames the host was last told of */
   int active, processing;
 } G;
 
@@ -90,6 +95,14 @@ static bool g_activate(const clap_plugin_t *p, double sample_rate, uint32_t min_
   G *g = (G *)p->plugin_data;
   if (g->active || !(sample_rate > 0.0)) return false;
   omx_{{kernel}}_core_init(&g->core, (uint32_t)sample_rate);
+  /* The latency the host reads after activation is the one the current values give: resolved on a
+   * probe instance, so the running core's state is not touched before its first block. */
+  Omx{{Kernel}}Core *probe = (Omx{{Kernel}}Core *)malloc(sizeof *probe);
+  if (!probe) return false;
+  omx_{{kernel}}_core_init(probe, (uint32_t)sample_rate);
+  omx_{{kernel}}_core_resolve(probe, g->values, g->values[G_BYPASS] > 0.5f);
+  atomic_store(&g->latency, omx_{{kernel}}_core_latency(probe));
+  free(probe);
   g->active = 1;
   return true;
 }
@@ -117,8 +130,17 @@ static clap_process_status g_process(const clap_plugin_t *p, const clap_process_
   const clap_audio_buffer_t *ao = &pr->audio_outputs[0];
   if (ai->channel_count < 2 || ao->channel_count < 2 || !ai->data32 || !ao->data32) return CLAP_PROCESS_ERROR;
   omx_{{kernel}}_core_resolve(&g->core, g->values, g->values[G_BYPASS] > 0.5f);
-  omx_{{kernel}}_core_run(&g->core, ai->data32[0], ai->data32[1], ao->data32[0], ao->data32[1], pr->frames_count);
-  g_publish(g);
+{{#keyed}}  const clap_audio_buffer_t *ak = pr->audio_inputs_count > 1 ? &pr->audio_inputs[1] : NULL;
+  const float *key = ak && ak->channel_count > 0 && ak->data32 ? ak->data32[0] : NULL;
+  omx_{{kernel}}_core_run(&g->core, key, ai->data32[0], ai->data32[1], ao->data32[0], ao->data32[1], pr->frames_count);
+{{/keyed}}{{^keyed}}  omx_{{kernel}}_core_run(&g->core, ai->data32[0], ai->data32[1], ao->data32[0], ao->data32[1], pr->frames_count);
+{{/keyed}}  g_publish(g);
+  /* A parameter that moves the kernel's latency: the host is asked to restart and read it again. */
+  const uint32_t lat = omx_{{kernel}}_core_latency(&g->core);
+  if (lat != atomic_load_explicit(&g->latency, memory_order_relaxed)) {
+    atomic_store_explicit(&g->latency, lat, memory_order_relaxed);
+    if (g->host && g->host->request_restart) g->host->request_restart(g->host);
+  }
   return CLAP_PROCESS_CONTINUE;
 }
 
@@ -184,14 +206,11 @@ static const clap_plugin_params_t G_PARAMS_EXT = {g_params_count, g_params_info,
 
 /* ---- latency, audio-ports ----------------------------------------------------- */
 
-static uint32_t g_latency(const clap_plugin_t *p) {
-  G *g = (G *)p->plugin_data;
-  return omx_{{kernel}}_core_latency(&g->core);
-}
+static uint32_t g_latency(const clap_plugin_t *p) { return atomic_load(&((G *)p->plugin_data)->latency); }
 
 static const clap_plugin_latency_t G_LATENCY_EXT = {g_latency};
 
-static uint32_t g_ports_count(const clap_plugin_t *p, bool is_input) {
+{{^keyed}}static uint32_t g_ports_count(const clap_plugin_t *p, bool is_input) {
   (void)p;
   (void)is_input;
   return 1;
@@ -202,6 +221,25 @@ static bool g_ports_get(const clap_plugin_t *p, uint32_t index, bool is_input, c
   if (index != 0) return false;
   memset(info, 0, sizeof *info);
   info->id = 0;
+{{/keyed}}{{#keyed}}/* Inputs: the main pair, then the key. Outputs: the main pair. */
+static uint32_t g_ports_count(const clap_plugin_t *p, bool is_input) {
+  (void)p;
+  return is_input ? 2 : 1;
+}
+
+static bool g_ports_get(const clap_plugin_t *p, uint32_t index, bool is_input, clap_audio_port_info_t *info) {
+  if (index >= g_ports_count(p, is_input)) return false;
+  memset(info, 0, sizeof *info);
+  info->id = index;
+  if (index == 1) {
+    snprintf(info->name, sizeof info->name, "%s", "{{keySymbol}}");
+    info->flags = 0;
+    info->channel_count = 1;
+    info->port_type = CLAP_PORT_MONO;
+    info->in_place_pair = CLAP_INVALID_ID;
+    return true;
+  }
+{{/keyed}}
   snprintf(info->name, sizeof info->name, "%s", is_input ? "in" : "out");
   info->flags = CLAP_AUDIO_PORT_IS_MAIN;
   info->channel_count = 2;

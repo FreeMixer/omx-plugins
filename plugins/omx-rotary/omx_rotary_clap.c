@@ -46,6 +46,7 @@ typedef struct {
   OmxRotaryCore core;
   float values[G_PARAMS];          /* audio-thread owned */
   _Atomic float applied[G_PARAMS]; /* the APPLIED values, published after each drain */
+  _Atomic uint32_t latency;        /* the frames the host was last told of */
   int active, processing;
 } G;
 
@@ -91,6 +92,14 @@ static bool g_activate(const clap_plugin_t *p, double sample_rate, uint32_t min_
   G *g = (G *)p->plugin_data;
   if (g->active || !(sample_rate > 0.0)) return false;
   omx_rotary_core_init(&g->core, (uint32_t)sample_rate);
+  /* The latency the host reads after activation is the one the current values give: resolved on a
+   * probe instance, so the running core's state is not touched before its first block. */
+  OmxRotaryCore *probe = (OmxRotaryCore *)malloc(sizeof *probe);
+  if (!probe) return false;
+  omx_rotary_core_init(probe, (uint32_t)sample_rate);
+  omx_rotary_core_resolve(probe, g->values, g->values[G_BYPASS] > 0.5f);
+  atomic_store(&g->latency, omx_rotary_core_latency(probe));
+  free(probe);
   g->active = 1;
   return true;
 }
@@ -120,6 +129,12 @@ static clap_process_status g_process(const clap_plugin_t *p, const clap_process_
   omx_rotary_core_resolve(&g->core, g->values, g->values[G_BYPASS] > 0.5f);
   omx_rotary_core_run(&g->core, ai->data32[0], ai->data32[1], ao->data32[0], ao->data32[1], pr->frames_count);
   g_publish(g);
+  /* A parameter that moves the kernel's latency: the host is asked to restart and read it again. */
+  const uint32_t lat = omx_rotary_core_latency(&g->core);
+  if (lat != atomic_load_explicit(&g->latency, memory_order_relaxed)) {
+    atomic_store_explicit(&g->latency, lat, memory_order_relaxed);
+    if (g->host && g->host->request_restart) g->host->request_restart(g->host);
+  }
   return CLAP_PROCESS_CONTINUE;
 }
 
@@ -185,10 +200,7 @@ static const clap_plugin_params_t G_PARAMS_EXT = {g_params_count, g_params_info,
 
 /* ---- latency, audio-ports ----------------------------------------------------- */
 
-static uint32_t g_latency(const clap_plugin_t *p) {
-  G *g = (G *)p->plugin_data;
-  return omx_rotary_core_latency(&g->core);
-}
+static uint32_t g_latency(const clap_plugin_t *p) { return atomic_load(&((G *)p->plugin_data)->latency); }
 
 static const clap_plugin_latency_t G_LATENCY_EXT = {g_latency};
 
@@ -203,6 +215,7 @@ static bool g_ports_get(const clap_plugin_t *p, uint32_t index, bool is_input, c
   if (index != 0) return false;
   memset(info, 0, sizeof *info);
   info->id = 0;
+
   snprintf(info->name, sizeof info->name, "%s", is_input ? "in" : "out");
   info->flags = CLAP_AUDIO_PORT_IS_MAIN;
   info->channel_count = 2;

@@ -459,6 +459,15 @@ static inline void omx_wobble_instance_run(OmxWobbleInstance *s, const float *in
     const literal = face('const float band[3]');
     expect(/not one scalar/.test(literal.error ?? ''), `a per-band array of literal extent is named, not bound (${literal.error ?? 'ACCEPTED'})`);
   }
+  {
+    // a keyed face takes the key block first, and only a block named `key` is read as one
+    const face = (key) => `static inline int omx_wobble_instance_init(OmxWobbleInstance *s, float sr) { return 1; }
+static inline void omx_wobble_instance_resolve(OmxWobbleInstance *s, int bypass, float depth) { }
+static inline void omx_wobble_instance_run(OmxWobbleInstance *s, const float *${key}, const float *in_l, const float *in_r, float *out_l, float *out_r, uint32_t n) { }
+#define OMX_WOBBLE_INSTANCE_LATENCY_FRAMES 0.0f`;
+    const keyed = parseFace(face('key'), 'wobble'), odd = parseFace(face('side'), 'wobble');
+    expect(keyed.keyed === true && /nor a key first/.test(odd.error ?? ''), `a key first is a keyed face, another block first is refused (${keyed.error ?? keyed.keyed}; ${odd.error ?? 'ACCEPTED'})`);
+  }
 
   // ---- 6. the port hints ---------------------------------------------------------------------
   delete process.env.OMX_CONTRACT_DIR; // the real tree reads the release it pins

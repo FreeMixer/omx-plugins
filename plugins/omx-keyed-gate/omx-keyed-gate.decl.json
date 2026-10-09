@@ -1,5 +1,5 @@
 {
-  "$comment": "THE declaration of omx-keyed-gate. Every face and the parameter header are generated from this file by tools/gen.mjs. Parameter order is append-only. It replaces the console's own keyed gate bundle, so its LV2 URI, port indices, symbols, travels and defaults are that bundle's: the travels are omx-contract's GATE_LIMITS (thresholdDb, ratio, rangeDb, attackMs, releaseMs), typed here while the pin is before contract.byReferenceSince; by reference they would read as whole steps (their step is 1), which the console's bundle never declared.",
+  "$comment": "THE declaration of omx-keyed-gate, the folder's one hand-written file. Every other file of the folder is generated from it by tools/gen.mjs. Its parameters are by reference to omx-contract's gate kernel and bind by name to omx-dsp's instance face. Parameter order is append-only.",
   "stem": "omx-keyed-gate",
   "kernel": "gate",
   "kernels": [
@@ -25,13 +25,73 @@
     "class": "lv2:GatePlugin",
     "enabledPort": "first"
   },
+  "binding": "instance",
   "params": [
-    { "symbol": "key_external", "name": "Key", "ref": "GATE_KEY_SOURCES", "values": ["Self", "Sidechain"], "defaultId": "sidechain" },
-    { "symbol": "threshold", "name": "Threshold", "ref": "GATE_CONTINUOUS_TRAVELS", "field": "thresholdDb" },
-    { "symbol": "ratio", "name": "Ratio", "ref": "GATE_CONTINUOUS_TRAVELS", "field": "ratio", "scale": "log" },
-    { "symbol": "range", "name": "Range", "ref": "GATE_CONTINUOUS_TRAVELS", "field": "rangeDb" },
-    { "symbol": "attack", "name": "Attack", "ref": "GATE_LIMITS", "field": "attackMs" },
-    { "symbol": "release", "name": "Release", "ref": "GATE_CONTINUOUS_TRAVELS", "field": "releaseMs" }
+    {
+      "symbol": "key_external",
+      "name": "Key",
+      "ref": "GATE_KEY_SOURCES",
+      "values": [
+        "Self",
+        "Sidechain"
+      ],
+      "defaultId": "sidechain"
+    },
+    {
+      "symbol": "threshold",
+      "name": "Threshold",
+      "ref": "GATE_CONTINUOUS_TRAVELS",
+      "field": "thresholdDb"
+    },
+    {
+      "symbol": "ratio",
+      "name": "Ratio",
+      "ref": "GATE_CONTINUOUS_TRAVELS",
+      "field": "ratio",
+      "scale": "log"
+    },
+    {
+      "symbol": "range",
+      "name": "Range",
+      "ref": "GATE_CONTINUOUS_TRAVELS",
+      "field": "rangeDb"
+    },
+    {
+      "symbol": "attack",
+      "name": "Attack",
+      "ref": "GATE_LIMITS",
+      "field": "attackMs"
+    },
+    {
+      "symbol": "release",
+      "name": "Release",
+      "ref": "GATE_CONTINUOUS_TRAVELS",
+      "field": "releaseMs"
+    },
+    {
+      "symbol": "knee_start",
+      "name": "Knee Start",
+      "ref": "GATE_LIMITS",
+      "field": "kneeStartDb"
+    },
+    {
+      "symbol": "knee_end",
+      "name": "Knee End",
+      "ref": "GATE_LIMITS",
+      "field": "kneeEndDb"
+    },
+    {
+      "symbol": "hold",
+      "name": "Hold",
+      "ref": "GATE_LIMITS",
+      "field": "holdMs"
+    },
+    {
+      "symbol": "hysteresis",
+      "name": "Hysteresis",
+      "ref": "GATE_LIMITS",
+      "field": "hysteresisDb"
+    }
   ],
   "sidechain": {
     "symbol": "key",
@@ -50,6 +110,10 @@
     "| Range | -90 to 0 dB | -90 dB |",
     "| Attack | 0 to 500 ms | 1 ms |",
     "| Release | 0 to 5000 ms | 100 ms |",
+    "| Knee start | -80 to 0 dB | -43 dB |",
+    "| Knee end | -80 to 0 dB | -37 dB |",
+    "| Hold | 0 to 2000 ms | 10 ms |",
+    "| Hysteresis | 0 to 24 dB | 3 dB |",
     "",
     "Plus the host's bypass. An attack under 0.5 ms engages the 4x detector path, which adds 72 frames",
     "of latency, reported to the host; otherwise the latency is zero. Its LV2 URI, ports and defaults",

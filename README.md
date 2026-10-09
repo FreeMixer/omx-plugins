@@ -192,6 +192,10 @@ key, or **Key** set to Self, it is the ordinary self-keyed gate.
 | Range | -90 to 0 dB | -90 dB |
 | Attack | 0 to 500 ms | 1 ms |
 | Release | 0 to 5000 ms | 100 ms |
+| Knee start | -80 to 0 dB | -43 dB |
+| Knee end | -80 to 0 dB | -37 dB |
+| Hold | 0 to 2000 ms | 10 ms |
+| Hysteresis | 0 to 24 dB | 3 dB |
 
 Plus the host's bypass. An attack under 0.5 ms engages the 4x detector path, which adds 72 frames
 of latency, reported to the host; otherwise the latency is zero. Its LV2 URI, ports and defaults

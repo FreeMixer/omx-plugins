@@ -35,6 +35,10 @@
 #include <omxdsp/omx_denormal.h>
 
 #define NP OMX_CHORUS_PARAM_COUNT
+/* 1 when the face takes a sidechain key (spec 2026-10-09-plugin-from-contract §15.1). */
+#define KEYED 0
+/* Each block of the plan is processed this many times in a row, the same values each time. */
+#define STRETCH 1u
 
 /* One block: its length (frames, or ms when ms > 0), the stimulus it carries (0 the moving bursts,
  * 1 a full-scale burst, 2 the quiet tail), the declared parameters (declaration order) and the
@@ -82,7 +86,7 @@ static uint32_t frames_of(const Block *k, double sr) {
 static uint32_t total_frames(double sr) {
   uint32_t n = 0;
   for (size_t i = 0; i < NBLOCKS; i++) n += frames_of(&PLAN[i], sr);
-  return n;
+  return n * STRETCH;
 }
 
 static uint32_t longest_block(double sr) {
@@ -122,6 +126,19 @@ static void signal_make(float *l, float *r, uint32_t n, double sr) {
   }
 }
 
+#if KEYED
+/* The key: a noise burst at 0 dBFS every 3 s, silence between: a detector keyed by it opens, then
+ * releases down through every threshold of the plan at the rate of each block's release. */
+static void key_make(float *k, uint32_t n, double sr) {
+  uint32_t seed = 0x6b6579u;
+  const uint32_t period = (uint32_t)(3.0 * sr), burst = (uint32_t)(0.02 * sr);
+  for (uint32_t i = 0; i < n; i++) {
+    seed = seed * 1664525u + 1013904223u;
+    k[i] = i % period < burst ? 2.0f * ((float)(seed >> 8) / 16777216.0f - 0.5f) : 0.0f;
+  }
+}
+#endif
+
 /* The block's values, with parameter `off` (or none, -1) moved one step inside its travel. */
 static void values_of(const Block *k, int off, float *v) {
   memcpy(v, k->v, sizeof k->v);
@@ -131,7 +148,8 @@ static void values_of(const Block *k, int off, float *v) {
 }
 
 /* The reference: omx-dsp's instance face, called directly, on the same blocks. */
-static void reference(double sr, int off, const float *il, const float *ir, float *ol, float *orr, uint32_t *latency) {
+static void reference(double sr, int off, const float *key, const float *il, const float *ir, float *ol, float *orr,
+                      uint32_t *latency) {
   static OmxChorusInstance inst;
   (void)omx_chorus_instance_init(&inst, (float)sr);
   uint32_t at = 0;
@@ -140,9 +158,16 @@ static void reference(double sr, int off, const float *il, const float *ir, floa
     float values[NP];
     values_of(k, off, values);
     const uint32_t frames = frames_of(k, sr);
-    omx_chorus_instance_resolve(&inst, k->bypass, values[OMX_CHORUS_PARAM_SPREAD], values[OMX_CHORUS_PARAM_RATE], values[OMX_CHORUS_PARAM_DEPTH], values[OMX_CHORUS_PARAM_VOICES], values[OMX_CHORUS_PARAM_MIX]);
-    omx_chorus_instance_run(&inst, il + at, ir + at, ol + at, orr + at, frames);
-    at += frames;
+    for (uint32_t r = 0; r < STRETCH; r++) {
+      omx_chorus_instance_resolve(&inst, k->bypass, values[OMX_CHORUS_PARAM_SPREAD], values[OMX_CHORUS_PARAM_RATE], values[OMX_CHORUS_PARAM_DEPTH], values[OMX_CHORUS_PARAM_VOICES], values[OMX_CHORUS_PARAM_MIX]);
+#if KEYED
+      omx_chorus_instance_run(&inst, key ? key + at : NULL, il + at, ir + at, ol + at, orr + at, frames);
+#else
+      (void)key;
+      omx_chorus_instance_run(&inst, il + at, ir + at, ol + at, orr + at, frames);
+#endif
+      at += frames;
+    }
   }
   if (latency) *latency = (uint32_t)lrintf((float)(OMX_CHORUS_INSTANCE_LATENCY_FRAMES));
 }
@@ -150,24 +175,32 @@ static void reference(double sr, int off, const float *il, const float *ir, floa
 typedef struct Driver Driver;
 struct Driver {
   /* the whole plan through ONE fresh instance; `*latency` is read back */
-  bool (*run)(void *face, double sr, const float *il, const float *ir, float *ol, float *orr, uint32_t *latency);
+  bool (*run)(void *face, double sr, const float *key, const float *il, const float *ir, float *ol, float *orr,
+              uint32_t *latency);
   void *face;
 };
 
 static bool same(const float *a, const float *b, uint32_t n) { return memcmp(a, b, (size_t)n * sizeof(float)) == 0; }
 
-static void run_checks(const char *face, Driver *d, double sr) {
+/* The plan through the face and the reference; `keyed` hands both the key, else no key is routed.
+ * `seen[p]` is set when a reference with parameter p one step off differs from the face's output. */
+static void run_checks(const char *face, Driver *d, double sr, bool keyed, bool *seen) {
   const uint32_t n = total_frames(sr);
-  float *buf = calloc((size_t)n * 8u, sizeof(float));
+  float *buf = calloc((size_t)n * 9u, sizeof(float));
   if (!buf) abort();
   float *il = buf, *ir = buf + n, *ol = buf + 2u * n, *orr = buf + 3u * n, *wl = buf + 4u * n, *wr = buf + 5u * n;
-  float *xl = buf + 6u * n, *xr = buf + 7u * n;
+  float *xl = buf + 6u * n, *xr = buf + 7u * n, *key = NULL;
   signal_make(il, ir, n, sr);
+#if KEYED
+  if (keyed) key_make(key = buf + 8u * n, n, sr);
+#endif
+  const char *pass = KEYED ? (keyed ? " (keyed)" : " (no key)") : "";
+  char what[200];
   omx_denormals_off(); /* the faces run with flush-to-zero; so does the reference */
   uint32_t want = 0;
-  reference(sr, -1, il, ir, wl, wr, &want);
+  reference(sr, -1, key, il, ir, wl, wr, &want);
   uint32_t lat = 99;
-  bool ran = d->run(d->face, sr, il, ir, ol, orr, &lat);
+  bool ran = d->run(d->face, sr, key, il, ir, ol, orr, &lat);
   bool ident = ran && same(ol, wl, n) && same(orr, wr, n);
   for (uint32_t i = 0; ran && !ident && i < n; i++)
     if (memcmp(ol + i, wl + i, sizeof(float)) != 0 || memcmp(orr + i, wr + i, sizeof(float)) != 0) {
@@ -175,18 +208,37 @@ static void run_checks(const char *face, Driver *d, double sr) {
               (double)orr[i], (double)wl[i], (double)wr[i]);
       break;
     }
-  check(ident, face, sr, "output is the instance face's, bit for bit");
+  snprintf(what, sizeof what, "output is the instance face's, bit for bit%s", pass);
+  check(ident, face, sr, what);
   /* the reference must have moved the signal, or identity would be vacuous */
-  check(!same(wl, il, n) || !same(wr, ir, n), face, sr, "the kernel shapes the signal");
-  check(ran && lat == want, face, sr, "published latency is the kernel's");
-  /* the sabotage arm: each parameter one step off must be seen */
+  snprintf(what, sizeof what, "the kernel shapes the signal%s", pass);
+  check(!same(wl, il, n) || !same(wr, ir, n), face, sr, what);
+  snprintf(what, sizeof what, "published latency is the kernel's%s", pass);
+  check(ran && lat == want, face, sr, what);
+  if (KEYED && keyed) {
+    /* the key must reach the detector: the same plan with no key routed differs */
+    reference(sr, -1, NULL, il, ir, xl, xr, NULL);
+    check(!same(xl, wl, n) || !same(xr, wr, n), face, sr, "the key changes the output");
+  }
+  /* the sabotage arm: each parameter one step off */
   for (int p = 0; p < (int)NP; p++) {
-    reference(sr, p, il, ir, xl, xr, NULL);
-    char what[160];
-    snprintf(what, sizeof what, "a reference with %s one step off differs", OMX_CHORUS_PARAMS[p].symbol);
-    check(ran && (!same(xl, ol, n) || !same(xr, orr, n)), face, sr, what);
+    reference(sr, p, key, il, ir, xl, xr, NULL);
+    if (ran && (!same(xl, ol, n) || !same(xr, orr, n))) seen[p] = true;
   }
   free(buf);
+}
+
+/* Every check at one rate: the plan (keyed, then with no key, for a keyed face), and the sabotage arm
+ * over both, so each parameter one step off must be seen by one of them. */
+static void rate_checks(const char *face, Driver *d, double sr) {
+  bool seen[NP] = {false};
+  run_checks(face, d, sr, KEYED, seen);
+  if (KEYED) run_checks(face, d, sr, false, seen);
+  for (int p = 0; p < (int)NP; p++) {
+    char what[160];
+    snprintf(what, sizeof what, "a reference with %s one step off differs", OMX_CHORUS_PARAMS[p].symbol);
+    check(seen[p], face, sr, what);
+  }
 }
 
 /* ---- CLAP ---------------------------------------------------------------------------------- */
@@ -230,7 +282,7 @@ static bool clap_param(const clap_plugin_params_t *pp, const clap_plugin_t *p, c
   return false;
 }
 
-static bool clap_run(void *face, double sr, const float *il, const float *ir, float *ol, float *orr,
+static bool clap_run(void *face, double sr, const float *key, const float *il, const float *ir, float *ol, float *orr,
                      uint32_t *latency) {
   ClapFace *c = (ClapFace *)face;
   const clap_plugin_descriptor_t *desc = c->factory->get_plugin_descriptor(c->factory, 0);
@@ -244,8 +296,8 @@ static bool clap_run(void *face, double sr, const float *il, const float *ir, fl
   ok = ok && clap_param(pp, p, NULL, &ids[NP]);
   clap_output_events_t out = {NULL, ev_push};
   uint32_t at = 0;
-  for (size_t b = 0; ok && b < NBLOCKS; b++) {
-    const Block *k = &PLAN[b];
+  for (size_t b = 0; ok && b < NBLOCKS * STRETCH; b++) {
+    const Block *k = &PLAN[b / STRETCH];
     Events evs = {.n = 0};
     for (uint32_t i = 0; i <= NP; i++) {
       clap_event_param_value_t *e = &evs.ev[evs.n++];
@@ -256,10 +308,12 @@ static bool clap_run(void *face, double sr, const float *il, const float *ir, fl
     }
     clap_input_events_t in = {&evs, ev_size, ev_get};
     float *ib[2] = {(float *)il + at, (float *)ir + at}, *ob[2] = {ol + at, orr + at};
-    clap_audio_buffer_t ai = {ib, NULL, 2, 0, 0}, ao = {ob, NULL, 2, 0, 0};
+    float *kb[1] = {key ? (float *)key + at : NULL};
+    clap_audio_buffer_t ai[2] = {{ib, NULL, 2, 0, 0}, {kb, NULL, 1, 0, 0}}, ao = {ob, NULL, 2, 0, 0};
     const uint32_t frames = frames_of(k, sr);
-    clap_process_t pr = {.steady_time = at, .frames_count = frames, .audio_inputs = &ai, .audio_outputs = &ao,
-                         .audio_inputs_count = 1, .audio_outputs_count = 1, .in_events = &in, .out_events = &out};
+    clap_process_t pr = {.steady_time = at, .frames_count = frames, .audio_inputs = ai, .audio_outputs = &ao,
+                         .audio_inputs_count = key ? 2u : 1u, .audio_outputs_count = 1, .in_events = &in,
+                         .out_events = &out};
     ok = p->process(p, &pr) != CLAP_PROCESS_ERROR;
     at += frames;
   }
@@ -278,7 +332,7 @@ static int clap_main(const char *path) {
   c.factory = (const clap_plugin_factory_t *)c.entry->get_factory(CLAP_PLUGIN_FACTORY_ID);
   if (!c.factory || c.factory->get_plugin_count(c.factory) != 1) return fprintf(stderr, "FAIL factory\n"), 1;
   Driver d = {clap_run, &c};
-  for (uint32_t i = 0; i < OMX_DECLARED_RATE_COUNT; i++) run_checks("clap", &d, (double)OMX_DECLARED_RATES[i]);
+  for (uint32_t i = 0; i < OMX_DECLARED_RATE_COUNT; i++) rate_checks("clap", &d, (double)OMX_DECLARED_RATES[i]);
   c.entry->deinit();
   dlclose(lib);
   return failures ? 1 : 0;
@@ -299,7 +353,7 @@ static int32_t port_of(const Lv2Face *l, const char *symbol) {
   return port ? (int32_t)lilv_port_get_index(l->plugin, port) : -1;
 }
 
-static bool lv2_run(void *face, double sr, const float *il, const float *ir, float *ol, float *orr,
+static bool lv2_run(void *face, double sr, const float *key, const float *il, const float *ir, float *ol, float *orr,
                     uint32_t *latency) {
   Lv2Face *l = (Lv2Face *)face;
   LilvInstance *inst = lilv_plugin_instantiate(l->plugin, sr, NULL);
@@ -309,20 +363,29 @@ static bool lv2_run(void *face, double sr, const float *il, const float *ir, flo
   float cv[NP + 2] = {0};
   bool ok = true;
   for (int i = 0; i < 4; i++) ok = (ap[i] = port_of(l, audio[i])) >= 0 && ok;
+#if KEYED
+  const int32_t kp = port_of(l, "");
+  ok = kp >= 0 && ok;
+#else
+  (void)key;
+#endif
   for (uint32_t i = 0; i < NP; i++) ok = (cp[i] = port_of(l, OMX_CHORUS_PARAMS[i].symbol)) >= 0 && ok;
   ok = (cp[NP] = port_of(l, "enabled")) >= 0 && ok;
   ok = (cp[NP + 1] = port_of(l, "latency")) >= 0 && ok;
   for (uint32_t i = 0; ok && i < NP + 2; i++) lilv_instance_connect_port(inst, (uint32_t)cp[i], &cv[i]);
   if (ok) lilv_instance_activate(inst);
   uint32_t at = 0;
-  for (size_t b = 0; ok && b < NBLOCKS; b++) {
-    const Block *k = &PLAN[b];
+  for (size_t b = 0; ok && b < NBLOCKS * STRETCH; b++) {
+    const Block *k = &PLAN[b / STRETCH];
     for (uint32_t i = 0; i < NP; i++) cv[i] = k->v[i];
     cv[NP] = k->bypass ? 0.0f : 1.0f;
     lilv_instance_connect_port(inst, (uint32_t)ap[0], (void *)(il + at));
     lilv_instance_connect_port(inst, (uint32_t)ap[1], (void *)(ir + at));
     lilv_instance_connect_port(inst, (uint32_t)ap[2], ol + at);
     lilv_instance_connect_port(inst, (uint32_t)ap[3], orr + at);
+#if KEYED
+    lilv_instance_connect_port(inst, (uint32_t)kp, key ? (void *)(key + at) : NULL);
+#endif
     const uint32_t frames = frames_of(k, sr);
     lilv_instance_run(inst, frames);
     at += frames;
@@ -343,7 +406,7 @@ static int lv2_main(const char *bundle, const char *uri) {
   l.plugin = lilv_plugins_get_by_uri(lilv_world_get_all_plugins(l.world), u);
   if (!l.plugin) return fprintf(stderr, "FAIL no LV2 plugin %s in %s\n", uri, dir), 1;
   Driver d = {lv2_run, &l};
-  for (uint32_t i = 0; i < OMX_DECLARED_RATE_COUNT; i++) run_checks("lv2", &d, (double)OMX_DECLARED_RATES[i]);
+  for (uint32_t i = 0; i < OMX_DECLARED_RATE_COUNT; i++) rate_checks("lv2", &d, (double)OMX_DECLARED_RATES[i]);
   lilv_node_free(u), lilv_node_free(b);
   lilv_world_free(l.world);
   return failures ? 1 : 0;

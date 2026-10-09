@@ -12,6 +12,8 @@
  *        (a control the kernel takes once per band: `const float <control>[OMX_<COUNT>]`)
  *   void omx_<k>_instance_run(Omx<K>Instance *s, const float *in_l, const float *in_r,
  *                             float *out_l, float *out_r, uint32_t n);
+ *        or, for a keyed face, (Omx<K>Instance *s, const float *key, <the same>), key NULL = self
+ *        (the declaration's `sidechain` then names the key port)
  *   latency: omx_<k>_instance_latency(const Omx<K>Instance *s), else OMX_<K>_INSTANCE_LATENCY_FRAMES
  *
  * A face of another shape (ring buffers handed to init, a ports struct) is not refused as wrong: it
@@ -46,7 +48,7 @@ const argsOf = (list) =>
 
 /**
  * The face's prototypes in the generated binding's shape: `{ type, srType, args: [{type, name}],
- * latency: { fn } | { macro } }`, or `{ error }` naming what does not fit.
+ * latency: { fn } | { macro }, keyed }`, or `{ error }` naming what does not fit.
  */
 export function parseFace(text, kernel) {
   const src = stripC(text);
@@ -71,12 +73,17 @@ export function parseFace(text, kernel) {
   const odd = scalar.filter((a) => !a.extent && !/^(float|int)$/.test(a.type));
   if (odd.length) return { error: `omx_${kernel}_instance_resolve takes ${odd.map((a) => `${a.type} ${a.name}`).join(', ')}, not one scalar (or one per-band array) per control` };
   const runWant = [`${T} *`, 'const float *', 'const float *', 'float *', 'float *', 'uint32_t'];
-  if (run.map((a) => a.type).join('|') !== runWant.join('|')) return { error: `omx_${kernel}_instance_run takes (${run.map((a) => a.type).join(', ')}), not (${runWant.join(', ')})` };
+  // a keyed face takes the key block first (spec §15.1): NULL is the kernel's own detector
+  const runKeyed = [`${T} *`, 'const float *', ...runWant.slice(1)];
+  const runTypes = run.map((a) => a.type).join('|');
+  const keyed = runTypes === runKeyed.join('|') && run[1].name === 'key';
+  if (!keyed && runTypes !== runWant.join('|'))
+    return { error: `omx_${kernel}_instance_run takes (${run.map((a) => a.type).join(', ')}), not (${runWant.join(', ')}), nor a key first (${runKeyed.join(', ')})` };
   let latency;
   if (lat && lat.length === 1 && lat[0].type === `const ${T} *`) latency = { fn: `omx_${kernel}_instance_latency` };
   else if (new RegExp(`#\\s*define\\s+OMX_${K}_INSTANCE_LATENCY_FRAMES\\b`).test(src)) latency = { macro: `OMX_${K}_INSTANCE_LATENCY_FRAMES` };
   else return { error: `the face publishes no latency (omx_${kernel}_instance_latency or OMX_${K}_INSTANCE_LATENCY_FRAMES)` };
-  return { type: T, srType: init[1].type, args: scalar, latency };
+  return { type: T, srType: init[1].type, args: scalar, latency, keyed };
 }
 
 /** A control name in snake case: attackTimeMs -> attack_time_ms. */
