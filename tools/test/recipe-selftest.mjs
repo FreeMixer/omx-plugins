@@ -4,8 +4,8 @@
 /*
  * recipe-selftest.mjs — the plugin recipe's machinery, sabotaged arm by arm (`make selftest`).
  *
- *   1. The wizard, `--from-contract tremolo` against a stand-in omx-contract release carrying the
- *      tremolo kernel (at the pin) and a stand-in omx-dsp instance face: the draft takes one
+ *   1. The wizard, `--from-contract wobble` against a stand-in omx-contract release carrying the
+ *      wobble kernel (at the pin) and a stand-in omx-dsp instance face: the draft takes one
  *      parameter per resolve() argument, by reference, and marks every design choice REVIEW; a
  *      settled draft generates the whole folder, the binding passing each parameter to the
  *      argument it names; only the package description (prose) is left.
@@ -79,29 +79,29 @@ function fakeContract(dst, kernels) {
 }
 
 const travel = (min, max, step, unit, def) => ({ kind: 'travels', shape: 'travel', value: { min, max, step, unit, default: def, defaultFrom: 'desk' } });
-const TREMOLO = {
-  TREMOLO_RATE_RANGE: travel(0.1, 20, 0.01, 'Hz', 4),
-  TREMOLO_DEPTH_RANGE: travel(0, 100, 0.1, '%', 50),
-  TREMOLO_MIX_RANGE: travel(0, 100, 0.1, '%', 100),
-  TREMOLO_MODES: { kind: 'set', value: ['tremolo', 'pan'], default: 'tremolo' },
+const WOBBLE = {
+  WOBBLE_RATE_RANGE: travel(0.1, 20, 0.01, 'Hz', 4),
+  WOBBLE_DEPTH_RANGE: travel(0, 100, 0.1, '%', 50),
+  WOBBLE_MIX_RANGE: travel(0, 100, 0.1, '%', 100),
+  WOBBLE_MODES: { kind: 'set', value: ['wobble', 'pan'], default: 'wobble' },
   // the aggregate: its field names are the controls' names (rateHz, not rate)
-  TREMOLO_TRAVELS: { kind: 'travels', shape: 'table', value: { rateHz: travel(0.1, 20, 0.01, 'Hz', 4).value, depth: travel(0, 100, 0.1, '%', 50).value, mix: travel(0, 100, 0.1, '%', 100).value } },
+  WOBBLE_TRAVELS: { kind: 'travels', shape: 'table', value: { rateHz: travel(0.1, 20, 0.01, 'Hz', 4).value, depth: travel(0, 100, 0.1, '%', 50).value, mix: travel(0, 100, 0.1, '%', 100).value } },
 };
 
-/** A stand-in omx-dsp: the real headers, plus a tremolo instance face of the generated shape. */
+/** A stand-in omx-dsp: the real headers, plus a wobble instance face of the generated shape. */
 function fakeOmxdsp(dst, args = 'float rate_hz, float depth, float mix, int mode') {
   const real = omxdspInclude();
   if (!real) throw new Error('no omx-dsp headers (pkg-config omxdsp, or OMXDSP_INCLUDE)');
   if (!existsSync(dst)) cpSync(real, dst, { recursive: true });
-  const fx = join(dst, existsSync(join(dst, 'omxdsp')) ? 'omxdsp' : '', 'fx', 'omx_tremolo_instance.h');
-  writeFileSync(fx, `#ifndef OMX_TREMOLO_INSTANCE_H
-#define OMX_TREMOLO_INSTANCE_H
+  const fx = join(dst, existsSync(join(dst, 'omxdsp')) ? 'omxdsp' : '', 'fx', 'omx_wobble_instance.h');
+  writeFileSync(fx, `#ifndef OMX_WOBBLE_INSTANCE_H
+#define OMX_WOBBLE_INSTANCE_H
 #include <stdint.h>
-typedef struct { float sr; } OmxTremoloInstance;
-#define OMX_TREMOLO_INSTANCE_LATENCY_FRAMES 0.0f
-static inline int omx_tremolo_instance_init(OmxTremoloInstance *s, float sr) { s->sr = sr; return 1; }
-static inline void omx_tremolo_instance_resolve(OmxTremoloInstance *s, int bypass, ${args}) { (void)s; (void)bypass; }
-static inline void omx_tremolo_instance_run(OmxTremoloInstance *s, const float *in_l, const float *in_r, float *out_l,
+typedef struct { float sr; } OmxWobbleInstance;
+#define OMX_WOBBLE_INSTANCE_LATENCY_FRAMES 0.0f
+static inline int omx_wobble_instance_init(OmxWobbleInstance *s, float sr) { s->sr = sr; return 1; }
+static inline void omx_wobble_instance_resolve(OmxWobbleInstance *s, int bypass, ${args}) { (void)s; (void)bypass; }
+static inline void omx_wobble_instance_run(OmxWobbleInstance *s, const float *in_l, const float *in_r, float *out_l,
                                             float *out_r, uint32_t n) { (void)s; (void)in_l; (void)in_r; (void)out_l; (void)out_r; (void)n; }
 #endif
 `);
@@ -133,7 +133,7 @@ async function main() {
   const recipe = loadRecipe(ROOT);
   const realInc = omxdspInclude();
   const contract = join(WORK, 'omx-contract');
-  fakeContract(contract, { tremolo: TREMOLO });
+  fakeContract(contract, { wobble: WOBBLE });
   const inc = join(WORK, 'omxdsp-include');
   const face = fakeOmxdsp(inc);
   process.env.OMX_CONTRACT_DIR = contract;
@@ -142,10 +142,10 @@ async function main() {
   // ---- 1. the wizard -------------------------------------------------------------------------
   const tree = join(WORK, 'wizard');
   copyTree(tree);
-  const src = kernelSources('tremolo', { root: tree });
-  expect(!src.refusals.length, `the wizard finds the tremolo kernel and its face${src.refusals.length ? `: ${src.refusals.map((r) => r.reason).join('; ')}` : ''}`);
+  const src = kernelSources('wobble', { root: tree });
+  expect(!src.refusals.length, `the wizard finds the wobble kernel and its face${src.refusals.length ? `: ${src.refusals.map((r) => r.reason).join('; ')}` : ''}`);
   if (src.refusals.length) return;
-  const draft = draftDeclaration('tremolo', src, { root: tree, recipe });
+  const draft = draftDeclaration('wobble', src, { root: tree, recipe });
   expect(draft.decl?.params.map((p) => `${p.symbol}:${p.name}`).join(' ') === 'rateHz:Rate depth:Depth mix:Mix mode:Mode',
     `the draft has one parameter per resolve() argument, named by the contract (${draft.decl?.params.map((p) => `${p.symbol}:${p.name}`).join(' ')})`);
   expect(draft.decl?.params.every((p) => p.ref && !('min' in p) && !('def' in p)), 'the draft is by reference only');
@@ -155,32 +155,32 @@ async function main() {
   const unsettled = await planPlugin(draft.decl, src, { root: tree, recipe });
   expect(!unsettled.ok && unsettled.refusals.length === marks.length, `a draft with REVIEW marks is refused, each named (${unsettled.refusals.map((r) => r.field).join(' ')})`);
   const settled = structuredClone(draft.decl);
-  settled.description = 'The console\'s tremolo: the level, or the balance, moved by one LFO.';
-  settled.clap.features[1] = 'tremolo';
+  settled.description = 'The console\'s wobble: the level, or the balance, moved by one LFO.';
+  settled.clap.features[1] = 'wobble';
   settled.lv2.class = 'lv2:ModulatorPlugin';
-  settled.params[3].values = ['Tremolo', 'Pan'];
+  settled.params[3].values = ['Wobble', 'Pan'];
   const answers = settled; // what section 5 mutates
   const plan = await planPlugin(settled, src, { root: tree, recipe });
   expect(plan.ok, `the settled draft is accepted${plan.ok ? '' : `: ${plan.refusals.map((r) => `${r.field} ${r.reason}`).join('; ')}`}`);
   if (!plan.ok) return;
   const written = writePlugin(plan, { root: tree });
-  const P_ = 'plugins/omx-tremolo';
-  for (const f of ['omx-tremolo.decl.json', 'Makefile', 'omx_tremolo_clap.c', 'omx_tremolo_lv2.c', 'omx_tremolo_core.h', 'test/tremolo-oracle.c', 'generated/omx_tremolo_params.h'])
+  const P_ = 'plugins/omx-wobble';
+  for (const f of ['omx-wobble.decl.json', 'Makefile', 'omx_wobble_clap.c', 'omx_wobble_lv2.c', 'omx_wobble_core.h', 'test/wobble-oracle.c', 'generated/omx_wobble_params.h'])
     expect(written.includes(`${P_}/${f}`), `the wizard wrote ${P_}/${f}`);
   for (const f of ['README.md', 'packaging/omx-plugins.spec', '.github/workflows/ci.yml']) expect(written.includes(f), `the shared file ${f} lists the new plugin`);
-  const header = readFileSync(join(tree, P_, 'generated/omx_tremolo_params.h'), 'utf8');
+  const header = readFileSync(join(tree, P_, 'generated/omx_wobble_params.h'), 'utf8');
   expect(header.includes('{ "rateHz", "Rate", "Hz", 0.1f, 20.0f, 4.0f, 0u }'), 'the generated table carries the kernel file\'s rate travel');
-  const core = readFileSync(join(tree, P_, 'omx_tremolo_core.h'), 'utf8');
-  expect(core.includes('/* rate_hz */ values[OMX_TREMOLO_PARAM_RATE_HZ]') && core.includes('/* mode */ (int)lrintf(values[OMX_TREMOLO_PARAM_MODE])') && !/OMX_WIZARD_STUB/.test(core),
+  const core = readFileSync(join(tree, P_, 'omx_wobble_core.h'), 'utf8');
+  expect(core.includes('/* rate_hz */ values[OMX_WOBBLE_PARAM_RATE_HZ]') && core.includes('/* mode */ (int)lrintf(values[OMX_WOBBLE_PARAM_MODE])') && !/OMX_WIZARD_STUB/.test(core),
     'the generated binding passes each parameter to the resolve() argument it names, a choice as an int');
-  // The scratch tree's package prose may already name tremolo (the real catalogue does); take it out so the arm
+  // The scratch tree's package prose may already name wobble (the real catalogue does); take it out so the arm
   // proves a new plugin's missing description is caught.
   for (const f of ['debian/control', 'packaging/omx-plugins.spec']) {
     const p = join(tree, f);
-    writeFileSync(p, readFileSync(p, 'utf8').replace(/(?<![-_])\btremolo\b,?[ \t]?/gi, ''));
+    writeFileSync(p, readFileSync(p, 'utf8').replace(/(?<![-_])\bwobble\b,?[ \t]?/gi, ''));
   }
-  const owed = gapLines(await checkPlugin(tree, recipe, 'omx-tremolo'));
-  expect(owed.length === 1 && owed[0].startsWith('omx-tremolo: package-description missing'), `a generated plugin owes only the package description, prose a person writes (${owed.map((g) => g.split(' (')[0]).join('; ')})`);
+  const owed = gapLines(await checkPlugin(tree, recipe, 'omx-wobble'));
+  expect(owed.length === 1 && owed[0].startsWith('omx-wobble: package-description missing'), `a generated plugin owes only the package description, prose a person writes (${owed.map((g) => g.split(' (')[0]).join('; ')})`);
 
   // ---- 1b. the generators, sabotaged input by input --------------------------------------------
   const check = () => spawnSync('node', [join(tree, 'tools', 'gen.mjs'), '--check'], { cwd: tree, encoding: 'utf8' });
@@ -196,17 +196,17 @@ async function main() {
     const out = `${red.stdout}${red.stderr}`;
     expect(red.status !== 0 && out.includes(needle) && back.status === 0, `sabotage gen: ${what} goes red naming ${needle}, green restored${red.status ? '' : ' (STAYED GREEN)'}`);
   };
-  sabotageGen('a hand edit to the generated binding', `${P_}/omx_tremolo_core.h`, (t) => t.replace('/* depth */', '/* depth (tuned) */'), `STALE ${P_}/omx_tremolo_core.h`);
-  sabotageGen('a hand edit to the generated identity test', `${P_}/test/tremolo-oracle.c`, (t) => t.replace('no tolerance', 'a little tolerance'), `STALE ${P_}/test/tremolo-oracle.c`);
-  sabotageGen('a declaration that moved a parameter\'s name', `${P_}/omx-tremolo.decl.json`, (t) => t.replace('"name": "Depth"', '"name": "Depth Amount"'), `STALE ${P_}/generated/omx_tremolo_params.h`);
+  sabotageGen('a hand edit to the generated binding', `${P_}/omx_wobble_core.h`, (t) => t.replace('/* depth */', '/* depth (tuned) */'), `STALE ${P_}/omx_wobble_core.h`);
+  sabotageGen('a hand edit to the generated identity test', `${P_}/test/wobble-oracle.c`, (t) => t.replace('no tolerance', 'a little tolerance'), `STALE ${P_}/test/wobble-oracle.c`);
+  sabotageGen('a declaration that moved a parameter\'s name', `${P_}/omx-wobble.decl.json`, (t) => t.replace('"name": "Depth"', '"name": "Depth Amount"'), `STALE ${P_}/generated/omx_wobble_params.h`);
   sabotageGen('a face whose argument no contract control names', face, (t) => t.replace('float depth,', 'float intensity,'), "resolve argument 'intensity'");
-  sabotageGen('a hand edit to a shared file', 'README.md', (t) => t.replace('| **omx tremolo** |', '| **omx tremolo (beta)** |'), 'STALE README.md');
+  sabotageGen('a hand edit to a shared file', 'README.md', (t) => t.replace('| **omx wobble** |', '| **omx wobble (beta)** |'), 'STALE README.md');
   {
-    const was = readFileSync(join(tree, P_, 'omx_tremolo_core.h'), 'utf8');
-    writeFileSync(join(tree, P_, 'omx_tremolo_core.h'), `${was}\n`);
-    const r = gapLines(await checkPlugin(tree, recipe, 'omx-tremolo'));
-    writeFileSync(join(tree, P_, 'omx_tremolo_core.h'), was);
-    expect(r.some((l) => l.startsWith('omx-tremolo: instance-files missing')), `sabotage completeness: a stale generated binding is the gap instance-files (${r.length} gaps)`);
+    const was = readFileSync(join(tree, P_, 'omx_wobble_core.h'), 'utf8');
+    writeFileSync(join(tree, P_, 'omx_wobble_core.h'), `${was}\n`);
+    const r = gapLines(await checkPlugin(tree, recipe, 'omx-wobble'));
+    writeFileSync(join(tree, P_, 'omx_wobble_core.h'), was);
+    expect(r.some((l) => l.startsWith('omx-wobble: instance-files missing')), `sabotage completeness: a stale generated binding is the gap instance-files (${r.length} gaps)`);
   }
 
   // ---- 2. the commit plan, applied literally ------------------------------------------------
@@ -372,7 +372,7 @@ async function main() {
   process.env.OMXDSP_INCLUDE = inc;
   const fresh = join(WORK, 'refusals');
   copyTree(fresh);
-  const srcFresh = kernelSources('tremolo', { root: fresh });
+  const srcFresh = kernelSources('wobble', { root: fresh });
   const refused = async (what, mutate, field) => {
     const a = structuredClone(answers);
     mutate(a);
@@ -396,20 +396,20 @@ async function main() {
   await refused('a folder that is another kernel\'s', (a) => { a.stem = 'omx-drive'; delete a.clap.id; delete a.lv2.uri; delete a.name; }, '/stem');
   await refused('another plugin\'s LV2 URI', (a) => { a.stem = 'omx-trem'; a.lv2.uri = 'urn:openmixer:drive'; delete a.clap.id; delete a.name; }, '/lv2/uri');
   await refused('a typed travel', (a) => { a.params[0].min = 0.1; }, '/params/0');
-  await refused('an unresolved reference', (a) => { a.params[1].ref = 'TREMOLO_SPEED_RANGE'; }, '/params/1/ref');
+  await refused('an unresolved reference', (a) => { a.params[1].ref = 'WOBBLE_SPEED_RANGE'; }, '/params/1/ref');
   await refused('a reference into another kernel', (a) => { a.params[0].ref = 'FX_DELAY_TIME_RANGE'; }, '/params/0/ref');
   await refused('a derived field written wrong', (a) => { a.clap.id = 'org.openmixer.trem'; }, '/clap/id');
   await refused('a face argument no parameter binds', (a) => { a.params.splice(2, 1); }, '/params');
-  await refused('a panel naming no parameter', (a) => { a.panel = { family: 'modulation', roles: {}, sections: [{ key: 'tremolo', label: 'Tremolo', controls: ['rateHz', 'speed'] }] }; }, '/panel/sections');
+  await refused('a panel naming no parameter', (a) => { a.panel = { family: 'modulation', roles: {}, sections: [{ key: 'wobble', label: 'Wobble', controls: ['rateHz', 'speed'] }] }; }, '/panel/sections');
   await refused('a console chip naming no parameter', (a) => { a.console = { placement: { strips: ['input'], group: 'insert' }, chip: '{rateHz} · {speed}' }; }, '/console/chip');
   await refused('a panel the MOD GUI cannot draw', (a) => {
-    a.panel = { family: 'modulation', roles: { mode: 'mode' }, sections: [{ key: 'tremolo', label: 'Tremolo', controls: ['rateHz', 'depth', 'mix', 'mode'] }] };
+    a.panel = { family: 'modulation', roles: { mode: 'mode' }, sections: [{ key: 'wobble', label: 'Wobble', controls: ['rateHz', 'depth', 'mix', 'mode'] }] };
   }, '/panel');
   {
-    const f = parseFace(`static inline int omx_tremolo_instance_init(OmxTremoloInstance *s, float sr) { return 1; }
-static inline void omx_tremolo_instance_resolve(OmxTremoloInstance *s, int bypass, float rate, float depth) { }
-static inline void omx_tremolo_instance_run(OmxTremoloInstance *s, const float *in_l, const float *in_r, float *out_l, float *out_r, uint32_t n) { }
-#define OMX_TREMOLO_INSTANCE_LATENCY_FRAMES 0.0f`, 'tremolo');
+    const f = parseFace(`static inline int omx_wobble_instance_init(OmxWobbleInstance *s, float sr) { return 1; }
+static inline void omx_wobble_instance_resolve(OmxWobbleInstance *s, int bypass, float rate, float depth) { }
+static inline void omx_wobble_instance_run(OmxWobbleInstance *s, const float *in_l, const float *in_r, float *out_l, float *out_r, uint32_t n) { }
+#define OMX_WOBBLE_INSTANCE_LATENCY_FRAMES 0.0f`, 'wobble');
     const ps = [{ symbol: 'rateHz' }, { symbol: 'depth' }];
     const loose = bindFace(f, ps, [{ name: 'rateHz' }, { name: 'depth' }], { strict: false });
     const strict = bindFace(f, ps, [{ name: 'rateHz' }, { name: 'depth' }], { strict: true });

@@ -109,6 +109,7 @@ parameter header, installed in %{_includedir}/omx-plugins.
 /usr/lib/clap/omx-phaser.clap
 /usr/lib/clap/omx-strip.clap
 /usr/lib/clap/omx-transient.clap
+/usr/lib/clap/omx-tremolo.clap
 # END GENERATED clap-files
 
 %files devel
@@ -128,6 +129,7 @@ parameter header, installed in %{_includedir}/omx-plugins.
 %{_libdir}/lv2/omx-phaser.lv2/
 %{_libdir}/lv2/omx-strip.lv2/
 %{_libdir}/lv2/omx-transient.lv2/
+%{_libdir}/lv2/omx-tremolo.lv2/
 # END GENERATED lv2-files
 
 %changelog
