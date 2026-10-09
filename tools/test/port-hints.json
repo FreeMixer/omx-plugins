@@ -2352,6 +2352,23 @@
       "points": []
     }
   },
+  "omx-pitch": {
+    "enabled": {
+      "props": [
+        "lv2:toggled"
+      ],
+      "unit": null,
+      "points": []
+    },
+    "latency": {
+      "props": [
+        "lv2:integer",
+        "lv2:reportsLatency"
+      ],
+      "unit": "units:frame",
+      "points": []
+    }
+  },
   "omx-strip": {
     "trimDb": {
       "props": [],
