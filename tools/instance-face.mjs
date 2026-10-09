@@ -9,12 +9,18 @@
  *
  *   int  omx_<k>_instance_init(Omx<K>Instance *s, float|double sr);
  *   void omx_<k>_instance_resolve(Omx<K>Instance *s, int bypass, <float|int> <control>, ...);
+ *        (a control the kernel takes once per band: `const float <control>[OMX_<COUNT>]`)
  *   void omx_<k>_instance_run(Omx<K>Instance *s, const float *in_l, const float *in_r,
  *                             float *out_l, float *out_r, uint32_t n);
+ *        or, for a keyed face, (Omx<K>Instance *s, const float *key, <the same>), key NULL = self
+ *        (the declaration's `sidechain` then names the key port)
  *   latency: omx_<k>_instance_latency(const Omx<K>Instance *s), else OMX_<K>_INSTANCE_LATENCY_FRAMES
  *
- * A face of another shape (ring buffers handed to init, a ports struct, an array of gains) is not
- * refused as wrong: it is not this binding's, and the plugin keeps a hand-written one.
+ * A face of another shape (ring buffers handed to init, a ports struct) is not refused as wrong: it
+ * is not this binding's, and the plugin keeps a hand-written one. An array argument whose extent is
+ * a macro (`const float band[OMX_GEQ_BANDS]`, omx-dsp's face-conformance holds the macro to a
+ * contract count) is a control taken once per band: it binds every parameter of that control, in
+ * declaration order, and the generated code asserts their count is the extent.
  *
  * Binding: argument `a` takes the parameter whose control name, in snake case, is `a`
  * (`attackDb` → `attack_db`). An argument that still carries an older short name binds when its
@@ -42,7 +48,7 @@ const argsOf = (list) =>
 
 /**
  * The face's prototypes in the generated binding's shape: `{ type, srType, args: [{type, name}],
- * latency: { fn } | { macro } }`, or `{ error }` naming what does not fit.
+ * latency: { fn } | { macro }, keyed }`, or `{ error }` naming what does not fit.
  */
 export function parseFace(text, kernel) {
   const src = stripC(text);
@@ -60,16 +66,24 @@ export function parseFace(text, kernel) {
     return { error: `omx_${kernel}_instance_init takes (${init.map((a) => a.type).join(', ')}), not (${T} *, float sr): the face holds memory the caller hands in` };
   if (resolve.length < 2 || resolve[0].type !== `${T} *` || resolve[1].type !== 'int')
     return { error: `omx_${kernel}_instance_resolve does not begin (${T} *, int bypass)` };
-  const scalar = resolve.slice(2);
-  const odd = scalar.filter((a) => !/^(float|int)$/.test(a.type));
-  if (odd.length) return { error: `omx_${kernel}_instance_resolve takes ${odd.map((a) => `${a.type} ${a.name}`).join(', ')}, not one scalar per control` };
+  const scalar = resolve.slice(2).map((a) => {
+    const m = a.type.match(/^const (float|int)\[(OMX_[A-Z0-9_]+)\]$/);
+    return m ? { ...a, elem: m[1], extent: m[2] } : a;
+  });
+  const odd = scalar.filter((a) => !a.extent && !/^(float|int)$/.test(a.type));
+  if (odd.length) return { error: `omx_${kernel}_instance_resolve takes ${odd.map((a) => `${a.type} ${a.name}`).join(', ')}, not one scalar (or one per-band array) per control` };
   const runWant = [`${T} *`, 'const float *', 'const float *', 'float *', 'float *', 'uint32_t'];
-  if (run.map((a) => a.type).join('|') !== runWant.join('|')) return { error: `omx_${kernel}_instance_run takes (${run.map((a) => a.type).join(', ')}), not (${runWant.join(', ')})` };
+  // a keyed face takes the key block first (spec §15.1): NULL is the kernel's own detector
+  const runKeyed = [`${T} *`, 'const float *', ...runWant.slice(1)];
+  const runTypes = run.map((a) => a.type).join('|');
+  const keyed = runTypes === runKeyed.join('|') && run[1].name === 'key';
+  if (!keyed && runTypes !== runWant.join('|'))
+    return { error: `omx_${kernel}_instance_run takes (${run.map((a) => a.type).join(', ')}), not (${runWant.join(', ')}), nor a key first (${runKeyed.join(', ')})` };
   let latency;
   if (lat && lat.length === 1 && lat[0].type === `const ${T} *`) latency = { fn: `omx_${kernel}_instance_latency` };
   else if (new RegExp(`#\\s*define\\s+OMX_${K}_INSTANCE_LATENCY_FRAMES\\b`).test(src)) latency = { macro: `OMX_${K}_INSTANCE_LATENCY_FRAMES` };
   else return { error: `the face publishes no latency (omx_${kernel}_instance_latency or OMX_${K}_INSTANCE_LATENCY_FRAMES)` };
-  return { type: T, srType: init[1].type, args: scalar, latency };
+  return { type: T, srType: init[1].type, args: scalar, latency, keyed };
 }
 
 /** A control name in snake case: attackTimeMs -> attack_time_ms. */
@@ -95,6 +109,21 @@ export function bindFace(face, params, controls, { strict = process.env.OMX_BIND
   const taken = new Set();
   const binding = [];
   for (const a of face.args) {
+    if (a.extent) {
+      // a per-band array: every parameter of the control, in declaration order, none taken twice
+      const hits = wanted.filter((w) => w.words.join('_') === a.name);
+      if (!hits.length) {
+        errors.push(`resolve argument '${a.name}[${a.extent}]' is no contract control of the declaration`);
+        continue;
+      }
+      if (hits.some((h) => taken.has(h.i))) {
+        errors.push(`'${a.name}' binds two resolve arguments`);
+        continue;
+      }
+      hits.forEach((h) => taken.add(h.i));
+      binding.push({ arg: a.name, type: a.type, elem: a.elem, extent: a.extent, param: hits[0].p, params: hits.map((h) => h.p), index: hits[0].i, control: controls[hits[0].i].name });
+      continue;
+    }
     let hit = wanted.filter((w) => w.words.join('_') === a.name);
     let rename;
     if (hit.length !== 1) {

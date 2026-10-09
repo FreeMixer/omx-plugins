@@ -3,7 +3,7 @@
 /*
  * omx_{{kernel}}_core.h — {{stem}}'s binding to omx-dsp's {{kernel}} kernel: the ONE place both faces
  * (omx_{{kernel}}_clap.c, omx_{{kernel}}_lv2.c) reach the DSP. It holds no DSP of its own: it hands the
- * declared parameter values, by name, to omx-dsp's instance face (<omxdsp/fx/omx_{{kernel}}_instance.h>)
+ * declared parameter values, by name, to omx-dsp's instance face (<omxdsp/fx/omx_{{face}}_instance.h>)
  * and runs it. The instance is plain inline state: nothing is allocated, locked or called into the
  * system, in process or at activate.
  *
@@ -21,8 +21,10 @@
 /* The generated table FIRST: its guard is omx-dsp's own, so the instance header reads this table. */
 #include "omx_{{kernel}}_params.h"
 
-#include <omxdsp/fx/omx_{{kernel}}_instance.h>
-
+#include <omxdsp/fx/omx_{{face}}_instance.h>
+{{#arrays}}
+_Static_assert({{count}} == {{extent}}, "the declaration names one {{arg}} parameter per band of the face");
+{{/arrays}}
 /** The kernel's state and what a block runs with. */
 typedef struct {
   uint32_t rate;
@@ -33,12 +35,12 @@ typedef struct {
 static inline void omx_{{kernel}}_core_init(Omx{{Kernel}}Core *c, uint32_t rate) {
   memset(c, 0, sizeof *c);
   c->rate = rate;
-  (void)omx_{{kernel}}_instance_init(&c->inst, ({{srType}})rate);
+  (void)omx_{{face}}_instance_init(&c->inst, ({{srType}})rate);
 }
 
 /** The block's parameters (declaration order) and the host's bypass, each to its resolve() argument. */
 static inline void omx_{{kernel}}_core_resolve(Omx{{Kernel}}Core *c, const float *values, int bypass) {
-  omx_{{kernel}}_instance_resolve(&c->inst, bypass{{#binding}},
+  omx_{{face}}_instance_resolve(&c->inst, bypass{{#binding}},
                                   /* {{arg}} */ {{value}}{{/binding}});
 }
 
@@ -48,10 +50,16 @@ static inline uint32_t omx_{{kernel}}_core_latency(const Omx{{Kernel}}Core *c) {
   return (uint32_t)lrintf((float)({{latency}}));
 }
 
-/** One block, stereo; the outputs may alias the inputs. */
+{{^keyed}}/** One block, stereo; the outputs may alias the inputs. */
 static inline void omx_{{kernel}}_core_run(Omx{{Kernel}}Core *c, const float *in_l, const float *in_r, float *out_l,
                                          float *out_r, uint32_t frames) {
-  omx_{{kernel}}_instance_run(&c->inst, in_l, in_r, out_l, out_r, frames);
+  omx_{{face}}_instance_run(&c->inst, in_l, in_r, out_l, out_r, frames);
 }
-
+{{/keyed}}{{#keyed}}/** One block, stereo, keyed by `key` (NULL: nothing routed to the key, the kernel's own detector);
+ * the outputs may alias the inputs or the key. */
+static inline void omx_{{kernel}}_core_run(Omx{{Kernel}}Core *c, const float *key, const float *in_l, const float *in_r,
+                                         float *out_l, float *out_r, uint32_t frames) {
+  omx_{{kernel}}_instance_run(&c->inst, key, in_l, in_r, out_l, out_r, frames);
+}
+{{/keyed}}
 #endif /* OMX_{{K}}_CORE_H */

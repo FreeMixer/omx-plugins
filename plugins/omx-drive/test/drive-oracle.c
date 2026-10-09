@@ -1,27 +1,22 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Pau Aliagas <linuxnow@gmail.com>
 /*
- * drive-oracle.c — what a drive stage MUST do, checked on the BUILT plugin at 44.1, 48, 96 and
- * 192 kHz. Unlike a delay's impulse response, a waveshaper has no closed-form "expected sample"
- * independent of its own curve — so this is not a from-the-definition oracle (delay-oracle.c's
- * kind). It checks the stage's DOCUMENTED, kernel-level laws (mix_drive.h's own header, carried
- * unchanged into omxdsp's installed <omxdsp/fx/omx_drive.h>) hold through the shell:
+ * drive-oracle.c — omx-drive's kernel-identity test: both built faces, sample for sample, against
+ * omx-dsp's drive instance face called DIRECTLY on the same blocks, at every declared rate,
+ * engaged and bypassed — no tolerance.
  *
  *   drive-oracle clap <omx-drive.clap>
  *   drive-oracle lv2 <bundle-dir> <uri>
  *
- *   - bypassed, output is input, bytes.
- *   - at mix 0 and trim 0 dB, output is input delayed by exactly the plugin's own published
- *     latency, bytes — "mix = 0 stays bit-identical dry at every factor and every band".
- *   - the declared `bandHz` control is LIVE: two bandHz settings a decade apart, drive and
- *     character both away from their no-op points, give a DIFFERENT output — the one way the
- *     shell could silently drop a parameter without any of the above catching it.
- *   - at the full declared travel (36 dB drive, +-1 character, 100% mix, +12 dB trim) on a
- *     full-scale tone, every output sample is finite — the curve's own bound (|out| < 1 before
- *     trim) carried through a shell that is free to compute trim and mix however it likes.
- *
- * Parameters are found BY NAME (CLAP) or BY SYMBOL (LV2, through lilv), so a renumbered face
- * cannot pass by accident. This file includes no DSP header of its own.
+ * GENERATED — DO NOT EDIT BY HAND. Produced by tools/gen.mjs from plugins/omx-drive/omx-drive.decl.json:
+ * the plan moves every declared parameter across its travel between uneven blocks (1 to 3000 frames)
+ * and toggles the bypass; then, timed in milliseconds so every rate gets the same time, a full-scale
+ * burst and a quiet tail at the defaults (a dynamics kernel engages and releases), and each value of
+ * every choice held over its own burst and tail with the other parameters stepped once (a control
+ * read only under one value is reached). All of it runs through ONE instance of the face. Parameters are found BY NAME (CLAP) or BY
+ * SYMBOL (LV2, through lilv), so a renumbered face cannot pass by accident. Two guards keep the test
+ * honest: the reference must move the signal, and a reference with any ONE parameter one step off must
+ * differ from the face (the sabotage arm), so a wrong or dead coefficient is seen.
  */
 #include <dlfcn.h>
 #include <math.h>
@@ -33,43 +28,263 @@
 
 #include <clap/clap.h>
 #include <lilv/lilv.h>
-#include <omxcontract/omx_contract_limits.h>
 
-static const double RATES[] = OMX_ORACLE_FLOOR_RATES_INIT; /* the four rates every kernel is judged at */
-#define BLOCK 512u
-#define FRAMES 8192u
+#include "omx_drive_params.h"
 
+#include <omxdsp/fx/omx_drive_instance.h>
+#include <omxdsp/omx_denormal.h>
+
+#define NP OMX_DRIVE_PARAM_COUNT
+/* 1 when the face takes a sidechain key (spec 2026-10-09-plugin-from-contract §15.1). */
+#define KEYED 0
+/* Each block of the plan is processed this many times in a row, the same values each time. */
+#define STRETCH 1u
+
+/* One block: its length (frames, or ms when ms > 0), the stimulus it carries (0 the moving bursts,
+ * 1 a full-scale burst, 2 the quiet tail), the declared parameters (declaration order) and the
+ * host's bypass. */
 typedef struct {
-  double drive_db, character, band_hz, mix, trim_db, bypass;
-} Setting;
+  uint32_t frames;
+  float ms;
+  int signal;
+  float v[NP];
+  int bypass;
+} Block;
+
+static const Block PLAN[] = {
+    { 64, 0.0f, 0, {0.0f, 1.0f, 15005.0f, 50.0f, -20.4f, 1.0f, 0.0f, 1.0f, 0.0f, 12000.0f}, 0 },
+    { 1, 0.0f, 0, {9.0f, -1.0f, 2000.0f, 90.0f, -2.4f, 0.0f, 1.0f, 0.0f, 1.0f, 16000.0f}, 0 },
+    { 333, 0.0f, 0, {36.0f, 0.5f, 10010.0f, 10.0f, -11.4f, 0.0f, 3.0f, 1.0f, 0.0f, 0.0f}, 0 },
+    { 512, 0.0f, 0, {0.0f, 0.0f, 18002.0f, 60.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 12000.0f}, 0 },
+    { 17, 0.0f, 0, {27.0f, 0.0f, 2018.0f, 35.0f, 0.0f, 3.0f, 2.0f, 1.0f, 0.0f, 12000.0f}, 1 },
+    { 480, 0.0f, 0, {0.0f, 0.8f, 12008.0f, 100.0f, -15.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f}, 1 },
+    { 129, 0.0f, 0, {18.0f, -0.8f, 7013.0f, 100.0f, 12.0f, 2.0f, 2.0f, 1.0f, 0.0f, 0.0f}, 0 },
+    { 1024, 0.0f, 0, {32.4f, 0.2f, 2000.0f, 25.0f, -24.0f, 0.0f, 3.0f, 0.0f, 1.0f, 12000.0f}, 0 },
+    { 7, 0.0f, 0, {3.6f, -0.3f, 2000.0f, 100.0f, 3.0f, 2.0f, 0.0f, 1.0f, 0.0f, 16000.0f}, 0 },
+    { 2500, 0.0f, 0, {21.6f, 0.0f, 5015.0f, 0.0f, 0.0f, 3.0f, 2.0f, 0.0f, 1.0f, 0.0f}, 0 },
+    { 600, 0.0f, 0, {12.6f, 0.0f, 20000.0f, 75.0f, -6.0f, 0.0f, 1.0f, 1.0f, 0.0f, 16000.0f}, 0 },
+    { 3000, 0.0f, 0, {0.0f, -0.5f, 20.0f, 100.0f, 8.4f, 2.0f, 0.0f, 0.0f, 1.0f, 0.0f}, 0 },
+    { 0, 10.0f, 1, {0.0f, 0.0f, 2000.0f, 100.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f}, 0 },
+    { 0, 100.0f, 2, {0.0f, 0.0f, 2000.0f, 100.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f}, 0 },
+    { 0, 10.0f, 1, {0.0f, 0.0f, 2000.0f, 100.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f}, 0 },
+    { 0, 100.0f, 2, {0.0f, 0.0f, 2000.0f, 100.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f}, 0 },
+    { 0, 100.0f, 2, {27.0f, 0.5f, 15005.0f, 75.0f, 3.0f, 0.0f, 1.0f, 0.0f, 0.0f, 12000.0f}, 0 },
+    { 0, 10.0f, 1, {0.0f, 0.0f, 2000.0f, 100.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f}, 0 },
+    { 0, 100.0f, 2, {0.0f, 0.0f, 2000.0f, 100.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f}, 0 },
+    { 0, 100.0f, 2, {27.0f, 0.5f, 15005.0f, 75.0f, 3.0f, 1.0f, 1.0f, 0.0f, 0.0f, 12000.0f}, 0 },
+    { 0, 10.0f, 1, {0.0f, 0.0f, 2000.0f, 100.0f, 0.0f, 2.0f, 0.0f, 1.0f, 1.0f, 0.0f}, 0 },
+    { 0, 100.0f, 2, {0.0f, 0.0f, 2000.0f, 100.0f, 0.0f, 2.0f, 0.0f, 1.0f, 1.0f, 0.0f}, 0 },
+    { 0, 100.0f, 2, {27.0f, 0.5f, 15005.0f, 75.0f, 3.0f, 2.0f, 1.0f, 0.0f, 0.0f, 12000.0f}, 0 },
+    { 0, 10.0f, 1, {0.0f, 0.0f, 2000.0f, 100.0f, 0.0f, 3.0f, 0.0f, 1.0f, 1.0f, 0.0f}, 0 },
+    { 0, 100.0f, 2, {0.0f, 0.0f, 2000.0f, 100.0f, 0.0f, 3.0f, 0.0f, 1.0f, 1.0f, 0.0f}, 0 },
+    { 0, 100.0f, 2, {27.0f, 0.5f, 15005.0f, 75.0f, 3.0f, 3.0f, 1.0f, 0.0f, 0.0f, 12000.0f}, 0 },
+    { 0, 10.0f, 1, {0.0f, 0.0f, 2000.0f, 100.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f}, 0 },
+    { 0, 100.0f, 2, {0.0f, 0.0f, 2000.0f, 100.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f}, 0 },
+    { 0, 100.0f, 2, {27.0f, 0.5f, 15005.0f, 75.0f, 3.0f, 1.0f, 0.0f, 0.0f, 0.0f, 12000.0f}, 0 },
+    { 0, 10.0f, 1, {0.0f, 0.0f, 2000.0f, 100.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f}, 0 },
+    { 0, 100.0f, 2, {0.0f, 0.0f, 2000.0f, 100.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f}, 0 },
+    { 0, 100.0f, 2, {27.0f, 0.5f, 15005.0f, 75.0f, 3.0f, 1.0f, 1.0f, 0.0f, 0.0f, 12000.0f}, 0 },
+    { 0, 10.0f, 1, {0.0f, 0.0f, 2000.0f, 100.0f, 0.0f, 0.0f, 2.0f, 1.0f, 1.0f, 0.0f}, 0 },
+    { 0, 100.0f, 2, {0.0f, 0.0f, 2000.0f, 100.0f, 0.0f, 0.0f, 2.0f, 1.0f, 1.0f, 0.0f}, 0 },
+    { 0, 100.0f, 2, {27.0f, 0.5f, 15005.0f, 75.0f, 3.0f, 1.0f, 2.0f, 0.0f, 0.0f, 12000.0f}, 0 },
+    { 0, 10.0f, 1, {0.0f, 0.0f, 2000.0f, 100.0f, 0.0f, 0.0f, 3.0f, 1.0f, 1.0f, 0.0f}, 0 },
+    { 0, 100.0f, 2, {0.0f, 0.0f, 2000.0f, 100.0f, 0.0f, 0.0f, 3.0f, 1.0f, 1.0f, 0.0f}, 0 },
+    { 0, 100.0f, 2, {27.0f, 0.5f, 15005.0f, 75.0f, 3.0f, 1.0f, 3.0f, 0.0f, 0.0f, 12000.0f}, 0 },
+    { 0, 10.0f, 1, {0.0f, 0.0f, 2000.0f, 100.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f}, 0 },
+    { 0, 100.0f, 2, {0.0f, 0.0f, 2000.0f, 100.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f}, 0 },
+    { 0, 100.0f, 2, {27.0f, 0.5f, 15005.0f, 75.0f, 3.0f, 1.0f, 1.0f, 0.0f, 0.0f, 12000.0f}, 0 },
+    { 0, 10.0f, 1, {0.0f, 0.0f, 2000.0f, 100.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f}, 0 },
+    { 0, 100.0f, 2, {0.0f, 0.0f, 2000.0f, 100.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f}, 0 },
+    { 0, 100.0f, 2, {27.0f, 0.5f, 15005.0f, 75.0f, 3.0f, 1.0f, 1.0f, 1.0f, 0.0f, 12000.0f}, 0 },
+    { 0, 10.0f, 1, {0.0f, 0.0f, 2000.0f, 100.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f}, 0 },
+    { 0, 100.0f, 2, {0.0f, 0.0f, 2000.0f, 100.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f}, 0 },
+    { 0, 100.0f, 2, {27.0f, 0.5f, 15005.0f, 75.0f, 3.0f, 1.0f, 1.0f, 0.0f, 0.0f, 12000.0f}, 0 },
+    { 0, 10.0f, 1, {0.0f, 0.0f, 2000.0f, 100.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f}, 0 },
+    { 0, 100.0f, 2, {0.0f, 0.0f, 2000.0f, 100.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f}, 0 },
+    { 0, 100.0f, 2, {27.0f, 0.5f, 15005.0f, 75.0f, 3.0f, 1.0f, 1.0f, 0.0f, 1.0f, 12000.0f}, 0 },
+    { 0, 10.0f, 1, {0.0f, 0.0f, 2000.0f, 100.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f}, 0 },
+    { 0, 100.0f, 2, {0.0f, 0.0f, 2000.0f, 100.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f}, 0 },
+    { 0, 100.0f, 2, {27.0f, 0.5f, 15005.0f, 75.0f, 3.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f}, 0 },
+    { 0, 10.0f, 1, {0.0f, 0.0f, 2000.0f, 100.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 12000.0f}, 0 },
+    { 0, 100.0f, 2, {0.0f, 0.0f, 2000.0f, 100.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 12000.0f}, 0 },
+    { 0, 100.0f, 2, {27.0f, 0.5f, 15005.0f, 75.0f, 3.0f, 1.0f, 1.0f, 0.0f, 0.0f, 12000.0f}, 0 },
+    { 0, 10.0f, 1, {0.0f, 0.0f, 2000.0f, 100.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 16000.0f}, 0 },
+    { 0, 100.0f, 2, {0.0f, 0.0f, 2000.0f, 100.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 16000.0f}, 0 },
+    { 0, 100.0f, 2, {27.0f, 0.5f, 15005.0f, 75.0f, 3.0f, 1.0f, 1.0f, 0.0f, 0.0f, 16000.0f}, 0 },
+};
+#define NBLOCKS (sizeof PLAN / sizeof PLAN[0])
+
+/* One step of each parameter: what the sabotage arm moves it by. */
+static const float STEP[NP] = { 0.36f, 0.02f, 1.0f, 1.0f, 0.36f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f };
 
 static int failures;
-
-typedef struct Driver Driver;
-static void run_checks(const char *face, Driver *d, double sr);
 
 static void check(bool ok, const char *face, double sr, const char *what) {
   if (!ok) failures++;
   printf("%s %s %s @ %.0f Hz\n", ok ? "PASS" : "FAIL", face, what, sr);
 }
 
-static void noise(float *l, float *r, uint32_t n, uint32_t seed) {
+static uint32_t frames_of(const Block *k, double sr) {
+  return k->ms > 0.0f ? (uint32_t)ceil((double)k->ms * sr / 1000.0) : k->frames;
+}
+
+static uint32_t total_frames(double sr) {
+  uint32_t n = 0;
+  for (size_t i = 0; i < NBLOCKS; i++) n += frames_of(&PLAN[i], sr);
+  return n * STRETCH;
+}
+
+static uint32_t longest_block(double sr) {
+  uint32_t n = 1;
+  for (size_t i = 0; i < NBLOCKS; i++) n = frames_of(&PLAN[i], sr) > n ? frames_of(&PLAN[i], sr) : n;
+  return n;
+}
+
+/* The moving blocks: bursts of decaying noise on a quiet bed, the legs unequal (onsets, decays and a
+ * stereo image). A burst block: full-scale noise. A tail block: noise falling from full scale by
+ * 8.7 dB every 10 ms onto a bed at about -60 dBFS, so a level crosses every threshold at its own
+ * time and a gate closes under its default threshold. */
+static void signal_make(float *l, float *r, uint32_t n, double sr) {
+  uint32_t seed = 0x6f6d78u;
+  const uint32_t period = (uint32_t)(0.09 * sr);
+  uint32_t start = 0, end = 0;
+  size_t b = 0;
   for (uint32_t i = 0; i < n; i++) {
+    while (i >= end && b < NBLOCKS) start = end, end += frames_of(&PLAN[b++], sr);
+    const int sig = PLAN[b - 1].signal;
     seed = seed * 1664525u + 1013904223u;
-    l[i] = ((float)(seed >> 8) / 16777216.0f - 0.5f) * 1.8f;
+    const float a = (float)(seed >> 8) / 16777216.0f - 0.5f;
     seed = seed * 1664525u + 1013904223u;
-    r[i] = ((float)(seed >> 8) / 16777216.0f - 0.5f) * 1.8f;
+    const float c = (float)(seed >> 8) / 16777216.0f - 0.5f;
+    if (sig == 1) {
+      l[i] = 2.0f * a;
+      r[i] = 1.8f * c;
+    } else if (sig == 2) {
+      const float fall = 2.0f * expf(-(float)(i - start) / (0.01f * (float)sr)) + 0.002f;
+      l[i] = fall * c;
+      r[i] = 0.9f * fall * a;
+    } else {
+      const float env = expf(-(float)(i % period) / (0.012f * (float)sr));
+      l[i] = 0.9f * env * a + 0.02f * c;
+      r[i] = 0.7f * env * c + 0.02f * a;
+    }
   }
 }
 
-/* ---- the two faces, behind one interface ------------------------------------------------- */
+#if KEYED
+/* The key: a noise burst at 0 dBFS every 3 s, silence between: a detector keyed by it opens, then
+ * releases down through every threshold of the plan at the rate of each block's release. */
+static void key_make(float *k, uint32_t n, double sr) {
+  uint32_t seed = 0x6b6579u;
+  const uint32_t period = (uint32_t)(3.0 * sr), burst = (uint32_t)(0.02 * sr);
+  for (uint32_t i = 0; i < n; i++) {
+    seed = seed * 1664525u + 1013904223u;
+    k[i] = i % period < burst ? 2.0f * ((float)(seed >> 8) / 16777216.0f - 0.5f) : 0.0f;
+  }
+}
+#endif
 
+/* The block's values, with parameter `off` (or none, -1) moved one step inside its travel. */
+static void values_of(const Block *k, int off, float *v) {
+  memcpy(v, k->v, sizeof k->v);
+  if (off < 0) return;
+  const omx_plugin_param *p = &OMX_DRIVE_PARAMS[off];
+  v[off] = v[off] + STEP[off] <= p->max ? v[off] + STEP[off] : v[off] - STEP[off];
+}
+
+/* The reference: omx-dsp's instance face, called directly, on the same blocks. */
+static void reference(double sr, int off, const float *key, const float *il, const float *ir, float *ol, float *orr,
+                      uint32_t *latency) {
+  static OmxDriveInstance inst;
+  (void)omx_drive_instance_init(&inst, (float)sr);
+  uint32_t at = 0;
+  for (size_t b = 0; b < NBLOCKS; b++) {
+    const Block *k = &PLAN[b];
+    float values[NP];
+    values_of(k, off, values);
+    const uint32_t frames = frames_of(k, sr);
+    for (uint32_t r = 0; r < STRETCH; r++) {
+      omx_drive_instance_resolve(&inst, k->bypass, values[OMX_DRIVE_PARAM_AMOUNT], values[OMX_DRIVE_PARAM_CHARACTER], values[OMX_DRIVE_PARAM_BAND_FREQ], values[OMX_DRIVE_PARAM_MIX], values[OMX_DRIVE_PARAM_TRIM], (int)lrintf(values[OMX_DRIVE_PARAM_CURVE]), (int)lrintf(values[OMX_DRIVE_PARAM_BAND]), (int)lrintf(values[OMX_DRIVE_PARAM_AUTO_GAIN]), (int)lrintf(values[OMX_DRIVE_PARAM_STEREO_LINK]), (int)lrintf(values[OMX_DRIVE_PARAM_HF_ROLLOFF]));
+#if KEYED
+      omx_drive_instance_run(&inst, key ? key + at : NULL, il + at, ir + at, ol + at, orr + at, frames);
+#else
+      (void)key;
+      omx_drive_instance_run(&inst, il + at, ir + at, ol + at, orr + at, frames);
+#endif
+      at += frames;
+    }
+  }
+  if (latency) *latency = (uint32_t)lrintf((float)(omx_drive_instance_latency(&inst)));
+}
+
+typedef struct Driver Driver;
 struct Driver {
-  /* run `frames` of stereo input through a FRESH instance under `s`; `*latency` is read back. */
-  bool (*run)(void *face, double sr, const Setting *s, const float *il, const float *ir, float *ol, float *orr,
-             uint32_t frames, uint32_t *latency);
+  /* the whole plan through ONE fresh instance; `*latency` is read back */
+  bool (*run)(void *face, double sr, const float *key, const float *il, const float *ir, float *ol, float *orr,
+              uint32_t *latency);
   void *face;
 };
+
+static bool same(const float *a, const float *b, uint32_t n) { return memcmp(a, b, (size_t)n * sizeof(float)) == 0; }
+
+/* The plan through the face and the reference; `keyed` hands both the key, else no key is routed.
+ * `seen[p]` is set when a reference with parameter p one step off differs from the face's output. */
+static void run_checks(const char *face, Driver *d, double sr, bool keyed, bool *seen) {
+  const uint32_t n = total_frames(sr);
+  float *buf = calloc((size_t)n * 9u, sizeof(float));
+  if (!buf) abort();
+  float *il = buf, *ir = buf + n, *ol = buf + 2u * n, *orr = buf + 3u * n, *wl = buf + 4u * n, *wr = buf + 5u * n;
+  float *xl = buf + 6u * n, *xr = buf + 7u * n, *key = NULL;
+  signal_make(il, ir, n, sr);
+#if KEYED
+  if (keyed) key_make(key = buf + 8u * n, n, sr);
+#endif
+  const char *pass = KEYED ? (keyed ? " (keyed)" : " (no key)") : "";
+  char what[200];
+  omx_denormals_off(); /* the faces run with flush-to-zero; so does the reference */
+  uint32_t want = 0;
+  reference(sr, -1, key, il, ir, wl, wr, &want);
+  uint32_t lat = 99;
+  bool ran = d->run(d->face, sr, key, il, ir, ol, orr, &lat);
+  bool ident = ran && same(ol, wl, n) && same(orr, wr, n);
+  for (uint32_t i = 0; ran && !ident && i < n; i++)
+    if (memcmp(ol + i, wl + i, sizeof(float)) != 0 || memcmp(orr + i, wr + i, sizeof(float)) != 0) {
+      fprintf(stderr, "  first difference at frame %u: got %.9g/%.9g, kernel %.9g/%.9g\n", i, (double)ol[i],
+              (double)orr[i], (double)wl[i], (double)wr[i]);
+      break;
+    }
+  snprintf(what, sizeof what, "output is the instance face's, bit for bit%s", pass);
+  check(ident, face, sr, what);
+  /* the reference must have moved the signal, or identity would be vacuous */
+  snprintf(what, sizeof what, "the kernel shapes the signal%s", pass);
+  check(!same(wl, il, n) || !same(wr, ir, n), face, sr, what);
+  snprintf(what, sizeof what, "published latency is the kernel's%s", pass);
+  check(ran && lat == want, face, sr, what);
+  if (KEYED && keyed) {
+    /* the key must reach the detector: the same plan with no key routed differs */
+    reference(sr, -1, NULL, il, ir, xl, xr, NULL);
+    check(!same(xl, wl, n) || !same(xr, wr, n), face, sr, "the key changes the output");
+  }
+  /* the sabotage arm: each parameter one step off */
+  for (int p = 0; p < (int)NP; p++) {
+    reference(sr, p, key, il, ir, xl, xr, NULL);
+    if (ran && (!same(xl, ol, n) || !same(xr, orr, n))) seen[p] = true;
+  }
+  free(buf);
+}
+
+/* Every check at one rate: the plan (keyed, then with no key, for a keyed face), and the sabotage arm
+ * over both, so each parameter one step off must be seen by one of them. */
+static void rate_checks(const char *face, Driver *d, double sr) {
+  bool seen[NP] = {false};
+  run_checks(face, d, sr, KEYED, seen);
+  if (KEYED) run_checks(face, d, sr, false, seen);
+  for (int p = 0; p < (int)NP; p++) {
+    char what[160];
+    snprintf(what, sizeof what, "a reference with %s one step off differs", OMX_DRIVE_PARAMS[p].symbol);
+    check(seen[p], face, sr, what);
+  }
+}
 
 /* ---- CLAP ---------------------------------------------------------------------------------- */
 
@@ -78,10 +293,11 @@ static const void *h_ext(const clap_host_t *h, const char *id) {
   return NULL;
 }
 static void h_noop(const clap_host_t *h) { (void)h; }
-static const clap_host_t HOST = {CLAP_VERSION_INIT, NULL, "drive-oracle", "openmixer", "", "0.1", h_ext, h_noop, h_noop, h_noop};
+static const clap_host_t HOST = {CLAP_VERSION_INIT, NULL, "drive-oracle", "openmixer", "", "0.1", h_ext, h_noop,
+                                 h_noop, h_noop};
 
 typedef struct {
-  clap_event_param_value_t ev[8];
+  clap_event_param_value_t ev[NP + 1];
   uint32_t n;
 } Events;
 static uint32_t ev_size(const clap_input_events_t *l) { return ((const Events *)l->ctx)->n; }
@@ -111,38 +327,40 @@ static bool clap_param(const clap_plugin_params_t *pp, const clap_plugin_t *p, c
   return false;
 }
 
-static bool clap_run(void *face, double sr, const Setting *s, const float *il, const float *ir, float *ol, float *orr,
-                     uint32_t frames, uint32_t *latency) {
+static bool clap_run(void *face, double sr, const float *key, const float *il, const float *ir, float *ol, float *orr,
+                     uint32_t *latency) {
   ClapFace *c = (ClapFace *)face;
   const clap_plugin_descriptor_t *desc = c->factory->get_plugin_descriptor(c->factory, 0);
   const clap_plugin_t *p = c->factory->create_plugin(c->factory, &HOST, desc->id);
   if (!p || !p->init(p)) return false;
   const clap_plugin_params_t *pp = (const clap_plugin_params_t *)p->get_extension(p, CLAP_EXT_PARAMS);
   const clap_plugin_latency_t *lat = (const clap_plugin_latency_t *)p->get_extension(p, CLAP_EXT_LATENCY);
-  bool ok = pp && lat && p->activate(p, sr, 1, BLOCK) && p->start_processing(p);
-  Events evs = {.n = 0};
-  const char *names[] = {"Drive", "Character", "Band", "Mix", "Trim", NULL};
-  const double vals[] = {s->drive_db, s->character, s->band_hz, s->mix, s->trim_db, s->bypass};
-  for (size_t i = 0; ok && i < 6; i++) {
-    clap_id id;
-    ok = clap_param(pp, p, names[i], &id);
-    clap_event_param_value_t *e = &evs.ev[evs.n++];
-    memset(e, 0, sizeof *e);
-    e->header = (clap_event_header_t){sizeof *e, 0, CLAP_CORE_EVENT_SPACE_ID, CLAP_EVENT_PARAM_VALUE, 0};
-    e->param_id = ok ? id : 0, e->note_id = -1, e->port_index = -1, e->channel = -1, e->key = -1, e->value = vals[i];
-  }
-  clap_input_events_t in = {&evs, ev_size, ev_get};
-  Events none = {.n = 0};
-  clap_input_events_t in_none = {&none, ev_size, ev_get};
+  bool ok = pp && lat && p->activate(p, sr, 1, longest_block(sr)) && p->start_processing(p);
+  clap_id ids[NP + 1];
+  for (uint32_t i = 0; ok && i < NP; i++) ok = clap_param(pp, p, OMX_DRIVE_PARAMS[i].name, &ids[i]);
+  ok = ok && clap_param(pp, p, NULL, &ids[NP]);
   clap_output_events_t out = {NULL, ev_push};
-  for (uint32_t f = 0; ok && f < frames; f += BLOCK) {
-    const uint32_t n = frames - f < BLOCK ? frames - f : BLOCK;
-    float *ib[2] = {(float *)il + f, (float *)ir + f}, *ob[2] = {ol + f, orr + f};
-    clap_audio_buffer_t ai = {ib, NULL, 2, 0, 0}, ao = {ob, NULL, 2, 0, 0};
-    clap_process_t pr = {.steady_time = f, .frames_count = n, .audio_inputs = &ai, .audio_outputs = &ao,
-                         .audio_inputs_count = 1, .audio_outputs_count = 1, .in_events = f ? &in_none : &in,
+  uint32_t at = 0;
+  for (size_t b = 0; ok && b < NBLOCKS * STRETCH; b++) {
+    const Block *k = &PLAN[b / STRETCH];
+    Events evs = {.n = 0};
+    for (uint32_t i = 0; i <= NP; i++) {
+      clap_event_param_value_t *e = &evs.ev[evs.n++];
+      memset(e, 0, sizeof *e);
+      e->header = (clap_event_header_t){sizeof *e, 0, CLAP_CORE_EVENT_SPACE_ID, CLAP_EVENT_PARAM_VALUE, 0};
+      e->param_id = ids[i], e->note_id = -1, e->port_index = -1, e->channel = -1, e->key = -1;
+      e->value = i < NP ? (double)k->v[i] : (k->bypass ? 1.0 : 0.0);
+    }
+    clap_input_events_t in = {&evs, ev_size, ev_get};
+    float *ib[2] = {(float *)il + at, (float *)ir + at}, *ob[2] = {ol + at, orr + at};
+    float *kb[1] = {key ? (float *)key + at : NULL};
+    clap_audio_buffer_t ai[2] = {{ib, NULL, 2, 0, 0}, {kb, NULL, 1, 0, 0}}, ao = {ob, NULL, 2, 0, 0};
+    const uint32_t frames = frames_of(k, sr);
+    clap_process_t pr = {.steady_time = at, .frames_count = frames, .audio_inputs = ai, .audio_outputs = &ao,
+                         .audio_inputs_count = key ? 2u : 1u, .audio_outputs_count = 1, .in_events = &in,
                          .out_events = &out};
     ok = p->process(p, &pr) != CLAP_PROCESS_ERROR;
+    at += frames;
   }
   if (ok && latency) *latency = lat->get(p);
   p->stop_processing(p);
@@ -159,7 +377,7 @@ static int clap_main(const char *path) {
   c.factory = (const clap_plugin_factory_t *)c.entry->get_factory(CLAP_PLUGIN_FACTORY_ID);
   if (!c.factory || c.factory->get_plugin_count(c.factory) != 1) return fprintf(stderr, "FAIL factory\n"), 1;
   Driver d = {clap_run, &c};
-  for (size_t i = 0; i < sizeof RATES / sizeof RATES[0]; i++) run_checks("clap", &d, RATES[i]);
+  for (uint32_t i = 0; i < OMX_DECLARED_RATE_COUNT; i++) rate_checks("clap", &d, (double)OMX_DECLARED_RATES[i]);
   c.entry->deinit();
   dlclose(lib);
   return failures ? 1 : 0;
@@ -180,35 +398,46 @@ static int32_t port_of(const Lv2Face *l, const char *symbol) {
   return port ? (int32_t)lilv_port_get_index(l->plugin, port) : -1;
 }
 
-static bool lv2_run(void *face, double sr, const Setting *s, const float *il, const float *ir, float *ol, float *orr,
-                    uint32_t frames, uint32_t *latency) {
+static bool lv2_run(void *face, double sr, const float *key, const float *il, const float *ir, float *ol, float *orr,
+                    uint32_t *latency) {
   Lv2Face *l = (Lv2Face *)face;
   LilvInstance *inst = lilv_plugin_instantiate(l->plugin, sr, NULL);
   if (!inst) return false;
   const char *audio[] = {"in_l", "in_r", "out_l", "out_r"};
-  const char *ctl[] = {"driveDb", "character", "bandHz", "mix", "trimDb", "enabled", "latency"};
-  float cv[7] = {(float)s->drive_db, (float)s->character, (float)s->band_hz, (float)s->mix, (float)s->trim_db,
-                 s->bypass > 0.5 ? 0.0f : 1.0f, 0.0f};
-  int32_t ap[4];
+  int32_t ap[4], cp[NP + 2];
+  float cv[NP + 2] = {0};
   bool ok = true;
   for (int i = 0; i < 4; i++) ok = (ap[i] = port_of(l, audio[i])) >= 0 && ok;
-  for (int i = 0; i < 7; i++) {
-    int32_t idx = port_of(l, ctl[i]);
-    ok = idx >= 0 && ok;
-    if (idx >= 0) lilv_instance_connect_port(inst, (uint32_t)idx, &cv[i]);
-  }
+#if KEYED
+  const int32_t kp = port_of(l, "");
+  ok = kp >= 0 && ok;
+#else
+  (void)key;
+#endif
+  for (uint32_t i = 0; i < NP; i++) ok = (cp[i] = port_of(l, OMX_DRIVE_PARAMS[i].symbol)) >= 0 && ok;
+  ok = (cp[NP] = port_of(l, "enabled")) >= 0 && ok;
+  ok = (cp[NP + 1] = port_of(l, "latency")) >= 0 && ok;
+  for (uint32_t i = 0; ok && i < NP + 2; i++) lilv_instance_connect_port(inst, (uint32_t)cp[i], &cv[i]);
   if (ok) lilv_instance_activate(inst);
-  for (uint32_t f = 0; ok && f < frames; f += BLOCK) {
-    const uint32_t n = frames - f < BLOCK ? frames - f : BLOCK;
-    lilv_instance_connect_port(inst, (uint32_t)ap[0], (void *)(il + f));
-    lilv_instance_connect_port(inst, (uint32_t)ap[1], (void *)(ir + f));
-    lilv_instance_connect_port(inst, (uint32_t)ap[2], ol + f);
-    lilv_instance_connect_port(inst, (uint32_t)ap[3], orr + f);
-    lilv_instance_run(inst, n);
+  uint32_t at = 0;
+  for (size_t b = 0; ok && b < NBLOCKS * STRETCH; b++) {
+    const Block *k = &PLAN[b / STRETCH];
+    for (uint32_t i = 0; i < NP; i++) cv[i] = k->v[i];
+    cv[NP] = k->bypass ? 0.0f : 1.0f;
+    lilv_instance_connect_port(inst, (uint32_t)ap[0], (void *)(il + at));
+    lilv_instance_connect_port(inst, (uint32_t)ap[1], (void *)(ir + at));
+    lilv_instance_connect_port(inst, (uint32_t)ap[2], ol + at);
+    lilv_instance_connect_port(inst, (uint32_t)ap[3], orr + at);
+#if KEYED
+    lilv_instance_connect_port(inst, (uint32_t)kp, key ? (void *)(key + at) : NULL);
+#endif
+    const uint32_t frames = frames_of(k, sr);
+    lilv_instance_run(inst, frames);
+    at += frames;
   }
   if (ok) lilv_instance_deactivate(inst);
   lilv_instance_free(inst);
-  if (ok && latency) *latency = (uint32_t)(cv[6] + 0.5f);
+  if (ok && latency) *latency = (uint32_t)(cv[NP + 1] + 0.5f);
   return ok;
 }
 
@@ -222,72 +451,10 @@ static int lv2_main(const char *bundle, const char *uri) {
   l.plugin = lilv_plugins_get_by_uri(lilv_world_get_all_plugins(l.world), u);
   if (!l.plugin) return fprintf(stderr, "FAIL no LV2 plugin %s in %s\n", uri, dir), 1;
   Driver d = {lv2_run, &l};
-  for (size_t i = 0; i < sizeof RATES / sizeof RATES[0]; i++) run_checks("lv2", &d, RATES[i]);
+  for (uint32_t i = 0; i < OMX_DECLARED_RATE_COUNT; i++) rate_checks("lv2", &d, (double)OMX_DECLARED_RATES[i]);
   lilv_node_free(u), lilv_node_free(b);
   lilv_world_free(l.world);
   return failures ? 1 : 0;
-}
-
-/* ---- the checks, written once against the Driver interface ------------------------------- */
-
-static void run_checks(const char *face, Driver *d, double sr) {
-  float *il = calloc(FRAMES, sizeof(float)), *ir = calloc(FRAMES, sizeof(float));
-  float *ol = calloc(FRAMES, sizeof(float)), *orr = calloc(FRAMES, sizeof(float));
-  if (!il || !ir || !ol || !orr) abort();
-  noise(il, ir, FRAMES, 0x6f6d78u);
-
-  /* bypass: output is input. */
-  {
-    Setting by = {18.0, 0.5, 2000.0, 70.0, 3.0, 1.0};
-    uint32_t lat = 0;
-    bool ok = d->run(d->face, sr, &by, il, ir, ol, orr, FRAMES, &lat) &&
-              memcmp(ol, il, FRAMES * sizeof(float)) == 0 && memcmp(orr, ir, FRAMES * sizeof(float)) == 0;
-    check(ok, face, sr, "bypass is the identity");
-  }
-
-  /* mix 0, trim 0 dB: output is input delayed by the plugin's own published latency. */
-  {
-    Setting dry = {24.0, 0.7, 500.0, 0.0, 0.0, 0.0};
-    uint32_t lat = 0;
-    bool ok = d->run(d->face, sr, &dry, il, ir, ol, orr, FRAMES, &lat) && lat < FRAMES;
-    if (ok) {
-      ok = memcmp(ol + lat, il, (FRAMES - lat) * sizeof(float)) == 0 &&
-           memcmp(orr + lat, ir, (FRAMES - lat) * sizeof(float)) == 0;
-    }
-    char what[80];
-    snprintf(what, sizeof what, "mix 0 is the delayed identity (latency %u)", lat);
-    check(ok, face, sr, what);
-  }
-
-  /* the declared bandHz control is live. */
-  {
-    Setting lo = {24.0, 0.8, 80.0, 100.0, 0.0, 0.0};
-    Setting hi = lo;
-    hi.band_hz = 12000.0;
-    float *ol2 = calloc(FRAMES, sizeof(float)), *or2 = calloc(FRAMES, sizeof(float));
-    uint32_t lat = 0;
-    bool ok = ol2 && or2 && d->run(d->face, sr, &lo, il, ir, ol, orr, FRAMES, &lat) &&
-              d->run(d->face, sr, &hi, il, ir, ol2, or2, FRAMES, &lat) &&
-              (memcmp(ol, ol2, FRAMES * sizeof(float)) != 0 || memcmp(orr, or2, FRAMES * sizeof(float)) != 0);
-    check(ok, face, sr, "bandHz changes the output");
-    free(ol2), free(or2);
-  }
-
-  /* full travel: every output sample is finite. */
-  {
-    const uint32_t n = 4096u;
-    for (uint32_t i = 0; i < n; i++) {
-      il[i] = sinf(2.0f * 3.14159265f * 300.0f * (float)i / (float)sr);
-      ir[i] = -il[i];
-    }
-    Setting hot = {36.0, 1.0, 20000.0, 100.0, 12.0, 0.0};
-    uint32_t lat = 0;
-    bool ok = d->run(d->face, sr, &hot, il, ir, ol, orr, n, &lat);
-    for (uint32_t i = 0; ok && i < n; i++) ok = isfinite(ol[i]) && isfinite(orr[i]);
-    check(ok, face, sr, "full travel stays finite");
-  }
-
-  free(il), free(ir), free(ol), free(orr);
 }
 
 int main(int argc, char **argv) {

@@ -47,6 +47,7 @@ import { kernelControls, locateContract } from '../omx-contract.mjs';
 import { omxdspInclude } from '../template.mjs';
 import { emitPluginTtl, generateInstance, loadDecl } from '../gen.mjs';
 import { hintErrors } from '../port-hints.mjs';
+import { expandVariant, variantBands } from '../variants.mjs';
 import { checkPlugin, debtGrowth, debtVerdict, gapLines, loadDebt, loadRecipe, pluginStems, recipeErrors } from '../plugin-recipe.mjs';
 
 const ROOT = resolve(fileURLToPath(import.meta.url), '..', '..', '..');
@@ -282,15 +283,16 @@ async function main() {
     ['generatedFresh', 'lv2-description', () => edit(`${P}/generated/omx-drive.lv2/omx-drive.ttl`, (s) => s.replace('lv2:default 0 ;', 'lv2:default 1 ;'))],
     ['modguiFresh', 'modgui', () => add(`${P}/generated/omx-drive.lv2/modgui/stray.css`, '')],
     ['makefile', 'makefile', () => edit(`${P}/Makefile`, (s) => s.replace('urn:openmixer:drive', 'urn:openmixer:drives'))],
-    ['face', 'clap-face', () => edit(`${P}/omx_drive_clap.c`, (s) => s.replace('#include "omx_drive_params.h"', ''))],
+    // the generated faces reach the table directly and through the binding: both includes go
+    ['face', 'clap-face', () => edit(`${P}/omx_drive_clap.c`, (s) => s.replace('#include "omx_drive_params.h"', '').replace('#include "omx_drive_core.h"', ''))],
     ['face', 'lv2-face', () => edit(`${P}/omx_drive_lv2.c`, (s) => s.replace('lv2_descriptor(uint32_t', 'lv2_descriptor_gone(uint32_t'))],
-    ['kernelBinding', 'kernel-binding', () => edit(`${P}/omx_drive_lv2.c`, (s) => `#define OMX_WIZARD_STUB 1\n${s}`)],
+    ['kernelBinding', 'kernel-binding', () => edit(`${P}/omx_drive_core.h`, (s) => `#define OMX_WIZARD_STUB 1\n${s}`)],
     ['kernelBinding', 'kernel-binding', () => {
       // only omx_denormal.h left: an omx-dsp header, but not the plugin's own kernel
-      const undo = ['omx_drive_clap.c', 'omx_drive_lv2.c'].map((f) => edit(`${P}/${f}`, (s) => s.replace(/#include <omxdsp\/fx\/omx_drive_instance\.h>\n/, '')));
+      const undo = ['omx_drive_core.h'].map((f) => edit(`${P}/${f}`, (s) => s.replace(/#include <omxdsp\/fx\/omx_drive_instance\.h>\n/, '')));
       return () => undo.forEach((u) => u());
     }],
-    ['kernelBinding', 'kernel-binding', () => edit(`${P}/omx-drive.decl.json`, (s) => s.replace('"kernel": "drive",', '"kernel": "drive",\n  "kernels": ["drive", "delay"],'))],
+    ['kernelBinding', 'kernel-binding', () => edit(`${P}/omx-drive.decl.json`, (s) => s.replace(/"kernels": \[[^\]]*\]/, '"kernels": ["drive", "delay"]'))],
     ['makeTestRuns', 'parameter-test', () => edit(`${P}/Makefile`, (s) => s.replace(/^.*clap-params-check\.mjs.*\n/m, ''))],
     ['oracle', 'kernel-identity-test', () => remove(`${P}/test/drive-oracle.c`)],
     ['sharedListed', 'spec-files', () => edit('packaging/omx-plugins.spec', (s) => s.replace('%{_libdir}/lv2/omx-drive.lv2/\n', ''))],
@@ -328,10 +330,13 @@ async function main() {
   const unheld = await ratchet();
   undo();
   expect(unheld.fresh.includes("omx-drive manual-section"), `sabotage: a gap the debt does not hold fails the ratchet (${unheld.fresh.join(", ")})`);
-  undo = add('plugins/omx-chorus/Makefile', readFileSync(join(t, 'plugins/omx-drive/Makefile'), 'utf8').replace(/omx-drive/g, 'omx-chorus').replace(/urn:openmixer:drive/g, 'urn:openmixer:chorus').replace(/org\.openmixer\.drive/g, 'org.openmixer.chorus'));
+  // An entry owed by a plugin that has the artifact: written here, so the arm does not depend on
+  // which plugin still owes something.
+  const owedEntry = '{ "plugin": "omx-drive", "entry": "makefile", "owedBy": "selftest" }';
+  undo = edit('recipes/completeness-debt.json', (s) => (/"debt": \[\s*\]/.test(s) ? s.replace(/"debt": \[\s*\]/, `"debt": [\n    ${owedEntry}\n  ]`) : s.replace('"debt": [', `"debt": [\n    ${owedEntry},`)));
   const paid = await ratchet();
   undo();
-  expect(paid.stale.some((x) => x.startsWith('omx-chorus makefile')), `sabotage: a debt entry now satisfied fails the ratchet as stale (${paid.stale.join(', ')})`);
+  expect(paid.stale.some((x) => x.startsWith('omx-drive makefile')), `sabotage: a debt entry now satisfied fails the ratchet as stale (${paid.stale.join(', ')})`);
 
   const ghost = await (async () => {
     const reports = [];
@@ -405,11 +410,16 @@ async function main() {
     expect(r && r.reason.includes(needle), `wizard refuses ${what}: ${r ? r.reason.slice(0, 120) : 'NOT REFUSED'}`);
   };
   sourceRefused('a kernel omx-contract lacks', 'nosuch', 'omx-contract', 'has no data/kernels/nosuch.json');
-  sourceRefused('a kernel with no instance face', 'delay', 'omx-dsp', 'has no <omxdsp/fx/omx_delay_instance.h>');
+  // balance: a contract kernel omx-dsp gives no instance face (delay, chorus and the rest have one now)
+  sourceRefused('a kernel with no instance face', 'balance', 'omx-dsp', 'has no <omxdsp/fx/omx_balance_instance.h>');
   {
-    const chorus = join(realInc, existsSync(join(realInc, 'omxdsp')) ? 'omxdsp' : '', 'fx', 'omx_chorus_instance.h');
-    const f = existsSync(chorus) ? parseFace(readFileSync(chorus, 'utf8'), 'chorus') : { error: 'no chorus face to read' };
-    expect(/hands in/.test(f.error ?? ''), `a face of another shape is named, not guessed (chorus: ${f.error ?? 'ACCEPTED'})`);
+    // A face whose init is handed the rings, the shape the faces had before the generator's: written
+    // here, so the arm does not depend on which of omx-dsp's faces still has it.
+    const f = parseFace(`static inline int omx_wobble_instance_init(OmxWobbleInstance *s, float sr, float *ring_l, float *ring_r, uint32_t cap) { return 1; }
+static inline void omx_wobble_instance_resolve(OmxWobbleInstance *s, int bypass, float rate, float depth) { }
+static inline void omx_wobble_instance_run(OmxWobbleInstance *s, const float *in_l, const float *in_r, float *out_l, float *out_r, uint32_t n) { }
+#define OMX_WOBBLE_INSTANCE_LATENCY_FRAMES 0.0f`, 'wobble');
+    expect(/hands in/.test(f.error ?? ''), `a face of another shape is named, not guessed (rings handed to init: ${f.error ?? 'ACCEPTED'})`);
   }
   await refused('a REVIEW mark left', (a) => { a.lv2.class = 'REVIEW: the LV2 class'; }, '/lv2/class');
   await refused('a plugin not generated from the face', (a) => { delete a.binding; }, '/binding');
@@ -436,10 +446,64 @@ static inline void omx_wobble_instance_run(OmxWobbleInstance *s, const float *in
     expect(!loose.errors.length && loose.renames[0]?.rename === 'rate_hz' && strict.errors.some((e) => e.includes("'rate'")),
       `an argument that binds only by its words is a rename owed, refused when strict (${loose.renames.map((r) => `${r.arg}->${r.rename}`).join(', ')}; ${strict.errors[0] ?? 'NOT REFUSED'})`);
   }
+  {
+    const face = (arg) => parseFace(`static inline int omx_wobble_instance_init(OmxWobbleInstance *s, float sr) { return 1; }
+static inline void omx_wobble_instance_resolve(OmxWobbleInstance *s, int bypass, ${arg}, float mix) { }
+static inline void omx_wobble_instance_run(OmxWobbleInstance *s, const float *in_l, const float *in_r, float *out_l, float *out_r, uint32_t n) { }
+#define OMX_WOBBLE_INSTANCE_LATENCY_FRAMES 0.0f`, 'wobble');
+    const ps = [{ symbol: 'band1' }, { symbol: 'mix' }, { symbol: 'band2' }, { symbol: 'band3' }];
+    const cs = [{ name: 'band' }, { name: 'mix' }, { name: 'band' }, { name: 'band' }];
+    const b = bindFace(face('const float band[OMX_WOBBLE_BANDS]'), ps, cs);
+    const arr = b.binding.find((x) => x.arg === 'band');
+    expect(!b.errors.length && arr?.extent === 'OMX_WOBBLE_BANDS' && arr.params.map((p) => p.symbol).join() === 'band1,band2,band3',
+      `a per-band array argument binds every parameter of its control, in declaration order (${arr?.params?.map((p) => p.symbol).join() ?? b.errors[0]})`);
+    const literal = face('const float band[3]');
+    expect(/not one scalar/.test(literal.error ?? ''), `a per-band array of literal extent is named, not bound (${literal.error ?? 'ACCEPTED'})`);
+  }
+  {
+    // a keyed face takes the key block first, and only a block named `key` is read as one
+    const face = (key) => `static inline int omx_wobble_instance_init(OmxWobbleInstance *s, float sr) { return 1; }
+static inline void omx_wobble_instance_resolve(OmxWobbleInstance *s, int bypass, float depth) { }
+static inline void omx_wobble_instance_run(OmxWobbleInstance *s, const float *${key}, const float *in_l, const float *in_r, float *out_l, float *out_r, uint32_t n) { }
+#define OMX_WOBBLE_INSTANCE_LATENCY_FRAMES 0.0f`;
+    const keyed = parseFace(face('key'), 'wobble'), odd = parseFace(face('side'), 'wobble');
+    expect(keyed.keyed === true && /nor a key first/.test(odd.error ?? ''), `a key first is a keyed face, another block first is refused (${keyed.error ?? keyed.keyed}; ${odd.error ?? 'ACCEPTED'})`);
+  }
 
   // ---- 6. the port hints ---------------------------------------------------------------------
   delete process.env.OMX_CONTRACT_DIR; // the real tree reads the release it pins
   delete process.env.OMXDSP_INCLUDE;
+  // ---- 5b. variants: one declaration, several band counts (tools/variants.mjs) ------------------
+  {
+    const real = locateContract(ROOT).dir;
+    const baseFile = join(ROOT, 'plugins', 'omx-eq', 'omx-eq.decl.json');
+    if (real && existsSync(baseFile)) {
+      const base = JSON.parse(readFileSync(baseFile, 'utf8'));
+      const v16 = base.variants.of.find((v) => v.count === 'eq16');
+      const d = expandVariant(real, base, v16);
+      const own = base.params.filter((p) => !p.perBand).length, per = base.params.filter((p) => p.perBand).length;
+      expect(variantBands(real, base, v16) === 16 && d.params.length === own + 16 * per && d.params.at(-1).symbol === `b16_${base.params.at(-1).symbol}` &&
+        d.kernel === 'eq16' && d.face === 'eq' && d.clap.id === 'org.openmixer.eq16' && !/\{bands\}/.test(d.description),
+        `a variant expands from its base: ${d.params.length} parameters, the last ${d.params.at(-1).symbol}, files ${d.kernel} over face ${d.face}`);
+      const typed = d.params.find((p) => p.symbol === 'b3_type');
+      expect(typed?.defaultBand?.strip === 'eq16' && typed.defaultBand.index === 2, `a per-band default takes the variant's strip and the band's index (${JSON.stringify(typed?.defaultBand)})`);
+      const loaded = loadDecl(join(ROOT, 'plugins', 'omx-eq16'));
+      expect(loaded.params.length === d.params.length && loaded.dir.endsWith('omx-eq16'), 'a variant folder with no declaration loads its base, expanded');
+      const sabotaged = { ...base, variants: { ...base.variants, of: [{ stem: 'omx-eq9', count: 'eq9' }] } };
+      let threw = '';
+      try {
+        expandVariant(real, sabotaged, sabotaged.variants.of[0]);
+      } catch (e) {
+        threw = e.message;
+      }
+      expect(/has no 'eq9'/.test(threw), `a variant the count sheet does not hold is refused (${threw || 'NOT REFUSED'})`);
+      const src = kernelSources('eq', { root: ROOT });
+      const draft = src.refusals.length ? { refusals: src.refusals } : draftDeclaration('eq', src, { root: ROOT, recipe });
+      expect(!draft.refusals?.length && draft.decl.variants?.count === 'EQ_BAND_COUNTS' && draft.decl.params.some((p) => p.perBand) &&
+        reviewMarks(draft.decl).some((m) => m.startsWith('/variants/of/')),
+        `the wizard drafts the EQ as one declaration of variants, each variant a REVIEW mark (${draft.refusals?.[0]?.reason ?? reviewMarks(draft.decl ?? {}).filter((m) => m.startsWith('/variants')).length})`);
+    } else expect(false, 'variants: the real contract and plugins/omx-eq are there to expand');
+  }
   {
     const hints = join(WORK, 'hints');
     copyTree(hints);
@@ -454,7 +518,8 @@ static inline void omx_wobble_instance_run(OmxWobbleInstance *s, const float *in
     named('a TTL that drops a frequency\'s logarithmic travel', 'omx-eq16: port "hpf_freq" lost pprops:logarithmic');
     named('a TTL that drops a gain\'s unit', 'omx-eq16: port "b1_gain" lost units:unit units:db');
     writeFileSync(eq16, ttl16);
-    const dir8 = join(hints, 'plugins/omx-eq8'), decl8 = join(dir8, 'omx-eq8.decl.json'), ttl8 = join(dir8, 'generated/omx-eq8.lv2/omx-eq8.ttl');
+    // omx-eq8 is a variant of plugins/omx-eq (tools/variants.mjs): its parameters are declared there
+    const dir8 = join(hints, 'plugins/omx-eq8'), decl8 = join(hints, 'plugins/omx-eq/omx-eq.decl.json'), ttl8 = join(dir8, 'generated/omx-eq8.lv2/omx-eq8.ttl');
     const d8 = readFileSync(decl8, 'utf8');
     const regen = (mutate) => {
       const d = JSON.parse(d8);
@@ -462,20 +527,20 @@ static inline void omx_wobble_instance_run(OmxWobbleInstance *s, const float *in
       writeFileSync(decl8, JSON.stringify(d, null, 2));
       writeFileSync(ttl8, emitPluginTtl(loadDecl(dir8)));
     };
-    regen((ps) => ps.splice(ps.findIndex((p) => p.symbol === 'b1_type'), 1, { symbol: 'b1_type', name: 'Band 1 Type', own: 'switch', unit: '', min: 0, max: 5, def: 0, kind: 'integer' }));
+    regen((ps) => ps.splice(ps.findIndex((p) => p.symbol === 'type'), 1, { symbol: 'type', name: 'Type', perBand: true, own: 'switch', unit: '', min: 0, max: 5, def: 0, kind: 'integer' }));
     named('a declaration that drops a band type\'s labels', 'omx-eq8: port "b1_type" lost the scale point 0 Bell');
     regen((ps) => (ps.find((p) => p.symbol === 'hpf_freq').scale = 'linear'));
     named('a frequency declared linear', 'omx-eq8: port "hpf_freq" lost pprops:logarithmic');
     regen(() => {});
     expect(hintErrors(hints).length === 0, 'port hints: restored, green again');
-    cpSync(join(hints, 'plugins/omx-eq8'), join(hints, 'plugins/omx-eq9'), { recursive: true });
-    for (const [from, to] of [['omx-eq8.decl.json', 'omx-eq9.decl.json'], ['generated/omx-eq8.lv2', 'generated/omx-eq9.lv2'], ['generated/omx-eq9.lv2/omx-eq8.ttl', 'generated/omx-eq9.lv2/omx-eq9.ttl']])
-      execFileSync('mv', [join(hints, 'plugins/omx-eq9', from), join(hints, 'plugins/omx-eq9', to)]);
-    const d9 = JSON.parse(readFileSync(join(hints, 'plugins/omx-eq9/omx-eq9.decl.json'), 'utf8'));
-    d9.stem = 'omx-eq9';
-    writeFileSync(join(hints, 'plugins/omx-eq9/omx-eq9.decl.json'), JSON.stringify(d9, null, 2));
-    rmSync(join(hints, 'plugins/omx-eq9/port-hints.json')); // the copy brought eq8's pin along
-    named('a plugin with no pin', 'omx-eq9: no pinned hints');
+    cpSync(join(hints, 'plugins/omx-delay'), join(hints, 'plugins/omx-delay9'), { recursive: true });
+    for (const [from, to] of [['omx-delay.decl.json', 'omx-delay9.decl.json'], ['generated/omx-delay.lv2', 'generated/omx-delay9.lv2'], ['generated/omx-delay9.lv2/omx-delay.ttl', 'generated/omx-delay9.lv2/omx-delay9.ttl']])
+      execFileSync('mv', [join(hints, 'plugins/omx-delay9', from), join(hints, 'plugins/omx-delay9', to)]);
+    const d9 = JSON.parse(readFileSync(join(hints, 'plugins/omx-delay9/omx-delay9.decl.json'), 'utf8'));
+    d9.stem = 'omx-delay9';
+    writeFileSync(join(hints, 'plugins/omx-delay9/omx-delay9.decl.json'), JSON.stringify(d9, null, 2));
+    rmSync(join(hints, 'plugins/omx-delay9/port-hints.json')); // the copy brought delay's pin along
+    named('a plugin with no pin', 'omx-delay9: no pinned hints');
     // the per-plugin file is the pin: a hint moved there moves the assembled view, a hand edit of the view goes stale
     const f16 = join(hints, 'plugins/omx-eq16/port-hints.json'), p16 = readFileSync(f16, 'utf8');
     const view = () => readFileSync(join(hints, 'tools/test/port-hints.json'), 'utf8');

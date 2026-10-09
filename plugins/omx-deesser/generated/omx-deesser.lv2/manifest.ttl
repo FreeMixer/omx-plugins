@@ -7,4 +7,4 @@
 <urn:openmixer:deesser>
     a lv2:Plugin ;
     lv2:binary <omx-deesser.so> ;
-    rdfs:seeAlso <omx-deesser.ttl> .
+    rdfs:seeAlso <omx-deesser.ttl> , <modgui.ttl> .

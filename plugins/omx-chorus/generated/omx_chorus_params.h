@@ -12,51 +12,51 @@
 #include "omx_plugin_param.h"
 
 enum {
-  OMX_CHORUS_PARAM_RATE_HZ = 0,
-  OMX_CHORUS_PARAM_DEPTH_MS = 1,
-  OMX_CHORUS_PARAM_VOICES = 2,
-  OMX_CHORUS_PARAM_MIX = 3,
-  OMX_CHORUS_PARAM_SPREAD = 4,
+  OMX_CHORUS_PARAM_SPREAD = 0,
+  OMX_CHORUS_PARAM_RATE = 1,
+  OMX_CHORUS_PARAM_DEPTH = 2,
+  OMX_CHORUS_PARAM_VOICES = 3,
+  OMX_CHORUS_PARAM_MIX = 4,
   OMX_CHORUS_PARAM_COUNT = 5
 };
 
 static const omx_plugin_param OMX_CHORUS_PARAMS[OMX_CHORUS_PARAM_COUNT] = {
-  { "rateHz", "Rate", "Hz", 0.05f, 8.0f, 0.6f, 0u },
-  { "depthMs", "Depth", "ms", 0.0f, 12.0f, 4.0f, 0u },
+  { "spread", "Spread", "", 0.0f, 0.5f, 0.0f, 0u },
+  { "rate", "Rate", "Hz", 0.05f, 8.0f, 0.6f, 0u },
+  { "depth", "Depth", "ms", 0.0f, 12.0f, 4.0f, 0u },
   { "voices", "Voices", "", 1.0f, 4.0f, 3.0f, OMX_PLUGIN_PARAM_INTEGER },
   { "mix", "Mix", "%", 0.0f, 100.0f, 35.0f, 0u },
-  { "spread", "Spread", "", 0.0f, 0.5f, 0.0f, 0u },
 };
 
 /* One macro per declared bound: what a C face reads where a constant is needed. */
-#define OMX_CHORUS_PARAM_RATE_HZ_MIN 0.05f
-#define OMX_CHORUS_PARAM_RATE_HZ_MAX 8.0f
-#define OMX_CHORUS_PARAM_RATE_HZ_DEFAULT 0.6f
-#define OMX_CHORUS_PARAM_DEPTH_MS_MIN 0.0f
-#define OMX_CHORUS_PARAM_DEPTH_MS_MAX 12.0f
-#define OMX_CHORUS_PARAM_DEPTH_MS_DEFAULT 4.0f
+#define OMX_CHORUS_PARAM_SPREAD_MIN 0.0f
+#define OMX_CHORUS_PARAM_SPREAD_MAX 0.5f
+#define OMX_CHORUS_PARAM_SPREAD_DEFAULT 0.0f
+#define OMX_CHORUS_PARAM_RATE_MIN 0.05f
+#define OMX_CHORUS_PARAM_RATE_MAX 8.0f
+#define OMX_CHORUS_PARAM_RATE_DEFAULT 0.6f
+#define OMX_CHORUS_PARAM_DEPTH_MIN 0.0f
+#define OMX_CHORUS_PARAM_DEPTH_MAX 12.0f
+#define OMX_CHORUS_PARAM_DEPTH_DEFAULT 4.0f
 #define OMX_CHORUS_PARAM_VOICES_MIN 1.0f
 #define OMX_CHORUS_PARAM_VOICES_MAX 4.0f
 #define OMX_CHORUS_PARAM_VOICES_DEFAULT 3.0f
 #define OMX_CHORUS_PARAM_MIX_MIN 0.0f
 #define OMX_CHORUS_PARAM_MIX_MAX 100.0f
 #define OMX_CHORUS_PARAM_MIX_DEFAULT 35.0f
-#define OMX_CHORUS_PARAM_SPREAD_MIN 0.0f
-#define OMX_CHORUS_PARAM_SPREAD_MAX 0.5f
-#define OMX_CHORUS_PARAM_SPREAD_DEFAULT 0.0f
 
 /* The identity every face publishes. */
 #define OMX_CHORUS_NAME "omx chorus"
 #define OMX_CHORUS_VENDOR "openmixer"
 #define OMX_CHORUS_URL "https://github.com/FreeMixer/omx-plugins"
 #define OMX_CHORUS_VERSION "0.2.0"
-#define OMX_CHORUS_DESCRIPTION "the native CHORUS stage: N voices reading ONE modulated fractional delay line."
+#define OMX_CHORUS_DESCRIPTION "The console's chorus: up to four voices read one modulated delay line, the right leg's sweep offset by the spread, mixed with the dry signal."
 #define OMX_CHORUS_CLAP_ID "org.openmixer.chorus"
-#define OMX_CHORUS_CLAP_FEATURES "audio-effect", "stereo"
+#define OMX_CHORUS_CLAP_FEATURES "audio-effect", "chorus", "stereo"
 #define OMX_CHORUS_LV2_URI "urn:openmixer:chorus"
 /* org.openmixer.declaration/1: the declaration's plain description and the digest of its parameters. */
-#define OMX_CHORUS_DECL_SOURCE "omx chorus: Rate 0.05 to 8 Hz, Depth 0 to 12 ms, Voices 1 to 4, Mix 0 to 100 %, Spread 0 to 0.5"
-#define OMX_CHORUS_DECL_DIGEST "9282092ea121c8b503a493f00e4e744a4ea23bc7b29f3e2b5f0e265b3218f185"
+#define OMX_CHORUS_DECL_SOURCE "omx chorus: Spread 0 to 0.5, Rate 0.05 to 8 Hz, Depth 0 to 12 ms, Voices 1 to 4, Mix 0 to 100 %"
+#define OMX_CHORUS_DECL_DIGEST "7e9d7de96f6b48a792b97d200fa3c98c64f705c253f31637301752d03a5a2e51"
 
 /* LV2 port indices (tools/gen.mjs lv2Ports): audio, then parameter i at FIRST_PARAM + i, then these. */
 #define OMX_CHORUS_LV2_PORT_IN_L 0u

@@ -11,7 +11,7 @@
  * The reference is written here, never read from the plugin (this file does not include
  * omx_strip.h): per block, the trim (omx_db_to_lin through omx_ramp), the HPF/LPF (an
  * omx_eq_instance per leg with no band), the gate (omx_gate_instance), the EQ (an omx_eq_instance
- * per leg) and the compressor (omx_dynamics_instance), in the order the `order` parameter names —
+ * per leg) and the compressor (omx_comp_instance), in the order the `order` parameter names —
  * decoded here as the index of a permutation of (input, gate, eq, comp) in lexicographic order, so
  * 0 is that default order. Every one of the 24 orders is checked with every stage engaged and
  * acting on a bursty signal, then the defaults, then bypass. A sanity check first proves the
@@ -30,8 +30,7 @@
 #include <lilv/lilv.h>
 
 #include "omx_strip_params.h"
-#define OMX_EQ_LV2_BANDS 4
-#include <omxdsp/fx/omx_dynamics_instance.h>
+#include <omxdsp/fx/omx_comp_instance.h>
 #include <omxdsp/fx/omx_eq_instance.h>
 #include <omxdsp/fx/omx_gate_instance.h>
 #include <omxdsp/omx_denormal.h>
@@ -94,10 +93,10 @@ static void reference(double sr, const Setting *s, const float *il, const float 
   if (s->bypass) return;
   struct omx_eq_lv2 filt[2], eq[2];
   OmxGateInstance gate;
-  OmxDynamicsInstance comp;
+  OmxCompInstance comp;
   for (int c = 0; c < 2; c++) omx_eq_lv2_init(&filt[c], sr), omx_eq_lv2_init(&eq[c], sr);
   omx_gate_instance_init(&gate, (float)sr);
-  omx_dynamics_instance_init(&comp, (float)sr);
+  omx_comp_instance_init(&comp, (float)sr);
   float trim = 1.0f;
   int order[4];
   order_of((uint32_t)lrintf(v[P(ORDER)]), order);
@@ -115,11 +114,10 @@ static void reference(double sr, const Setting *s, const float *il, const float 
         omx_eq_lv2_set_band(&eq[c], b, (int)lrintf(q[0]), q[1], q[2], q[3], q[4] > 0.5f);
       }
     }
-    omx_gate_instance_resolve(&gate, v[P(GATE_ON)] < 0.5f, 0, v[P(GATE_THRESHOLD)], v[P(GATE_RATIO)],
-                              v[P(GATE_RANGE)], v[P(GATE_ATTACK)], v[P(GATE_RELEASE)]);
-    omx_dynamics_instance_resolve(&comp, v[P(COMP_ON)] < 0.5f, v[P(COMP_THRESHOLD)], v[P(COMP_RATIO)],
-                                  v[P(COMP_KNEE)], v[P(COMP_ATTACK)], v[P(COMP_RELEASE)], v[P(COMP_MAKEUP)],
-                                  v[P(COMP_RMS)] > 0.5f, OMX_DYN_OVS_AUTO);
+    omx_gate_instance_resolve(&gate, v[P(GATE_ON)] < 0.5f, 0, v[P(GATE_THRESHOLD)], v[P(GATE_RANGE)], v[P(GATE_THRESHOLD)], v[P(GATE_THRESHOLD)], v[P(GATE_ATTACK)], 0.0f, v[P(GATE_RELEASE)], 0.0f, v[P(GATE_RATIO)]);
+    omx_comp_instance_resolve(&comp, v[P(COMP_ON)] < 0.5f, v[P(COMP_THRESHOLD)], v[P(COMP_RATIO)],
+                                  v[P(COMP_KNEE)], v[P(COMP_ATTACK)], v[P(COMP_RELEASE)], v[P(COMP_MAKEUP)], OMX_COMP_MIX_PCT_DEFAULT,
+      v[P(COMP_RMS)] > 0.5f ? (int)OMX_COMP_KINDS_COMP : (int)OMX_COMP_KINDS_LIMITER, (int)OMX_DETECTOR_OVERSAMPLINGS_DEFAULT);
     for (int k = 0; k < 4; k++) {
       switch (order[k]) {
       case INPUT: {
@@ -132,7 +130,7 @@ static void reference(double sr, const Setting *s, const float *il, const float 
       }
       case GATE: omx_gate_instance_run(&gate, NULL, l, r, l, r, n); break;
       case EQ: omx_eq_lv2_run(&eq[0], l, l, n), omx_eq_lv2_run(&eq[1], r, r, n); break;
-      case COMP: omx_dynamics_instance_run(&comp, l, r, l, r, n); break;
+      case COMP: omx_comp_instance_run(&comp, l, r, l, r, n); break;
       }
     }
   }

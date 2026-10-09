@@ -52,6 +52,32 @@
     "unit": "units:ms",
     "points": []
   },
+  "knee_start": {
+    "props": [
+      "lv2:integer"
+    ],
+    "unit": "units:db",
+    "points": []
+  },
+  "knee_end": {
+    "props": [
+      "lv2:integer"
+    ],
+    "unit": "units:db",
+    "points": []
+  },
+  "hold": {
+    "props": [
+      "lv2:integer"
+    ],
+    "unit": "units:ms",
+    "points": []
+  },
+  "hysteresis": {
+    "props": [],
+    "unit": "units:db",
+    "points": []
+  },
   "latency": {
     "props": [
       "lv2:integer",

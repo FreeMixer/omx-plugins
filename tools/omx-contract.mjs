@@ -29,7 +29,7 @@ import { fileURLToPath } from 'node:url';
 
 export const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 export const PIN_FILE = '.github/pins.txt';
-const RESOLVED = join('share', 'omx-contract', 'omx-contract.json');
+export const RESOLVED = join('share', 'omx-contract', 'omx-contract.json');
 const RELEASE_URL = (v) => `https://github.com/FreeMixer/omx-contract/releases/download/v${v}/openmixer-omx-contract-${v}.tgz`;
 
 /** The pinned version of one source in .github/pins.txt (`name url version`), or undefined. */
@@ -184,7 +184,8 @@ const bandCount = (dir, strip, symbol) => {
  * A `travels` entry gives min/max/default/unit (from `field` when the entry is a table; the default
  * for `forKind` from its byKind; `defaultRef` NAME.path names a sheet number to come up at instead,
  * and `defaultBand` {strip, index, of: 'centre'|'type'} takes the default of one band of
- * omx-contract's default EQ rule); a boolean `scalar` is a toggle; a `list` is an integer index into
+ * omx-contract's default EQ rule); a boolean `scalar` is a toggle, and so is a set whose ids are
+ * exactly off, on; a `list` is an integer index into
  * its values, its default named by `defaultRef` (a scalar holding one of the values) or the first;
  * a `set` is an integer index into its ids, labelled by its labels (or the declaration's `values`
  * when the set has none), its default the set's own, `defaultRef` or `defaultBand`.
@@ -242,6 +243,10 @@ export function resolveParam(dir, kernel, p) {
       const unit = p.unit ?? '';
       return { min: ids[0], max: ids[ids.length - 1], def: ids[def], unit, kind: 'integer', points: ids.map((v) => ({ value: v, label: unit ? `${v} ${unit}` : `${v}` })), from: at };
     }
+    // a switch (ids exactly off, on: DELAY_PINGPONGS, DRIVE_AUTO_GAINS, EQ_BAND_ONS) is a toggle,
+    // its value the id's index, so a host draws it as one and keeps the toggled hint
+    if (ids.length === 2 && ids[0] === 'off' && ids[1] === 'on' && p.values === undefined)
+      return { min: 0, max: 1, def, unit: '', kind: 'toggle', from: at };
     const labels = e.labels ?? p.values;
     if (!Array.isArray(labels) || labels.length !== ids.length) throw new Error(`param '${p.symbol}': ${p.ref} has no labels; the declaration's "values" must give one per id (${ids.length})`);
     return { min: 0, max: ids.length - 1, def, unit: '', kind: 'integer', values: labels, from: at };
@@ -267,7 +272,12 @@ export function perturbCopy(src, dst, kernel, p) {
     t.default = def === t.max ? t.min : t.max;
     if (p.forKind && t.byKind && p.forKind in t.byKind) t.byKind[p.forKind] = t.default;
   } else if (e.kind === 'scalar' && typeof e.value === 'boolean') e.value = !e.value;
-  else throw new Error(`${p.ref}: a ${e.kind} has no default to move`);
+  else if (e.kind === 'set' && Array.isArray(e.value) && e.value.length > 1) {
+    // a set's default is one of its ids: it moves to the last, or from the last to the first
+    const ids = e.value;
+    const now = ids.includes(e.default) ? e.default : ids[0];
+    e.default = now === ids[ids.length - 1] ? ids[0] : ids[ids.length - 1];
+  } else throw new Error(`${p.ref}: a ${e.kind} has no default to move`);
   writeFileSync(file, `${JSON.stringify(data, null, 2)}\n`);
   return where.file;
 }
@@ -321,13 +331,25 @@ export function kernelControls(dir, kernel) {
     ...(c.table ? { field: c.name } : {}),
     kind: c.kind,
     ...(c.rearms === true ? { rearms: true } : {}),
+    ...(c.count ? { count: c.count } : {}),
+    ...(c.when ? { when: c.when } : {}),
   }));
 }
 
-/** The contract control a by-reference parameter reads: its `field`, or the control its `ref` is. */
+/** The contract control a by-reference parameter reads: its `field`, or the control its `ref` is. A
+ * field of a shared table (the primitives' GATE_CONTINUOUS_TRAVELS: the same control's travel
+ * without its step) names the kernel's control of that name. */
 export function controlOf(dir, kernel, p) {
   if (p.ref === undefined) return undefined;
   const cs = kernelControls(dir, kernel);
-  const c = p.field ? cs.find((x) => x.name === p.field && (x.ref === p.ref || !x.field)) : cs.find((x) => x.ref === p.ref);
+  // two controls may use one set (eq's hpfSlope and lpfSlope, FILTER_SLOPES): the parameter whose
+  // symbol is the control's name in snake case (or its base symbol, a per-band b<n>_ prefix off) takes it
+  const snake = (x) => x.replace(/([a-z0-9])([A-Z])/g, '$1_$2').toLowerCase();
+  const byRef = cs.filter((x) => x.ref === p.ref);
+  const sym = snake(p.symbol.replace(/^b\d+_/, ''));
+  const shared = SHARED.includes(items(dir)[p.ref]?.rel);
+  const c = p.field
+    ? cs.find((x) => x.name === p.field && (x.ref === p.ref || !x.field || shared))
+    : byRef.length > 1 ? byRef.find((x) => snake(x.name) === sym) ?? byRef[0] : byRef[0];
   return c ? { ...c, ...(p.field ? { name: p.field } : {}) } : undefined;
 }

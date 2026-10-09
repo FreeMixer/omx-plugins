@@ -12,7 +12,7 @@ Source0: %{url}/archive/v%{version}/%{name}-%{version}.tar.gz
 BuildRequires: gcc
 BuildRequires: make
 BuildRequires: pkgconf-pkg-config
-BuildRequires: omx-dsp-devel >= 0.4.1
+BuildRequires: omx-dsp-devel >= 0.5.1
 BuildRequires: omx-clap-core-devel
 BuildRequires: clap-devel
 BuildRequires: lv2-devel
@@ -70,11 +70,11 @@ console's own DSP, so they sound like the desk.
 
 %package devel
 Summary: Headers of the OpenMixer plugins, for projects that build on them
-Requires: omx-dsp-devel >= 0.4.1
+Requires: omx-dsp-devel >= 0.5.1
 
 %description devel
 The headers other projects include to use the OpenMixer plugins' parameters and
-instance code, such as omx_delay_instance.h and each plugin's generated
+instance code, such as omx_delay_core.h and each plugin's generated
 parameter header, installed in %{_includedir}/omx-plugins.
 
 %prep
@@ -100,15 +100,20 @@ parameter header, installed in %{_includedir}/omx-plugins.
 %doc README.md
 %dir /usr/lib/clap
 # BEGIN GENERATED clap-files: tools/gen.mjs, one line per shipped plugin
+/usr/lib/clap/omx-chorus.clap
+/usr/lib/clap/omx-deesser.clap
 /usr/lib/clap/omx-delay.clap
 /usr/lib/clap/omx-drive.clap
 /usr/lib/clap/omx-eq8.clap
 /usr/lib/clap/omx-eq16.clap
 /usr/lib/clap/omx-eq32.clap
+/usr/lib/clap/omx-flanger.clap
+/usr/lib/clap/omx-geq.clap
 /usr/lib/clap/omx-keyed-gate.clap
 /usr/lib/clap/omx-limiter.clap
 /usr/lib/clap/omx-phaser.clap
 /usr/lib/clap/omx-pitch.clap
+/usr/lib/clap/omx-reverb.clap
 /usr/lib/clap/omx-rotary.clap
 /usr/lib/clap/omx-strip.clap
 /usr/lib/clap/omx-transient.clap
@@ -123,15 +128,20 @@ parameter header, installed in %{_includedir}/omx-plugins.
 %license LICENSE
 %doc README.md
 # BEGIN GENERATED lv2-files: tools/gen.mjs, one line per shipped plugin
+%{_libdir}/lv2/omx-chorus.lv2/
+%{_libdir}/lv2/omx-deesser.lv2/
 %{_libdir}/lv2/omx-delay.lv2/
 %{_libdir}/lv2/omx-drive.lv2/
 %{_libdir}/lv2/omx-eq8.lv2/
 %{_libdir}/lv2/omx-eq16.lv2/
 %{_libdir}/lv2/omx-eq32.lv2/
+%{_libdir}/lv2/omx-flanger.lv2/
+%{_libdir}/lv2/omx-geq.lv2/
 %{_libdir}/lv2/omx-keyed-gate.lv2/
 %{_libdir}/lv2/omx-limiter.lv2/
 %{_libdir}/lv2/omx-phaser.lv2/
 %{_libdir}/lv2/omx-pitch.lv2/
+%{_libdir}/lv2/omx-reverb.lv2/
 %{_libdir}/lv2/omx-rotary.lv2/
 %{_libdir}/lv2/omx-strip.lv2/
 %{_libdir}/lv2/omx-transient.lv2/

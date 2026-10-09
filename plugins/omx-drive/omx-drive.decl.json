@@ -1,63 +1,124 @@
 {
-  "$comment": "THE declaration of omx-drive. Every face and the parameter header are generated from this file by tools/gen.mjs. Parameter order is append-only.",
+  "$comment": "THE declaration of omx-drive, the folder's one hand-written file. Every other file of the folder is generated from it by tools/gen.mjs. Its parameters are by reference to omx-contract's drive kernel and bind by name to omx-dsp's instance face. Parameter order is append-only.",
   "stem": "omx-drive",
   "kernel": "drive",
+  "kernels": [
+    "drive"
+  ],
   "name": "omx drive",
   "vendor": "openmixer",
   "url": "https://github.com/FreeMixer/omx-plugins",
   "version": "0.2.0",
-  "description": "the native DRIVE stage: one waveshaper, run inside the console's ONE oversampler.",
-  "summary": "The console's drive: one waveshaper run inside the console's oversampler, with drive, character, band, wet/dry mix and trim. Stereo, real-time safe, 44.1 to 192 kHz.",
+  "description": "The console's drive: one waveshaper (soft, tape, tube or exciter) run inside the console's oversampler, on the full band, the lows, the highs or a tilt, with a wet/dry mix and a trim.",
+  "summary": "The console's drive: one waveshaper (soft, tape, tube or exciter) run inside the console's 4x oversampler, on the full band, the lows, the highs or a tilt, with drive, character, wet/dry mix and trim. Stereo, real-time safe, 44.1 to 192 kHz.",
   "clap": {
     "id": "org.openmixer.drive",
     "features": [
       "audio-effect",
+      "distortion",
       "stereo"
     ]
   },
   "lv2": {
     "uri": "urn:openmixer:drive",
-    "class": "lv2:Plugin"
+    "class": "lv2:DistortionPlugin"
   },
+  "binding": "instance",
   "params": [
-    { "symbol": "driveDb", "name": "Drive", "ref": "DRIVE_AMOUNT_RANGE" },
-    { "symbol": "character", "name": "Character", "ref": "DRIVE_CHARACTER_RANGE" },
-    { "symbol": "bandHz", "name": "Band", "ref": "DRIVE_BAND_FREQ_RANGE" },
-    { "symbol": "mix", "name": "Mix", "ref": "DRIVE_MIX_RANGE" },
-    { "symbol": "trimDb", "name": "Trim", "ref": "DRIVE_TRIM_RANGE" }
+    {
+      "symbol": "amount",
+      "name": "Drive",
+      "ref": "DRIVE_AMOUNT_RANGE"
+    },
+    {
+      "symbol": "character",
+      "name": "Character",
+      "ref": "DRIVE_CHARACTER_RANGE"
+    },
+    {
+      "symbol": "bandFreq",
+      "name": "Band Frequency",
+      "ref": "DRIVE_BAND_FREQ_RANGE"
+    },
+    {
+      "symbol": "mix",
+      "name": "Mix",
+      "ref": "DRIVE_MIX_RANGE"
+    },
+    {
+      "symbol": "trim",
+      "name": "Trim",
+      "ref": "DRIVE_TRIM_RANGE"
+    },
+    {
+      "symbol": "curve",
+      "name": "Curve",
+      "ref": "DRIVE_CURVES",
+      "values": [
+        "Soft",
+        "Tape",
+        "Tube",
+        "Exciter"
+      ]
+    },
+    {
+      "symbol": "band",
+      "name": "Band",
+      "ref": "DRIVE_BANDS",
+      "values": [
+        "Full",
+        "Low",
+        "High",
+        "Tilt"
+      ]
+    },
+    {
+      "symbol": "autoGain",
+      "name": "Auto Gain",
+      "ref": "DRIVE_AUTO_GAINS"
+    },
+    {
+      "symbol": "stereoLink",
+      "name": "Stereo Link",
+      "ref": "DRIVE_STEREO_LINKS"
+    },
+    {
+      "symbol": "hfRolloff",
+      "name": "HF Roll-off",
+      "ref": "DRIVE_HF_ROLLOFFS"
+    }
   ],
   "panel": {
     "family": "drive",
     "roles": {
-      "drive": "driveDb",
+      "drive": "amount",
       "character": "character",
-      "band": "bandHz",
+      "band": "bandFreq",
       "mix": "mix",
-      "trim": "trimDb"
+      "trim": "trim",
+      "curve": "curve",
+      "bandMode": "band",
+      "autoGain": "autoGain",
+      "stereoLink": "stereoLink",
+      "hfRolloff": "hfRolloff"
     },
     "sections": [
       {
         "key": "drive",
         "label": "Drive",
         "controls": [
-          "driveDb",
+          "amount",
           "character",
-          "bandHz",
+          "bandFreq",
           "mix",
-          "trimDb"
+          "trim",
+          "curve",
+          "band",
+          "autoGain",
+          "stereoLink",
+          "hfRolloff"
         ]
       }
     ]
-  },
-  "manual": [
-    "| Parameter | Range | Default |",
-    "|---|---|---|",
-    "| Drive | 0 to 36 dB | 0 dB |",
-    "| Character | -1 to 1 | 0 |",
-    "| Band | 20 to 20000 Hz | 2000 Hz |",
-    "| Mix | 0 to 100 % | 100 % |",
-    "| Trim | -24 to +12 dB | 0 dB |",
-    "",
-    "Plus the host's bypass. The latency the plugin reports is the oversampler's."
-  ]
+  }
 }
