@@ -11,6 +11,7 @@
   "url": "https://github.com/FreeMixer/omx-plugins",
   "version": "0.2.0",
   "description": "The OpenMixer console's channel gate with an external key: the stereo signal is gated while the detector listens to the sidechain input the host routes to it, or to the signal itself with the key unconnected or set to Self. One gain drives both legs. An attack under 0.5 ms engages 4x detector oversampling, which adds 72 frames of latency, reported to the host. The DSP is omx-dsp's <omxdsp/fx/omx_gate_instance.h>, the console's own gate.",
+  "summary": "The console's channel gate with a sidechain key: the detector listens to the key your host routes to it, or to the signal itself. One gain for both legs, so the stereo image never shifts. Real-time safe, 44.1 to 192 kHz.",
   "clap": {
     "id": "org.openmixer.keyed-gate",
     "features": [
@@ -35,5 +36,24 @@
   "sidechain": {
     "symbol": "key",
     "name": "Key (Sidechain)"
-  }
+  },
+  "manual": [
+    "The console's gate, keyed: the stereo signal is gated while the detector listens to a second, mono",
+    "input, the **key** (an LV2 sidechain port; in CLAP a second input port). With nothing routed to the",
+    "key, or **Key** set to Self, it is the ordinary self-keyed gate.",
+    "",
+    "| Parameter | Range | Default |",
+    "|---|---|---|",
+    "| Key | Self / Sidechain | Sidechain |",
+    "| Threshold | -80 to 0 dB | -40 dB |",
+    "| Ratio | 1 to 100 | 16 |",
+    "| Range | -90 to 0 dB | -90 dB |",
+    "| Attack | 0 to 500 ms | 1 ms |",
+    "| Release | 0 to 5000 ms | 100 ms |",
+    "",
+    "Plus the host's bypass. An attack under 0.5 ms engages the 4x detector path, which adds 72 frames",
+    "of latency, reported to the host; otherwise the latency is zero. Its LV2 URI, ports and defaults",
+    "are those of the keyed gate bundle the OpenMixer console used to ship, so a session saved with that",
+    "bundle loads this one."
+  ]
 }

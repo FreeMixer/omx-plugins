@@ -9,6 +9,7 @@
   "url": "https://github.com/FreeMixer/omx-plugins",
   "version": "0.2.0",
   "description": "The OpenMixer console’s channel strip in one plugin: input trim with high- and low-pass filters, gate, four-band EQ and compressor, in the console’s default order or any other. No DSP of its own: each stage is omx-dsp’s strip module, called in order.",
+  "summary": "The console's channel strip in one plugin: input trim with HPF/LPF, gate, four-band EQ and compressor, in the desk's order or any other. Stereo, real-time safe, 44.1 to 192 kHz.",
   "clap": { "id": "org.openmixer.strip", "features": ["audio-effect", "mixing", "stereo"] },
   "lv2": { "uri": "urn:openmixer:strip", "class": "lv2:MixerPlugin" },
   "params": [
@@ -55,5 +56,20 @@
     { "symbol": "compMakeup", "name": "Comp Makeup", "ref": "COMP_LIMITS", "field": "makeupDb", "kernel": "comp" },
     { "symbol": "compRms", "name": "Comp RMS", "unit": "", "min": 0, "max": 1, "def": 0, "kind": "toggle", "own": "switch" },
     { "symbol": "order", "name": "Order", "unit": "", "min": 0, "max": 23, "def": 0, "kind": "integer", "own": "stage-order" }
+  ],
+  "manual": [
+    "Four stages, each the console's own module, run one after the other:",
+    "",
+    "| Stage | Parameters |",
+    "|---|---|",
+    "| Input | Trim (-24 to +24 dB); HPF (20 to 1000 Hz) and LPF (1 to 20 kHz), each on/off, 12 or 24 dB/oct |",
+    "| Gate | on/off, threshold, ratio, range, attack, release |",
+    "| EQ | on/off; four bands, each on/off, type (bell, low/high shelf, notch, all-pass), frequency, gain (±15 dB), Q |",
+    "| Comp | on/off, threshold, ratio, knee, attack, release, make-up, RMS/peak |",
+    "",
+    "**Order** (0 to 23) picks the order of the four stages: 0 is the desk's input > gate > EQ > comp,",
+    "and the rest follow in lexicographic order (1 is input > gate > comp > EQ, 2 is input > EQ > gate >",
+    "comp, ... 23 is comp > EQ > gate > input). Plus the host's bypass. The latency reported is the gate's",
+    "and the compressor's 4x detector paths while they are engaged, else zero."
   ]
 }

@@ -9,6 +9,7 @@
   "url": "https://github.com/FreeMixer/omx-plugins",
   "version": "0.2.0",
   "description": "The OpenMixer console's channel EQ, 16-band form: sixteen parametric bands (bell, shelves, notch, allpass) and a high-pass and a low-pass filter at 12 or 24 dB/oct, stereo, zero latency. The DSP is omx-dsp's <omxdsp/fx/omx_eq_instance.h>, the console's own EQ; every band ships off, so a racked instance is a wire.",
+  "summary": "The console's channel EQ in its 16-band form: sixteen parametric bands (bell, shelves, notch, all-pass) plus high- and low-pass filters at 12 or 24 dB/oct. Stereo, zero latency, 44.1 to 192 kHz.",
   "clap": {
     "id": "org.openmixer.eq16",
     "features": [
@@ -109,5 +110,17 @@
     { "symbol": "b16_gain", "name": "Band 16 Gain", "ref": "EQ_GAIN_RANGE", "defaultRef": "EQ_BAND_DEFAULTS.gainDb" },
     { "symbol": "b16_q", "name": "Band 16 Q", "ref": "EQ_NOTCH_Q_RANGE", "defaultRef": "EQ_BAND_DEFAULTS.q" },
     { "symbol": "b16_on", "name": "Band 16 On", "unit": "", "min": 0, "max": 1, "def": 0, "kind": "toggle", "own": "switch" }
+  ],
+  "manual": [
+    "| Section | Parameters |",
+    "|---|---|",
+    "| EQ | on/off (on) |",
+    "| High-pass | on/off, 20 to 1000 Hz, 12 or 24 dB/oct |",
+    "| Low-pass | on/off, 1 to 20 kHz, 12 or 24 dB/oct |",
+    "| Bands 1 to 16 | each on/off, type, frequency (20 Hz to 20 kHz), gain (±15 dB), Q (0.3 to 116) |",
+    "",
+    "Plus the host's bypass. Every band and filter starts off, so a freshly loaded instance passes the",
+    "signal untouched. The bands' frequencies start spread from 25 Hz to 16 kHz, as on",
+    "the console."
   ]
 }

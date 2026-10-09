@@ -7,6 +7,7 @@
   "url": "https://github.com/FreeMixer/omx-plugins",
   "version": "0.2.0",
   "description": "the native DRIVE stage: one waveshaper, run inside the console's ONE oversampler.",
+  "summary": "The console's drive: one waveshaper run inside the console's oversampler, with drive, character, band, wet/dry mix and trim. Stereo, real-time safe, 44.1 to 192 kHz.",
   "clap": {
     "id": "org.openmixer.drive",
     "features": [
@@ -47,5 +48,16 @@
         ]
       }
     ]
-  }
+  },
+  "manual": [
+    "| Parameter | Range | Default |",
+    "|---|---|---|",
+    "| Drive | 0 to 36 dB | 0 dB |",
+    "| Character | -1 to 1 | 0 |",
+    "| Band | 20 to 20000 Hz | 2000 Hz |",
+    "| Mix | 0 to 100 % | 100 % |",
+    "| Trim | -24 to +12 dB | 0 dB |",
+    "",
+    "Plus the host's bypass. The latency the plugin reports is the oversampler's."
+  ]
 }

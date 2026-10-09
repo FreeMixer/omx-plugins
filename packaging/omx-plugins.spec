@@ -93,6 +93,7 @@ parameter header, installed in %{_includedir}/omx-plugins.
 %license LICENSE
 %doc README.md
 %dir /usr/lib/clap
+# BEGIN GENERATED clap-files: tools/gen.mjs, one line per shipped plugin
 /usr/lib/clap/omx-delay.clap
 /usr/lib/clap/omx-drive.clap
 /usr/lib/clap/omx-eq8.clap
@@ -100,6 +101,7 @@ parameter header, installed in %{_includedir}/omx-plugins.
 /usr/lib/clap/omx-eq32.clap
 /usr/lib/clap/omx-keyed-gate.clap
 /usr/lib/clap/omx-strip.clap
+# END GENERATED clap-files
 
 %files devel
 %license LICENSE
@@ -108,6 +110,7 @@ parameter header, installed in %{_includedir}/omx-plugins.
 %files lv2
 %license LICENSE
 %doc README.md
+# BEGIN GENERATED lv2-files: tools/gen.mjs, one line per shipped plugin
 %{_libdir}/lv2/omx-delay.lv2/
 %{_libdir}/lv2/omx-drive.lv2/
 %{_libdir}/lv2/omx-eq8.lv2/
@@ -115,6 +118,7 @@ parameter header, installed in %{_includedir}/omx-plugins.
 %{_libdir}/lv2/omx-eq32.lv2/
 %{_libdir}/lv2/omx-keyed-gate.lv2/
 %{_libdir}/lv2/omx-strip.lv2/
+# END GENERATED lv2-files
 
 %changelog
 * Thu Oct 08 2026 Pau Aliagas <linuxnow@gmail.com> - 0.2.0-1
