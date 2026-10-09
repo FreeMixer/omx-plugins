@@ -184,7 +184,8 @@ const bandCount = (dir, strip, symbol) => {
  * A `travels` entry gives min/max/default/unit (from `field` when the entry is a table; the default
  * for `forKind` from its byKind; `defaultRef` NAME.path names a sheet number to come up at instead,
  * and `defaultBand` {strip, index, of: 'centre'|'type'} takes the default of one band of
- * omx-contract's default EQ rule); a boolean `scalar` is a toggle; a `list` is an integer index into
+ * omx-contract's default EQ rule); a boolean `scalar` is a toggle, and so is a set whose ids are
+ * exactly off, on; a `list` is an integer index into
  * its values, its default named by `defaultRef` (a scalar holding one of the values) or the first;
  * a `set` is an integer index into its ids, labelled by its labels (or the declaration's `values`
  * when the set has none), its default the set's own, `defaultRef` or `defaultBand`.
@@ -242,6 +243,10 @@ export function resolveParam(dir, kernel, p) {
       const unit = p.unit ?? '';
       return { min: ids[0], max: ids[ids.length - 1], def: ids[def], unit, kind: 'integer', points: ids.map((v) => ({ value: v, label: unit ? `${v} ${unit}` : `${v}` })), from: at };
     }
+    // a switch (ids exactly off, on: DELAY_PINGPONGS, DRIVE_AUTO_GAINS, EQ_BAND_ONS) is a toggle,
+    // its value the id's index, so a host draws it as one and keeps the toggled hint
+    if (ids.length === 2 && ids[0] === 'off' && ids[1] === 'on' && p.values === undefined)
+      return { min: 0, max: 1, def, unit: '', kind: 'toggle', from: at };
     const labels = e.labels ?? p.values;
     if (!Array.isArray(labels) || labels.length !== ids.length) throw new Error(`param '${p.symbol}': ${p.ref} has no labels; the declaration's "values" must give one per id (${ids.length})`);
     return { min: 0, max: ids.length - 1, def, unit: '', kind: 'integer', values: labels, from: at };
