@@ -200,6 +200,77 @@
         },
         "console": {
           "$ref": "#/$defs/console"
+        },
+        "variants": {
+          "type": "object",
+          "required": [
+            "count",
+            "of"
+          ],
+          "additionalProperties": false,
+          "title": "Variants",
+          "description": "ONE declaration for several plugins that differ in a band count only (tools/variants.mjs): `count` names omx-contract's count sheet (EQ_BAND_COUNTS), `of` each variant, its stem and its sheet key. The variants' folders hold generated files only; the per-band parameters (`perBand`) repeat for every band of each, and `{bands}` in the prose reads the count.",
+          "properties": {
+            "count": {
+              "type": "string",
+              "pattern": "^[A-Z][A-Z0-9_]*$"
+            },
+            "of": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "object",
+                "required": [
+                  "stem",
+                  "count"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "stem": {
+                    "type": "string",
+                    "pattern": "^omx-[a-z][a-z0-9]*(-[a-z][a-z0-9]*)*$"
+                  },
+                  "count": {
+                    "type": "string",
+                    "pattern": "^[a-z][a-z0-9]*$"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "face": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*$",
+          "title": "Face",
+          "description": "Written by tools/variants.mjs for a variant: the omx-dsp instance face it binds, its base's kernel, where `kernel` names the variant's own files."
+        },
+        "variantOf": {
+          "type": "object",
+          "title": "Variant of",
+          "description": "Written by tools/variants.mjs for a variant: its base, its count sheet, key and band count.",
+          "required": [
+            "stem",
+            "count",
+            "key",
+            "bands"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "stem": {
+              "type": "string"
+            },
+            "count": {
+              "type": "string"
+            },
+            "key": {
+              "type": "string"
+            },
+            "bands": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
         }
       }
     },
@@ -336,13 +407,11 @@
         "defaultBand": {
           "type": "object",
           "required": [
-            "strip",
-            "index",
             "of"
           ],
           "additionalProperties": false,
           "title": "Default band",
-          "description": "For an EQ band: the default of band `index` (0-based) in an EQ of the strip type `strip` (a key of EQ_BAND_COUNTS), by omx-contract's one default rule for a fresh EQ. `of` is `centre` for the band's frequency travel and `type` for its band type set.",
+          "description": "For an EQ band: the default of band `index` (0-based) in an EQ of the strip type `strip` (a key of EQ_BAND_COUNTS), by omx-contract's one default rule for a fresh EQ. `of` is `centre` for the band's frequency travel and `type` for its band type set. A per-band parameter gives `of` alone; tools/variants.mjs fills `strip` and `index` for each band.",
           "properties": {
             "strip": {
               "type": "string",
@@ -365,6 +434,11 @@
           "pattern": "^[a-z][a-z-]*$",
           "title": "Own",
           "description": "Why this parameter is typed here and not by reference: `switch` is a switch of the plugin's face (an on/off the contract declares nowhere), `stage-order` the strip's own stage-order table. A parameter is by reference or own, never both."
+        },
+        "perBand": {
+          "type": "boolean",
+          "title": "Per band",
+          "description": "In a declaration with `variants`: the parameter repeats for every band of each variant, as `b<n>_<symbol>` named `Band <n> <name>`; a `defaultBand` given only its `of` takes the variant's strip and the band's index."
         }
       }
     },

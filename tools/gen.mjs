@@ -38,6 +38,7 @@ import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { faceBinding } from './instance-face.mjs';
 import { PIN_FILE, controlOf, findName, locateContract, paramKernel, pinOf, resolveParam } from './omx-contract.mjs';
+import { bandsMacro, baseOf, expandVariant, variantStems } from './variants.mjs';
 import { omxdspInclude, render } from './template.mjs';
 
 export const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -48,8 +49,18 @@ const TTL_BANNER = '# SPDX-License-Identifier: GPL-3.0-or-later\n# Copyright (C)
 /** Read and validate a plugin's declaration. Everything downstream trusts what this returns. */
 export function loadDecl(dir) {
   const stem = basename(resolve(dir));
-  const file = join(dir, `${stem}.decl.json`);
-  const d = JSON.parse(readFileSync(file, 'utf8'));
+  let file = join(dir, `${stem}.decl.json`);
+  let d;
+  if (existsSync(file) || !baseOf(dir)) d = JSON.parse(readFileSync(file, 'utf8'));
+  else {
+    // a variant's folder holds generated files only: its declaration is its base's, expanded
+    const base = baseOf(dir);
+    file = base.file;
+    const where = locateContract(treeOf(file));
+    if (!where.dir) throw new Error(`${file}: its variant ${stem} is expanded from omx-contract and ${where.why}`);
+    d = expandVariant(where.dir, base.decl, base.decl.variants.of.find((v) => v.stem === stem));
+  }
+  if (d.variants) throw new Error(`${file}: the base of ${variantStems(d).join(', ')} is no plugin of its own; load one of its variants`);
   if (d.stem !== stem) throw new Error(`${file}: stem '${d.stem}' is not the directory's '${stem}'`);
   if (!/^[a-z][a-z0-9_]*$/.test(d.kernel)) throw new Error(`${file}: kernel '${d.kernel}' is not a C identifier`);
   const { params, controls } = resolveParams(file, d);
@@ -124,6 +135,14 @@ function resolveParams(file, d) {
     if (typed.length) throw new Error(`${file}: '${p.symbol}' is by reference and retypes ${typed.join(', ')}; omx-contract holds them`);
     const t = resolveParam(dir, kernel, p);
     const out = { ...p, min: t.min, max: t.max, def: t.def, unit: t.unit };
+    // a control whose travel another choice widens (eq's q, notchQ while the band is a notch): the
+    // port spans every travel it may take, and the face clamps by the choice
+    const c = d.binding === 'instance' ? controlOf(dir, kernel, p) : undefined;
+    for (const w of c?.when ?? []) {
+      const u = resolveParam(dir, kernel, { symbol: p.symbol, ref: w.global });
+      out.min = Math.min(out.min, u.min);
+      out.max = Math.max(out.max, u.max);
+    }
     if (t.kind) out.kind = t.kind;
     if (t.points) out.points = t.points;
     if (t.values) out.values = t.values;
@@ -200,7 +219,10 @@ export function emitParamsHeader(d) {
  * table is the one the kernel's instance header reads.
  */
 #include "omx_plugin_param.h"
-
+${d.variantOf ? `
+/* The band count of this variant of plugins/${d.variantOf.stem}: the instance face's compile-time count. */
+#define OMX_${(d.face ?? d.kernel).toUpperCase()}_INSTANCE_BANDS ${bandsMacro(d)}
+` : ''}
 enum {
 ${d.params.map((p, i) => `  ${P}_${macro(p.symbol)} = ${i},`).join('\n')}
   ${P}_COUNT = ${d.params.length}
@@ -324,7 +346,7 @@ export function paramRow(p) {
 /** The view every plugin template renders from. */
 export function templateView(d) {
   return {
-    stem: d.stem, kernel: d.kernel, K: d.kernel.toUpperCase(), Kernel: d.kernel.replace(/(^|_)([a-z])/g, (_m, _u, c) => c.toUpperCase()),
+    stem: d.stem, kernel: d.kernel, face: d.face ?? d.kernel, K: d.kernel.toUpperCase(), Kernel: d.kernel.replace(/(^|_)([a-z])/g, (_m, _u, c) => c.toUpperCase()),
     name: d.name, uri: d.lv2.uri, clapId: d.clap.id, description: d.description,
     omxdspMin: pinOf('omx-dsp', d.tree ?? ROOT), panel: Boolean(d.panel), params: d.params.map(paramRow),
   };
@@ -437,7 +459,7 @@ const stepOf = (p) => (p.kind === 'toggle' || p.kind === 'integer' ? 1 : (p.max 
 
 /** The binding of `d` to its kernel's instance face, or a thrown error naming what is missing. */
 export function bindingOf(d) {
-  const b = faceBinding(omxdspInclude(), d.kernel, d.params, d.controls ?? []);
+  const b = faceBinding(omxdspInclude(), d.face ?? d.kernel, d.params, d.controls ?? []);
   if (b.errors.length) throw new Error(`plugins/${d.stem}: binding: instance, but ${b.errors.join('; ')}`);
   return b;
 }
@@ -480,8 +502,17 @@ export function generate(d) {
   };
 }
 
+/** Every plugin's folder: each plugins/<stem>/ holding <stem>.decl.json, a base of variants standing
+ * for its variants' folders (tools/variants.mjs). */
 export const pluginDirs = (root = ROOT) =>
-  readdirSync(join(root, 'plugins')).map((n) => join(root, 'plugins', n)).filter((p) => existsSync(join(p, `${basename(p)}.decl.json`)));
+  readdirSync(join(root, 'plugins'))
+    .map((n) => join(root, 'plugins', n))
+    .filter((p) => existsSync(join(p, `${basename(p)}.decl.json`)))
+    .flatMap((p) => {
+      const raw = JSON.parse(readFileSync(join(p, `${basename(p)}.decl.json`), 'utf8'));
+      return raw.variants ? variantStems(raw).map((s) => join(root, 'plugins', s)) : [p];
+    })
+    .sort();
 
 // ---- the shared files, generated from every plugin folder ---------------------------------------
 

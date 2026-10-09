@@ -7,12 +7,15 @@
  * data when it is by reference. Prints the environment the consumer must then read with
  * (`OMX_CONTRACT_DIR=<copy>`, or nothing). Exit 3: there is no parameter to move.
  */
-import { readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { basename, join, resolve } from 'node:path';
 import { ROOT, locateContract, paramKernel, perturbCopy } from './omx-contract.mjs';
+import { baseOf } from './variants.mjs';
 
 const [pdir, scratch] = process.argv.slice(2);
-const file = join(pdir, `${basename(resolve(pdir))}.decl.json`);
+// a variant's parameters are declared in its base (tools/variants.mjs), copied beside it
+const own = join(pdir, `${basename(resolve(pdir))}.decl.json`);
+const file = existsSync(own) ? own : (baseOf(pdir)?.file ?? own);
 const d = JSON.parse(readFileSync(file, 'utf8'));
 const p = d.params?.[0];
 if (!p) process.exit(3);

@@ -27,6 +27,7 @@ import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { compareVersions, contractPin, declKernels, findName, kernelExists, locateContract, paramKernel } from './omx-contract.mjs';
 import { omxdspInclude, render } from './template.mjs';
+import { baseOf, expandVariant, variantStems } from './variants.mjs';
 
 export { omxdspInclude, render };
 
@@ -83,16 +84,35 @@ export function validate(root, schema, value, path = '') {
 /** The plugin directories: every plugins/<stem>/ holding <stem>.decl.json. */
 export function pluginStems(root = ROOT) {
   const dir = join(root, 'plugins');
-  return readdirSync(dir).filter((n) => existsSync(join(dir, n, `${n}.decl.json`))).sort();
+  // a base of variants is no plugin: its variants are (tools/variants.mjs)
+  return readdirSync(dir)
+    .filter((n) => existsSync(join(dir, n, `${n}.decl.json`)))
+    .flatMap((n) => {
+      let raw;
+      try {
+        raw = JSON.parse(readFileSync(join(dir, n, `${n}.decl.json`), 'utf8'));
+      } catch {
+        return [n];
+      }
+      return raw.variants ? variantStems(raw) : [n];
+    })
+    .sort();
 }
 
 /** What the checkers fill placeholders with, read from the raw declaration (never resolved: a
  * declaration whose references cannot resolve still has its identity checked). */
 export function pluginFacts(root, stem) {
-  const file = join(root, 'plugins', stem, `${stem}.decl.json`);
+  let file = join(root, 'plugins', stem, `${stem}.decl.json`);
   let decl;
   try {
-    decl = JSON.parse(readFileSync(file, 'utf8'));
+    const base = existsSync(file) ? undefined : baseOf(join(root, 'plugins', stem));
+    if (base) {
+      // a variant's declaration is its base's, expanded (its band count read from omx-contract)
+      file = base.file;
+      const where = locateContract(root);
+      if (!where.dir) throw new Error(`its variant ${stem} is expanded from omx-contract and ${where.why}`);
+      decl = expandVariant(where.dir, base.decl, base.decl.variants.of.find((v) => v.stem === stem));
+    } else decl = JSON.parse(readFileSync(file, 'utf8'));
   } catch (e) {
     return { stem, short: stem.replace(/^omx-/, ''), decl: undefined, error: `${relative(root, file)}: ${e.message}` };
   }
