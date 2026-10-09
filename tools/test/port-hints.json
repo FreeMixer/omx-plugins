@@ -2289,6 +2289,178 @@
       "points": []
     }
   },
+  "omx-geq": {
+    "band01": {
+      "props": [],
+      "unit": "units:db",
+      "points": []
+    },
+    "band02": {
+      "props": [],
+      "unit": "units:db",
+      "points": []
+    },
+    "band03": {
+      "props": [],
+      "unit": "units:db",
+      "points": []
+    },
+    "band04": {
+      "props": [],
+      "unit": "units:db",
+      "points": []
+    },
+    "band05": {
+      "props": [],
+      "unit": "units:db",
+      "points": []
+    },
+    "band06": {
+      "props": [],
+      "unit": "units:db",
+      "points": []
+    },
+    "band07": {
+      "props": [],
+      "unit": "units:db",
+      "points": []
+    },
+    "band08": {
+      "props": [],
+      "unit": "units:db",
+      "points": []
+    },
+    "band09": {
+      "props": [],
+      "unit": "units:db",
+      "points": []
+    },
+    "band10": {
+      "props": [],
+      "unit": "units:db",
+      "points": []
+    },
+    "band11": {
+      "props": [],
+      "unit": "units:db",
+      "points": []
+    },
+    "band12": {
+      "props": [],
+      "unit": "units:db",
+      "points": []
+    },
+    "band13": {
+      "props": [],
+      "unit": "units:db",
+      "points": []
+    },
+    "band14": {
+      "props": [],
+      "unit": "units:db",
+      "points": []
+    },
+    "band15": {
+      "props": [],
+      "unit": "units:db",
+      "points": []
+    },
+    "band16": {
+      "props": [],
+      "unit": "units:db",
+      "points": []
+    },
+    "band17": {
+      "props": [],
+      "unit": "units:db",
+      "points": []
+    },
+    "band18": {
+      "props": [],
+      "unit": "units:db",
+      "points": []
+    },
+    "band19": {
+      "props": [],
+      "unit": "units:db",
+      "points": []
+    },
+    "band20": {
+      "props": [],
+      "unit": "units:db",
+      "points": []
+    },
+    "band21": {
+      "props": [],
+      "unit": "units:db",
+      "points": []
+    },
+    "band22": {
+      "props": [],
+      "unit": "units:db",
+      "points": []
+    },
+    "band23": {
+      "props": [],
+      "unit": "units:db",
+      "points": []
+    },
+    "band24": {
+      "props": [],
+      "unit": "units:db",
+      "points": []
+    },
+    "band25": {
+      "props": [],
+      "unit": "units:db",
+      "points": []
+    },
+    "band26": {
+      "props": [],
+      "unit": "units:db",
+      "points": []
+    },
+    "band27": {
+      "props": [],
+      "unit": "units:db",
+      "points": []
+    },
+    "band28": {
+      "props": [],
+      "unit": "units:db",
+      "points": []
+    },
+    "band29": {
+      "props": [],
+      "unit": "units:db",
+      "points": []
+    },
+    "band30": {
+      "props": [],
+      "unit": "units:db",
+      "points": []
+    },
+    "band31": {
+      "props": [],
+      "unit": "units:db",
+      "points": []
+    },
+    "enabled": {
+      "props": [
+        "lv2:toggled"
+      ],
+      "unit": null,
+      "points": []
+    },
+    "latency": {
+      "props": [
+        "lv2:integer",
+        "lv2:reportsLatency"
+      ],
+      "unit": "units:frame",
+      "points": []
+    }
+  },
   "omx-keyed-gate": {
     "key": {
       "props": [
