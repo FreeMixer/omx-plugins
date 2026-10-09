@@ -22,7 +22,9 @@ check() { # <root>
   if [ -n "${PINS_CHECK_PKG-1}" ] && command -v pkg-config >/dev/null 2>&1 && pkg-config --exists omxdsp 2>/dev/null; then
     have="$(pkg-config --modversion omxdsp)"
     req="$(pkg-config --print-requires omxdsp | tr -d ' ')"
-    printf '%s\n' "$req" | grep -qx "omx-contract=$contract" || { echo "pins-check: the installed omx-dsp $have requires $(printf '%s' "$req" | tr '\n' ' '), the pin is omx-contract $contract" >&2; fail=1; }
+    # omx-dsp requires the contract as a range from its pin (>= X, < next major), from 0.5.0 on; an
+    # older one names the exact release
+    printf '%s\n' "$req" | grep -qx "omx-contract=$contract\|omx-contract>=$contract" || { echo "pins-check: the installed omx-dsp $have requires $(printf '%s' "$req" | tr '\n' ' '), the pin is omx-contract $contract" >&2; fail=1; }
   fi
   [ "$fail" = 0 ] || return 1
   echo "pins-check: omx-dsp >= $dsp and omx-contract $contract agree in the pins, the spec and debian/control"

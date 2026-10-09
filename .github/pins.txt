@@ -4,5 +4,5 @@
 # omx-contract: the release whose resolved data every plugin declaration references (tools/omx-contract.mjs);
 #   moving it is one commit of its own, with omx-dsp's when the pair moves (tools/pins-check.sh).
 # omx-dsp: the release whose kernels the faces call (pkg-config omxdsp); omx-dsp requires the same omx-contract.
-omx-contract https://github.com/FreeMixer/omx-contract 2.1.0
-omx-dsp https://github.com/FreeMixer/omx-dsp 0.4.1
+omx-contract https://github.com/FreeMixer/omx-contract 2.2.0
+omx-dsp https://github.com/FreeMixer/omx-dsp 0.5.0
