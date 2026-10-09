@@ -336,28 +336,94 @@ function withBanner(text, d, comment) {
 }
 
 /**
- * The block plan of the identity test: every parameter moved across its travel, the bypass toggled.
+ * The block plan of the identity test, three parts:
+ *
+ *   1. MOVES: twelve uneven blocks, fixed in frames, every parameter moved across its travel between
+ *      them, the bypass toggled.
+ *   2. RELEASE: at the defaults, a full-scale burst and then a tail that falls from full scale onto
+ *      a quiet bed (about -60 dBFS, under any gate's default threshold, each threshold crossed at its
+ *      own time), both in milliseconds so every rate gets the same time. The tail
+ *      lasts the sum of every time travel's default (ms or s): the longest release or decay, with
+ *      the predelay, hold or window that comes before it (a gated reverb holds 120 ms, then releases),
+ *      and at least TAIL_FLOOR_MS. A dynamics kernel engages on the burst and releases in the tail, so
+ *      its release is seen.
+ *   3. CHOICES: for every choice (a set's values, or a toggle), each of its values in turn, held over
+ *      its own burst and two tails: every other parameter at its default for the first, stepped once
+ *      for the second. A control that is read only under one value of a choice (a reverb's plate
+ *      depth under the plate algorithm) is then in the plan for long enough to be seen.
+ *
  * A parameter whose contract control `rearms` (`controls[i].rearms`: changing it re-arms the kernel's
- * state) is held at its default in every block: moving it would test the re-arm,
- * not the identity of the faces and the kernel. The sabotage arm still moves it, by one step.
+ * state) is held at its default in every block: moving it would test the re-arm, not the identity
+ * of the faces and the kernel. The sabotage arm still moves it, by one step.
+ *
+ * A row is `frames, ms, signal, {values}, bypass`. `ms` > 0 means the block lasts that long at every
+ * rate and `frames` is unused. `signal` is 0 for the moving stimulus, 1 for the full-scale burst and
+ * 2 for the quiet tail.
  */
 const PLAN_FRAMES = [64, 1, 333, 512, 17, 480, 129, 1024, 7, 2500, 600, 3000];
 const PLAN_BYPASS = [0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0];
 const PLAN_AT = ['def', 0.25, 1, 0, 0.75, 'def', 0.5, 0.9, 0.1, 0.6, 0.35, 'def'];
-export function oraclePlan(params, controls = []) {
-  return PLAN_FRAMES.map((frames, b) => {
-    const v = params.map((p, i) => {
-      if (controls[i]?.rearms) return p.def;
-      if (p.kind === 'toggle') return (b + i) % 2;
-      const at = PLAN_AT[(b + 2 * i) % PLAN_AT.length];
-      if (at === 'def') return p.def;
-      const choices = choicesOf(p);
-      if (choices) return choices[Math.round(at * (choices.length - 1))].value;
-      const x = p.min + at * (p.max - p.min);
-      return p.kind === 'integer' ? Math.round(x) : x;
-    });
-    return { row: `${frames}, {${v.map(cfloat).join(', ')}}, ${PLAN_BYPASS[b]}` };
+export const BURST_MS = 10;
+export const TAIL_FLOOR_MS = 100;
+const SIGNAL = { moves: 0, burst: 1, tail: 2 };
+
+/** The quiet tail of a release section, ms: the sum of every time travel's default, at least TAIL_FLOOR_MS. */
+export function tailMs(params) {
+  const sum = params
+    .filter((p) => p.unit === 'ms' || p.unit === 's')
+    .reduce((t, p) => t + (p.unit === 's' ? p.def * 1000 : p.def), 0);
+  return Math.max(TAIL_FLOOR_MS, Math.ceil(sum));
+}
+
+/** A choice's values (a set's ids by index, a toggle's 0 and 1), or undefined for a travel. */
+const valuesOf = (p) => (p.kind === 'toggle' ? [0, 1] : choicesOf(p)?.map((c) => c.value));
+
+/** A parameter's value at `at` (a fraction of its travel, or 'def'). */
+function valueAt(p, at) {
+  if (at === 'def') return p.def;
+  const choices = choicesOf(p);
+  if (choices) return choices[Math.round(at * (choices.length - 1))].value;
+  const x = p.min + at * (p.max - p.min);
+  return p.kind === 'integer' ? Math.round(x) : x;
+}
+
+/** One step of every parameter but those in `keep`: a travel to three quarters of its travel (a
+ * quarter when that is its default), a choice to its next value, a toggle flipped. */
+function stepped(params, v, keep) {
+  return params.map((p, i) => {
+    if (keep.has(i)) return v[i];
+    const vals = valuesOf(p);
+    if (vals) return vals[(vals.indexOf(v[i]) + 1) % vals.length];
+    const x = valueAt(p, 0.75);
+    return x === v[i] ? valueAt(p, 0.25) : x;
   });
+}
+
+export function oraclePlan(params, controls = []) {
+  const held = new Set(params.map((_, i) => i).filter((i) => controls[i]?.rearms));
+  const row = (frames, ms, signal, v, bypass) => ({ row: `${frames}, ${cfloat(ms)}, ${signal}, {${v.map(cfloat).join(', ')}}, ${bypass}` });
+  const moves = PLAN_FRAMES.map((frames, b) => {
+    const v = params.map((p, i) => {
+      if (held.has(i)) return p.def;
+      if (p.kind === 'toggle') return (b + i) % 2;
+      return valueAt(p, PLAN_AT[(b + 2 * i) % PLAN_AT.length]);
+    });
+    return row(frames, 0, SIGNAL.moves, v, PLAN_BYPASS[b]);
+  });
+  const tail = tailMs(params);
+  const defaults = params.map((p) => p.def);
+  const release = [row(0, BURST_MS, SIGNAL.burst, defaults, 0), row(0, tail, SIGNAL.tail, defaults, 0)];
+  const choices = [];
+  params.forEach((p, c) => {
+    const vals = valuesOf(p);
+    if (!vals || held.has(c)) return;
+    for (const value of vals) {
+      const v = defaults.map((d, i) => (i === c ? value : d));
+      const moved = stepped(params, v, new Set([...held, c]));
+      choices.push(row(0, BURST_MS, SIGNAL.burst, v, 0), row(0, tail, SIGNAL.tail, v, 0), row(0, tail, SIGNAL.tail, moved, 0));
+    }
+  });
+  return [...moves, ...release, ...choices];
 }
 
 /** The parameters the plan holds at their default, for the oracle's comment: `[{ symbol }]`. */

@@ -10,7 +10,10 @@
  *
  * GENERATED — DO NOT EDIT BY HAND. Produced by tools/gen.mjs from plugins/omx-transient/omx-transient.decl.json:
  * the plan moves every declared parameter across its travel between uneven blocks (1 to 3000 frames)
- * and toggles the bypass, through ONE instance of the face. Parameters are found BY NAME (CLAP) or BY
+ * and toggles the bypass; then, timed in milliseconds so every rate gets the same time, a full-scale
+ * burst and a quiet tail at the defaults (a dynamics kernel engages and releases), and each value of
+ * every choice held over its own burst and tail with the other parameters stepped once (a control
+ * read only under one value is reached). All of it runs through ONE instance of the face. Parameters are found BY NAME (CLAP) or BY
  * SYMBOL (LV2, through lilv), so a renumbered face cannot pass by accident. Two guards keep the test
  * honest: the reference must move the signal, and a reference with any ONE parameter one step off must
  * differ from the face (the sabotage arm), so a wrong or dead coefficient is seen.
@@ -33,26 +36,32 @@
 
 #define NP OMX_TRANSIENT_PARAM_COUNT
 
-/* One block: its length, the declared parameters (declaration order) and the host's bypass. */
+/* One block: its length (frames, or ms when ms > 0), the stimulus it carries (0 the moving bursts,
+ * 1 a full-scale burst, 2 the quiet tail), the declared parameters (declaration order) and the
+ * host's bypass. */
 typedef struct {
   uint32_t frames;
+  float ms;
+  int signal;
   float v[NP];
   int bypass;
 } Block;
 
 static const Block PLAN[] = {
-    { 64, {0.0f, 24.0f, 38.0f, 1025.0f, -20.4f}, 0 },
-    { 1, {-12.0f, -24.0f, 10.0f, 1805.0f, -2.4f}, 0 },
-    { 333, {24.0f, 12.0f, 26.0f, 245.0f, -11.4f}, 0 },
-    { 512, {-24.0f, 0.0f, 45.2f, 1220.0f, 0.0f}, 0 },
-    { 17, {12.0f, 0.0f, 6.8f, 733.0f, 0.0f}, 1 },
-    { 480, {0.0f, 19.2f, 30.8f, 250.0f, -15.0f}, 1 },
-    { 129, {0.0f, -19.2f, 18.8f, 250.0f, 12.0f}, 0 },
-    { 1024, {19.2f, 4.8f, 10.0f, 538.0f, -24.0f}, 0 },
-    { 7, {-19.2f, -7.2f, 10.0f, 2000.0f, 3.0f}, 0 },
-    { 2500, {4.8f, 0.0f, 14.0f, 50.0f, 0.0f}, 0 },
-    { 600, {-7.2f, 0.0f, 50.0f, 1513.0f, -6.0f}, 0 },
-    { 3000, {0.0f, -12.0f, 2.0f, 250.0f, 8.4f}, 0 },
+    { 64, 0.0f, 0, {0.0f, 24.0f, 38.0f, 1025.0f, -20.4f}, 0 },
+    { 1, 0.0f, 0, {-12.0f, -24.0f, 10.0f, 1805.0f, -2.4f}, 0 },
+    { 333, 0.0f, 0, {24.0f, 12.0f, 26.0f, 245.0f, -11.4f}, 0 },
+    { 512, 0.0f, 0, {-24.0f, 0.0f, 45.2f, 1220.0f, 0.0f}, 0 },
+    { 17, 0.0f, 0, {12.0f, 0.0f, 6.8f, 733.0f, 0.0f}, 1 },
+    { 480, 0.0f, 0, {0.0f, 19.2f, 30.8f, 250.0f, -15.0f}, 1 },
+    { 129, 0.0f, 0, {0.0f, -19.2f, 18.8f, 250.0f, 12.0f}, 0 },
+    { 1024, 0.0f, 0, {19.2f, 4.8f, 10.0f, 538.0f, -24.0f}, 0 },
+    { 7, 0.0f, 0, {-19.2f, -7.2f, 10.0f, 2000.0f, 3.0f}, 0 },
+    { 2500, 0.0f, 0, {4.8f, 0.0f, 14.0f, 50.0f, 0.0f}, 0 },
+    { 600, 0.0f, 0, {-7.2f, 0.0f, 50.0f, 1513.0f, -6.0f}, 0 },
+    { 3000, 0.0f, 0, {0.0f, -12.0f, 2.0f, 250.0f, 8.4f}, 0 },
+    { 0, 10.0f, 1, {0.0f, 0.0f, 10.0f, 250.0f, 0.0f}, 0 },
+    { 0, 260.0f, 2, {0.0f, 0.0f, 10.0f, 250.0f, 0.0f}, 0 },
 };
 #define NBLOCKS (sizeof PLAN / sizeof PLAN[0])
 
@@ -66,24 +75,50 @@ static void check(bool ok, const char *face, double sr, const char *what) {
   printf("%s %s %s @ %.0f Hz\n", ok ? "PASS" : "FAIL", face, what, sr);
 }
 
-static uint32_t total_frames(void) {
+static uint32_t frames_of(const Block *k, double sr) {
+  return k->ms > 0.0f ? (uint32_t)ceil((double)k->ms * sr / 1000.0) : k->frames;
+}
+
+static uint32_t total_frames(double sr) {
   uint32_t n = 0;
-  for (size_t i = 0; i < NBLOCKS; i++) n += PLAN[i].frames;
+  for (size_t i = 0; i < NBLOCKS; i++) n += frames_of(&PLAN[i], sr);
   return n;
 }
 
-/* Bursts of decaying noise on a quiet bed, the legs unequal: onsets, decays and a stereo image. */
+static uint32_t longest_block(double sr) {
+  uint32_t n = 1;
+  for (size_t i = 0; i < NBLOCKS; i++) n = frames_of(&PLAN[i], sr) > n ? frames_of(&PLAN[i], sr) : n;
+  return n;
+}
+
+/* The moving blocks: bursts of decaying noise on a quiet bed, the legs unequal (onsets, decays and a
+ * stereo image). A burst block: full-scale noise. A tail block: noise falling from full scale by
+ * 8.7 dB every 10 ms onto a bed at about -60 dBFS, so a level crosses every threshold at its own
+ * time and a gate closes under its default threshold. */
 static void signal_make(float *l, float *r, uint32_t n, double sr) {
   uint32_t seed = 0x6f6d78u;
   const uint32_t period = (uint32_t)(0.09 * sr);
+  uint32_t start = 0, end = 0;
+  size_t b = 0;
   for (uint32_t i = 0; i < n; i++) {
+    while (i >= end && b < NBLOCKS) start = end, end += frames_of(&PLAN[b++], sr);
+    const int sig = PLAN[b - 1].signal;
     seed = seed * 1664525u + 1013904223u;
     const float a = (float)(seed >> 8) / 16777216.0f - 0.5f;
     seed = seed * 1664525u + 1013904223u;
-    const float b = (float)(seed >> 8) / 16777216.0f - 0.5f;
-    const float env = expf(-(float)(i % period) / (0.012f * (float)sr));
-    l[i] = 0.9f * env * a + 0.02f * b;
-    r[i] = 0.7f * env * b + 0.02f * a;
+    const float c = (float)(seed >> 8) / 16777216.0f - 0.5f;
+    if (sig == 1) {
+      l[i] = 2.0f * a;
+      r[i] = 1.8f * c;
+    } else if (sig == 2) {
+      const float fall = 2.0f * expf(-(float)(i - start) / (0.01f * (float)sr)) + 0.002f;
+      l[i] = fall * c;
+      r[i] = 0.9f * fall * a;
+    } else {
+      const float env = expf(-(float)(i % period) / (0.012f * (float)sr));
+      l[i] = 0.9f * env * a + 0.02f * c;
+      r[i] = 0.7f * env * c + 0.02f * a;
+    }
   }
 }
 
@@ -104,9 +139,10 @@ static void reference(double sr, int off, const float *il, const float *ir, floa
     const Block *k = &PLAN[b];
     float values[NP];
     values_of(k, off, values);
+    const uint32_t frames = frames_of(k, sr);
     omx_transient_instance_resolve(&inst, k->bypass, values[OMX_TRANSIENT_PARAM_ATTACK_DB], values[OMX_TRANSIENT_PARAM_SUSTAIN_DB], values[OMX_TRANSIENT_PARAM_ATTACK_TIME_MS], values[OMX_TRANSIENT_PARAM_SUSTAIN_TIME_MS], values[OMX_TRANSIENT_PARAM_OUTPUT_DB]);
-    omx_transient_instance_run(&inst, il + at, ir + at, ol + at, orr + at, k->frames);
-    at += k->frames;
+    omx_transient_instance_run(&inst, il + at, ir + at, ol + at, orr + at, frames);
+    at += frames;
   }
   if (latency) *latency = (uint32_t)lrintf((float)(OMX_TRANSIENT_INSTANCE_LATENCY_FRAMES));
 }
@@ -121,7 +157,7 @@ struct Driver {
 static bool same(const float *a, const float *b, uint32_t n) { return memcmp(a, b, (size_t)n * sizeof(float)) == 0; }
 
 static void run_checks(const char *face, Driver *d, double sr) {
-  const uint32_t n = total_frames();
+  const uint32_t n = total_frames(sr);
   float *buf = calloc((size_t)n * 8u, sizeof(float));
   if (!buf) abort();
   float *il = buf, *ir = buf + n, *ol = buf + 2u * n, *orr = buf + 3u * n, *wl = buf + 4u * n, *wr = buf + 5u * n;
@@ -202,7 +238,7 @@ static bool clap_run(void *face, double sr, const float *il, const float *ir, fl
   if (!p || !p->init(p)) return false;
   const clap_plugin_params_t *pp = (const clap_plugin_params_t *)p->get_extension(p, CLAP_EXT_PARAMS);
   const clap_plugin_latency_t *lat = (const clap_plugin_latency_t *)p->get_extension(p, CLAP_EXT_LATENCY);
-  bool ok = pp && lat && p->activate(p, sr, 1, 4096) && p->start_processing(p);
+  bool ok = pp && lat && p->activate(p, sr, 1, longest_block(sr)) && p->start_processing(p);
   clap_id ids[NP + 1];
   for (uint32_t i = 0; ok && i < NP; i++) ok = clap_param(pp, p, OMX_TRANSIENT_PARAMS[i].name, &ids[i]);
   ok = ok && clap_param(pp, p, NULL, &ids[NP]);
@@ -221,10 +257,11 @@ static bool clap_run(void *face, double sr, const float *il, const float *ir, fl
     clap_input_events_t in = {&evs, ev_size, ev_get};
     float *ib[2] = {(float *)il + at, (float *)ir + at}, *ob[2] = {ol + at, orr + at};
     clap_audio_buffer_t ai = {ib, NULL, 2, 0, 0}, ao = {ob, NULL, 2, 0, 0};
-    clap_process_t pr = {.steady_time = at, .frames_count = k->frames, .audio_inputs = &ai, .audio_outputs = &ao,
+    const uint32_t frames = frames_of(k, sr);
+    clap_process_t pr = {.steady_time = at, .frames_count = frames, .audio_inputs = &ai, .audio_outputs = &ao,
                          .audio_inputs_count = 1, .audio_outputs_count = 1, .in_events = &in, .out_events = &out};
     ok = p->process(p, &pr) != CLAP_PROCESS_ERROR;
-    at += k->frames;
+    at += frames;
   }
   if (ok && latency) *latency = lat->get(p);
   p->stop_processing(p);
@@ -286,8 +323,9 @@ static bool lv2_run(void *face, double sr, const float *il, const float *ir, flo
     lilv_instance_connect_port(inst, (uint32_t)ap[1], (void *)(ir + at));
     lilv_instance_connect_port(inst, (uint32_t)ap[2], ol + at);
     lilv_instance_connect_port(inst, (uint32_t)ap[3], orr + at);
-    lilv_instance_run(inst, k->frames);
-    at += k->frames;
+    const uint32_t frames = frames_of(k, sr);
+    lilv_instance_run(inst, frames);
+    at += frames;
   }
   if (ok) lilv_instance_deactivate(inst);
   lilv_instance_free(inst);

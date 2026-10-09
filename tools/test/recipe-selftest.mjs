@@ -29,7 +29,9 @@
  *   7. The identity oracle: a wobble control the stand-in render lists with `rearms` (its
  *      `kernels`) is held at its default in every block of the plan, and named in the oracle's
  *      comment, while the rest move; the same render without the flag moves it again; a render
- *      that does not list the kernel is refused, never read some other way.
+ *      that does not list the kernel is refused, never read some other way. The plan ends with a
+ *      full-scale burst and a quiet tail, then each value of every choice over a burst and tail of
+ *      its own with the other parameters stepped once for its second tail.
  *
  * Works in build/selftest/ (removed first). Needs git, and omx-dsp's headers as the build does.
  * Exit 1 when any check failed, including an arm that stopped early.
@@ -483,8 +485,10 @@ static inline void omx_wobble_instance_run(OmxWobbleInstance *s, const float *in
       process.env.OMXDSP_INCLUDE = inc; // the stand-in wobble face
       try {
         const oracle = generateInstance(loadDecl(join(tree, P_)))['test/wobble-oracle.c'];
-        const rows = [...oracle.matchAll(/^ *\{ \d+, \{([^}]*)\}, [01] \},$/gm)].map((m) => m[1].split(',').map((x) => x.trim()));
-        return { oracle, cols: rows.length ? rows[0].map((_, i) => rows.map((r) => r[i])) : [] };
+        const found = [...oracle.matchAll(/^ *\{ (\d+), ([-\d.e]+)f, ([012]), \{([^}]*)\}, [01] \},$/gm)];
+        const rows = found.map((m) => m[4].split(',').map((x) => x.trim()));
+        const timed = found.map((m) => ({ ms: Number(m[2]), signal: Number(m[3]), v: m[4].split(',').map((x) => x.trim()) }));
+        return { oracle, timed, cols: rows.length ? rows[0].map((_, i) => rows.map((r) => r[i])) : [] };
       } finally {
         delete process.env.OMX_CONTRACT_DIR; // as arm 6 left them: the real tree reads what it pins
         delete process.env.OMXDSP_INCLUDE;
@@ -498,6 +502,16 @@ static inline void omx_wobble_instance_run(OmxWobbleInstance *s, const float *in
     expect(h.cols[1]?.every((v) => v === '50.0f'), `oracle: depth, which re-arms, is held at its default 50 in every block (${[...new Set(h.cols[1] ?? [])].join(' ')})`);
     expect(varies(h.cols[0] ?? []) && varies(h.cols[2] ?? []) && varies(h.cols[3] ?? []), 'oracle: rateHz, mix and mode still move across their travels');
     expect(/Held at its default in every block[^]*`rearms`\): depth\./.test(h.oracle), "oracle: the comment names the held parameter");
+    // the release section: a full-scale burst at the defaults, then a quiet tail of at least the floor
+    const rel = h.timed.findIndex((t) => t.signal === 1);
+    expect(rel > 0 && h.timed[rel + 1]?.signal === 2 && h.timed[rel + 1].ms >= 100, `oracle: a full-scale burst, then a quiet tail of ${h.timed[rel + 1]?.ms} ms`);
+    // the choice sections: mode (2 values) held at each value over its own burst and two tail halves, the rest stepped once
+    const sections = h.timed.slice(rel + 2);
+    const modes = [...new Set(sections.map((t) => t.v[3]))];
+    expect(sections.length === 6 && modes.length === 2 && sections.every((t, k) => t.signal === (k % 3 === 0 ? 1 : 2)),
+      `oracle: each value of the mode choice gets a burst and a tail (${sections.length} blocks, values ${modes.join(' ')})`);
+    expect(sections[1]?.v[0] !== sections[2]?.v[0] && sections[1]?.v[2] !== sections[2]?.v[2] && sections[1]?.v[1] === sections[2]?.v[1],
+      'oracle: under a choice value, every other parameter is stepped once for the second tail, the one that re-arms excepted');
     const moving = join(WORK, 'omx-contract-no-rearms');
     fakeContract(moving, { wobble: WOBBLE }, wobbleControls(false));
     const m = planOf(moving);

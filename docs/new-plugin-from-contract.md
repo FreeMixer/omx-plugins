@@ -67,8 +67,14 @@ settled it fills the derived fields and runs `tools/gen.mjs`, which writes:
 
 ## The identity test
 
-One template, filled from the declaration: a deterministic stimulus in uneven blocks, every
-parameter moving between blocks across its declared travel, the bypass toggled. The CLAP and LV2
+One template, filled from the declaration. The plan has three parts. First, a deterministic stimulus
+in uneven blocks, with every parameter moving between blocks across its declared travel and the
+bypass toggled. Second, at the defaults, a full-scale burst followed by a tail that falls onto a quiet
+bed. The tail lasts the sum of every time travel's default (at least 100 ms), so a dynamics stage
+engages and releases, and a gate holds and closes. Third, for every choice or toggle, each of its
+values in turn over its own burst and two tails: the other parameters stay at their defaults for the
+first tail and are stepped once for the second. A control that only one mode reads is therefore
+reached. The second and third parts are timed in milliseconds, so every rate gets the same time. The CLAP and LV2
 builds must equal omx-dsp's instance face called directly, bit for bit, at every rate in
 `OMX_DECLARED_RATES`, and publish its latency. Two guards keep it honest: the reference must move
 the signal, and a reference rendered with one parameter one step off must differ from the faces
