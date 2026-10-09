@@ -2418,6 +2418,95 @@
       "points": []
     }
   },
+  "omx-reverb": {
+    "plateModDepth": {
+      "props": [
+        "lv2:integer"
+      ],
+      "unit": "units:pc",
+      "points": []
+    },
+    "predelay": {
+      "props": [
+        "lv2:integer"
+      ],
+      "unit": "units:ms",
+      "points": []
+    },
+    "lowcut": {
+      "props": [
+        "lv2:integer",
+        "pprops:logarithmic"
+      ],
+      "unit": "units:hz",
+      "points": []
+    },
+    "highcut": {
+      "props": [
+        "lv2:integer",
+        "pprops:logarithmic"
+      ],
+      "unit": "units:hz",
+      "points": []
+    },
+    "reverse": {
+      "props": [
+        "lv2:integer"
+      ],
+      "unit": "units:ms",
+      "points": []
+    },
+    "hold": {
+      "props": [
+        "lv2:integer"
+      ],
+      "unit": "units:ms",
+      "points": []
+    },
+    "release": {
+      "props": [
+        "lv2:integer"
+      ],
+      "unit": "units:ms",
+      "points": []
+    },
+    "gateThreshold": {
+      "props": [
+        "lv2:integer"
+      ],
+      "unit": null,
+      "points": []
+    },
+    "algorithm": {
+      "props": [
+        "lv2:enumeration",
+        "lv2:integer"
+      ],
+      "unit": null,
+      "points": [
+        "0 Room",
+        "1 Plate",
+        "2 Hall",
+        "3 Reverse",
+        "4 Gated"
+      ]
+    },
+    "enabled": {
+      "props": [
+        "lv2:toggled"
+      ],
+      "unit": null,
+      "points": []
+    },
+    "latency": {
+      "props": [
+        "lv2:integer",
+        "lv2:reportsLatency"
+      ],
+      "unit": "units:frame",
+      "points": []
+    }
+  },
   "omx-rotary": {
     "hornSlowHz": {
       "props": [
