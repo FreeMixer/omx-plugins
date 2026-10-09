@@ -13,9 +13,7 @@
     { "plugin": "omx-chorus", "entry": "catalogue-row", "owedBy": "the omx-chorus migration (faces, tests, packaging, docs)" },
     { "plugin": "omx-chorus", "entry": "manual-section", "owedBy": "the omx-chorus migration (faces, tests, packaging, docs)" },
     { "plugin": "omx-deesser", "entry": "kernel-identity-test", "owedBy": "the omx-deesser migration (faces, tests, packaging, docs)" },
-    { "plugin": "omx-deesser", "entry": "spec-files", "owedBy": "the omx-deesser migration (faces, tests, packaging, docs)" },
     { "plugin": "omx-deesser", "entry": "package-description", "owedBy": "the omx-deesser migration (faces, tests, packaging, docs)" },
-    { "plugin": "omx-deesser", "entry": "ci-installed-files", "owedBy": "the omx-deesser migration (faces, tests, packaging, docs)" },
     { "plugin": "omx-deesser", "entry": "catalogue-row", "owedBy": "the omx-deesser migration (faces, tests, packaging, docs)" },
     { "plugin": "omx-deesser", "entry": "manual-section", "owedBy": "the omx-deesser migration (faces, tests, packaging, docs)" }
   ]
