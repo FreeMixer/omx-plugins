@@ -93,6 +93,7 @@ parameter header, installed in %{_includedir}/omx-plugins.
 %license LICENSE
 %doc README.md
 %dir /usr/lib/clap
+/usr/lib/clap/omx-chorus.clap
 /usr/lib/clap/omx-delay.clap
 /usr/lib/clap/omx-drive.clap
 /usr/lib/clap/omx-eq8.clap
@@ -108,6 +109,7 @@ parameter header, installed in %{_includedir}/omx-plugins.
 %files lv2
 %license LICENSE
 %doc README.md
+%{_libdir}/lv2/omx-chorus.lv2/
 %{_libdir}/lv2/omx-delay.lv2/
 %{_libdir}/lv2/omx-drive.lv2/
 %{_libdir}/lv2/omx-eq8.lv2/

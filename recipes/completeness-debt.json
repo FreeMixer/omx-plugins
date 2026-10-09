@@ -2,9 +2,7 @@
   "$comment": "The completeness gaps owed today, each with who owes it. A ratchet (tools/plugin-recipe.mjs, make completeness): a gap not listed here fails, and so does an entry here that is now satisfied, which is then deleted. Nothing is added here to make a new gap pass.",
   "debt": [
     { "plugin": "omx-chorus", "entry": "kernel-identity-test", "owedBy": "the omx-chorus migration (faces, tests, packaging, docs)" },
-    { "plugin": "omx-chorus", "entry": "spec-files", "owedBy": "the omx-chorus migration (faces, tests, packaging, docs)" },
     { "plugin": "omx-chorus", "entry": "package-description", "owedBy": "the omx-chorus migration (faces, tests, packaging, docs)" },
-    { "plugin": "omx-chorus", "entry": "ci-installed-files", "owedBy": "the omx-chorus migration (faces, tests, packaging, docs)" },
     { "plugin": "omx-chorus", "entry": "catalogue-row", "owedBy": "the omx-chorus migration (faces, tests, packaging, docs)" },
     { "plugin": "omx-chorus", "entry": "manual-section", "owedBy": "the omx-chorus migration (faces, tests, packaging, docs)" },
     { "plugin": "omx-deesser", "entry": "makefile", "owedBy": "the omx-deesser migration (faces, tests, packaging, docs)" },

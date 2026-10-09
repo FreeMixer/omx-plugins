@@ -113,7 +113,7 @@ jobs:
             rpm=$(ls rpms/omx-plugins-$sub-[0-9]*.${{ matrix.arch }}.rpm)
             rpm -qlp "$rpm" | grep -v '^/usr/lib/.build-id' | sort > files-$sub.txt
           done
-          printf '%s\n' /usr/lib/clap /usr/lib/clap/omx-delay.clap /usr/lib/clap/omx-drive.clap \
+          printf '%s\n' /usr/lib/clap /usr/lib/clap/omx-chorus.clap /usr/lib/clap/omx-delay.clap /usr/lib/clap/omx-drive.clap \
             /usr/lib/clap/omx-eq8.clap /usr/lib/clap/omx-eq16.clap /usr/lib/clap/omx-eq32.clap \
             /usr/lib/clap/omx-keyed-gate.clap /usr/lib/clap/omx-strip.clap \
             /usr/share/doc/omx-plugins-clap /usr/share/doc/omx-plugins-clap/README.md \
@@ -123,10 +123,10 @@ jobs:
           rpm -qlp "$devel" | grep -qx /usr/include/omx-plugins/omx_delay_instance.h
           rpm -qlp "$devel" | grep -qx /usr/include/omx-plugins/omx_plugin_param.h
           for p in delay drive eq8 eq16 eq32 gate strip; do rpm -qlp "$devel" | grep -qx "/usr/include/omx-plugins/omx_${p}_params.h"; done
-          for p in omx-delay omx-drive omx-eq8 omx-eq16 omx-eq32 omx-keyed-gate omx-strip; do
+          for p in omx-chorus omx-delay omx-drive omx-eq8 omx-eq16 omx-eq32 omx-keyed-gate omx-strip; do
             for f in "$p.so" manifest.ttl "$p.ttl"; do grep -qx "/usr/lib64/lv2/$p.lv2/$f" files-lv2.txt; done
           done
-          ! grep -vE '^/usr/lib64/lv2/omx-(delay|drive|eq8|eq16|eq32|keyed-gate|strip)\.lv2(/|$)|^/usr/share/(doc|licenses)/omx-plugins-lv2(/|$)' files-lv2.txt
+          ! grep -vE '^/usr/lib64/lv2/omx-(chorus|delay|drive|eq8|eq16|eq32|keyed-gate|strip)\.lv2(/|$)|^/usr/share/(doc|licenses)/omx-plugins-lv2(/|$)' files-lv2.txt
 
       - name: The packages install and their plugins load
         run: |
@@ -137,7 +137,7 @@ jobs:
           req=$(rpm -q --requires omx-plugins)
           grep -qE '^omx-plugins-clap\([a-z0-9-]+\) = ' <<<"$req"
           grep -qE '^omx-plugins-lv2\([a-z0-9-]+\) = ' <<<"$req"
-          for p in delay drive eq8 eq16 eq32 keyed-gate strip; do
+          for p in chorus delay drive eq8 eq16 eq32 keyed-gate strip; do
             # captured first: grep -q leaving a pipe early would fail the step under pipefail
             out=$(omx-clap-scan --json /usr/lib/clap/omx-$p.clap); grep -q "\"id\":\"org.openmixer.$p\"" <<<"$out"
             out=$(lv2ls); grep -qx "urn:openmixer:$p" <<<"$out"
@@ -200,7 +200,7 @@ jobs:
           apt-get install -y --no-install-recommends ./debs/omx-plugins_*.deb ./debs/omx-plugins-clap_*.deb ./debs/omx-plugins-lv2_*.deb
           dev=$(dpkg -c debs/omx-plugins-dev_*.deb); grep -q './usr/include/omx-plugins/omx_delay_instance.h' <<<"$dev"
           dep=$(dpkg -s omx-plugins); grep -q '^Depends: omx-plugins-clap (= .*), omx-plugins-lv2 (= .*)' <<<"$dep"
-          for p in delay drive eq8 eq16 eq32 keyed-gate strip; do
+          for p in chorus delay drive eq8 eq16 eq32 keyed-gate strip; do
             # captured first: grep -q leaving a pipe early would fail the step under pipefail
             out=$(dpkg -L omx-plugins-clap); grep -qx "/usr/lib/clap/omx-$p.clap" <<<"$out"
             out=$(dpkg -L omx-plugins-lv2); grep -qx "/usr/lib/lv2/omx-$p.lv2/omx-$p.so" <<<"$out"
