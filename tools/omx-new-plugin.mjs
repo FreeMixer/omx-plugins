@@ -33,6 +33,7 @@ import { fileURLToPath } from 'node:url';
 import { bindFace, instanceHeader, parseFace } from './instance-face.mjs';
 import { PIN_FILE, contractPin, controlOf, items, kernelControls, kernelExists, locateContract, resolveParam } from './omx-contract.mjs';
 import { ROOT, checkPlugin, gapLines, layerOfPath, loadRecipe, loadSchema, pluginFacts, pluginStems, validate } from './plugin-recipe.mjs';
+import { pinOfTtl } from './port-hints.mjs';
 import { omxdspInclude } from './template.mjs';
 import { expandVariant } from './variants.mjs';
 
@@ -254,6 +255,26 @@ export async function planPlugin(declIn, src, { root = ROOT, recipe = loadRecipe
 
 // ---- writing: the declaration, then every generated file ---------------------------------------
 
+/** `decl` with its `portHints` pin, placed where the schema puts it: after the parameters (and the
+ * sidechain), every other key where the person wrote it. */
+export function withPortHints(decl, pin) {
+  const keys = Object.keys(decl).filter((k) => k !== 'portHints');
+  const after = keys.includes('sidechain') && keys.indexOf('sidechain') > keys.indexOf('params') ? 'sidechain' : 'params';
+  return Object.fromEntries(keys.flatMap((k) => (k === after ? [[k, decl[k]], ['portHints', pin]] : [[k, decl[k]]])));
+}
+
+/** A declaration with no `portHints` yet gets the pin of the TTL just generated (tools/port-hints.mjs):
+ * a new face pins the hints it carries, and `make hints` holds every later TTL to them. */
+function pinHints(root, declPath, decl, stems, perBand = []) {
+  if (decl.portHints) return;
+  const pins = stems.map((s) => pinOfTtl(readFileSync(join(root, 'plugins', s, 'generated', `${s}.lv2`, `${s}.ttl`), 'utf8'), perBand));
+  for (const [i, p] of pins.entries()) if (JSON.stringify(p) !== JSON.stringify(pins[0])) throw new Error(`port-hints: ${stems[i]} pins other hints than ${stems[0]}`);
+  writeFileSync(declPath, `${JSON.stringify(withPortHints(decl, pins[0]), null, 2)}\n`);
+  // the pin moved the hint view gen.mjs assembles: refresh it (no other file reads the pin)
+  const r = run('node', [join(root, 'tools', 'gen.mjs')], { cwd: root });
+  if (r.code !== 0) throw new Error(`tools/gen.mjs: ${r.out.trim()}`);
+}
+
 function run(cmd, args, opts) {
   const r = spawnSync(cmd, args, { encoding: 'utf8', ...opts });
   return { code: r.status, out: `${r.stdout ?? ''}${r.stderr ?? ''}` };
@@ -277,6 +298,7 @@ export function writePlugin(plan, { root = ROOT } = {}) {
     if (r.code !== 0) throw new Error(`${relative(root, args[0])}: ${r.out.trim()}`);
     for (const m of r.out.matchAll(/wrote (\S+)/g)) written.push(relative(root, resolve(root, m[1])));
   }
+  pinHints(root, join(root, rel), d, [d.stem]);
   return [...new Set(written)];
 }
 
@@ -389,6 +411,7 @@ async function variantsMain(raw, src, { root, recipe, declPath, argv, opt }) {
     if (r.code !== 0) throw new Error(`${relative(root, args[0])}: ${r.out.trim()}`);
     for (const m of r.out.matchAll(/wrote (\S+)/g)) written.push(relative(root, resolve(root, m[1])));
   }
+  pinHints(root, declPath, raw, plans.map((p) => p.decl.stem), raw.params.filter((p) => p.perBand).map((p) => p.symbol));
   const files = [...new Set(written)];
   console.log(`\nwritten (${files.length}), the variants ${plans.map((p) => p.decl.stem).join(', ')} of ${raw.stem}:`);
   for (const f of files) console.log(`  ${f}`);

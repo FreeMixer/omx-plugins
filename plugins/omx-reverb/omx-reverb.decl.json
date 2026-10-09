@@ -96,5 +96,81 @@
         "Gated"
       ]
     }
-  ]
+  ],
+  "portHints": {
+    "plateModDepth": {
+      "props": [
+        "lv2:integer"
+      ],
+      "unit": "units:pc"
+    },
+    "predelay": {
+      "props": [
+        "lv2:integer"
+      ],
+      "unit": "units:ms"
+    },
+    "lowcut": {
+      "props": [
+        "lv2:integer",
+        "pprops:logarithmic"
+      ],
+      "unit": "units:hz"
+    },
+    "highcut": {
+      "props": [
+        "lv2:integer",
+        "pprops:logarithmic"
+      ],
+      "unit": "units:hz"
+    },
+    "reverse": {
+      "props": [
+        "lv2:integer"
+      ],
+      "unit": "units:ms"
+    },
+    "hold": {
+      "props": [
+        "lv2:integer"
+      ],
+      "unit": "units:ms"
+    },
+    "release": {
+      "props": [
+        "lv2:integer"
+      ],
+      "unit": "units:ms"
+    },
+    "gateThreshold": {
+      "props": [
+        "lv2:integer"
+      ]
+    },
+    "algorithm": {
+      "props": [
+        "lv2:enumeration",
+        "lv2:integer"
+      ],
+      "points": [
+        "0 Room",
+        "1 Plate",
+        "2 Hall",
+        "3 Reverse",
+        "4 Gated"
+      ]
+    },
+    "enabled": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "latency": {
+      "props": [
+        "lv2:integer",
+        "lv2:reportsLatency"
+      ],
+      "unit": "units:frame"
+    }
+  }
 }

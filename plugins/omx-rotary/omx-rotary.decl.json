@@ -69,5 +69,63 @@
       ],
       "defaultId": "slow"
     }
-  ]
+  ],
+  "portHints": {
+    "hornSlowHz": {
+      "props": [
+        "pprops:logarithmic"
+      ],
+      "unit": "units:hz"
+    },
+    "hornFastHz": {
+      "props": [
+        "pprops:logarithmic"
+      ],
+      "unit": "units:hz"
+    },
+    "drumSlowHz": {
+      "props": [
+        "pprops:logarithmic"
+      ],
+      "unit": "units:hz"
+    },
+    "drumFastHz": {
+      "props": [
+        "pprops:logarithmic"
+      ],
+      "unit": "units:hz"
+    },
+    "balance": {
+      "props": [
+        "lv2:integer"
+      ],
+      "unit": "units:pc"
+    },
+    "mix": {
+      "unit": "units:pc"
+    },
+    "speed": {
+      "props": [
+        "lv2:enumeration",
+        "lv2:integer"
+      ],
+      "points": [
+        "0 Stop",
+        "1 Slow",
+        "2 Fast"
+      ]
+    },
+    "enabled": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "latency": {
+      "props": [
+        "lv2:integer",
+        "lv2:reportsLatency"
+      ],
+      "unit": "units:frame"
+    }
+  }
 }

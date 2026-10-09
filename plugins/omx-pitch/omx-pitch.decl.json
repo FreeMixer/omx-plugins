@@ -42,5 +42,19 @@
       "ref": "PITCH_LIMITS",
       "field": "mix"
     }
-  ]
+  ],
+  "portHints": {
+    "enabled": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "latency": {
+      "props": [
+        "lv2:integer",
+        "lv2:reportsLatency"
+      ],
+      "unit": "units:frame"
+    }
+  }
 }

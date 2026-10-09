@@ -116,6 +116,93 @@
       "perBand": true
     }
   ],
+  "portHints": {
+    "hpf_on": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "hpf_freq": {
+      "props": [
+        "lv2:integer",
+        "pprops:logarithmic"
+      ],
+      "unit": "units:hz"
+    },
+    "hpf_slope": {
+      "props": [
+        "lv2:enumeration",
+        "lv2:integer"
+      ],
+      "points": [
+        "12 12 dB/oct",
+        "24 24 dB/oct"
+      ]
+    },
+    "lpf_on": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "lpf_freq": {
+      "props": [
+        "lv2:integer",
+        "pprops:logarithmic"
+      ],
+      "unit": "units:hz"
+    },
+    "lpf_slope": {
+      "props": [
+        "lv2:enumeration",
+        "lv2:integer"
+      ],
+      "points": [
+        "12 12 dB/oct",
+        "24 24 dB/oct"
+      ]
+    },
+    "type": {
+      "props": [
+        "lv2:enumeration",
+        "lv2:integer"
+      ],
+      "points": [
+        "0 Bell",
+        "1 Low Shelf",
+        "2 High Shelf",
+        "3 Notch",
+        "4 All-pass 1st",
+        "5 All-pass 2nd"
+      ]
+    },
+    "freq": {
+      "props": [
+        "lv2:integer",
+        "pprops:logarithmic"
+      ],
+      "unit": "units:hz"
+    },
+    "gain": {
+      "unit": "units:db"
+    },
+    "on": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "enabled": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "latency": {
+      "props": [
+        "lv2:integer",
+        "lv2:reportsLatency"
+      ],
+      "unit": "units:frame"
+    }
+  },
   "manual": [
     "| Section | Parameters |",
     "|---|---|",

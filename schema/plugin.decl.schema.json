@@ -186,6 +186,17 @@
             }
           }
         },
+        "portHints": {
+          "type": "object",
+          "title": "Port hints",
+          "description": "The pin of the LV2 port hints (tools/port-hints.mjs, `make hints`): by port symbol, the hints a host draws the port from that the generated TTL must keep — its port properties, its unit and its labelled scale points (\"<value> <label>\"). A face may gain hints; losing one is red until the pin here is changed on purpose. Written by tools/omx-new-plugin.mjs from the first generated TTL; a per-band symbol of a declaration with variants pins every band. tools/gen.mjs assembles every plugin's pin into the git-ignored view tools/test/port-hints.json.",
+          "propertyNames": {
+            "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/portHint"
+          }
+        },
         "panel": {
           "$ref": "#/$defs/panel"
         },
@@ -439,6 +450,39 @@
           "type": "boolean",
           "title": "Per band",
           "description": "In a declaration with `variants`: the parameter repeats for every band of each variant, as `b<n>_<symbol>` named `Band <n> <name>`; a `defaultBand` given only its `of` takes the variant's strip and the band's index."
+        }
+      }
+    },
+    "portHint": {
+      "type": "object",
+      "additionalProperties": false,
+      "minProperties": 1,
+      "title": "Port hint",
+      "description": "One port's pinned hints; an empty one is left out.",
+      "properties": {
+        "props": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+:[A-Za-z]+$"
+          },
+          "description": "The port properties, sorted (lv2:integer, lv2:enumeration, lv2:toggled, pprops:logarithmic, ...)."
+        },
+        "unit": {
+          "type": "string",
+          "pattern": "^units:[a-z]+$",
+          "description": "The LV2 unit (units:hz, units:db, ...)."
+        },
+        "points": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "pattern": "^-?[0-9.]+ .+$"
+          },
+          "description": "The labelled scale points, \"<value> <label>\", from the lowest value up."
         }
       }
     },

@@ -14,8 +14,9 @@
  * and parameters of two sorts: the plugin's own (written once) and the per-band ones, marked
  * `"perBand": true`, written once and repeated for every band of a variant, in band order, each
  * band's parameters together: symbol `b<n>_<symbol>`, name `Band <n> <name>`, and a `defaultBand`
- * given only its `of` takes the variant's strip and the band's index. `{bands}` in the prose
- * (`noun`, `description`, `summary`, `manual`) reads the variant's count.
+ * given only its `of` takes the variant's strip and the band's index; a per-band symbol's pinned
+ * port hints (`portHints`) pin every band's port. `{bands}` in the prose (`noun`, `description`,
+ * `summary`, `manual`) reads the variant's count.
  *
  * Each variant is a plugin of its own, in plugins/<variant stem>/, which holds generated files
  * only. Its declaration is the base's, expanded here: stem, name, CLAP id and LV2 URI derived from
@@ -101,9 +102,21 @@ export function expandVariant(contractDir, base, variant) {
     lv2: { ...base.lv2, uri: `urn:openmixer:${short}` },
     params: [...own, ...bands],
   };
+  if (base.portHints) d.portHints = perBandKeys(base.portHints, per, n);
   for (const k of ['noun', 'description', 'summary']) if (d[k] !== undefined) d[k] = fillBands(d[k], n);
   if (d.manual) d.manual = d.manual.map((l) => fillBands(l, n));
   return d;
+}
+
+/** An object keyed by symbol with each per-band symbol's entry repeated for bands 1..n as `b<n>_<symbol>`. */
+function perBandKeys(obj, per, n) {
+  const perBand = new Set(per.map((p) => p.symbol));
+  const out = {};
+  for (const [sym, v] of Object.entries(obj)) {
+    if (!perBand.has(sym)) out[sym] = v;
+    else for (let b = 1; b <= n; b++) out[`b${b}_${sym}`] = v;
+  }
+  return out;
 }
 
 /** The C macro the face reads for the band count: OMX_<SHEET>_<KEY>_MAX of the contract's render. */

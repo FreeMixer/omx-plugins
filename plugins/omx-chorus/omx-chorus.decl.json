@@ -49,5 +49,36 @@
       "name": "Mix",
       "ref": "CHORUS_MIX_RANGE"
     }
-  ]
+  ],
+  "portHints": {
+    "rate": {
+      "props": [
+        "pprops:logarithmic"
+      ],
+      "unit": "units:hz"
+    },
+    "depth": {
+      "unit": "units:ms"
+    },
+    "voices": {
+      "props": [
+        "lv2:integer"
+      ]
+    },
+    "mix": {
+      "unit": "units:pc"
+    },
+    "enabled": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "latency": {
+      "props": [
+        "lv2:integer",
+        "lv2:reportsLatency"
+      ],
+      "unit": "units:frame"
+    }
+  }
 }

@@ -54,5 +54,37 @@
       "ref": "TRANSIENT_LIMITS",
       "field": "outputDb"
     }
-  ]
+  ],
+  "portHints": {
+    "attackDb": {
+      "unit": "units:db"
+    },
+    "sustainDb": {
+      "unit": "units:db"
+    },
+    "attackTimeMs": {
+      "unit": "units:ms"
+    },
+    "sustainTimeMs": {
+      "props": [
+        "lv2:integer"
+      ],
+      "unit": "units:ms"
+    },
+    "outputDb": {
+      "unit": "units:db"
+    },
+    "enabled": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "latency": {
+      "props": [
+        "lv2:integer",
+        "lv2:reportsLatency"
+      ],
+      "unit": "units:frame"
+    }
+  }
 }

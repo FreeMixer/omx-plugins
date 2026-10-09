@@ -88,6 +88,81 @@
       "ref": "DRIVE_HF_ROLLOFFS"
     }
   ],
+  "portHints": {
+    "amount": {
+      "unit": "units:db"
+    },
+    "bandFreq": {
+      "props": [
+        "lv2:integer",
+        "pprops:logarithmic"
+      ],
+      "unit": "units:hz"
+    },
+    "mix": {
+      "unit": "units:pc"
+    },
+    "trim": {
+      "unit": "units:db"
+    },
+    "curve": {
+      "props": [
+        "lv2:enumeration",
+        "lv2:integer"
+      ],
+      "points": [
+        "0 Soft",
+        "1 Tape",
+        "2 Tube",
+        "3 Exciter"
+      ]
+    },
+    "band": {
+      "props": [
+        "lv2:enumeration",
+        "lv2:integer"
+      ],
+      "points": [
+        "0 Full",
+        "1 Low",
+        "2 High",
+        "3 Tilt"
+      ]
+    },
+    "autoGain": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "stereoLink": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "hfRolloff": {
+      "props": [
+        "lv2:enumeration",
+        "lv2:integer"
+      ],
+      "points": [
+        "0 0",
+        "12000 12000",
+        "16000 16000"
+      ]
+    },
+    "enabled": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "latency": {
+      "props": [
+        "lv2:integer",
+        "lv2:reportsLatency"
+      ],
+      "unit": "units:frame"
+    }
+  },
   "panel": {
     "family": "drive",
     "roles": {

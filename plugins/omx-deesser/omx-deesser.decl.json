@@ -69,5 +69,54 @@
         "Wideband"
       ]
     }
-  ]
+  ],
+  "portHints": {
+    "deessFreq": {
+      "props": [
+        "lv2:integer",
+        "pprops:logarithmic"
+      ],
+      "unit": "units:hz"
+    },
+    "deessWidth": {
+      "unit": "units:oct"
+    },
+    "deessThreshold": {
+      "unit": "units:db"
+    },
+    "deessRange": {
+      "unit": "units:db"
+    },
+    "deessAttack": {
+      "unit": "units:ms"
+    },
+    "deessRelease": {
+      "props": [
+        "lv2:integer"
+      ],
+      "unit": "units:ms"
+    },
+    "deessMode": {
+      "props": [
+        "lv2:enumeration",
+        "lv2:integer"
+      ],
+      "points": [
+        "0 Split",
+        "1 Wideband"
+      ]
+    },
+    "enabled": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "latency": {
+      "props": [
+        "lv2:integer",
+        "lv2:reportsLatency"
+      ],
+      "unit": "units:frame"
+    }
+  }
 }

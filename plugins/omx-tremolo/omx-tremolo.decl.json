@@ -48,5 +48,41 @@
         "Pan"
       ]
     }
-  ]
+  ],
+  "portHints": {
+    "rateHz": {
+      "props": [
+        "pprops:logarithmic"
+      ],
+      "unit": "units:hz"
+    },
+    "depth": {
+      "unit": "units:pc"
+    },
+    "mix": {
+      "unit": "units:pc"
+    },
+    "mode": {
+      "props": [
+        "lv2:enumeration",
+        "lv2:integer"
+      ],
+      "points": [
+        "0 Tremolo",
+        "1 Pan"
+      ]
+    },
+    "enabled": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "latency": {
+      "props": [
+        "lv2:integer",
+        "lv2:reportsLatency"
+      ],
+      "unit": "units:frame"
+    }
+  }
 }

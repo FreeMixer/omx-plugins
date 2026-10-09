@@ -97,6 +97,74 @@
     "symbol": "key",
     "name": "Key (Sidechain)"
   },
+  "portHints": {
+    "key": {
+      "props": [
+        "lv2:connectionOptional",
+        "lv2:isSideChain"
+      ]
+    },
+    "enabled": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "key_external": {
+      "props": [
+        "lv2:enumeration",
+        "lv2:integer"
+      ],
+      "points": [
+        "0 Self",
+        "1 Sidechain"
+      ]
+    },
+    "threshold": {
+      "unit": "units:db"
+    },
+    "ratio": {
+      "props": [
+        "pprops:logarithmic"
+      ]
+    },
+    "range": {
+      "unit": "units:db"
+    },
+    "attack": {
+      "unit": "units:ms"
+    },
+    "release": {
+      "unit": "units:ms"
+    },
+    "knee_start": {
+      "props": [
+        "lv2:integer"
+      ],
+      "unit": "units:db"
+    },
+    "knee_end": {
+      "props": [
+        "lv2:integer"
+      ],
+      "unit": "units:db"
+    },
+    "hold": {
+      "props": [
+        "lv2:integer"
+      ],
+      "unit": "units:ms"
+    },
+    "hysteresis": {
+      "unit": "units:db"
+    },
+    "latency": {
+      "props": [
+        "lv2:integer",
+        "lv2:reportsLatency"
+      ],
+      "unit": "units:frame"
+    }
+  },
   "manual": [
     "The console's gate, keyed: the stereo signal is gated while the detector listens to a second, mono",
     "input, the **key** (an LV2 sidechain port; in CLAP a second input port). With nothing routed to the",

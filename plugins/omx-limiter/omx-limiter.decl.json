@@ -42,5 +42,28 @@
       "ref": "LIMITER_LIMITS",
       "field": "releaseMs"
     }
-  ]
+  ],
+  "portHints": {
+    "lookaheadMs": {
+      "unit": "units:ms"
+    },
+    "releaseMs": {
+      "props": [
+        "lv2:integer"
+      ],
+      "unit": "units:ms"
+    },
+    "enabled": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "latency": {
+      "props": [
+        "lv2:integer",
+        "lv2:reportsLatency"
+      ],
+      "unit": "units:frame"
+    }
+  }
 }

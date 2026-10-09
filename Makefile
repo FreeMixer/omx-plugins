@@ -6,7 +6,7 @@
 #
 #   make            build every plugin
 #   make test       every plugin's tests (what the package builds run), then `make hints`
-#   make hints      no LV2 face lost a port hint: tools/port-hints.mjs against each plugin's plugins/<id>/port-hints.json
+#   make hints      no LV2 face lost a port hint: tools/port-hints.mjs against each declaration's `portHints` pin
 #   make recipe-test   the repository's own checks, run by CI beside `make test`:
 #     make completeness  every plugin against recipes/plugin.recipe.json, each gap naming its wizard step;
 #                        a gap not in recipes/completeness-debt.json fails, and so does a paid debt entry

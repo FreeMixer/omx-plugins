@@ -51,6 +51,31 @@
       "ref": "DELAY_PINGPONGS"
     }
   ],
+  "portHints": {
+    "fxDelayTime": {
+      "props": [
+        "lv2:integer"
+      ],
+      "unit": "units:ms"
+    },
+    "pingpong": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "enabled": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "latency": {
+      "props": [
+        "lv2:integer",
+        "lv2:reportsLatency"
+      ],
+      "unit": "units:frame"
+    }
+  },
   "panel": {
     "family": "delay",
     "roles": {

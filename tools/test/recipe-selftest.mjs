@@ -24,8 +24,10 @@
  *      parameter the face takes no argument for, a panel or console naming no parameter, a panel
  *      it cannot draw; and a strict build refuses an argument that binds only by its words.
  *   6. The port hints (tools/port-hints.mjs): a TTL that drops a hint, a declaration that drops a
- *      band type's labels or declares a frequency linear, and a plugin with no pin are each named;
- *      the whole tree is green.
+ *      band type's labels or declares a frequency linear, a plugin with no pin, and a pin moved in a
+ *      declaration that the TTL does not carry are each named; the view follows the declarations
+ *      (`gen --check` stale on a moved pin or a hand edit, and on a per-plugin pin file); the whole
+ *      tree is green.
  *   7. The identity oracle: a wobble control the stand-in render lists with `rearms` (its
  *      `kernels`) is held at its default in every block of the plan, and named in the oracle's
  *      comment, while the rest move; the same render without the flag moves it again; a render
@@ -538,24 +540,35 @@ static inline void omx_wobble_instance_run(OmxWobbleInstance *s, const float *${
       execFileSync('mv', [join(hints, 'plugins/omx-delay9', from), join(hints, 'plugins/omx-delay9', to)]);
     const d9 = JSON.parse(readFileSync(join(hints, 'plugins/omx-delay9/omx-delay9.decl.json'), 'utf8'));
     d9.stem = 'omx-delay9';
+    delete d9.portHints; // the copy brought delay's pin along, in its declaration
     writeFileSync(join(hints, 'plugins/omx-delay9/omx-delay9.decl.json'), JSON.stringify(d9, null, 2));
-    rmSync(join(hints, 'plugins/omx-delay9/port-hints.json')); // the copy brought delay's pin along
     named('a plugin with no pin', 'omx-delay9: no pinned hints');
-    // the per-plugin file is the pin: a hint moved there moves the assembled view, a hand edit of the view goes stale
-    const f16 = join(hints, 'plugins/omx-eq16/port-hints.json'), p16 = readFileSync(f16, 'utf8');
+    rmSync(join(hints, 'plugins/omx-delay9'), { recursive: true });
+    // the declaration is the pin: a hint moved there moves the assembled view and is held against the
+    // TTL; a hand edit of the view goes stale; a per-plugin pin file beside the declaration is refused
+    const fEq = join(hints, 'plugins/omx-eq/omx-eq.decl.json'), pEq = readFileSync(fEq, 'utf8');
     const view = () => readFileSync(join(hints, 'tools/test/port-hints.json'), 'utf8');
     const gen = (...a) => spawnSync('node', ['tools/gen.mjs', ...a], { cwd: hints, encoding: 'utf8' });
     gen();
     const v0 = view();
-    writeFileSync(f16, p16.replace('units:db', 'units:pc'));
-    expect(gen('--check').status === 1, 'port hints: a hint moved in one plugin\'s file leaves the view stale');
+    const moved = JSON.parse(pEq);
+    moved.portHints.gain.unit = 'units:pc';
+    writeFileSync(fEq, `${JSON.stringify(moved, null, 2)}\n`);
+    expect(gen('--check').status === 1, 'port hints: a hint moved in a declaration leaves the view stale');
     gen();
-    expect(view() !== v0 && JSON.parse(view())['omx-eq16'].b1_gain.unit === 'units:pc' && gen('--check').status === 0, 'port hints: and regenerating moves the view');
-    writeFileSync(f16, p16);
+    expect(view() !== v0 && ['omx-eq8', 'omx-eq16', 'omx-eq32'].every((s) => JSON.parse(view())[s].b1_gain.unit === 'units:pc' && JSON.parse(view())[s][`b${s === 'omx-eq8' ? 8 : 16}_gain`].unit === 'units:pc') && gen('--check').status === 0,
+      'port hints: and regenerating moves the view, the per-band pin on every band of every variant');
+    named('a pin the TTL does not carry', 'omx-eq16: port "b16_gain" lost units:unit units:pc');
+    writeFileSync(fEq, pEq);
     gen();
+    expect(view() === v0 && hintErrors(hints).length === 0, 'port hints: the declaration restored, the view and the check whole again');
     writeFileSync(join(hints, 'tools/test/port-hints.json'), v0.replace('units:db', 'units:pc'));
     expect(gen('--check').status === 1, 'port hints: a hand edit of the generated view goes stale');
     gen();
+    writeFileSync(join(hints, 'plugins/omx-tremolo/port-hints.json'), '{}\n');
+    const stray = gen('--check');
+    expect(stray.status === 1 && /plugins\/omx-tremolo\/port-hints\.json/.test(stray.stderr), `port hints: a per-plugin pin file is refused (${stray.stderr.trim().split('\n')[0] || 'NOT REFUSED'})`);
+    rmSync(join(hints, 'plugins/omx-tremolo/port-hints.json'));
     expect(view() === v0 && gen('--check').status === 0, 'port hints: restored, the view is whole again');
   }
 
