@@ -18,7 +18,7 @@
 NAME       := omx-phaser
 URI        := urn:openmixer:phaser
 CLAP_ID    := org.openmixer.phaser
-OMXDSP_MIN ?= 0.3.0
+OMXDSP_MIN ?= 0.4.0
 ROOT       := $(abspath ../..)
 GEN        := generated
 B          := build
