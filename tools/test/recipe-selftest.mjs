@@ -242,11 +242,15 @@ async function main() {
   const unheld = await ratchet();
   undo();
   expect(unheld.fresh.includes("omx-drive manual-section"), `sabotage: a gap the debt does not hold fails the ratchet (${unheld.fresh.join(", ")})`);
-  undo = edit('README.md', (s) => `${s}\n### omx chorus\n`);
-  const paid = await ratchet();
-  undo();
-  expect(paid.stale.some((x) => x.startsWith('omx-chorus manual-section')), `sabotage: a debt entry now satisfied fails the ratchet as stale (${paid.stale.join(', ')})`);
-
+  // a debt entry that is now satisfied: write the first owed manual section (whichever plugin still owes one)
+  const owed = loadDebt(t).find((d) => d.entry === 'manual-section');
+  if (owed) {
+    const heading = JSON.parse(readFileSync(join(t, 'plugins', owed.plugin, `${owed.plugin}.decl.json`), 'utf8')).name;
+    undo = edit('README.md', (s) => `${s}\n### ${heading}\n`);
+    const paid = await ratchet();
+    undo();
+    expect(paid.stale.some((x) => x.startsWith(`${owed.plugin} manual-section`)), `sabotage: a debt entry now satisfied fails the ratchet as stale (${paid.stale.join(', ')})`);
+  }
   const ghost = await (async () => {
     const reports = [];
     for (const st of pluginStems(t)) reports.push(await checkPlugin(t, recipe, st));
