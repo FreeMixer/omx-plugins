@@ -2352,6 +2352,55 @@
       "points": []
     }
   },
+  "omx-phaser": {
+    "rateHz": {
+      "props": [
+        "pprops:logarithmic"
+      ],
+      "unit": "units:hz",
+      "points": []
+    },
+    "baseHz": {
+      "props": [
+        "lv2:integer",
+        "pprops:logarithmic"
+      ],
+      "unit": "units:hz",
+      "points": []
+    },
+    "depthOct": {
+      "props": [],
+      "unit": "units:oct",
+      "points": []
+    },
+    "stages": {
+      "props": [
+        "lv2:integer"
+      ],
+      "unit": null,
+      "points": []
+    },
+    "mix": {
+      "props": [],
+      "unit": "units:pc",
+      "points": []
+    },
+    "enabled": {
+      "props": [
+        "lv2:toggled"
+      ],
+      "unit": null,
+      "points": []
+    },
+    "latency": {
+      "props": [
+        "lv2:integer",
+        "lv2:reportsLatency"
+      ],
+      "unit": "units:frame",
+      "points": []
+    }
+  },
   "omx-strip": {
     "trimDb": {
       "props": [],
