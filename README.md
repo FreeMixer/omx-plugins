@@ -21,6 +21,7 @@ drawn from one declaration: its CLAP parameters, its LV2 ports and its MOD GUI c
 | **omx eq8** | `org.openmixer.eq8` | `urn:openmixer:eq8` | The console's channel EQ in its eight-band form: eight parametric bands (bell, shelves, notch, all-pass) plus high- and low-pass filters at 12 or 24 dB/oct. Stereo, zero latency, 44.1 to 192 kHz. |
 | **omx eq16** | `org.openmixer.eq16` | `urn:openmixer:eq16` | The console's channel EQ in its 16-band form: sixteen parametric bands (bell, shelves, notch, all-pass) plus high- and low-pass filters at 12 or 24 dB/oct. Stereo, zero latency, 44.1 to 192 kHz. |
 | **omx eq32** | `org.openmixer.eq32` | `urn:openmixer:eq32` | The console's channel EQ in its 32-band form: thirty-two parametric bands (bell, shelves, notch, all-pass) plus high- and low-pass filters at 12 or 24 dB/oct. Stereo, zero latency, 44.1 to 192 kHz. |
+| **omx geq** | `org.openmixer.geq` | `urn:openmixer:geq` | The console's 31-band graphic EQ: one fader per ISO third-octave band, 20 Hz to 20 kHz, ±15 dB each, designed in double precision so the lowest bands hold their shape at 192 kHz. Stereo, zero latency, 44.1 to 192 kHz. |
 | **omx keyed-gate** | `org.openmixer.keyed-gate` | `urn:openmixer:keyed-gate` | The console's channel gate with a sidechain key: the detector listens to the key your host routes to it, or to the signal itself. One gain for both legs, so the stereo image never shifts. Real-time safe, 44.1 to 192 kHz. |
 | **omx phaser** | `org.openmixer.phaser` | `urn:openmixer:phaser` | The console's phaser: identical all-pass sections swept in octaves by one oscillator, with feedback around the chain and a wet/dry mix. |
 | **omx pitch** | `org.openmixer.pitch` | `urn:openmixer:pitch` | The console's pitch shifter: shifts both channels up or down by semitones and cents, without changing their length, mixed with the dry signal. |
@@ -95,6 +96,44 @@ the console.
 Plus the host's bypass. Every band and filter starts off, so a freshly loaded instance passes the
 signal untouched. The bands' frequencies start spread from 22 Hz to 18 kHz, as on
 the console.
+
+### omx geq
+
+| Parameter | Range | Default |
+|---|---|---|
+| 20 Hz | -15 to 15 dB | 0 dB |
+| 25 Hz | -15 to 15 dB | 0 dB |
+| 31.5 Hz | -15 to 15 dB | 0 dB |
+| 40 Hz | -15 to 15 dB | 0 dB |
+| 50 Hz | -15 to 15 dB | 0 dB |
+| 63 Hz | -15 to 15 dB | 0 dB |
+| 80 Hz | -15 to 15 dB | 0 dB |
+| 100 Hz | -15 to 15 dB | 0 dB |
+| 125 Hz | -15 to 15 dB | 0 dB |
+| 160 Hz | -15 to 15 dB | 0 dB |
+| 200 Hz | -15 to 15 dB | 0 dB |
+| 250 Hz | -15 to 15 dB | 0 dB |
+| 315 Hz | -15 to 15 dB | 0 dB |
+| 400 Hz | -15 to 15 dB | 0 dB |
+| 500 Hz | -15 to 15 dB | 0 dB |
+| 630 Hz | -15 to 15 dB | 0 dB |
+| 800 Hz | -15 to 15 dB | 0 dB |
+| 1 kHz | -15 to 15 dB | 0 dB |
+| 1.25 kHz | -15 to 15 dB | 0 dB |
+| 1.6 kHz | -15 to 15 dB | 0 dB |
+| 2 kHz | -15 to 15 dB | 0 dB |
+| 2.5 kHz | -15 to 15 dB | 0 dB |
+| 3.15 kHz | -15 to 15 dB | 0 dB |
+| 4 kHz | -15 to 15 dB | 0 dB |
+| 5 kHz | -15 to 15 dB | 0 dB |
+| 6.3 kHz | -15 to 15 dB | 0 dB |
+| 8 kHz | -15 to 15 dB | 0 dB |
+| 10 kHz | -15 to 15 dB | 0 dB |
+| 12.5 kHz | -15 to 15 dB | 0 dB |
+| 16 kHz | -15 to 15 dB | 0 dB |
+| 20 kHz | -15 to 15 dB | 0 dB |
+
+Plus the host's bypass.
 
 ### omx keyed-gate
 
