@@ -18,7 +18,7 @@
 NAME       := omx-rotary
 URI        := urn:openmixer:rotary
 CLAP_ID    := org.openmixer.rotary
-OMXDSP_MIN ?= 0.4.0
+OMXDSP_MIN ?= 0.4.1
 ROOT       := $(abspath ../..)
 GEN        := generated
 B          := build
