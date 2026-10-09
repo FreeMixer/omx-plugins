@@ -7,6 +7,11 @@
  *
  *   node tools/omx-new-plugin.mjs --from-contract <kernel> [--stem omx-<x>] [--root <tree>]
  *                                 [--plan-json <file>] [--no-run]
+ *   node tools/omx-new-plugin.mjs --from-contract <k1>,<k2>,... --stem omx-<x> [...]
+ *
+ * Several kernels draft a composite (`binding: chain`, spec 2026-10-09-plugin-from-contract §15.2):
+ * one element per kernel in the order given, each drafted as a single plugin's parameters are, and
+ * each refused, naming the omx-dsp work, when its kernel has no instance face of the generated shape.
  *
  * The declaration plugins/<stem>/<stem>.decl.json is the input and the output; there is no
  * answers file.
@@ -32,6 +37,7 @@ import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { bindFace, instanceHeader, parseFace } from './instance-face.mjs';
 import { PIN_FILE, contractPin, controlOf, items, kernelControls, kernelExists, locateContract, resolveParam } from './omx-contract.mjs';
+import { chainBindings, prepareDecl } from './gen.mjs';
 import { ROOT, checkPlugin, gapLines, layerOfPath, loadRecipe, loadSchema, pluginFacts, pluginStems, validate } from './plugin-recipe.mjs';
 import { omxdspInclude } from './template.mjs';
 import { expandVariant } from './variants.mjs';
@@ -49,7 +55,9 @@ const DERIVERS = {
   '/version': (_d, ctx) => ctx.version,
   '/clap/id': (d) => `org.openmixer.${d.stem.replace(/^omx-/, '')}`,
   '/lv2/uri': (d) => `urn:openmixer:${d.stem.replace(/^omx-/, '')}`,
-  '/$comment': (d) => `THE declaration of ${d.stem}, the folder's one hand-written file. Every other file of the folder is generated from it by tools/gen.mjs. Its parameters are by reference to omx-contract's ${d.kernel} kernel and bind by name to omx-dsp's instance face. Parameter order is append-only.`,
+  '/$comment': (d) => (d.binding === 'chain'
+    ? `THE declaration of ${d.stem}, the folder's one hand-written file. Every other file of the folder is generated from it by tools/gen.mjs. A chain of omx-dsp instance faces (${d.chain.map((el) => el.kernel).join(', ')}): each element's parameters are by reference to omx-contract's kernel of that element and bind by name to its face. The parameter list is generated from the chain and is append-only.`
+    : `THE declaration of ${d.stem}, the folder's one hand-written file. Every other file of the folder is generated from it by tools/gen.mjs. Its parameters are by reference to omx-contract's ${d.kernel} kernel and bind by name to omx-dsp's instance face. Parameter order is append-only.`),
 };
 
 const getPtr = (obj, ptr) => ptr.split('/').slice(1).reduce((o, k) => o?.[k], obj);
@@ -184,6 +192,7 @@ export async function planPlugin(declIn, src, { root = ROOT, recipe = loadRecipe
   const schema = loadSchema(root, recipe);
   const refusals = [];
   const refuse = (field, reason) => refusals.push({ field, reason });
+  refuse.count = () => refusals.length;
   const decl = structuredClone(declIn);
   const marks = reviewMarks(decl);
   for (const m of marks) refuse(m, 'still marked REVIEW: a person settles it');
@@ -228,6 +237,14 @@ export async function planPlugin(declIn, src, { root = ROOT, recipe = loadRecipe
   const bound = bindFace(src.face, decl.params, controls);
   for (const e of bound.errors) refuse('/params', e);
 
+  await checkPanelConsole(decl, symbols, resolved, refuse, root);
+
+  return { ok: refusals.length === 0, refusals, decl: canonical(schema, decl), resolved, binding: bound.binding, renames: bound.renames, pin: src.pin };
+}
+
+/** The panel and the console name declared parameters, and the panel draws every one of them as
+ * the MOD GUI generator will draw it (selectors included). */
+async function checkPanelConsole(decl, symbols, resolved, refuse, root) {
   // the panel and the console name declared parameters
   for (const s of decl.panel?.sections ?? []) for (const c of s.controls) if (!symbols.has(c)) refuse('/panel/sections', `section '${s.key}' names '${c}', which is no parameter`);
   for (const [role, sym] of Object.entries(decl.panel?.roles ?? {})) if (!symbols.has(sym)) refuse(`/panel/roles/${role}`, `'${sym}' is no parameter`);
@@ -237,19 +254,134 @@ export async function planPlugin(declIn, src, { root = ROOT, recipe = loadRecipe
     for (const h of holes(t)) if (!symbols.has(h)) refuse(at, `{${h}} is no parameter`);
 
   // the panel, drawn as the MOD GUI generator will draw it (every parameter on it, selectors included)
-  if (decl.panel && !refusals.length) {
+  if (decl.panel && !refuse.count()) {
     const mg = await import(join(root, 'tools', 'modgui-gen.mjs'));
     try {
       mg.resolvePanel({ ...decl, params: resolved });
       const drawn = new Set(decl.panel.sections.flatMap((x) => x.controls));
-      const undrawn = decl.params.filter((p) => !drawn.has(p.symbol)).map((p) => p.symbol);
+      const undrawn = resolved.filter((p) => !drawn.has(p.symbol)).map((p) => p.symbol);
       if (undrawn.length) throw new Error(`the MOD GUI draws every parameter (tools/modgui-test.sh), and the panel leaves out ${undrawn.join(', ')}`);
     } catch (e) {
       refuse('/panel', `${e.message}; put every parameter on the panel, or leave the panel out and the MOD GUI draws every parameter in one section`);
     }
   }
+}
 
-  return { ok: refusals.length === 0, refusals, decl: canonical(schema, decl), resolved, binding: bound.binding, renames: bound.renames, pin: src.pin };
+// ---- a composite: --from-contract <k1>,<k2>,... (spec 2026-10-09-plugin-from-contract §15.2) -------
+
+/** Each element's kernel sources (kernelSources), and every refusal among them, each naming its kernel. */
+export function chainSources(kernels, { root = ROOT } = {}) {
+  const srcs = kernels.map((k) => kernelSources(k, { root }));
+  const refusals = srcs.flatMap((src, i) => src.refusals.map((r) => ({ ...r, field: `${kernels[i]}: ${r.field}` })));
+  if (kernels.length < 2) refusals.push({ field: '--from-contract', reason: 'a chain runs two or more kernels' });
+  return { refusals, srcs, kernels, contract: srcs[0]?.contract, pin: srcs[0]?.pin };
+}
+
+const cap = (w) => `${w[0].toUpperCase()}${w.slice(1)}`;
+
+/**
+ * The draft declaration of a chain over `kernels`, in the order given: one element per kernel, its
+ * parameters drafted as a single plugin's are (one per resolve() argument, by reference, a set's
+ * labels the contract does not give marked REVIEW), each symbol carrying the element's id in front;
+ * a per-band control repeated for each band of the count sheet entry `bands` (the stem's short name
+ * when the sheet has it, else REVIEW). Each element's switch default and every design choice of the
+ * plugin are marked REVIEW.
+ */
+export function draftChain(kernels, chainSrc, { root = ROOT, recipe = loadRecipe(root), stem } = {}) {
+  const short = stem.replace(/^omx-/, '');
+  const refusals = [];
+  const notes = [];
+  const seen = {};
+  const chain = kernels.map((kernel, i) => {
+    const src = chainSrc.srcs[i];
+    const base = kernel.replace(/_/g, '');
+    seen[base] = (seen[base] ?? 0) + 1;
+    const id = kernels.filter((k) => k.replace(/_/g, '') === base).length > 1 ? `${base}${seen[base]}` : base;
+    const name = labelOf(id);
+    const controls = kernelControls(src.contract, kernel);
+    const asParams = controls.map((c) => ({ symbol: c.name, ref: c.ref, ...(c.field ? { field: c.field } : {}) }));
+    const bound = bindFace(src.face, asParams, controls, { strict: false });
+    for (const reason of bound.errors) refusals.push({ field: `${kernel}: omx-dsp`, reason });
+    if (bound.errors.length) return undefined;
+    const el = { id, kernel, name, on: `${REVIEW}: the switch's default, true or false`, params: [] };
+    const one = (b) => {
+      const p = { symbol: `${id}${cap(b.param.symbol)}`, name: `${name} ${labelOf(b.param.symbol)}`, ref: b.param.ref, ...(b.param.field ? { field: b.param.field } : {}) };
+      const e = items(src.contract)[p.ref];
+      if (e.kind === 'set' && !e.value.every((x) => typeof x === 'number') && !e.labels) p.values = e.value.map((v) => `${REVIEW}: the label of ${v}`);
+      return p;
+    };
+    const bands = bound.binding.filter((b) => b.extent);
+    el.params.push(...bound.binding.filter((b) => !b.extent).map(one));
+    if (bands.length) {
+      const sheet = controls.find((c) => c.count)?.count;
+      const counts = sheet ? items(src.contract)[sheet]?.value ?? {} : {};
+      const key = short in counts ? short : Object.keys(counts)[0];
+      const n = counts[key]?.max;
+      if (!Number.isInteger(n)) {
+        refusals.push({ field: `${kernel}: omx-contract`, reason: `the per-band controls of ${kernel} name no count sheet with a max per entry` });
+        return undefined;
+      }
+      el.bands = short in counts ? key : `${REVIEW}: the key of ${sheet} whose max is the band count (${Object.keys(counts).join(', ')}); drafted with ${key}'s ${n}`;
+      for (let k = 1; k <= n; k++)
+        for (const b of bands) {
+          const p = one(b);
+          el.params.push({ ...p, symbol: `${id}${k}${cap(b.param.symbol)}`, name: `${name} ${k} ${labelOf(b.param.symbol)}` });
+        }
+    }
+    if (src.face.keyed) notes.push(`element '${id}': its face takes a key; name it in "key" (with a "sidechain"), or pass its key-source control in "fixed" and leave it out of "params"`);
+    return el;
+  });
+  if (refusals.length) return { refusals };
+  const schema = loadSchema(root, recipe);
+  const decl = {
+    stem, kernel: short.replace(/-/g, '_'),
+    description: `${REVIEW}: one plain sentence a host shows, what the effect does for you`,
+    clap: { features: ['audio-effect', `${REVIEW}: the CLAP kind (mixing, dynamics, ...)`, 'stereo'] },
+    lv2: { class: `${REVIEW}: the LV2 class (lv2:MixerPlugin, lv2:DynamicsPlugin, ...)` },
+    binding: 'chain',
+    chain,
+  };
+  fillDerived(decl, { schema, version: treeVersion(root, recipe) }, recipe);
+  return { refusals: [], decl: canonical(schema, decl), notes };
+}
+
+/** A chain's plan: everything planPlugin checks, each element bound to its own face by tools/gen.mjs's
+ * own reading of the declaration (prepareDecl, chainBindings), writing nothing. */
+export async function planChain(declIn, chainSrc, { root = ROOT, recipe = loadRecipe(root) } = {}) {
+  const schema = loadSchema(root, recipe);
+  const refusals = [];
+  const refuse = (field, reason) => refusals.push({ field, reason });
+  refuse.count = () => refusals.length;
+  const decl = structuredClone(declIn);
+  const marks = reviewMarks(decl);
+  for (const m of marks) refuse(m, 'still marked REVIEW: a person settles it');
+  if (marks.length) return { ok: false, refusals };
+  if (decl.binding !== 'chain') refuse('/binding', 'is not "chain": several kernels make a chain');
+  fillDerived(decl, { schema, version: treeVersion(root, recipe) }, recipe, refuse);
+  for (const e of validate(schema, schema, decl)) refuse(e.split(':')[0], `schema: ${e.slice(e.indexOf(':') + 2)}`);
+  if (refusals.length) return { ok: false, refusals };
+  const kernels = (decl.chain ?? []).map((el) => el.kernel);
+  if (JSON.stringify(kernels) !== JSON.stringify(chainSrc.kernels)) refuse('/chain', `runs ${kernels.join(', ')}, and --from-contract names ${chainSrc.kernels.join(', ')}`);
+  const here = pluginStems(root).includes(decl.stem) ? pluginFacts(root, decl.stem) : undefined;
+  if (here && here.kernel !== decl.kernel) refuse('/stem', `plugins/${decl.stem} is the ${here.kernel} plugin's folder`);
+  for (const st of pluginStems(root).filter((x) => x !== decl.stem)) {
+    const o = pluginFacts(root, st);
+    if (o.clapId === decl.clap.id) refuse('/clap/id', `'${decl.clap.id}' is ${st}'s`);
+    if (o.uri === decl.lv2.uri) refuse('/lv2/uri', `'${decl.lv2.uri}' is ${st}'s`);
+  }
+  if (refusals.length) return { ok: false, refusals };
+  let d;
+  let bound = [];
+  try {
+    d = prepareDecl(join(root, 'plugins', decl.stem, `${decl.stem}.decl.json`), structuredClone(decl), decl.stem);
+    bound = chainBindings(d);
+  } catch (e) {
+    refuse('/chain', e.message);
+    return { ok: false, refusals };
+  }
+  await checkPanelConsole(decl, new Set(d.params.map((p) => p.symbol)), d.params, refuse, root);
+  const renames = bound.flatMap((b) => b.renames);
+  return { ok: refusals.length === 0, refusals, decl: canonical(schema, decl), resolved: d.params, binding: bound.flatMap((b) => b.binding), renames, pin: chainSrc.pin };
 }
 
 // ---- writing: the declaration, then every generated file ---------------------------------------
@@ -271,7 +403,7 @@ export function writePlugin(plan, { root = ROOT } = {}) {
     writeFileSync(join(root, rel), text);
   }
   // a generated plugin always has its MOD GUI: its declared panel, or gen.mjs's one section of every parameter
-  const tools = [[join(root, 'tools', 'gen.mjs')], ...(d.panel || d.binding === 'instance' ? [[join(root, 'tools', 'modgui-gen.mjs'), join(root, 'plugins', d.stem)]] : [])];
+  const tools = [[join(root, 'tools', 'gen.mjs')], ...(d.panel || d.binding === 'instance' || d.binding === 'chain' ? [[join(root, 'tools', 'modgui-gen.mjs'), join(root, 'plugins', d.stem)]] : [])];
   for (const args of tools) {
     const r = run('node', args, { cwd: root });
     if (r.code !== 0) throw new Error(`${relative(root, args[0])}: ${r.out.trim()}`);
@@ -301,7 +433,7 @@ export function commitPlan(recipe, plan, files) {
 
 function usage(msg) {
   if (msg) process.stderr.write(`omx-new-plugin: ${msg}\n`);
-  process.stderr.write('usage: omx-new-plugin.mjs --from-contract <kernel> [--stem omx-<x>] [--root <tree>] [--plan-json <file>] [--no-run]\n');
+  process.stderr.write('usage: omx-new-plugin.mjs --from-contract <kernel>[,<kernel>...] [--stem omx-<x>] [--root <tree>] [--plan-json <file>] [--no-run]\n');
   process.exit(2);
 }
 
@@ -319,8 +451,9 @@ async function main(argv) {
   if (!kernel) usage('--from-contract <kernel> is required');
   const root = resolve(opt('--root') ?? ROOT);
   const recipe = loadRecipe(root);
-  const stem = opt('--stem') ?? `omx-${kernel.replace(/_/g, '-')}`;
+  const stem = opt('--stem') ?? `omx-${kernel.replace(/_/g, '-').replace(/,/g, '-')}`;
   const declPath = join(root, 'plugins', stem, `${stem}.decl.json`);
+  if (kernel.includes(',')) return chainMain(kernel.split(','), { root, recipe, stem, declPath, argv, opt });
 
   const src = kernelSources(kernel, { root });
   if (src.refusals.length) refused(src.refusals);
@@ -344,6 +477,11 @@ async function main(argv) {
   const plan = await planPlugin(raw, src, { root, recipe });
   if (!plan.ok) refused(plan.refusals);
   for (const b of plan.renames) console.log(`note: resolve argument '${b.arg}' binds '${b.param.symbol}' by its words; omx-dsp's name conformance owes the rename to '${b.rename}'`);
+  return finish(plan, { root, recipe, stem, argv, opt });
+}
+
+/** Write a settled plan, print its commit plan, then run the plugin's make test and completeness. */
+async function finish(plan, { root, recipe, stem, argv, opt }) {
   const files = writePlugin(plan, { root });
   console.log(`\nwritten (${files.length}):`);
   for (const f of files) console.log(`  ${f}`);
@@ -363,6 +501,29 @@ async function main(argv) {
   console.log(`completeness for ${stem}: ${gaps.length ? `${gaps.length} owed entries left` : 'complete'}`);
   for (const g of gaps) console.log(`  [ ] ${g}`);
   if (make.code !== 0 || gaps.length) process.exit(1);
+}
+
+/** `--from-contract <k1>,<k2>,...`: draft the chain, or plan and write a settled one. */
+async function chainMain(kernels, { root, recipe, stem, declPath, argv, opt }) {
+  const src = chainSources(kernels, { root });
+  if (src.refusals.length) refused(src.refusals);
+  console.log(`omx-contract ${contractPin(root)}: ${kernels.map((k) => `data/kernels/${k}.json`).join(', ')}; omx-dsp: ${src.srcs.map((x) => x.header).join(', ')}`);
+  if (!existsSync(declPath)) {
+    const draft = draftChain(kernels, src, { root, recipe, stem });
+    if (draft.refusals.length) refused(draft.refusals);
+    mkdirSync(dirname(declPath), { recursive: true });
+    writeFileSync(declPath, `${JSON.stringify(draft.decl, null, 2)}\n`);
+    console.log(`drafted ${relative(root, declPath)}: a chain of ${kernels.length} elements (${draft.decl.chain.map((el) => `${el.id} ${el.params.length}`).join(', ')} parameters), one per resolve() argument`);
+    for (const n of draft.notes) console.log(`note: ${n}`);
+    console.log('settle each mark, then run the same command again:');
+    for (const m of reviewMarks(draft.decl)) console.log(`  [ ] ${m}`);
+    console.log('  [ ] review each parameter\'s name; add "order": "permutable", "summary", "manual", "panel" or "console" where wanted');
+    return;
+  }
+  const plan = await planChain(JSON.parse(readFileSync(declPath, 'utf8')), src, { root, recipe });
+  if (!plan.ok) refused(plan.refusals);
+  for (const b of plan.renames) console.log(`note: resolve argument '${b.arg}' binds '${b.param.symbol}' by its words; omx-dsp's name conformance owes the rename to '${b.rename}'`);
+  return finish(plan, { root, recipe, stem, argv, opt });
 }
 
 /**
