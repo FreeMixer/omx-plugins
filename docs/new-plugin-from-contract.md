@@ -74,6 +74,14 @@ builds must equal omx-dsp's instance face called directly, bit for bit, at every
 the signal, and a reference rendered with one parameter one step off must differ from the faces
 (the sabotage arm), so a test that could not see a wrong coefficient fails.
 
+A parameter whose contract control declares `rearms` is held at its default in every block. Such a
+control re-arms the kernel's state when it changes, so it is not a smooth parameter: the limiter's
+look-ahead, for example, rebuilds the rings and restarts the gain at unity. Moving it between blocks
+would test the re-arm, not the identity. The flag is read from omx-contract's JSON render, where
+`kernels.<kernel>.controls` lists each kernel's controls in declared order (omx-contract 2.1.0 and
+later). The oracle's header comment names each held parameter, and the sabotage arm still moves it
+by one step. The other parameters move as before.
+
 ## What it does not do
 
 Placement, the console's card and chip, and the panel's widgets are declared here and checked
