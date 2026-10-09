@@ -125,11 +125,16 @@ export function draftDeclaration(kernel, src, { root = ROOT, recipe = loadRecipe
   const asParams = controls.map((c) => ({ symbol: c.name, ref: c.ref, ...(c.field ? { field: c.field } : {}) }));
   const bound = bindFace(src.face, asParams, controls, { strict: false });
   if (bound.errors.length) return { refusals: bound.errors.map((reason) => ({ field: 'omx-dsp', reason })) };
-  const params = bound.binding.map((b) => {
+  const params = bound.binding.flatMap((b) => {
     const p = { symbol: b.param.symbol, name: labelOf(b.param.symbol), ref: b.param.ref, ...(b.param.field ? { field: b.param.field } : {}) };
     const e = items(src.contract)[p.ref];
     if (e.kind === 'set' && !e.value.every((x) => typeof x === 'number') && !e.labels) p.values = e.value.map((id) => `${REVIEW}: the label of ${id}`);
-    return p;
+    if (!b.extent) return [p];
+    // a per-band array: one parameter per band, the count the contract renders as the extent
+    const n = items(src.contract)[b.extent.replace(/^OMX_/, '')]?.value;
+    if (!Number.isInteger(n) || n < 1) throw new Error(`resolve argument '${b.arg}[${b.extent}]': omx-contract renders no count ${b.extent.replace(/^OMX_/, '')}`);
+    const w = String(n).length;
+    return Array.from({ length: n }, (_x, k) => ({ ...p, symbol: `${p.symbol}${String(k + 1).padStart(w, '0')}`, name: `${p.name} ${k + 1}` }));
   });
   const schema = loadSchema(root, recipe);
   const decl = {

@@ -31,7 +31,10 @@ Step 1 checks before it writes:
 - omx-dsp has the kernel's instance face, in the shape the generated binding calls (`init(s, sr)`,
   `resolve(s, bypass, <one scalar per control>)`, `run(s, in_l, in_r, out_l, out_r, n)`); a kernel
   without one, or with a face of another shape (ring buffers handed in, a ports struct), is refused
-  with the omx-dsp work named;
+  with the omx-dsp work named. A control the kernel takes once per band is one array argument,
+  `const float band[OMX_GEQ_BANDS]`, sized by a count the contract renders: the draft gives it one
+  parameter per band (`band01` … `band31`), the binding passes them in declaration order, and the
+  generated code asserts their count is the extent;
 - every `resolve` argument binds to exactly one contract control BY NAME: the argument is the
   control's name in snake case (`attackDb` → `attack_db`). An argument that still carries an older
   short name (`attack_ms` for `attackTimeMs`) binds when its words are, in order, a unique subset

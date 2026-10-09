@@ -416,6 +416,20 @@ static inline void omx_wobble_instance_run(OmxWobbleInstance *s, const float *in
     expect(!loose.errors.length && loose.renames[0]?.rename === 'rate_hz' && strict.errors.some((e) => e.includes("'rate'")),
       `an argument that binds only by its words is a rename owed, refused when strict (${loose.renames.map((r) => `${r.arg}->${r.rename}`).join(', ')}; ${strict.errors[0] ?? 'NOT REFUSED'})`);
   }
+  {
+    const face = (arg) => parseFace(`static inline int omx_wobble_instance_init(OmxWobbleInstance *s, float sr) { return 1; }
+static inline void omx_wobble_instance_resolve(OmxWobbleInstance *s, int bypass, ${arg}, float mix) { }
+static inline void omx_wobble_instance_run(OmxWobbleInstance *s, const float *in_l, const float *in_r, float *out_l, float *out_r, uint32_t n) { }
+#define OMX_WOBBLE_INSTANCE_LATENCY_FRAMES 0.0f`, 'wobble');
+    const ps = [{ symbol: 'band1' }, { symbol: 'mix' }, { symbol: 'band2' }, { symbol: 'band3' }];
+    const cs = [{ name: 'band' }, { name: 'mix' }, { name: 'band' }, { name: 'band' }];
+    const b = bindFace(face('const float band[OMX_WOBBLE_BANDS]'), ps, cs);
+    const arr = b.binding.find((x) => x.arg === 'band');
+    expect(!b.errors.length && arr?.extent === 'OMX_WOBBLE_BANDS' && arr.params.map((p) => p.symbol).join() === 'band1,band2,band3',
+      `a per-band array argument binds every parameter of its control, in declaration order (${arr?.params?.map((p) => p.symbol).join() ?? b.errors[0]})`);
+    const literal = face('const float band[3]');
+    expect(/not one scalar/.test(literal.error ?? ''), `a per-band array of literal extent is named, not bound (${literal.error ?? 'ACCEPTED'})`);
+  }
 
   // ---- 6. the port hints ---------------------------------------------------------------------
   delete process.env.OMX_CONTRACT_DIR; // the real tree reads the release it pins

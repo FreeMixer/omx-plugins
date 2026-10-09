@@ -369,12 +369,15 @@ export function generateInstance(d) {
   const { face, binding, renames } = bindingOf(d);
   const K = d.kernel.toUpperCase();
   const macro_ = (sym) => `OMX_${K}_PARAM_${macro(sym)}`;
-  const value = (b) => (b.type === 'int' ? `(int)lrintf(values[${macro_(b.param.symbol)}])` : `values[${macro_(b.param.symbol)}]`);
+  const one = (type, sym) => (type === 'int' ? `(int)lrintf(values[${macro_(sym)}])` : `values[${macro_(sym)}]`);
+  // a per-band array: a compound literal of its parameters, in declaration order
+  const value = (b) => (b.extent ? `(const ${b.elem}[${b.extent}]){${b.params.map((p) => one(b.elem, p.symbol)).join(', ')}}` : one(b.type, b.param.symbol));
   const lat = (self) => (face.latency.fn ? `${face.latency.fn}(${self})` : face.latency.macro);
   const view = {
     ...templateView(d),
     faceType: face.type, srType: face.srType,
     binding: binding.map((b) => ({ arg: b.arg, value: value(b) })),
+    arrays: binding.filter((b) => b.extent).map((b) => ({ arg: b.arg, count: b.params.length, extent: b.extent })),
     renames: renames.map((b) => ({ arg: b.arg, rename: b.rename })),
     latency: lat('&c->inst'), refLatency: lat('&inst'),
     plan: oraclePlan(d.params), steps: d.params.map((p) => cfloat(stepOf(p))).join(', '),
