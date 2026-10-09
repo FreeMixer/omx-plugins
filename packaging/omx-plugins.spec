@@ -108,6 +108,7 @@ parameter header, installed in %{_includedir}/omx-plugins.
 /usr/lib/clap/omx-keyed-gate.clap
 /usr/lib/clap/omx-phaser.clap
 /usr/lib/clap/omx-pitch.clap
+/usr/lib/clap/omx-reverb.clap
 /usr/lib/clap/omx-rotary.clap
 /usr/lib/clap/omx-strip.clap
 /usr/lib/clap/omx-transient.clap
@@ -130,6 +131,7 @@ parameter header, installed in %{_includedir}/omx-plugins.
 %{_libdir}/lv2/omx-keyed-gate.lv2/
 %{_libdir}/lv2/omx-phaser.lv2/
 %{_libdir}/lv2/omx-pitch.lv2/
+%{_libdir}/lv2/omx-reverb.lv2/
 %{_libdir}/lv2/omx-rotary.lv2/
 %{_libdir}/lv2/omx-strip.lv2/
 %{_libdir}/lv2/omx-transient.lv2/
