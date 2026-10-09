@@ -26,7 +26,7 @@
   },
   "rules": {
     "always": "every plugin",
-    "panel": "the declaration carries a panel block (a plugin with no panel yet owes no MOD GUI)",
+    "panel": "the declaration carries a panel block, or the plugin is generated from its instance face (which draws every parameter when it declares none); a hand-written plugin with no panel yet owes no MOD GUI",
     "byReference": "the pinned omx-contract is at or past contract.byReferenceSince, the release that carries plugin parameters by reference; before it, a declaration still types its travels",
     "instance": "the declaration says \"binding\": \"instance\": tools/gen.mjs generates the plugin's binding, identity test, faces and Makefile from it and omx-dsp's instance face"
   },

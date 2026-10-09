@@ -402,8 +402,8 @@ async function main() {
   await refused('a face argument no parameter binds', (a) => { a.params.splice(2, 1); }, '/params');
   await refused('a panel naming no parameter', (a) => { a.panel = { family: 'modulation', roles: {}, sections: [{ key: 'wobble', label: 'Wobble', controls: ['rateHz', 'speed'] }] }; }, '/panel/sections');
   await refused('a console chip naming no parameter', (a) => { a.console = { placement: { strips: ['input'], group: 'insert' }, chip: '{rateHz} · {speed}' }; }, '/console/chip');
-  await refused('a panel the MOD GUI cannot draw', (a) => {
-    a.panel = { family: 'modulation', roles: { mode: 'mode' }, sections: [{ key: 'wobble', label: 'Wobble', controls: ['rateHz', 'depth', 'mix', 'mode'] }] };
+  await refused('a panel that leaves a parameter off the MOD GUI', (a) => {
+    a.panel = { family: 'modulation', roles: {}, sections: [{ key: 'wobble', label: 'Wobble', controls: ['rateHz', 'depth', 'mix'] }] };
   }, '/panel');
   {
     const f = parseFace(`static inline int omx_wobble_instance_init(OmxWobbleInstance *s, float sr) { return 1; }
