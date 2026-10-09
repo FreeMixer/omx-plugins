@@ -20,6 +20,7 @@ drawn from one declaration: its CLAP parameters, its LV2 ports and its MOD GUI c
 | **omx eq16** | `org.openmixer.eq16` | `urn:openmixer:eq16` | The console's channel EQ in its 16-band form: sixteen parametric bands (bell, shelves, notch, all-pass) plus high- and low-pass filters at 12 or 24 dB/oct. Stereo, zero latency, 44.1 to 192 kHz. |
 | **omx eq32** | `org.openmixer.eq32` | `urn:openmixer:eq32` | The console's channel EQ in its 32-band form: thirty-two parametric bands (bell, shelves, notch, all-pass) plus high- and low-pass filters at 12 or 24 dB/oct. Stereo, zero latency, 44.1 to 192 kHz. |
 | **omx strip** | `org.openmixer.strip` | `urn:openmixer:strip` | The console's channel strip in one plugin: input trim with HPF/LPF, gate, four-band EQ and compressor, in the desk's order or any other. Stereo, real-time safe, 44.1 to 192 kHz. |
+| **omx reverb** | `org.openmixer.reverb` | `urn:openmixer:reverb` | native algorithmic reverb, ONE Schroeder-Moorer comb+allpass kernel (Freeverb lineage) serving TWO configurations (OMX_REVERB_ROOM, OMX_REVERB_HALL — same omx_fv_comb / omx_fv_allpass functions, each with its own delay-line lengths + feedback/damping curve) plus a second, structurally different kernel, OMX_REVERB_PLATE (Dattorro figure-8 plate tank: input diffusers -> a damped delay-network tank). |
 | **omx keyed-gate** | `org.openmixer.keyed-gate` | `urn:openmixer:keyed-gate` | The console's channel gate with a sidechain key: the detector listens to the key your host routes to it, or to the signal itself. One gain for both legs, so the stereo image never shifts. Real-time safe, 44.1 to 192 kHz. |
 
 ### omx delay
@@ -120,6 +121,26 @@ Plus the host's bypass. An attack under 0.5 ms engages the 4x detector path, whi
 of latency, reported to the host; otherwise the latency is zero. Its LV2 URI, ports and defaults
 are those of the keyed gate bundle the OpenMixer console used to ship, so a session saved with that
 bundle loads this one.
+
+### omx reverb
+
+| Parameter | Range | Default |
+|---|---|---|
+| Plate Mod Depth | 0 to 400 %, whole steps | 100 % |
+| Mix | 0 to 1 | 0.3 |
+| Size | 0 to 1 | 0.7 |
+| Damping | 0 to 1 | 0.5 |
+| Width | 0 to 1 | 1 |
+| Predelay | 0 to 100 ms, whole steps | 0 ms |
+| Lowcut | 0 to 20000 Hz, whole steps | 0 Hz |
+| Highcut | 0 to 20000 Hz, whole steps | 20000 Hz |
+| Reverse | 50 to 500 ms, whole steps | 300 ms |
+| Hold | 10 to 2000 ms, whole steps | 120 ms |
+| Release | 1 to 500 ms, whole steps | 20 ms |
+| Gate Threshold | -80 to 0 dBFS, whole steps | -40 dBFS |
+| Algorithm | Room / Plate / Hall / Reverse / Gated | Room |
+
+Plus the host's bypass.
 
 ## Install
 
