@@ -173,6 +173,12 @@ async function main() {
   const core = readFileSync(join(tree, P_, 'omx_tremolo_core.h'), 'utf8');
   expect(core.includes('/* rate_hz */ values[OMX_TREMOLO_PARAM_RATE_HZ]') && core.includes('/* mode */ (int)lrintf(values[OMX_TREMOLO_PARAM_MODE])') && !/OMX_WIZARD_STUB/.test(core),
     'the generated binding passes each parameter to the resolve() argument it names, a choice as an int');
+  // The scratch tree's package prose may already name tremolo (the real catalogue does); take it out so the arm
+  // proves a new plugin's missing description is caught.
+  for (const f of ['debian/control', 'packaging/omx-plugins.spec']) {
+    const p = join(tree, f);
+    writeFileSync(p, readFileSync(p, 'utf8').replace(/(?<![-_])\btremolo\b,?[ \t]?/gi, ''));
+  }
   const owed = gapLines(await checkPlugin(tree, recipe, 'omx-tremolo'));
   expect(owed.length === 1 && owed[0].startsWith('omx-tremolo: package-description missing'), `a generated plugin owes only the package description, prose a person writes (${owed.map((g) => g.split(' (')[0]).join('; ')})`);
 
