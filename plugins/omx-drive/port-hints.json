@@ -1,0 +1,40 @@
+{
+  "driveDb": {
+    "props": [],
+    "unit": "units:db",
+    "points": []
+  },
+  "bandHz": {
+    "props": [
+      "lv2:integer",
+      "pprops:logarithmic"
+    ],
+    "unit": "units:hz",
+    "points": []
+  },
+  "mix": {
+    "props": [],
+    "unit": "units:pc",
+    "points": []
+  },
+  "trimDb": {
+    "props": [],
+    "unit": "units:db",
+    "points": []
+  },
+  "enabled": {
+    "props": [
+      "lv2:toggled"
+    ],
+    "unit": null,
+    "points": []
+  },
+  "latency": {
+    "props": [
+      "lv2:integer",
+      "lv2:reportsLatency"
+    ],
+    "unit": "units:frame",
+    "points": []
+  }
+}

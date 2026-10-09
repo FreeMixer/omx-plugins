@@ -5,13 +5,13 @@
  * port-hints.mjs — no LV2 face loses a port hint (`make hints`, run by `make test`).
  *
  *   node tools/port-hints.mjs            check every plugin's generated TTL
- *   node tools/port-hints.mjs --write    pin the hints the TTLs carry now (commit the result)
+ *   node tools/port-hints.mjs --write    pin the hints the TTLs carry now, into each plugins/<stem>/port-hints.json
  *
  * A hint is what a host draws a control from: a port property (logarithmic, integer, enumeration,
  * toggled, ...), a unit, a labelled scale point. Two checks, each naming the plugin, the port and
  * the hint:
  *
- *   - the PIN, tools/test/port-hints.json: every hint pinned for a port is still on it. A face
+ *   - the PIN, plugins/<stem>/port-hints.json (the plugin's own file; gen.mjs assembles the view): every hint pinned for a port is still on it. A face
  *     may gain hints; losing one is a capability regression, so it is red until the pin is
  *     rewritten on purpose. A plugin with no pin is red too: a new face pins its hints.
  *   - the LAW, from the declaration: a frequency is logarithmic in hertz unless declared linear,
@@ -21,7 +21,7 @@
 import { readdirSync, readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { choicesOf, loadDecl, scaleOf } from './gen.mjs';
+import { choicesOf, hintsView, loadDecl, scaleOf } from './gen.mjs';
 
 const ROOT = resolve(fileURLToPath(import.meta.url), '..', '..');
 const UNITS = { Hz: 'hz', dB: 'db', ms: 'ms', s: 's', '%': 'pc', oct: 'oct' };
@@ -50,15 +50,15 @@ export function pluginStems(root = ROOT) {
 }
 
 const ttlOf = (root, stem) => readFileSync(join(root, 'plugins', stem, 'generated', `${stem}.lv2`, `${stem}.ttl`), 'utf8');
-const pinPath = (root) => join(root, 'tools', 'test', 'port-hints.json');
+const pinPath = (root, stem) => join(root, 'plugins', stem, 'port-hints.json');
 
 /** Every lost or missing hint, one line each; empty when every face keeps them all. */
 export function hintErrors(root = ROOT) {
   const errors = [];
-  const pin = existsSync(pinPath(root)) ? JSON.parse(readFileSync(pinPath(root), 'utf8')) : {};
+  const pin = hintsView(root);
   for (const stem of pluginStems(root)) {
     const have = ttlHints(ttlOf(root, stem));
-    if (!pin[stem]) errors.push(`${stem}: no pinned hints (node tools/port-hints.mjs --write, then commit tools/test/port-hints.json)`);
+    if (!pin[stem]) errors.push(`${stem}: no pinned hints (node tools/port-hints.mjs --write, then commit plugins/${stem}/port-hints.json)`);
     for (const [sym, want] of Object.entries(pin[stem] ?? {})) {
       const got = have[sym];
       if (!got) {
@@ -90,18 +90,17 @@ export function hintErrors(root = ROOT) {
 
 /** The pin: every plugin's hints as its TTL carries them now. */
 export function writePin(root = ROOT) {
-  const pin = {};
   for (const stem of pluginStems(root)) {
-    pin[stem] = {};
-    for (const [sym, h] of Object.entries(ttlHints(ttlOf(root, stem)))) if (h.props.length || h.unit || h.points.length) pin[stem][sym] = h;
+    const pin = {};
+    for (const [sym, h] of Object.entries(ttlHints(ttlOf(root, stem)))) if (h.props.length || h.unit || h.points.length) pin[sym] = h;
+    writeFileSync(pinPath(root, stem), `${JSON.stringify(pin, null, 2)}\n`);
   }
-  writeFileSync(pinPath(root), `${JSON.stringify(pin, null, 2)}\n`);
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   if (process.argv.includes('--write')) {
     writePin();
-    console.log('port-hints: wrote tools/test/port-hints.json');
+    console.log('port-hints: wrote plugins/<stem>/port-hints.json');
   } else {
     const errors = hintErrors();
     for (const e of errors) console.log(`FAIL ${e}`);
