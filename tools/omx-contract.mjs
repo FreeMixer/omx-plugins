@@ -301,9 +301,20 @@ export function paramKernel(d, p, dir) {
 const camel = (s) => s.toLowerCase().replace(/_([a-z0-9])/g, (_m, c) => c.toUpperCase());
 const sameTravel = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 
+const kernelsCache = new Map();
+/** The render's `kernels` (omx-contract 2.1.0 on): kernel -> { controls: [{ name, kind, global, table?, rearms? }] }, or {}. */
+export function renderKernels(dir) {
+  if (!kernelsCache.has(dir)) kernelsCache.set(dir, JSON.parse(readFileSync(join(dir, RESOLVED), 'utf8')).kernels ?? {});
+  return kernelsCache.get(dir);
+}
+
 /**
- * The controls of one kernel, in the kernel file's order, read from the resolved render alone (it
- * carries items, not the file's `controls` list): `[{ name, ref, field?, kind: 'travel'|'choice' }]`.
+ * The controls of one kernel, in the kernel file's order: `[{ name, ref, field?, kind: 'travel'|'choice', rearms? }]`.
+ * `rearms` is true on a control whose change re-arms the kernel's state (omx-contract's flag).
+ *
+ * From omx-contract 2.1.0 the render lists them, in order, under `kernels`: each control's `global`
+ * is its `ref`, and a table field's name is its `field`. A render that does not list the kernel
+ * (2.0.0, or a stand-in that adds a kernel) is read as below, from its items alone, with no `rearms`.
  *
  * A control's name is what omx-contract 2.0.0 derives its item name from, run backwards: a single
  * travel `<KERNEL>_<NAME>_RANGE` and a set `<KERNEL>_<NAME>S` are `<name>` in camel case (an item
@@ -313,6 +324,16 @@ const sameTravel = (a, b) => JSON.stringify(a) === JSON.stringify(b);
  * fields are controls of their own (TRANSIENT_LIMITS.attackDb).
  */
 export function kernelControls(dir, kernel) {
+  const listed = renderKernels(dir)[kernel];
+  if (listed) {
+    return listed.controls.map((c) => ({
+      name: c.name,
+      ref: c.global,
+      ...(c.table ? { field: c.name } : {}),
+      kind: c.kind,
+      ...(c.rearms === true ? { rearms: true } : {}),
+    }));
+  }
   const rel = kernelFile(kernel);
   const its = Object.entries(items(dir)).filter(([, e]) => e.rel === rel);
   const prefix = `${kernel.toUpperCase()}_`;
