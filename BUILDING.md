@@ -95,8 +95,7 @@ installed omx-dsp requires, equal to `.github/pins.txt`.
 
 The wizard checks every answer before it writes anything, then writes every artifact of
 `recipes/plugin.recipe.json` from `recipes/templates/plugin/`: the declaration, the generated files,
-the Makefile, the CLAP and LV2 faces, the packaging lines, the README row and section and the
-CHANGELOG entry. The two pieces only a person can write, the binding of the faces to the kernel and
+the Makefile, the CLAP and LV2 faces, the packaging lines and the README row and section. The two pieces only a person can write, the binding of the faces to the kernel and
 the kernel-identity oracle, are written as stubs whose tests fail by name until they are done. It
 prints the commit plan (one concern per commit, in the recipe's layer order), runs the generators
 and the plugin's tests, and ends with the checklist of what is left.
