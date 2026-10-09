@@ -101,6 +101,7 @@ parameter header, installed in %{_includedir}/omx-plugins.
 %dir /usr/lib/clap
 # BEGIN GENERATED clap-files: tools/gen.mjs, one line per shipped plugin
 /usr/lib/clap/omx-chorus.clap
+/usr/lib/clap/omx-deesser.clap
 /usr/lib/clap/omx-delay.clap
 /usr/lib/clap/omx-drive.clap
 /usr/lib/clap/omx-eq8.clap
@@ -127,6 +128,7 @@ parameter header, installed in %{_includedir}/omx-plugins.
 %doc README.md
 # BEGIN GENERATED lv2-files: tools/gen.mjs, one line per shipped plugin
 %{_libdir}/lv2/omx-chorus.lv2/
+%{_libdir}/lv2/omx-deesser.lv2/
 %{_libdir}/lv2/omx-delay.lv2/
 %{_libdir}/lv2/omx-drive.lv2/
 %{_libdir}/lv2/omx-eq8.lv2/
