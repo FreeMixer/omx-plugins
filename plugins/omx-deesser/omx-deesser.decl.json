@@ -2,6 +2,7 @@
   "$comment": "THE declaration of omx-deesser. Every face and the parameter header are generated from this file by tools/gen.mjs. Parameter order is append-only.",
   "stem": "omx-deesser",
   "kernel": "deesser",
+  "noun": "de-esser",
   "name": "omx deesser",
   "vendor": "openmixer",
   "url": "https://github.com/FreeMixer/omx-plugins",

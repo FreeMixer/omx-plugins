@@ -4,7 +4,7 @@ Name: omx-plugins
 Version: 0.2.0
 Release: 1%{?dist}
 License: GPL-3.0-or-later
-Summary: The OpenMixer console's delay, drive, EQ, channel strip and keyed gate, as plugins for your DAW
+Summary: The OpenMixer console's delay, drive, EQ, channel strip, keyed gate and effects, as plugins for your DAW
 URL: https://github.com/FreeMixer/omx-plugins
 
 Source0: %{url}/archive/v%{version}/%{name}-%{version}.tar.gz
@@ -33,10 +33,12 @@ Requires: %{name}-lv2%{?_isa} = %{version}-%{release}
 
 %description
 Take the sound of the OpenMixer console into your DAW or onto your own rig:
-delay, drive, the channel EQ as an 8-band EQ, a 16-band EQ or a 32-band EQ, the
-full channel strip and the keyed gate with its sidechain input, as CLAP plugins
-for Bitwig, REAPER and Carla, and as LV2 plugins for Ardour, Carla, MOD and
-Zynthian. Each one runs the same DSP as the console, so a track sounds the same
+delay, drive, the channel EQ as an 8-band EQ, a 16-band EQ or a 32-band EQ, a
+31-band graphic EQ, the full channel strip and the keyed gate with its sidechain
+input, and the console's effects: chorus, flanger, phaser, tremolo, rotary
+speaker, reverb, pitch shifter, transient shaper, de-esser and limiter. They come
+as CLAP plugins for Bitwig, REAPER and Carla, and as LV2 plugins for Ardour,
+Carla, MOD and Zynthian. Each one runs the same DSP as the console, so a track sounds the same
 in a session as it does on the desk, sample for sample. Every plugin comes in
 both formats with the same controls, MOD GUI included.
 
@@ -44,21 +46,25 @@ This package installs both formats; omx-plugins-clap and omx-plugins-lv2
 install one each.
 
 %package clap
-Summary: OpenMixer delay, drive, EQ, channel strip and keyed gate as CLAP plugins
+Summary: OpenMixer delay, drive, EQ, strip, gate and effects as CLAP plugins
 
 %description clap
-The OpenMixer console's delay, drive, 8-, 16- and 32-band EQ, channel strip and
-keyed gate as CLAP plugins, installed in /usr/lib/clap where Bitwig, REAPER,
+The OpenMixer console's delay, drive, 8-, 16- and 32-band EQ, 31-band graphic
+EQ, channel strip, keyed gate and effects (chorus, flanger, phaser, tremolo,
+rotary speaker, reverb, pitch shifter, transient shaper, de-esser, limiter) as
+CLAP plugins, installed in /usr/lib/clap where Bitwig, REAPER,
 Carla and other CLAP hosts find them. They run the console's own DSP, so they
 sound like the desk.
 
 %package lv2
-Summary: OpenMixer delay, drive, EQ, channel strip and keyed gate as LV2 plugins
+Summary: OpenMixer delay, drive, EQ, strip, gate and effects as LV2 plugins
 Requires: lv2
 
 %description lv2
-The OpenMixer console's delay, drive, 8-, 16- and 32-band EQ, channel strip and
-keyed gate as LV2 plugins, installed in %{_libdir}/lv2 where Ardour, Carla, MOD
+The OpenMixer console's delay, drive, 8-, 16- and 32-band EQ, 31-band graphic
+EQ, channel strip, keyed gate and effects (chorus, flanger, phaser, tremolo,
+rotary speaker, reverb, pitch shifter, transient shaper, de-esser, limiter) as
+LV2 plugins, installed in %{_libdir}/lv2 where Ardour, Carla, MOD
 and Zynthian find them, with a MOD GUI where the plugin has one. They run the
 console's own DSP, so they sound like the desk.
 
