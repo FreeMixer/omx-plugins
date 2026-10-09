@@ -25,7 +25,7 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { compareVersions, contractPin, declKernels, findName, kernelExists, locateContract, paramKernel } from './omx-contract.mjs';
+import { compareVersions, contractPin, declKernels, declParams, findName, kernelExists, locateContract, paramKernel } from './omx-contract.mjs';
 import { omxdspInclude, render } from './template.mjs';
 import { baseOf, expandVariant, variantStems } from './variants.mjs';
 
@@ -138,8 +138,9 @@ const escapeRe = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
 export const RULES = {
   always: () => true,
-  instance: (_root, _recipe, facts) => facts.decl?.binding === 'instance',
-  panel: (_root, _recipe, facts) => Boolean(facts.decl?.panel) || facts.decl?.binding === 'instance',
+  // a chain (spec §15.2) is generated whole, as an instance plugin is
+  instance: (_root, _recipe, facts) => facts.decl?.binding === 'instance' || facts.decl?.binding === 'chain',
+  panel: (_root, _recipe, facts) => Boolean(facts.decl?.panel) || facts.decl?.binding === 'instance' || facts.decl?.binding === 'chain',
   byReference: (root, recipe) => compareVersions(contractPin(root), recipe.contract.byReferenceSince) >= 0,
 };
 
@@ -230,7 +231,9 @@ export const CHECKERS = {
       if (o.clapId && o.clapId === facts.clapId) errs.push(`/clap/id: '${facts.clapId}' is also ${other}'s`);
       if (o.uri && o.uri === facts.uri) errs.push(`/lv2/uri: '${facts.uri}' is also ${other}'s`);
     }
-    const symbols = new Set((facts.decl.params ?? []).map((p) => p.symbol));
+    // a chain's generated switches and `order` are parameters too
+    const generated = [...(facts.decl.chain ?? []).map((el) => `${el.id}On`), ...(facts.decl.order === 'permutable' ? ['order'] : [])];
+    const symbols = new Set([...declParams(facts.decl).map((p) => p.symbol), ...generated]);
     for (const s of facts.decl.panel?.sections ?? []) for (const c of s.controls) if (!symbols.has(c)) errs.push(`/panel: section '${s.key}' names '${c}', no parameter`);
     for (const [role, sym] of Object.entries(facts.decl.panel?.roles ?? {})) if (!symbols.has(sym)) errs.push(`/panel/roles/${role}: '${sym}' is no parameter`);
     return errs.length ? missing(`plugins/${facts.stem}/${facts.stem}.decl.json: ${errs.join('; ')}`) : ok(`plugins/${facts.stem}/${facts.stem}.decl.json`);
@@ -400,7 +403,7 @@ export const CHECKERS = {
     } catch (e) {
       return missing(`cannot generate: ${e.message}`);
     }
-    if (!gen.ships(d)) return missing(`${facts.stem} does not ship yet: its folder has no Makefile and its declaration no "binding": "instance"`);
+    if (!gen.ships(d)) return missing(`${facts.stem} does not ship yet: its folder has no Makefile and its declaration no "binding" (instance or chain)`);
     const want = fill(needle, facts);
     const lines = shared[file].split('\n');
     const from = lines.findIndex((l) => new RegExp(`\\bBEGIN GENERATED ${name}\\b`).test(l));
@@ -451,7 +454,7 @@ export const CHECKERS = {
     if (!facts.decl) return missing(facts.error);
     const typed = ['min', 'max', 'def', 'unit', 'kind'];
     const bad = [];
-    for (const p of facts.decl.params ?? []) {
+    for (const p of declParams(facts.decl)) {
       if (p.ref === undefined) {
         if (typeof p.own !== 'string' || !p.own) bad.push(`'${p.symbol}' has no ref and no "own" reason`);
         continue;
@@ -463,7 +466,7 @@ export const CHECKERS = {
     if (!bad.length) {
       const where = locateContract(root);
       if (!where.dir) return missing(`cannot check: ${where.why}`);
-      for (const p of facts.decl.params) {
+      for (const p of declParams(facts.decl)) {
         if (p.ref === undefined) continue;
         let k;
         try {
