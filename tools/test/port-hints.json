@@ -2639,5 +2639,50 @@
       "unit": "units:frame",
       "points": []
     }
+  },
+  "omx-tremolo": {
+    "rate": {
+      "props": [
+        "pprops:logarithmic"
+      ],
+      "unit": "units:hz",
+      "points": []
+    },
+    "depth": {
+      "props": [],
+      "unit": "units:pc",
+      "points": []
+    },
+    "mix": {
+      "props": [],
+      "unit": "units:pc",
+      "points": []
+    },
+    "mode": {
+      "props": [
+        "lv2:enumeration",
+        "lv2:integer"
+      ],
+      "unit": null,
+      "points": [
+        "0 Tremolo",
+        "1 Pan"
+      ]
+    },
+    "enabled": {
+      "props": [
+        "lv2:toggled"
+      ],
+      "unit": null,
+      "points": []
+    },
+    "latency": {
+      "props": [
+        "lv2:integer",
+        "lv2:reportsLatency"
+      ],
+      "unit": "units:frame",
+      "points": []
+    }
   }
 }
