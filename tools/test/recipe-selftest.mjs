@@ -282,15 +282,16 @@ async function main() {
     ['generatedFresh', 'lv2-description', () => edit(`${P}/generated/omx-drive.lv2/omx-drive.ttl`, (s) => s.replace('lv2:default 0 ;', 'lv2:default 1 ;'))],
     ['modguiFresh', 'modgui', () => add(`${P}/generated/omx-drive.lv2/modgui/stray.css`, '')],
     ['makefile', 'makefile', () => edit(`${P}/Makefile`, (s) => s.replace('urn:openmixer:drive', 'urn:openmixer:drives'))],
-    ['face', 'clap-face', () => edit(`${P}/omx_drive_clap.c`, (s) => s.replace('#include "omx_drive_params.h"', ''))],
+    // the generated faces reach the table directly and through the binding: both includes go
+    ['face', 'clap-face', () => edit(`${P}/omx_drive_clap.c`, (s) => s.replace('#include "omx_drive_params.h"', '').replace('#include "omx_drive_core.h"', ''))],
     ['face', 'lv2-face', () => edit(`${P}/omx_drive_lv2.c`, (s) => s.replace('lv2_descriptor(uint32_t', 'lv2_descriptor_gone(uint32_t'))],
-    ['kernelBinding', 'kernel-binding', () => edit(`${P}/omx_drive_lv2.c`, (s) => `#define OMX_WIZARD_STUB 1\n${s}`)],
+    ['kernelBinding', 'kernel-binding', () => edit(`${P}/omx_drive_core.h`, (s) => `#define OMX_WIZARD_STUB 1\n${s}`)],
     ['kernelBinding', 'kernel-binding', () => {
       // only omx_denormal.h left: an omx-dsp header, but not the plugin's own kernel
-      const undo = ['omx_drive_clap.c', 'omx_drive_lv2.c'].map((f) => edit(`${P}/${f}`, (s) => s.replace(/#include <omxdsp\/fx\/omx_drive_instance\.h>\n/, '')));
+      const undo = ['omx_drive_core.h'].map((f) => edit(`${P}/${f}`, (s) => s.replace(/#include <omxdsp\/fx\/omx_drive_instance\.h>\n/, '')));
       return () => undo.forEach((u) => u());
     }],
-    ['kernelBinding', 'kernel-binding', () => edit(`${P}/omx-drive.decl.json`, (s) => s.replace('"kernel": "drive",', '"kernel": "drive",\n  "kernels": ["drive", "delay"],'))],
+    ['kernelBinding', 'kernel-binding', () => edit(`${P}/omx-drive.decl.json`, (s) => s.replace(/"kernels": \[[^\]]*\]/, '"kernels": ["drive", "delay"]'))],
     ['makeTestRuns', 'parameter-test', () => edit(`${P}/Makefile`, (s) => s.replace(/^.*clap-params-check\.mjs.*\n/m, ''))],
     ['oracle', 'kernel-identity-test', () => remove(`${P}/test/drive-oracle.c`)],
     ['sharedListed', 'spec-files', () => edit('packaging/omx-plugins.spec', (s) => s.replace('%{_libdir}/lv2/omx-drive.lv2/\n', ''))],
@@ -405,11 +406,15 @@ async function main() {
     expect(r && r.reason.includes(needle), `wizard refuses ${what}: ${r ? r.reason.slice(0, 120) : 'NOT REFUSED'}`);
   };
   sourceRefused('a kernel omx-contract lacks', 'nosuch', 'omx-contract', 'has no data/kernels/nosuch.json');
-  sourceRefused('a kernel with no instance face', 'delay', 'omx-dsp', 'has no <omxdsp/fx/omx_delay_instance.h>');
+  // balance: a contract kernel omx-dsp gives no instance face (delay, chorus and the rest have one now)
+  sourceRefused('a kernel with no instance face', 'balance', 'omx-dsp', 'has no <omxdsp/fx/omx_balance_instance.h>');
   {
-    const chorus = join(realInc, existsSync(join(realInc, 'omxdsp')) ? 'omxdsp' : '', 'fx', 'omx_chorus_instance.h');
-    const f = existsSync(chorus) ? parseFace(readFileSync(chorus, 'utf8'), 'chorus') : { error: 'no chorus face to read' };
-    expect(/hands in/.test(f.error ?? ''), `a face of another shape is named, not guessed (chorus: ${f.error ?? 'ACCEPTED'})`);
+    // every face omx-dsp ships is of the generated shape; a ring-handing init stands in for another
+    const f = parseFace(`static inline int omx_wobble_instance_init(OmxWobbleInstance *s, float sr, float *ring_l, float *ring_r, uint32_t cap) { return 1; }
+static inline void omx_wobble_instance_resolve(OmxWobbleInstance *s, int bypass, float rate) { }
+static inline void omx_wobble_instance_run(OmxWobbleInstance *s, const float *in_l, const float *in_r, float *out_l, float *out_r, uint32_t n) { }
+#define OMX_WOBBLE_INSTANCE_LATENCY_FRAMES 0.0f`, 'wobble');
+    expect(/hands in/.test(f.error ?? ''), `a face of another shape is named, not guessed (rings handed to init: ${f.error ?? 'ACCEPTED'})`);
   }
   await refused('a REVIEW mark left', (a) => { a.lv2.class = 'REVIEW: the LV2 class'; }, '/lv2/class');
   await refused('a plugin not generated from the face', (a) => { delete a.binding; }, '/binding');

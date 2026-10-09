@@ -17,7 +17,7 @@
         modgui:label "omx drive" ;
         modgui:port [
             lv2:index 0 ;
-            lv2:symbol "driveDb" ;
+            lv2:symbol "amount" ;
             lv2:name "Drive" ;
         ] , [
             lv2:index 1 ;
@@ -25,15 +25,35 @@
             lv2:name "Character" ;
         ] , [
             lv2:index 2 ;
-            lv2:symbol "bandHz" ;
-            lv2:name "Band" ;
+            lv2:symbol "bandFreq" ;
+            lv2:name "Band Frequency" ;
         ] , [
             lv2:index 3 ;
             lv2:symbol "mix" ;
             lv2:name "Mix" ;
         ] , [
             lv2:index 4 ;
-            lv2:symbol "trimDb" ;
+            lv2:symbol "trim" ;
             lv2:name "Trim" ;
+        ] , [
+            lv2:index 5 ;
+            lv2:symbol "curve" ;
+            lv2:name "Curve" ;
+        ] , [
+            lv2:index 6 ;
+            lv2:symbol "band" ;
+            lv2:name "Band" ;
+        ] , [
+            lv2:index 7 ;
+            lv2:symbol "autoGain" ;
+            lv2:name "Auto Gain" ;
+        ] , [
+            lv2:index 8 ;
+            lv2:symbol "stereoLink" ;
+            lv2:name "Stereo Link" ;
+        ] , [
+            lv2:index 9 ;
+            lv2:symbol "hfRolloff" ;
+            lv2:name "HF Roll-off" ;
         ] ;
     ] .
