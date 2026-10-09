@@ -19,9 +19,9 @@
  *     values or points is an enumeration that lists them all.
  */
 import { readdirSync, readFileSync, writeFileSync, existsSync } from 'node:fs';
-import { join, resolve } from 'node:path';
+import { basename, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { choicesOf, hintsView, loadDecl, scaleOf } from './gen.mjs';
+import { choicesOf, hintsView, loadDecl, pluginDirs, scaleOf } from './gen.mjs';
 
 const ROOT = resolve(fileURLToPath(import.meta.url), '..', '..');
 const UNITS = { Hz: 'hz', dB: 'db', ms: 'ms', s: 's', '%': 'pc', oct: 'oct' };
@@ -42,11 +42,9 @@ export function ttlHints(text) {
   return ports;
 }
 
+/** Every plugin's stem, a base of variants standing for its variants (tools/variants.mjs). */
 export function pluginStems(root = ROOT) {
-  return readdirSync(join(root, 'plugins'), { withFileTypes: true })
-    .filter((e) => e.isDirectory() && existsSync(join(root, 'plugins', e.name, `${e.name}.decl.json`)))
-    .map((e) => e.name)
-    .sort();
+  return pluginDirs(root).map((p) => basename(p)).sort();
 }
 
 const ttlOf = (root, stem) => readFileSync(join(root, 'plugins', stem, 'generated', `${stem}.lv2`, `${stem}.ttl`), 'utf8');

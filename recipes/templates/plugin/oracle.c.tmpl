@@ -33,9 +33,11 @@
 
 #include "omx_{{kernel}}_params.h"
 
-#include <omxdsp/fx/omx_{{kernel}}_instance.h>
+#include <omxdsp/fx/omx_{{face}}_instance.h>
 #include <omxdsp/omx_denormal.h>
-
+{{#arrays}}
+_Static_assert({{count}} == {{extent}}, "the declaration names one {{arg}} parameter per band of the face");
+{{/arrays}}
 #define NP OMX_{{K}}_PARAM_COUNT
 
 /* One block: its length (frames, or ms when ms > 0), the stimulus it carries (0 the moving bursts,
@@ -122,15 +124,15 @@ static void values_of(const Block *k, int off, float *v) {
 /* The reference: omx-dsp's instance face, called directly, on the same blocks. */
 static void reference(double sr, int off, const float *il, const float *ir, float *ol, float *orr, uint32_t *latency) {
   static {{faceType}} inst;
-  (void)omx_{{kernel}}_instance_init(&inst, ({{srType}})sr);
+  (void)omx_{{face}}_instance_init(&inst, ({{srType}})sr);
   uint32_t at = 0;
   for (size_t b = 0; b < NBLOCKS; b++) {
     const Block *k = &PLAN[b];
     float values[NP];
     values_of(k, off, values);
     const uint32_t frames = frames_of(k, sr);
-    omx_{{kernel}}_instance_resolve(&inst, k->bypass{{#binding}}, {{value}}{{/binding}});
-    omx_{{kernel}}_instance_run(&inst, il + at, ir + at, ol + at, orr + at, frames);
+    omx_{{face}}_instance_resolve(&inst, k->bypass{{#binding}}, {{value}}{{/binding}});
+    omx_{{face}}_instance_run(&inst, il + at, ir + at, ol + at, orr + at, frames);
     at += frames;
   }
   if (latency) *latency = (uint32_t)lrintf((float)({{refLatency}}));

@@ -272,7 +272,12 @@ export function perturbCopy(src, dst, kernel, p) {
     t.default = def === t.max ? t.min : t.max;
     if (p.forKind && t.byKind && p.forKind in t.byKind) t.byKind[p.forKind] = t.default;
   } else if (e.kind === 'scalar' && typeof e.value === 'boolean') e.value = !e.value;
-  else throw new Error(`${p.ref}: a ${e.kind} has no default to move`);
+  else if (e.kind === 'set' && Array.isArray(e.value) && e.value.length > 1) {
+    // a set's default is one of its ids: it moves to the last, or from the last to the first
+    const ids = e.value;
+    const now = ids.includes(e.default) ? e.default : ids[0];
+    e.default = now === ids[ids.length - 1] ? ids[0] : ids[ids.length - 1];
+  } else throw new Error(`${p.ref}: a ${e.kind} has no default to move`);
   writeFileSync(file, `${JSON.stringify(data, null, 2)}\n`);
   return where.file;
 }
@@ -326,6 +331,8 @@ export function kernelControls(dir, kernel) {
     ...(c.table ? { field: c.name } : {}),
     kind: c.kind,
     ...(c.rearms === true ? { rearms: true } : {}),
+    ...(c.count ? { count: c.count } : {}),
+    ...(c.when ? { when: c.when } : {}),
   }));
 }
 
@@ -333,6 +340,13 @@ export function kernelControls(dir, kernel) {
 export function controlOf(dir, kernel, p) {
   if (p.ref === undefined) return undefined;
   const cs = kernelControls(dir, kernel);
-  const c = p.field ? cs.find((x) => x.name === p.field && (x.ref === p.ref || !x.field)) : cs.find((x) => x.ref === p.ref);
+  // two controls may use one set (eq's hpfSlope and lpfSlope, FILTER_SLOPES): the parameter whose
+  // symbol is the control's name in snake case (or its base symbol, a per-band b<n>_ prefix off) takes it
+  const snake = (x) => x.replace(/([a-z0-9])([A-Z])/g, '$1_$2').toLowerCase();
+  const byRef = cs.filter((x) => x.ref === p.ref);
+  const sym = snake(p.symbol.replace(/^b\d+_/, ''));
+  const c = p.field
+    ? cs.find((x) => x.name === p.field && (x.ref === p.ref || !x.field))
+    : byRef.length > 1 ? byRef.find((x) => snake(x.name) === sym) ?? byRef[0] : byRef[0];
   return c ? { ...c, ...(p.field ? { name: p.field } : {}) } : undefined;
 }

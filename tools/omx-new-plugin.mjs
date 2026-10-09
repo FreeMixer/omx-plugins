@@ -34,6 +34,7 @@ import { bindFace, instanceHeader, parseFace } from './instance-face.mjs';
 import { PIN_FILE, contractPin, controlOf, items, kernelControls, kernelExists, locateContract, resolveParam } from './omx-contract.mjs';
 import { ROOT, checkPlugin, gapLines, layerOfPath, loadRecipe, loadSchema, pluginFacts, pluginStems, validate } from './plugin-recipe.mjs';
 import { omxdspInclude } from './template.mjs';
+import { expandVariant } from './variants.mjs';
 
 const REVIEW = 'REVIEW';
 
@@ -125,11 +126,24 @@ export function draftDeclaration(kernel, src, { root = ROOT, recipe = loadRecipe
   const asParams = controls.map((c) => ({ symbol: c.name, ref: c.ref, ...(c.field ? { field: c.field } : {}) }));
   const bound = bindFace(src.face, asParams, controls, { strict: false });
   if (bound.errors.length) return { refusals: bound.errors.map((reason) => ({ field: 'omx-dsp', reason })) };
-  const params = bound.binding.map((b) => {
+  let variantsOf;
+  const params = bound.binding.flatMap((b) => {
     const p = { symbol: b.param.symbol, name: labelOf(b.param.symbol), ref: b.param.ref, ...(b.param.field ? { field: b.param.field } : {}) };
     const e = items(src.contract)[p.ref];
     if (e.kind === 'set' && !e.value.every((x) => typeof x === 'number') && !e.labels) p.values = e.value.map((id) => `${REVIEW}: the label of ${id}`);
-    return p;
+    if (!b.extent) return [p];
+    // a per-band array whose count is a sheet of variants (EQ_BAND_COUNTS): one declaration for the
+    // variants (tools/variants.mjs), the parameter written once and repeated per band
+    const count = controls.find((c) => c.name === b.control)?.count;
+    if (count && items(src.contract)[count]?.kind === 'sheet') {
+      variantsOf = count;
+      return [{ ...p, perBand: true }];
+    }
+    // a per-band array: one parameter per band, the count the contract renders as the extent
+    const n = items(src.contract)[b.extent.replace(/^OMX_/, '')]?.value;
+    if (!Number.isInteger(n) || n < 1) throw new Error(`resolve argument '${b.arg}[${b.extent}]': omx-contract renders no count ${b.extent.replace(/^OMX_/, '')}`);
+    const w = String(n).length;
+    return Array.from({ length: n }, (_x, k) => ({ ...p, symbol: `${p.symbol}${String(k + 1).padStart(w, '0')}`, name: `${p.name} ${k + 1}` }));
   });
   const schema = loadSchema(root, recipe);
   const decl = {
@@ -140,6 +154,13 @@ export function draftDeclaration(kernel, src, { root = ROOT, recipe = loadRecipe
     binding: 'instance',
     params,
   };
+  if (variantsOf) {
+    // every entry of the count sheet drafted; a person keeps the ones that ship as plugins
+    decl.variants = {
+      count: variantsOf,
+      of: Object.keys(items(src.contract)[variantsOf].value).map((k) => ({ stem: `${REVIEW}: the stem of the ${k} variant, or drop it`, count: k })),
+    };
+  }
   fillDerived(decl, { schema, version: treeVersion(root, recipe) }, recipe);
   return { refusals: [], decl: canonical(schema, decl), unbound: controls.filter((c) => !bound.binding.some((b) => b.param.symbol === c.name)).map((c) => c.name) };
 }
@@ -169,7 +190,9 @@ export async function planPlugin(declIn, src, { root = ROOT, recipe = loadRecipe
   if (marks.length) return { ok: false, refusals };
   if (decl.binding !== 'instance') refuse('/binding', 'is not "instance": this wizard writes plugins generated from omx-dsp\'s instance face');
   fillDerived(decl, { schema, version: treeVersion(root, recipe) }, recipe, refuse);
-  decl.kernels ??= [decl.kernel];
+  decl.kernels ??= [decl.face ?? decl.kernel];
+  // a variant (tools/variants.mjs) names its files `kernel` and binds its base's face
+  const face = decl.face ?? decl.kernel;
   for (const e of validate(schema, schema, decl)) refuse(e.split(':')[0], `schema: ${e.slice(e.indexOf(':') + 2)}`);
   if (refusals.length) return { ok: false, refusals };
 
@@ -181,7 +204,7 @@ export async function planPlugin(declIn, src, { root = ROOT, recipe = loadRecipe
     if (o.clapId === decl.clap.id) refuse('/clap/id', `'${decl.clap.id}' is ${s}'s`);
     if (o.uri === decl.lv2.uri) refuse('/lv2/uri', `'${decl.lv2.uri}' is ${s}'s`);
   }
-  if (decl.kernels.length !== 1 || decl.kernels[0] !== decl.kernel) refuse('/kernels', `a plugin generated from one instance face reads one kernel, '${decl.kernel}'`);
+  if (decl.kernels.length !== 1 || decl.kernels[0] !== face) refuse('/kernels', `a plugin generated from one instance face reads one kernel, '${face}'`);
 
   // every parameter by reference, resolving in the kernel's file, and bound to the face by name
   const symbols = new Set();
@@ -191,11 +214,12 @@ export async function planPlugin(declIn, src, { root = ROOT, recipe = loadRecipe
     if (symbols.has(p.symbol)) refuse(`/params/${i}/symbol`, `'${p.symbol}' declared twice`);
     symbols.add(p.symbol);
     if (p.ref === undefined) return refuse(`/params/${i}`, `'${p.symbol}' has no ref: every parameter of a generated plugin is a contract control`);
-    const typed = ['min', 'max', 'def', 'unit', 'kind'].filter((k) => k in p);
+    const isSet = items(src.contract)[p.ref]?.kind === 'set';
+    const typed = ['min', 'max', 'def', 'unit', 'kind'].filter((k) => k in p && !(isSet && k === 'unit'));
     if (typed.length) refuse(`/params/${i}`, `'${p.symbol}' retypes ${typed.join(', ')}: omx-contract holds them`);
     try {
-      resolved.push({ ...p, ...resolveParam(src.contract, decl.kernel, p) });
-      controls.push(controlOf(src.contract, decl.kernel, p));
+      resolved.push({ ...p, ...resolveParam(src.contract, face, p) });
+      controls.push(controlOf(src.contract, face, p));
     } catch (e) {
       refuse(`/params/${i}/ref`, e.message);
     }
@@ -315,7 +339,9 @@ async function main(argv) {
     return;
   }
 
-  const plan = await planPlugin(JSON.parse(readFileSync(declPath, 'utf8')), src, { root, recipe });
+  const raw = JSON.parse(readFileSync(declPath, 'utf8'));
+  if (raw.variants) return variantsMain(raw, src, { root, recipe, declPath, argv, opt });
+  const plan = await planPlugin(raw, src, { root, recipe });
   if (!plan.ok) refused(plan.refusals);
   for (const b of plan.renames) console.log(`note: resolve argument '${b.arg}' binds '${b.param.symbol}' by its words; omx-dsp's name conformance owes the rename to '${b.rename}'`);
   const files = writePlugin(plan, { root });
@@ -337,6 +363,55 @@ async function main(argv) {
   console.log(`completeness for ${stem}: ${gaps.length ? `${gaps.length} owed entries left` : 'complete'}`);
   for (const g of gaps) console.log(`  [ ] ${g}`);
   if (make.code !== 0 || gaps.length) process.exit(1);
+}
+
+/**
+ * A declaration with `variants` (tools/variants.mjs): ONE hand-written file for several plugins.
+ * Each variant is planned as a plugin of its own from the expanded declaration, and refused as one;
+ * the base is written as the person wrote it, and every variant's folder is generated.
+ */
+async function variantsMain(raw, src, { root, recipe, declPath, argv, opt }) {
+  const marks = reviewMarks(raw);
+  if (marks.length) refused(marks.map((m) => ({ field: m, reason: 'still marked REVIEW: a person settles it' })));
+  const schema = loadSchema(root, recipe);
+  const errs = validate(schema, schema, raw);
+  if (errs.length) refused(errs.map((e) => ({ field: e.split(':')[0], reason: `schema: ${e.slice(e.indexOf(':') + 2)}` })));
+  const plans = [];
+  for (const v of raw.variants.of) {
+    const plan = await planPlugin(expandVariant(src.contract, raw, v), src, { root, recipe });
+    if (!plan.ok) refused(plan.refusals.map((r) => ({ ...r, field: `${v.stem} ${r.field}` })));
+    plans.push(plan);
+  }
+  const written = [relative(root, declPath)];
+  const tools = [[join(root, 'tools', 'gen.mjs')], ...plans.map((p) => [join(root, 'tools', 'modgui-gen.mjs'), join(root, 'plugins', p.decl.stem)])];
+  for (const args of tools) {
+    const r = run('node', args, { cwd: root });
+    if (r.code !== 0) throw new Error(`${relative(root, args[0])}: ${r.out.trim()}`);
+    for (const m of r.out.matchAll(/wrote (\S+)/g)) written.push(relative(root, resolve(root, m[1])));
+  }
+  const files = [...new Set(written)];
+  console.log(`\nwritten (${files.length}), the variants ${plans.map((p) => p.decl.stem).join(', ')} of ${raw.stem}:`);
+  for (const f of files) console.log(`  ${f}`);
+  const commits = commitPlan(recipe, { ...plans[0], decl: { ...plans[0].decl, name: raw.name, kernel: raw.kernel } }, files);
+  console.log('\nCOMMIT PLAN (one concern per commit, in layer order; tools/commit-plan-check.mjs holds the range to it):');
+  commits.forEach((c, i) => {
+    console.log(`  ${i + 1}. [${c.layer}] ${c.message}`);
+    for (const f of c.files) console.log(`       ${f}`);
+  });
+  if (opt('--plan-json')) writeFileSync(opt('--plan-json'), `${JSON.stringify(commits, null, 2)}\n`);
+  if (argv.includes('--no-run')) return;
+  let red = 0;
+  for (const p of plans) {
+    const stem = p.decl.stem;
+    const make = run('make', ['-C', join(root, 'plugins', stem), 'test']);
+    const fails = make.out.split('\n').filter((l) => /^FAIL /.test(l));
+    console.log(`\nmake -C plugins/${stem} test: ${make.code === 0 ? 'green' : `RED\n  ${(fails.length ? fails : make.out.trim().split('\n').slice(-3)).join('\n  ')}`}`);
+    const gaps = gapLines(await checkPlugin(root, recipe, stem));
+    console.log(`completeness for ${stem}: ${gaps.length ? `${gaps.length} owed entries left` : 'complete'}`);
+    for (const g of gaps) console.log(`  [ ] ${g}`);
+    if (make.code !== 0 || gaps.length) red++;
+  }
+  if (red) process.exit(1);
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) await main(process.argv.slice(2));

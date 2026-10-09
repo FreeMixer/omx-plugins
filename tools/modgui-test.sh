@@ -116,6 +116,11 @@ fi
 # parameter's default moved WHERE IT IS DECLARED (the declaration, or omx-contract's data when the
 # parameter is by reference); its stale generated copy must be refused.
 mkdir -p "$TMP/p" "$TMP/c" && cp -R "$PDIR" "$TMP/p/$STEM"
+# a variant's declaration is its base's (tools/variants.mjs): the base folder goes beside it
+if [ ! -f "$DECL" ]; then
+  BASE=$(node --input-type=module -e 'const { baseOf } = await import(process.argv[1]); const b = baseOf(process.argv[2]); if (b) console.log(b.file);' "$ROOT/tools/variants.mjs" "$PDIR")
+  [ -n "$BASE" ] && cp -R "$(dirname "$BASE")" "$TMP/p/"
+fi
 if env=$(node "$ROOT/tools/perturb.mjs" "$TMP/p/$STEM" "$TMP/c"); then
   if env $env node "$ROOT/tools/modgui-gen.mjs" --check "$TMP/p/$STEM" >"$TMP/perturb.out" 2>&1; then
     fail "a moved default makes modgui-gen --check fail"

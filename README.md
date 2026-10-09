@@ -18,9 +18,9 @@ drawn from one declaration: its CLAP parameters, its LV2 ports and its MOD GUI c
 |---|---|---|---|
 | **omx delay** | `org.openmixer.delay` | `urn:openmixer:delay` | Stereo delay up to 2 s: feedback through a tone filter that darkens each repeat, ping-pong, wet/dry mix. Zero latency, real-time safe, 44.1 to 192 kHz. |
 | **omx drive** | `org.openmixer.drive` | `urn:openmixer:drive` | The console's drive: one waveshaper (soft, tape, tube or exciter) run inside the console's 4x oversampler, on the full band, the lows, the highs or a tilt, with drive, character, wet/dry mix and trim. Stereo, real-time safe, 44.1 to 192 kHz. |
-| **omx eq8** | `org.openmixer.eq8` | `urn:openmixer:eq8` | The console's channel EQ in its eight-band form: eight parametric bands (bell, shelves, notch, all-pass) plus high- and low-pass filters at 12 or 24 dB/oct. Stereo, zero latency, 44.1 to 192 kHz. |
-| **omx eq16** | `org.openmixer.eq16` | `urn:openmixer:eq16` | The console's channel EQ in its 16-band form: sixteen parametric bands (bell, shelves, notch, all-pass) plus high- and low-pass filters at 12 or 24 dB/oct. Stereo, zero latency, 44.1 to 192 kHz. |
-| **omx eq32** | `org.openmixer.eq32` | `urn:openmixer:eq32` | The console's channel EQ in its 32-band form: thirty-two parametric bands (bell, shelves, notch, all-pass) plus high- and low-pass filters at 12 or 24 dB/oct. Stereo, zero latency, 44.1 to 192 kHz. |
+| **omx eq8** | `org.openmixer.eq8` | `urn:openmixer:eq8` | The console's channel EQ in its 8-band form: 8 parametric bands (bell, shelves, notch, all-pass) plus high- and low-pass filters at 12 or 24 dB/oct. Stereo, zero latency, 44.1 to 192 kHz. |
+| **omx eq16** | `org.openmixer.eq16` | `urn:openmixer:eq16` | The console's channel EQ in its 16-band form: 16 parametric bands (bell, shelves, notch, all-pass) plus high- and low-pass filters at 12 or 24 dB/oct. Stereo, zero latency, 44.1 to 192 kHz. |
+| **omx eq32** | `org.openmixer.eq32` | `urn:openmixer:eq32` | The console's channel EQ in its 32-band form: 32 parametric bands (bell, shelves, notch, all-pass) plus high- and low-pass filters at 12 or 24 dB/oct. Stereo, zero latency, 44.1 to 192 kHz. |
 | **omx keyed-gate** | `org.openmixer.keyed-gate` | `urn:openmixer:keyed-gate` | The console's channel gate with a sidechain key: the detector listens to the key your host routes to it, or to the signal itself. One gain for both legs, so the stereo image never shifts. Real-time safe, 44.1 to 192 kHz. |
 | **omx limiter** | `org.openmixer.limiter` | `urn:openmixer:limiter` | The precision limiter: a look-ahead, true-peak, stereo-linked brickwall. |
 | **omx phaser** | `org.openmixer.phaser` | `urn:openmixer:phaser` | The console's phaser: identical all-pass sections swept in octaves by one oscillator, with feedback around the chain and a wet/dry mix. |
@@ -68,39 +68,34 @@ Plus the host's bypass.
 
 | Section | Parameters |
 |---|---|
-| EQ | on/off (on) |
 | High-pass | on/off, 20 to 1000 Hz, 12 or 24 dB/oct |
 | Low-pass | on/off, 1 to 20 kHz, 12 or 24 dB/oct |
-| Bands 1 to 8 | each on/off, type, frequency (20 Hz to 20 kHz), gain (±15 dB), Q (0.3 to 116) |
+| Bands 1 to 8 | each on/off, type, frequency (20 Hz to 20 kHz), gain (±15 dB), Q (0.3 to 8, a notch to 116) |
 
-Plus the host's bypass. Every band and filter starts off, so a freshly loaded instance passes the
+Plus the host's bypass, which is the whole EQ's switch. Every band and filter starts off, so a freshly loaded instance passes the
 signal untouched.
 
 ### omx eq16
 
 | Section | Parameters |
 |---|---|
-| EQ | on/off (on) |
 | High-pass | on/off, 20 to 1000 Hz, 12 or 24 dB/oct |
 | Low-pass | on/off, 1 to 20 kHz, 12 or 24 dB/oct |
-| Bands 1 to 16 | each on/off, type, frequency (20 Hz to 20 kHz), gain (±15 dB), Q (0.3 to 116) |
+| Bands 1 to 16 | each on/off, type, frequency (20 Hz to 20 kHz), gain (±15 dB), Q (0.3 to 8, a notch to 116) |
 
-Plus the host's bypass. Every band and filter starts off, so a freshly loaded instance passes the
-signal untouched. The bands' frequencies start spread from 25 Hz to 16 kHz, as on
-the console.
+Plus the host's bypass, which is the whole EQ's switch. Every band and filter starts off, so a freshly loaded instance passes the
+signal untouched.
 
 ### omx eq32
 
 | Section | Parameters |
 |---|---|
-| EQ | on/off (on) |
 | High-pass | on/off, 20 to 1000 Hz, 12 or 24 dB/oct |
 | Low-pass | on/off, 1 to 20 kHz, 12 or 24 dB/oct |
-| Bands 1 to 32 | each on/off, type, frequency (20 Hz to 20 kHz), gain (±15 dB), Q (0.3 to 116) |
+| Bands 1 to 32 | each on/off, type, frequency (20 Hz to 20 kHz), gain (±15 dB), Q (0.3 to 8, a notch to 116) |
 
-Plus the host's bypass. Every band and filter starts off, so a freshly loaded instance passes the
-signal untouched. The bands' frequencies start spread from 22 Hz to 18 kHz, as on
-the console.
+Plus the host's bypass, which is the whole EQ's switch. Every band and filter starts off, so a freshly loaded instance passes the
+signal untouched.
 
 ### omx keyed-gate
 
