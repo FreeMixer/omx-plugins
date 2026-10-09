@@ -1,5 +1,5 @@
 {
-  "$comment": "The plugin recipe: every artifact a complete plugin needs, each with the wizard step that writes it, its commit layer, how it is made, the questions it needs (JSON pointers into the declaration schema, or a question this recipe declares), its template, its paths, the rule that says when it is owed, and its CHECKER: the name of one function in tools/plugin-recipe.mjs and that function's arguments, reading the real files. Plus the LAWS every plugin keeps. Read by tools/omx-new-plugin.mjs (the questions, the files it writes, the commit plan, the checklist) and by tools/plugin-recipe.mjs (`make completeness`: every plugin has every owed artifact and keeps every law). Adding a required artifact is one entry here: the wizard then writes it and the completeness test requires it of every plugin.",
+  "$comment": "The plugin recipe: every artifact a complete plugin needs, each with the wizard step that writes it, its commit layer, how it is made, the declaration fields it reads (JSON pointers into the declaration schema), its template, its paths, the rule that says when it is owed, and its CHECKER: the name of one function in tools/plugin-recipe.mjs and that function's arguments, reading the real files. Plus the LAWS every plugin keeps. Read by tools/omx-new-plugin.mjs (the derived fields, the commit plan, the checklist) and by tools/plugin-recipe.mjs (`make completeness`: every plugin has every owed artifact and keeps every law). Adding a required artifact is one entry here: the wizard then writes it and the completeness test requires it of every plugin.",
   "item": "plugin",
   "schema": "schema/plugin.decl.schema.json",
   "templates": "recipes/templates/plugin",
@@ -9,10 +9,6 @@
     "versionFrom": {
       "file": "Makefile",
       "var": "VERSION"
-    },
-    "omxdspMinFrom": {
-      "file": "packaging/omx-plugins.spec",
-      "pattern": "^BuildRequires: omx-dsp-devel >= ([0-9.]+)$"
     }
   },
   "contract": {
@@ -27,20 +23,6 @@
     "/clap/id": "'org.openmixer.' + the short name",
     "/lv2/uri": "'urn:openmixer:' + the short name",
     "/$comment": "the declaration's standing comment"
-  },
-  "questions": {
-    "omxdspMin": {
-      "type": "string",
-      "pattern": "^\\d+\\.\\d+\\.\\d+$",
-      "title": "omx-dsp minimum",
-      "description": "The first omx-dsp release that carries the kernel. Defaults to the packaging's BuildRequires."
-    },
-    "contractRelease": {
-      "type": "string",
-      "pattern": "^\\d+\\.\\d+\\.\\d+$",
-      "title": "omx-contract release",
-      "description": "For a NEW kernel: the omx-contract release the kernel recipe cuts with data/kernels/<kernel>.json, which the pin then moves to. Leave it out to keep the pin and list the move as pending."
-    }
   },
   "rules": {
     "always": "every plugin",
@@ -130,8 +112,7 @@
         ".github/pins.txt"
       ],
       "questions": [
-        "/$defs/plugin/properties/kernels",
-        "#/questions/contractRelease"
+        "/$defs/plugin/properties/kernels"
       ],
       "template": null,
       "when": "byReference",

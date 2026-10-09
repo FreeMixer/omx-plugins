@@ -4,29 +4,41 @@
 /*
  * recipe-selftest.mjs — the plugin recipe's machinery, sabotaged arm by arm (`make selftest`).
  *
- *   1. The wizard, from recipes/examples/omx-tremolo.answers.json against a stand-in omx-contract
- *      release that carries the tremolo kernel: it writes every artifact, its declaration is by
- *      reference only, and the generated table carries the kernel file's numbers.
+ *   1. The wizard, `--from-contract tremolo` against a stand-in omx-contract release carrying the
+ *      tremolo kernel (at the pin) and a stand-in omx-dsp instance face: the draft takes one
+ *      parameter per resolve() argument, by reference, and marks every design choice REVIEW; a
+ *      settled draft generates the whole folder, the binding passing each parameter to the
+ *      argument it names; only the package description (prose) is left.
+ *   1b. The generators: `gen.mjs --check` is green on that tree and red, naming the file or the
+ *      argument, for a hand edit to the generated binding, a declaration that moved, a face whose
+ *      argument no control names, and a hand edit to a shared file; each restored, green.
  *   2. Its commit plan, applied literally in a throwaway repository, keeps the commit protocol
  *      (tools/commit-plan-check.mjs); two commits swapped, or two concerns in one commit, break it.
  *   3. Every checker family of the completeness test: break the artifact on a copy of the tree
  *      (omx-drive), and the test names that entry and its wizard step; restore, and it is green.
  *   4. The recipe: a new required entry makes every plugin red; an entry naming a checker that does
  *      not exist breaks the recipe.
- *   5. The wizard refuses, before writing, a taken stem, a typed travel, an unresolved reference, a
- *      reference into another kernel, a derived field answered wrong and a panel it cannot draw.
+ *   5. The wizard refuses, before writing: a kernel omx-contract lacks, a kernel with no instance
+ *      face or one of another shape, a REVIEW mark left, a folder of another kernel, a typed travel,
+ *      an unresolved reference, a reference into another kernel, a derived field written wrong, a
+ *      parameter the face takes no argument for, a panel or console naming no parameter, a panel
+ *      it cannot draw; and a strict build refuses an argument that binds only by its words.
  *   6. The port hints (tools/port-hints.mjs): a TTL that drops a hint, a declaration that drops a
  *      band type's labels or declares a frequency linear, and a plugin with no pin are each named;
  *      the whole tree is green.
  *
  * Works in build/selftest/ (removed first). Needs git, and omx-dsp's headers as the build does.
+ * Exit 1 when any check failed, including an arm that stopped early.
  */
 import { execFileSync, spawnSync } from 'node:child_process';
 import { cpSync, existsSync, mkdirSync, readFileSync, rmSync, unlinkSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { checkCommits, rangeCommits } from '../commit-plan-check.mjs';
-import { commitPlan, planPlugin, writePlugin } from '../omx-new-plugin.mjs';
+import { commitPlan, draftDeclaration, kernelSources, planPlugin, reviewMarks, writePlugin } from '../omx-new-plugin.mjs';
+import { bindFace, parseFace } from '../instance-face.mjs';
+import { locateContract } from '../omx-contract.mjs';
+import { omxdspInclude } from '../template.mjs';
 import { emitPluginTtl, loadDecl } from '../gen.mjs';
 import { hintErrors } from '../port-hints.mjs';
 import { checkPlugin, debtGrowth, debtVerdict, gapLines, loadDebt, loadRecipe, pluginStems, recipeErrors } from '../plugin-recipe.mjs';
@@ -50,16 +62,20 @@ function copyTree(dst) {
   execFileSync('sh', ['-c', 'xargs -0 tar -cf - | tar -xf - -C "$1"', 'sh', dst], { cwd: ROOT, input: files });
 }
 
-/** A stand-in omx-contract release: the version, and the items of each kernel given, as the resolved
- * render (share/omx-contract/omx-contract.json) carries them. */
-function fakeContract(dst, version, kernels) {
+/** A stand-in omx-contract release: the pinned release's resolved render, with the items of each
+ * kernel given in place of that kernel's own (the rest of the tree still resolves against it). */
+function fakeContract(dst, kernels) {
+  const real = locateContract(ROOT);
+  if (!real.dir) throw new Error(`the stand-in starts from the pinned omx-contract: ${real.why}`);
   mkdirSync(join(dst, 'share', 'omx-contract'), { recursive: true });
-  mkdirSync(join(dst, 'lib'), { recursive: true });
-  writeFileSync(join(dst, 'package.json'), JSON.stringify({ name: '@openmixer/omx-contract', version }));
-  writeFileSync(join(dst, 'lib', 'eq-defaults.mjs'), '// the stand-in has no EQ\n');
-  const items = {};
-  for (const [k, v] of Object.entries(kernels)) for (const [name, e] of Object.entries(v)) items[name] = { rel: `data/kernels/${k}.json`, ...e };
-  writeFileSync(join(dst, 'share', 'omx-contract', 'omx-contract.json'), JSON.stringify({ name: '@openmixer/omx-contract', version, items }, null, 2));
+  cpSync(join(real.dir, 'lib'), join(dst, 'lib'), { recursive: true });
+  cpSync(join(real.dir, 'package.json'), join(dst, 'package.json'));
+  const render = JSON.parse(readFileSync(join(real.dir, 'share', 'omx-contract', 'omx-contract.json'), 'utf8'));
+  for (const [k, v] of Object.entries(kernels)) {
+    for (const [name, e] of Object.entries(render.items)) if (e.rel === `data/kernels/${k}.json`) delete render.items[name];
+    for (const [name, e] of Object.entries(v)) render.items[name] = { rel: `data/kernels/${k}.json`, ...e };
+  }
+  writeFileSync(join(dst, 'share', 'omx-contract', 'omx-contract.json'), JSON.stringify(render, null, 2));
 }
 
 const travel = (min, max, step, unit, def) => ({ kind: 'travels', shape: 'travel', value: { min, max, step, unit, default: def, defaultFrom: 'desk' } });
@@ -68,8 +84,29 @@ const TREMOLO = {
   TREMOLO_DEPTH_RANGE: travel(0, 100, 0.1, '%', 50),
   TREMOLO_MIX_RANGE: travel(0, 100, 0.1, '%', 100),
   TREMOLO_MODES: { kind: 'set', value: ['tremolo', 'pan'], default: 'tremolo' },
+  // the aggregate: its field names are the controls' names (rateHz, not rate)
+  TREMOLO_TRAVELS: { kind: 'travels', shape: 'table', value: { rateHz: travel(0.1, 20, 0.01, 'Hz', 4).value, depth: travel(0, 100, 0.1, '%', 50).value, mix: travel(0, 100, 0.1, '%', 100).value } },
 };
-const DELAY = { FX_DELAY_TIME_RANGE: travel(0, 2000, 1, 'ms', 300) };
+
+/** A stand-in omx-dsp: the real headers, plus a tremolo instance face of the generated shape. */
+function fakeOmxdsp(dst, args = 'float rate_hz, float depth, float mix, int mode') {
+  const real = omxdspInclude();
+  if (!real) throw new Error('no omx-dsp headers (pkg-config omxdsp, or OMXDSP_INCLUDE)');
+  if (!existsSync(dst)) cpSync(real, dst, { recursive: true });
+  const fx = join(dst, existsSync(join(dst, 'omxdsp')) ? 'omxdsp' : '', 'fx', 'omx_tremolo_instance.h');
+  writeFileSync(fx, `#ifndef OMX_TREMOLO_INSTANCE_H
+#define OMX_TREMOLO_INSTANCE_H
+#include <stdint.h>
+typedef struct { float sr; } OmxTremoloInstance;
+#define OMX_TREMOLO_INSTANCE_LATENCY_FRAMES 0.0f
+static inline int omx_tremolo_instance_init(OmxTremoloInstance *s, float sr) { s->sr = sr; return 1; }
+static inline void omx_tremolo_instance_resolve(OmxTremoloInstance *s, int bypass, ${args}) { (void)s; (void)bypass; }
+static inline void omx_tremolo_instance_run(OmxTremoloInstance *s, const float *in_l, const float *in_r, float *out_l,
+                                            float *out_r, uint32_t n) { (void)s; (void)in_l; (void)in_r; (void)out_l; (void)out_r; (void)n; }
+#endif
+`);
+  return fx;
+}
 
 const git = (repo, ...args) => execFileSync('git', ['-C', repo, '-c', 'user.name=selftest', '-c', 'user.email=selftest@invalid', '-c', 'commit.gpgsign=false', ...args], { encoding: 'utf8' });
 
@@ -94,34 +131,80 @@ async function main() {
   rmSync(WORK, { recursive: true, force: true });
   mkdirSync(WORK, { recursive: true });
   const recipe = loadRecipe(ROOT);
-  const answers = JSON.parse(readFileSync(join(ROOT, 'recipes', 'examples', 'omx-tremolo.answers.json'), 'utf8'));
-  const contract = join(WORK, 'omx-contract-1.4.0');
-  fakeContract(contract, '1.4.0', { tremolo: TREMOLO, delay: DELAY });
+  const realInc = omxdspInclude();
+  const contract = join(WORK, 'omx-contract');
+  fakeContract(contract, { tremolo: TREMOLO });
+  const inc = join(WORK, 'omxdsp-include');
+  const face = fakeOmxdsp(inc);
   process.env.OMX_CONTRACT_DIR = contract;
+  process.env.OMXDSP_INCLUDE = inc;
 
   // ---- 1. the wizard -------------------------------------------------------------------------
   const tree = join(WORK, 'wizard');
   copyTree(tree);
-  const plan = await planPlugin(answers, { root: tree, recipe });
-  expect(plan.ok, `wizard accepts the tremolo answers${plan.ok ? '' : `: ${plan.refusals.map((r) => `${r.field} ${r.reason}`).join('; ')}`}`);
+  const src = kernelSources('tremolo', { root: tree });
+  expect(!src.refusals.length, `the wizard finds the tremolo kernel and its face${src.refusals.length ? `: ${src.refusals.map((r) => r.reason).join('; ')}` : ''}`);
+  if (src.refusals.length) return;
+  const draft = draftDeclaration('tremolo', src, { root: tree, recipe });
+  expect(draft.decl?.params.map((p) => `${p.symbol}:${p.name}`).join(' ') === 'rateHz:Rate depth:Depth mix:Mix mode:Mode',
+    `the draft has one parameter per resolve() argument, named by the contract (${draft.decl?.params.map((p) => `${p.symbol}:${p.name}`).join(' ')})`);
+  expect(draft.decl?.params.every((p) => p.ref && !('min' in p) && !('def' in p)), 'the draft is by reference only');
+  const marks = reviewMarks(draft.decl);
+  expect(marks.join(' ') === '/description /clap/features/1 /lv2/class /params/3/values/0 /params/3/values/1',
+    `the draft marks every design choice REVIEW (${marks.join(' ')})`);
+  const unsettled = await planPlugin(draft.decl, src, { root: tree, recipe });
+  expect(!unsettled.ok && unsettled.refusals.length === marks.length, `a draft with REVIEW marks is refused, each named (${unsettled.refusals.map((r) => r.field).join(' ')})`);
+  const settled = structuredClone(draft.decl);
+  settled.description = 'The console\'s tremolo: the level, or the balance, moved by one LFO.';
+  settled.clap.features[1] = 'tremolo';
+  settled.lv2.class = 'lv2:ModulatorPlugin';
+  settled.params[3].values = ['Tremolo', 'Pan'];
+  const answers = settled; // what section 5 mutates
+  const plan = await planPlugin(settled, src, { root: tree, recipe });
+  expect(plan.ok, `the settled draft is accepted${plan.ok ? '' : `: ${plan.refusals.map((r) => `${r.field} ${r.reason}`).join('; ')}`}`);
   if (!plan.ok) return;
-  const { written, generated } = writePlugin(plan, { root: tree, recipe });
-  const decl = JSON.parse(readFileSync(join(tree, 'plugins/omx-tremolo/omx-tremolo.decl.json'), 'utf8'));
-  expect(decl.params.every((p) => p.ref && !('min' in p) && !('def' in p)), 'the written declaration is by reference only');
-  const header = readFileSync(join(tree, 'plugins/omx-tremolo/generated/omx_tremolo_params.h'), 'utf8');
+  const written = writePlugin(plan, { root: tree });
+  const P_ = 'plugins/omx-tremolo';
+  for (const f of ['omx-tremolo.decl.json', 'Makefile', 'omx_tremolo_clap.c', 'omx_tremolo_lv2.c', 'omx_tremolo_core.h', 'test/tremolo-oracle.c', 'generated/omx_tremolo_params.h'])
+    expect(written.includes(`${P_}/${f}`), `the wizard wrote ${P_}/${f}`);
+  for (const f of ['README.md', 'packaging/omx-plugins.spec', '.github/workflows/ci.yml']) expect(written.includes(f), `the shared file ${f} lists the new plugin`);
+  const header = readFileSync(join(tree, P_, 'generated/omx_tremolo_params.h'), 'utf8');
   expect(header.includes('{ "rateHz", "Rate", "Hz", 0.1f, 20.0f, 4.0f, 0u }'), 'the generated table carries the kernel file\'s rate travel');
-  for (const a of recipe.artifacts.filter((x) => x.made === 'TEMPLATED' || x.made === 'HAND-WRITTEN')) {
-    if (!a.template) continue;
-    const at = typeof a.template === 'object' ? a.template.file : a.target.replace(/#.*/, '').replace(/\{stem\}/g, 'omx-tremolo').replace(/\{kernel\}/g, 'tremolo');
-    expect(existsSync(join(tree, at)) && [...written, ...generated].includes(at), `the wizard wrote ${a.id} (${at})`);
+  const core = readFileSync(join(tree, P_, 'omx_tremolo_core.h'), 'utf8');
+  expect(core.includes('/* rate_hz */ values[OMX_TREMOLO_PARAM_RATE_HZ]') && core.includes('/* mode */ (int)lrintf(values[OMX_TREMOLO_PARAM_MODE])') && !/OMX_WIZARD_STUB/.test(core),
+    'the generated binding passes each parameter to the resolve() argument it names, a choice as an int');
+  const owed = gapLines(await checkPlugin(tree, recipe, 'omx-tremolo'));
+  expect(owed.length === 1 && owed[0].startsWith('omx-tremolo: package-description missing'), `a generated plugin owes only the package description, prose a person writes (${owed.map((g) => g.split(' (')[0]).join('; ')})`);
+
+  // ---- 1b. the generators, sabotaged input by input --------------------------------------------
+  const check = () => spawnSync('node', [join(tree, 'tools', 'gen.mjs'), '--check'], { cwd: tree, encoding: 'utf8' });
+  const green = check();
+  expect(green.status === 0, `gen.mjs --check is green on the wizard's tree${green.status ? `: ${green.stderr.trim().split('\n')[0]}` : ''}`);
+  const sabotageGen = (what, file, mutate, needle) => {
+    const at = join(file.startsWith('/') ? '' : tree, file);
+    const was = readFileSync(at, 'utf8');
+    writeFileSync(at, mutate(was));
+    const red = check();
+    writeFileSync(at, was);
+    const back = check();
+    const out = `${red.stdout}${red.stderr}`;
+    expect(red.status !== 0 && out.includes(needle) && back.status === 0, `sabotage gen: ${what} goes red naming ${needle}, green restored${red.status ? '' : ' (STAYED GREEN)'}`);
+  };
+  sabotageGen('a hand edit to the generated binding', `${P_}/omx_tremolo_core.h`, (t) => t.replace('/* depth */', '/* depth (tuned) */'), `STALE ${P_}/omx_tremolo_core.h`);
+  sabotageGen('a hand edit to the generated identity test', `${P_}/test/tremolo-oracle.c`, (t) => t.replace('no tolerance', 'a little tolerance'), `STALE ${P_}/test/tremolo-oracle.c`);
+  sabotageGen('a declaration that moved a parameter\'s name', `${P_}/omx-tremolo.decl.json`, (t) => t.replace('"name": "Depth"', '"name": "Depth Amount"'), `STALE ${P_}/generated/omx_tremolo_params.h`);
+  sabotageGen('a face whose argument no contract control names', face, (t) => t.replace('float depth,', 'float intensity,'), "resolve argument 'intensity'");
+  sabotageGen('a hand edit to a shared file', 'README.md', (t) => t.replace('| **omx tremolo** |', '| **omx tremolo (beta)** |'), 'STALE README.md');
+  {
+    const was = readFileSync(join(tree, P_, 'omx_tremolo_core.h'), 'utf8');
+    writeFileSync(join(tree, P_, 'omx_tremolo_core.h'), `${was}\n`);
+    const r = gapLines(await checkPlugin(tree, recipe, 'omx-tremolo'));
+    writeFileSync(join(tree, P_, 'omx_tremolo_core.h'), was);
+    expect(r.some((l) => l.startsWith('omx-tremolo: instance-files missing')), `sabotage completeness: a stale generated binding is the gap instance-files (${r.length} gaps)`);
   }
-  const red = await checkPlugin(tree, recipe, 'omx-tremolo');
-  const redIds = gapLines(red).join('\n');
-  expect(/kernel-binding missing \(wizard step 'faces'/.test(redIds) && /kernel-identity-test missing \(wizard step 'tests'/.test(redIds),
-    'red first: the stub binding and the stub oracle are named gaps');
 
   // ---- 2. the commit plan, applied literally ------------------------------------------------
-  const commits = commitPlan(recipe, plan, [...written, ...generated]);
+  const commits = commitPlan(recipe, plan, written);
   const order = recipe.layers.map((l) => l.id);
   expect(commits.every((c, i) => i === 0 || order.indexOf(c.layer) > order.indexOf(commits[i - 1].layer)), `the plan is in layer order (${commits.map((c) => c.layer).join(' → ')})`);
   const good = applyPlan(join(WORK, 'plan-ok'), ROOT, tree, commits);
@@ -141,6 +224,7 @@ async function main() {
 
   // ---- 3. every checker family, broken on a copy of omx-drive --------------------------------
   delete process.env.OMX_CONTRACT_DIR;
+  delete process.env.OMXDSP_INCLUDE;
   const t = join(WORK, 'sabotage');
   copyTree(t);
   const P = 'plugins/omx-drive';
@@ -161,9 +245,8 @@ async function main() {
     unlinkSync(join(t, f));
     return () => writeFileSync(join(t, f), was);
   };
-  const { omxdspInclude } = await import('../plugin-recipe.mjs');
   const dspName = (() => {
-    const inc = omxdspInclude();
+    const inc = realInc;
     const h = readFileSync(join(inc, 'omxdsp', 'omx_lfo.h'), 'utf8');
     return h.match(/static inline \w+ (omx_lfo_[a-z_]+)\s*\(/)[1];
   })();
@@ -184,12 +267,12 @@ async function main() {
     ['kernelBinding', 'kernel-binding', () => edit(`${P}/omx-drive.decl.json`, (s) => s.replace('"kernel": "drive",', '"kernel": "drive",\n  "kernels": ["drive", "delay"],'))],
     ['makeTestRuns', 'parameter-test', () => edit(`${P}/Makefile`, (s) => s.replace(/^.*clap-params-check\.mjs.*\n/m, ''))],
     ['oracle', 'kernel-identity-test', () => remove(`${P}/test/drive-oracle.c`)],
-    ['linesPresent', 'spec-files', () => edit('packaging/omx-plugins.spec', (s) => s.replace('%{_libdir}/lv2/omx-drive.lv2/\n', ''))],
+    ['sharedListed', 'spec-files', () => edit('packaging/omx-plugins.spec', (s) => s.replace('%{_libdir}/lv2/omx-drive.lv2/\n', ''))],
     ['installCovers', 'deb-install', () => edit('debian/omx-plugins-clap.install', () => 'usr/lib/clap/omx-delay.clap\n')],
     ['namedIn', 'package-description', () => edit('debian/control', (s) => s.replace(/delay, drive,/g, 'delay,'))],
-    ['ciCovers', 'ci-installed-files', () => edit('.github/workflows/ci.yml', (s) => s.replaceAll('/usr/lib/clap/omx-drive.clap', ''))],
-    ['catalogueRow', 'catalogue-row', () => edit('README.md', (s) => s.replace('`org.openmixer.drive`', '`org.openmixer.x`'))],
-    ['heading', 'manual-section', () => edit('README.md', (s) => s.replace('### omx drive\n', '### drive\n'))],
+    ['sharedListed', 'ci-installed-files', () => edit('.github/workflows/ci.yml', (s) => s.replaceAll(' drive ', ' '))],
+    ['sharedListed', 'catalogue-row', () => edit('README.md', (s) => s.replace('`org.openmixer.drive`', '`org.openmixer.x`'))],
+    ['sharedListed', 'manual-section', () => edit('README.md', (s) => s.replace('### omx drive\n', '### drive\n'))],
     ['noFiles', 'no-cpp', () => add(`${P}/shell.cpp`, '// SPDX-License-Identifier: GPL-3.0-or-later\n')],
     ['noText', 'no-dpf', () => add(`${P}/dpf_shell.h`, '#include "DistrhoPlugin.hpp"\n')],
     ['noCopiedDsp', 'no-copied-dsp', () => add(`${P}/copied.h`, `static inline float ${dspName}(float x) {\n  return x;\n}\n`)],
@@ -219,10 +302,10 @@ async function main() {
   const unheld = await ratchet();
   undo();
   expect(unheld.fresh.includes("omx-drive manual-section"), `sabotage: a gap the debt does not hold fails the ratchet (${unheld.fresh.join(", ")})`);
-  undo = edit('README.md', (s) => `${s}\n### omx chorus\n`);
+  undo = add('plugins/omx-chorus/Makefile', readFileSync(join(t, 'plugins/omx-drive/Makefile'), 'utf8').replace(/omx-drive/g, 'omx-chorus').replace(/urn:openmixer:drive/g, 'urn:openmixer:chorus').replace(/org\.openmixer\.drive/g, 'org.openmixer.chorus'));
   const paid = await ratchet();
   undo();
-  expect(paid.stale.some((x) => x.startsWith('omx-chorus manual-section')), `sabotage: a debt entry now satisfied fails the ratchet as stale (${paid.stale.join(', ')})`);
+  expect(paid.stale.some((x) => x.startsWith('omx-chorus makefile')), `sabotage: a debt entry now satisfied fails the ratchet as stale (${paid.stale.join(', ')})`);
 
   const ghost = await (async () => {
     const reports = [];
@@ -265,7 +348,7 @@ async function main() {
 
   // ---- 4. the recipe itself ----------------------------------------------------------------
   const grown = JSON.parse(JSON.stringify(recipe));
-  grown.artifacts.push({ id: 'sabotage-notes', what: 'a section every plugin now owes', step: 'docs', layer: 'docs', made: 'HAND-WRITTEN', target: 'README.md', paths: [], questions: [], template: null, when: 'always', checker: { fn: 'heading', file: 'README.md', heading: '### {name} notes' } });
+  grown.artifacts.push({ id: 'sabotage-notes', what: 'a section every plugin now owes', step: 'docs', layer: 'docs', made: 'HAND-WRITTEN', target: 'README.md', paths: [], questions: [], template: null, when: 'always', checker: { fn: 'sharedListed', file: 'README.md', region: 'sections', needle: '### {name} notes' } });
   let allRed = true;
   for (const s of ['omx-delay', 'omx-drive', 'omx-eq8', 'omx-strip']) {
     if (!gapLines(await checkPlugin(t, grown, s)).some((l) => l.includes('sabotage-notes missing'))) allRed = false;
@@ -280,38 +363,57 @@ async function main() {
 
   // ---- 5. the wizard refuses before writing ------------------------------------------------------
   process.env.OMX_CONTRACT_DIR = contract;
+  process.env.OMXDSP_INCLUDE = inc;
   const fresh = join(WORK, 'refusals');
   copyTree(fresh);
+  const srcFresh = kernelSources('tremolo', { root: fresh });
   const refused = async (what, mutate, field) => {
-    const a = JSON.parse(JSON.stringify(answers));
+    const a = structuredClone(answers);
     mutate(a);
-    const p = await planPlugin(a, { root: fresh, recipe });
+    const p = await planPlugin(a, srcFresh, { root: fresh, recipe });
     const r = p.refusals.find((x) => x.field.startsWith(field));
     expect(!p.ok && r, `wizard refuses ${what}: ${r ? `${r.field} ${r.reason}` : 'NOT REFUSED'}`);
   };
-  await refused('a taken stem', (a) => { a.stem = 'omx-drive'; a.kernel = 'drive'; }, '/stem');
+  const sourceRefused = (what, kernel, field, needle) => {
+    const r = kernelSources(kernel, { root: fresh }).refusals.find((x) => x.field === field);
+    expect(r && r.reason.includes(needle), `wizard refuses ${what}: ${r ? r.reason.slice(0, 120) : 'NOT REFUSED'}`);
+  };
+  sourceRefused('a kernel omx-contract lacks', 'nosuch', 'omx-contract', 'has no data/kernels/nosuch.json');
+  sourceRefused('a kernel with no instance face', 'delay', 'omx-dsp', 'has no <omxdsp/fx/omx_delay_instance.h>');
+  {
+    const chorus = join(realInc, existsSync(join(realInc, 'omxdsp')) ? 'omxdsp' : '', 'fx', 'omx_chorus_instance.h');
+    const f = existsSync(chorus) ? parseFace(readFileSync(chorus, 'utf8'), 'chorus') : { error: 'no chorus face to read' };
+    expect(/hands in/.test(f.error ?? ''), `a face of another shape is named, not guessed (chorus: ${f.error ?? 'ACCEPTED'})`);
+  }
+  await refused('a REVIEW mark left', (a) => { a.lv2.class = 'REVIEW: the LV2 class'; }, '/lv2/class');
+  await refused('a plugin not generated from the face', (a) => { delete a.binding; }, '/binding');
+  await refused('a folder that is another kernel\'s', (a) => { a.stem = 'omx-drive'; delete a.clap.id; delete a.lv2.uri; delete a.name; }, '/stem');
+  await refused('another plugin\'s LV2 URI', (a) => { a.stem = 'omx-trem'; a.lv2.uri = 'urn:openmixer:drive'; delete a.clap.id; delete a.name; }, '/lv2/uri');
   await refused('a typed travel', (a) => { a.params[0].min = 0.1; }, '/params/0');
   await refused('an unresolved reference', (a) => { a.params[1].ref = 'TREMOLO_SPEED_RANGE'; }, '/params/1/ref');
   await refused('a reference into another kernel', (a) => { a.params[0].ref = 'FX_DELAY_TIME_RANGE'; }, '/params/0/ref');
-  await refused('a derived field answered wrong', (a) => { a.clap.id = 'org.openmixer.trem'; }, '/clap/id');
-  await refused('a composite parameter that names no kernel', (a) => { a.kernels = ['tremolo', 'delay']; }, '/params/0/kernel');
-  await refused('a parameter naming a kernel the plugin does not declare', (a) => { a.params[0].kernel = 'delay'; }, '/params/0/kernel');
-  {
-    const a = JSON.parse(JSON.stringify(answers));
-    a.kernels = ['tremolo', 'delay'];
-    for (const p of a.params) p.kernel = 'tremolo';
-    a.params.push({ symbol: 'timeMs', name: 'Time', kernel: 'delay', ref: 'FX_DELAY_TIME_RANGE', scale: 'linear' });
-    const p = await planPlugin(a, { root: fresh, recipe });
-    const time = p.resolved?.find((x) => x.symbol === 'timeMs');
-    const rate = p.resolved?.find((x) => x.symbol === 'rateHz');
-    expect(p.ok && time?.max === 2000 && rate?.max === 20, `a composite resolves each parameter in its own kernel (timeMs from delay: ${time?.max}, rateHz from tremolo: ${rate?.max})`);
-  }
+  await refused('a derived field written wrong', (a) => { a.clap.id = 'org.openmixer.trem'; }, '/clap/id');
+  await refused('a face argument no parameter binds', (a) => { a.params.splice(2, 1); }, '/params');
+  await refused('a panel naming no parameter', (a) => { a.panel = { family: 'modulation', roles: {}, sections: [{ key: 'tremolo', label: 'Tremolo', controls: ['rateHz', 'speed'] }] }; }, '/panel/sections');
+  await refused('a console chip naming no parameter', (a) => { a.console = { placement: { strips: ['input'], group: 'insert' }, chip: '{rateHz} · {speed}' }; }, '/console/chip');
   await refused('a panel the MOD GUI cannot draw', (a) => {
     a.panel = { family: 'modulation', roles: { mode: 'mode' }, sections: [{ key: 'tremolo', label: 'Tremolo', controls: ['rateHz', 'depth', 'mix', 'mode'] }] };
   }, '/panel');
+  {
+    const f = parseFace(`static inline int omx_tremolo_instance_init(OmxTremoloInstance *s, float sr) { return 1; }
+static inline void omx_tremolo_instance_resolve(OmxTremoloInstance *s, int bypass, float rate, float depth) { }
+static inline void omx_tremolo_instance_run(OmxTremoloInstance *s, const float *in_l, const float *in_r, float *out_l, float *out_r, uint32_t n) { }
+#define OMX_TREMOLO_INSTANCE_LATENCY_FRAMES 0.0f`, 'tremolo');
+    const ps = [{ symbol: 'rateHz' }, { symbol: 'depth' }];
+    const loose = bindFace(f, ps, [{ name: 'rateHz' }, { name: 'depth' }], { strict: false });
+    const strict = bindFace(f, ps, [{ name: 'rateHz' }, { name: 'depth' }], { strict: true });
+    expect(!loose.errors.length && loose.renames[0]?.rename === 'rate_hz' && strict.errors.some((e) => e.includes("'rate'")),
+      `an argument that binds only by its words is a rename owed, refused when strict (${loose.renames.map((r) => `${r.arg}->${r.rename}`).join(', ')}; ${strict.errors[0] ?? 'NOT REFUSED'})`);
+  }
 
   // ---- 6. the port hints ---------------------------------------------------------------------
   delete process.env.OMX_CONTRACT_DIR; // the real tree reads the release it pins
+  delete process.env.OMXDSP_INCLUDE;
   {
     const hints = join(WORK, 'hints');
     copyTree(hints);
@@ -349,8 +451,9 @@ async function main() {
     named('a plugin with no pin', 'omx-eq9: no pinned hints');
   }
 
-  console.log(fails ? `recipe-selftest: ${fails} check(s) failed` : 'recipe-selftest: every arm red when broken, green when whole');
-  process.exit(fails ? 1 : 0);
 }
 
+// an arm that stops early has failed already: the verdict and the exit come after main, always
 await main();
+console.log(fails ? `recipe-selftest: ${fails} check(s) failed` : 'recipe-selftest: every arm red when broken, green when whole');
+process.exit(fails ? 1 : 0);
