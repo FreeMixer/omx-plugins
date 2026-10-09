@@ -54,7 +54,7 @@
     "faces": "the build and the CLAP and LV2 faces, plain C over omx-dsp, and their binding to the kernel",
     "tests": "the parameter test and the kernel-identity test",
     "packaging": "the RPM and DEB file lists, the metapackage's description and CI's installed-file checks",
-    "docs": "the README's catalogue row and manual section, and the CHANGELOG entry"
+    "docs": "the README's catalogue row and manual section"
   },
   "layers": [
     {
@@ -94,8 +94,8 @@
     },
     {
       "id": "docs",
-      "what": "the manual, the catalogue and the changelog",
-      "message": "{name}: in the README's catalogue and the changelog"
+      "what": "the manual and the catalogue",
+      "message": "{name}: in the README's catalogue"
     }
   ],
   "artifacts": [
@@ -486,34 +486,6 @@
         "fn": "heading",
         "file": "README.md",
         "heading": "### {name}"
-      }
-    },
-    {
-      "id": "changelog",
-      "what": "the effect's entry in CHANGELOG.md, the one changelog the RPM and Debian changelogs and the release notes are generated from",
-      "step": "docs",
-      "layer": "docs",
-      "made": "TEMPLATED",
-      "target": "CHANGELOG.md#Unreleased",
-      "paths": [
-        "CHANGELOG.md"
-      ],
-      "questions": [],
-      "template": {
-        "file": "CHANGELOG.md",
-        "insert": "changelog.md.tmpl",
-        "after": "^## Unreleased$",
-        "create": "## Unreleased",
-        "createBefore": "^## "
-      },
-      "when": "always",
-      "checker": {
-        "fn": "namedIn",
-        "places": [
-          {
-            "file": "CHANGELOG.md"
-          }
-        ]
       }
     }
   ],
