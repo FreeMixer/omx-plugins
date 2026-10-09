@@ -1,0 +1,49 @@
+{
+  "stem": "omx-transient",
+  "kernel": "transient",
+  "description": "The native transient designer: a gain driven by two envelope contrasts, with no threshold.",
+  "clap": {
+    "features": [
+      "audio-effect",
+      "transient-shaper",
+      "stereo"
+    ]
+  },
+  "lv2": {
+    "class": "lv2:DynamicsPlugin"
+  },
+  "params": [
+    {
+      "symbol": "attackDb",
+      "name": "Attack Db",
+      "ref": "TRANSIENT_LIMITS",
+      "field": "attackDb"
+    },
+    {
+      "symbol": "sustainDb",
+      "name": "Sustain Db",
+      "ref": "TRANSIENT_LIMITS",
+      "field": "sustainDb"
+    },
+    {
+      "symbol": "attackTimeMs",
+      "name": "Attack Time Ms",
+      "ref": "TRANSIENT_LIMITS",
+      "field": "attackTimeMs"
+    },
+    {
+      "symbol": "sustainTimeMs",
+      "name": "Sustain Time Ms",
+      "ref": "TRANSIENT_LIMITS",
+      "field": "sustainTimeMs"
+    },
+    {
+      "symbol": "outputDb",
+      "name": "Output Db",
+      "ref": "TRANSIENT_LIMITS",
+      "field": "outputDb"
+    }
+  ],
+  "omxdspMin": "0.2.0",
+  "contractRelease": "1.3.0"
+}
