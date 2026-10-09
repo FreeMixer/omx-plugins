@@ -20,6 +20,7 @@ drawn from one declaration: its CLAP parameters, its LV2 ports and its MOD GUI c
 | **omx eq16** | `org.openmixer.eq16` | `urn:openmixer:eq16` | The console's channel EQ in its 16-band form: sixteen parametric bands (bell, shelves, notch, all-pass) plus high- and low-pass filters at 12 or 24 dB/oct. Stereo, zero latency, 44.1 to 192 kHz. |
 | **omx eq32** | `org.openmixer.eq32` | `urn:openmixer:eq32` | The console's channel EQ in its 32-band form: thirty-two parametric bands (bell, shelves, notch, all-pass) plus high- and low-pass filters at 12 or 24 dB/oct. Stereo, zero latency, 44.1 to 192 kHz. |
 | **omx strip** | `org.openmixer.strip` | `urn:openmixer:strip` | The console's channel strip in one plugin: input trim with HPF/LPF, gate, four-band EQ and compressor, in the desk's order or any other. Stereo, real-time safe, 44.1 to 192 kHz. |
+| **omx transient** | `org.openmixer.transient` | `urn:openmixer:transient` | The native transient designer: a gain driven by two envelope contrasts, with no threshold. |
 | **omx keyed-gate** | `org.openmixer.keyed-gate` | `urn:openmixer:keyed-gate` | The console's channel gate with a sidechain key: the detector listens to the key your host routes to it, or to the signal itself. One gain for both legs, so the stereo image never shifts. Real-time safe, 44.1 to 192 kHz. |
 
 ### omx delay
@@ -120,6 +121,18 @@ Plus the host's bypass. An attack under 0.5 ms engages the 4x detector path, whi
 of latency, reported to the host; otherwise the latency is zero. Its LV2 URI, ports and defaults
 are those of the keyed gate bundle the OpenMixer console used to ship, so a session saved with that
 bundle loads this one.
+
+### omx transient
+
+| Parameter | Range | Default |
+|---|---|---|
+| Attack Db | -24 to 24 dB | 0 dB |
+| Sustain Db | -24 to 24 dB | 0 dB |
+| Attack Time Ms | 2 to 50 ms | 10 ms |
+| Sustain Time Ms | 50 to 2000 ms, whole steps | 250 ms |
+| Output Db | -24 to 12 dB | 0 dB |
+
+Plus the host's bypass.
 
 ## Install
 
