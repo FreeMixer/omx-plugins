@@ -17,7 +17,7 @@ drawn from one declaration: its CLAP parameters, its LV2 ports and its MOD GUI c
 | Plugin | CLAP id | LV2 URI | What it does |
 |---|---|---|---|
 | **omx delay** | `org.openmixer.delay` | `urn:openmixer:delay` | Stereo delay up to 2 s: feedback through a tone filter that darkens each repeat, ping-pong, wet/dry mix. Zero latency, real-time safe, 44.1 to 192 kHz. |
-| **omx drive** | `org.openmixer.drive` | `urn:openmixer:drive` | The console's drive: one waveshaper run inside the console's oversampler, with drive, character, band, wet/dry mix and trim. Stereo, real-time safe, 44.1 to 192 kHz. |
+| **omx drive** | `org.openmixer.drive` | `urn:openmixer:drive` | The console's drive: one waveshaper (soft, tape, tube or exciter) run inside the console's 4x oversampler, on the full band, the lows, the highs or a tilt, with drive, character, wet/dry mix and trim. Stereo, real-time safe, 44.1 to 192 kHz. |
 | **omx eq8** | `org.openmixer.eq8` | `urn:openmixer:eq8` | The console's channel EQ in its eight-band form: eight parametric bands (bell, shelves, notch, all-pass) plus high- and low-pass filters at 12 or 24 dB/oct. Stereo, zero latency, 44.1 to 192 kHz. |
 | **omx eq16** | `org.openmixer.eq16` | `urn:openmixer:eq16` | The console's channel EQ in its 16-band form: sixteen parametric bands (bell, shelves, notch, all-pass) plus high- and low-pass filters at 12 or 24 dB/oct. Stereo, zero latency, 44.1 to 192 kHz. |
 | **omx eq32** | `org.openmixer.eq32` | `urn:openmixer:eq32` | The console's channel EQ in its 32-band form: thirty-two parametric bands (bell, shelves, notch, all-pass) plus high- and low-pass filters at 12 or 24 dB/oct. Stereo, zero latency, 44.1 to 192 kHz. |
@@ -53,11 +53,16 @@ moved from 48 to 96 kHz sounds the same.
 |---|---|---|
 | Drive | 0 to 36 dB | 0 dB |
 | Character | -1 to 1 | 0 |
-| Band | 20 to 20000 Hz | 2000 Hz |
+| Band Frequency | 20 to 20000 Hz, whole steps | 2000 Hz |
 | Mix | 0 to 100 % | 100 % |
-| Trim | -24 to +12 dB | 0 dB |
+| Trim | -24 to 12 dB | 0 dB |
+| Curve | Soft / Tape / Tube / Exciter | Soft |
+| Band | Full / Low / High / Tilt | Full |
+| Auto Gain | off / on | on |
+| Stereo Link | off / on | on |
+| HF Roll-off | 0 / 12000 / 16000 | 0 |
 
-Plus the host's bypass. The latency the plugin reports is the oversampler's.
+Plus the host's bypass.
 
 ### omx eq8
 
