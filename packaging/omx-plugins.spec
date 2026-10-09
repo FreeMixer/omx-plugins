@@ -12,7 +12,7 @@ Source0: %{url}/archive/v%{version}/%{name}-%{version}.tar.gz
 BuildRequires: gcc
 BuildRequires: make
 BuildRequires: pkgconf-pkg-config
-BuildRequires: omx-dsp-devel >= 0.4.1
+BuildRequires: omx-dsp-devel >= 0.5.0
 BuildRequires: omx-clap-core-devel
 BuildRequires: clap-devel
 BuildRequires: lv2-devel
@@ -70,7 +70,7 @@ console's own DSP, so they sound like the desk.
 
 %package devel
 Summary: Headers of the OpenMixer plugins, for projects that build on them
-Requires: omx-dsp-devel >= 0.4.1
+Requires: omx-dsp-devel >= 0.5.0
 
 %description devel
 The headers other projects include to use the OpenMixer plugins' parameters and
