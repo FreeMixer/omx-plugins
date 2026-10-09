@@ -22,7 +22,9 @@
 #include "omx_{{kernel}}_params.h"
 
 #include <omxdsp/fx/omx_{{kernel}}_instance.h>
-
+{{#arrays}}
+_Static_assert({{count}} == {{extent}}, "the declaration names one {{arg}} parameter per band of the face");
+{{/arrays}}
 /** The kernel's state and what a block runs with. */
 typedef struct {
   uint32_t rate;

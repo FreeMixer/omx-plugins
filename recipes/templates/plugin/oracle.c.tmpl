@@ -35,7 +35,9 @@
 
 #include <omxdsp/fx/omx_{{kernel}}_instance.h>
 #include <omxdsp/omx_denormal.h>
-
+{{#arrays}}
+_Static_assert({{count}} == {{extent}}, "the declaration names one {{arg}} parameter per band of the face");
+{{/arrays}}
 #define NP OMX_{{K}}_PARAM_COUNT
 
 /* One block: its length (frames, or ms when ms > 0), the stimulus it carries (0 the moving bursts,
