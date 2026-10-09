@@ -67,12 +67,25 @@ settled it fills the derived fields and runs `tools/gen.mjs`, which writes:
 
 ## The identity test
 
-One template, filled from the declaration: a deterministic stimulus in uneven blocks, every
-parameter moving between blocks across its declared travel, the bypass toggled. The CLAP and LV2
+One template, filled from the declaration. The plan has three parts. First, a deterministic stimulus
+in uneven blocks, with every parameter moving between blocks across its declared travel and the
+bypass toggled. Second, at the defaults, a full-scale burst followed by a tail that falls onto a quiet
+bed. The tail lasts the sum of every time travel's default (at least 100 ms), so a dynamics stage
+engages and releases, and a gate holds and closes. Third, for every choice or toggle, each of its
+values in turn over its own burst and two tails: the other parameters stay at their defaults for the
+first tail and are stepped once for the second. A control that only one mode reads is therefore
+reached. The second and third parts are timed in milliseconds, so every rate gets the same time. The CLAP and LV2
 builds must equal omx-dsp's instance face called directly, bit for bit, at every rate in
 `OMX_DECLARED_RATES`, and publish its latency. Two guards keep it honest: the reference must move
 the signal, and a reference rendered with one parameter one step off must differ from the faces
 (the sabotage arm), so a test that could not see a wrong coefficient fails.
+
+A parameter whose contract control declares `rearms` is held at its default in every block. Such a
+control re-arms the kernel's state when it changes, so it is not a smooth parameter: the limiter's
+look-ahead, for example, rebuilds the rings and restarts the gain at unity. Moving it between blocks
+would test the re-arm, not the identity. The flag is read from omx-contract's JSON render, where
+`kernels.<kernel>.controls` lists each kernel's controls in declared order. The oracle's header comment names each held parameter, and the sabotage arm still moves it
+by one step. The other parameters move as before.
 
 ## What it does not do
 

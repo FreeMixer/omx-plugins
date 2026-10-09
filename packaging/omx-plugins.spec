@@ -12,7 +12,7 @@ Source0: %{url}/archive/v%{version}/%{name}-%{version}.tar.gz
 BuildRequires: gcc
 BuildRequires: make
 BuildRequires: pkgconf-pkg-config
-BuildRequires: omx-dsp-devel >= 0.4.0
+BuildRequires: omx-dsp-devel >= 0.4.1
 BuildRequires: omx-clap-core-devel
 BuildRequires: clap-devel
 BuildRequires: lv2-devel
@@ -70,7 +70,7 @@ console's own DSP, so they sound like the desk.
 
 %package devel
 Summary: Headers of the OpenMixer plugins, for projects that build on them
-Requires: omx-dsp-devel >= 0.4.0
+Requires: omx-dsp-devel >= 0.4.1
 
 %description devel
 The headers other projects include to use the OpenMixer plugins' parameters and
@@ -106,6 +106,7 @@ parameter header, installed in %{_includedir}/omx-plugins.
 /usr/lib/clap/omx-eq16.clap
 /usr/lib/clap/omx-eq32.clap
 /usr/lib/clap/omx-keyed-gate.clap
+/usr/lib/clap/omx-limiter.clap
 /usr/lib/clap/omx-phaser.clap
 /usr/lib/clap/omx-pitch.clap
 /usr/lib/clap/omx-rotary.clap
@@ -128,6 +129,7 @@ parameter header, installed in %{_includedir}/omx-plugins.
 %{_libdir}/lv2/omx-eq16.lv2/
 %{_libdir}/lv2/omx-eq32.lv2/
 %{_libdir}/lv2/omx-keyed-gate.lv2/
+%{_libdir}/lv2/omx-limiter.lv2/
 %{_libdir}/lv2/omx-phaser.lv2/
 %{_libdir}/lv2/omx-pitch.lv2/
 %{_libdir}/lv2/omx-rotary.lv2/

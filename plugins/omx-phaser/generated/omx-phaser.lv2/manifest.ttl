@@ -7,4 +7,4 @@
 <urn:openmixer:phaser>
     a lv2:Plugin ;
     lv2:binary <omx-phaser.so> ;
-    rdfs:seeAlso <omx-phaser.ttl> .
+    rdfs:seeAlso <omx-phaser.ttl> , <modgui.ttl> .

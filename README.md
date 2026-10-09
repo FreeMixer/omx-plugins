@@ -22,6 +22,7 @@ drawn from one declaration: its CLAP parameters, its LV2 ports and its MOD GUI c
 | **omx eq16** | `org.openmixer.eq16` | `urn:openmixer:eq16` | The console's channel EQ in its 16-band form: sixteen parametric bands (bell, shelves, notch, all-pass) plus high- and low-pass filters at 12 or 24 dB/oct. Stereo, zero latency, 44.1 to 192 kHz. |
 | **omx eq32** | `org.openmixer.eq32` | `urn:openmixer:eq32` | The console's channel EQ in its 32-band form: thirty-two parametric bands (bell, shelves, notch, all-pass) plus high- and low-pass filters at 12 or 24 dB/oct. Stereo, zero latency, 44.1 to 192 kHz. |
 | **omx keyed-gate** | `org.openmixer.keyed-gate` | `urn:openmixer:keyed-gate` | The console's channel gate with a sidechain key: the detector listens to the key your host routes to it, or to the signal itself. One gain for both legs, so the stereo image never shifts. Real-time safe, 44.1 to 192 kHz. |
+| **omx limiter** | `org.openmixer.limiter` | `urn:openmixer:limiter` | The precision limiter: a look-ahead, true-peak, stereo-linked brickwall. |
 | **omx phaser** | `org.openmixer.phaser` | `urn:openmixer:phaser` | The console's phaser: identical all-pass sections swept in octaves by one oscillator, with feedback around the chain and a wet/dry mix. |
 | **omx pitch** | `org.openmixer.pitch` | `urn:openmixer:pitch` | The console's pitch shifter: shifts both channels up or down by semitones and cents, without changing their length, mixed with the dry signal. |
 | **omx rotary** | `org.openmixer.rotary` | `urn:openmixer:rotary` | The console's rotary speaker: a drum rotor on the low band and a horn rotor on the high band, with stop, slow and fast speeds, mixed with the dry signal. |
@@ -115,6 +116,16 @@ Plus the host's bypass. An attack under 0.5 ms engages the 4x detector path, whi
 of latency, reported to the host; otherwise the latency is zero. Its LV2 URI, ports and defaults
 are those of the keyed gate bundle the OpenMixer console used to ship, so a session saved with that
 bundle loads this one.
+
+### omx limiter
+
+| Parameter | Range | Default |
+|---|---|---|
+| Ceiling | -12 to 0 dBFS | -1 dBFS |
+| Lookahead | 0.5 to 5 ms | 1.5 ms |
+| Release | 1 to 1000 ms, whole steps | 50 ms |
+
+Plus the host's bypass.
 
 ### omx phaser
 

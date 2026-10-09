@@ -5,9 +5,9 @@
 #
 # omx-rotary as CLAP and LV2, in plain C, from ONE declaration (omx-rotary.decl.json).
 #
-#   make            build/omx-rotary.clap and build/omx-rotary.lv2/ (binary, TTL)
+#   make            build/omx-rotary.clap and build/omx-rotary.lv2/ (binary, TTL, MOD GUI)
 #   make test       freshness of every generated file, the parameters as declared, every parameter
-#                   live, the rotary kernel-identity oracle, and the
+#                   live, the rotary kernel-identity oracle, the MOD GUI checks, and the
 #                   host checks (omx-clap-scan, lv2info) where installed
 #   make gen        regenerate generated/ from the declaration (commit the result)
 #   make install    DESTDIR/PREFIX/LIBDIR/CLAPDIR: $(CLAPDIR)/omx-rotary.clap, $(LIBDIR)/lv2/omx-rotary.lv2/
@@ -18,7 +18,7 @@
 NAME       := omx-rotary
 URI        := urn:openmixer:rotary
 CLAP_ID    := org.openmixer.rotary
-OMXDSP_MIN ?= 0.4.0
+OMXDSP_MIN ?= 0.4.1
 ROOT       := $(abspath ../..)
 GEN        := generated
 B          := build
@@ -58,7 +58,7 @@ $(BUNDLE)/$(NAME).so: omx_rotary_lv2.c $(CORE) | $(B)
 	@mkdir -p $(BUNDLE)
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(WARN) $(PLUGIN) $(LV2_CFLAGS) -o $@ $< $(LDFLAGS) $(LDLIBS)
 
-# The bundle's text are generated and committed; the build copies them beside the binary.
+# The bundle's text and images are generated and committed; the build copies them beside the binary.
 $(BUNDLE)/manifest.ttl: $(TTL_SRCS) | $(B)
 	@mkdir -p $(BUNDLE)
 	cp -r $(TTL)/. $(BUNDLE)/
@@ -74,9 +74,11 @@ $(B)/rotary-oracle: test/rotary-oracle.c $(CORE) | $(B)
 
 gen:
 	node $(ROOT)/tools/gen.mjs $(CURDIR)
+	node $(ROOT)/tools/modgui-gen.mjs $(CURDIR)
 
 check:
 	node $(ROOT)/tools/gen.mjs --check $(CURDIR)
+	node $(ROOT)/tools/modgui-gen.mjs --check $(CURDIR)
 
 # The parameter test: the built CLAP face's parameters are the declaration's, and every one of them
 # reaches the kernel. The kernel-identity test: both faces, sample for sample, against omx-dsp's
@@ -89,6 +91,7 @@ test: all check $(B)/clap-probe $(B)/rotary-oracle
 	$(B)/clap-probe live $(B)/$(NAME).clap || fail=1; \
 	$(B)/rotary-oracle clap $(B)/$(NAME).clap || fail=1; \
 	$(B)/rotary-oracle lv2 $(BUNDLE) $(URI) || fail=1; \
+	sh $(ROOT)/tools/modgui-test.sh $(CURDIR) || fail=1; \
 	sh $(ROOT)/tools/host-check.sh $(B)/$(NAME).clap $(BUNDLE) $(URI) $(CLAP_ID) || fail=1; \
 	exit $$fail
 

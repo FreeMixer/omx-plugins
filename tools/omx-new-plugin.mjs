@@ -212,7 +212,7 @@ export async function planPlugin(declIn, src, { root = ROOT, recipe = loadRecipe
   for (const [at, t] of [['/console/chip', decl.console?.chip], ['/console/card/summary', decl.console?.card?.summary]])
     for (const h of holes(t)) if (!symbols.has(h)) refuse(at, `{${h}} is no parameter`);
 
-  // the panel, drawn as the MOD GUI generator will draw it (a selector it cannot draw is refused now)
+  // the panel, drawn as the MOD GUI generator will draw it (every parameter on it, selectors included)
   if (decl.panel && !refusals.length) {
     const mg = await import(join(root, 'tools', 'modgui-gen.mjs'));
     try {
@@ -221,7 +221,7 @@ export async function planPlugin(declIn, src, { root = ROOT, recipe = loadRecipe
       const undrawn = decl.params.filter((p) => !drawn.has(p.symbol)).map((p) => p.symbol);
       if (undrawn.length) throw new Error(`the MOD GUI draws every parameter (tools/modgui-test.sh), and the panel leaves out ${undrawn.join(', ')}`);
     } catch (e) {
-      refuse('/panel', `${e.message}; leave the panel out until the MOD GUI draws it, or keep that parameter off it`);
+      refuse('/panel', `${e.message}; put every parameter on the panel, or leave the panel out and the MOD GUI draws every parameter in one section`);
     }
   }
 
@@ -246,7 +246,8 @@ export function writePlugin(plan, { root = ROOT } = {}) {
     mkdirSync(dirname(join(root, rel)), { recursive: true });
     writeFileSync(join(root, rel), text);
   }
-  const tools = [[join(root, 'tools', 'gen.mjs')], ...(d.panel ? [[join(root, 'tools', 'modgui-gen.mjs'), join(root, 'plugins', d.stem)]] : [])];
+  // a generated plugin always has its MOD GUI: its declared panel, or gen.mjs's one section of every parameter
+  const tools = [[join(root, 'tools', 'gen.mjs')], ...(d.panel || d.binding === 'instance' ? [[join(root, 'tools', 'modgui-gen.mjs'), join(root, 'plugins', d.stem)]] : [])];
   for (const args of tools) {
     const r = run('node', args, { cwd: root });
     if (r.code !== 0) throw new Error(`${relative(root, args[0])}: ${r.out.trim()}`);
