@@ -39,6 +39,6 @@ if (p.ref === undefined) {
     console.error(`perturb: ${where.why}`);
     process.exit(2);
   }
-  perturbCopy(where.dir, scratch, paramKernel(d, p), p);
+  perturbCopy(where.dir, scratch, paramKernel(d, p, where.dir), p);
   console.log(`OMX_CONTRACT_DIR=${scratch}`);
 }
