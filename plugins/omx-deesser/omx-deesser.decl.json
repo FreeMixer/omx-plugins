@@ -1,31 +1,73 @@
 {
-  "$comment": "THE declaration of omx-deesser. Every face and the parameter header are generated from this file by tools/gen.mjs. Parameter order is append-only.",
+  "$comment": "THE declaration of omx-deesser, the folder's one hand-written file. Every other file of the folder is generated from it by tools/gen.mjs. Its parameters are by reference to omx-contract's deesser kernel and bind by name to omx-dsp's instance face. Parameter order is append-only.",
   "stem": "omx-deesser",
   "kernel": "deesser",
-  "noun": "de-esser",
+  "kernels": [
+    "deesser"
+  ],
   "name": "omx deesser",
+  "noun": "de-esser",
   "vendor": "openmixer",
   "url": "https://github.com/FreeMixer/omx-plugins",
   "version": "0.2.0",
-  "description": "the native DE-ESSER stage: a band-limited detector driving the COMPRESSOR's own gain computer.",
+  "description": "The console's de-esser: a detector on a band around the sibilance drives the compressor's gain computer, and the reduction lands on that band alone or on the whole signal.",
   "clap": {
     "id": "org.openmixer.deesser",
     "features": [
       "audio-effect",
+      "de-esser",
       "stereo"
     ]
   },
   "lv2": {
     "uri": "urn:openmixer:deesser",
-    "class": "lv2:Plugin"
+    "class": "lv2:DynamicsPlugin"
   },
+  "binding": "instance",
   "params": [
-    { "symbol": "freqHz", "name": "Freq", "ref": "DEESS_FREQ_RANGE" },
-    { "symbol": "widthOct", "name": "Width", "ref": "DEESS_WIDTH_RANGE" },
-    { "symbol": "thresholdDb", "name": "Threshold", "ref": "DEESS_THRESHOLD_RANGE" },
-    { "symbol": "ratio", "name": "Ratio", "ref": "DEESS_RATIO_RANGE" },
-    { "symbol": "rangeDb", "name": "Range", "ref": "DEESS_RANGE_RANGE" },
-    { "symbol": "attackMs", "name": "Attack", "ref": "DEESS_ATTACK_RANGE" },
-    { "symbol": "releaseMs", "name": "Release", "ref": "DEESS_RELEASE_RANGE" }
+    {
+      "symbol": "deessFreq",
+      "name": "Freq",
+      "ref": "DEESS_FREQ_RANGE"
+    },
+    {
+      "symbol": "deessWidth",
+      "name": "Width",
+      "ref": "DEESS_WIDTH_RANGE"
+    },
+    {
+      "symbol": "deessThreshold",
+      "name": "Threshold",
+      "ref": "DEESS_THRESHOLD_RANGE"
+    },
+    {
+      "symbol": "deessRatio",
+      "name": "Ratio",
+      "ref": "DEESS_RATIO_RANGE"
+    },
+    {
+      "symbol": "deessRange",
+      "name": "Range",
+      "ref": "DEESS_RANGE_RANGE"
+    },
+    {
+      "symbol": "deessAttack",
+      "name": "Attack",
+      "ref": "DEESS_ATTACK_RANGE"
+    },
+    {
+      "symbol": "deessRelease",
+      "name": "Release",
+      "ref": "DEESS_RELEASE_RANGE"
+    },
+    {
+      "symbol": "deessMode",
+      "name": "Mode",
+      "ref": "DEESS_MODES",
+      "values": [
+        "Split",
+        "Wideband"
+      ]
+    }
   ]
 }
