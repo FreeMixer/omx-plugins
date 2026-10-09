@@ -1,0 +1,175 @@
+{
+  "stem": "omx-geq",
+  "kernel": "geq",
+  "noun": "graphic EQ",
+  "description": "The 31-band graphic EQ kernel: {@link OMX_GEQ_BANDS} peaking sections at the ISO third-octave centres, in their OWN section array, run by the library's double cascade.",
+  "clap": {
+    "features": [
+      "audio-effect",
+      "equalizer",
+      "stereo"
+    ]
+  },
+  "lv2": {
+    "class": "lv2:EQPlugin"
+  },
+  "params": [
+    {
+      "symbol": "band01",
+      "name": "20 Hz",
+      "ref": "GEQ_BAND_RANGE"
+    },
+    {
+      "symbol": "band02",
+      "name": "25 Hz",
+      "ref": "GEQ_BAND_RANGE"
+    },
+    {
+      "symbol": "band03",
+      "name": "31.5 Hz",
+      "ref": "GEQ_BAND_RANGE"
+    },
+    {
+      "symbol": "band04",
+      "name": "40 Hz",
+      "ref": "GEQ_BAND_RANGE"
+    },
+    {
+      "symbol": "band05",
+      "name": "50 Hz",
+      "ref": "GEQ_BAND_RANGE"
+    },
+    {
+      "symbol": "band06",
+      "name": "63 Hz",
+      "ref": "GEQ_BAND_RANGE"
+    },
+    {
+      "symbol": "band07",
+      "name": "80 Hz",
+      "ref": "GEQ_BAND_RANGE"
+    },
+    {
+      "symbol": "band08",
+      "name": "100 Hz",
+      "ref": "GEQ_BAND_RANGE"
+    },
+    {
+      "symbol": "band09",
+      "name": "125 Hz",
+      "ref": "GEQ_BAND_RANGE"
+    },
+    {
+      "symbol": "band10",
+      "name": "160 Hz",
+      "ref": "GEQ_BAND_RANGE"
+    },
+    {
+      "symbol": "band11",
+      "name": "200 Hz",
+      "ref": "GEQ_BAND_RANGE"
+    },
+    {
+      "symbol": "band12",
+      "name": "250 Hz",
+      "ref": "GEQ_BAND_RANGE"
+    },
+    {
+      "symbol": "band13",
+      "name": "315 Hz",
+      "ref": "GEQ_BAND_RANGE"
+    },
+    {
+      "symbol": "band14",
+      "name": "400 Hz",
+      "ref": "GEQ_BAND_RANGE"
+    },
+    {
+      "symbol": "band15",
+      "name": "500 Hz",
+      "ref": "GEQ_BAND_RANGE"
+    },
+    {
+      "symbol": "band16",
+      "name": "630 Hz",
+      "ref": "GEQ_BAND_RANGE"
+    },
+    {
+      "symbol": "band17",
+      "name": "800 Hz",
+      "ref": "GEQ_BAND_RANGE"
+    },
+    {
+      "symbol": "band18",
+      "name": "1 kHz",
+      "ref": "GEQ_BAND_RANGE"
+    },
+    {
+      "symbol": "band19",
+      "name": "1.25 kHz",
+      "ref": "GEQ_BAND_RANGE"
+    },
+    {
+      "symbol": "band20",
+      "name": "1.6 kHz",
+      "ref": "GEQ_BAND_RANGE"
+    },
+    {
+      "symbol": "band21",
+      "name": "2 kHz",
+      "ref": "GEQ_BAND_RANGE"
+    },
+    {
+      "symbol": "band22",
+      "name": "2.5 kHz",
+      "ref": "GEQ_BAND_RANGE"
+    },
+    {
+      "symbol": "band23",
+      "name": "3.15 kHz",
+      "ref": "GEQ_BAND_RANGE"
+    },
+    {
+      "symbol": "band24",
+      "name": "4 kHz",
+      "ref": "GEQ_BAND_RANGE"
+    },
+    {
+      "symbol": "band25",
+      "name": "5 kHz",
+      "ref": "GEQ_BAND_RANGE"
+    },
+    {
+      "symbol": "band26",
+      "name": "6.3 kHz",
+      "ref": "GEQ_BAND_RANGE"
+    },
+    {
+      "symbol": "band27",
+      "name": "8 kHz",
+      "ref": "GEQ_BAND_RANGE"
+    },
+    {
+      "symbol": "band28",
+      "name": "10 kHz",
+      "ref": "GEQ_BAND_RANGE"
+    },
+    {
+      "symbol": "band29",
+      "name": "12.5 kHz",
+      "ref": "GEQ_BAND_RANGE"
+    },
+    {
+      "symbol": "band30",
+      "name": "16 kHz",
+      "ref": "GEQ_BAND_RANGE"
+    },
+    {
+      "symbol": "band31",
+      "name": "20 kHz",
+      "ref": "GEQ_BAND_RANGE"
+    }
+  ],
+  "omxdspMin": "0.2.0",
+  "contractRelease": "1.3.0"
+}
