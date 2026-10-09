@@ -2,7 +2,7 @@
   "$comment": "THE declaration of omx-strip: the CLAP face, the LV2 face and the parameter header are generated from this file by tools/gen.mjs. Parameter order is append-only. The travels are omx-dsp’s declared ones (omx_contract_limits.h: TRIM_RANGE, HPF/LPF_FREQ_RANGE, OMX_GATE_*, EQ_*_RANGE, OMX_COMP_*), copied here at the omx-dsp pin. the ‘order’ parameter is the index of the stage permutation, lexicographic over (input, gate, eq, comp): 0 is the strip’s default order.",
   "stem": "omx-strip",
   "kernel": "strip",
-  "kernels": ["eq", "gate", "comp"],
+  "kernels": ["trim", "eq", "gate", "comp"],
   "name": "omx strip",
   "noun": "channel strip",
   "vendor": "openmixer",
@@ -13,7 +13,7 @@
   "clap": { "id": "org.openmixer.strip", "features": ["audio-effect", "mixing", "stereo"] },
   "lv2": { "uri": "urn:openmixer:strip", "class": "lv2:MixerPlugin" },
   "params": [
-    { "symbol": "trimDb", "name": "Trim", "ref": "TRIM_TRAVELS", "field": "trimDb" },
+    { "symbol": "trimDb", "name": "Trim", "ref": "TRIM_TRAVELS", "field": "trimDb", "kernel": "trim" },
     { "symbol": "hpfOn", "name": "HPF", "unit": "", "min": 0, "max": 1, "def": 0, "kind": "toggle", "own": "switch" },
     { "symbol": "hpfFreq", "name": "HPF Freq", "ref": "EQ_CONTINUOUS_TRAVELS", "field": "hpfFreqHz", "defaultRef": "EQ_PASS_FILTER_DEFAULTS.hpfFreqHz", "kernel": "eq" },
     { "symbol": "hpfSlope", "name": "HPF Slope", "ref": "FILTER_SLOPES", "unit": "dB/oct", "kernel": "eq" },
