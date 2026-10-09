@@ -1,0 +1,46 @@
+{
+  "$comment": "THE declaration of omx-pitch, the folder's one hand-written file. Every other file of the folder is generated from it by tools/gen.mjs. Its parameters are by reference to omx-contract's pitch kernel and bind by name to omx-dsp's instance face. Parameter order is append-only.",
+  "stem": "omx-pitch",
+  "kernel": "pitch",
+  "kernels": [
+    "pitch"
+  ],
+  "name": "omx pitch",
+  "vendor": "openmixer",
+  "url": "https://github.com/FreeMixer/omx-plugins",
+  "version": "0.2.0",
+  "description": "The console's pitch shifter: shifts both channels up or down by semitones and cents, without changing their length, mixed with the dry signal.",
+  "clap": {
+    "id": "org.openmixer.pitch",
+    "features": [
+      "audio-effect",
+      "pitch-shifter",
+      "stereo"
+    ]
+  },
+  "lv2": {
+    "uri": "urn:openmixer:pitch",
+    "class": "lv2:PitchPlugin"
+  },
+  "binding": "instance",
+  "params": [
+    {
+      "symbol": "semitones",
+      "name": "Semitones",
+      "ref": "PITCH_LIMITS",
+      "field": "semitones"
+    },
+    {
+      "symbol": "cents",
+      "name": "Cents",
+      "ref": "PITCH_LIMITS",
+      "field": "cents"
+    },
+    {
+      "symbol": "mix",
+      "name": "Mix",
+      "ref": "PITCH_LIMITS",
+      "field": "mix"
+    }
+  ]
+}
