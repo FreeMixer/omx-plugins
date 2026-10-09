@@ -1,13 +1,13 @@
 {
   "omx-chorus": {
-    "rateHz": {
+    "rate": {
       "props": [
         "pprops:logarithmic"
       ],
       "unit": "units:hz",
       "points": []
     },
-    "depthMs": {
+    "depth": {
       "props": [],
       "unit": "units:ms",
       "points": []
