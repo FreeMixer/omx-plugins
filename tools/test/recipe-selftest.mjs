@@ -16,6 +16,8 @@
  *      (tools/commit-plan-check.mjs); two commits swapped, or two concerns in one commit, break it.
  *   3. Every checker family of the completeness test: break the artifact on a copy of the tree
  *      (omx-drive), and the test names that entry and its wizard step; restore, and it is green.
+ *      The declaration's schema check among them: a declaration with no panel, with no console
+ *      block, or whose console chip or console panel names no parameter, is red.
  *   4. The recipe: a new required entry makes every plugin red; an entry naming a checker that does
  *      not exist breaks the recipe.
  *   5. The wizard refuses, before writing: a kernel omx-contract lacks, a kernel with no instance
@@ -24,8 +26,10 @@
  *      parameter the face takes no argument for, a panel or console naming no parameter, a panel
  *      it cannot draw; and a strict build refuses an argument that binds only by its words.
  *   6. The port hints (tools/port-hints.mjs): a TTL that drops a hint, a declaration that drops a
- *      band type's labels or declares a frequency linear, and a plugin with no pin are each named;
- *      the whole tree is green.
+ *      band type's labels or declares a frequency linear, a plugin with no pin, and a pin moved in a
+ *      declaration that the TTL does not carry are each named; the view follows the declarations
+ *      (`gen --check` stale on a moved pin or a hand edit, and on a per-plugin pin file); the whole
+ *      tree is green.
  *   7. The identity oracle: a wobble control the stand-in render lists with `rearms` (its
  *      `kernels`) is held at its default in every block of the plan, and named in the oracle's
  *      comment, while the rest move; the same render without the flag moves it again; a render
@@ -171,7 +175,7 @@ async function main() {
     `the draft has one parameter per resolve() argument, named by the contract (${draft.decl?.params.map((p) => `${p.symbol}:${p.name}`).join(' ')})`);
   expect(draft.decl?.params.every((p) => p.ref && !('min' in p) && !('def' in p)), 'the draft is by reference only');
   const marks = reviewMarks(draft.decl);
-  expect(marks.join(' ') === '/description /clap/features/1 /lv2/class /params/3/values/0 /params/3/values/1',
+  expect(marks.join(' ') === '/description /clap/features/1 /lv2/class /params/3/values/0 /params/3/values/1 /console/placement/strips/0 /console/placement/group',
     `the draft marks every design choice REVIEW (${marks.join(' ')})`);
   const unsettled = await planPlugin(draft.decl, src, { root: tree, recipe });
   expect(!unsettled.ok && unsettled.refusals.length === marks.length, `a draft with REVIEW marks is refused, each named (${unsettled.refusals.map((r) => r.field).join(' ')})`);
@@ -180,6 +184,7 @@ async function main() {
   settled.clap.features[1] = 'wobble';
   settled.lv2.class = 'lv2:ModulatorPlugin';
   settled.params[3].values = ['Wobble', 'Pan'];
+  settled.console.placement = { strips: ['input'], group: 'plugins' };
   const answers = settled; // what section 5 mutates
   const plan = await planPlugin(settled, src, { root: tree, recipe });
   expect(plan.ok, `the settled draft is accepted${plan.ok ? '' : `: ${plan.refusals.map((r) => `${r.field} ${r.reason}`).join('; ')}`}`);
@@ -305,6 +310,11 @@ async function main() {
     ['noText', 'no-dpf', () => add(`${P}/dpf_shell.h`, '#include "DistrhoPlugin.hpp"\n')],
     ['noCopiedDsp', 'no-copied-dsp', () => add(`${P}/copied.h`, `static inline float ${dspName}(float x) {\n  return x;\n}\n`)],
     ['noCopiedDsp', 'no-copied-dsp', () => add(`${P}/engine.h`, '#include "mix_drive.h"\n')],
+    // every plugin declares its panel and its console block, each naming declared parameters only
+    ['declValid', 'declaration', () => edit(`${P}/omx-drive.decl.json`, (s) => JSON.stringify((({ panel: _p, ...d }) => d)(JSON.parse(s)), null, 2))],
+    ['declValid', 'declaration', () => edit(`${P}/omx-drive.decl.json`, (s) => JSON.stringify((({ console: _c, ...d }) => d)(JSON.parse(s)), null, 2))],
+    ['declValid', 'declaration', () => edit(`${P}/omx-drive.decl.json`, (s) => s.replace('"chip": "{amount}"', '"chip": "{drive}"'))],
+    ['declValid', 'declaration', () => edit(`${P}/omx-drive.decl.json`, (s) => s.replace('"bandFreq",\n            "mix"', '"bandFreq",\n            "wet"'))],
     ['paramsByReference', 'params-by-reference', () => edit(`${P}/omx-drive.decl.json`, (s) => s.replace('"ref": "DRIVE_AMOUNT_RANGE"', '"ref": "DRIVE_AMOUNT_RANGE", "min": 0'))],
   ];
   for (const [family, id, breakIt] of SABOTAGE) {
@@ -538,24 +548,35 @@ static inline void omx_wobble_instance_run(OmxWobbleInstance *s, const float *${
       execFileSync('mv', [join(hints, 'plugins/omx-delay9', from), join(hints, 'plugins/omx-delay9', to)]);
     const d9 = JSON.parse(readFileSync(join(hints, 'plugins/omx-delay9/omx-delay9.decl.json'), 'utf8'));
     d9.stem = 'omx-delay9';
+    delete d9.portHints; // the copy carries delay's pin in its declaration
     writeFileSync(join(hints, 'plugins/omx-delay9/omx-delay9.decl.json'), JSON.stringify(d9, null, 2));
-    rmSync(join(hints, 'plugins/omx-delay9/port-hints.json')); // the copy brought delay's pin along
     named('a plugin with no pin', 'omx-delay9: no pinned hints');
-    // the per-plugin file is the pin: a hint moved there moves the assembled view, a hand edit of the view goes stale
-    const f16 = join(hints, 'plugins/omx-eq16/port-hints.json'), p16 = readFileSync(f16, 'utf8');
+    rmSync(join(hints, 'plugins/omx-delay9'), { recursive: true });
+    // the declaration is the pin: a hint moved there moves the assembled view and is held against the
+    // TTL; a hand edit of the view goes stale; a per-plugin pin file beside the declaration is refused
+    const fEq = join(hints, 'plugins/omx-eq/omx-eq.decl.json'), pEq = readFileSync(fEq, 'utf8');
     const view = () => readFileSync(join(hints, 'tools/test/port-hints.json'), 'utf8');
     const gen = (...a) => spawnSync('node', ['tools/gen.mjs', ...a], { cwd: hints, encoding: 'utf8' });
     gen();
     const v0 = view();
-    writeFileSync(f16, p16.replace('units:db', 'units:pc'));
-    expect(gen('--check').status === 1, 'port hints: a hint moved in one plugin\'s file leaves the view stale');
+    const moved = JSON.parse(pEq);
+    moved.portHints.gain.unit = 'units:pc';
+    writeFileSync(fEq, `${JSON.stringify(moved, null, 2)}\n`);
+    expect(gen('--check').status === 1, 'port hints: a hint moved in a declaration leaves the view stale');
     gen();
-    expect(view() !== v0 && JSON.parse(view())['omx-eq16'].b1_gain.unit === 'units:pc' && gen('--check').status === 0, 'port hints: and regenerating moves the view');
-    writeFileSync(f16, p16);
+    expect(view() !== v0 && ['omx-eq8', 'omx-eq16', 'omx-eq32'].every((s) => JSON.parse(view())[s].b1_gain.unit === 'units:pc' && JSON.parse(view())[s][`b${s === 'omx-eq8' ? 8 : 16}_gain`].unit === 'units:pc') && gen('--check').status === 0,
+      'port hints: and regenerating moves the view, the per-band pin on every band of every variant');
+    named('a pin the TTL does not carry', 'omx-eq16: port "b16_gain" lost units:unit units:pc');
+    writeFileSync(fEq, pEq);
     gen();
+    expect(view() === v0 && hintErrors(hints).length === 0, 'port hints: the declaration restored, the view and the check whole again');
     writeFileSync(join(hints, 'tools/test/port-hints.json'), v0.replace('units:db', 'units:pc'));
     expect(gen('--check').status === 1, 'port hints: a hand edit of the generated view goes stale');
     gen();
+    writeFileSync(join(hints, 'plugins/omx-tremolo/port-hints.json'), '{}\n');
+    const stray = gen('--check');
+    expect(stray.status === 1 && /plugins\/omx-tremolo\/port-hints\.json/.test(stray.stderr), `port hints: a per-plugin pin file is refused (${stray.stderr.trim().split('\n')[0] || 'NOT REFUSED'})`);
+    rmSync(join(hints, 'plugins/omx-tremolo/port-hints.json'));
     expect(view() === v0 && gen('--check').status === 0, 'port hints: restored, the view is whole again');
   }
 

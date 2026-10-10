@@ -116,6 +116,116 @@
       "perBand": true
     }
   ],
+  "portHints": {
+    "hpf_on": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "hpf_freq": {
+      "props": [
+        "lv2:integer",
+        "pprops:logarithmic"
+      ],
+      "unit": "units:hz"
+    },
+    "hpf_slope": {
+      "props": [
+        "lv2:enumeration",
+        "lv2:integer"
+      ],
+      "points": [
+        "12 12 dB/oct",
+        "24 24 dB/oct"
+      ]
+    },
+    "lpf_on": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "lpf_freq": {
+      "props": [
+        "lv2:integer",
+        "pprops:logarithmic"
+      ],
+      "unit": "units:hz"
+    },
+    "lpf_slope": {
+      "props": [
+        "lv2:enumeration",
+        "lv2:integer"
+      ],
+      "points": [
+        "12 12 dB/oct",
+        "24 24 dB/oct"
+      ]
+    },
+    "type": {
+      "props": [
+        "lv2:enumeration",
+        "lv2:integer"
+      ],
+      "points": [
+        "0 Bell",
+        "1 Low Shelf",
+        "2 High Shelf",
+        "3 Notch",
+        "4 All-pass 1st",
+        "5 All-pass 2nd"
+      ]
+    },
+    "freq": {
+      "props": [
+        "lv2:integer",
+        "pprops:logarithmic"
+      ],
+      "unit": "units:hz"
+    },
+    "gain": {
+      "unit": "units:db"
+    },
+    "on": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "enabled": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "latency": {
+      "props": [
+        "lv2:integer",
+        "lv2:reportsLatency"
+      ],
+      "unit": "units:frame"
+    }
+  },
+  "panel": {
+    "family": "eq",
+    "roles": {},
+    "sections": [
+      {
+        "key": "eq",
+        "label": "EQ",
+        "controls": [
+          "hpf_on",
+          "hpf_freq",
+          "hpf_slope",
+          "lpf_on",
+          "lpf_freq",
+          "lpf_slope",
+          "type",
+          "freq",
+          "gain",
+          "q",
+          "on"
+        ]
+      }
+    ]
+  },
   "manual": [
     "| Section | Parameters |",
     "|---|---|",
@@ -125,5 +235,65 @@
     "",
     "Plus the host's bypass, which is the whole EQ's switch. Every band and filter starts off, so a freshly loaded instance passes the",
     "signal untouched."
-  ]
+  ],
+  "console": {
+    "$comment": "As FreeMixer/openmixer integration/waves-2026-10 draws its eq stage: EqCurve over EqEncoderBank.vue, a chip per band (on, type, freq, gain, q) plus the HPF and LPF (on, slope, cutoff); the console's bands are a list the operator adds to, these variants' are fixed. Chip: STAGE_CHIP_PARAMS.eq, shown while the HPF is on. Card: one gain per band, then the HPF frequency (useStripOverview).",
+    "placement": {
+      "strips": [
+        "input",
+        "fxReturn",
+        "aux",
+        "mix",
+        "matrix",
+        "main",
+        "fxSend",
+        "mixMinus"
+      ],
+      "group": "walk",
+      "stage": "eq",
+      "after": "gate",
+      "fxGroup": "eq"
+    },
+    "card": {
+      "show": [
+        "gain",
+        "hpf_freq"
+      ]
+    },
+    "chip": "HPF {hpf_freq}",
+    "panel": {
+      "sections": [
+        {
+          "key": "bands",
+          "label": "Bands",
+          "controls": [
+            "on",
+            "type",
+            "freq",
+            "gain",
+            "q"
+          ],
+          "graph": "eq-curve"
+        },
+        {
+          "key": "hpf",
+          "label": "HPF",
+          "controls": [
+            "hpf_on",
+            "hpf_slope",
+            "hpf_freq"
+          ]
+        },
+        {
+          "key": "lpf",
+          "label": "LPF",
+          "controls": [
+            "lpf_on",
+            "lpf_slope",
+            "lpf_freq"
+          ]
+        }
+      ]
+    }
+  }
 }

@@ -69,5 +69,102 @@
       ],
       "defaultId": "slow"
     }
-  ]
+  ],
+  "portHints": {
+    "hornSlowHz": {
+      "props": [
+        "pprops:logarithmic"
+      ],
+      "unit": "units:hz"
+    },
+    "hornFastHz": {
+      "props": [
+        "pprops:logarithmic"
+      ],
+      "unit": "units:hz"
+    },
+    "drumSlowHz": {
+      "props": [
+        "pprops:logarithmic"
+      ],
+      "unit": "units:hz"
+    },
+    "drumFastHz": {
+      "props": [
+        "pprops:logarithmic"
+      ],
+      "unit": "units:hz"
+    },
+    "balance": {
+      "props": [
+        "lv2:integer"
+      ],
+      "unit": "units:pc"
+    },
+    "mix": {
+      "unit": "units:pc"
+    },
+    "speed": {
+      "props": [
+        "lv2:enumeration",
+        "lv2:integer"
+      ],
+      "points": [
+        "0 Stop",
+        "1 Slow",
+        "2 Fast"
+      ]
+    },
+    "enabled": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "latency": {
+      "props": [
+        "lv2:integer",
+        "lv2:reportsLatency"
+      ],
+      "unit": "units:frame"
+    }
+  },
+  "panel": {
+    "family": "rotary",
+    "roles": {},
+    "sections": [
+      {
+        "key": "rotary",
+        "label": "Rotary",
+        "controls": [
+          "hornSlowHz",
+          "hornFastHz",
+          "drumSlowHz",
+          "drumFastHz",
+          "accel",
+          "balance",
+          "mix",
+          "speed"
+        ]
+      }
+    ]
+  },
+  "console": {
+    "$comment": "The console has the rotary stage in its walk (packages/declarations/stages/rotary.json, \"contract\": null) and draws no panel, chip or card for it today; racked as a plugin it is drawn by the generic plugin editor.",
+    "placement": {
+      "strips": [
+        "input",
+        "fxReturn",
+        "aux",
+        "mix",
+        "matrix",
+        "main",
+        "fxSend",
+        "mixMinus"
+      ],
+      "group": "walk",
+      "stage": "rotary",
+      "after": "drive",
+      "fxGroup": "modulation"
+    }
+  }
 }
