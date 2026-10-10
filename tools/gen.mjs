@@ -87,7 +87,7 @@ export function loadDecl(dir) {
 }
 
 /** The panel the wizard drafts for a plugin generated from its instance face: one section, every
- * parameter in declaration order (the MOD GUI every generated plugin had before declaring one). */
+ * parameter in declaration order, so the MOD GUI draws every parameter until a person groups them. */
 export function defaultPanel(d) {
   const label = d.name.replace(/^omx /, '');
   return { family: d.kernel, roles: {}, sections: [{ key: d.kernel, label: label[0].toUpperCase() + label.slice(1), controls: d.params.map((p) => p.symbol) }] };
