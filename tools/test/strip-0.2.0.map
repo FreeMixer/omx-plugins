@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 Pau Aliagas <linuxnow@gmail.com>
 # omx-strip as the hand-ported 0.2.0 plugin (A) and as a chain (B): A's every setting, as B sets it.
 # Read by tools/test/strip-crosscheck.sh (tools/test/clap-crosscheck.c); a line is <A name>|<B names>[|<a>:<b> ...], or |<B name>|=<x>.
 Trim|Trim
