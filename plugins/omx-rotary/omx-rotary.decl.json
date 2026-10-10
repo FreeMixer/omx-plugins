@@ -8,7 +8,7 @@
   "name": "omx rotary",
   "vendor": "openmixer",
   "url": "https://github.com/FreeMixer/omx-plugins",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "The console's rotary speaker: a drum rotor on the low band and a horn rotor on the high band, with stop, slow and fast speeds, mixed with the dry signal.",
   "clap": {
     "id": "org.openmixer.rotary",

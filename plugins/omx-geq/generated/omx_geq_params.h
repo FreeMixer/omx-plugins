@@ -179,7 +179,7 @@ static const omx_plugin_param OMX_GEQ_PARAMS[OMX_GEQ_PARAM_COUNT] = {
 #define OMX_GEQ_NAME "omx geq"
 #define OMX_GEQ_VENDOR "openmixer"
 #define OMX_GEQ_URL "https://github.com/FreeMixer/omx-plugins"
-#define OMX_GEQ_VERSION "0.2.0"
+#define OMX_GEQ_VERSION "0.3.0"
 #define OMX_GEQ_DESCRIPTION "The console's 31-band graphic EQ: one fader per ISO third-octave band from 20 Hz to 20 kHz, each cutting or boosting by up to 15 dB."
 #define OMX_GEQ_CLAP_ID "org.openmixer.geq"
 #define OMX_GEQ_CLAP_FEATURES "audio-effect", "equalizer", "stereo"

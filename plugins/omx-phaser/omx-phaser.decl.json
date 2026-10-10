@@ -8,7 +8,7 @@
   "name": "omx phaser",
   "vendor": "openmixer",
   "url": "https://github.com/FreeMixer/omx-plugins",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "The console's phaser: identical all-pass sections swept in octaves by one oscillator, with feedback around the chain and a wet/dry mix.",
   "clap": {
     "id": "org.openmixer.phaser",

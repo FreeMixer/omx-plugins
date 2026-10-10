@@ -44,7 +44,7 @@ static const omx_plugin_param OMX_FLANGER_PARAMS[OMX_FLANGER_PARAM_COUNT] = {
 #define OMX_FLANGER_NAME "omx flanger"
 #define OMX_FLANGER_VENDOR "openmixer"
 #define OMX_FLANGER_URL "https://github.com/FreeMixer/omx-plugins"
-#define OMX_FLANGER_VERSION "0.2.0"
+#define OMX_FLANGER_VERSION "0.3.0"
 #define OMX_FLANGER_DESCRIPTION "The console's flanger: one modulated short delay with signed feedback, swept by one oscillator and mixed with the dry signal."
 #define OMX_FLANGER_CLAP_ID "org.openmixer.flanger"
 #define OMX_FLANGER_CLAP_FEATURES "audio-effect", "flanger", "stereo"

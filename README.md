@@ -287,6 +287,8 @@ comp, and the rest follow in lexicographic order (1 is input > filters > gate > 
 comp > EQ > gate > filters > input). Plus the host's bypass. The latency reported is the sum of the
 stages': the gate's and the compressor's 4x detector paths while they are engaged, else zero.
 
+0.3.0 changed the parameter list (the Input and Filters switches, the gate's knee, hold and hysteresis, the compressor's kind, mix and detector oversampling, five-stage orders): a session saved with 0.2.0 does not load as it was, though at 0.2.0's settings the strip sounds the same, sample for sample.
+
 ### omx transient
 
 | Parameter | Range | Default |

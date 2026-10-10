@@ -6,7 +6,7 @@
   "noun": "channel strip",
   "vendor": "openmixer",
   "url": "https://github.com/FreeMixer/omx-plugins",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "The OpenMixer console's channel strip in one plugin: input trim, high- and low-pass filters, gate, four-band EQ and compressor, in the console's order or any other. No DSP of its own: each stage is omx-dsp's instance face of the console's kernel, called in order.",
   "summary": "The console's channel strip in one plugin: input trim, HPF/LPF, gate, four-band EQ and compressor, in the desk's order or any other. Stereo, real-time safe, 44.1 to 192 kHz.",
   "clap": {
@@ -831,7 +831,9 @@
     "**Order** (0 to 119) picks the order of the five stages: 0 is the desk's input > filters > gate > EQ >",
     "comp, and the rest follow in lexicographic order (1 is input > filters > gate > comp > EQ, ... 119 is",
     "comp > EQ > gate > filters > input). Plus the host's bypass. The latency reported is the sum of the",
-    "stages': the gate's and the compressor's 4x detector paths while they are engaged, else zero."
+    "stages': the gate's and the compressor's 4x detector paths while they are engaged, else zero.",
+    "",
+    "0.3.0 changed the parameter list (the Input and Filters switches, the gate's knee, hold and hysteresis, the compressor's kind, mix and detector oversampling, five-stage orders): a session saved with 0.2.0 does not load as it was, though at 0.2.0's settings the strip sounds the same, sample for sample."
   ],
   "console": {
     "$comment": "FreeMixer/openmixer integration/waves-2026-10 has no channel-strip stage: its strip is the trim, the EQ (with the HPF and LPF), the gate and the dynamics stages themselves. Racked as a plugin (the insert rack's kinds, channel-contract.ts INSERT_RACK_KINDS) it is drawn by the generic plugin editor.",

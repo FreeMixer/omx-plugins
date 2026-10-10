@@ -16,7 +16,7 @@
 #   make install    DESTDIR, PREFIX, LIBDIR, CLAPDIR: $(CLAPDIR)/<name>.clap and $(LIBDIR)/lv2/<name>.lv2/
 #   make install-devel   the public headers other projects include: $(INCLUDEDIR)/omx-plugins/*.h
 #   make version    the release version, the one packaging/omx-plugins.spec and debian/changelog carry
-VERSION := 0.2.0
+VERSION := 0.3.0
 PLUGINS := $(sort $(dir $(wildcard plugins/*/Makefile)))
 PREFIX     ?= /usr
 INCLUDEDIR ?= $(PREFIX)/include
