@@ -100,7 +100,7 @@ export function prepareDecl(file, d, stem, dir = dirname(file)) {
 }
 
 /** The panel the wizard drafts for a plugin generated from its instance face: one section, every
- * parameter in declaration order (the MOD GUI every generated plugin had before declaring one). */
+ * parameter in declaration order, so the MOD GUI draws every parameter until a person groups them. */
 export function defaultPanel(d) {
   if (d.binding === 'chain') {
     // one section per element, by its id (spec §15.2: the elements are drawn, never placed, apart)
