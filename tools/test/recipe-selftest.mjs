@@ -42,7 +42,9 @@
  *      then `order`), and its `make test` is green: both faces bit-identical to the chain of faces
  *      called directly at every declared rate, each parameter one step off seen. The generated
  *      core with two orders swapped makes the oracle red; restored, green. gen refuses a `key` on
- *      an element whose face takes none, and a parameter of another element's kernel.
+ *      an element whose face takes none, and a parameter of another element's kernel; held to a
+ *      released tag (`shipped`), a list that differs from it is refused, each index named, unless
+ *      `shippedDiff` names exactly those, and a tree with no such tag says it was not checked.
  *
  * Works in build/selftest/ (removed first). Needs git, and omx-dsp's headers as the build does.
  * Exit 1 when any check failed, including an arm that stopped early.
@@ -712,6 +714,34 @@ static inline void omx_wobble_instance_run(OmxWobbleInstance *s, const float *${
     refusedBy('a parameter of another kernel', (d) => {
       d.chain[2].params[0].kernel = 'gate';
     }, "names kernel 'gate', not the element's 'comp'");
+    writeFileSync(join(ct, CP, `${stem}.decl.json`), `${JSON.stringify(plan.decl, null, 2)}\n`);
+    // a chain converted from a release: gen holds it to that release's parameter list
+    const shippedAs = (mutate) => {
+      const d = structuredClone(plan.decl);
+      d.shipped = 'v9.9.9';
+      mutate(d);
+      writeFileSync(join(ct, CP, `${stem}.decl.json`), `${JSON.stringify(d, null, 2)}\n`);
+      return spawnSync('node', ['tools/gen.mjs', '--check', CP], { cwd: ct, encoding: 'utf8' });
+    };
+    const untagged = shippedAs(() => {});
+    expect(untagged.status === 0 && untagged.stderr.includes('v9.9.9 is not readable here'), `chain: with no such tag, gen says the release list is not checked (${untagged.stderr.trim().split('\n')[0]})`);
+    git(ct, 'init', '-q');
+    git(ct, 'add', '-A');
+    git(ct, 'commit', '-q', '-m', 'released');
+    git(ct, 'tag', 'v9.9.9');
+    expect(shippedAs(() => {}).status === 0, 'chain: the released list unchanged, gen is green');
+    const swap = (d) => {
+      const ps = d.chain[2].params;
+      [ps[0], ps[1]] = [ps[1], ps[0]];
+    };
+    const moved = shippedAs(swap);
+    expect(moved.status !== 0 && moved.stderr.includes('compThresholdDb -> compRatio') && moved.stderr.includes('compRatio -> compThresholdDb'),
+      `sabotage chain: two parameters swapped against the release are refused, each index named (${moved.stderr.split('\n').find((l) => l.includes('->'))?.trim()})`);
+    const idxs = [...moved.stderr.matchAll(/^ {2}(\d+ \S+ -> \S+)$/gm)].map((m) => m[1]);
+    expect(idxs.length === 2 && shippedAs((d) => {
+      swap(d);
+      d.shippedDiff = idxs;
+    }).status === 0, `chain: the same swap named in shippedDiff is accepted (${idxs.join('; ')})`);
     writeFileSync(join(ct, CP, `${stem}.decl.json`), `${JSON.stringify(plan.decl, null, 2)}\n`);
     delete process.env.OMX_CONTRACT_DIR;
   }
