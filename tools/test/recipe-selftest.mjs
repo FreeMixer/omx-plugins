@@ -719,20 +719,21 @@ static inline void omx_wobble_instance_run(OmxWobbleInstance *s, const float *${
     }, "names kernel 'gate', not the element's 'comp'");
     writeFileSync(join(ct, CP, `${stem}.decl.json`), `${JSON.stringify(plan.decl, null, 2)}\n`);
     // a chain converted from a release: gen holds it to that release's parameter list
-    const shippedAs = (mutate) => {
+    // gen reads the declaration, then generates (the list a change moves is no longer the committed one)
+    const shippedAs = (mutate, ...mode) => {
       const d = structuredClone(plan.decl);
       d.shipped = 'v9.9.9';
       mutate(d);
       writeFileSync(join(ct, CP, `${stem}.decl.json`), `${JSON.stringify(d, null, 2)}\n`);
-      return spawnSync('node', ['tools/gen.mjs', '--check', CP], { cwd: ct, encoding: 'utf8' });
+      return spawnSync('node', ['tools/gen.mjs', ...mode, CP], { cwd: ct, encoding: 'utf8' });
     };
-    const untagged = shippedAs(() => {});
+    const untagged = shippedAs(() => {}, '--check');
     expect(untagged.status === 0 && untagged.stderr.includes('v9.9.9 is not readable here'), `chain: with no such tag, gen says the release list is not checked (${untagged.stderr.trim().split('\n')[0]})`);
     git(ct, 'init', '-q');
     git(ct, 'add', '-A');
     git(ct, 'commit', '-q', '-m', 'released');
     git(ct, 'tag', 'v9.9.9');
-    expect(shippedAs(() => {}).status === 0, 'chain: the released list unchanged, gen is green');
+    expect(shippedAs(() => {}, '--check').status === 0, 'chain: the released list unchanged, gen is green');
     const swap = (d) => {
       const ps = d.chain[2].params;
       [ps[0], ps[1]] = [ps[1], ps[0]];
@@ -746,6 +747,7 @@ static inline void omx_wobble_instance_run(OmxWobbleInstance *s, const float *${
       d.shippedDiff = idxs;
     }).status === 0, `chain: the same swap named in shippedDiff is accepted (${idxs.join('; ')})`);
     writeFileSync(join(ct, CP, `${stem}.decl.json`), `${JSON.stringify(plan.decl, null, 2)}\n`);
+    spawnSync('node', ['tools/gen.mjs', CP], { cwd: ct, encoding: 'utf8' }); // the plugin as it was released
     delete process.env.OMX_CONTRACT_DIR;
   }
 
