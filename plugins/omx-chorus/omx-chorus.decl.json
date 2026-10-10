@@ -8,7 +8,7 @@
   "name": "omx chorus",
   "vendor": "openmixer",
   "url": "https://github.com/FreeMixer/omx-plugins",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "The console's chorus: up to four voices read one modulated delay line, the right leg's sweep offset by the spread, mixed with the dry signal.",
   "clap": {
     "id": "org.openmixer.chorus",

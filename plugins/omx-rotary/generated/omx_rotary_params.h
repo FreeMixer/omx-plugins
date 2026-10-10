@@ -64,7 +64,7 @@ static const omx_plugin_param OMX_ROTARY_PARAMS[OMX_ROTARY_PARAM_COUNT] = {
 #define OMX_ROTARY_NAME "omx rotary"
 #define OMX_ROTARY_VENDOR "openmixer"
 #define OMX_ROTARY_URL "https://github.com/FreeMixer/omx-plugins"
-#define OMX_ROTARY_VERSION "0.2.0"
+#define OMX_ROTARY_VERSION "0.3.0"
 #define OMX_ROTARY_DESCRIPTION "The console's rotary speaker: a drum rotor on the low band and a horn rotor on the high band, with stop, slow and fast speeds, mixed with the dry signal."
 #define OMX_ROTARY_CLAP_ID "org.openmixer.rotary"
 #define OMX_ROTARY_CLAP_FEATURES "audio-effect", "stereo"

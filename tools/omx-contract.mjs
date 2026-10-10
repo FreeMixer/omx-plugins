@@ -289,8 +289,14 @@ function findNameIn(its, kernel, name) {
   return { error: `'${name}' is in ${e.rel}, another kernel's file` };
 }
 
-/** The omx-contract kernels a declaration's parameters reference: `kernels`, or `[kernel]`. */
-export const declKernels = (d) => (Array.isArray(d.kernels) && d.kernels.length ? d.kernels : [d.kernel]);
+/** The omx-contract kernels a declaration's parameters reference: `kernels`, a chain's elements'
+ * (each once, in chain order), or `[kernel]`. */
+export const declKernels = (d) =>
+  Array.isArray(d.kernels) && d.kernels.length ? d.kernels : Array.isArray(d.chain) ? [...new Set(d.chain.map((el) => el.kernel))] : [d.kernel];
+
+/** A declaration's hand-written parameters: its `params`, or a chain's elements' (each naming its
+ * element's kernel); a chain's switches and `order` are generated, never declared. */
+export const declParams = (d) => d.params ?? (d.chain ?? []).flatMap((el) => (el.params ?? []).map((p) => ({ ...p, kernel: p.kernel ?? el.kernel })));
 
 /**
  * The kernel one parameter's reference is read from: its own `kernel` (which must be one of the

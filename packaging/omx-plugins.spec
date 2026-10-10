@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # Copyright (C) 2026 Pau Aliagas <linuxnow@gmail.com>
 Name: omx-plugins
-Version: 0.2.0
+Version: 0.3.0
 Release: 1%{?dist}
 License: GPL-3.0-or-later
 Summary: The OpenMixer console's delay, drive, EQ, channel strip, keyed gate and effects, as plugins for your DAW
@@ -12,7 +12,7 @@ Source0: %{url}/archive/v%{version}/%{name}-%{version}.tar.gz
 BuildRequires: gcc
 BuildRequires: make
 BuildRequires: pkgconf-pkg-config
-BuildRequires: omx-dsp-devel >= 0.5.1
+BuildRequires: omx-dsp-devel >= 0.5.2
 BuildRequires: omx-clap-core-devel
 BuildRequires: clap-devel
 BuildRequires: lv2-devel
@@ -70,7 +70,7 @@ console's own DSP, so they sound like the desk.
 
 %package devel
 Summary: Headers of the OpenMixer plugins, for projects that build on them
-Requires: omx-dsp-devel >= 0.5.1
+Requires: omx-dsp-devel >= 0.5.2
 
 %description devel
 The headers other projects include to use the OpenMixer plugins' parameters and
@@ -151,6 +151,28 @@ parameter header, installed in %{_includedir}/omx-plugins.
 # END GENERATED lv2-files
 
 %changelog
+* Sat Oct 10 2026 Pau Aliagas <linuxnow@gmail.com> - 0.3.0-1
+- New plugin, **omx comp** (CLAP and LV2): the console's compressor.
+  Threshold, ratio and knee set how hard it holds the level down, attack and
+  release how fast, with make-up gain and a dry/wet mix; Kind picks the RMS
+  detector (compressor) or the peak detector (limiter), and detector
+  oversampling can run the control path at 4x.
+- **omx strip** is now built from its declaration, as a chain of the console's
+  own stages: input trim, high- and low-pass filters, gate, four-band EQ and
+  compressor, each with its own on/off switch, in the console's order or any
+  other.
+- **omx strip: sessions saved with 0.2.0 do not load as they were.** Its
+  parameter list changed: the new Input and Filters switches come first, so
+  every later parameter moved; Order now picks among the 120 orders of five
+  stages (0 is still the console's order); the gate gains knee start and end,
+  hold and hysteresis; the RMS switch is replaced by Kind (compressor, RMS
+  detector, or limiter, peak), and a fresh strip now starts as a compressor
+  where 0.2.0 started with the peak detector; the compressor gains mix and
+  detector oversampling. At the settings 0.2.0 had, the strip sounds the same,
+  sample for sample.
+- Builds against omx-dsp 0.5.2 and omx-contract 2.3.0, the releases with the
+  input trim.
+
 * Thu Oct 08 2026 Pau Aliagas <linuxnow@gmail.com> - 0.2.0-1
 - New plugin, **omx keyed-gate** (CLAP and LV2): the console's keyed gate, its
   detector fed by a sidechain key the host routes to it, or by the signal

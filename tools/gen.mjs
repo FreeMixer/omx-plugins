@@ -9,8 +9,9 @@
  *   plugins/<stem>/generated/<stem>.lv2/manifest.ttl  the LV2 bundle's manifest
  *   plugins/<stem>/generated/<stem>.lv2/<stem>.ttl    the LV2 plugin description
  *
- * and, for a plugin whose declaration says `"binding": "instance"`, the rest of its folder (the
- * declaration is then the folder's one hand-written file), from recipes/templates/plugin/:
+ * and, for a plugin whose declaration says `"binding": "instance"` (or `"chain"`: a composite whose
+ * `chain` runs several kernels' faces in order, spec §15.2), the rest of its folder (the declaration
+ * is then the folder's one hand-written file), from recipes/templates/plugin/:
  *
  *   plugins/<stem>/omx_<kernel>_core.h               the binding: each parameter to the resolve()
  *                                                    argument of omx-dsp's instance face it names
@@ -32,12 +33,13 @@
  * stale, missing or changed file. Named plugins are generated alone; with none, every plugin and
  * the shared files. No clock and no absolute path reach the output.
  */
+import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { faceBinding } from './instance-face.mjs';
-import { PIN_FILE, controlOf, findName, locateContract, paramKernel, pinOf, resolveParam } from './omx-contract.mjs';
+import { PIN_FILE, controlOf, eqDefaultBands, findName, kernelControls, locateContract, paramKernel, pinOf, resolveParam } from './omx-contract.mjs';
 import { bandsMacro, baseOf, expandVariant, variantStems } from './variants.mjs';
 import { omxdspInclude, render } from './template.mjs';
 
@@ -60,12 +62,22 @@ export function loadDecl(dir) {
     if (!where.dir) throw new Error(`${file}: its variant ${stem} is expanded from omx-contract and ${where.why}`);
     d = expandVariant(where.dir, base.decl, base.decl.variants.of.find((v) => v.stem === stem));
   }
+  return prepareDecl(file, d, stem, dir);
+}
+
+/** A declaration read from `file` (or about to be written there: the wizard's plan), validated and
+ * resolved for the plugin folder `dir`, whose name is `stem`. */
+export function prepareDecl(file, d, stem, dir = dirname(file)) {
   if (d.variants) throw new Error(`${file}: the base of ${variantStems(d).join(', ')} is no plugin of its own; load one of its variants`);
   if (d.stem !== stem) throw new Error(`${file}: stem '${d.stem}' is not the directory's '${stem}'`);
   if (!/^[a-z][a-z0-9_]*$/.test(d.kernel)) throw new Error(`${file}: kernel '${d.kernel}' is not a C identifier`);
+  if (d.binding === 'chain') {
+    d.params = flattenChain(file, d);
+    d.kernels = chainKernels(file, d);
+  } else if (d.chain !== undefined || d.order !== undefined || d.key !== undefined) throw new Error(`${file}: "chain", "order" and "key" belong to a "binding": "chain" declaration`);
   const { params, controls } = resolveParams(file, d);
   d.params = params;
-  if (d.binding === 'instance') d.controls = controls();
+  if (generatedBinding(d)) d.controls = controls();
   const seen = new Set();
   for (const p of d.params) {
     if (!/^[A-Za-z][A-Za-z0-9_]*$/.test(p.symbol)) throw new Error(`${file}: symbol '${p.symbol}' is not an LV2 symbol`);
@@ -83,14 +95,149 @@ export function loadDecl(dir) {
     }
   }
   if (d.sidechain && (seen.has(d.sidechain.symbol) || FIXED_PORTS.includes(d.sidechain.symbol))) throw new Error(`${file}: sidechain symbol '${d.sidechain.symbol}' is taken`);
+  if (d.binding === 'chain') checkShipped(file, d);
   return { ...d, dir: resolve(dir), tree: treeOf(file) };
 }
 
 /** The panel the wizard drafts for a plugin generated from its instance face: one section, every
  * parameter in declaration order, so the MOD GUI draws every parameter until a person groups them. */
 export function defaultPanel(d) {
+  if (d.binding === 'chain') {
+    // one section per element, by its id (spec §15.2: the elements are drawn, never placed, apart)
+    const sections = d.chain.map((el) => ({ key: el.id, label: elementName(el), controls: [`${el.id}On`, ...el.params.map((p) => p.symbol)] }));
+    if (d.order === 'permutable') sections.push({ key: 'order', label: 'Order', controls: ['order'] });
+    return { family: d.kernel, roles: {}, sections };
+  }
   const label = d.name.replace(/^omx /, '');
   return { family: d.kernel, roles: {}, sections: [{ key: d.kernel, label: label[0].toUpperCase() + label.slice(1), controls: d.params.map((p) => p.symbol) }] };
+}
+
+/** A plugin whose folder tools/gen.mjs writes whole from the declaration: over one instance face,
+ * or a chain of them. */
+export const generatedBinding = (d) => d.binding === 'instance' || d.binding === 'chain';
+
+// ---- a composite: a chain of kernel faces (spec 2026-10-09-plugin-from-contract §15.2) -----------
+
+/** An element's name, the label of its switch and of its panel section: its `name`, else its id. */
+const elementName = (el) => el.name ?? `${el.id[0].toUpperCase()}${el.id.slice(1)}`;
+
+/** n! */
+const factorial = (n) => (n <= 1 ? 1 : n * factorial(n - 1));
+
+/** Every order of `n` elements, lexicographic: row k is the order the `order` parameter's value k runs
+ * (0 the declared order). */
+export function permutations(n) {
+  const out = [];
+  const walk = (row, left) => {
+    if (!left.length) return out.push(row);
+    for (const x of left) walk([...row, x], left.filter((y) => y !== x));
+  };
+  walk([], [...Array(n).keys()]);
+  return out;
+}
+
+/** A parameter as its element names it: the symbol without the element's id in front (`eqHpfSlope`
+ * -> `hpfSlope`), what omx-contract matches a control shared by two names against. */
+const localParam = (p) => {
+  if (!p.element || !p.symbol.startsWith(p.element) || !/^[A-Z]/.test(p.symbol.slice(p.element.length))) return p;
+  const rest = p.symbol.slice(p.element.length);
+  return { ...p, symbol: `${rest[0].toLowerCase()}${rest.slice(1)}` };
+};
+
+/**
+ * The flattened parameter list of a chain: element by element in chain order, each element's
+ * generated switch `<id>On` (its default the element's `on`) and then its parameters, each read from
+ * the element's kernel; then, for `"order": "permutable"`, the plugin's own `order` over the
+ * permutations of the elements.
+ */
+function flattenChain(file, d) {
+  if (d.params !== undefined) throw new Error(`${file}: a chain's parameters are generated from "chain"; declare no "params"`);
+  if (!Array.isArray(d.chain) || d.chain.length < 2) throw new Error(`${file}: "binding": "chain" runs two or more elements, listed in "chain"`);
+  const ids = new Set();
+  const out = [];
+  for (const el of d.chain) {
+    if (!/^[a-z][a-z0-9]*$/.test(el.id ?? '')) throw new Error(`${file}: chain element id '${el.id}' is not a lower-case word`);
+    if (ids.has(el.id)) throw new Error(`${file}: chain element '${el.id}' declared twice`);
+    ids.add(el.id);
+    if (!/^[a-z][a-z0-9_]*$/.test(el.kernel ?? '')) throw new Error(`${file}: chain element '${el.id}' names no kernel`);
+    if (typeof el.on !== 'boolean') throw new Error(`${file}: chain element '${el.id}': "on" (its switch's default) is true or false`);
+    if (!Array.isArray(el.params) || !el.params.length) throw new Error(`${file}: chain element '${el.id}' has no "params"`);
+    out.push({ symbol: `${el.id}On`, name: elementName(el), unit: '', min: 0, max: 1, def: el.on ? 1 : 0, kind: 'toggle', own: 'switch', element: el.id });
+    for (const p of el.params) {
+      if (p.ref === undefined) throw new Error(`${file}: chain element '${el.id}': '${p.symbol}' has no ref; an element's parameters are its kernel's contract controls`);
+      if (p.kernel !== undefined && p.kernel !== el.kernel) throw new Error(`${file}: chain element '${el.id}': '${p.symbol}' names kernel '${p.kernel}', not the element's '${el.kernel}'`);
+      out.push({ ...p, kernel: el.kernel, element: el.id });
+    }
+  }
+  if (d.order === 'permutable') out.push({ symbol: 'order', name: 'Order', unit: '', min: 0, max: factorial(d.chain.length) - 1, def: 0, kind: 'integer', own: 'stage-order' });
+  else if (d.order !== undefined) throw new Error(`${file}: "order" is "permutable" or left out (the declared order)`);
+  if (d.key !== undefined) {
+    if (!ids.has(d.key)) throw new Error(`${file}: "key" names '${d.key}', no element of the chain`);
+    if (!d.sidechain) throw new Error(`${file}: "key" hands the plugin's sidechain to '${d.key}'; declare it in "sidechain"`);
+  } else if (d.sidechain) throw new Error(`${file}: a chain's "sidechain" goes to one element, named by "key"`);
+  return out;
+}
+
+/** The macro of an element's band count, `bands` the key of its kernel's count sheet (eq's
+ * EQ_BAND_COUNTS: strip, eq8, ...): OMX_EQ_BAND_COUNTS_STRIP_MAX. */
+/** The count sheet key an element's face is compiled at: `faceBands` (a count the face takes where
+ * the element exposes fewer bands), else `bands`. */
+export const faceBandsOf = (el) => el.faceBands ?? el.bands;
+
+export function chainBandsMacro(d, el) {
+  const where = locateContract(d.tree ?? ROOT);
+  if (!where.dir) throw new Error(`plugins/${d.stem}: element '${el.id}' counts its bands in omx-contract and ${where.why}`);
+  const sheet = kernelControls(where.dir, el.kernel).find((c) => c.count)?.count;
+  if (!sheet) throw new Error(`plugins/${d.stem}: element '${el.id}' declares "bands", and the ${el.kernel} kernel has no per-band control`);
+  const e = findName(where.dir, el.kernel, sheet).entry;
+  const key = faceBandsOf(el);
+  if (!Number.isInteger(e?.value?.[key]?.max)) throw new Error(`plugins/${d.stem}: element '${el.id}': ${sheet} has no '${key}' with a max`);
+  return `OMX_${sheet}_${key.toUpperCase()}_MAX`;
+}
+
+/** The kernels a chain reads, in chain order, each once; a declared `kernels` must be the same. */
+function chainKernels(file, d) {
+  const ks = [...new Set(d.chain.map((el) => el.kernel))];
+  if (d.kernels !== undefined && JSON.stringify(d.kernels) !== JSON.stringify(ks)) throw new Error(`${file}: "kernels" is ${JSON.stringify(d.kernels)}, the chain's are ${JSON.stringify(ks)}; leave it out`);
+  return ks;
+}
+
+/** The parameter symbols a released plugin shipped: its generated header at the git tag `tag`, or
+ * undefined where the tree has no git or no such tag (a tarball build). */
+function shippedSymbols(d, tag) {
+  try {
+    const text = execFileSync('git', ['-C', d.tree, 'show', `${tag}:plugins/${d.stem}/generated/omx_${d.kernel}_params.h`], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
+    return [...text.matchAll(/^\s*\{ "([A-Za-z0-9_]+)", "/gm)].map((m) => m[1]);
+  } catch {
+    return undefined;
+  }
+}
+
+/** The differences between a released list of symbols and the flattened one, index by index. */
+export function symbolDiff(was, now) {
+  const out = [];
+  for (let i = 0; i < Math.max(was.length, now.length); i++) {
+    if (was[i] === now[i]) continue;
+    out.push(i >= was.length ? `+${i} ${now[i]}` : i >= now.length ? `-${i} ${was[i]}` : `${i} ${was[i]} -> ${now[i]}`);
+  }
+  return out;
+}
+
+/** A chain converted from a released plugin (`shipped`: its release tag) keeps that plugin's ids
+ * and symbols, or names every difference in `shippedDiff` (spec §15.2): CLAP ids are indices and LV2
+ * symbols are saved state, so a difference is a decision, never a side effect. */
+function checkShipped(file, d) {
+  if (d.shipped === undefined) return;
+  const was = shippedSymbols({ ...d, tree: treeOf(file) }, d.shipped);
+  if (!was) {
+    // a tarball or shallow build has no tag to read: said, never silent
+    console.error(`gen: NOTE ${d.stem}: ${d.shipped} is not readable here (no git or no such tag); its parameter list is not checked against that release`);
+    return;
+  }
+  const diff = symbolDiff(was, d.params.map((p) => p.symbol));
+  const named = d.shippedDiff ?? [];
+  if (JSON.stringify(diff) !== JSON.stringify(named))
+    throw new Error(`${file}: the flattened parameters differ from ${d.stem} ${d.shipped}'s, and "shippedDiff" does not name exactly the differences; they are:\n  ${diff.join('\n  ') || '(none: drop "shippedDiff")'}`);
 }
 
 /** The tree a declaration sits in; a declaration copied out of its tree (a test's scratch copy)
@@ -117,7 +264,7 @@ function resolveParams(file, d) {
   };
   // each parameter's contract control ({ name }), or undefined for an own one: what the generated
   // binding matches resolve() arguments against
-  const controls = () => d.params.map((p) => (p.ref === undefined ? undefined : controlOf(contract(), paramKernel(d, p, contract()), p)));
+  const controls = () => d.params.map((p) => (p.ref === undefined ? undefined : controlOf(contract(), paramKernel(d, p, contract()), localParam(p))));
   const params = d.params.map((p) => {
     if (p.ref === undefined) {
       if (typeof p.own !== 'string' || !p.own) throw new Error(`${file}: '${p.symbol}' has no ref and no "own" reason; a parameter is by reference to omx-contract or says why it is the plugin's own`);
@@ -134,7 +281,7 @@ function resolveParams(file, d) {
     const out = { ...p, min: t.min, max: t.max, def: t.def, unit: t.unit };
     // a control whose travel another choice widens (eq's q, notchQ while the band is a notch): the
     // port spans every travel it may take, and the face clamps by the choice
-    const c = d.binding === 'instance' ? controlOf(dir, kernel, p) : undefined;
+    const c = generatedBinding(d) ? controlOf(dir, kernel, localParam(p)) : undefined;
     for (const w of c?.when ?? []) {
       const u = resolveParam(dir, kernel, { symbol: p.symbol, ref: w.global });
       out.min = Math.min(out.min, u.min);
@@ -219,7 +366,10 @@ export function emitParamsHeader(d) {
 ${d.variantOf ? `
 /* The band count of this variant of plugins/${d.variantOf.stem}: the instance face's compile-time count. */
 #define OMX_${(d.face ?? d.kernel).toUpperCase()}_INSTANCE_BANDS ${bandsMacro(d)}
-` : ''}
+` : ''}${(d.chain ?? []).filter((el, i, all) => faceBandsOf(el) && all.findIndex((o) => o.kernel === el.kernel) === i).map((el) => `
+/* The band count of the chain's ${el.id}: its instance face's compile-time count, omx-contract's ${chainBandsMacro(d, el)}. */
+#define OMX_${el.kernel.toUpperCase()}_INSTANCE_BANDS ${chainBandsMacro(d, el)}
+`).join('')}
 enum {
 ${d.params.map((p, i) => `  ${P}_${macro(p.symbol)} = ${i},`).join('\n')}
   ${P}_COUNT = ${d.params.length}
@@ -421,8 +571,11 @@ function stepped(params, v, keep) {
   });
 }
 
-export function oraclePlan(params, controls = []) {
+export function oraclePlan(params, controls = [], { engaged = [] } = {}) {
   const held = new Set(params.map((_, i) => i).filter((i) => controls[i]?.rearms));
+  // a chain's element switches: on in the release and choice sections, so each element is heard
+  // there (an EQ switched off by the stepped row would hide every band's Q), and never stepped
+  const on = new Set(engaged);
   const row = (frames, ms, signal, v, bypass) => ({ row: `${frames}, ${cfloat(ms)}, ${signal}, {${v.map(cfloat).join(', ')}}, ${bypass}` });
   const moves = PLAN_FRAMES.map((frames, b) => {
     const v = params.map((p, i) => {
@@ -433,7 +586,7 @@ export function oraclePlan(params, controls = []) {
     return row(frames, 0, SIGNAL.moves, v, PLAN_BYPASS[b]);
   });
   const tail = tailMs(params);
-  const defaults = params.map((p) => p.def);
+  const defaults = params.map((p, i) => (on.has(i) ? 1 : p.def));
   const release = [row(0, BURST_MS, SIGNAL.burst, defaults, 0), row(0, tail, SIGNAL.tail, defaults, 0)];
   const choices = [];
   params.forEach((p, c) => {
@@ -441,7 +594,7 @@ export function oraclePlan(params, controls = []) {
     if (!vals || held.has(c)) return;
     for (const value of vals) {
       const v = defaults.map((d, i) => (i === c ? value : d));
-      const moved = stepped(params, v, new Set([...held, c]));
+      const moved = stepped(params, v, new Set([...held, ...on, c]));
       choices.push(row(0, BURST_MS, SIGNAL.burst, v, 0), row(0, tail, SIGNAL.tail, v, 0), row(0, tail, SIGNAL.tail, moved, 0));
     }
   });
@@ -486,12 +639,160 @@ export function generateInstance(d) {
     latency: lat('&c->inst'), refLatency: lat('&inst'),
     keyed: face.keyed, keyPort: face.keyed ? macro(d.sidechain.symbol) : '', keySymbol: face.keyed ? d.sidechain.symbol : '',
     plan: oraclePlan(d.params, d.controls ?? []), held: heldOf(d), stretch: oracleStretch(face), steps: d.params.map((p) => cfloat(stepOf(p))).join(', '),
+    chain: false,
   };
   return {
     Makefile: withBanner(render(template('Makefile.tmpl'), view), d, '#'),
     [`omx_${d.kernel}_clap.c`]: withBanner(render(template('clap.c.tmpl'), view), d, '//'),
     [`omx_${d.kernel}_lv2.c`]: withBanner(render(template('lv2.c.tmpl'), view), d, '//'),
     [`omx_${d.kernel}_core.h`]: render(template('core.h.tmpl'), view),
+    [`test/${d.kernel}-oracle.c`]: render(template('oracle.c.tmpl'), view),
+  };
+}
+
+/** The value a chain element's `fixed` control is passed at: a set's id as its index (a numeric
+ * set's id as itself), a travel's number as given, `"default"` the control's declared default (a
+ * travel that declares none is refused), `{ "defaultRef": "<SHEET>.<field>" }` the default a sheet
+ * of omx-contract holds for it (EQ_PASS_FILTER_DEFAULTS.hpfFreqHz). */
+function fixedValue(d, el, control, v) {
+  const where = locateContract(d.tree ?? ROOT);
+  if (!where.dir) throw new Error(`plugins/${d.stem}: element '${el.id}' fixes '${control.name}' and ${where.why}`);
+  const as = { symbol: `${el.id}.${control.name}`, ref: control.ref, ...(control.field ? { field: control.field } : {}) };
+  const e = findName(where.dir, el.kernel, control.ref).entry;
+  if (v && typeof v === 'object') return resolveParam(where.dir, el.kernel, { ...as, defaultRef: v.defaultRef }).def;
+  if (v === 'default') {
+    const t = e?.kind === 'travels' ? (control.field ? e.value?.[control.field] : e.value) : undefined;
+    if (t && t.default === undefined) throw new Error(`plugins/${d.stem}: element '${el.id}' fixes '${control.name}' at "default", and ${control.ref} declares no default; name the sheet that holds it, { "defaultRef": "<SHEET>.<field>" }`);
+    return resolveParam(where.dir, el.kernel, as).def;
+  }
+  if (e?.kind === 'set') {
+    if (e.value.every((x) => typeof x === 'number')) {
+      if (!e.value.includes(v)) throw new Error(`plugins/${d.stem}: element '${el.id}' fixes '${control.name}' at ${JSON.stringify(v)}, not one of ${control.ref}'s ids ${JSON.stringify(e.value)}`);
+      return v;
+    }
+    const k = e.value.indexOf(v);
+    if (k < 0) throw new Error(`plugins/${d.stem}: element '${el.id}' fixes '${control.name}' at ${JSON.stringify(v)}, not one of ${control.ref}'s ids ${JSON.stringify(e.value)}`);
+    return k;
+  }
+  if (typeof v !== 'number') throw new Error(`plugins/${d.stem}: element '${el.id}' fixes the travel '${control.name}' at ${JSON.stringify(v)}, not a number, "default" or { "defaultRef" }`);
+  return v;
+}
+
+/** The values of a per-band control an element fixes, for the bands of its face it does not expose:
+ * from band `exposed` (the element's own parameters of that control come first) to the face's
+ * compiled count. `"default"` gives each band its own default by omx-contract's one default rule at
+ * that count (its type, centre, gain and Q; a control the rule does not name, its declared default);
+ * any other value is the one value for every band. */
+function fixedBands(d, el, control, v, exposed) {
+  const where = locateContract(d.tree ?? ROOT);
+  if (!faceBandsOf(el)) throw new Error(`plugins/${d.stem}: element '${el.id}' fixes '${control.name}', a control taken once per band; it declares its "bands" (or "faceBands")`);
+  const n = findName(where.dir, el.kernel, control.count).entry?.value?.[faceBandsOf(el)]?.max;
+  if (!Number.isInteger(n)) throw new Error(`plugins/${d.stem}: element '${el.id}': ${control.count} has no '${faceBandsOf(el)}' with a max`);
+  const rest = [...Array(n).keys()].slice(exposed);
+  if (v !== 'default') return rest.map(() => fixedValue(d, el, control, v));
+  const rule = eqDefaultBands(where.dir, n);
+  const name = control.name.toLowerCase();
+  return rest.map((i) => {
+    const band = rule[i];
+    const key = Object.keys(band).find((k) => k.toLowerCase() === name || k.toLowerCase().startsWith(name) || name.endsWith(k.toLowerCase()));
+    return key === undefined ? fixedValue(d, el, control, 'default') : fixedValue(d, el, control, band[key]);
+  });
+}
+
+/**
+ * Each element of a chain bound to its own kernel's instance face, exactly as a single plugin's
+ * parameters are (bindFace, by name): `[{ el, face, binding, renames, fixed }]`, or a thrown error
+ * naming every element that does not bind. An element's `fixed` controls (`{ control: id | number }`)
+ * are the ones it does not expose (a keyed face's key source, in an element that is not the chain's
+ * `key`): passed at that value, they bind like parameters and are never a port.
+ */
+export function chainBindings(d) {
+  const inc = omxdspInclude();
+  const where = locateContract(d.tree ?? ROOT);
+  const errors = [];
+  for (const el of d.chain) {
+    const other = d.chain.find((o) => o !== el && o.kernel === el.kernel && faceBandsOf(o) !== faceBandsOf(el));
+    if (other) errors.push(`elements '${el.id}' and '${other.id}' run one ${el.kernel} face, compiled once: they declare the same face band count ("faceBands", else "bands")`);
+  }
+  const out = d.chain.map((el) => {
+    const idx = d.params.map((p, i) => i).filter((i) => d.params[i].element === el.id && d.params[i].own === undefined);
+    const params = idx.map((i) => d.params[i]), controls = idx.map((i) => d.controls[i]);
+    if (el.bands && where.dir) {
+      const want = findName(where.dir, el.kernel, kernelControls(where.dir, el.kernel).find((x) => x.count)?.count ?? '').entry?.value?.[el.bands]?.max;
+      for (const c of kernelControls(where.dir, el.kernel).filter((x) => x.count)) {
+        const have = controls.filter((x) => x?.name === c.name).length;
+        if (have && have !== want) errors.push(`element '${el.id}' exposes ${have} '${c.name}' parameters, and its "bands" '${el.bands}' counts ${want}`);
+      }
+    }
+    const fixed = Object.entries(el.fixed ?? {}).flatMap(([name, v]) => {
+      const c = where.dir ? kernelControls(where.dir, el.kernel).find((x) => x.name === name) : undefined;
+      if (!c) {
+        errors.push(`element '${el.id}' fixes '${name}', no control of the ${el.kernel} kernel`);
+        return [];
+      }
+      try {
+        // a per-band control: one fixed value per band, bound as the face's array argument
+        if (c.count) {
+          const exposed = controls.filter((x) => x?.name === name).length;
+          return fixedBands(d, el, c, v, exposed).map((x, k) => ({ p: { symbol: `${el.id}.${name}[${exposed + k}]`, fixed: x }, c: { name } }));
+        }
+        return [{ p: { symbol: `${el.id}.${name}`, fixed: fixedValue(d, el, c, v) }, c: { name } }];
+      } catch (e) {
+        errors.push(e.message);
+        return [];
+      }
+    });
+    const b = faceBinding(inc, el.kernel, [...params, ...fixed.map((f) => f.p)], [...controls, ...fixed.map((f) => f.c)]);
+    for (const e of b.errors) errors.push(`element '${el.id}' (${el.kernel}): ${e}`);
+    if (b.face && !b.face.keyed && d.key === el.id) errors.push(`"key" names '${el.id}', and omx_${el.kernel}_instance_run takes no key`);
+    return { el, ...b };
+  });
+  if (errors.length) throw new Error(`plugins/${d.stem}: binding: chain, but ${errors.join('; ')}`);
+  return out;
+}
+
+/** The files of a `binding: chain` plugin beyond generated/: path relative to the plugin dir -> text.
+ * The faces and the Makefile are a single plugin's; the binding is the chain core (copy in to out
+ * once, each element's face in place in the chosen order, no arithmetic of its own) and the oracle's
+ * reference is the same chain of faces called directly. */
+export function generateChain(d) {
+  const bound = chainBindings(d);
+  const K = d.kernel.toUpperCase();
+  const macro_ = (sym) => `OMX_${K}_PARAM_${macro(sym)}`;
+  const one = (type, p) => (p.fixed !== undefined ? (type === 'int' ? `${p.fixed}` : cfloat(p.fixed)) : type === 'int' ? `(int)lrintf(values[${macro_(p.symbol)}])` : `values[${macro_(p.symbol)}]`);
+  const value = (b) => (b.extent ? `(const ${b.elem}[${b.extent}]){${b.params.map((p) => one(b.elem, p)).join(', ')}}` : one(b.type, b.param));
+  const lat = (b, self) => (b.face.latency.fn ? `${b.face.latency.fn}(${self})` : b.face.latency.macro);
+  const keyed = d.key !== undefined;
+  const elements = bound.map((b, index) => ({
+    id: b.el.id, index, name: elementName(b.el), face: b.el.kernel, faceType: b.face.type, srType: b.face.srType,
+    on: macro_(`${b.el.id}On`),
+    binding: b.binding.map((x) => ({ arg: x.arg, value: value(x) })),
+    arrays: b.binding.filter((x) => x.extent).map((x) => ({ arg: x.arg, count: x.params.length, extent: x.extent })),
+    renames: b.renames.map((x) => ({ arg: x.arg, rename: x.rename })),
+    fixed: (b.el.fixed ? Object.entries(b.el.fixed) : []).map(([name, v]) => ({ control: name, at: JSON.stringify(v) })),
+    keyedFace: b.face.keyed, keyArg: b.face.keyed ? (d.key === b.el.id ? 'key' : 'NULL') : '',
+    keyRef: b.face.keyed && d.key === b.el.id ? 'key ? key + at : NULL' : 'NULL',
+    latency: lat(b, `&c->${b.el.id}`), refLatency: lat(b, `&${b.el.id}`),
+  }));
+  const rows = d.order === 'permutable' ? permutations(d.chain.length) : [[...d.chain.keys()]];
+  const view = {
+    ...templateView(d),
+    chain: true, elements, faces: [...new Set(elements.map((e) => e.face))].map((face) => ({ face })),
+    length: elements.length, orders: rows.length, orderRows: rows.map((r) => ({ row: r.join(', ') })),
+    permutable: d.order === 'permutable', orderParam: d.order === 'permutable' ? macro_('order') : '',
+    sequence: elements.map((e) => e.name).join(' > '),
+    latency: elements.map((e) => `(float)(${e.latency})`).join(' + '), refLatency: elements.map((e) => `(float)(${e.refLatency})`).join(' + '),
+    keyed, keyPort: keyed ? macro(d.sidechain.symbol) : '', keySymbol: keyed ? d.sidechain.symbol : '',
+    plan: oraclePlan(d.params, d.controls ?? [], { engaged: d.params.map((p, i) => i).filter((i) => d.params[i].own === 'switch' && d.params[i].element) }),
+    held: heldOf(d), stretch: keyed ? 64 : 1, steps: d.params.map((p) => cfloat(stepOf(p))).join(', '),
+    // the single-face fields the shared templates read, empty for a chain
+    faceType: '', srType: '', binding: [], arrays: [], renames: [],
+  };
+  return {
+    Makefile: withBanner(render(template('Makefile.tmpl'), view), d, '#'),
+    [`omx_${d.kernel}_clap.c`]: withBanner(render(template('clap.c.tmpl'), view), d, '//'),
+    [`omx_${d.kernel}_lv2.c`]: withBanner(render(template('lv2.c.tmpl'), view), d, '//'),
+    [`omx_${d.kernel}_core.h`]: render(template('chain-core.h.tmpl'), view),
     [`test/${d.kernel}-oracle.c`]: render(template('oracle.c.tmpl'), view),
   };
 }
@@ -504,6 +805,7 @@ export function generate(d) {
     [`${lv2}/manifest.ttl`]: emitManifest(d, { modgui: Boolean(d.panel) }),
     [`${lv2}/${d.stem}.ttl`]: emitPluginTtl(d),
     ...(d.binding === 'instance' ? generateInstance(d) : {}),
+    ...(d.binding === 'chain' ? generateChain(d) : {}),
   };
 }
 
@@ -522,7 +824,7 @@ export const pluginDirs = (root = ROOT) =>
 // ---- the shared files, generated from every plugin folder ---------------------------------------
 
 /** A plugin ships (is built, packaged, listed) when its folder has a Makefile or generates one. */
-export const ships = (d) => d.binding === 'instance' || existsSync(join(d.dir, 'Makefile'));
+export const ships = (d) => generatedBinding(d) || existsSync(join(d.dir, 'Makefile'));
 
 /** Plugin order everywhere a list is generated: by stem, numbers by value (eq8 before eq16). */
 const byStem = (a, b) => a.stem.localeCompare(b.stem, 'en', { numeric: true });
