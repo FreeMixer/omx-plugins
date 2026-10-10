@@ -152,6 +152,11 @@ parameter header, installed in %{_includedir}/omx-plugins.
 
 %changelog
 * Sat Oct 10 2026 Pau Aliagas <linuxnow@gmail.com> - 0.3.0-1
+- New plugin, **omx comp** (CLAP and LV2): the console's compressor.
+  Threshold, ratio and knee set how hard it holds the level down, attack and
+  release how fast, with make-up gain and a dry/wet mix; Kind picks the RMS
+  detector (compressor) or the peak detector (limiter), and detector
+  oversampling can run the control path at 4x.
 - **omx strip** is now built from its declaration, as a chain of the console's
   own stages: input trim, high- and low-pass filters, gate, four-band EQ and
   compressor, each with its own on/off switch, in the console's order or any
