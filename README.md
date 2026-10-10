@@ -17,6 +17,7 @@ drawn from one declaration: its CLAP parameters, its LV2 ports and its MOD GUI c
 | Plugin | CLAP id | LV2 URI | What it does |
 |---|---|---|---|
 | **omx chorus** | `org.openmixer.chorus` | `urn:openmixer:chorus` | The console's chorus: up to four voices read one modulated delay line, the right leg's sweep offset by the spread, mixed with the dry signal. |
+| **omx comp** | `org.openmixer.comp` | `urn:openmixer:comp` | The console's compressor: threshold, ratio and knee set how hard it holds the level down, attack and release how fast, with makeup gain and a dry/wet mix. Kind picks the RMS detector (Compressor) or the peak detector (Limiter), and detector oversampling can run the control path at 4x. The DSP is omx-dsp's <omxdsp/fx/omx_comp_instance.h>, the console's own compressor. |
 | **omx deesser** | `org.openmixer.deesser` | `urn:openmixer:deesser` | The console's de-esser: a detector on a band around the sibilance drives the compressor's gain computer, and the reduction lands on that band alone or on the whole signal. |
 | **omx delay** | `org.openmixer.delay` | `urn:openmixer:delay` | Stereo delay up to 2 s: feedback through a tone filter that darkens each repeat, ping-pong, wet/dry mix. Zero latency, real-time safe, 44.1 to 192 kHz. |
 | **omx drive** | `org.openmixer.drive` | `urn:openmixer:drive` | The console's drive: one waveshaper (soft, tape, tube or exciter) run inside the console's 4x oversampler, on the full band, the lows, the highs or a tilt, with drive, character, wet/dry mix and trim. Stereo, real-time safe, 44.1 to 192 kHz. |
@@ -48,6 +49,22 @@ drawn from one declaration: its CLAP parameters, its LV2 ports and its MOD GUI c
 | Depth | 0 to 12 ms | 4 ms |
 | Voices | 1 to 4, whole steps | 3 |
 | Mix | 0 to 100 % | 35 % |
+
+Plus the host's bypass.
+
+### omx comp
+
+| Parameter | Range | Default |
+|---|---|---|
+| Threshold | -60 to 0 dB, whole steps | -18 dB |
+| Ratio | 1 to 20 | 4 |
+| Knee | 0 to 24 dB | 6 dB |
+| Attack | 0.1 to 100 ms | 5 ms |
+| Release | 5 to 3000 ms, whole steps | 200 ms |
+| Makeup | 0 to 24 dB | 0 dB |
+| Mix | 0 to 100 %, whole steps | 100 % |
+| Kind | Compressor / Limiter | Compressor |
+| Detector Oversampling | Auto / Off / 4x | Auto |
 
 Plus the host's bypass.
 
