@@ -8,7 +8,7 @@
   "name": "omx limiter",
   "vendor": "openmixer",
   "url": "https://github.com/FreeMixer/omx-plugins",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "The precision limiter: a look-ahead, true-peak, stereo-linked brickwall.",
   "clap": {
     "id": "org.openmixer.limiter",

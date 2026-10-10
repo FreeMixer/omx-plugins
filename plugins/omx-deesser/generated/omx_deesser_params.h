@@ -64,7 +64,7 @@ static const omx_plugin_param OMX_DEESSER_PARAMS[OMX_DEESSER_PARAM_COUNT] = {
 #define OMX_DEESSER_NAME "omx deesser"
 #define OMX_DEESSER_VENDOR "openmixer"
 #define OMX_DEESSER_URL "https://github.com/FreeMixer/omx-plugins"
-#define OMX_DEESSER_VERSION "0.2.0"
+#define OMX_DEESSER_VERSION "0.3.0"
 #define OMX_DEESSER_DESCRIPTION "The console's de-esser: a detector on a band around the sibilance drives the compressor's gain computer, and the reduction lands on that band alone or on the whole signal."
 #define OMX_DEESSER_CLAP_ID "org.openmixer.deesser"
 #define OMX_DEESSER_CLAP_FEATURES "audio-effect", "de-esser", "stereo"

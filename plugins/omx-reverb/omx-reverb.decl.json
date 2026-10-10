@@ -8,7 +8,7 @@
   "name": "omx reverb",
   "vendor": "openmixer",
   "url": "https://github.com/FreeMixer/omx-plugins",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "The console's reverb: room, plate, hall, reverse and gated algorithms with pre-delay, size, damping, width and low and high cuts, mixed with the dry signal.",
   "clap": {
     "id": "org.openmixer.reverb",

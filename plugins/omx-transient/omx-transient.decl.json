@@ -8,7 +8,7 @@
   "name": "omx transient",
   "vendor": "openmixer",
   "url": "https://github.com/FreeMixer/omx-plugins",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "The console's transient designer: more or less attack and sustain, from two envelope contrasts, with no threshold to set.",
   "clap": {
     "id": "org.openmixer.transient",

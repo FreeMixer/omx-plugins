@@ -89,7 +89,7 @@ static const omx_plugin_param OMX_REVERB_PARAMS[OMX_REVERB_PARAM_COUNT] = {
 #define OMX_REVERB_NAME "omx reverb"
 #define OMX_REVERB_VENDOR "openmixer"
 #define OMX_REVERB_URL "https://github.com/FreeMixer/omx-plugins"
-#define OMX_REVERB_VERSION "0.2.0"
+#define OMX_REVERB_VERSION "0.3.0"
 #define OMX_REVERB_DESCRIPTION "The console's reverb: room, plate, hall, reverse and gated algorithms with pre-delay, size, damping, width and low and high cuts, mixed with the dry signal."
 #define OMX_REVERB_CLAP_ID "org.openmixer.reverb"
 #define OMX_REVERB_CLAP_FEATURES "audio-effect", "reverb", "stereo"
