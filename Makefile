@@ -11,6 +11,8 @@
 #     make completeness  every plugin against recipes/plugin.recipe.json, each gap naming its wizard step;
 #                        a gap not in recipes/completeness-debt.json fails, and so does a paid debt entry
 #     make selftest      the recipe's checkers, wizard and commit protocol, each sabotaged (needs git)
+#   make strip-crosscheck   omx-strip, a chain, against the hand-ported strip it replaced, bit for bit at
+#                    the old plugin's settings (tools/test/strip-crosscheck.sh; needs the git history)
 #   make install    DESTDIR, PREFIX, LIBDIR, CLAPDIR: $(CLAPDIR)/<name>.clap and $(LIBDIR)/lv2/<name>.lv2/
 #   make install-devel   the public headers other projects include: $(INCLUDEDIR)/omx-plugins/*.h
 #   make version    the release version, the one packaging/omx-plugins.spec and debian/changelog carry
@@ -23,7 +25,7 @@ INCLUDEDIR ?= $(PREFIX)/include
 # headers are the .h files beside its Makefile and in its generated/ directory.
 HEADERS := include/omx_plugin_param.h $(foreach p,$(PLUGINS),$(wildcard $(p)*.h) $(wildcard $(p)generated/*.h))
 
-.PHONY: all test hints install install-devel clean version recipe-test completeness selftest
+.PHONY: all test hints install install-devel clean version recipe-test completeness selftest strip-crosscheck
 all:
 	@for p in $(PLUGINS); do $(MAKE) -C $$p all || exit 1; done
 test:
@@ -41,6 +43,8 @@ completeness:
 	node tools/plugin-recipe.mjs
 selftest:
 	node tools/test/recipe-selftest.mjs
+strip-crosscheck:
+	sh tools/test/strip-crosscheck.sh
 install:
 	@for p in $(PLUGINS); do $(MAKE) -C $$p install || exit 1; done
 install-devel:
