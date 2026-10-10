@@ -246,7 +246,7 @@ export async function planPlugin(declIn, src, { root = ROOT, recipe = loadRecipe
 }
 
 /** The panel and the console name declared parameters, and the panel draws every one of them as
- * the MOD GUI generator will draw it (selectors included). */
+ * the MOD GUI generator draws it (selectors included). */
 async function checkPanelConsole(decl, symbols, resolved, refuse, root) {
   // the panel and the console name declared parameters
   for (const s of decl.panel?.sections ?? []) for (const c of s.controls) if (!symbols.has(c)) refuse('/panel/sections', `section '${s.key}' names '${c}', which is no parameter`);
@@ -254,7 +254,7 @@ async function checkPanelConsole(decl, symbols, resolved, refuse, root) {
   for (const sym of Object.keys(decl.panel?.widgets ?? {})) if (!symbols.has(sym)) refuse(`/panel/widgets/${sym}`, 'is no parameter');
   for (const e of consoleErrors(decl, symbols)) refuse(e.split(':')[0], e.slice(e.indexOf(':') + 2));
 
-  // the panel, drawn as the MOD GUI generator will draw it (every parameter on it, selectors included)
+  // the panel, drawn as the MOD GUI generator draws it (every parameter on it, selectors included)
   if (decl.panel && !refuse.count()) {
     const mg = await import(join(root, 'tools', 'modgui-gen.mjs'));
     try {
