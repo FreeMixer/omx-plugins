@@ -2,8 +2,10 @@
 // Copyright (C) 2026 Pau Aliagas <linuxnow@gmail.com>
 /*
  * {{kernel}}-oracle.c — {{stem}}'s kernel-identity test: both built faces, sample for sample, against
- * omx-dsp's {{kernel}} instance face called DIRECTLY on the same blocks, at every declared rate,
- * engaged and bypassed — no tolerance.
+{{^chain}} * omx-dsp's {{kernel}} instance face called DIRECTLY on the same blocks, at every declared rate,
+{{/chain}}{{#chain}} * omx-dsp's instance faces of its chain ({{sequence}}) called DIRECTLY, one after the other in the
+ * order the `order` parameter picks, each with its own switch, on the same blocks, at every declared rate,
+{{/chain}} * engaged and bypassed — no tolerance.
  *
  *   {{kernel}}-oracle clap <{{stem}}.clap>
  *   {{kernel}}-oracle lv2 <bundle-dir> <uri>
@@ -37,8 +39,9 @@
 
 #include "omx_{{kernel}}_params.h"
 
-#include <omxdsp/fx/omx_{{face}}_instance.h>
-#include <omxdsp/omx_denormal.h>
+{{^chain}}#include <omxdsp/fx/omx_{{face}}_instance.h>
+{{/chain}}{{#chain}}{{#faces}}#include <omxdsp/fx/omx_{{face}}_instance.h>
+{{/faces}}{{/chain}}#include <omxdsp/omx_denormal.h>
 {{#arrays}}
 _Static_assert({{count}} == {{extent}}, "the declaration names one {{arg}} parameter per band of the face");
 {{/arrays}}
@@ -142,7 +145,7 @@ static void values_of(const Block *k, int off, float *v) {
   v[off] = v[off] + STEP[off] <= p->max ? v[off] + STEP[off] : v[off] - STEP[off];
 }
 
-/* The reference: omx-dsp's instance face, called directly, on the same blocks. */
+{{^chain}}/* The reference: omx-dsp's instance face, called directly, on the same blocks. */
 static void reference(double sr, int off, const float *key, const float *il, const float *ir, float *ol, float *orr,
                       uint32_t *latency) {
   static {{faceType}} inst;
@@ -167,7 +170,57 @@ static void reference(double sr, int off, const float *key, const float *il, con
   if (latency) *latency = (uint32_t)lrintf((float)({{refLatency}}));
 }
 
-typedef struct Driver Driver;
+{{/chain}}{{#chain}}/* The chain's length, and its element `k` of the order the `order` value `row` names: the row-th
+ * permutation of 0..LENGTH-1 in lexicographic order, computed here (not read from the binding's table). */
+#define LENGTH {{length}}u
+static uint32_t element_at(uint32_t row, uint32_t k) {
+  uint32_t left[LENGTH], n = LENGTH, e = 0;
+  for (uint32_t i = 0; i < LENGTH; i++) left[i] = i;
+  for (uint32_t i = 0; i <= k; i++, n--) {
+    uint32_t f = 1; /* (n - 1)! */
+    for (uint32_t j = 2; j < n; j++) f *= j;
+    const uint32_t q = row / f;
+    row %= f;
+    e = left[q];
+    for (uint32_t j = q; j + 1 < n; j++) left[j] = left[j + 1];
+  }
+  return e;
+}
+
+/* The reference: omx-dsp's instance faces of the chain, called directly, on the same blocks: in to out,
+ * then each element in place in the order the block's `order` names, its switch off or the host's bypass
+ * its bypass. */
+static void reference(double sr, int off, const float *key, const float *il, const float *ir, float *ol, float *orr,
+                      uint32_t *latency) {
+{{#elements}}  static {{faceType}} {{id}};
+  (void)omx_{{face}}_instance_init(&{{id}}, ({{srType}})sr);
+{{/elements}}  (void)key;
+  uint32_t at = 0;
+  for (size_t b = 0; b < NBLOCKS; b++) {
+    const Block *k = &PLAN[b];
+    float values[NP];
+    values_of(k, off, values);
+    const uint32_t frames = frames_of(k, sr);
+    for (uint32_t r = 0; r < STRETCH; r++) {
+{{#elements}}      omx_{{face}}_instance_resolve(&{{id}}, k->bypass || values[{{on}}] < 0.5f{{#binding}}, {{value}}{{/binding}});
+{{/elements}}{{#permutable}}      const uint32_t row = (uint32_t)lrintf(values[{{orderParam}}]);
+{{/permutable}}{{^permutable}}      const uint32_t row = 0;
+{{/permutable}}      memcpy(ol + at, il + at, (size_t)frames * sizeof(float));
+      memcpy(orr + at, ir + at, (size_t)frames * sizeof(float));
+      for (uint32_t s = 0; s < LENGTH; s++) {
+        switch (element_at(row, s)) {
+{{#elements}}        case {{index}}:
+          omx_{{face}}_instance_run(&{{id}}, {{#keyedFace}}{{keyRef}}, {{/keyedFace}}ol + at, orr + at, ol + at, orr + at, frames);
+          break;
+{{/elements}}        }
+      }
+      at += frames;
+    }
+  }
+  if (latency) *latency = (uint32_t)lrintf({{refLatency}});
+}
+
+{{/chain}}typedef struct Driver Driver;
 struct Driver {
   /* the whole plan through ONE fresh instance; `*latency` is read back */
   bool (*run)(void *face, double sr, const float *key, const float *il, const float *ir, float *ol, float *orr,

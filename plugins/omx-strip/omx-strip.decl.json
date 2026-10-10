@@ -1,112 +1,746 @@
 {
-  "$comment": "THE declaration of omx-strip: the CLAP face, the LV2 face and the parameter header are generated from this file by tools/gen.mjs. Parameter order is append-only. The travels are omx-dsp’s declared ones (omx_contract_limits.h: TRIM_RANGE, HPF/LPF_FREQ_RANGE, OMX_GATE_*, EQ_*_RANGE, OMX_COMP_*), copied here at the omx-dsp pin. the ‘order’ parameter is the index of the stage permutation, lexicographic over (input, gate, eq, comp): 0 is the strip’s default order.",
+  "$comment": "THE declaration of omx-strip, the folder's one hand-written file. Every other file of the folder is generated from it by tools/gen.mjs. A chain of omx-dsp instance faces (trim, eq, gate, eq, comp): each element's parameters are by reference to omx-contract's kernel of that element and bind by name to its face. The parameter list is generated from the chain and is append-only.",
   "stem": "omx-strip",
   "kernel": "strip",
-  "kernels": ["eq", "gate", "comp"],
   "name": "omx strip",
   "noun": "channel strip",
   "vendor": "openmixer",
   "url": "https://github.com/FreeMixer/omx-plugins",
-  "version": "0.2.0",
-  "description": "The OpenMixer console’s channel strip in one plugin: input trim with high- and low-pass filters, gate, four-band EQ and compressor, in the console’s default order or any other. No DSP of its own: each stage is omx-dsp’s strip module, called in order.",
-  "summary": "The console's channel strip in one plugin: input trim with HPF/LPF, gate, four-band EQ and compressor, in the desk's order or any other. Stereo, real-time safe, 44.1 to 192 kHz.",
-  "clap": { "id": "org.openmixer.strip", "features": ["audio-effect", "mixing", "stereo"] },
-  "lv2": { "uri": "urn:openmixer:strip", "class": "lv2:MixerPlugin" },
-  "params": [
-    { "symbol": "trimDb", "name": "Trim", "ref": "TRIM_TRAVELS", "field": "trimDb" },
-    { "symbol": "hpfOn", "name": "HPF", "unit": "", "min": 0, "max": 1, "def": 0, "kind": "toggle", "own": "switch" },
-    { "symbol": "hpfFreq", "name": "HPF Freq", "ref": "EQ_CONTINUOUS_TRAVELS", "field": "hpfFreqHz", "defaultRef": "EQ_PASS_FILTER_DEFAULTS.hpfFreqHz", "kernel": "eq" },
-    { "symbol": "hpfSlope", "name": "HPF Slope", "ref": "FILTER_SLOPES", "unit": "dB/oct", "kernel": "eq" },
-    { "symbol": "lpfOn", "name": "LPF", "unit": "", "min": 0, "max": 1, "def": 0, "kind": "toggle", "own": "switch" },
-    { "symbol": "lpfFreq", "name": "LPF Freq", "ref": "EQ_CONTINUOUS_TRAVELS", "field": "lpfFreqHz", "defaultRef": "EQ_PASS_FILTER_DEFAULTS.lpfFreqHz", "kernel": "eq" },
-    { "symbol": "lpfSlope", "name": "LPF Slope", "ref": "FILTER_SLOPES", "unit": "dB/oct", "kernel": "eq" },
-    { "symbol": "gateOn", "name": "Gate", "unit": "", "min": 0, "max": 1, "def": 0, "kind": "toggle", "own": "switch" },
-    { "symbol": "gateThreshold", "name": "Gate Threshold", "ref": "GATE_CONTINUOUS_TRAVELS", "field": "thresholdDb", "kernel": "gate" },
-    { "symbol": "gateRatio", "name": "Gate Ratio", "ref": "GATE_CONTINUOUS_TRAVELS", "field": "ratio", "kernel": "gate" },
-    { "symbol": "gateRange", "name": "Gate Range", "ref": "GATE_CONTINUOUS_TRAVELS", "field": "rangeDb", "kernel": "gate" },
-    { "symbol": "gateAttack", "name": "Gate Attack", "ref": "GATE_LIMITS", "field": "attackMs", "kernel": "gate" },
-    { "symbol": "gateRelease", "name": "Gate Release", "ref": "GATE_CONTINUOUS_TRAVELS", "field": "releaseMs", "kernel": "gate" },
-    { "symbol": "eqOn", "name": "EQ", "unit": "", "min": 0, "max": 1, "def": 1, "kind": "toggle", "own": "switch" },
-    { "symbol": "eq1Type", "name": "EQ 1 Type", "ref": "EQ_BAND_TYPES", "defaultBand": {"strip": "strip", "index": 0, "of": "type"}, "kernel": "eq" },
-    { "symbol": "eq1Freq", "name": "EQ 1 Freq", "ref": "EQ_CONTINUOUS_TRAVELS", "field": "freqHz", "defaultBand": {"strip": "strip", "index": 0, "of": "centre"}, "kernel": "eq" },
-    { "symbol": "eq1Gain", "name": "EQ 1 Gain", "ref": "EQ_GAIN_RANGE", "defaultRef": "EQ_BAND_DEFAULTS.gainDb", "kernel": "eq" },
-    { "symbol": "eq1Q", "name": "EQ 1 Q", "ref": "EQ_Q_RANGE", "defaultRef": "EQ_BAND_DEFAULTS.q", "kernel": "eq" },
-    { "symbol": "eq1On", "name": "EQ 1", "unit": "", "min": 0, "max": 1, "def": 1, "kind": "toggle", "own": "switch" },
-    { "symbol": "eq2Type", "name": "EQ 2 Type", "ref": "EQ_BAND_TYPES", "defaultBand": {"strip": "strip", "index": 1, "of": "type"}, "kernel": "eq" },
-    { "symbol": "eq2Freq", "name": "EQ 2 Freq", "ref": "EQ_CONTINUOUS_TRAVELS", "field": "freqHz", "defaultBand": {"strip": "strip", "index": 1, "of": "centre"}, "kernel": "eq" },
-    { "symbol": "eq2Gain", "name": "EQ 2 Gain", "ref": "EQ_GAIN_RANGE", "defaultRef": "EQ_BAND_DEFAULTS.gainDb", "kernel": "eq" },
-    { "symbol": "eq2Q", "name": "EQ 2 Q", "ref": "EQ_Q_RANGE", "defaultRef": "EQ_BAND_DEFAULTS.q", "kernel": "eq" },
-    { "symbol": "eq2On", "name": "EQ 2", "unit": "", "min": 0, "max": 1, "def": 1, "kind": "toggle", "own": "switch" },
-    { "symbol": "eq3Type", "name": "EQ 3 Type", "ref": "EQ_BAND_TYPES", "defaultBand": {"strip": "strip", "index": 2, "of": "type"}, "kernel": "eq" },
-    { "symbol": "eq3Freq", "name": "EQ 3 Freq", "ref": "EQ_CONTINUOUS_TRAVELS", "field": "freqHz", "defaultBand": {"strip": "strip", "index": 2, "of": "centre"}, "kernel": "eq" },
-    { "symbol": "eq3Gain", "name": "EQ 3 Gain", "ref": "EQ_GAIN_RANGE", "defaultRef": "EQ_BAND_DEFAULTS.gainDb", "kernel": "eq" },
-    { "symbol": "eq3Q", "name": "EQ 3 Q", "ref": "EQ_Q_RANGE", "defaultRef": "EQ_BAND_DEFAULTS.q", "kernel": "eq" },
-    { "symbol": "eq3On", "name": "EQ 3", "unit": "", "min": 0, "max": 1, "def": 1, "kind": "toggle", "own": "switch" },
-    { "symbol": "eq4Type", "name": "EQ 4 Type", "ref": "EQ_BAND_TYPES", "defaultBand": {"strip": "strip", "index": 3, "of": "type"}, "kernel": "eq" },
-    { "symbol": "eq4Freq", "name": "EQ 4 Freq", "ref": "EQ_CONTINUOUS_TRAVELS", "field": "freqHz", "defaultBand": {"strip": "strip", "index": 3, "of": "centre"}, "kernel": "eq" },
-    { "symbol": "eq4Gain", "name": "EQ 4 Gain", "ref": "EQ_GAIN_RANGE", "defaultRef": "EQ_BAND_DEFAULTS.gainDb", "kernel": "eq" },
-    { "symbol": "eq4Q", "name": "EQ 4 Q", "ref": "EQ_Q_RANGE", "defaultRef": "EQ_BAND_DEFAULTS.q", "kernel": "eq" },
-    { "symbol": "eq4On", "name": "EQ 4", "unit": "", "min": 0, "max": 1, "def": 1, "kind": "toggle", "own": "switch" },
-    { "symbol": "compOn", "name": "Comp", "unit": "", "min": 0, "max": 1, "def": 0, "kind": "toggle", "own": "switch" },
-    { "symbol": "compThreshold", "name": "Comp Threshold", "ref": "COMP_CONTINUOUS_TRAVELS", "field": "thresholdDb", "kernel": "comp" },
-    { "symbol": "compRatio", "name": "Comp Ratio", "ref": "COMP_LIMITS", "field": "ratio", "kernel": "comp" },
-    { "symbol": "compKnee", "name": "Comp Knee", "ref": "COMP_LIMITS", "field": "kneeDb", "kernel": "comp" },
-    { "symbol": "compAttack", "name": "Comp Attack", "ref": "COMP_LIMITS", "field": "attackMs", "kernel": "comp" },
-    { "symbol": "compRelease", "name": "Comp Release", "ref": "COMP_CONTINUOUS_TRAVELS", "field": "releaseMs", "kernel": "comp" },
-    { "symbol": "compMakeup", "name": "Comp Makeup", "ref": "COMP_LIMITS", "field": "makeupDb", "kernel": "comp" },
-    { "symbol": "compRms", "name": "Comp RMS", "unit": "", "min": 0, "max": 1, "def": 0, "kind": "toggle", "own": "switch" },
-    { "symbol": "order", "name": "Order", "unit": "", "min": 0, "max": 23, "def": 0, "kind": "integer", "own": "stage-order" }
-  ],
-  "portHints": {
-    "trimDb": { "unit": "units:db" },
-    "hpfOn": { "props": ["lv2:toggled"] },
-    "hpfFreq": { "props": ["pprops:logarithmic"], "unit": "units:hz" },
-    "hpfSlope": { "props": ["lv2:enumeration", "lv2:integer"], "points": ["12 12 dB/oct", "24 24 dB/oct"] },
-    "lpfOn": { "props": ["lv2:toggled"] },
-    "lpfFreq": { "props": ["pprops:logarithmic"], "unit": "units:hz" },
-    "lpfSlope": { "props": ["lv2:enumeration", "lv2:integer"], "points": ["12 12 dB/oct", "24 24 dB/oct"] },
-    "gateOn": { "props": ["lv2:toggled"] },
-    "gateThreshold": { "unit": "units:db" },
-    "gateRange": { "unit": "units:db" },
-    "gateAttack": { "unit": "units:ms" },
-    "gateRelease": { "unit": "units:ms" },
-    "eqOn": { "props": ["lv2:toggled"] },
-    "eq1Type": { "props": ["lv2:enumeration", "lv2:integer"], "points": ["0 Bell", "1 Low Shelf", "2 High Shelf", "3 Notch", "4 All-pass 1st", "5 All-pass 2nd"] },
-    "eq1Freq": { "props": ["pprops:logarithmic"], "unit": "units:hz" },
-    "eq1Gain": { "unit": "units:db" },
-    "eq1On": { "props": ["lv2:toggled"] },
-    "eq2Type": { "props": ["lv2:enumeration", "lv2:integer"], "points": ["0 Bell", "1 Low Shelf", "2 High Shelf", "3 Notch", "4 All-pass 1st", "5 All-pass 2nd"] },
-    "eq2Freq": { "props": ["pprops:logarithmic"], "unit": "units:hz" },
-    "eq2Gain": { "unit": "units:db" },
-    "eq2On": { "props": ["lv2:toggled"] },
-    "eq3Type": { "props": ["lv2:enumeration", "lv2:integer"], "points": ["0 Bell", "1 Low Shelf", "2 High Shelf", "3 Notch", "4 All-pass 1st", "5 All-pass 2nd"] },
-    "eq3Freq": { "props": ["pprops:logarithmic"], "unit": "units:hz" },
-    "eq3Gain": { "unit": "units:db" },
-    "eq3On": { "props": ["lv2:toggled"] },
-    "eq4Type": { "props": ["lv2:enumeration", "lv2:integer"], "points": ["0 Bell", "1 Low Shelf", "2 High Shelf", "3 Notch", "4 All-pass 1st", "5 All-pass 2nd"] },
-    "eq4Freq": { "props": ["pprops:logarithmic"], "unit": "units:hz" },
-    "eq4Gain": { "unit": "units:db" },
-    "eq4On": { "props": ["lv2:toggled"] },
-    "compOn": { "props": ["lv2:toggled"] },
-    "compThreshold": { "unit": "units:db" },
-    "compKnee": { "unit": "units:db" },
-    "compAttack": { "unit": "units:ms" },
-    "compRelease": { "unit": "units:ms" },
-    "compMakeup": { "unit": "units:db" },
-    "compRms": { "props": ["lv2:toggled"] },
-    "order": { "props": ["lv2:integer"] },
-    "enabled": { "props": ["lv2:toggled"] },
-    "latency": { "props": ["lv2:integer", "lv2:reportsLatency"], "unit": "units:frame" }
+  "version": "0.3.0",
+  "description": "The OpenMixer console's channel strip in one plugin: input trim, high- and low-pass filters, gate, four-band EQ and compressor, in the console's order or any other. No DSP of its own: each stage is omx-dsp's instance face of the console's kernel, called in order.",
+  "summary": "The console's channel strip in one plugin: input trim, HPF/LPF, gate, four-band EQ and compressor, in the desk's order or any other. Stereo, real-time safe, 44.1 to 192 kHz.",
+  "clap": {
+    "id": "org.openmixer.strip",
+    "features": [
+      "audio-effect",
+      "mixing",
+      "stereo"
+    ]
   },
+  "lv2": {
+    "uri": "urn:openmixer:strip",
+    "class": "lv2:MixerPlugin"
+  },
+  "binding": "chain",
+  "chain": [
+    {
+      "id": "trim",
+      "kernel": "trim",
+      "name": "Input",
+      "on": true,
+      "params": [
+        {
+          "symbol": "trimDb",
+          "name": "Trim",
+          "ref": "TRIM_RANGE"
+        }
+      ]
+    },
+    {
+      "id": "filter",
+      "kernel": "eq",
+      "name": "Filters",
+      "on": true,
+      "params": [
+        {
+          "symbol": "hpfOn",
+          "name": "HPF",
+          "ref": "EQ_HPF_ONS"
+        },
+        {
+          "symbol": "hpfFreq",
+          "name": "HPF Freq",
+          "ref": "HPF_FREQ_RANGE",
+          "defaultRef": "EQ_PASS_FILTER_DEFAULTS.hpfFreqHz"
+        },
+        {
+          "symbol": "hpfSlope",
+          "name": "HPF Slope",
+          "ref": "FILTER_SLOPES",
+          "unit": "dB/oct"
+        },
+        {
+          "symbol": "lpfOn",
+          "name": "LPF",
+          "ref": "EQ_LPF_ONS"
+        },
+        {
+          "symbol": "lpfFreq",
+          "name": "LPF Freq",
+          "ref": "LPF_FREQ_RANGE",
+          "defaultRef": "EQ_PASS_FILTER_DEFAULTS.lpfFreqHz"
+        },
+        {
+          "symbol": "lpfSlope",
+          "name": "LPF Slope",
+          "ref": "FILTER_SLOPES",
+          "unit": "dB/oct"
+        }
+      ],
+      "faceBands": "eq8",
+      "fixed": {
+        "bandType": "default",
+        "freq": "default",
+        "gain": "default",
+        "q": "default",
+        "bandOn": "off"
+      }
+    },
+    {
+      "id": "gate",
+      "kernel": "gate",
+      "name": "Gate",
+      "on": false,
+      "params": [
+        {
+          "symbol": "gateThreshold",
+          "name": "Gate Threshold",
+          "ref": "GATE_CONTINUOUS_TRAVELS",
+          "field": "thresholdDb"
+        },
+        {
+          "symbol": "gateRatio",
+          "name": "Gate Ratio",
+          "ref": "GATE_CONTINUOUS_TRAVELS",
+          "field": "ratio"
+        },
+        {
+          "symbol": "gateRange",
+          "name": "Gate Range",
+          "ref": "GATE_CONTINUOUS_TRAVELS",
+          "field": "rangeDb"
+        },
+        {
+          "symbol": "gateAttack",
+          "name": "Gate Attack",
+          "ref": "GATE_LIMITS",
+          "field": "attackMs"
+        },
+        {
+          "symbol": "gateRelease",
+          "name": "Gate Release",
+          "ref": "GATE_CONTINUOUS_TRAVELS",
+          "field": "releaseMs"
+        },
+        {
+          "symbol": "gateKneeStart",
+          "name": "Gate Knee Start",
+          "ref": "GATE_LIMITS",
+          "field": "kneeStartDb"
+        },
+        {
+          "symbol": "gateKneeEnd",
+          "name": "Gate Knee End",
+          "ref": "GATE_LIMITS",
+          "field": "kneeEndDb"
+        },
+        {
+          "symbol": "gateHold",
+          "name": "Gate Hold",
+          "ref": "GATE_LIMITS",
+          "field": "holdMs"
+        },
+        {
+          "symbol": "gateHysteresis",
+          "name": "Gate Hysteresis",
+          "ref": "GATE_LIMITS",
+          "field": "hysteresisDb"
+        }
+      ],
+      "fixed": {
+        "keySource": "self"
+      }
+    },
+    {
+      "id": "eq",
+      "kernel": "eq",
+      "name": "EQ",
+      "on": true,
+      "params": [
+        {
+          "symbol": "eq1Type",
+          "name": "EQ 1 Type",
+          "ref": "EQ_BAND_TYPES",
+          "defaultBand": {
+            "strip": "strip",
+            "index": 0,
+            "of": "type"
+          }
+        },
+        {
+          "symbol": "eq1Freq",
+          "name": "EQ 1 Freq",
+          "ref": "EQ_FREQ_RANGE",
+          "defaultBand": {
+            "strip": "strip",
+            "index": 0,
+            "of": "centre"
+          }
+        },
+        {
+          "symbol": "eq1Gain",
+          "name": "EQ 1 Gain",
+          "ref": "EQ_GAIN_RANGE",
+          "defaultRef": "EQ_BAND_DEFAULTS.gainDb"
+        },
+        {
+          "symbol": "eq1Q",
+          "name": "EQ 1 Q",
+          "ref": "EQ_Q_RANGE",
+          "defaultRef": "EQ_BAND_DEFAULTS.q"
+        },
+        {
+          "symbol": "eq1On",
+          "name": "EQ 1",
+          "ref": "EQ_BAND_ONS"
+        },
+        {
+          "symbol": "eq2Type",
+          "name": "EQ 2 Type",
+          "ref": "EQ_BAND_TYPES",
+          "defaultBand": {
+            "strip": "strip",
+            "index": 1,
+            "of": "type"
+          }
+        },
+        {
+          "symbol": "eq2Freq",
+          "name": "EQ 2 Freq",
+          "ref": "EQ_FREQ_RANGE",
+          "defaultBand": {
+            "strip": "strip",
+            "index": 1,
+            "of": "centre"
+          }
+        },
+        {
+          "symbol": "eq2Gain",
+          "name": "EQ 2 Gain",
+          "ref": "EQ_GAIN_RANGE",
+          "defaultRef": "EQ_BAND_DEFAULTS.gainDb"
+        },
+        {
+          "symbol": "eq2Q",
+          "name": "EQ 2 Q",
+          "ref": "EQ_Q_RANGE",
+          "defaultRef": "EQ_BAND_DEFAULTS.q"
+        },
+        {
+          "symbol": "eq2On",
+          "name": "EQ 2",
+          "ref": "EQ_BAND_ONS"
+        },
+        {
+          "symbol": "eq3Type",
+          "name": "EQ 3 Type",
+          "ref": "EQ_BAND_TYPES",
+          "defaultBand": {
+            "strip": "strip",
+            "index": 2,
+            "of": "type"
+          }
+        },
+        {
+          "symbol": "eq3Freq",
+          "name": "EQ 3 Freq",
+          "ref": "EQ_FREQ_RANGE",
+          "defaultBand": {
+            "strip": "strip",
+            "index": 2,
+            "of": "centre"
+          }
+        },
+        {
+          "symbol": "eq3Gain",
+          "name": "EQ 3 Gain",
+          "ref": "EQ_GAIN_RANGE",
+          "defaultRef": "EQ_BAND_DEFAULTS.gainDb"
+        },
+        {
+          "symbol": "eq3Q",
+          "name": "EQ 3 Q",
+          "ref": "EQ_Q_RANGE",
+          "defaultRef": "EQ_BAND_DEFAULTS.q"
+        },
+        {
+          "symbol": "eq3On",
+          "name": "EQ 3",
+          "ref": "EQ_BAND_ONS"
+        },
+        {
+          "symbol": "eq4Type",
+          "name": "EQ 4 Type",
+          "ref": "EQ_BAND_TYPES",
+          "defaultBand": {
+            "strip": "strip",
+            "index": 3,
+            "of": "type"
+          }
+        },
+        {
+          "symbol": "eq4Freq",
+          "name": "EQ 4 Freq",
+          "ref": "EQ_FREQ_RANGE",
+          "defaultBand": {
+            "strip": "strip",
+            "index": 3,
+            "of": "centre"
+          }
+        },
+        {
+          "symbol": "eq4Gain",
+          "name": "EQ 4 Gain",
+          "ref": "EQ_GAIN_RANGE",
+          "defaultRef": "EQ_BAND_DEFAULTS.gainDb"
+        },
+        {
+          "symbol": "eq4Q",
+          "name": "EQ 4 Q",
+          "ref": "EQ_Q_RANGE",
+          "defaultRef": "EQ_BAND_DEFAULTS.q"
+        },
+        {
+          "symbol": "eq4On",
+          "name": "EQ 4",
+          "ref": "EQ_BAND_ONS"
+        }
+      ],
+      "bands": "strip",
+      "faceBands": "eq8",
+      "fixed": {
+        "hpfOn": "off",
+        "hpfFreq": {
+          "defaultRef": "EQ_PASS_FILTER_DEFAULTS.hpfFreqHz"
+        },
+        "hpfSlope": "default",
+        "lpfOn": "off",
+        "lpfFreq": {
+          "defaultRef": "EQ_PASS_FILTER_DEFAULTS.lpfFreqHz"
+        },
+        "lpfSlope": "default",
+        "bandType": "default",
+        "freq": "default",
+        "gain": "default",
+        "q": "default",
+        "bandOn": "off"
+      }
+    },
+    {
+      "id": "comp",
+      "kernel": "comp",
+      "name": "Comp",
+      "on": false,
+      "params": [
+        {
+          "symbol": "compThreshold",
+          "name": "Comp Threshold",
+          "ref": "COMP_CONTINUOUS_TRAVELS",
+          "field": "thresholdDb"
+        },
+        {
+          "symbol": "compRatio",
+          "name": "Comp Ratio",
+          "ref": "COMP_LIMITS",
+          "field": "ratio"
+        },
+        {
+          "symbol": "compKnee",
+          "name": "Comp Knee",
+          "ref": "COMP_LIMITS",
+          "field": "kneeDb"
+        },
+        {
+          "symbol": "compAttack",
+          "name": "Comp Attack",
+          "ref": "COMP_LIMITS",
+          "field": "attackMs"
+        },
+        {
+          "symbol": "compRelease",
+          "name": "Comp Release",
+          "ref": "COMP_CONTINUOUS_TRAVELS",
+          "field": "releaseMs"
+        },
+        {
+          "symbol": "compMakeup",
+          "name": "Comp Makeup",
+          "ref": "COMP_LIMITS",
+          "field": "makeupDb"
+        },
+        {
+          "symbol": "compKind",
+          "name": "Comp Kind",
+          "ref": "COMP_KINDS"
+        },
+        {
+          "symbol": "compMix",
+          "name": "Comp Mix",
+          "ref": "COMP_LIMITS",
+          "field": "mixPct"
+        },
+        {
+          "symbol": "compDetectorOversampling",
+          "name": "Comp Detector Oversampling",
+          "ref": "DETECTOR_OVERSAMPLINGS"
+        }
+      ]
+    }
+  ],
+  "order": "permutable",
+  "portHints": {
+    "trimOn": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "trimDb": {
+      "unit": "units:db"
+    },
+    "filterOn": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "hpfOn": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "hpfFreq": {
+      "props": [
+        "lv2:integer",
+        "pprops:logarithmic"
+      ],
+      "unit": "units:hz"
+    },
+    "hpfSlope": {
+      "props": [
+        "lv2:enumeration",
+        "lv2:integer"
+      ],
+      "points": [
+        "12 12 dB/oct",
+        "24 24 dB/oct"
+      ]
+    },
+    "lpfOn": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "lpfFreq": {
+      "props": [
+        "lv2:integer",
+        "pprops:logarithmic"
+      ],
+      "unit": "units:hz"
+    },
+    "lpfSlope": {
+      "props": [
+        "lv2:enumeration",
+        "lv2:integer"
+      ],
+      "points": [
+        "12 12 dB/oct",
+        "24 24 dB/oct"
+      ]
+    },
+    "gateOn": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "gateThreshold": {
+      "unit": "units:db"
+    },
+    "gateRange": {
+      "unit": "units:db"
+    },
+    "gateAttack": {
+      "unit": "units:ms"
+    },
+    "gateRelease": {
+      "unit": "units:ms"
+    },
+    "gateKneeStart": {
+      "props": [
+        "lv2:integer"
+      ],
+      "unit": "units:db"
+    },
+    "gateKneeEnd": {
+      "props": [
+        "lv2:integer"
+      ],
+      "unit": "units:db"
+    },
+    "gateHold": {
+      "props": [
+        "lv2:integer"
+      ],
+      "unit": "units:ms"
+    },
+    "gateHysteresis": {
+      "unit": "units:db"
+    },
+    "eqOn": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "eq1Type": {
+      "props": [
+        "lv2:enumeration",
+        "lv2:integer"
+      ],
+      "points": [
+        "0 Bell",
+        "1 Low Shelf",
+        "2 High Shelf",
+        "3 Notch",
+        "4 All-pass 1st",
+        "5 All-pass 2nd"
+      ]
+    },
+    "eq1Freq": {
+      "props": [
+        "lv2:integer",
+        "pprops:logarithmic"
+      ],
+      "unit": "units:hz"
+    },
+    "eq1Gain": {
+      "unit": "units:db"
+    },
+    "eq1On": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "eq2Type": {
+      "props": [
+        "lv2:enumeration",
+        "lv2:integer"
+      ],
+      "points": [
+        "0 Bell",
+        "1 Low Shelf",
+        "2 High Shelf",
+        "3 Notch",
+        "4 All-pass 1st",
+        "5 All-pass 2nd"
+      ]
+    },
+    "eq2Freq": {
+      "props": [
+        "lv2:integer",
+        "pprops:logarithmic"
+      ],
+      "unit": "units:hz"
+    },
+    "eq2Gain": {
+      "unit": "units:db"
+    },
+    "eq2On": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "eq3Type": {
+      "props": [
+        "lv2:enumeration",
+        "lv2:integer"
+      ],
+      "points": [
+        "0 Bell",
+        "1 Low Shelf",
+        "2 High Shelf",
+        "3 Notch",
+        "4 All-pass 1st",
+        "5 All-pass 2nd"
+      ]
+    },
+    "eq3Freq": {
+      "props": [
+        "lv2:integer",
+        "pprops:logarithmic"
+      ],
+      "unit": "units:hz"
+    },
+    "eq3Gain": {
+      "unit": "units:db"
+    },
+    "eq3On": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "eq4Type": {
+      "props": [
+        "lv2:enumeration",
+        "lv2:integer"
+      ],
+      "points": [
+        "0 Bell",
+        "1 Low Shelf",
+        "2 High Shelf",
+        "3 Notch",
+        "4 All-pass 1st",
+        "5 All-pass 2nd"
+      ]
+    },
+    "eq4Freq": {
+      "props": [
+        "lv2:integer",
+        "pprops:logarithmic"
+      ],
+      "unit": "units:hz"
+    },
+    "eq4Gain": {
+      "unit": "units:db"
+    },
+    "eq4On": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "compOn": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "compThreshold": {
+      "unit": "units:db"
+    },
+    "compKnee": {
+      "unit": "units:db"
+    },
+    "compAttack": {
+      "unit": "units:ms"
+    },
+    "compRelease": {
+      "unit": "units:ms"
+    },
+    "compMakeup": {
+      "unit": "units:db"
+    },
+    "compKind": {
+      "props": [
+        "lv2:enumeration",
+        "lv2:integer"
+      ],
+      "points": [
+        "0 Compressor",
+        "1 Limiter"
+      ]
+    },
+    "compMix": {
+      "props": [
+        "lv2:integer"
+      ],
+      "unit": "units:pc"
+    },
+    "compDetectorOversampling": {
+      "props": [
+        "lv2:enumeration",
+        "lv2:integer"
+      ],
+      "points": [
+        "0 Auto",
+        "1 Off",
+        "2 4x"
+      ]
+    },
+    "order": {
+      "props": [
+        "lv2:integer"
+      ]
+    },
+    "enabled": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "latency": {
+      "props": [
+        "lv2:integer",
+        "lv2:reportsLatency"
+      ],
+      "unit": "units:frame"
+    }
+  },
+  "shipped": "v0.2.0",
+  "shippedDiff": [
+    "0 trimDb -> trimOn",
+    "1 hpfOn -> trimDb",
+    "2 hpfFreq -> filterOn",
+    "3 hpfSlope -> hpfOn",
+    "4 lpfOn -> hpfFreq",
+    "5 lpfFreq -> hpfSlope",
+    "6 lpfSlope -> lpfOn",
+    "7 gateOn -> lpfFreq",
+    "8 gateThreshold -> lpfSlope",
+    "9 gateRatio -> gateOn",
+    "10 gateRange -> gateThreshold",
+    "11 gateAttack -> gateRatio",
+    "12 gateRelease -> gateRange",
+    "13 eqOn -> gateAttack",
+    "14 eq1Type -> gateRelease",
+    "15 eq1Freq -> gateKneeStart",
+    "16 eq1Gain -> gateKneeEnd",
+    "17 eq1Q -> gateHold",
+    "18 eq1On -> gateHysteresis",
+    "19 eq2Type -> eqOn",
+    "20 eq2Freq -> eq1Type",
+    "21 eq2Gain -> eq1Freq",
+    "22 eq2Q -> eq1Gain",
+    "23 eq2On -> eq1Q",
+    "24 eq3Type -> eq1On",
+    "25 eq3Freq -> eq2Type",
+    "26 eq3Gain -> eq2Freq",
+    "27 eq3Q -> eq2Gain",
+    "28 eq3On -> eq2Q",
+    "29 eq4Type -> eq2On",
+    "30 eq4Freq -> eq3Type",
+    "31 eq4Gain -> eq3Freq",
+    "32 eq4Q -> eq3Gain",
+    "33 eq4On -> eq3Q",
+    "34 compOn -> eq3On",
+    "35 compThreshold -> eq4Type",
+    "36 compRatio -> eq4Freq",
+    "37 compKnee -> eq4Gain",
+    "38 compAttack -> eq4Q",
+    "39 compRelease -> eq4On",
+    "40 compMakeup -> compOn",
+    "41 compRms -> compThreshold",
+    "42 order -> compRatio",
+    "+43 compKnee",
+    "+44 compAttack",
+    "+45 compRelease",
+    "+46 compMakeup",
+    "+47 compKind",
+    "+48 compMix",
+    "+49 compDetectorOversampling",
+    "+50 order"
+  ],
   "panel": {
     "family": "strip",
     "roles": {},
     "sections": [
       {
-        "key": "input",
+        "key": "trim",
         "label": "Input",
         "controls": [
-          "trimDb",
+          "trimOn",
+          "trimDb"
+        ]
+      },
+      {
+        "key": "filter",
+        "label": "Filters",
+        "controls": [
+          "filterOn",
           "hpfOn",
           "hpfFreq",
           "hpfSlope",
@@ -124,7 +758,11 @@
           "gateRatio",
           "gateRange",
           "gateAttack",
-          "gateRelease"
+          "gateRelease",
+          "gateKneeStart",
+          "gateKneeEnd",
+          "gateHold",
+          "gateHysteresis"
         ]
       },
       {
@@ -165,7 +803,9 @@
           "compAttack",
           "compRelease",
           "compMakeup",
-          "compRms"
+          "compKind",
+          "compMix",
+          "compDetectorOversampling"
         ]
       },
       {
@@ -177,6 +817,24 @@
       }
     ]
   },
+  "manual": [
+    "Five stages, each omx-dsp's instance face of the console's own kernel, run one after the other; each has its own switch:",
+    "",
+    "| Stage | Parameters |",
+    "|---|---|",
+    "| Input | on/off; Trim, a click-free ramp to each new gain |",
+    "| Filters | on/off; HPF and LPF, each on/off, its frequency, 12 or 24 dB/oct |",
+    "| Gate | on/off, threshold, ratio, range, attack, release, knee start and end, hold, hysteresis |",
+    "| EQ | on/off; four bands, each on/off, type (bell, low or high shelf, notch, all-pass 1st or 2nd order), frequency, gain, Q |",
+    "| Comp | on/off, threshold, ratio, knee, attack, release, make-up, kind (compressor: RMS detector; limiter: peak), mix, detector oversampling (auto, off, 4x) |",
+    "",
+    "**Order** (0 to 119) picks the order of the five stages: 0 is the desk's input > filters > gate > EQ >",
+    "comp, and the rest follow in lexicographic order (1 is input > filters > gate > comp > EQ, ... 119 is",
+    "comp > EQ > gate > filters > input). Plus the host's bypass. The latency reported is the sum of the",
+    "stages': the gate's and the compressor's 4x detector paths while they are engaged, else zero.",
+    "",
+    "0.3.0 changed the parameter list (the Input and Filters switches, the gate's knee, hold and hysteresis, the compressor's kind, mix and detector oversampling, five-stage orders): a session saved with 0.2.0 does not load as it was, though at 0.2.0's settings the strip sounds the same, sample for sample."
+  ],
   "console": {
     "$comment": "FreeMixer/openmixer integration/waves-2026-10 has no channel-strip stage: its strip is the trim, the EQ (with the HPF and LPF), the gate and the dynamics stages themselves. Racked as a plugin (the insert rack's kinds, channel-contract.ts INSERT_RACK_KINDS) it is drawn by the generic plugin editor.",
     "placement": {
@@ -190,20 +848,5 @@
       ],
       "group": "plugins"
     }
-  },
-  "manual": [
-    "Four stages, each the console's own module, run one after the other:",
-    "",
-    "| Stage | Parameters |",
-    "|---|---|",
-    "| Input | Trim (-24 to +24 dB); HPF (20 to 1000 Hz) and LPF (1 to 20 kHz), each on/off, 12 or 24 dB/oct |",
-    "| Gate | on/off, threshold, ratio, range, attack, release |",
-    "| EQ | on/off; four bands, each on/off, type (bell, low/high shelf, notch, all-pass), frequency, gain (±15 dB), Q |",
-    "| Comp | on/off, threshold, ratio, knee, attack, release, make-up, RMS/peak |",
-    "",
-    "**Order** (0 to 23) picks the order of the four stages: 0 is the desk's input > gate > EQ > comp,",
-    "and the rest follow in lexicographic order (1 is input > gate > comp > EQ, 2 is input > EQ > gate >",
-    "comp, ... 23 is comp > EQ > gate > input). Plus the host's bypass. The latency reported is the gate's",
-    "and the compressor's 4x detector paths while they are engaged, else zero."
-  ]
+  }
 }

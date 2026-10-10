@@ -1,0 +1,57 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 Pau Aliagas <linuxnow@gmail.com>
+# omx-strip as the hand-ported 0.2.0 plugin (A) and as a chain (B): A's every setting, as B sets it.
+# Read by tools/test/strip-crosscheck.sh (tools/test/clap-crosscheck.c); a line is <A name>|<B names>[|<a>:<b> ...], or |<B name>|=<x>.
+Trim|Trim
+HPF|HPF
+HPF Freq|HPF Freq
+HPF Slope|HPF Slope
+LPF|LPF
+LPF Freq|LPF Freq
+LPF Slope|LPF Slope
+Gate|Gate
+# the hand-ported strip passed its threshold as both knee edges (a hard knee)
+Gate Threshold|Gate Threshold,Gate Knee Start,Gate Knee End
+Gate Ratio|Gate Ratio
+Gate Range|Gate Range
+Gate Attack|Gate Attack
+Gate Release|Gate Release
+EQ|EQ
+EQ 1 Type|EQ 1 Type
+EQ 1 Freq|EQ 1 Freq
+EQ 1 Gain|EQ 1 Gain
+EQ 1 Q|EQ 1 Q
+EQ 1|EQ 1
+EQ 2 Type|EQ 2 Type
+EQ 2 Freq|EQ 2 Freq
+EQ 2 Gain|EQ 2 Gain
+EQ 2 Q|EQ 2 Q
+EQ 2|EQ 2
+EQ 3 Type|EQ 3 Type
+EQ 3 Freq|EQ 3 Freq
+EQ 3 Gain|EQ 3 Gain
+EQ 3 Q|EQ 3 Q
+EQ 3|EQ 3
+EQ 4 Type|EQ 4 Type
+EQ 4 Freq|EQ 4 Freq
+EQ 4 Gain|EQ 4 Gain
+EQ 4 Q|EQ 4 Q
+EQ 4|EQ 4
+Comp|Comp
+Comp Threshold|Comp Threshold
+Comp Ratio|Comp Ratio
+Comp Knee|Comp Knee
+Comp Attack|Comp Attack
+Comp Release|Comp Release
+Comp Makeup|Comp Makeup
+# RMS on was the comp kind (RMS detector), off the limiter kind (peak)
+Comp RMS|Comp Kind|0:1 1:0
+# the old order of (input, gate, eq, comp) as the new order of (trim, filters, gate, eq, comp)
+Order|Order|0:0 1:1 2:2 3:3 4:4 5:5 6:48 7:49 8:60 9:64 10:66 11:70 12:72 13:73 14:84 15:88 16:90 17:94 18:96 19:97 20:108 21:112 22:114 23:118
+# what the hand-ported strip did not expose, held where it reproduces it
+|Input|=1
+|Filters|=1
+|Gate Hold|=0
+|Gate Hysteresis|=0
+|Comp Mix|=100
+|Comp Detector Oversampling|=0

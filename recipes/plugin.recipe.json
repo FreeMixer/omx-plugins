@@ -184,7 +184,7 @@
     },
     {
       "id": "instance-files",
-      "what": "for a binding: instance plugin, the rest of its folder as tools/gen.mjs writes it now from the declaration and omx-dsp's instance face: the Makefile, both faces, the binding and the identity test",
+      "what": "for a binding: instance (or chain) plugin, the rest of its folder as tools/gen.mjs writes it now from the declaration and omx-dsp's instance face: the Makefile, both faces, the binding and the identity test",
       "step": "generate",
       "layer": "generated",
       "made": "GENERATED",

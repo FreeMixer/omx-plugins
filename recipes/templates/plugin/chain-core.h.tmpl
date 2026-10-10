@@ -1,0 +1,90 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Copyright (C) 2026 Pau Aliagas <linuxnow@gmail.com>
+/*
+ * omx_{{kernel}}_core.h — {{stem}}'s binding to its chain of omx-dsp instance faces, {{sequence}}: the ONE
+ * place both faces (omx_{{kernel}}_clap.c, omx_{{kernel}}_lv2.c) reach the DSP. It holds no DSP of its
+ * own: it copies in to out once, then runs each element's face in place on out, in the chosen order.
+ * Each element's parameters go, by name, to its own face's resolve(); its switch off, or the host's
+ * bypass, is that face's bypass. The latency is the sum of the elements'. Plain inline state: nothing
+ * is allocated, locked or called into the system, in process or at activate.
+ *
+ * GENERATED — DO NOT EDIT BY HAND. Produced by tools/gen.mjs from plugins/{{stem}}/{{stem}}.decl.json and
+ * each face's resolve() prototype (spec 2026-10-09-plugin-from-contract §15.2).
+{{#elements}}{{#renames}} * RENAME OWED by omx-dsp's name conformance: {{id}}'s resolve argument `{{arg}}` is the contract's `{{rename}}`.
+{{/renames}}{{#fixed}} * {{id}}: `{{control}}` is not a parameter; it is passed at {{at}}.
+{{/fixed}}{{/elements}} */
+#ifndef OMX_{{K}}_CORE_H
+#define OMX_{{K}}_CORE_H
+
+#include <math.h>
+#include <stdint.h>
+#include <string.h>
+
+/* The generated table FIRST, then the faces. */
+#include "omx_{{kernel}}_params.h"
+
+{{#faces}}#include <omxdsp/fx/omx_{{face}}_instance.h>
+{{/faces}}{{#elements}}{{#arrays}}_Static_assert({{count}} == {{extent}}, "the declaration names one {{id}} {{arg}} parameter per band of the face");
+{{/arrays}}{{/elements}}
+/* The elements, in declared order, and every order they may run in{{#permutable}} (the `order` parameter's value is
+ * the row: lexicographic, 0 the declared order){{/permutable}}. */
+enum { {{#elements}}OMX_{{K}}_CHAIN_{{index}}_{{id}} = {{index}}, {{/elements}}OMX_{{K}}_CHAIN_LENGTH = {{length}} };
+#define OMX_{{K}}_CHAIN_ORDERS {{orders}}u
+static const uint8_t OMX_{{K}}_CHAIN_ORDER[OMX_{{K}}_CHAIN_ORDERS][OMX_{{K}}_CHAIN_LENGTH] = {
+{{#orderRows}}    { {{row}} },
+{{/orderRows}}};
+
+/** Each element's state, and the order a block runs in. */
+typedef struct {
+  uint32_t rate;
+  uint32_t order;
+{{#elements}}  {{faceType}} {{id}};
+{{/elements}}} Omx{{Kernel}}Core;
+
+/** A fresh chain at `rate`: every state word zero, each face bound to the rate. A rate a face does not
+ * declare leaves that element a wire. */
+static inline void omx_{{kernel}}_core_init(Omx{{Kernel}}Core *c, uint32_t rate) {
+  memset(c, 0, sizeof *c);
+  c->rate = rate;
+{{#elements}}  (void)omx_{{face}}_instance_init(&c->{{id}}, ({{srType}})rate);
+{{/elements}}}
+
+/** The block's parameters (declaration order) and the host's bypass, each element's to its own face. */
+static inline void omx_{{kernel}}_core_resolve(Omx{{Kernel}}Core *c, const float *values, int bypass) {
+{{#elements}}  omx_{{face}}_instance_resolve(&c->{{id}}, bypass || values[{{on}}] < 0.5f{{#binding}},
+                                  /* {{arg}} */ {{value}}{{/binding}});
+{{/elements}}{{#permutable}}  const float o = values[{{orderParam}}];
+  const long row = o - o == 0.0f ? lrintf(o) : 0;
+  c->order = row >= 0 && row < (long)OMX_{{K}}_CHAIN_ORDERS ? (uint32_t)row : 0u;
+{{/permutable}}{{^permutable}}  c->order = 0u;
+{{/permutable}}}
+
+/** The latency the chain adds, in samples: the sum of its elements'. */
+static inline uint32_t omx_{{kernel}}_core_latency(const Omx{{Kernel}}Core *c) {
+  (void)c;
+  return (uint32_t)lrintf({{latency}});
+}
+
+/** One element over the block, in place on out. */
+static inline void omx_{{kernel}}_core_element(Omx{{Kernel}}Core *c, uint32_t e, const float *key, float *out_l, float *out_r,
+                                            uint32_t frames) {
+  (void)key;
+  switch (e) {
+{{#elements}}  case OMX_{{K}}_CHAIN_{{index}}_{{id}}:
+    omx_{{face}}_instance_run(&c->{{id}}, {{#keyedFace}}{{keyArg}}, {{/keyedFace}}out_l, out_r, out_l, out_r, frames);
+    return;
+{{/elements}}  }
+}
+
+/** One block, stereo{{#keyed}}, keyed by `key` (NULL: nothing routed to it){{/keyed}}: in to out once (they may alias), then
+ * each element in the chosen order. */
+static inline void omx_{{kernel}}_core_run(Omx{{Kernel}}Core *c, {{#keyed}}const float *key, {{/keyed}}const float *in_l, const float *in_r, float *out_l,
+                                         float *out_r, uint32_t frames) {
+  if (!in_l || !in_r || !out_l || !out_r || frames == 0u) return;
+  if (out_l != in_l) memmove(out_l, in_l, (size_t)frames * sizeof(float));
+  if (out_r != in_r) memmove(out_r, in_r, (size_t)frames * sizeof(float));
+{{^keyed}}  const float *key = NULL;
+{{/keyed}}  for (uint32_t k = 0; k < OMX_{{K}}_CHAIN_LENGTH; k++) omx_{{kernel}}_core_element(c, OMX_{{K}}_CHAIN_ORDER[c->order][k], key, out_l, out_r, frames);
+}
+
+#endif /* OMX_{{K}}_CORE_H */

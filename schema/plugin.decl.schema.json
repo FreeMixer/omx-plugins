@@ -16,7 +16,6 @@
         "description",
         "clap",
         "lv2",
-        "params",
         "panel",
         "console"
       ],
@@ -150,10 +149,11 @@
         },
         "binding": {
           "enum": [
-            "instance"
+            "instance",
+            "chain"
           ],
           "title": "Binding",
-          "description": "`instance`: the plugin runs omx-dsp's instance face of its kernel (<omxdsp/fx/omx_<kernel>_instance.h>), and tools/gen.mjs generates the kernel binding, the kernel-identity test, both faces and the Makefile from this declaration; each parameter binds to the `resolve` argument named after its contract control. Left out, those files are the plugin's own (a composite, a face omx-dsp does not have)."
+          "description": "`instance`: the plugin runs omx-dsp's instance face of its kernel (<omxdsp/fx/omx_<kernel>_instance.h>), and tools/gen.mjs generates the kernel binding, the kernel-identity test, both faces and the Makefile from this declaration; each parameter binds to the `resolve` argument named after its contract control. `chain`: a composite, its parameters generated from `chain` (spec 2026-10-09-plugin-from-contract §15.2): each element binds to its own kernel's instance face exactly as `instance` does, and the binding runs them in order. Left out, those files are the plugin's own (a composite, a face omx-dsp does not have)."
         },
         "params": {
           "type": "array",
@@ -162,7 +162,43 @@
             "$ref": "#/$defs/param"
           },
           "title": "Parameters",
-          "description": "The parameters, in order. Append-only once released: the order is the CLAP param id and the LV2 port order."
+          "description": "The parameters, in order. Append-only once released: the order is the CLAP param id and the LV2 port order. A `binding: chain` declaration has none: its list is generated from `chain`."
+        },
+        "chain": {
+          "type": "array",
+          "minItems": 2,
+          "items": {
+            "$ref": "#/$defs/element"
+          },
+          "title": "Chain",
+          "description": "For `binding: chain`: the elements, in the order they run (the console's order for that strip kind). The parameter list is generated from it: element by element, each element's switch `<id>On` (default its `on`), then its parameters; then the plugin's own `order` when `order` is `permutable`. Append-only once released, as any parameter list."
+        },
+        "order": {
+          "enum": [
+            "permutable"
+          ],
+          "title": "Order",
+          "description": "For `binding: chain`: `permutable` adds the plugin's own integer parameter `order` over the permutations of the elements, lexicographic, 0 the declared order. Left out, the chain runs in its declared order."
+        },
+        "key": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9]*$",
+          "title": "Key",
+          "description": "For `binding: chain`: the id of the one element whose keyed face takes the plugin's `sidechain`. The other keyed elements run self-keyed."
+        },
+        "shipped": {
+          "type": "string",
+          "pattern": "^v\\d+\\.\\d+\\.\\d+$",
+          "title": "Shipped",
+          "description": "For a chain converted from a released plugin: the release tag whose parameter list it replaces. tools/gen.mjs reads that release's symbols with git and refuses a flattened list that differs, unless `shippedDiff` names exactly every difference."
+        },
+        "shippedDiff": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "Shipped difference",
+          "description": "Every index at which the flattened list differs from the `shipped` release's, as tools/gen.mjs prints them (`<index> <was> -> <now>`, `+<index> <added>`, `-<index> <removed>`): the decision, written down."
         },
         "sidechain": {
           "type": "object",
@@ -285,7 +321,19 @@
             }
           }
         }
-      }
+      },
+      "anyOf": [
+        {
+          "required": [
+            "params"
+          ]
+        },
+        {
+          "required": [
+            "chain"
+          ]
+        }
+      ]
     },
     "param": {
       "type": "object",
@@ -713,6 +761,95 @@
               }
             }
           }
+        }
+      }
+    },
+    "element": {
+      "type": "object",
+      "required": [
+        "id",
+        "kernel",
+        "on",
+        "params"
+      ],
+      "additionalProperties": false,
+      "title": "Chain element",
+      "description": "One kernel of a chain, run through its own omx-dsp instance face.",
+      "properties": {
+        "$comment": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9]*$",
+          "title": "Id",
+          "description": "The element's name: its switch is `<id>On`, its panel section is keyed by it, its state is the binding's field of that name."
+        },
+        "kernel": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*$",
+          "title": "Kernel",
+          "description": "The omx-contract kernel, whose omx-dsp instance face <omxdsp/fx/omx_<kernel>_instance.h> the element runs."
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "title": "Name",
+          "description": "The label of the element's switch and of its panel section. Defaults to the id, capitalised."
+        },
+        "on": {
+          "type": "boolean",
+          "title": "On",
+          "description": "The default of the element's switch `<id>On`."
+        },
+        "params": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/param"
+          },
+          "title": "Parameters",
+          "description": "The element's parameters, by reference to ITS kernel only; they bind to its face's resolve() by name, as a single plugin's do. A symbol may carry the element's id in front (`eqHpfSlope`)."
+        },
+        "bands": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9]*$",
+          "title": "Bands",
+          "description": "For a kernel with per-band controls: the key of its count sheet (eq's EQ_BAND_COUNTS: strip, eq8, ...) whose `max` is how many bands the element exposes, one parameter of each per-band control per band. Left out, the element exposes no band."
+        },
+        "faceBands": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9]*$",
+          "title": "Face bands",
+          "description": "The count sheet key the element's face is compiled at, where it differs from `bands` (omx-dsp's eq face takes eq8, eq16 or eq32 only): the bands past `bands` are passed as `fixed` says, never exposed. Elements over one face share it. Left out, `bands`."
+        },
+        "fixed": {
+          "type": "object",
+          "additionalProperties": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "defaultRef"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "defaultRef": {
+                    "type": "string",
+                    "pattern": "^[A-Z][A-Z0-9_]*\\.[a-z][A-Za-z0-9]*$"
+                  }
+                }
+              }
+            ]
+          },
+          "title": "Fixed",
+          "description": "Controls of the element's kernel that are no parameter, each passed at one value: a set's id, a travel's number, \"default\" (its declared default), or {\"defaultRef\": \"<SHEET>.<field>\"} (a default an omx-contract sheet holds). A per-band control is passed so for every band the element does not expose. For a control a chain cannot use, such as the key source of a keyed face that is not the chain's `key` (it runs self-keyed)."
         }
       }
     }

@@ -54,7 +54,7 @@ static const omx_plugin_param OMX_PHASER_PARAMS[OMX_PHASER_PARAM_COUNT] = {
 #define OMX_PHASER_NAME "omx phaser"
 #define OMX_PHASER_VENDOR "openmixer"
 #define OMX_PHASER_URL "https://github.com/FreeMixer/omx-plugins"
-#define OMX_PHASER_VERSION "0.2.0"
+#define OMX_PHASER_VERSION "0.3.0"
 #define OMX_PHASER_DESCRIPTION "The console's phaser: identical all-pass sections swept in octaves by one oscillator, with feedback around the chain and a wet/dry mix."
 #define OMX_PHASER_CLAP_ID "org.openmixer.phaser"
 #define OMX_PHASER_CLAP_FEATURES "audio-effect", "phaser", "stereo"

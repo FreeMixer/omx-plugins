@@ -36,6 +36,15 @@
  *      that does not list the kernel is refused, never read some other way. The plan ends with a
  *      full-scale burst and a quiet tail, then each value of every choice over a burst and tail of
  *      its own with the other parameters stepped once for its second tail.
+ *   8. A chain (spec §15.2), on the real faces eq, gate and comp: `--from-contract eq,gate,comp`
+ *      drafts one element per kernel and refuses a kernel with no face; the settled chain is
+ *      written whole, its parameter list flattened (each element's switch, then its parameters,
+ *      then `order`), and its `make test` is green: both faces bit-identical to the chain of faces
+ *      called directly at every declared rate, each parameter one step off seen. The generated
+ *      core with two orders swapped makes the oracle red; restored, green. gen refuses a `key` on
+ *      an element whose face takes none, and a parameter of another element's kernel; held to a
+ *      released tag (`shipped`), a list that differs from it is refused, each index named, unless
+ *      `shippedDiff` names exactly those, and a tree with no such tag says it was not checked.
  *
  * Works in build/selftest/ (removed first). Needs git, and omx-dsp's headers as the build does.
  * Exit 1 when any check failed, including an arm that stopped early.
@@ -45,11 +54,11 @@ import { cpSync, existsSync, mkdirSync, readFileSync, rmSync, unlinkSync, writeF
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { checkCommits, rangeCommits } from '../commit-plan-check.mjs';
-import { commitPlan, draftDeclaration, kernelSources, planPlugin, reviewMarks, writePlugin } from '../omx-new-plugin.mjs';
+import { chainSources, commitPlan, draftChain, draftDeclaration, kernelSources, planChain, planPlugin, reviewMarks, writePlugin } from '../omx-new-plugin.mjs';
 import { bindFace, parseFace } from '../instance-face.mjs';
 import { kernelControls, locateContract } from '../omx-contract.mjs';
 import { omxdspInclude } from '../template.mjs';
-import { emitPluginTtl, generateInstance, loadDecl } from '../gen.mjs';
+import { defaultPanel, emitPluginTtl, generateInstance, loadDecl } from '../gen.mjs';
 import { hintErrors } from '../port-hints.mjs';
 import { expandVariant, variantBands } from '../variants.mjs';
 import { checkPlugin, debtGrowth, debtVerdict, gapLines, loadDebt, loadRecipe, pluginStems, recipeErrors } from '../plugin-recipe.mjs';
@@ -624,6 +633,122 @@ static inline void omx_wobble_instance_run(OmxWobbleInstance *s, const float *${
     let why = '';
     try { kernelControls(unlisted, 'wobble'); } catch (e) { why = e.message; }
     expect(why.includes("lists no kernel 'wobble'"), `oracle: a render that does not list the kernel is refused (${why || 'READ ANYWAY'})`);
+  }
+
+  // ---- 8. a chain of real faces: eq, gate, comp ------------------------------------------------
+  {
+    process.env.OMX_CONTRACT_DIR = contract; // the pinned render (plus wobble), for the tree and its make
+    delete process.env.OMXDSP_INCLUDE; // the real faces, as the build finds them
+    const ct = join(WORK, 'chain');
+    copyTree(ct);
+    const kernels = ['eq', 'gate', 'comp'];
+    const csrc = chainSources(kernels, { root: ct });
+    expect(!csrc.refusals.length, `chain: the wizard finds eq, gate and comp and their faces${csrc.refusals.length ? `: ${csrc.refusals.map((r) => r.reason).join('; ')}` : ''}`);
+    const noFace = chainSources(['eq', 'balance'], { root: ct });
+    expect(noFace.refusals.some((r) => r.field === 'balance: omx-dsp' && /omx_balance_instance\.h/.test(r.reason)), `chain: a kernel with no instance face is refused, naming the omx-dsp work (${noFace.refusals.map((r) => r.field).join(', ')})`);
+    if (csrc.refusals.length) return;
+    const stem = 'omx-chainproof', CP = `plugins/${stem}`;
+    const draft = draftChain(kernels, csrc, { root: ct, recipe, stem });
+    expect(draft.decl?.binding === 'chain' && draft.decl.chain.map((el) => `${el.id}:${el.kernel}`).join(' ') === 'eq:eq gate:gate comp:comp',
+      `chain: the draft has one element per kernel, in the order given (${draft.decl?.chain.map((el) => el.id).join(' ')})`);
+    const cmarks = reviewMarks(draft.decl);
+    expect(['/chain/0/on', '/chain/0/bands', '/chain/1/on', '/chain/2/on', '/description', '/console/placement/group'].every((m) => cmarks.includes(m)), `chain: each switch's default, the band count and the console placement are marked REVIEW (${cmarks.join(' ')})`);
+    expect(draft.decl?.panel?.sections.map((x) => x.key).join(' ') === 'eq gate comp', `chain: the drafted panel is one section per element (${draft.decl?.panel?.sections.map((x) => x.key).join(' ')})`);
+    expect(draft.notes.some((n) => n.startsWith("element 'gate'")), 'chain: the draft notes that the gate\'s face takes a key');
+    const settled = structuredClone(draft.decl);
+    settled.description = 'A test chain: the console EQ, then its gate, then its compressor, in any order.';
+    settled.clap.features[1] = 'mixing';
+    settled.lv2.class = 'lv2:MixerPlugin';
+    settled.console.placement = { strips: ['input'], group: 'plugins' };
+    const [eq, gate, comp] = settled.chain;
+    eq.on = true;
+    eq.name = 'EQ';
+    eq.bands = 'eq8';
+    eq.params = eq.params.filter((p) => !/^eq\d+/.test(p.symbol) || Number(p.symbol.match(/^eq(\d+)/)[1]) <= 8);
+    gate.on = false;
+    gate.fixed = { keySource: 'self' };
+    gate.params = gate.params.filter((p) => p.symbol !== 'gateKeySource');
+    comp.on = true;
+    settled.order = 'permutable';
+    settled.panel = defaultPanel(settled); // the settled elements' parameters, one section each
+    const plan = await planChain(settled, csrc, { root: ct, recipe });
+    expect(plan.ok, `chain: the settled chain is accepted${plan.ok ? '' : `: ${plan.refusals.map((r) => `${r.field} ${r.reason}`).join('; ')}`}`);
+    if (!plan.ok) return;
+    const symbols = plan.resolved.map((p) => p.symbol);
+    expect(symbols[0] === 'eqOn' && symbols[symbols.indexOf('gateOn') - 1] === 'eq8BandOn' && symbols[symbols.indexOf('gateOn') + 1] === 'gateThresholdDb' &&
+      symbols[symbols.indexOf('compOn') + 1] === 'compThresholdDb' && symbols.at(-1) === 'order' && plan.resolved.at(-1).max === 5,
+      `chain: the flattened list is each element's switch then its parameters, then order over 3! orders (${symbols.length} parameters)`);
+    const written = writePlugin(plan, { root: ct });
+    for (const f of ['Makefile', 'omx_chainproof_core.h', 'omx_chainproof_clap.c', 'omx_chainproof_lv2.c', 'test/chainproof-oracle.c', 'generated/omx_chainproof_params.h', `generated/${stem}.lv2/modgui.ttl`])
+      expect(written.includes(`${CP}/${f}`), `chain: the wizard wrote ${CP}/${f}`);
+    const header = readFileSync(join(ct, CP, 'generated/omx_chainproof_params.h'), 'utf8');
+    expect(header.includes('#define OMX_EQ_INSTANCE_BANDS OMX_EQ_BAND_COUNTS_EQ8_MAX'), 'chain: the eq element\'s band count is the contract\'s, compiled into its face');
+    const coreFile = join(ct, CP, 'omx_chainproof_core.h'), core = readFileSync(coreFile, 'utf8');
+    expect(/omx_gate_instance_resolve\(&c->gate, bypass \|\| values\[OMX_CHAINPROOF_PARAM_GATE_ON\] < 0\.5f,\s*\/\* key_source \*\/ 0,/.test(core) && core.includes('omx_gate_instance_run(&c->gate, NULL,'),
+      'chain: the gate, no key of the chain\'s, runs self-keyed, its key source fixed at self');
+    const make = (...a) => spawnSync('make', ['-C', join(ct, CP), ...a], { encoding: 'utf8' });
+    const green = make('test');
+    expect(green.status === 0 && /ORACLE-GREEN clap/.test(green.stdout) && /ORACLE-GREEN lv2/.test(green.stdout),
+      `chain: make test is green, both faces the chain of faces bit for bit${green.status === 0 ? '' : `: ${`${green.stdout}${green.stderr}`.split('\n').filter((l) => /^FAIL|rror/.test(l)).slice(0, 3).join(' | ')}`}`);
+    const oracle = () => {
+      const b = make('build/omx-chainproof.clap', 'build/chainproof-oracle');
+      if (b.status !== 0) return `build failed: ${b.stderr.trim().split('\n').at(-1)}`;
+      const r = spawnSync(join(ct, CP, 'build/chainproof-oracle'), ['clap', join(ct, CP, 'build/omx-chainproof.clap')], { encoding: 'utf8' });
+      return r.stdout.split('\n').find((l) => /^ORACLE-/.test(l)) ?? `no verdict (${r.status})`;
+    };
+    writeFileSync(coreFile, core.replace('    { 0, 1, 2 },\n    { 0, 2, 1 },', '    { 0, 2, 1 },\n    { 0, 1, 2 },'));
+    const red = oracle();
+    expect(/^ORACLE-RED/.test(red), `sabotage chain: the core with two orders swapped makes the oracle red (${red})`);
+    writeFileSync(coreFile, core);
+    const back = oracle();
+    expect(/^ORACLE-GREEN/.test(back), `chain: restored, the oracle is green (${back})`);
+    // gen's own refusals
+    const refusedBy = (what, mutate, needle) => {
+      const d = structuredClone(plan.decl);
+      mutate(d);
+      writeFileSync(join(ct, CP, `${stem}.decl.json`), `${JSON.stringify(d, null, 2)}\n`);
+      const r = spawnSync('node', ['tools/gen.mjs', CP], { cwd: ct, encoding: 'utf8' });
+      expect(r.status !== 0 && r.stderr.includes(needle), `chain: gen refuses ${what} (${r.stderr.split('\n').find((l) => l.includes('Error')) ?? r.status})`);
+    };
+    refusedBy('a key on an element whose face takes none', (d) => {
+      d.key = 'comp';
+      d.sidechain = { symbol: 'key', name: 'Key' };
+    }, "omx_comp_instance_run takes no key");
+    refusedBy('a parameter of another kernel', (d) => {
+      d.chain[2].params[0].kernel = 'gate';
+    }, "names kernel 'gate', not the element's 'comp'");
+    writeFileSync(join(ct, CP, `${stem}.decl.json`), `${JSON.stringify(plan.decl, null, 2)}\n`);
+    // a chain converted from a release: gen holds it to that release's parameter list
+    // gen reads the declaration, then generates (the list a change moves is no longer the committed one)
+    const shippedAs = (mutate, ...mode) => {
+      const d = structuredClone(plan.decl);
+      d.shipped = 'v9.9.9';
+      mutate(d);
+      writeFileSync(join(ct, CP, `${stem}.decl.json`), `${JSON.stringify(d, null, 2)}\n`);
+      return spawnSync('node', ['tools/gen.mjs', ...mode, CP], { cwd: ct, encoding: 'utf8' });
+    };
+    const untagged = shippedAs(() => {}, '--check');
+    expect(untagged.status === 0 && untagged.stderr.includes('v9.9.9 is not readable here'), `chain: with no such tag, gen says the release list is not checked (${untagged.stderr.trim().split('\n')[0]})`);
+    git(ct, 'init', '-q');
+    git(ct, 'add', '-A');
+    git(ct, 'commit', '-q', '-m', 'released');
+    git(ct, 'tag', 'v9.9.9');
+    expect(shippedAs(() => {}, '--check').status === 0, 'chain: the released list unchanged, gen is green');
+    const swap = (d) => {
+      const ps = d.chain[2].params;
+      [ps[0], ps[1]] = [ps[1], ps[0]];
+    };
+    const moved = shippedAs(swap);
+    expect(moved.status !== 0 && moved.stderr.includes('compThresholdDb -> compRatio') && moved.stderr.includes('compRatio -> compThresholdDb'),
+      `sabotage chain: two parameters swapped against the release are refused, each index named (${moved.stderr.split('\n').find((l) => l.includes('->'))?.trim()})`);
+    const idxs = [...moved.stderr.matchAll(/^ {2}(\d+ \S+ -> \S+)$/gm)].map((m) => m[1]);
+    expect(idxs.length === 2 && shippedAs((d) => {
+      swap(d);
+      d.shippedDiff = idxs;
+    }).status === 0, `chain: the same swap named in shippedDiff is accepted (${idxs.join('; ')})`);
+    writeFileSync(join(ct, CP, `${stem}.decl.json`), `${JSON.stringify(plan.decl, null, 2)}\n`);
+    spawnSync('node', ['tools/gen.mjs', CP], { cwd: ct, encoding: 'utf8' }); // the plugin as it was released
+    delete process.env.OMX_CONTRACT_DIR;
   }
 
 }

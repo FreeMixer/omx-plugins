@@ -19,7 +19,10 @@
  *       several controls is heard (a speed switch) hides them until it is moved, and a far
  *       value of another travel (a mix at 0) can hide them again. A parameter whose output is
  *       byte-identical in all five, and under every value of every other choice or toggle in turn (the
- *       rest at their defaults: a control read only under one mode), is one the face does not deliver.
+ *       rest at their defaults: a control read only under one mode), and with every other toggle on and
+ *       each other travel in turn at either end of it (the rest at their defaults: a strip's gate hold is
+ *       heard only once its trim lowers the quiet bed under the gate's threshold), is one the face does
+ *       not deliver.
  *       `PASS live <name>` / `FAIL live <name>` per parameter. A face still on the wizard's stub
  *       binding is red here, by design. Every input port past the main one (a sidechain key) is
  *       connected too, fed a signal of its own: square-wave bursts the main signal does not have, so a
@@ -216,7 +219,8 @@ static float *in_l, *in_r, *a_l, *a_r, *b_l, *b_r;
 /** Does moving parameter `i` from its default to its far value change the output, the others set by
  * `setting` (0 defaults, 1 toggles on, 2 at their far values, 3 toggles on and the rest far, 4 the
  * other stepped choices far and the rest at their defaults, 5 the other choice or toggle `k` at
- * `kv` and the rest at their defaults)? -1 on a host error. */
+ * `kv` and the rest at their defaults, 6 every other toggle on and the travel `k` at `kv`, the rest at
+ * their defaults)? -1 on a host error. */
 static int moves(const char *path, const clap_param_info_t *info, uint32_t n, uint32_t i, int setting, uint32_t k_at,
                  double kv) {
   static clap_id ids[MAX_PARAMS];
@@ -229,6 +233,7 @@ static int moves(const char *path, const clap_param_info_t *info, uint32_t n, ui
     if (setting == 3) ids[m] = info[k].id, vals[m++] = is_toggle(&info[k]) ? 1.0 : far_of(&info[k]);
     if (setting == 4 && is_choice(&info[k])) ids[m] = info[k].id, vals[m++] = far_of(&info[k]);
     if (setting == 5 && k == k_at) ids[m] = info[k].id, vals[m++] = kv;
+    if (setting == 6 && (k == k_at || is_toggle(&info[k]))) ids[m] = info[k].id, vals[m++] = k == k_at ? kv : 1.0;
   }
   ids[m] = info[i].id;
   vals[m] = info[i].default_value;
@@ -275,8 +280,21 @@ static int live(const char *path) {
         k_at = k, kv = v;
       }
     }
+    /* then, every other toggle on, each other travel in turn at either end of it */
+    int ends = 0;
+    for (uint32_t k = 0; r == 0 && k < n; k++) {
+      if (k == i || is_choice(&info[k]) || is_toggle(&info[k]) || (info[k].flags & CLAP_PARAM_IS_BYPASS)) continue;
+      const double end[2] = {info[k].min_value, info[k].max_value};
+      for (int e = 0; r == 0 && e < 2; e++) {
+        if (end[e] == info[k].default_value) continue;
+        r = moves(path, info, n, i, 6, k, end[e]);
+        k_at = k, kv = end[e], ends = 1;
+      }
+    }
     if (r < 0) return 1;
-    if (r && setting < 5) {
+    if (r && ends) {
+      printf("PASS live %s moves the output (every other toggle on, %s at %g, the rest at their defaults)\n", info[i].name, info[k_at].name, kv);
+    } else if (r && setting < 5) {
       printf("PASS live %s moves the output (%s)\n", info[i].name, SETTING[setting]);
     } else if (r) {
       printf("PASS live %s moves the output (%s at %g, the rest at their defaults)\n", info[i].name, info[k_at].name, kv);

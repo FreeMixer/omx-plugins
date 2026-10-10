@@ -4,7 +4,7 @@ Priority: optional
 Maintainer: Pau Aliagas <linuxnow@gmail.com>
 Build-Depends: debhelper-compat (= 13),
                clap-headers,
-               libomxdsp-dev (>= 0.5.1),
+               libomxdsp-dev (>= 0.5.2),
                libomx-clap-core-dev,
                lv2-dev,
                pkgconf,
@@ -53,7 +53,7 @@ Description: OpenMixer delay, drive, EQ, strip, gate and effects as CLAP plugins
 Package: omx-plugins-dev
 Section: libdevel
 Architecture: all
-Depends: libomxdsp-dev (>= 0.5.1), ${misc:Depends}
+Depends: libomxdsp-dev (>= 0.5.2), ${misc:Depends}
 Description: Headers of the OpenMixer plugins, for projects that build on them
  The headers other projects include to use the OpenMixer plugins' parameters
  and instance code, such as omx_delay_core.h and each plugin's generated
