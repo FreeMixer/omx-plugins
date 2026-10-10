@@ -75,9 +75,11 @@ $(B)/strip-oracle: test/strip-oracle.c $(GEN)/omx_strip_params.h | $(B)
 
 gen:
 	node $(ROOT)/tools/gen.mjs $(CURDIR)
+	node $(ROOT)/tools/modgui-gen.mjs $(CURDIR)
 
 check:
 	node $(ROOT)/tools/gen.mjs --check $(CURDIR)
+	node $(ROOT)/tools/modgui-gen.mjs --check $(CURDIR)
 
 test: all check $(B)/strip-oracle
 	$(B)/strip-oracle clap-params $(B)/$(NAME).clap > $(B)/clap-params.txt
@@ -85,6 +87,7 @@ test: all check $(B)/strip-oracle
 	$(B)/strip-oracle clap $(B)/$(NAME).clap
 	$(B)/strip-oracle lv2 $(BUNDLE) $(URI)
 	sh $(ROOT)/tools/host-check.sh $(B)/$(NAME).clap $(BUNDLE) $(URI) $(CLAP_ID)
+	sh $(ROOT)/tools/modgui-test.sh $(CURDIR)
 
 install: all
 	install -Dm755 $(B)/$(NAME).clap $(DESTDIR)$(CLAPDIR)/$(NAME).clap
