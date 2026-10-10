@@ -1,0 +1,201 @@
+{
+  "$comment": "THE declaration of omx-comp, the folder's one hand-written file. Every other file of the folder is generated from it by tools/gen.mjs. Its parameters are by reference to omx-contract's comp kernel and bind by name to omx-dsp's instance face. Parameter order is append-only.",
+  "stem": "omx-comp",
+  "kernel": "comp",
+  "kernels": [
+    "comp"
+  ],
+  "name": "omx comp",
+  "vendor": "openmixer",
+  "url": "https://github.com/FreeMixer/omx-plugins",
+  "version": "0.2.0",
+  "description": "The console's compressor: threshold, ratio and knee set how hard it holds the level down, attack and release how fast, with makeup gain and a dry/wet mix. Kind picks the RMS detector (Compressor) or the peak detector (Limiter), and detector oversampling can run the control path at 4x. The DSP is omx-dsp's <omxdsp/fx/omx_comp_instance.h>, the console's own compressor.",
+  "clap": {
+    "id": "org.openmixer.comp",
+    "features": [
+      "audio-effect",
+      "compressor",
+      "stereo"
+    ]
+  },
+  "lv2": {
+    "uri": "urn:openmixer:comp",
+    "class": "lv2:CompressorPlugin"
+  },
+  "binding": "instance",
+  "params": [
+    {
+      "symbol": "thresholdDb",
+      "name": "Threshold",
+      "ref": "COMP_LIMITS",
+      "field": "thresholdDb"
+    },
+    {
+      "symbol": "ratio",
+      "name": "Ratio",
+      "ref": "COMP_LIMITS",
+      "field": "ratio"
+    },
+    {
+      "symbol": "kneeDb",
+      "name": "Knee",
+      "ref": "COMP_LIMITS",
+      "field": "kneeDb"
+    },
+    {
+      "symbol": "attackMs",
+      "name": "Attack",
+      "ref": "COMP_LIMITS",
+      "field": "attackMs"
+    },
+    {
+      "symbol": "releaseMs",
+      "name": "Release",
+      "ref": "COMP_LIMITS",
+      "field": "releaseMs"
+    },
+    {
+      "symbol": "makeupDb",
+      "name": "Makeup",
+      "ref": "COMP_LIMITS",
+      "field": "makeupDb"
+    },
+    {
+      "symbol": "mixPct",
+      "name": "Mix",
+      "ref": "COMP_LIMITS",
+      "field": "mixPct"
+    },
+    {
+      "symbol": "kind",
+      "name": "Kind",
+      "ref": "COMP_KINDS"
+    },
+    {
+      "symbol": "detectorOversampling",
+      "name": "Detector Oversampling",
+      "ref": "DETECTOR_OVERSAMPLINGS"
+    }
+  ],
+  "portHints": {
+    "thresholdDb": {
+      "props": [
+        "lv2:integer"
+      ],
+      "unit": "units:db"
+    },
+    "kneeDb": {
+      "unit": "units:db"
+    },
+    "attackMs": {
+      "unit": "units:ms"
+    },
+    "releaseMs": {
+      "props": [
+        "lv2:integer"
+      ],
+      "unit": "units:ms"
+    },
+    "makeupDb": {
+      "unit": "units:db"
+    },
+    "mixPct": {
+      "props": [
+        "lv2:integer"
+      ],
+      "unit": "units:pc"
+    },
+    "kind": {
+      "props": [
+        "lv2:enumeration",
+        "lv2:integer"
+      ],
+      "points": [
+        "0 Compressor",
+        "1 Limiter"
+      ]
+    },
+    "detectorOversampling": {
+      "props": [
+        "lv2:enumeration",
+        "lv2:integer"
+      ],
+      "points": [
+        "0 Auto",
+        "1 Off",
+        "2 4x"
+      ]
+    },
+    "enabled": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "latency": {
+      "props": [
+        "lv2:integer",
+        "lv2:reportsLatency"
+      ],
+      "unit": "units:frame"
+    }
+  },
+  "panel": {
+    "family": "comp",
+    "roles": {},
+    "sections": [
+      {
+        "key": "comp",
+        "label": "Comp",
+        "controls": [
+          "thresholdDb",
+          "ratio",
+          "kneeDb",
+          "attackMs",
+          "releaseMs",
+          "makeupDb",
+          "mixPct",
+          "kind",
+          "detectorOversampling"
+        ]
+      }
+    ]
+  },
+  "console": {
+    "$comment": "The compressor as a dynamics stage of the console walk: one section of the nine controls, in declaration order. Its placement follows the other dynamics stages (gate, de-esser); the card, chip and graph the console draws for it are not declared yet.",
+    "placement": {
+      "strips": [
+        "input",
+        "fxReturn",
+        "aux",
+        "mix",
+        "matrix",
+        "main",
+        "fxSend",
+        "mixMinus"
+      ],
+      "group": "walk",
+      "stage": "comp",
+      "after": "deEsser",
+      "fxGroup": "dynamics"
+    },
+    "panel": {
+      "sections": [
+        {
+          "key": "comp",
+          "label": "Comp",
+          "controls": [
+            "thresholdDb",
+            "ratio",
+            "kneeDb",
+            "attackMs",
+            "releaseMs",
+            "makeupDb",
+            "mixPct",
+            "kind",
+            "detectorOversampling"
+          ]
+        }
+      ]
+    }
+  }
+}

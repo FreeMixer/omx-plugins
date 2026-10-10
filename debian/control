@@ -30,11 +30,11 @@ Description: OpenMixer delay, drive, EQ, strip, gate and effects (CLAP, LV2)
  delay, drive, the channel EQ as an 8-band EQ, a 16-band EQ or a 32-band EQ,
  a 31-band graphic EQ, the full channel strip and the keyed gate with its
  sidechain input, and the console's effects: chorus, flanger, phaser,
- tremolo, rotary speaker, reverb, pitch shifter, transient shaper, de-esser
- and limiter. They come as CLAP plugins for Bitwig, REAPER and Carla, and as
- LV2 plugins for Ardour, Carla, MOD and Zynthian. Each one runs the same DSP
- as the console, so a track sounds the same in a session as it does on the
- desk, sample for sample.
+ tremolo, rotary speaker, reverb, pitch shifter, transient shaper, de-esser,
+ limiter and compressor. They come as CLAP plugins for Bitwig, REAPER and
+ Carla, and as LV2 plugins for Ardour, Carla, MOD and Zynthian. Each one runs
+ the same DSP as the console, so a track sounds the same in a session as it
+ does on the desk, sample for sample.
  .
  This package installs both formats; omx-plugins-clap and omx-plugins-lv2
  install one each.
@@ -46,7 +46,7 @@ Description: OpenMixer delay, drive, EQ, strip, gate and effects as CLAP plugins
  The OpenMixer console's delay, drive, 8-, 16- and 32-band EQ, 31-band
  graphic EQ, channel strip, keyed gate and effects (chorus, flanger, phaser,
  tremolo, rotary speaker, reverb, pitch shifter, transient shaper, de-esser,
- limiter) as CLAP plugins, installed in /usr/lib/clap where Bitwig,
+ limiter, compressor) as CLAP plugins, installed in /usr/lib/clap where Bitwig,
  REAPER, Carla and other CLAP hosts find them. They run the console's own DSP,
  so they sound like the desk, sample for sample.
 
@@ -66,6 +66,7 @@ Description: OpenMixer delay, drive, EQ, strip, gate and effects as LV2 plugins
  The OpenMixer console's delay, drive, 8-, 16- and 32-band EQ, 31-band
  graphic EQ, channel strip, keyed gate and effects (chorus, flanger, phaser,
  tremolo, rotary speaker, reverb, pitch shifter, transient shaper, de-esser,
- limiter) as LV2 plugins, installed in /usr/lib/lv2 where Ardour, Carla,
- MOD and Zynthian find them, with a MOD GUI where the plugin has one. They run
- the console's own DSP, so they sound like the desk, sample for sample.
+ limiter, compressor) as LV2 plugins, installed in /usr/lib/lv2 where Ardour,
+ Carla, MOD and Zynthian find them, with a MOD GUI where the plugin has one.
+ They run the console's own DSP, so they sound like the desk, sample for
+ sample.
