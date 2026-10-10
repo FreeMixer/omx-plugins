@@ -548,7 +548,7 @@ static inline void omx_wobble_instance_run(OmxWobbleInstance *s, const float *${
       execFileSync('mv', [join(hints, 'plugins/omx-delay9', from), join(hints, 'plugins/omx-delay9', to)]);
     const d9 = JSON.parse(readFileSync(join(hints, 'plugins/omx-delay9/omx-delay9.decl.json'), 'utf8'));
     d9.stem = 'omx-delay9';
-    delete d9.portHints; // the copy brought delay's pin along, in its declaration
+    delete d9.portHints; // the copy carries delay's pin in its declaration
     writeFileSync(join(hints, 'plugins/omx-delay9/omx-delay9.decl.json'), JSON.stringify(d9, null, 2));
     named('a plugin with no pin', 'omx-delay9: no pinned hints');
     rmSync(join(hints, 'plugins/omx-delay9'), { recursive: true });
