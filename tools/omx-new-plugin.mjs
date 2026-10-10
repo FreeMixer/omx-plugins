@@ -343,6 +343,9 @@ export function draftChain(kernels, chainSrc, { root = ROOT, recipe = loadRecipe
     chain,
   };
   fillDerived(decl, { schema, version: treeVersion(root, recipe) }, recipe);
+  // as a single plugin's: the panel one section per element, the console placement a person's choice
+  decl.panel = defaultPanel(decl);
+  decl.console = { placement: { strips: [`${REVIEW}: the strip kinds that may host it (input, fxReturn, aux, mix, matrix, main, ...)`], group: `${REVIEW}: walk, tail or plugins (the console's channel layout)` } };
   return { refusals: [], decl: canonical(schema, decl), notes };
 }
 
