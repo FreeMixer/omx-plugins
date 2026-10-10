@@ -16,7 +16,9 @@
         "description",
         "clap",
         "lv2",
-        "params"
+        "params",
+        "panel",
+        "console"
       ],
       "additionalProperties": false,
       "properties": {
@@ -184,6 +186,17 @@
               "title": "Name",
               "description": "The label a host shows for the key input."
             }
+          }
+        },
+        "portHints": {
+          "type": "object",
+          "title": "Port hints",
+          "description": "The pin of the LV2 port hints (tools/port-hints.mjs, `make hints`): by port symbol, the hints a host draws the port from that the generated TTL must keep — its port properties, its unit and its labelled scale points (\"<value> <label>\"). A face may gain hints; losing one is red until the pin here is changed on purpose. Written by tools/omx-new-plugin.mjs from the first generated TTL; a per-band symbol of a declaration with variants pins every band. tools/gen.mjs assembles every plugin's pin into the git-ignored view tools/test/port-hints.json.",
+          "propertyNames": {
+            "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/portHint"
           }
         },
         "panel": {
@@ -442,6 +455,70 @@
         }
       }
     },
+    "portHint": {
+      "type": "object",
+      "additionalProperties": false,
+      "minProperties": 1,
+      "title": "Port hint",
+      "description": "One port's pinned hints; an empty one is left out.",
+      "properties": {
+        "props": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+:[A-Za-z]+$"
+          },
+          "description": "The port properties, sorted (lv2:integer, lv2:enumeration, lv2:toggled, pprops:logarithmic, ...)."
+        },
+        "unit": {
+          "type": "string",
+          "pattern": "^units:[a-z]+$",
+          "description": "The LV2 unit (units:hz, units:db, ...)."
+        },
+        "points": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "pattern": "^-?[0-9.]+ .+$"
+          },
+          "description": "The labelled scale points, \"<value> <label>\", from the lowest value up."
+        }
+      }
+    },
+    "section": {
+      "type": "object",
+      "required": [
+        "key",
+        "label",
+        "controls"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "key": {
+          "type": "string",
+          "pattern": "^[a-z][a-zA-Z0-9]*$"
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1
+        },
+        "controls": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
+        },
+        "graph": {
+          "$ref": "#/$defs/graph"
+        }
+      },
+      "title": "Section",
+      "description": "One group of controls drawn together, by parameter symbol in drawing order; `graph` names the graph kind drawn over it. In a declaration with variants a per-band symbol stands for every band's, band by band."
+    },
     "panel": {
       "type": "object",
       "required": [
@@ -451,7 +528,7 @@
       ],
       "additionalProperties": false,
       "title": "Panel",
-      "description": "How the plugin's controls are drawn, by every renderer (the console's processing panel, the MOD GUI, a native window): a family, each control's role, each control's widget, and the sections drawn. Leave it out for a plugin with no panel yet.",
+      "description": "How the plugin's controls are drawn by the plugin's own renderers: the MOD GUI (tools/modgui-gen.mjs reads it) and, later, a native window. Today's MOD GUI layout: a family, each control's role, each control's widget, and the sections drawn. Every plugin declares one; the wizard drafts one section of every parameter.",
       "properties": {
         "family": {
           "type": "string",
@@ -467,33 +544,7 @@
           "type": "array",
           "minItems": 1,
           "items": {
-            "type": "object",
-            "required": [
-              "key",
-              "label",
-              "controls"
-            ],
-            "additionalProperties": false,
-            "properties": {
-              "key": {
-                "type": "string",
-                "pattern": "^[a-z][a-zA-Z0-9]*$"
-              },
-              "label": {
-                "type": "string",
-                "minLength": 1
-              },
-              "controls": {
-                "type": "array",
-                "minItems": 1,
-                "items": {
-                  "type": "string"
-                }
-              },
-              "graph": {
-                "$ref": "#/$defs/graph"
-              }
-            }
+            "$ref": "#/$defs/section"
           }
         },
         "widgets": {
@@ -523,11 +574,13 @@
       "enum": [
         "eq-curve",
         "dynamics-curve",
+        "transfer-curve",
         "lfo",
-        "delay-taps"
+        "delay-taps",
+        "decay-envelope"
       ],
       "title": "Graph",
-      "description": "The graph kinds a panel section may draw, computed by the renderer from the section's controls. A new kind is added here once, and in each renderer."
+      "description": "The graph kinds a panel section may draw, computed by the renderer from the section's controls: the console draws eq-curve (EqCurve), dynamics-curve (GateCurve, CompCurve), transfer-curve (drive's TransferCurve), delay-taps and decay-envelope (StageTimeCurve's delay taps and reverb decay) today; lfo is spec §8's. A new kind is added here once, and in each renderer."
     },
     "console": {
       "type": "object",
@@ -536,7 +589,7 @@
         "placement"
       ],
       "title": "Console",
-      "description": "How the plugin shows in the OpenMixer console (spec 2026-10-09-plugin-from-contract §8): where it may go, its overview card and its FX chip. The console's placement rules refuse a declaration that breaks them; the plugin cannot widen them.",
+      "description": "How the plugin shows in the OpenMixer console (spec 2026-10-09-plugin-from-contract §8), as the console draws it TODAY: where it may go, its overview card, its FX chip and its processing panel. A part the console does not draw for this effect today is left out (the console then draws a racked plugin with its generic editor). The console's placement rules refuse a declaration that breaks them; the plugin cannot widen them.",
       "properties": {
         "$comment": {
           "type": "string"
@@ -557,16 +610,28 @@
               "uniqueItems": true,
               "items": {
                 "type": "string",
-                "pattern": "^[a-z][a-z0-9-]*$"
+                "pattern": "^[a-z][a-zA-Z0-9]*$"
               },
               "title": "Strip kinds",
-              "description": "The strip kinds that may host the plugin (the console's names: input, aux, fx, group, matrix, main, ...)."
+              "description": "The strip kinds that may host the plugin, in the console's names (packages/core ChannelKind: input, fxReturn, aux, mix, matrix, main, fxSend, mixMinus)."
             },
             "group": {
               "type": "string",
               "pattern": "^[a-z][a-z0-9-]*$",
               "title": "Chain position group",
-              "description": "The console's chain position group the plugin is placed in (pre, insert, post, ...)."
+              "description": "Where the console's channel layout (packages/web-ui utils/channelLayout.ts) puts it: `walk`, the reorderable chain of native stages (the strip's /order row); `tail`, a fixed member after the walk (the limiter); `plugins`, the hosted plugin rack (the insert rack's strip kinds)."
+            },
+            "stage": {
+              "type": "string",
+              "pattern": "^[a-z][a-zA-Z0-9]*$",
+              "title": "Stage",
+              "description": "The console's native stage kind the plugin draws as today (packages/declarations/stages/<stage>.json, or the limiter's fixed tail stage)."
+            },
+            "after": {
+              "type": "string",
+              "pattern": "^[a-z][a-zA-Z0-9]*$",
+              "title": "After",
+              "description": "The stage it follows in the console's default walk (the stage file's order.after); left out for the first."
             },
             "fxGroup": {
               "type": "string",
@@ -594,13 +659,12 @@
             "show": {
               "type": "array",
               "minItems": 1,
-              "maxItems": 3,
               "uniqueItems": true,
               "items": {
                 "type": "string",
                 "pattern": "^([A-Za-z][A-Za-z0-9_]*|readout:[a-z][A-Za-z0-9]*)$"
               },
-              "description": "One to three parameter symbols, or `readout:<name>` for a readout the contract declares."
+              "description": "The controls the card shows, by parameter symbol (spec §8 says one to three; the console's gate and EQ cards show more today), or `readout:<name>` for a readout the contract declares. A per-band symbol of a declaration with variants stands for every band's."
             },
             "summary": {
               "type": "string",
@@ -617,6 +681,38 @@
           "pattern": "^[^{}]*(\\{[A-Za-z][A-Za-z0-9_]*\\}[^{}]*)*$",
           "description": "The summary text of the strip's FX chip that opens the panel, e.g. `{timeMs} · {feedback}`; `{symbol}` names a declared parameter.",
           "title": "Chip"
+        },
+        "panel": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "sections"
+          ],
+          "title": "Console panel",
+          "description": "The console's processing panel for the effect: its sections in drawing order, each control by parameter symbol (drawn with the shared widget its kind takes, or `widgets`), and each section's graph. Controls the console draws that the plugin has no parameter for, and readouts, are named in `$comment`.",
+          "properties": {
+            "$comment": {
+              "type": "string"
+            },
+            "sections": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/section"
+              }
+            },
+            "widgets": {
+              "type": "object",
+              "title": "Widgets",
+              "description": "Each control's widget, by parameter symbol: one of the shared widgets every renderer has. A control left out takes its renderer's default for its kind (a toggle a switch, a labelled integer a choice, a travel a knob).",
+              "propertyNames": {
+                "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+              },
+              "additionalProperties": {
+                "$ref": "#/$defs/widget"
+              }
+            }
+          }
         }
       }
     }
