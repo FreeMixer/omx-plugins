@@ -36,7 +36,7 @@ Take the sound of the OpenMixer console into your DAW or onto your own rig:
 delay, drive, the channel EQ as an 8-band EQ, a 16-band EQ or a 32-band EQ, a
 31-band graphic EQ, the full channel strip and the keyed gate with its sidechain
 input, and the console's effects: chorus, flanger, phaser, tremolo, rotary
-speaker, reverb, pitch shifter, transient shaper, de-esser and limiter. They come
+speaker, reverb, pitch shifter, transient shaper, de-esser, limiter and compressor. They come
 as CLAP plugins for Bitwig, REAPER and Carla, and as LV2 plugins for Ardour,
 Carla, MOD and Zynthian. Each one runs the same DSP as the console, so a track sounds the same
 in a session as it does on the desk, sample for sample. Every plugin comes in
@@ -51,7 +51,7 @@ Summary: OpenMixer delay, drive, EQ, strip, gate and effects as CLAP plugins
 %description clap
 The OpenMixer console's delay, drive, 8-, 16- and 32-band EQ, 31-band graphic
 EQ, channel strip, keyed gate and effects (chorus, flanger, phaser, tremolo,
-rotary speaker, reverb, pitch shifter, transient shaper, de-esser, limiter) as
+rotary speaker, reverb, pitch shifter, transient shaper, de-esser, limiter, compressor) as
 CLAP plugins, installed in /usr/lib/clap where Bitwig, REAPER,
 Carla and other CLAP hosts find them. They run the console's own DSP, so they
 sound like the desk.
@@ -63,7 +63,7 @@ Requires: lv2
 %description lv2
 The OpenMixer console's delay, drive, 8-, 16- and 32-band EQ, 31-band graphic
 EQ, channel strip, keyed gate and effects (chorus, flanger, phaser, tremolo,
-rotary speaker, reverb, pitch shifter, transient shaper, de-esser, limiter) as
+rotary speaker, reverb, pitch shifter, transient shaper, de-esser, limiter, compressor) as
 LV2 plugins, installed in %{_libdir}/lv2 where Ardour, Carla, MOD
 and Zynthian find them, with a MOD GUI where the plugin has one. They run the
 console's own DSP, so they sound like the desk.
@@ -101,6 +101,7 @@ parameter header, installed in %{_includedir}/omx-plugins.
 %dir /usr/lib/clap
 # BEGIN GENERATED clap-files: tools/gen.mjs, one line per shipped plugin
 /usr/lib/clap/omx-chorus.clap
+/usr/lib/clap/omx-comp.clap
 /usr/lib/clap/omx-deesser.clap
 /usr/lib/clap/omx-delay.clap
 /usr/lib/clap/omx-drive.clap
@@ -129,6 +130,7 @@ parameter header, installed in %{_includedir}/omx-plugins.
 %doc README.md
 # BEGIN GENERATED lv2-files: tools/gen.mjs, one line per shipped plugin
 %{_libdir}/lv2/omx-chorus.lv2/
+%{_libdir}/lv2/omx-comp.lv2/
 %{_libdir}/lv2/omx-deesser.lv2/
 %{_libdir}/lv2/omx-delay.lv2/
 %{_libdir}/lv2/omx-drive.lv2/
