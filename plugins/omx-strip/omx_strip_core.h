@@ -17,11 +17,16 @@
  * filter: `bandOn` is not a parameter; it is passed at "off".
  * gate: `keySource` is not a parameter; it is passed at "self".
  * eq: `hpfOn` is not a parameter; it is passed at "off".
- * eq: `hpfFreq` is not a parameter; it is passed at "default".
+ * eq: `hpfFreq` is not a parameter; it is passed at {"defaultRef":"EQ_PASS_FILTER_DEFAULTS.hpfFreqHz"}.
  * eq: `hpfSlope` is not a parameter; it is passed at "default".
  * eq: `lpfOn` is not a parameter; it is passed at "off".
- * eq: `lpfFreq` is not a parameter; it is passed at "default".
+ * eq: `lpfFreq` is not a parameter; it is passed at {"defaultRef":"EQ_PASS_FILTER_DEFAULTS.lpfFreqHz"}.
  * eq: `lpfSlope` is not a parameter; it is passed at "default".
+ * eq: `bandType` is not a parameter; it is passed at "default".
+ * eq: `freq` is not a parameter; it is passed at "default".
+ * eq: `gain` is not a parameter; it is passed at "default".
+ * eq: `q` is not a parameter; it is passed at "default".
+ * eq: `bandOn` is not a parameter; it is passed at "off".
  */
 #ifndef OMX_STRIP_CORE_H
 #define OMX_STRIP_CORE_H
@@ -227,16 +232,16 @@ static inline void omx_strip_core_resolve(OmxStripCore *c, const float *values, 
                                   /* ratio */ values[OMX_STRIP_PARAM_GATE_RATIO]);
   omx_eq_instance_resolve(&c->eq, bypass || values[OMX_STRIP_PARAM_EQ_ON] < 0.5f,
                                   /* hpf_on */ 0,
-                                  /* hpf_freq */ 20.0f,
+                                  /* hpf_freq */ 80.0f,
                                   /* hpf_slope */ 12,
                                   /* lpf_on */ 0,
-                                  /* lpf_freq */ 1000.0f,
+                                  /* lpf_freq */ 18000.0f,
                                   /* lpf_slope */ 12,
-                                  /* band_type */ (const int[OMX_EQ_INSTANCE_BANDS]){(int)lrintf(values[OMX_STRIP_PARAM_EQ1_TYPE]), (int)lrintf(values[OMX_STRIP_PARAM_EQ2_TYPE]), (int)lrintf(values[OMX_STRIP_PARAM_EQ3_TYPE]), (int)lrintf(values[OMX_STRIP_PARAM_EQ4_TYPE]), (int)lrintf(values[OMX_STRIP_PARAM_EQ5_TYPE]), (int)lrintf(values[OMX_STRIP_PARAM_EQ6_TYPE]), (int)lrintf(values[OMX_STRIP_PARAM_EQ7_TYPE]), (int)lrintf(values[OMX_STRIP_PARAM_EQ8_TYPE])},
-                                  /* freq */ (const float[OMX_EQ_INSTANCE_BANDS]){values[OMX_STRIP_PARAM_EQ1_FREQ], values[OMX_STRIP_PARAM_EQ2_FREQ], values[OMX_STRIP_PARAM_EQ3_FREQ], values[OMX_STRIP_PARAM_EQ4_FREQ], values[OMX_STRIP_PARAM_EQ5_FREQ], values[OMX_STRIP_PARAM_EQ6_FREQ], values[OMX_STRIP_PARAM_EQ7_FREQ], values[OMX_STRIP_PARAM_EQ8_FREQ]},
-                                  /* gain */ (const float[OMX_EQ_INSTANCE_BANDS]){values[OMX_STRIP_PARAM_EQ1_GAIN], values[OMX_STRIP_PARAM_EQ2_GAIN], values[OMX_STRIP_PARAM_EQ3_GAIN], values[OMX_STRIP_PARAM_EQ4_GAIN], values[OMX_STRIP_PARAM_EQ5_GAIN], values[OMX_STRIP_PARAM_EQ6_GAIN], values[OMX_STRIP_PARAM_EQ7_GAIN], values[OMX_STRIP_PARAM_EQ8_GAIN]},
-                                  /* q */ (const float[OMX_EQ_INSTANCE_BANDS]){values[OMX_STRIP_PARAM_EQ1_Q], values[OMX_STRIP_PARAM_EQ2_Q], values[OMX_STRIP_PARAM_EQ3_Q], values[OMX_STRIP_PARAM_EQ4_Q], values[OMX_STRIP_PARAM_EQ5_Q], values[OMX_STRIP_PARAM_EQ6_Q], values[OMX_STRIP_PARAM_EQ7_Q], values[OMX_STRIP_PARAM_EQ8_Q]},
-                                  /* band_on */ (const int[OMX_EQ_INSTANCE_BANDS]){(int)lrintf(values[OMX_STRIP_PARAM_EQ1_ON]), (int)lrintf(values[OMX_STRIP_PARAM_EQ2_ON]), (int)lrintf(values[OMX_STRIP_PARAM_EQ3_ON]), (int)lrintf(values[OMX_STRIP_PARAM_EQ4_ON]), (int)lrintf(values[OMX_STRIP_PARAM_EQ5_ON]), (int)lrintf(values[OMX_STRIP_PARAM_EQ6_ON]), (int)lrintf(values[OMX_STRIP_PARAM_EQ7_ON]), (int)lrintf(values[OMX_STRIP_PARAM_EQ8_ON])});
+                                  /* band_type */ (const int[OMX_EQ_INSTANCE_BANDS]){(int)lrintf(values[OMX_STRIP_PARAM_EQ1_TYPE]), (int)lrintf(values[OMX_STRIP_PARAM_EQ2_TYPE]), (int)lrintf(values[OMX_STRIP_PARAM_EQ3_TYPE]), (int)lrintf(values[OMX_STRIP_PARAM_EQ4_TYPE]), 0, 0, 0, 2},
+                                  /* freq */ (const float[OMX_EQ_INSTANCE_BANDS]){values[OMX_STRIP_PARAM_EQ1_FREQ], values[OMX_STRIP_PARAM_EQ2_FREQ], values[OMX_STRIP_PARAM_EQ3_FREQ], values[OMX_STRIP_PARAM_EQ4_FREQ], 1000.0f, 2500.0f, 5000.0f, 12500.0f},
+                                  /* gain */ (const float[OMX_EQ_INSTANCE_BANDS]){values[OMX_STRIP_PARAM_EQ1_GAIN], values[OMX_STRIP_PARAM_EQ2_GAIN], values[OMX_STRIP_PARAM_EQ3_GAIN], values[OMX_STRIP_PARAM_EQ4_GAIN], 0.0f, 0.0f, 0.0f, 0.0f},
+                                  /* q */ (const float[OMX_EQ_INSTANCE_BANDS]){values[OMX_STRIP_PARAM_EQ1_Q], values[OMX_STRIP_PARAM_EQ2_Q], values[OMX_STRIP_PARAM_EQ3_Q], values[OMX_STRIP_PARAM_EQ4_Q], 1.0f, 1.0f, 1.0f, 1.0f},
+                                  /* band_on */ (const int[OMX_EQ_INSTANCE_BANDS]){(int)lrintf(values[OMX_STRIP_PARAM_EQ1_ON]), (int)lrintf(values[OMX_STRIP_PARAM_EQ2_ON]), (int)lrintf(values[OMX_STRIP_PARAM_EQ3_ON]), (int)lrintf(values[OMX_STRIP_PARAM_EQ4_ON]), 0, 0, 0, 0});
   omx_comp_instance_resolve(&c->comp, bypass || values[OMX_STRIP_PARAM_COMP_ON] < 0.5f,
                                   /* threshold_db */ values[OMX_STRIP_PARAM_COMP_THRESHOLD],
                                   /* ratio */ values[OMX_STRIP_PARAM_COMP_RATIO],
