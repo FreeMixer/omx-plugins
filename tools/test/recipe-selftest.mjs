@@ -58,7 +58,7 @@ import { chainSources, commitPlan, draftChain, draftDeclaration, kernelSources, 
 import { bindFace, parseFace } from '../instance-face.mjs';
 import { kernelControls, locateContract } from '../omx-contract.mjs';
 import { omxdspInclude } from '../template.mjs';
-import { emitPluginTtl, generateInstance, loadDecl } from '../gen.mjs';
+import { defaultPanel, emitPluginTtl, generateInstance, loadDecl } from '../gen.mjs';
 import { hintErrors } from '../port-hints.mjs';
 import { expandVariant, variantBands } from '../variants.mjs';
 import { checkPlugin, debtGrowth, debtVerdict, gapLines, loadDebt, loadRecipe, pluginStems, recipeErrors } from '../plugin-recipe.mjs';
@@ -652,12 +652,14 @@ static inline void omx_wobble_instance_run(OmxWobbleInstance *s, const float *${
     expect(draft.decl?.binding === 'chain' && draft.decl.chain.map((el) => `${el.id}:${el.kernel}`).join(' ') === 'eq:eq gate:gate comp:comp',
       `chain: the draft has one element per kernel, in the order given (${draft.decl?.chain.map((el) => el.id).join(' ')})`);
     const cmarks = reviewMarks(draft.decl);
-    expect(['/chain/0/on', '/chain/0/bands', '/chain/1/on', '/chain/2/on', '/description'].every((m) => cmarks.includes(m)), `chain: each switch's default and the band count are marked REVIEW (${cmarks.join(' ')})`);
+    expect(['/chain/0/on', '/chain/0/bands', '/chain/1/on', '/chain/2/on', '/description', '/console/placement/group'].every((m) => cmarks.includes(m)), `chain: each switch's default, the band count and the console placement are marked REVIEW (${cmarks.join(' ')})`);
+    expect(draft.decl?.panel?.sections.map((x) => x.key).join(' ') === 'eq gate comp', `chain: the drafted panel is one section per element (${draft.decl?.panel?.sections.map((x) => x.key).join(' ')})`);
     expect(draft.notes.some((n) => n.startsWith("element 'gate'")), 'chain: the draft notes that the gate\'s face takes a key');
     const settled = structuredClone(draft.decl);
     settled.description = 'A test chain: the console EQ, then its gate, then its compressor, in any order.';
     settled.clap.features[1] = 'mixing';
     settled.lv2.class = 'lv2:MixerPlugin';
+    settled.console.placement = { strips: ['input'], group: 'plugins' };
     const [eq, gate, comp] = settled.chain;
     eq.on = true;
     eq.name = 'EQ';
@@ -668,6 +670,7 @@ static inline void omx_wobble_instance_run(OmxWobbleInstance *s, const float *${
     gate.params = gate.params.filter((p) => p.symbol !== 'gateKeySource');
     comp.on = true;
     settled.order = 'permutable';
+    settled.panel = defaultPanel(settled); // the settled elements' parameters, one section each
     const plan = await planChain(settled, csrc, { root: ct, recipe });
     expect(plan.ok, `chain: the settled chain is accepted${plan.ok ? '' : `: ${plan.refusals.map((r) => `${r.field} ${r.reason}`).join('; ')}`}`);
     if (!plan.ok) return;
