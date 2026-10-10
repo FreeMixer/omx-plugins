@@ -180,14 +180,19 @@ function flattenChain(file, d) {
 
 /** The macro of an element's band count, `bands` the key of its kernel's count sheet (eq's
  * EQ_BAND_COUNTS: strip, eq8, ...): OMX_EQ_BAND_COUNTS_STRIP_MAX. */
+/** The count sheet key an element's face is compiled at: `faceBands` (a count the face takes where
+ * the element exposes fewer bands), else `bands`. */
+export const faceBandsOf = (el) => el.faceBands ?? el.bands;
+
 export function chainBandsMacro(d, el) {
   const where = locateContract(d.tree ?? ROOT);
   if (!where.dir) throw new Error(`plugins/${d.stem}: element '${el.id}' counts its bands in omx-contract and ${where.why}`);
   const sheet = kernelControls(where.dir, el.kernel).find((c) => c.count)?.count;
   if (!sheet) throw new Error(`plugins/${d.stem}: element '${el.id}' declares "bands", and the ${el.kernel} kernel has no per-band control`);
   const e = findName(where.dir, el.kernel, sheet).entry;
-  if (!Number.isInteger(e?.value?.[el.bands]?.max)) throw new Error(`plugins/${d.stem}: element '${el.id}': ${sheet} has no '${el.bands}' with a max`);
-  return `OMX_${sheet}_${el.bands.toUpperCase()}_MAX`;
+  const key = faceBandsOf(el);
+  if (!Number.isInteger(e?.value?.[key]?.max)) throw new Error(`plugins/${d.stem}: element '${el.id}': ${sheet} has no '${key}' with a max`);
+  return `OMX_${sheet}_${key.toUpperCase()}_MAX`;
 }
 
 /** The kernels a chain reads, in chain order, each once; a declared `kernels` must be the same. */
@@ -224,7 +229,11 @@ export function symbolDiff(was, now) {
 function checkShipped(file, d) {
   if (d.shipped === undefined) return;
   const was = shippedSymbols({ ...d, tree: treeOf(file) }, d.shipped);
-  if (!was) return;
+  if (!was) {
+    // a tarball or shallow build has no tag to read: said, never silent
+    console.error(`gen: NOTE ${d.stem}: ${d.shipped} is not readable here (no git or no such tag); its parameter list is not checked against that release`);
+    return;
+  }
   const diff = symbolDiff(was, d.params.map((p) => p.symbol));
   const named = d.shippedDiff ?? [];
   if (JSON.stringify(diff) !== JSON.stringify(named))
@@ -357,7 +366,7 @@ export function emitParamsHeader(d) {
 ${d.variantOf ? `
 /* The band count of this variant of plugins/${d.variantOf.stem}: the instance face's compile-time count. */
 #define OMX_${(d.face ?? d.kernel).toUpperCase()}_INSTANCE_BANDS ${bandsMacro(d)}
-` : ''}${(d.chain ?? []).filter((el, i, all) => el.bands && all.findIndex((o) => o.kernel === el.kernel) === i).map((el) => `
+` : ''}${(d.chain ?? []).filter((el, i, all) => faceBandsOf(el) && all.findIndex((o) => o.kernel === el.kernel) === i).map((el) => `
 /* The band count of the chain's ${el.id}: its instance face's compile-time count, omx-contract's ${chainBandsMacro(d, el)}. */
 #define OMX_${el.kernel.toUpperCase()}_INSTANCE_BANDS ${chainBandsMacro(d, el)}
 `).join('')}
@@ -642,12 +651,20 @@ export function generateInstance(d) {
 }
 
 /** The value a chain element's `fixed` control is passed at: a set's id as its index (a numeric
- * set's id as itself), a travel's number as given, `"default"` the control's declared default. */
+ * set's id as itself), a travel's number as given, `"default"` the control's declared default (a
+ * travel that declares none is refused), `{ "defaultRef": "<SHEET>.<field>" }` the default a sheet
+ * of omx-contract holds for it (EQ_PASS_FILTER_DEFAULTS.hpfFreqHz). */
 function fixedValue(d, el, control, v) {
   const where = locateContract(d.tree ?? ROOT);
   if (!where.dir) throw new Error(`plugins/${d.stem}: element '${el.id}' fixes '${control.name}' and ${where.why}`);
-  if (v === 'default') return resolveParam(where.dir, el.kernel, { symbol: `${el.id}.${control.name}`, ref: control.ref, ...(control.field ? { field: control.field } : {}) }).def;
+  const as = { symbol: `${el.id}.${control.name}`, ref: control.ref, ...(control.field ? { field: control.field } : {}) };
   const e = findName(where.dir, el.kernel, control.ref).entry;
+  if (v && typeof v === 'object') return resolveParam(where.dir, el.kernel, { ...as, defaultRef: v.defaultRef }).def;
+  if (v === 'default') {
+    const t = e?.kind === 'travels' ? (control.field ? e.value?.[control.field] : e.value) : undefined;
+    if (t && t.default === undefined) throw new Error(`plugins/${d.stem}: element '${el.id}' fixes '${control.name}' at "default", and ${control.ref} declares no default; name the sheet that holds it, { "defaultRef": "<SHEET>.<field>" }`);
+    return resolveParam(where.dir, el.kernel, as).def;
+  }
   if (e?.kind === 'set') {
     if (e.value.every((x) => typeof x === 'number')) {
       if (!e.value.includes(v)) throw new Error(`plugins/${d.stem}: element '${el.id}' fixes '${control.name}' at ${JSON.stringify(v)}, not one of ${control.ref}'s ids ${JSON.stringify(e.value)}`);
@@ -657,22 +674,26 @@ function fixedValue(d, el, control, v) {
     if (k < 0) throw new Error(`plugins/${d.stem}: element '${el.id}' fixes '${control.name}' at ${JSON.stringify(v)}, not one of ${control.ref}'s ids ${JSON.stringify(e.value)}`);
     return k;
   }
-  if (typeof v !== 'number') throw new Error(`plugins/${d.stem}: element '${el.id}' fixes the travel '${control.name}' at ${JSON.stringify(v)}, not a number or "default"`);
+  if (typeof v !== 'number') throw new Error(`plugins/${d.stem}: element '${el.id}' fixes the travel '${control.name}' at ${JSON.stringify(v)}, not a number, "default" or { "defaultRef" }`);
   return v;
 }
 
-/** The values of a per-band control an element fixes, one per band of its `bands` count: `"default"`
- * each band's own default by omx-contract's one default rule (its type, centre, gain and Q; a control
- * the rule does not name, its declared default), else the one value for every band. */
-function fixedBands(d, el, control, v) {
+/** The values of a per-band control an element fixes, for the bands of its face it does not expose:
+ * from band `exposed` (the element's own parameters of that control come first) to the face's
+ * compiled count. `"default"` gives each band its own default by omx-contract's one default rule at
+ * that count (its type, centre, gain and Q; a control the rule does not name, its declared default);
+ * any other value is the one value for every band. */
+function fixedBands(d, el, control, v, exposed) {
   const where = locateContract(d.tree ?? ROOT);
-  if (!el.bands) throw new Error(`plugins/${d.stem}: element '${el.id}' fixes '${control.name}', a control taken once per band; it declares its "bands"`);
-  const n = findName(where.dir, el.kernel, control.count).entry?.value?.[el.bands]?.max;
-  if (!Number.isInteger(n)) throw new Error(`plugins/${d.stem}: element '${el.id}': ${control.count} has no '${el.bands}' with a max`);
-  if (v !== 'default') return Array(n).fill(fixedValue(d, el, control, v));
+  if (!faceBandsOf(el)) throw new Error(`plugins/${d.stem}: element '${el.id}' fixes '${control.name}', a control taken once per band; it declares its "bands" (or "faceBands")`);
+  const n = findName(where.dir, el.kernel, control.count).entry?.value?.[faceBandsOf(el)]?.max;
+  if (!Number.isInteger(n)) throw new Error(`plugins/${d.stem}: element '${el.id}': ${control.count} has no '${faceBandsOf(el)}' with a max`);
+  const rest = [...Array(n).keys()].slice(exposed);
+  if (v !== 'default') return rest.map(() => fixedValue(d, el, control, v));
   const rule = eqDefaultBands(where.dir, n);
   const name = control.name.toLowerCase();
-  return rule.map((band) => {
+  return rest.map((i) => {
+    const band = rule[i];
     const key = Object.keys(band).find((k) => k.toLowerCase() === name || k.toLowerCase().startsWith(name) || name.endsWith(k.toLowerCase()));
     return key === undefined ? fixedValue(d, el, control, 'default') : fixedValue(d, el, control, band[key]);
   });
@@ -690,12 +711,19 @@ export function chainBindings(d) {
   const where = locateContract(d.tree ?? ROOT);
   const errors = [];
   for (const el of d.chain) {
-    const other = d.chain.find((o) => o !== el && o.kernel === el.kernel && o.bands !== el.bands);
-    if (other) errors.push(`elements '${el.id}' and '${other.id}' run one ${el.kernel} face, compiled once: they declare the same "bands"`);
+    const other = d.chain.find((o) => o !== el && o.kernel === el.kernel && faceBandsOf(o) !== faceBandsOf(el));
+    if (other) errors.push(`elements '${el.id}' and '${other.id}' run one ${el.kernel} face, compiled once: they declare the same face band count ("faceBands", else "bands")`);
   }
   const out = d.chain.map((el) => {
     const idx = d.params.map((p, i) => i).filter((i) => d.params[i].element === el.id && d.params[i].own === undefined);
     const params = idx.map((i) => d.params[i]), controls = idx.map((i) => d.controls[i]);
+    if (el.bands && where.dir) {
+      const want = findName(where.dir, el.kernel, kernelControls(where.dir, el.kernel).find((x) => x.count)?.count ?? '').entry?.value?.[el.bands]?.max;
+      for (const c of kernelControls(where.dir, el.kernel).filter((x) => x.count)) {
+        const have = controls.filter((x) => x?.name === c.name).length;
+        if (have && have !== want) errors.push(`element '${el.id}' exposes ${have} '${c.name}' parameters, and its "bands" '${el.bands}' counts ${want}`);
+      }
+    }
     const fixed = Object.entries(el.fixed ?? {}).flatMap(([name, v]) => {
       const c = where.dir ? kernelControls(where.dir, el.kernel).find((x) => x.name === name) : undefined;
       if (!c) {
@@ -704,7 +732,10 @@ export function chainBindings(d) {
       }
       try {
         // a per-band control: one fixed value per band, bound as the face's array argument
-        if (c.count) return fixedBands(d, el, c, v).map((x, k) => ({ p: { symbol: `${el.id}.${name}[${k}]`, fixed: x }, c: { name } }));
+        if (c.count) {
+          const exposed = controls.filter((x) => x?.name === name).length;
+          return fixedBands(d, el, c, v, exposed).map((x, k) => ({ p: { symbol: `${el.id}.${name}[${exposed + k}]`, fixed: x }, c: { name } }));
+        }
         return [{ p: { symbol: `${el.id}.${name}`, fixed: fixedValue(d, el, c, v) }, c: { name } }];
       } catch (e) {
         errors.push(e.message);
