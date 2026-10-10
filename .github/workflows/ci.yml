@@ -106,8 +106,8 @@ jobs:
             rpm -qlp "$rpm" | grep -v '^/usr/lib/.build-id' | sort > files-$sub.txt
           done
           # BEGIN GENERATED plugins: tools/gen.mjs, the shipped plugins' short names and kernels
-          shorts="chorus deesser delay drive eq8 eq16 eq32 flanger geq keyed-gate limiter phaser pitch reverb rotary strip transient tremolo"
-          kernels="chorus deesser delay drive eq8 eq16 eq32 flanger geq gate limiter phaser pitch reverb rotary strip transient tremolo"
+          shorts="chorus comp deesser delay drive eq8 eq16 eq32 flanger geq keyed-gate limiter phaser pitch reverb rotary strip transient tremolo"
+          kernels="chorus comp deesser delay drive eq8 eq16 eq32 flanger geq gate limiter phaser pitch reverb rotary strip transient tremolo"
           # END GENERATED plugins
           { printf '%s\n' /usr/lib/clap /usr/share/doc/omx-plugins-clap /usr/share/doc/omx-plugins-clap/README.md \
               /usr/share/licenses/omx-plugins-clap /usr/share/licenses/omx-plugins-clap/LICENSE
@@ -132,8 +132,8 @@ jobs:
           grep -qE '^omx-plugins-clap\([a-z0-9-]+\) = ' <<<"$req"
           grep -qE '^omx-plugins-lv2\([a-z0-9-]+\) = ' <<<"$req"
           # BEGIN GENERATED plugins: tools/gen.mjs, the shipped plugins' short names and kernels
-          shorts="chorus deesser delay drive eq8 eq16 eq32 flanger geq keyed-gate limiter phaser pitch reverb rotary strip transient tremolo"
-          kernels="chorus deesser delay drive eq8 eq16 eq32 flanger geq gate limiter phaser pitch reverb rotary strip transient tremolo"
+          shorts="chorus comp deesser delay drive eq8 eq16 eq32 flanger geq keyed-gate limiter phaser pitch reverb rotary strip transient tremolo"
+          kernels="chorus comp deesser delay drive eq8 eq16 eq32 flanger geq gate limiter phaser pitch reverb rotary strip transient tremolo"
           # END GENERATED plugins
           for p in $shorts; do
             # captured first: grep -q leaving a pipe early would fail the step under pipefail
@@ -199,8 +199,8 @@ jobs:
           dev=$(dpkg -c debs/omx-plugins-dev_*.deb); grep -q './usr/include/omx-plugins/omx_delay_core.h' <<<"$dev"
           dep=$(dpkg -s omx-plugins); grep -q '^Depends: omx-plugins-clap (= .*), omx-plugins-lv2 (= .*)' <<<"$dep"
           # BEGIN GENERATED plugins: tools/gen.mjs, the shipped plugins' short names and kernels
-          shorts="chorus deesser delay drive eq8 eq16 eq32 flanger geq keyed-gate limiter phaser pitch reverb rotary strip transient tremolo"
-          kernels="chorus deesser delay drive eq8 eq16 eq32 flanger geq gate limiter phaser pitch reverb rotary strip transient tremolo"
+          shorts="chorus comp deesser delay drive eq8 eq16 eq32 flanger geq keyed-gate limiter phaser pitch reverb rotary strip transient tremolo"
+          kernels="chorus comp deesser delay drive eq8 eq16 eq32 flanger geq gate limiter phaser pitch reverb rotary strip transient tremolo"
           # END GENERATED plugins
           for p in $shorts; do
             # captured first: grep -q leaving a pipe early would fail the step under pipefail
