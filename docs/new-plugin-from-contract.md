@@ -107,17 +107,22 @@ omx-dsp work, for a kernel with no instance face of the generated shape. The dec
 (its default the element's `on`) and then its parameters, then `order` when the chain says
 `"order": "permutable"` (the permutations of the elements, lexicographic, 0 the declared order).
 
-An element may declare `bands`, the key of its kernel's count sheet (`eq8`), and `fixed`, the
-controls of its kernel it does not expose, each at an id, a number or `"default"` (a per-band
-control then takes each band's own default). omx-strip's filter element is the eq face with every
-band fixed off, and its gate, which takes no key in a strip, has its key source fixed at `self`.
+An element may declare `bands`, the key of its kernel's count sheet whose `max` is how many bands
+it exposes (`strip`), `faceBands`, the key its face is compiled at where omx-dsp's face takes no
+smaller count (`eq8`), and `fixed`, the controls of its kernel it does not expose, each at an id, a
+number, `"default"` (refused for a travel that declares none) or `{"defaultRef": "<SHEET>.<field>"}`;
+a per-band control fixed so covers every band the element does not expose, `"default"` giving each
+its own default by the contract's one rule. omx-strip's EQ exposes the strip's four bands on the
+eq8 face, the other four fixed off; its filter element is the eq face with every band fixed off;
+its gate, which takes no key in a strip, has its key source fixed at `self`.
 
 The generated binding copies in to out once and runs each element's face in place in the chosen
 order; an element's bypass is its switch off or the host's bypass; the latency is the sum. The
 oracle's reference is the same chain of faces called directly, its order computed in the test.
 A chain converted from a released plugin names that release in `shipped`; `tools/gen.mjs` then
 refuses a parameter list that differs from the release's, unless `shippedDiff` names every
-difference. `tools/test/strip-crosscheck.sh` holds omx-strip, so converted, to the hand-ported
+difference; where the tag cannot be read (a tarball build) gen says the list went unchecked.
+`make strip-crosscheck` (`tools/test/strip-crosscheck.sh`) holds omx-strip, so converted, to the hand-ported
 plugin it replaced, bit for bit at that plugin's settings.
 
 ## What it does not do
