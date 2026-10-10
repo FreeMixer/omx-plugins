@@ -55,38 +55,18 @@ enum {
   OMX_STRIP_PARAM_EQ4_GAIN = 37,
   OMX_STRIP_PARAM_EQ4_Q = 38,
   OMX_STRIP_PARAM_EQ4_ON = 39,
-  OMX_STRIP_PARAM_EQ5_TYPE = 40,
-  OMX_STRIP_PARAM_EQ5_FREQ = 41,
-  OMX_STRIP_PARAM_EQ5_GAIN = 42,
-  OMX_STRIP_PARAM_EQ5_Q = 43,
-  OMX_STRIP_PARAM_EQ5_ON = 44,
-  OMX_STRIP_PARAM_EQ6_TYPE = 45,
-  OMX_STRIP_PARAM_EQ6_FREQ = 46,
-  OMX_STRIP_PARAM_EQ6_GAIN = 47,
-  OMX_STRIP_PARAM_EQ6_Q = 48,
-  OMX_STRIP_PARAM_EQ6_ON = 49,
-  OMX_STRIP_PARAM_EQ7_TYPE = 50,
-  OMX_STRIP_PARAM_EQ7_FREQ = 51,
-  OMX_STRIP_PARAM_EQ7_GAIN = 52,
-  OMX_STRIP_PARAM_EQ7_Q = 53,
-  OMX_STRIP_PARAM_EQ7_ON = 54,
-  OMX_STRIP_PARAM_EQ8_TYPE = 55,
-  OMX_STRIP_PARAM_EQ8_FREQ = 56,
-  OMX_STRIP_PARAM_EQ8_GAIN = 57,
-  OMX_STRIP_PARAM_EQ8_Q = 58,
-  OMX_STRIP_PARAM_EQ8_ON = 59,
-  OMX_STRIP_PARAM_COMP_ON = 60,
-  OMX_STRIP_PARAM_COMP_THRESHOLD = 61,
-  OMX_STRIP_PARAM_COMP_RATIO = 62,
-  OMX_STRIP_PARAM_COMP_KNEE = 63,
-  OMX_STRIP_PARAM_COMP_ATTACK = 64,
-  OMX_STRIP_PARAM_COMP_RELEASE = 65,
-  OMX_STRIP_PARAM_COMP_MAKEUP = 66,
-  OMX_STRIP_PARAM_COMP_KIND = 67,
-  OMX_STRIP_PARAM_COMP_MIX = 68,
-  OMX_STRIP_PARAM_COMP_DETECTOR_OVERSAMPLING = 69,
-  OMX_STRIP_PARAM_ORDER = 70,
-  OMX_STRIP_PARAM_COUNT = 71
+  OMX_STRIP_PARAM_COMP_ON = 40,
+  OMX_STRIP_PARAM_COMP_THRESHOLD = 41,
+  OMX_STRIP_PARAM_COMP_RATIO = 42,
+  OMX_STRIP_PARAM_COMP_KNEE = 43,
+  OMX_STRIP_PARAM_COMP_ATTACK = 44,
+  OMX_STRIP_PARAM_COMP_RELEASE = 45,
+  OMX_STRIP_PARAM_COMP_MAKEUP = 46,
+  OMX_STRIP_PARAM_COMP_KIND = 47,
+  OMX_STRIP_PARAM_COMP_MIX = 48,
+  OMX_STRIP_PARAM_COMP_DETECTOR_OVERSAMPLING = 49,
+  OMX_STRIP_PARAM_ORDER = 50,
+  OMX_STRIP_PARAM_COUNT = 51
 };
 
 static const omx_plugin_param OMX_STRIP_PARAMS[OMX_STRIP_PARAM_COUNT] = {
@@ -111,45 +91,25 @@ static const omx_plugin_param OMX_STRIP_PARAMS[OMX_STRIP_PARAM_COUNT] = {
   { "gateHysteresis", "Gate Hysteresis", "dB", 0.0f, 24.0f, 3.0f, 0u },
   { "eqOn", "EQ", "", 0.0f, 1.0f, 1.0f, OMX_PLUGIN_PARAM_TOGGLE },
   { "eq1Type", "EQ 1 Type", "", 0.0f, 5.0f, 1.0f, OMX_PLUGIN_PARAM_INTEGER },
-  { "eq1Freq", "EQ 1 Freq", "Hz", 20.0f, 20000.0f, 31.5f, OMX_PLUGIN_PARAM_INTEGER },
+  { "eq1Freq", "EQ 1 Freq", "Hz", 20.0f, 20000.0f, 100.0f, OMX_PLUGIN_PARAM_INTEGER },
   { "eq1Gain", "EQ 1 Gain", "dB", -15.0f, 15.0f, 0.0f, 0u },
   { "eq1Q", "EQ 1 Q", "", 0.3f, 116.0f, 1.0f, 0u },
   { "eq1On", "EQ 1", "", 0.0f, 1.0f, 0.0f, OMX_PLUGIN_PARAM_TOGGLE },
   { "eq2Type", "EQ 2 Type", "", 0.0f, 5.0f, 0.0f, OMX_PLUGIN_PARAM_INTEGER },
-  { "eq2Freq", "EQ 2 Freq", "Hz", 20.0f, 20000.0f, 80.0f, OMX_PLUGIN_PARAM_INTEGER },
+  { "eq2Freq", "EQ 2 Freq", "Hz", 20.0f, 20000.0f, 400.0f, OMX_PLUGIN_PARAM_INTEGER },
   { "eq2Gain", "EQ 2 Gain", "dB", -15.0f, 15.0f, 0.0f, 0u },
   { "eq2Q", "EQ 2 Q", "", 0.3f, 116.0f, 1.0f, 0u },
   { "eq2On", "EQ 2", "", 0.0f, 1.0f, 0.0f, OMX_PLUGIN_PARAM_TOGGLE },
   { "eq3Type", "EQ 3 Type", "", 0.0f, 5.0f, 0.0f, OMX_PLUGIN_PARAM_INTEGER },
-  { "eq3Freq", "EQ 3 Freq", "Hz", 20.0f, 20000.0f, 160.0f, OMX_PLUGIN_PARAM_INTEGER },
+  { "eq3Freq", "EQ 3 Freq", "Hz", 20.0f, 20000.0f, 2000.0f, OMX_PLUGIN_PARAM_INTEGER },
   { "eq3Gain", "EQ 3 Gain", "dB", -15.0f, 15.0f, 0.0f, 0u },
   { "eq3Q", "EQ 3 Q", "", 0.3f, 116.0f, 1.0f, 0u },
   { "eq3On", "EQ 3", "", 0.0f, 1.0f, 0.0f, OMX_PLUGIN_PARAM_TOGGLE },
-  { "eq4Type", "EQ 4 Type", "", 0.0f, 5.0f, 0.0f, OMX_PLUGIN_PARAM_INTEGER },
-  { "eq4Freq", "EQ 4 Freq", "Hz", 20.0f, 20000.0f, 400.0f, OMX_PLUGIN_PARAM_INTEGER },
+  { "eq4Type", "EQ 4 Type", "", 0.0f, 5.0f, 2.0f, OMX_PLUGIN_PARAM_INTEGER },
+  { "eq4Freq", "EQ 4 Freq", "Hz", 20.0f, 20000.0f, 8000.0f, OMX_PLUGIN_PARAM_INTEGER },
   { "eq4Gain", "EQ 4 Gain", "dB", -15.0f, 15.0f, 0.0f, 0u },
   { "eq4Q", "EQ 4 Q", "", 0.3f, 116.0f, 1.0f, 0u },
   { "eq4On", "EQ 4", "", 0.0f, 1.0f, 0.0f, OMX_PLUGIN_PARAM_TOGGLE },
-  { "eq5Type", "EQ 5 Type", "", 0.0f, 5.0f, 0.0f, OMX_PLUGIN_PARAM_INTEGER },
-  { "eq5Freq", "EQ 5 Freq", "Hz", 20.0f, 20000.0f, 1000.0f, OMX_PLUGIN_PARAM_INTEGER },
-  { "eq5Gain", "EQ 5 Gain", "dB", -15.0f, 15.0f, 0.0f, 0u },
-  { "eq5Q", "EQ 5 Q", "", 0.3f, 116.0f, 1.0f, 0u },
-  { "eq5On", "EQ 5", "", 0.0f, 1.0f, 0.0f, OMX_PLUGIN_PARAM_TOGGLE },
-  { "eq6Type", "EQ 6 Type", "", 0.0f, 5.0f, 0.0f, OMX_PLUGIN_PARAM_INTEGER },
-  { "eq6Freq", "EQ 6 Freq", "Hz", 20.0f, 20000.0f, 2500.0f, OMX_PLUGIN_PARAM_INTEGER },
-  { "eq6Gain", "EQ 6 Gain", "dB", -15.0f, 15.0f, 0.0f, 0u },
-  { "eq6Q", "EQ 6 Q", "", 0.3f, 116.0f, 1.0f, 0u },
-  { "eq6On", "EQ 6", "", 0.0f, 1.0f, 0.0f, OMX_PLUGIN_PARAM_TOGGLE },
-  { "eq7Type", "EQ 7 Type", "", 0.0f, 5.0f, 0.0f, OMX_PLUGIN_PARAM_INTEGER },
-  { "eq7Freq", "EQ 7 Freq", "Hz", 20.0f, 20000.0f, 5000.0f, OMX_PLUGIN_PARAM_INTEGER },
-  { "eq7Gain", "EQ 7 Gain", "dB", -15.0f, 15.0f, 0.0f, 0u },
-  { "eq7Q", "EQ 7 Q", "", 0.3f, 116.0f, 1.0f, 0u },
-  { "eq7On", "EQ 7", "", 0.0f, 1.0f, 0.0f, OMX_PLUGIN_PARAM_TOGGLE },
-  { "eq8Type", "EQ 8 Type", "", 0.0f, 5.0f, 2.0f, OMX_PLUGIN_PARAM_INTEGER },
-  { "eq8Freq", "EQ 8 Freq", "Hz", 20.0f, 20000.0f, 12500.0f, OMX_PLUGIN_PARAM_INTEGER },
-  { "eq8Gain", "EQ 8 Gain", "dB", -15.0f, 15.0f, 0.0f, 0u },
-  { "eq8Q", "EQ 8 Q", "", 0.3f, 116.0f, 1.0f, 0u },
-  { "eq8On", "EQ 8", "", 0.0f, 1.0f, 0.0f, OMX_PLUGIN_PARAM_TOGGLE },
   { "compOn", "Comp", "", 0.0f, 1.0f, 0.0f, OMX_PLUGIN_PARAM_TOGGLE },
   { "compThreshold", "Comp Threshold", "dB", -60.0f, 0.0f, -18.0f, 0u },
   { "compRatio", "Comp Ratio", "", 1.0f, 20.0f, 4.0f, 0u },
@@ -229,7 +189,7 @@ static const omx_plugin_param OMX_STRIP_PARAMS[OMX_STRIP_PARAM_COUNT] = {
 #define OMX_STRIP_PARAM_EQ1_TYPE_DEFAULT 1.0f
 #define OMX_STRIP_PARAM_EQ1_FREQ_MIN 20.0f
 #define OMX_STRIP_PARAM_EQ1_FREQ_MAX 20000.0f
-#define OMX_STRIP_PARAM_EQ1_FREQ_DEFAULT 31.5f
+#define OMX_STRIP_PARAM_EQ1_FREQ_DEFAULT 100.0f
 #define OMX_STRIP_PARAM_EQ1_GAIN_MIN -15.0f
 #define OMX_STRIP_PARAM_EQ1_GAIN_MAX 15.0f
 #define OMX_STRIP_PARAM_EQ1_GAIN_DEFAULT 0.0f
@@ -244,7 +204,7 @@ static const omx_plugin_param OMX_STRIP_PARAMS[OMX_STRIP_PARAM_COUNT] = {
 #define OMX_STRIP_PARAM_EQ2_TYPE_DEFAULT 0.0f
 #define OMX_STRIP_PARAM_EQ2_FREQ_MIN 20.0f
 #define OMX_STRIP_PARAM_EQ2_FREQ_MAX 20000.0f
-#define OMX_STRIP_PARAM_EQ2_FREQ_DEFAULT 80.0f
+#define OMX_STRIP_PARAM_EQ2_FREQ_DEFAULT 400.0f
 #define OMX_STRIP_PARAM_EQ2_GAIN_MIN -15.0f
 #define OMX_STRIP_PARAM_EQ2_GAIN_MAX 15.0f
 #define OMX_STRIP_PARAM_EQ2_GAIN_DEFAULT 0.0f
@@ -259,7 +219,7 @@ static const omx_plugin_param OMX_STRIP_PARAMS[OMX_STRIP_PARAM_COUNT] = {
 #define OMX_STRIP_PARAM_EQ3_TYPE_DEFAULT 0.0f
 #define OMX_STRIP_PARAM_EQ3_FREQ_MIN 20.0f
 #define OMX_STRIP_PARAM_EQ3_FREQ_MAX 20000.0f
-#define OMX_STRIP_PARAM_EQ3_FREQ_DEFAULT 160.0f
+#define OMX_STRIP_PARAM_EQ3_FREQ_DEFAULT 2000.0f
 #define OMX_STRIP_PARAM_EQ3_GAIN_MIN -15.0f
 #define OMX_STRIP_PARAM_EQ3_GAIN_MAX 15.0f
 #define OMX_STRIP_PARAM_EQ3_GAIN_DEFAULT 0.0f
@@ -271,10 +231,10 @@ static const omx_plugin_param OMX_STRIP_PARAMS[OMX_STRIP_PARAM_COUNT] = {
 #define OMX_STRIP_PARAM_EQ3_ON_DEFAULT 0.0f
 #define OMX_STRIP_PARAM_EQ4_TYPE_MIN 0.0f
 #define OMX_STRIP_PARAM_EQ4_TYPE_MAX 5.0f
-#define OMX_STRIP_PARAM_EQ4_TYPE_DEFAULT 0.0f
+#define OMX_STRIP_PARAM_EQ4_TYPE_DEFAULT 2.0f
 #define OMX_STRIP_PARAM_EQ4_FREQ_MIN 20.0f
 #define OMX_STRIP_PARAM_EQ4_FREQ_MAX 20000.0f
-#define OMX_STRIP_PARAM_EQ4_FREQ_DEFAULT 400.0f
+#define OMX_STRIP_PARAM_EQ4_FREQ_DEFAULT 8000.0f
 #define OMX_STRIP_PARAM_EQ4_GAIN_MIN -15.0f
 #define OMX_STRIP_PARAM_EQ4_GAIN_MAX 15.0f
 #define OMX_STRIP_PARAM_EQ4_GAIN_DEFAULT 0.0f
@@ -284,66 +244,6 @@ static const omx_plugin_param OMX_STRIP_PARAMS[OMX_STRIP_PARAM_COUNT] = {
 #define OMX_STRIP_PARAM_EQ4_ON_MIN 0.0f
 #define OMX_STRIP_PARAM_EQ4_ON_MAX 1.0f
 #define OMX_STRIP_PARAM_EQ4_ON_DEFAULT 0.0f
-#define OMX_STRIP_PARAM_EQ5_TYPE_MIN 0.0f
-#define OMX_STRIP_PARAM_EQ5_TYPE_MAX 5.0f
-#define OMX_STRIP_PARAM_EQ5_TYPE_DEFAULT 0.0f
-#define OMX_STRIP_PARAM_EQ5_FREQ_MIN 20.0f
-#define OMX_STRIP_PARAM_EQ5_FREQ_MAX 20000.0f
-#define OMX_STRIP_PARAM_EQ5_FREQ_DEFAULT 1000.0f
-#define OMX_STRIP_PARAM_EQ5_GAIN_MIN -15.0f
-#define OMX_STRIP_PARAM_EQ5_GAIN_MAX 15.0f
-#define OMX_STRIP_PARAM_EQ5_GAIN_DEFAULT 0.0f
-#define OMX_STRIP_PARAM_EQ5_Q_MIN 0.3f
-#define OMX_STRIP_PARAM_EQ5_Q_MAX 116.0f
-#define OMX_STRIP_PARAM_EQ5_Q_DEFAULT 1.0f
-#define OMX_STRIP_PARAM_EQ5_ON_MIN 0.0f
-#define OMX_STRIP_PARAM_EQ5_ON_MAX 1.0f
-#define OMX_STRIP_PARAM_EQ5_ON_DEFAULT 0.0f
-#define OMX_STRIP_PARAM_EQ6_TYPE_MIN 0.0f
-#define OMX_STRIP_PARAM_EQ6_TYPE_MAX 5.0f
-#define OMX_STRIP_PARAM_EQ6_TYPE_DEFAULT 0.0f
-#define OMX_STRIP_PARAM_EQ6_FREQ_MIN 20.0f
-#define OMX_STRIP_PARAM_EQ6_FREQ_MAX 20000.0f
-#define OMX_STRIP_PARAM_EQ6_FREQ_DEFAULT 2500.0f
-#define OMX_STRIP_PARAM_EQ6_GAIN_MIN -15.0f
-#define OMX_STRIP_PARAM_EQ6_GAIN_MAX 15.0f
-#define OMX_STRIP_PARAM_EQ6_GAIN_DEFAULT 0.0f
-#define OMX_STRIP_PARAM_EQ6_Q_MIN 0.3f
-#define OMX_STRIP_PARAM_EQ6_Q_MAX 116.0f
-#define OMX_STRIP_PARAM_EQ6_Q_DEFAULT 1.0f
-#define OMX_STRIP_PARAM_EQ6_ON_MIN 0.0f
-#define OMX_STRIP_PARAM_EQ6_ON_MAX 1.0f
-#define OMX_STRIP_PARAM_EQ6_ON_DEFAULT 0.0f
-#define OMX_STRIP_PARAM_EQ7_TYPE_MIN 0.0f
-#define OMX_STRIP_PARAM_EQ7_TYPE_MAX 5.0f
-#define OMX_STRIP_PARAM_EQ7_TYPE_DEFAULT 0.0f
-#define OMX_STRIP_PARAM_EQ7_FREQ_MIN 20.0f
-#define OMX_STRIP_PARAM_EQ7_FREQ_MAX 20000.0f
-#define OMX_STRIP_PARAM_EQ7_FREQ_DEFAULT 5000.0f
-#define OMX_STRIP_PARAM_EQ7_GAIN_MIN -15.0f
-#define OMX_STRIP_PARAM_EQ7_GAIN_MAX 15.0f
-#define OMX_STRIP_PARAM_EQ7_GAIN_DEFAULT 0.0f
-#define OMX_STRIP_PARAM_EQ7_Q_MIN 0.3f
-#define OMX_STRIP_PARAM_EQ7_Q_MAX 116.0f
-#define OMX_STRIP_PARAM_EQ7_Q_DEFAULT 1.0f
-#define OMX_STRIP_PARAM_EQ7_ON_MIN 0.0f
-#define OMX_STRIP_PARAM_EQ7_ON_MAX 1.0f
-#define OMX_STRIP_PARAM_EQ7_ON_DEFAULT 0.0f
-#define OMX_STRIP_PARAM_EQ8_TYPE_MIN 0.0f
-#define OMX_STRIP_PARAM_EQ8_TYPE_MAX 5.0f
-#define OMX_STRIP_PARAM_EQ8_TYPE_DEFAULT 2.0f
-#define OMX_STRIP_PARAM_EQ8_FREQ_MIN 20.0f
-#define OMX_STRIP_PARAM_EQ8_FREQ_MAX 20000.0f
-#define OMX_STRIP_PARAM_EQ8_FREQ_DEFAULT 12500.0f
-#define OMX_STRIP_PARAM_EQ8_GAIN_MIN -15.0f
-#define OMX_STRIP_PARAM_EQ8_GAIN_MAX 15.0f
-#define OMX_STRIP_PARAM_EQ8_GAIN_DEFAULT 0.0f
-#define OMX_STRIP_PARAM_EQ8_Q_MIN 0.3f
-#define OMX_STRIP_PARAM_EQ8_Q_MAX 116.0f
-#define OMX_STRIP_PARAM_EQ8_Q_DEFAULT 1.0f
-#define OMX_STRIP_PARAM_EQ8_ON_MIN 0.0f
-#define OMX_STRIP_PARAM_EQ8_ON_MAX 1.0f
-#define OMX_STRIP_PARAM_EQ8_ON_DEFAULT 0.0f
 #define OMX_STRIP_PARAM_COMP_ON_MIN 0.0f
 #define OMX_STRIP_PARAM_COMP_ON_MAX 1.0f
 #define OMX_STRIP_PARAM_COMP_ON_DEFAULT 0.0f
@@ -383,22 +283,22 @@ static const omx_plugin_param OMX_STRIP_PARAMS[OMX_STRIP_PARAM_COUNT] = {
 #define OMX_STRIP_VENDOR "openmixer"
 #define OMX_STRIP_URL "https://github.com/FreeMixer/omx-plugins"
 #define OMX_STRIP_VERSION "0.2.0"
-#define OMX_STRIP_DESCRIPTION "The OpenMixer console's channel strip in one plugin: input trim, high- and low-pass filters, gate, eight-band EQ and compressor, in the console's order or any other. No DSP of its own: each stage is omx-dsp's instance face of the console's kernel, called in order."
+#define OMX_STRIP_DESCRIPTION "The OpenMixer console's channel strip in one plugin: input trim, high- and low-pass filters, gate, four-band EQ and compressor, in the console's order or any other. No DSP of its own: each stage is omx-dsp's instance face of the console's kernel, called in order."
 #define OMX_STRIP_CLAP_ID "org.openmixer.strip"
 #define OMX_STRIP_CLAP_FEATURES "audio-effect", "mixing", "stereo"
 #define OMX_STRIP_LV2_URI "urn:openmixer:strip"
 /* org.openmixer.declaration/1: the declaration's plain description and the digest of its parameters. */
-#define OMX_STRIP_DECL_SOURCE "omx strip: Input 0 to 1, Trim -24 to 24 dB, Filters 0 to 1, HPF 0 to 1, HPF Freq 20 to 1000 Hz, HPF Slope 12 to 24 dB/oct, LPF 0 to 1, LPF Freq 1000 to 20000 Hz, LPF Slope 12 to 24 dB/oct, Gate 0 to 1, Gate Threshold -80 to 0 dB, Gate Ratio 1 to 100, Gate Range -90 to 0 dB, Gate Attack 0 to 500 ms, Gate Release 0 to 5000 ms, Gate Knee Start -80 to 0 dB, Gate Knee End -80 to 0 dB, Gate Hold 0 to 2000 ms, Gate Hysteresis 0 to 24 dB, EQ 0 to 1, EQ 1 Type 0 to 5, EQ 1 Freq 20 to 20000 Hz, EQ 1 Gain -15 to 15 dB, EQ 1 Q 0.3 to 116, EQ 1 0 to 1, EQ 2 Type 0 to 5, EQ 2 Freq 20 to 20000 Hz, EQ 2 Gain -15 to 15 dB, EQ 2 Q 0.3 to 116, EQ 2 0 to 1, EQ 3 Type 0 to 5, EQ 3 Freq 20 to 20000 Hz, EQ 3 Gain -15 to 15 dB, EQ 3 Q 0.3 to 116, EQ 3 0 to 1, EQ 4 Type 0 to 5, EQ 4 Freq 20 to 20000 Hz, EQ 4 Gain -15 to 15 dB, EQ 4 Q 0.3 to 116, EQ 4 0 to 1, EQ 5 Type 0 to 5, EQ 5 Freq 20 to 20000 Hz, EQ 5 Gain -15 to 15 dB, EQ 5 Q 0.3 to 116, EQ 5 0 to 1, EQ 6 Type 0 to 5, EQ 6 Freq 20 to 20000 Hz, EQ 6 Gain -15 to 15 dB, EQ 6 Q 0.3 to 116, EQ 6 0 to 1, EQ 7 Type 0 to 5, EQ 7 Freq 20 to 20000 Hz, EQ 7 Gain -15 to 15 dB, EQ 7 Q 0.3 to 116, EQ 7 0 to 1, EQ 8 Type 0 to 5, EQ 8 Freq 20 to 20000 Hz, EQ 8 Gain -15 to 15 dB, EQ 8 Q 0.3 to 116, EQ 8 0 to 1, Comp 0 to 1, Comp Threshold -60 to 0 dB, Comp Ratio 1 to 20, Comp Knee 0 to 24 dB, Comp Attack 0.1 to 100 ms, Comp Release 5 to 3000 ms, Comp Makeup 0 to 24 dB, Comp Kind 0 to 1, Comp Mix 0 to 100 %, Comp Detector Oversampling 0 to 2, Order 0 to 119"
-#define OMX_STRIP_DECL_DIGEST "ea23e003880ed169324df5a4df5b2f279c879717f730052001d890139f557bd8"
+#define OMX_STRIP_DECL_SOURCE "omx strip: Input 0 to 1, Trim -24 to 24 dB, Filters 0 to 1, HPF 0 to 1, HPF Freq 20 to 1000 Hz, HPF Slope 12 to 24 dB/oct, LPF 0 to 1, LPF Freq 1000 to 20000 Hz, LPF Slope 12 to 24 dB/oct, Gate 0 to 1, Gate Threshold -80 to 0 dB, Gate Ratio 1 to 100, Gate Range -90 to 0 dB, Gate Attack 0 to 500 ms, Gate Release 0 to 5000 ms, Gate Knee Start -80 to 0 dB, Gate Knee End -80 to 0 dB, Gate Hold 0 to 2000 ms, Gate Hysteresis 0 to 24 dB, EQ 0 to 1, EQ 1 Type 0 to 5, EQ 1 Freq 20 to 20000 Hz, EQ 1 Gain -15 to 15 dB, EQ 1 Q 0.3 to 116, EQ 1 0 to 1, EQ 2 Type 0 to 5, EQ 2 Freq 20 to 20000 Hz, EQ 2 Gain -15 to 15 dB, EQ 2 Q 0.3 to 116, EQ 2 0 to 1, EQ 3 Type 0 to 5, EQ 3 Freq 20 to 20000 Hz, EQ 3 Gain -15 to 15 dB, EQ 3 Q 0.3 to 116, EQ 3 0 to 1, EQ 4 Type 0 to 5, EQ 4 Freq 20 to 20000 Hz, EQ 4 Gain -15 to 15 dB, EQ 4 Q 0.3 to 116, EQ 4 0 to 1, Comp 0 to 1, Comp Threshold -60 to 0 dB, Comp Ratio 1 to 20, Comp Knee 0 to 24 dB, Comp Attack 0.1 to 100 ms, Comp Release 5 to 3000 ms, Comp Makeup 0 to 24 dB, Comp Kind 0 to 1, Comp Mix 0 to 100 %, Comp Detector Oversampling 0 to 2, Order 0 to 119"
+#define OMX_STRIP_DECL_DIGEST "7bc2f63aae815b41303644971f60fdc441e2c9407e093d98200c1c9e1ae0ea2d"
 
 /* LV2 port indices (tools/gen.mjs lv2Ports): audio, then parameter i at FIRST_PARAM + i, then these. */
 #define OMX_STRIP_LV2_PORT_IN_L 0u
 #define OMX_STRIP_LV2_PORT_IN_R 1u
 #define OMX_STRIP_LV2_PORT_OUT_L 2u
 #define OMX_STRIP_LV2_PORT_OUT_R 3u
-#define OMX_STRIP_LV2_PORT_ENABLED 75u
-#define OMX_STRIP_LV2_PORT_LATENCY 76u
+#define OMX_STRIP_LV2_PORT_ENABLED 55u
+#define OMX_STRIP_LV2_PORT_LATENCY 56u
 #define OMX_STRIP_LV2_PORT_FIRST_PARAM 4u
-#define OMX_STRIP_LV2_PORT_COUNT 77u
+#define OMX_STRIP_LV2_PORT_COUNT 57u
 
 #endif /* OMX_STRIP_PARAMS_H */

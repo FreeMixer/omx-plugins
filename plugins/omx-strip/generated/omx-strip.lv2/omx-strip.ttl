@@ -21,7 +21,7 @@
     lv2:project <https://github.com/FreeMixer/omx-plugins> ;
     lv2:minorVersion 2 ;
     lv2:microVersion 0 ;
-    rdfs:comment "The OpenMixer console's channel strip in one plugin: input trim, high- and low-pass filters, gate, eight-band EQ and compressor, in the console's order or any other. No DSP of its own: each stage is omx-dsp's instance face of the console's kernel, called in order." ;
+    rdfs:comment "The OpenMixer console's channel strip in one plugin: input trim, high- and low-pass filters, gate, four-band EQ and compressor, in the console's order or any other. No DSP of its own: each stage is omx-dsp's instance face of the console's kernel, called in order." ;
     lv2:optionalFeature lv2:hardRTCapable ;
     lv2:port
     [
@@ -282,7 +282,7 @@
         lv2:index 25 ;
         lv2:symbol "eq1Freq" ;
         lv2:name "EQ 1 Freq" ;
-        lv2:default 31.5 ;
+        lv2:default 100 ;
         lv2:minimum 20 ;
         lv2:maximum 20000 ;
         lv2:portProperty lv2:integer ;
@@ -340,7 +340,7 @@
         lv2:index 30 ;
         lv2:symbol "eq2Freq" ;
         lv2:name "EQ 2 Freq" ;
-        lv2:default 80 ;
+        lv2:default 400 ;
         lv2:minimum 20 ;
         lv2:maximum 20000 ;
         lv2:portProperty lv2:integer ;
@@ -398,7 +398,7 @@
         lv2:index 35 ;
         lv2:symbol "eq3Freq" ;
         lv2:name "EQ 3 Freq" ;
-        lv2:default 160 ;
+        lv2:default 2000 ;
         lv2:minimum 20 ;
         lv2:maximum 20000 ;
         lv2:portProperty lv2:integer ;
@@ -439,7 +439,7 @@
         lv2:index 39 ;
         lv2:symbol "eq4Type" ;
         lv2:name "EQ 4 Type" ;
-        lv2:default 0 ;
+        lv2:default 2 ;
         lv2:minimum 0 ;
         lv2:maximum 5 ;
         lv2:portProperty lv2:integer , lv2:enumeration ;
@@ -456,7 +456,7 @@
         lv2:index 40 ;
         lv2:symbol "eq4Freq" ;
         lv2:name "EQ 4 Freq" ;
-        lv2:default 400 ;
+        lv2:default 8000 ;
         lv2:minimum 20 ;
         lv2:maximum 20000 ;
         lv2:portProperty lv2:integer ;
@@ -495,238 +495,6 @@
     [
         a lv2:ControlPort , lv2:InputPort ;
         lv2:index 44 ;
-        lv2:symbol "eq5Type" ;
-        lv2:name "EQ 5 Type" ;
-        lv2:default 0 ;
-        lv2:minimum 0 ;
-        lv2:maximum 5 ;
-        lv2:portProperty lv2:integer , lv2:enumeration ;
-        lv2:scalePoint
-            [ rdfs:label "Bell" ; rdf:value 0 ] ,
-            [ rdfs:label "Low Shelf" ; rdf:value 1 ] ,
-            [ rdfs:label "High Shelf" ; rdf:value 2 ] ,
-            [ rdfs:label "Notch" ; rdf:value 3 ] ,
-            [ rdfs:label "All-pass 1st" ; rdf:value 4 ] ,
-            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ]
-    ] ,
-    [
-        a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 45 ;
-        lv2:symbol "eq5Freq" ;
-        lv2:name "EQ 5 Freq" ;
-        lv2:default 1000 ;
-        lv2:minimum 20 ;
-        lv2:maximum 20000 ;
-        lv2:portProperty lv2:integer ;
-        lv2:portProperty pprops:logarithmic ;
-        units:unit units:hz
-    ] ,
-    [
-        a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 46 ;
-        lv2:symbol "eq5Gain" ;
-        lv2:name "EQ 5 Gain" ;
-        lv2:default 0 ;
-        lv2:minimum -15 ;
-        lv2:maximum 15 ;
-        units:unit units:db
-    ] ,
-    [
-        a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 47 ;
-        lv2:symbol "eq5Q" ;
-        lv2:name "EQ 5 Q" ;
-        lv2:default 1 ;
-        lv2:minimum 0.3 ;
-        lv2:maximum 116
-    ] ,
-    [
-        a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 48 ;
-        lv2:symbol "eq5On" ;
-        lv2:name "EQ 5" ;
-        lv2:default 0 ;
-        lv2:minimum 0 ;
-        lv2:maximum 1 ;
-        lv2:portProperty lv2:toggled
-    ] ,
-    [
-        a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 49 ;
-        lv2:symbol "eq6Type" ;
-        lv2:name "EQ 6 Type" ;
-        lv2:default 0 ;
-        lv2:minimum 0 ;
-        lv2:maximum 5 ;
-        lv2:portProperty lv2:integer , lv2:enumeration ;
-        lv2:scalePoint
-            [ rdfs:label "Bell" ; rdf:value 0 ] ,
-            [ rdfs:label "Low Shelf" ; rdf:value 1 ] ,
-            [ rdfs:label "High Shelf" ; rdf:value 2 ] ,
-            [ rdfs:label "Notch" ; rdf:value 3 ] ,
-            [ rdfs:label "All-pass 1st" ; rdf:value 4 ] ,
-            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ]
-    ] ,
-    [
-        a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 50 ;
-        lv2:symbol "eq6Freq" ;
-        lv2:name "EQ 6 Freq" ;
-        lv2:default 2500 ;
-        lv2:minimum 20 ;
-        lv2:maximum 20000 ;
-        lv2:portProperty lv2:integer ;
-        lv2:portProperty pprops:logarithmic ;
-        units:unit units:hz
-    ] ,
-    [
-        a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 51 ;
-        lv2:symbol "eq6Gain" ;
-        lv2:name "EQ 6 Gain" ;
-        lv2:default 0 ;
-        lv2:minimum -15 ;
-        lv2:maximum 15 ;
-        units:unit units:db
-    ] ,
-    [
-        a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 52 ;
-        lv2:symbol "eq6Q" ;
-        lv2:name "EQ 6 Q" ;
-        lv2:default 1 ;
-        lv2:minimum 0.3 ;
-        lv2:maximum 116
-    ] ,
-    [
-        a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 53 ;
-        lv2:symbol "eq6On" ;
-        lv2:name "EQ 6" ;
-        lv2:default 0 ;
-        lv2:minimum 0 ;
-        lv2:maximum 1 ;
-        lv2:portProperty lv2:toggled
-    ] ,
-    [
-        a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 54 ;
-        lv2:symbol "eq7Type" ;
-        lv2:name "EQ 7 Type" ;
-        lv2:default 0 ;
-        lv2:minimum 0 ;
-        lv2:maximum 5 ;
-        lv2:portProperty lv2:integer , lv2:enumeration ;
-        lv2:scalePoint
-            [ rdfs:label "Bell" ; rdf:value 0 ] ,
-            [ rdfs:label "Low Shelf" ; rdf:value 1 ] ,
-            [ rdfs:label "High Shelf" ; rdf:value 2 ] ,
-            [ rdfs:label "Notch" ; rdf:value 3 ] ,
-            [ rdfs:label "All-pass 1st" ; rdf:value 4 ] ,
-            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ]
-    ] ,
-    [
-        a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 55 ;
-        lv2:symbol "eq7Freq" ;
-        lv2:name "EQ 7 Freq" ;
-        lv2:default 5000 ;
-        lv2:minimum 20 ;
-        lv2:maximum 20000 ;
-        lv2:portProperty lv2:integer ;
-        lv2:portProperty pprops:logarithmic ;
-        units:unit units:hz
-    ] ,
-    [
-        a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 56 ;
-        lv2:symbol "eq7Gain" ;
-        lv2:name "EQ 7 Gain" ;
-        lv2:default 0 ;
-        lv2:minimum -15 ;
-        lv2:maximum 15 ;
-        units:unit units:db
-    ] ,
-    [
-        a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 57 ;
-        lv2:symbol "eq7Q" ;
-        lv2:name "EQ 7 Q" ;
-        lv2:default 1 ;
-        lv2:minimum 0.3 ;
-        lv2:maximum 116
-    ] ,
-    [
-        a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 58 ;
-        lv2:symbol "eq7On" ;
-        lv2:name "EQ 7" ;
-        lv2:default 0 ;
-        lv2:minimum 0 ;
-        lv2:maximum 1 ;
-        lv2:portProperty lv2:toggled
-    ] ,
-    [
-        a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 59 ;
-        lv2:symbol "eq8Type" ;
-        lv2:name "EQ 8 Type" ;
-        lv2:default 2 ;
-        lv2:minimum 0 ;
-        lv2:maximum 5 ;
-        lv2:portProperty lv2:integer , lv2:enumeration ;
-        lv2:scalePoint
-            [ rdfs:label "Bell" ; rdf:value 0 ] ,
-            [ rdfs:label "Low Shelf" ; rdf:value 1 ] ,
-            [ rdfs:label "High Shelf" ; rdf:value 2 ] ,
-            [ rdfs:label "Notch" ; rdf:value 3 ] ,
-            [ rdfs:label "All-pass 1st" ; rdf:value 4 ] ,
-            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ]
-    ] ,
-    [
-        a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 60 ;
-        lv2:symbol "eq8Freq" ;
-        lv2:name "EQ 8 Freq" ;
-        lv2:default 12500 ;
-        lv2:minimum 20 ;
-        lv2:maximum 20000 ;
-        lv2:portProperty lv2:integer ;
-        lv2:portProperty pprops:logarithmic ;
-        units:unit units:hz
-    ] ,
-    [
-        a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 61 ;
-        lv2:symbol "eq8Gain" ;
-        lv2:name "EQ 8 Gain" ;
-        lv2:default 0 ;
-        lv2:minimum -15 ;
-        lv2:maximum 15 ;
-        units:unit units:db
-    ] ,
-    [
-        a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 62 ;
-        lv2:symbol "eq8Q" ;
-        lv2:name "EQ 8 Q" ;
-        lv2:default 1 ;
-        lv2:minimum 0.3 ;
-        lv2:maximum 116
-    ] ,
-    [
-        a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 63 ;
-        lv2:symbol "eq8On" ;
-        lv2:name "EQ 8" ;
-        lv2:default 0 ;
-        lv2:minimum 0 ;
-        lv2:maximum 1 ;
-        lv2:portProperty lv2:toggled
-    ] ,
-    [
-        a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 64 ;
         lv2:symbol "compOn" ;
         lv2:name "Comp" ;
         lv2:default 0 ;
@@ -736,7 +504,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 65 ;
+        lv2:index 45 ;
         lv2:symbol "compThreshold" ;
         lv2:name "Comp Threshold" ;
         lv2:default -18 ;
@@ -746,7 +514,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 66 ;
+        lv2:index 46 ;
         lv2:symbol "compRatio" ;
         lv2:name "Comp Ratio" ;
         lv2:default 4 ;
@@ -755,7 +523,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 67 ;
+        lv2:index 47 ;
         lv2:symbol "compKnee" ;
         lv2:name "Comp Knee" ;
         lv2:default 6 ;
@@ -765,7 +533,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 68 ;
+        lv2:index 48 ;
         lv2:symbol "compAttack" ;
         lv2:name "Comp Attack" ;
         lv2:default 5 ;
@@ -775,7 +543,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 69 ;
+        lv2:index 49 ;
         lv2:symbol "compRelease" ;
         lv2:name "Comp Release" ;
         lv2:default 200 ;
@@ -785,7 +553,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 70 ;
+        lv2:index 50 ;
         lv2:symbol "compMakeup" ;
         lv2:name "Comp Makeup" ;
         lv2:default 0 ;
@@ -795,7 +563,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 71 ;
+        lv2:index 51 ;
         lv2:symbol "compKind" ;
         lv2:name "Comp Kind" ;
         lv2:default 0 ;
@@ -808,7 +576,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 72 ;
+        lv2:index 52 ;
         lv2:symbol "compMix" ;
         lv2:name "Comp Mix" ;
         lv2:default 100 ;
@@ -819,7 +587,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 73 ;
+        lv2:index 53 ;
         lv2:symbol "compDetectorOversampling" ;
         lv2:name "Comp Detector Oversampling" ;
         lv2:default 0 ;
@@ -833,7 +601,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 74 ;
+        lv2:index 54 ;
         lv2:symbol "order" ;
         lv2:name "Order" ;
         lv2:default 0 ;
@@ -843,7 +611,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 75 ;
+        lv2:index 55 ;
         lv2:symbol "enabled" ;
         lv2:name "Enabled" ;
         lv2:default 1 ;
@@ -854,7 +622,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:OutputPort ;
-        lv2:index 76 ;
+        lv2:index 56 ;
         lv2:symbol "latency" ;
         lv2:name "Latency" ;
         lv2:designation lv2:latency ;

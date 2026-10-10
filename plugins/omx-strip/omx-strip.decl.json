@@ -7,8 +7,8 @@
   "vendor": "openmixer",
   "url": "https://github.com/FreeMixer/omx-plugins",
   "version": "0.2.0",
-  "description": "The OpenMixer console's channel strip in one plugin: input trim, high- and low-pass filters, gate, eight-band EQ and compressor, in the console's order or any other. No DSP of its own: each stage is omx-dsp's instance face of the console's kernel, called in order.",
-  "summary": "The console's channel strip in one plugin: input trim, HPF/LPF, gate, eight-band EQ and compressor, in the desk's order or any other. Stereo, real-time safe, 44.1 to 192 kHz.",
+  "description": "The OpenMixer console's channel strip in one plugin: input trim, high- and low-pass filters, gate, four-band EQ and compressor, in the console's order or any other. No DSP of its own: each stage is omx-dsp's instance face of the console's kernel, called in order.",
+  "summary": "The console's channel strip in one plugin: input trim, HPF/LPF, gate, four-band EQ and compressor, in the desk's order or any other. Stereo, real-time safe, 44.1 to 192 kHz.",
   "clap": {
     "id": "org.openmixer.strip",
     "features": [
@@ -77,7 +77,7 @@
           "unit": "dB/oct"
         }
       ],
-      "bands": "eq8",
+      "faceBands": "eq8",
       "fixed": {
         "bandType": "default",
         "freq": "default",
@@ -162,7 +162,7 @@
           "name": "EQ 1 Type",
           "ref": "EQ_BAND_TYPES",
           "defaultBand": {
-            "strip": "eq8",
+            "strip": "strip",
             "index": 0,
             "of": "type"
           }
@@ -172,7 +172,7 @@
           "name": "EQ 1 Freq",
           "ref": "EQ_FREQ_RANGE",
           "defaultBand": {
-            "strip": "eq8",
+            "strip": "strip",
             "index": 0,
             "of": "centre"
           }
@@ -199,7 +199,7 @@
           "name": "EQ 2 Type",
           "ref": "EQ_BAND_TYPES",
           "defaultBand": {
-            "strip": "eq8",
+            "strip": "strip",
             "index": 1,
             "of": "type"
           }
@@ -209,7 +209,7 @@
           "name": "EQ 2 Freq",
           "ref": "EQ_FREQ_RANGE",
           "defaultBand": {
-            "strip": "eq8",
+            "strip": "strip",
             "index": 1,
             "of": "centre"
           }
@@ -236,7 +236,7 @@
           "name": "EQ 3 Type",
           "ref": "EQ_BAND_TYPES",
           "defaultBand": {
-            "strip": "eq8",
+            "strip": "strip",
             "index": 2,
             "of": "type"
           }
@@ -246,7 +246,7 @@
           "name": "EQ 3 Freq",
           "ref": "EQ_FREQ_RANGE",
           "defaultBand": {
-            "strip": "eq8",
+            "strip": "strip",
             "index": 2,
             "of": "centre"
           }
@@ -273,7 +273,7 @@
           "name": "EQ 4 Type",
           "ref": "EQ_BAND_TYPES",
           "defaultBand": {
-            "strip": "eq8",
+            "strip": "strip",
             "index": 3,
             "of": "type"
           }
@@ -283,7 +283,7 @@
           "name": "EQ 4 Freq",
           "ref": "EQ_FREQ_RANGE",
           "defaultBand": {
-            "strip": "eq8",
+            "strip": "strip",
             "index": 3,
             "of": "centre"
           }
@@ -304,164 +304,26 @@
           "symbol": "eq4On",
           "name": "EQ 4",
           "ref": "EQ_BAND_ONS"
-        },
-        {
-          "symbol": "eq5Type",
-          "name": "EQ 5 Type",
-          "ref": "EQ_BAND_TYPES",
-          "defaultBand": {
-            "strip": "eq8",
-            "index": 4,
-            "of": "type"
-          }
-        },
-        {
-          "symbol": "eq5Freq",
-          "name": "EQ 5 Freq",
-          "ref": "EQ_FREQ_RANGE",
-          "defaultBand": {
-            "strip": "eq8",
-            "index": 4,
-            "of": "centre"
-          }
-        },
-        {
-          "symbol": "eq5Gain",
-          "name": "EQ 5 Gain",
-          "ref": "EQ_GAIN_RANGE",
-          "defaultRef": "EQ_BAND_DEFAULTS.gainDb"
-        },
-        {
-          "symbol": "eq5Q",
-          "name": "EQ 5 Q",
-          "ref": "EQ_Q_RANGE",
-          "defaultRef": "EQ_BAND_DEFAULTS.q"
-        },
-        {
-          "symbol": "eq5On",
-          "name": "EQ 5",
-          "ref": "EQ_BAND_ONS"
-        },
-        {
-          "symbol": "eq6Type",
-          "name": "EQ 6 Type",
-          "ref": "EQ_BAND_TYPES",
-          "defaultBand": {
-            "strip": "eq8",
-            "index": 5,
-            "of": "type"
-          }
-        },
-        {
-          "symbol": "eq6Freq",
-          "name": "EQ 6 Freq",
-          "ref": "EQ_FREQ_RANGE",
-          "defaultBand": {
-            "strip": "eq8",
-            "index": 5,
-            "of": "centre"
-          }
-        },
-        {
-          "symbol": "eq6Gain",
-          "name": "EQ 6 Gain",
-          "ref": "EQ_GAIN_RANGE",
-          "defaultRef": "EQ_BAND_DEFAULTS.gainDb"
-        },
-        {
-          "symbol": "eq6Q",
-          "name": "EQ 6 Q",
-          "ref": "EQ_Q_RANGE",
-          "defaultRef": "EQ_BAND_DEFAULTS.q"
-        },
-        {
-          "symbol": "eq6On",
-          "name": "EQ 6",
-          "ref": "EQ_BAND_ONS"
-        },
-        {
-          "symbol": "eq7Type",
-          "name": "EQ 7 Type",
-          "ref": "EQ_BAND_TYPES",
-          "defaultBand": {
-            "strip": "eq8",
-            "index": 6,
-            "of": "type"
-          }
-        },
-        {
-          "symbol": "eq7Freq",
-          "name": "EQ 7 Freq",
-          "ref": "EQ_FREQ_RANGE",
-          "defaultBand": {
-            "strip": "eq8",
-            "index": 6,
-            "of": "centre"
-          }
-        },
-        {
-          "symbol": "eq7Gain",
-          "name": "EQ 7 Gain",
-          "ref": "EQ_GAIN_RANGE",
-          "defaultRef": "EQ_BAND_DEFAULTS.gainDb"
-        },
-        {
-          "symbol": "eq7Q",
-          "name": "EQ 7 Q",
-          "ref": "EQ_Q_RANGE",
-          "defaultRef": "EQ_BAND_DEFAULTS.q"
-        },
-        {
-          "symbol": "eq7On",
-          "name": "EQ 7",
-          "ref": "EQ_BAND_ONS"
-        },
-        {
-          "symbol": "eq8Type",
-          "name": "EQ 8 Type",
-          "ref": "EQ_BAND_TYPES",
-          "defaultBand": {
-            "strip": "eq8",
-            "index": 7,
-            "of": "type"
-          }
-        },
-        {
-          "symbol": "eq8Freq",
-          "name": "EQ 8 Freq",
-          "ref": "EQ_FREQ_RANGE",
-          "defaultBand": {
-            "strip": "eq8",
-            "index": 7,
-            "of": "centre"
-          }
-        },
-        {
-          "symbol": "eq8Gain",
-          "name": "EQ 8 Gain",
-          "ref": "EQ_GAIN_RANGE",
-          "defaultRef": "EQ_BAND_DEFAULTS.gainDb"
-        },
-        {
-          "symbol": "eq8Q",
-          "name": "EQ 8 Q",
-          "ref": "EQ_Q_RANGE",
-          "defaultRef": "EQ_BAND_DEFAULTS.q"
-        },
-        {
-          "symbol": "eq8On",
-          "name": "EQ 8",
-          "ref": "EQ_BAND_ONS"
         }
       ],
-      "bands": "eq8",
+      "bands": "strip",
+      "faceBands": "eq8",
       "fixed": {
         "hpfOn": "off",
-        "hpfFreq": "default",
+        "hpfFreq": {
+          "defaultRef": "EQ_PASS_FILTER_DEFAULTS.hpfFreqHz"
+        },
         "hpfSlope": "default",
         "lpfOn": "off",
-        "lpfFreq": "default",
-        "lpfSlope": "default"
+        "lpfFreq": {
+          "defaultRef": "EQ_PASS_FILTER_DEFAULTS.lpfFreqHz"
+        },
+        "lpfSlope": "default",
+        "bandType": "default",
+        "freq": "default",
+        "gain": "default",
+        "q": "default",
+        "bandOn": "off"
       }
     },
     {
@@ -743,122 +605,6 @@
         "lv2:toggled"
       ]
     },
-    "eq5Type": {
-      "props": [
-        "lv2:enumeration",
-        "lv2:integer"
-      ],
-      "points": [
-        "0 Bell",
-        "1 Low Shelf",
-        "2 High Shelf",
-        "3 Notch",
-        "4 All-pass 1st",
-        "5 All-pass 2nd"
-      ]
-    },
-    "eq5Freq": {
-      "props": [
-        "lv2:integer",
-        "pprops:logarithmic"
-      ],
-      "unit": "units:hz"
-    },
-    "eq5Gain": {
-      "unit": "units:db"
-    },
-    "eq5On": {
-      "props": [
-        "lv2:toggled"
-      ]
-    },
-    "eq6Type": {
-      "props": [
-        "lv2:enumeration",
-        "lv2:integer"
-      ],
-      "points": [
-        "0 Bell",
-        "1 Low Shelf",
-        "2 High Shelf",
-        "3 Notch",
-        "4 All-pass 1st",
-        "5 All-pass 2nd"
-      ]
-    },
-    "eq6Freq": {
-      "props": [
-        "lv2:integer",
-        "pprops:logarithmic"
-      ],
-      "unit": "units:hz"
-    },
-    "eq6Gain": {
-      "unit": "units:db"
-    },
-    "eq6On": {
-      "props": [
-        "lv2:toggled"
-      ]
-    },
-    "eq7Type": {
-      "props": [
-        "lv2:enumeration",
-        "lv2:integer"
-      ],
-      "points": [
-        "0 Bell",
-        "1 Low Shelf",
-        "2 High Shelf",
-        "3 Notch",
-        "4 All-pass 1st",
-        "5 All-pass 2nd"
-      ]
-    },
-    "eq7Freq": {
-      "props": [
-        "lv2:integer",
-        "pprops:logarithmic"
-      ],
-      "unit": "units:hz"
-    },
-    "eq7Gain": {
-      "unit": "units:db"
-    },
-    "eq7On": {
-      "props": [
-        "lv2:toggled"
-      ]
-    },
-    "eq8Type": {
-      "props": [
-        "lv2:enumeration",
-        "lv2:integer"
-      ],
-      "points": [
-        "0 Bell",
-        "1 Low Shelf",
-        "2 High Shelf",
-        "3 Notch",
-        "4 All-pass 1st",
-        "5 All-pass 2nd"
-      ]
-    },
-    "eq8Freq": {
-      "props": [
-        "lv2:integer",
-        "pprops:logarithmic"
-      ],
-      "unit": "units:hz"
-    },
-    "eq8Gain": {
-      "unit": "units:db"
-    },
-    "eq8On": {
-      "props": [
-        "lv2:toggled"
-      ]
-    },
     "compOn": {
       "props": [
         "lv2:toggled"
@@ -966,37 +712,17 @@
     "37 compKnee -> eq4Gain",
     "38 compAttack -> eq4Q",
     "39 compRelease -> eq4On",
-    "40 compMakeup -> eq5Type",
-    "41 compRms -> eq5Freq",
-    "42 order -> eq5Gain",
-    "+43 eq5Q",
-    "+44 eq5On",
-    "+45 eq6Type",
-    "+46 eq6Freq",
-    "+47 eq6Gain",
-    "+48 eq6Q",
-    "+49 eq6On",
-    "+50 eq7Type",
-    "+51 eq7Freq",
-    "+52 eq7Gain",
-    "+53 eq7Q",
-    "+54 eq7On",
-    "+55 eq8Type",
-    "+56 eq8Freq",
-    "+57 eq8Gain",
-    "+58 eq8Q",
-    "+59 eq8On",
-    "+60 compOn",
-    "+61 compThreshold",
-    "+62 compRatio",
-    "+63 compKnee",
-    "+64 compAttack",
-    "+65 compRelease",
-    "+66 compMakeup",
-    "+67 compKind",
-    "+68 compMix",
-    "+69 compDetectorOversampling",
-    "+70 order"
+    "40 compMakeup -> compOn",
+    "41 compRms -> compThreshold",
+    "42 order -> compRatio",
+    "+43 compKnee",
+    "+44 compAttack",
+    "+45 compRelease",
+    "+46 compMakeup",
+    "+47 compKind",
+    "+48 compMix",
+    "+49 compDetectorOversampling",
+    "+50 order"
   ],
   "panel": {
     "family": "strip",
@@ -1063,27 +789,7 @@
           "eq4Freq",
           "eq4Gain",
           "eq4Q",
-          "eq4On",
-          "eq5Type",
-          "eq5Freq",
-          "eq5Gain",
-          "eq5Q",
-          "eq5On",
-          "eq6Type",
-          "eq6Freq",
-          "eq6Gain",
-          "eq6Q",
-          "eq6On",
-          "eq7Type",
-          "eq7Freq",
-          "eq7Gain",
-          "eq7Q",
-          "eq7On",
-          "eq8Type",
-          "eq8Freq",
-          "eq8Gain",
-          "eq8Q",
-          "eq8On"
+          "eq4On"
         ]
       },
       {
@@ -1119,7 +825,7 @@
     "| Input | on/off; Trim, a click-free ramp to each new gain |",
     "| Filters | on/off; HPF and LPF, each on/off, its frequency, 12 or 24 dB/oct |",
     "| Gate | on/off, threshold, ratio, range, attack, release, knee start and end, hold, hysteresis |",
-    "| EQ | on/off; eight bands, each on/off, type (bell, low or high shelf, notch, all-pass 1st or 2nd order), frequency, gain, Q |",
+    "| EQ | on/off; four bands, each on/off, type (bell, low or high shelf, notch, all-pass 1st or 2nd order), frequency, gain, Q |",
     "| Comp | on/off, threshold, ratio, knee, attack, release, make-up, kind (compressor: RMS detector; limiter: peak), mix, detector oversampling (auto, off, 4x) |",
     "",
     "**Order** (0 to 119) picks the order of the five stages: 0 is the desk's input > filters > gate > EQ >",
