@@ -54,5 +54,68 @@
       "ref": "TRANSIENT_LIMITS",
       "field": "outputDb"
     }
-  ]
+  ],
+  "portHints": {
+    "attackDb": {
+      "unit": "units:db"
+    },
+    "sustainDb": {
+      "unit": "units:db"
+    },
+    "attackTimeMs": {
+      "unit": "units:ms"
+    },
+    "sustainTimeMs": {
+      "props": [
+        "lv2:integer"
+      ],
+      "unit": "units:ms"
+    },
+    "outputDb": {
+      "unit": "units:db"
+    },
+    "enabled": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "latency": {
+      "props": [
+        "lv2:integer",
+        "lv2:reportsLatency"
+      ],
+      "unit": "units:frame"
+    }
+  },
+  "panel": {
+    "family": "transient",
+    "roles": {},
+    "sections": [
+      {
+        "key": "transient",
+        "label": "Transient",
+        "controls": [
+          "attackDb",
+          "sustainDb",
+          "attackTimeMs",
+          "sustainTimeMs",
+          "outputDb"
+        ]
+      }
+    ]
+  },
+  "console": {
+    "$comment": "FreeMixer/openmixer integration/waves-2026-10 has no transient stage. Racked as a plugin (the insert rack's kinds, channel-contract.ts INSERT_RACK_KINDS) it is drawn by the generic plugin editor.",
+    "placement": {
+      "strips": [
+        "input",
+        "fxReturn",
+        "main",
+        "aux",
+        "mix",
+        "matrix"
+      ],
+      "group": "plugins"
+    }
+  }
 }

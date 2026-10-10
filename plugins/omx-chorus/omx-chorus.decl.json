@@ -49,5 +49,88 @@
       "name": "Mix",
       "ref": "CHORUS_MIX_RANGE"
     }
-  ]
+  ],
+  "portHints": {
+    "rate": {
+      "props": [
+        "pprops:logarithmic"
+      ],
+      "unit": "units:hz"
+    },
+    "depth": {
+      "unit": "units:ms"
+    },
+    "voices": {
+      "props": [
+        "lv2:integer"
+      ]
+    },
+    "mix": {
+      "unit": "units:pc"
+    },
+    "enabled": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "latency": {
+      "props": [
+        "lv2:integer",
+        "lv2:reportsLatency"
+      ],
+      "unit": "units:frame"
+    }
+  },
+  "panel": {
+    "family": "chorus",
+    "roles": {},
+    "sections": [
+      {
+        "key": "chorus",
+        "label": "Chorus",
+        "controls": [
+          "spread",
+          "rate",
+          "depth",
+          "voices",
+          "mix"
+        ]
+      }
+    ]
+  },
+  "console": {
+    "$comment": "As FreeMixer/openmixer integration/waves-2026-10 draws its chorus stage: the panel is ModulationPanel.vue (rateHz, depthMs, voices, mix, spread), the FX chip FxSummaryValue of STAGE_KEY_FIELD.chorus (rateHz); the overview card shows the engage switch only.",
+    "placement": {
+      "strips": [
+        "input",
+        "fxReturn",
+        "aux",
+        "mix",
+        "matrix",
+        "main",
+        "fxSend",
+        "mixMinus"
+      ],
+      "group": "walk",
+      "stage": "chorus",
+      "after": "rotary",
+      "fxGroup": "modulation"
+    },
+    "chip": "{rate}",
+    "panel": {
+      "sections": [
+        {
+          "key": "chorus",
+          "label": "Chorus",
+          "controls": [
+            "rate",
+            "depth",
+            "voices",
+            "mix",
+            "spread"
+          ]
+        }
+      ]
+    }
+  }
 }

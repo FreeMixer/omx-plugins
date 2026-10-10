@@ -96,5 +96,175 @@
         "Gated"
       ]
     }
-  ]
+  ],
+  "portHints": {
+    "plateModDepth": {
+      "props": [
+        "lv2:integer"
+      ],
+      "unit": "units:pc"
+    },
+    "predelay": {
+      "props": [
+        "lv2:integer"
+      ],
+      "unit": "units:ms"
+    },
+    "lowcut": {
+      "props": [
+        "lv2:integer",
+        "pprops:logarithmic"
+      ],
+      "unit": "units:hz"
+    },
+    "highcut": {
+      "props": [
+        "lv2:integer",
+        "pprops:logarithmic"
+      ],
+      "unit": "units:hz"
+    },
+    "reverse": {
+      "props": [
+        "lv2:integer"
+      ],
+      "unit": "units:ms"
+    },
+    "hold": {
+      "props": [
+        "lv2:integer"
+      ],
+      "unit": "units:ms"
+    },
+    "release": {
+      "props": [
+        "lv2:integer"
+      ],
+      "unit": "units:ms"
+    },
+    "gateThreshold": {
+      "props": [
+        "lv2:integer"
+      ]
+    },
+    "algorithm": {
+      "props": [
+        "lv2:enumeration",
+        "lv2:integer"
+      ],
+      "points": [
+        "0 Room",
+        "1 Plate",
+        "2 Hall",
+        "3 Reverse",
+        "4 Gated"
+      ]
+    },
+    "enabled": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "latency": {
+      "props": [
+        "lv2:integer",
+        "lv2:reportsLatency"
+      ],
+      "unit": "units:frame"
+    }
+  },
+  "panel": {
+    "family": "reverb",
+    "roles": {},
+    "sections": [
+      {
+        "key": "reverb",
+        "label": "Reverb",
+        "controls": [
+          "plateModDepth",
+          "mix",
+          "size",
+          "damping",
+          "width",
+          "predelay",
+          "lowcut",
+          "highcut",
+          "reverse",
+          "hold",
+          "release",
+          "gateThreshold",
+          "algorithm"
+        ]
+      }
+    ]
+  },
+  "console": {
+    "$comment": "As FreeMixer/openmixer integration/waves-2026-10 draws its reverb stage: FxPanel's StageTimeCurve (decay) over ReverbPanel.vue (preset and algorithm selects, then size, damping, predelayMs, width, mix, lowcut, highcut, then the reverse, gated or plate row of the chosen algorithm). Chip: FxSummaryValue of STAGE_KEY_FIELD.reverb (size). Card: useStripOverview's reverb controls.",
+    "placement": {
+      "strips": [
+        "input",
+        "fxReturn",
+        "aux",
+        "mix",
+        "matrix",
+        "main",
+        "fxSend",
+        "mixMinus"
+      ],
+      "group": "walk",
+      "stage": "reverb",
+      "after": "delay",
+      "fxGroup": "reverb"
+    },
+    "card": {
+      "show": [
+        "size",
+        "damping",
+        "mix"
+      ]
+    },
+    "chip": "{size}",
+    "panel": {
+      "sections": [
+        {
+          "key": "reverb",
+          "label": "Reverb",
+          "controls": [
+            "algorithm",
+            "size",
+            "damping",
+            "predelay",
+            "width",
+            "mix",
+            "lowcut",
+            "highcut"
+          ],
+          "graph": "decay-envelope"
+        },
+        {
+          "key": "reverse",
+          "label": "Reverse",
+          "controls": [
+            "reverse"
+          ]
+        },
+        {
+          "key": "gated",
+          "label": "Gated",
+          "controls": [
+            "hold",
+            "release",
+            "gateThreshold"
+          ]
+        },
+        {
+          "key": "plate",
+          "label": "Plate",
+          "controls": [
+            "plateModDepth"
+          ]
+        }
+      ]
+    }
+  }
 }

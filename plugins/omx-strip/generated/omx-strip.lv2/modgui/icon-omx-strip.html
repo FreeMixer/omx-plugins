@@ -1,0 +1,289 @@
+<div class="omx-pedal{{{cns}}} omx-family-strip" style="width:624px;height:750px">
+    <!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+    <!-- Copyright (C) 2026 Pau Aliagas <linuxnow@gmail.com> -->
+    <!-- GENERATED — DO NOT EDIT BY HAND. Produced by tools/modgui-gen.mjs from -->
+    <!-- plugins/omx-strip/omx-strip.decl.json (its panel block) and tools/look.json -->
+    <!-- Regenerate: `node tools/modgui-gen.mjs`, then commit the result. -->
+    <!-- Template format: MOD Devices' modgui (mod-ui, https://github.com/moddevices/mod-ui, and the
+         MOD SDK's icon-template documentation) — Mustache, mod-role / mod-port-symbol, the {{{cns}}}
+         and {{{ns}}} scoping, MOD's own drag-handle, bypass and jack roles. Credited, not copied. -->
+    <div mod-role="drag-handle" class="mod-drag-handle"></div>
+    <div class="omx-head" style="height:40px">
+        <span class="omx-brand">{{brand}}</span>
+        <span class="omx-label">{{label}}</span>
+        <div class="omx-bypass" mod-role="bypass"><div class="omx-bypass-light" mod-role="bypass-light"></div></div>
+    </div>
+        <div class="omx-section" data-section="input" style="left:16px;top:52px;width:592px;height:98px">
+            <h2 class="omx-section-title">Input</h2>
+            <div class="omx-control omx-knob" style="left:8px;top:18px" title="Trim" data-symbol="trimDb" data-min="-24" data-max="24" data-default="0">
+                <div class="omx-knob-image" mod-role="input-control-port" mod-port-symbol="trimDb"></div>
+                <span class="omx-control-title">Trim</span>
+            </div>
+            <div class="omx-control omx-switch" style="left:80px;top:18px" title="HPF" data-symbol="hpfOn" data-min="0" data-max="1" data-default="0">
+                <div class="omx-switch-image" mod-role="input-control-port" mod-port-symbol="hpfOn" mod-widget="switch"></div>
+                <span class="omx-control-title">HPF</span>
+            </div>
+            <div class="omx-control omx-knob" style="left:152px;top:18px" title="HPF Freq" data-symbol="hpfFreq" data-min="20" data-max="1000" data-default="80">
+                <div class="omx-knob-image" mod-role="input-control-port" mod-port-symbol="hpfFreq"></div>
+                <span class="omx-control-title">HPF Freq</span>
+            </div>
+            <div class="omx-control omx-select" style="left:224px;top:18px" title="HPF Slope" data-symbol="hpfSlope" data-min="12" data-max="24" data-default="12">
+                <div class="omx-select-image" mod-role="input-control-port" mod-port-symbol="hpfSlope" mod-widget="custom-select">
+                    <div class="omx-select-value" mod-role="input-control-value" mod-port-symbol="hpfSlope"></div>
+                    <div class="omx-select-list">
+                    <div class="omx-select-option" mod-role="enumeration-option" mod-port-value="12">12 dB/oct</div>
+                    <div class="omx-select-option" mod-role="enumeration-option" mod-port-value="24">24 dB/oct</div>
+                    </div>
+                </div>
+                <span class="omx-control-title">HPF Slope</span>
+            </div>
+            <div class="omx-control omx-switch" style="left:296px;top:18px" title="LPF" data-symbol="lpfOn" data-min="0" data-max="1" data-default="0">
+                <div class="omx-switch-image" mod-role="input-control-port" mod-port-symbol="lpfOn" mod-widget="switch"></div>
+                <span class="omx-control-title">LPF</span>
+            </div>
+            <div class="omx-control omx-knob" style="left:368px;top:18px" title="LPF Freq" data-symbol="lpfFreq" data-min="1000" data-max="20000" data-default="18000">
+                <div class="omx-knob-image" mod-role="input-control-port" mod-port-symbol="lpfFreq"></div>
+                <span class="omx-control-title">LPF Freq</span>
+            </div>
+            <div class="omx-control omx-select" style="left:440px;top:18px" title="LPF Slope" data-symbol="lpfSlope" data-min="12" data-max="24" data-default="12">
+                <div class="omx-select-image" mod-role="input-control-port" mod-port-symbol="lpfSlope" mod-widget="custom-select">
+                    <div class="omx-select-value" mod-role="input-control-value" mod-port-symbol="lpfSlope"></div>
+                    <div class="omx-select-list">
+                    <div class="omx-select-option" mod-role="enumeration-option" mod-port-value="12">12 dB/oct</div>
+                    <div class="omx-select-option" mod-role="enumeration-option" mod-port-value="24">24 dB/oct</div>
+                    </div>
+                </div>
+                <span class="omx-control-title">LPF Slope</span>
+            </div>
+        </div>
+        <div class="omx-section" data-section="gate" style="left:16px;top:160px;width:592px;height:98px">
+            <h2 class="omx-section-title">Gate</h2>
+            <div class="omx-control omx-switch" style="left:8px;top:18px" title="Gate" data-symbol="gateOn" data-min="0" data-max="1" data-default="0">
+                <div class="omx-switch-image" mod-role="input-control-port" mod-port-symbol="gateOn" mod-widget="switch"></div>
+                <span class="omx-control-title">Gate</span>
+            </div>
+            <div class="omx-control omx-knob" style="left:80px;top:18px" title="Gate Threshold" data-symbol="gateThreshold" data-min="-80" data-max="0" data-default="-40">
+                <div class="omx-knob-image" mod-role="input-control-port" mod-port-symbol="gateThreshold"></div>
+                <span class="omx-control-title">Gate Threshold</span>
+            </div>
+            <div class="omx-control omx-knob" style="left:152px;top:18px" title="Gate Ratio" data-symbol="gateRatio" data-min="1" data-max="100" data-default="16">
+                <div class="omx-knob-image" mod-role="input-control-port" mod-port-symbol="gateRatio"></div>
+                <span class="omx-control-title">Gate Ratio</span>
+            </div>
+            <div class="omx-control omx-knob" style="left:224px;top:18px" title="Gate Range" data-symbol="gateRange" data-min="-90" data-max="0" data-default="-90">
+                <div class="omx-knob-image" mod-role="input-control-port" mod-port-symbol="gateRange"></div>
+                <span class="omx-control-title">Gate Range</span>
+            </div>
+            <div class="omx-control omx-knob" style="left:296px;top:18px" title="Gate Attack" data-symbol="gateAttack" data-min="0" data-max="500" data-default="1">
+                <div class="omx-knob-image" mod-role="input-control-port" mod-port-symbol="gateAttack"></div>
+                <span class="omx-control-title">Gate Attack</span>
+            </div>
+            <div class="omx-control omx-knob" style="left:368px;top:18px" title="Gate Release" data-symbol="gateRelease" data-min="0" data-max="5000" data-default="100">
+                <div class="omx-knob-image" mod-role="input-control-port" mod-port-symbol="gateRelease"></div>
+                <span class="omx-control-title">Gate Release</span>
+            </div>
+        </div>
+        <div class="omx-section" data-section="eq" style="left:16px;top:268px;width:592px;height:250px">
+            <h2 class="omx-section-title">EQ</h2>
+            <div class="omx-control omx-switch" style="left:8px;top:18px" title="EQ" data-symbol="eqOn" data-min="0" data-max="1" data-default="1">
+                <div class="omx-switch-image" mod-role="input-control-port" mod-port-symbol="eqOn" mod-widget="switch"></div>
+                <span class="omx-control-title">EQ</span>
+            </div>
+            <div class="omx-control omx-select" style="left:80px;top:18px" title="EQ 1 Type" data-symbol="eq1Type" data-min="0" data-max="5" data-default="1">
+                <div class="omx-select-image" mod-role="input-control-port" mod-port-symbol="eq1Type" mod-widget="custom-select">
+                    <div class="omx-select-value" mod-role="input-control-value" mod-port-symbol="eq1Type"></div>
+                    <div class="omx-select-list">
+                    <div class="omx-select-option" mod-role="enumeration-option" mod-port-value="0">Bell</div>
+                    <div class="omx-select-option" mod-role="enumeration-option" mod-port-value="1">Low Shelf</div>
+                    <div class="omx-select-option" mod-role="enumeration-option" mod-port-value="2">High Shelf</div>
+                    <div class="omx-select-option" mod-role="enumeration-option" mod-port-value="3">Notch</div>
+                    <div class="omx-select-option" mod-role="enumeration-option" mod-port-value="4">All-pass 1st</div>
+                    <div class="omx-select-option" mod-role="enumeration-option" mod-port-value="5">All-pass 2nd</div>
+                    </div>
+                </div>
+                <span class="omx-control-title">EQ 1 Type</span>
+            </div>
+            <div class="omx-control omx-knob" style="left:152px;top:18px" title="EQ 1 Freq" data-symbol="eq1Freq" data-min="20" data-max="20000" data-default="100">
+                <div class="omx-knob-image" mod-role="input-control-port" mod-port-symbol="eq1Freq"></div>
+                <span class="omx-control-title">EQ 1 Freq</span>
+            </div>
+            <div class="omx-control omx-knob" style="left:224px;top:18px" title="EQ 1 Gain" data-symbol="eq1Gain" data-min="-15" data-max="15" data-default="0">
+                <div class="omx-knob-image" mod-role="input-control-port" mod-port-symbol="eq1Gain"></div>
+                <span class="omx-control-title">EQ 1 Gain</span>
+            </div>
+            <div class="omx-control omx-knob" style="left:296px;top:18px" title="EQ 1 Q" data-symbol="eq1Q" data-min="0.3" data-max="8" data-default="1">
+                <div class="omx-knob-image" mod-role="input-control-port" mod-port-symbol="eq1Q"></div>
+                <span class="omx-control-title">EQ 1 Q</span>
+            </div>
+            <div class="omx-control omx-switch" style="left:368px;top:18px" title="EQ 1" data-symbol="eq1On" data-min="0" data-max="1" data-default="1">
+                <div class="omx-switch-image" mod-role="input-control-port" mod-port-symbol="eq1On" mod-widget="switch"></div>
+                <span class="omx-control-title">EQ 1</span>
+            </div>
+            <div class="omx-control omx-select" style="left:440px;top:18px" title="EQ 2 Type" data-symbol="eq2Type" data-min="0" data-max="5" data-default="0">
+                <div class="omx-select-image" mod-role="input-control-port" mod-port-symbol="eq2Type" mod-widget="custom-select">
+                    <div class="omx-select-value" mod-role="input-control-value" mod-port-symbol="eq2Type"></div>
+                    <div class="omx-select-list">
+                    <div class="omx-select-option" mod-role="enumeration-option" mod-port-value="0">Bell</div>
+                    <div class="omx-select-option" mod-role="enumeration-option" mod-port-value="1">Low Shelf</div>
+                    <div class="omx-select-option" mod-role="enumeration-option" mod-port-value="2">High Shelf</div>
+                    <div class="omx-select-option" mod-role="enumeration-option" mod-port-value="3">Notch</div>
+                    <div class="omx-select-option" mod-role="enumeration-option" mod-port-value="4">All-pass 1st</div>
+                    <div class="omx-select-option" mod-role="enumeration-option" mod-port-value="5">All-pass 2nd</div>
+                    </div>
+                </div>
+                <span class="omx-control-title">EQ 2 Type</span>
+            </div>
+            <div class="omx-control omx-knob" style="left:512px;top:18px" title="EQ 2 Freq" data-symbol="eq2Freq" data-min="20" data-max="20000" data-default="400">
+                <div class="omx-knob-image" mod-role="input-control-port" mod-port-symbol="eq2Freq"></div>
+                <span class="omx-control-title">EQ 2 Freq</span>
+            </div>
+            <div class="omx-control omx-knob" style="left:8px;top:94px" title="EQ 2 Gain" data-symbol="eq2Gain" data-min="-15" data-max="15" data-default="0">
+                <div class="omx-knob-image" mod-role="input-control-port" mod-port-symbol="eq2Gain"></div>
+                <span class="omx-control-title">EQ 2 Gain</span>
+            </div>
+            <div class="omx-control omx-knob" style="left:80px;top:94px" title="EQ 2 Q" data-symbol="eq2Q" data-min="0.3" data-max="8" data-default="1">
+                <div class="omx-knob-image" mod-role="input-control-port" mod-port-symbol="eq2Q"></div>
+                <span class="omx-control-title">EQ 2 Q</span>
+            </div>
+            <div class="omx-control omx-switch" style="left:152px;top:94px" title="EQ 2" data-symbol="eq2On" data-min="0" data-max="1" data-default="1">
+                <div class="omx-switch-image" mod-role="input-control-port" mod-port-symbol="eq2On" mod-widget="switch"></div>
+                <span class="omx-control-title">EQ 2</span>
+            </div>
+            <div class="omx-control omx-select" style="left:224px;top:94px" title="EQ 3 Type" data-symbol="eq3Type" data-min="0" data-max="5" data-default="0">
+                <div class="omx-select-image" mod-role="input-control-port" mod-port-symbol="eq3Type" mod-widget="custom-select">
+                    <div class="omx-select-value" mod-role="input-control-value" mod-port-symbol="eq3Type"></div>
+                    <div class="omx-select-list">
+                    <div class="omx-select-option" mod-role="enumeration-option" mod-port-value="0">Bell</div>
+                    <div class="omx-select-option" mod-role="enumeration-option" mod-port-value="1">Low Shelf</div>
+                    <div class="omx-select-option" mod-role="enumeration-option" mod-port-value="2">High Shelf</div>
+                    <div class="omx-select-option" mod-role="enumeration-option" mod-port-value="3">Notch</div>
+                    <div class="omx-select-option" mod-role="enumeration-option" mod-port-value="4">All-pass 1st</div>
+                    <div class="omx-select-option" mod-role="enumeration-option" mod-port-value="5">All-pass 2nd</div>
+                    </div>
+                </div>
+                <span class="omx-control-title">EQ 3 Type</span>
+            </div>
+            <div class="omx-control omx-knob" style="left:296px;top:94px" title="EQ 3 Freq" data-symbol="eq3Freq" data-min="20" data-max="20000" data-default="2000">
+                <div class="omx-knob-image" mod-role="input-control-port" mod-port-symbol="eq3Freq"></div>
+                <span class="omx-control-title">EQ 3 Freq</span>
+            </div>
+            <div class="omx-control omx-knob" style="left:368px;top:94px" title="EQ 3 Gain" data-symbol="eq3Gain" data-min="-15" data-max="15" data-default="0">
+                <div class="omx-knob-image" mod-role="input-control-port" mod-port-symbol="eq3Gain"></div>
+                <span class="omx-control-title">EQ 3 Gain</span>
+            </div>
+            <div class="omx-control omx-knob" style="left:440px;top:94px" title="EQ 3 Q" data-symbol="eq3Q" data-min="0.3" data-max="8" data-default="1">
+                <div class="omx-knob-image" mod-role="input-control-port" mod-port-symbol="eq3Q"></div>
+                <span class="omx-control-title">EQ 3 Q</span>
+            </div>
+            <div class="omx-control omx-switch" style="left:512px;top:94px" title="EQ 3" data-symbol="eq3On" data-min="0" data-max="1" data-default="1">
+                <div class="omx-switch-image" mod-role="input-control-port" mod-port-symbol="eq3On" mod-widget="switch"></div>
+                <span class="omx-control-title">EQ 3</span>
+            </div>
+            <div class="omx-control omx-select" style="left:8px;top:170px" title="EQ 4 Type" data-symbol="eq4Type" data-min="0" data-max="5" data-default="2">
+                <div class="omx-select-image" mod-role="input-control-port" mod-port-symbol="eq4Type" mod-widget="custom-select">
+                    <div class="omx-select-value" mod-role="input-control-value" mod-port-symbol="eq4Type"></div>
+                    <div class="omx-select-list">
+                    <div class="omx-select-option" mod-role="enumeration-option" mod-port-value="0">Bell</div>
+                    <div class="omx-select-option" mod-role="enumeration-option" mod-port-value="1">Low Shelf</div>
+                    <div class="omx-select-option" mod-role="enumeration-option" mod-port-value="2">High Shelf</div>
+                    <div class="omx-select-option" mod-role="enumeration-option" mod-port-value="3">Notch</div>
+                    <div class="omx-select-option" mod-role="enumeration-option" mod-port-value="4">All-pass 1st</div>
+                    <div class="omx-select-option" mod-role="enumeration-option" mod-port-value="5">All-pass 2nd</div>
+                    </div>
+                </div>
+                <span class="omx-control-title">EQ 4 Type</span>
+            </div>
+            <div class="omx-control omx-knob" style="left:80px;top:170px" title="EQ 4 Freq" data-symbol="eq4Freq" data-min="20" data-max="20000" data-default="8000">
+                <div class="omx-knob-image" mod-role="input-control-port" mod-port-symbol="eq4Freq"></div>
+                <span class="omx-control-title">EQ 4 Freq</span>
+            </div>
+            <div class="omx-control omx-knob" style="left:152px;top:170px" title="EQ 4 Gain" data-symbol="eq4Gain" data-min="-15" data-max="15" data-default="0">
+                <div class="omx-knob-image" mod-role="input-control-port" mod-port-symbol="eq4Gain"></div>
+                <span class="omx-control-title">EQ 4 Gain</span>
+            </div>
+            <div class="omx-control omx-knob" style="left:224px;top:170px" title="EQ 4 Q" data-symbol="eq4Q" data-min="0.3" data-max="8" data-default="1">
+                <div class="omx-knob-image" mod-role="input-control-port" mod-port-symbol="eq4Q"></div>
+                <span class="omx-control-title">EQ 4 Q</span>
+            </div>
+            <div class="omx-control omx-switch" style="left:296px;top:170px" title="EQ 4" data-symbol="eq4On" data-min="0" data-max="1" data-default="1">
+                <div class="omx-switch-image" mod-role="input-control-port" mod-port-symbol="eq4On" mod-widget="switch"></div>
+                <span class="omx-control-title">EQ 4</span>
+            </div>
+        </div>
+        <div class="omx-section" data-section="comp" style="left:16px;top:528px;width:592px;height:98px">
+            <h2 class="omx-section-title">Comp</h2>
+            <div class="omx-control omx-switch" style="left:8px;top:18px" title="Comp" data-symbol="compOn" data-min="0" data-max="1" data-default="0">
+                <div class="omx-switch-image" mod-role="input-control-port" mod-port-symbol="compOn" mod-widget="switch"></div>
+                <span class="omx-control-title">Comp</span>
+            </div>
+            <div class="omx-control omx-knob" style="left:80px;top:18px" title="Comp Threshold" data-symbol="compThreshold" data-min="-60" data-max="0" data-default="-18">
+                <div class="omx-knob-image" mod-role="input-control-port" mod-port-symbol="compThreshold"></div>
+                <span class="omx-control-title">Comp Threshold</span>
+            </div>
+            <div class="omx-control omx-knob" style="left:152px;top:18px" title="Comp Ratio" data-symbol="compRatio" data-min="1" data-max="20" data-default="4">
+                <div class="omx-knob-image" mod-role="input-control-port" mod-port-symbol="compRatio"></div>
+                <span class="omx-control-title">Comp Ratio</span>
+            </div>
+            <div class="omx-control omx-knob" style="left:224px;top:18px" title="Comp Knee" data-symbol="compKnee" data-min="0" data-max="24" data-default="6">
+                <div class="omx-knob-image" mod-role="input-control-port" mod-port-symbol="compKnee"></div>
+                <span class="omx-control-title">Comp Knee</span>
+            </div>
+            <div class="omx-control omx-knob" style="left:296px;top:18px" title="Comp Attack" data-symbol="compAttack" data-min="0.1" data-max="100" data-default="5">
+                <div class="omx-knob-image" mod-role="input-control-port" mod-port-symbol="compAttack"></div>
+                <span class="omx-control-title">Comp Attack</span>
+            </div>
+            <div class="omx-control omx-knob" style="left:368px;top:18px" title="Comp Release" data-symbol="compRelease" data-min="5" data-max="3000" data-default="200">
+                <div class="omx-knob-image" mod-role="input-control-port" mod-port-symbol="compRelease"></div>
+                <span class="omx-control-title">Comp Release</span>
+            </div>
+            <div class="omx-control omx-knob" style="left:440px;top:18px" title="Comp Makeup" data-symbol="compMakeup" data-min="0" data-max="24" data-default="0">
+                <div class="omx-knob-image" mod-role="input-control-port" mod-port-symbol="compMakeup"></div>
+                <span class="omx-control-title">Comp Makeup</span>
+            </div>
+            <div class="omx-control omx-switch" style="left:512px;top:18px" title="Comp RMS" data-symbol="compRms" data-min="0" data-max="1" data-default="0">
+                <div class="omx-switch-image" mod-role="input-control-port" mod-port-symbol="compRms" mod-widget="switch"></div>
+                <span class="omx-control-title">Comp RMS</span>
+            </div>
+        </div>
+        <div class="omx-section" data-section="order" style="left:16px;top:636px;width:592px;height:98px">
+            <h2 class="omx-section-title">Order</h2>
+            <div class="omx-control omx-knob" style="left:8px;top:18px" title="Order" data-symbol="order" data-min="0" data-max="23" data-default="0">
+                <div class="omx-knob-image" mod-role="input-control-port" mod-port-symbol="order"></div>
+                <span class="omx-control-title">Order</span>
+            </div>
+        </div>
+    <div class="mod-pedal-input">
+        {{#effect.ports.audio.input}}
+        <div class="mod-input mod-input-disconnected" title="{{name}}" mod-role="input-audio-port" mod-port-symbol="{{symbol}}">
+            <div class="mod-pedal-input-image"></div>
+        </div>
+        {{/effect.ports.audio.input}}
+        {{#effect.ports.midi.input}}
+        <div class="mod-input mod-input-disconnected" title="{{name}}" mod-role="input-midi-port" mod-port-symbol="{{symbol}}">
+            <div class="mod-pedal-input-image"></div>
+        </div>
+        {{/effect.ports.midi.input}}
+        {{#effect.ports.cv.input}}
+        <div class="mod-input mod-input-disconnected" title="{{name}}" mod-role="input-cv-port" mod-port-symbol="{{symbol}}">
+            <div class="mod-pedal-input-image"></div>
+        </div>
+        {{/effect.ports.cv.input}}
+    </div>
+    <div class="mod-pedal-output">
+        {{#effect.ports.audio.output}}
+        <div class="mod-output mod-output-disconnected" title="{{name}}" mod-role="output-audio-port" mod-port-symbol="{{symbol}}">
+            <div class="mod-pedal-output-image"></div>
+        </div>
+        {{/effect.ports.audio.output}}
+        {{#effect.ports.midi.output}}
+        <div class="mod-output mod-output-disconnected" title="{{name}}" mod-role="output-midi-port" mod-port-symbol="{{symbol}}">
+            <div class="mod-pedal-output-image"></div>
+        </div>
+        {{/effect.ports.midi.output}}
+        {{#effect.ports.cv.output}}
+        <div class="mod-output mod-output-disconnected" title="{{name}}" mod-role="output-cv-port" mod-port-symbol="{{symbol}}">
+            <div class="mod-pedal-output-image"></div>
+        </div>
+        {{/effect.ports.cv.output}}
+    </div>
+</div>
