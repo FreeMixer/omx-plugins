@@ -68,13 +68,37 @@ jobs:
           make test 2>&1 | tee test.log
           if grep -E '^SKIP' test.log; then echo "::error::a test was skipped"; exit 1; fi
 
-      - name: The recipe machinery, sabotaged arm by arm
-        id: handback-selftest
-        run: make selftest
-
       - name: Every plugin has every artifact of the plugin recipe
         id: handback-completeness
         run: make completeness
+
+  selftest:
+    # Its own job, beside make test: the two together outgrew one job's 30 minutes once the chain and the
+    # compressor landed. Same container and dependencies; nothing is dropped.
+    name: make selftest (fedora:44, amd64)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    container:
+      image: fedora:44
+    steps:
+      - name: Install the build dependencies
+        run: |
+          dnf install -y --setopt=install_weak_deps=False git dnf5-plugins
+          dnf config-manager addrepo --from-repofile=https://freemixer.github.io/rpm/freemixer.repo
+
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: The checkout is a git directory this job may read
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+
+      - name: Install what the spec builds and tests with
+        run: dnf builddep -y --setopt=install_weak_deps=False packaging/omx-plugins.spec
+
+      - name: The recipe machinery, sabotaged arm by arm
+        id: handback-selftest
+        run: make selftest
 
   rpm:
     name: omx-plugins RPMs (fc44, ${{ matrix.arch }})
