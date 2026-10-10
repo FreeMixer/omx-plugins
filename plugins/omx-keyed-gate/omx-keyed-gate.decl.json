@@ -97,6 +97,96 @@
     "symbol": "key",
     "name": "Key (Sidechain)"
   },
+  "portHints": {
+    "key": {
+      "props": [
+        "lv2:connectionOptional",
+        "lv2:isSideChain"
+      ]
+    },
+    "enabled": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "key_external": {
+      "props": [
+        "lv2:enumeration",
+        "lv2:integer"
+      ],
+      "points": [
+        "0 Self",
+        "1 Sidechain"
+      ]
+    },
+    "threshold": {
+      "unit": "units:db"
+    },
+    "ratio": {
+      "props": [
+        "pprops:logarithmic"
+      ]
+    },
+    "range": {
+      "unit": "units:db"
+    },
+    "attack": {
+      "unit": "units:ms"
+    },
+    "release": {
+      "unit": "units:ms"
+    },
+    "knee_start": {
+      "props": [
+        "lv2:integer"
+      ],
+      "unit": "units:db"
+    },
+    "knee_end": {
+      "props": [
+        "lv2:integer"
+      ],
+      "unit": "units:db"
+    },
+    "hold": {
+      "props": [
+        "lv2:integer"
+      ],
+      "unit": "units:ms"
+    },
+    "hysteresis": {
+      "unit": "units:db"
+    },
+    "latency": {
+      "props": [
+        "lv2:integer",
+        "lv2:reportsLatency"
+      ],
+      "unit": "units:frame"
+    }
+  },
+  "panel": {
+    "family": "gate",
+    "roles": {},
+    "sections": [
+      {
+        "key": "gate",
+        "label": "Keyed-gate",
+        "controls": [
+          "key_external",
+          "threshold",
+          "ratio",
+          "range",
+          "attack",
+          "release",
+          "knee_start",
+          "knee_end",
+          "hold",
+          "hysteresis"
+        ]
+      }
+    ]
+  },
   "manual": [
     "The console's gate, keyed: the stereo signal is gated while the detector listens to a second, mono",
     "input, the **key** (an LV2 sidechain port; in CLAP a second input port). With nothing routed to the",
@@ -119,5 +209,57 @@
     "of latency, reported to the host; otherwise the latency is zero. Its LV2 URI, ports and defaults",
     "are those of the keyed gate bundle the OpenMixer console used to ship, so a session saved with that",
     "bundle loads this one."
-  ]
+  ],
+  "console": {
+    "$comment": "As FreeMixer/openmixer integration/waves-2026-10 draws its gate stage and its key (ProcessingStrip.vue): GateCurve beside the gate's encoders (thresholdDb, rangeDb, ratio, attackMs, holdMs, releaseMs, hysteresisDb), the knee as readouts (knee_start, knee_end are not drawn as controls), then the KEY section (key source select; the voice-band button, key HP/LP and listen have no parameter here). Chip: STAGE_CHIP_PARAMS.gate. Card: useStripOverview's gate controls.",
+    "placement": {
+      "strips": [
+        "input",
+        "fxReturn",
+        "aux",
+        "mix",
+        "matrix",
+        "main",
+        "fxSend",
+        "mixMinus"
+      ],
+      "group": "walk",
+      "stage": "gate",
+      "fxGroup": "dynamics"
+    },
+    "card": {
+      "show": [
+        "threshold",
+        "range",
+        "attack",
+        "release"
+      ]
+    },
+    "chip": "THR {threshold}",
+    "panel": {
+      "sections": [
+        {
+          "key": "gate",
+          "label": "Gate",
+          "controls": [
+            "threshold",
+            "range",
+            "ratio",
+            "attack",
+            "hold",
+            "release",
+            "hysteresis"
+          ],
+          "graph": "dynamics-curve"
+        },
+        {
+          "key": "key",
+          "label": "Key",
+          "controls": [
+            "key_external"
+          ]
+        }
+      ]
+    }
+  }
 }

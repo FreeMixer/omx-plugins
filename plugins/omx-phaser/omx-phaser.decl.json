@@ -54,5 +54,80 @@
       "name": "Mix",
       "ref": "PHASER_MIX_RANGE"
     }
-  ]
+  ],
+  "portHints": {
+    "rateHz": {
+      "props": [
+        "pprops:logarithmic"
+      ],
+      "unit": "units:hz"
+    },
+    "baseHz": {
+      "props": [
+        "lv2:integer",
+        "pprops:logarithmic"
+      ],
+      "unit": "units:hz"
+    },
+    "depthOct": {
+      "unit": "units:oct"
+    },
+    "stages": {
+      "props": [
+        "lv2:integer"
+      ]
+    },
+    "mix": {
+      "unit": "units:pc"
+    },
+    "enabled": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "latency": {
+      "props": [
+        "lv2:integer",
+        "lv2:reportsLatency"
+      ],
+      "unit": "units:frame"
+    }
+  },
+  "panel": {
+    "family": "phaser",
+    "roles": {},
+    "sections": [
+      {
+        "key": "phaser",
+        "label": "Phaser",
+        "controls": [
+          "rateHz",
+          "baseHz",
+          "depthOct",
+          "stages",
+          "feedback",
+          "mix"
+        ]
+      }
+    ]
+  },
+  "console": {
+    "$comment": "The console has the phaser stage in its walk (packages/declarations/stages/phaser.json, \"contract\": null) and draws no panel, chip or card for it today; racked as a plugin it is drawn by the generic plugin editor.",
+    "placement": {
+      "strips": [
+        "input",
+        "fxReturn",
+        "aux",
+        "mix",
+        "matrix",
+        "main",
+        "fxSend",
+        "mixMinus"
+      ],
+      "group": "walk",
+      "stage": "phaser",
+      "after": "pitch",
+      "fxGroup": "modulation"
+    }
+  }
 }
