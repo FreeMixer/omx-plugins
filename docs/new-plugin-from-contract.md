@@ -57,12 +57,14 @@ Step 1 checks before it writes:
 | `description` | `REVIEW` | one plain sentence a host shows |
 | `lv2.class`, `clap.features` | `REVIEW`, and `audio-effect`, `stereo` | the LV2 class and the CLAP kind |
 | `summary`, `manual` | left out: the README row reads `description`, the section is the parameter table | optional prose |
-| `panel`, `console` | left out | written when the console draws the plugin (spec §8) |
+| `panel` | one section of every parameter (the MOD GUI) | groups the controls into sections |
+| `console` | its `placement`'s strip kinds and group as `REVIEW` | the placement, and the card, chip and panel the console draws (spec §8) |
+| `portHints` | written after the first generation: the pin of the hints the generated TTL carries (`make hints` holds every later TTL to it) | — |
 
 Step 3 refuses while any `REVIEW` mark is left, naming each by its JSON pointer. When the draft is
 settled it fills the derived fields and runs `tools/gen.mjs`, which writes:
 
-- per plugin: `generated/` (parameter header, LV2 bundle, MOD GUI when there is a `panel`), the
+- per plugin: `generated/` (parameter header, LV2 bundle, MOD GUI from the `panel`), the
   `Makefile`, `omx_<kernel>_clap.c`, `omx_<kernel>_lv2.c`, the binding `omx_<kernel>_core.h` and
   the kernel-identity test `test/<kernel>-oracle.c`, each with a GENERATED banner;
 - across plugins, from the folders: the README's catalogue and sections, the RPM `%files` lists and
@@ -120,7 +122,8 @@ plugin it replaced, bit for bit at that plugin's settings.
 
 ## What it does not do
 
-Placement, the console's card and chip, and the panel's widgets are declared here and checked
-against the vocabulary in `schema/plugin.decl.schema.json`; the console's placement rules are
+Placement, the console's card, chip and panel, and the panel's widgets are declared here (every
+plugin declares `panel` and `console`) and checked against the vocabulary in
+`schema/plugin.decl.schema.json`; the console's placement rules are
 openmixer's and are applied there. The package descriptions are prose a person writes; the
 completeness test checks that they name every shipped plugin.

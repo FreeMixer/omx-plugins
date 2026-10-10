@@ -526,6 +526,404 @@
     }
   ],
   "order": "permutable",
+  "portHints": {
+    "trimOn": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "trimDb": {
+      "unit": "units:db"
+    },
+    "filterOn": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "hpfOn": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "hpfFreq": {
+      "props": [
+        "lv2:integer",
+        "pprops:logarithmic"
+      ],
+      "unit": "units:hz"
+    },
+    "hpfSlope": {
+      "props": [
+        "lv2:enumeration",
+        "lv2:integer"
+      ],
+      "points": [
+        "12 12 dB/oct",
+        "24 24 dB/oct"
+      ]
+    },
+    "lpfOn": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "lpfFreq": {
+      "props": [
+        "lv2:integer",
+        "pprops:logarithmic"
+      ],
+      "unit": "units:hz"
+    },
+    "lpfSlope": {
+      "props": [
+        "lv2:enumeration",
+        "lv2:integer"
+      ],
+      "points": [
+        "12 12 dB/oct",
+        "24 24 dB/oct"
+      ]
+    },
+    "gateOn": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "gateThreshold": {
+      "unit": "units:db"
+    },
+    "gateRange": {
+      "unit": "units:db"
+    },
+    "gateAttack": {
+      "unit": "units:ms"
+    },
+    "gateRelease": {
+      "unit": "units:ms"
+    },
+    "gateKneeStart": {
+      "props": [
+        "lv2:integer"
+      ],
+      "unit": "units:db"
+    },
+    "gateKneeEnd": {
+      "props": [
+        "lv2:integer"
+      ],
+      "unit": "units:db"
+    },
+    "gateHold": {
+      "props": [
+        "lv2:integer"
+      ],
+      "unit": "units:ms"
+    },
+    "gateHysteresis": {
+      "unit": "units:db"
+    },
+    "eqOn": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "eq1Type": {
+      "props": [
+        "lv2:enumeration",
+        "lv2:integer"
+      ],
+      "points": [
+        "0 Bell",
+        "1 Low Shelf",
+        "2 High Shelf",
+        "3 Notch",
+        "4 All-pass 1st",
+        "5 All-pass 2nd"
+      ]
+    },
+    "eq1Freq": {
+      "props": [
+        "lv2:integer",
+        "pprops:logarithmic"
+      ],
+      "unit": "units:hz"
+    },
+    "eq1Gain": {
+      "unit": "units:db"
+    },
+    "eq1On": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "eq2Type": {
+      "props": [
+        "lv2:enumeration",
+        "lv2:integer"
+      ],
+      "points": [
+        "0 Bell",
+        "1 Low Shelf",
+        "2 High Shelf",
+        "3 Notch",
+        "4 All-pass 1st",
+        "5 All-pass 2nd"
+      ]
+    },
+    "eq2Freq": {
+      "props": [
+        "lv2:integer",
+        "pprops:logarithmic"
+      ],
+      "unit": "units:hz"
+    },
+    "eq2Gain": {
+      "unit": "units:db"
+    },
+    "eq2On": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "eq3Type": {
+      "props": [
+        "lv2:enumeration",
+        "lv2:integer"
+      ],
+      "points": [
+        "0 Bell",
+        "1 Low Shelf",
+        "2 High Shelf",
+        "3 Notch",
+        "4 All-pass 1st",
+        "5 All-pass 2nd"
+      ]
+    },
+    "eq3Freq": {
+      "props": [
+        "lv2:integer",
+        "pprops:logarithmic"
+      ],
+      "unit": "units:hz"
+    },
+    "eq3Gain": {
+      "unit": "units:db"
+    },
+    "eq3On": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "eq4Type": {
+      "props": [
+        "lv2:enumeration",
+        "lv2:integer"
+      ],
+      "points": [
+        "0 Bell",
+        "1 Low Shelf",
+        "2 High Shelf",
+        "3 Notch",
+        "4 All-pass 1st",
+        "5 All-pass 2nd"
+      ]
+    },
+    "eq4Freq": {
+      "props": [
+        "lv2:integer",
+        "pprops:logarithmic"
+      ],
+      "unit": "units:hz"
+    },
+    "eq4Gain": {
+      "unit": "units:db"
+    },
+    "eq4On": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "eq5Type": {
+      "props": [
+        "lv2:enumeration",
+        "lv2:integer"
+      ],
+      "points": [
+        "0 Bell",
+        "1 Low Shelf",
+        "2 High Shelf",
+        "3 Notch",
+        "4 All-pass 1st",
+        "5 All-pass 2nd"
+      ]
+    },
+    "eq5Freq": {
+      "props": [
+        "lv2:integer",
+        "pprops:logarithmic"
+      ],
+      "unit": "units:hz"
+    },
+    "eq5Gain": {
+      "unit": "units:db"
+    },
+    "eq5On": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "eq6Type": {
+      "props": [
+        "lv2:enumeration",
+        "lv2:integer"
+      ],
+      "points": [
+        "0 Bell",
+        "1 Low Shelf",
+        "2 High Shelf",
+        "3 Notch",
+        "4 All-pass 1st",
+        "5 All-pass 2nd"
+      ]
+    },
+    "eq6Freq": {
+      "props": [
+        "lv2:integer",
+        "pprops:logarithmic"
+      ],
+      "unit": "units:hz"
+    },
+    "eq6Gain": {
+      "unit": "units:db"
+    },
+    "eq6On": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "eq7Type": {
+      "props": [
+        "lv2:enumeration",
+        "lv2:integer"
+      ],
+      "points": [
+        "0 Bell",
+        "1 Low Shelf",
+        "2 High Shelf",
+        "3 Notch",
+        "4 All-pass 1st",
+        "5 All-pass 2nd"
+      ]
+    },
+    "eq7Freq": {
+      "props": [
+        "lv2:integer",
+        "pprops:logarithmic"
+      ],
+      "unit": "units:hz"
+    },
+    "eq7Gain": {
+      "unit": "units:db"
+    },
+    "eq7On": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "eq8Type": {
+      "props": [
+        "lv2:enumeration",
+        "lv2:integer"
+      ],
+      "points": [
+        "0 Bell",
+        "1 Low Shelf",
+        "2 High Shelf",
+        "3 Notch",
+        "4 All-pass 1st",
+        "5 All-pass 2nd"
+      ]
+    },
+    "eq8Freq": {
+      "props": [
+        "lv2:integer",
+        "pprops:logarithmic"
+      ],
+      "unit": "units:hz"
+    },
+    "eq8Gain": {
+      "unit": "units:db"
+    },
+    "eq8On": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "compOn": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "compThreshold": {
+      "unit": "units:db"
+    },
+    "compKnee": {
+      "unit": "units:db"
+    },
+    "compAttack": {
+      "unit": "units:ms"
+    },
+    "compRelease": {
+      "unit": "units:ms"
+    },
+    "compMakeup": {
+      "unit": "units:db"
+    },
+    "compKind": {
+      "props": [
+        "lv2:enumeration",
+        "lv2:integer"
+      ],
+      "points": [
+        "0 Compressor",
+        "1 Limiter"
+      ]
+    },
+    "compMix": {
+      "props": [
+        "lv2:integer"
+      ],
+      "unit": "units:pc"
+    },
+    "compDetectorOversampling": {
+      "props": [
+        "lv2:enumeration",
+        "lv2:integer"
+      ],
+      "points": [
+        "0 Auto",
+        "1 Off",
+        "2 4x"
+      ]
+    },
+    "order": {
+      "props": [
+        "lv2:integer"
+      ]
+    },
+    "enabled": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "latency": {
+      "props": [
+        "lv2:integer",
+        "lv2:reportsLatency"
+      ],
+      "unit": "units:frame"
+    }
+  },
   "shipped": "v0.2.0",
   "shippedDiff": [
     "0 trimDb -> trimOn",
@@ -600,6 +998,119 @@
     "+69 compDetectorOversampling",
     "+70 order"
   ],
+  "panel": {
+    "family": "strip",
+    "roles": {},
+    "sections": [
+      {
+        "key": "trim",
+        "label": "Input",
+        "controls": [
+          "trimOn",
+          "trimDb"
+        ]
+      },
+      {
+        "key": "filter",
+        "label": "Filters",
+        "controls": [
+          "filterOn",
+          "hpfOn",
+          "hpfFreq",
+          "hpfSlope",
+          "lpfOn",
+          "lpfFreq",
+          "lpfSlope"
+        ]
+      },
+      {
+        "key": "gate",
+        "label": "Gate",
+        "controls": [
+          "gateOn",
+          "gateThreshold",
+          "gateRatio",
+          "gateRange",
+          "gateAttack",
+          "gateRelease",
+          "gateKneeStart",
+          "gateKneeEnd",
+          "gateHold",
+          "gateHysteresis"
+        ]
+      },
+      {
+        "key": "eq",
+        "label": "EQ",
+        "controls": [
+          "eqOn",
+          "eq1Type",
+          "eq1Freq",
+          "eq1Gain",
+          "eq1Q",
+          "eq1On",
+          "eq2Type",
+          "eq2Freq",
+          "eq2Gain",
+          "eq2Q",
+          "eq2On",
+          "eq3Type",
+          "eq3Freq",
+          "eq3Gain",
+          "eq3Q",
+          "eq3On",
+          "eq4Type",
+          "eq4Freq",
+          "eq4Gain",
+          "eq4Q",
+          "eq4On",
+          "eq5Type",
+          "eq5Freq",
+          "eq5Gain",
+          "eq5Q",
+          "eq5On",
+          "eq6Type",
+          "eq6Freq",
+          "eq6Gain",
+          "eq6Q",
+          "eq6On",
+          "eq7Type",
+          "eq7Freq",
+          "eq7Gain",
+          "eq7Q",
+          "eq7On",
+          "eq8Type",
+          "eq8Freq",
+          "eq8Gain",
+          "eq8Q",
+          "eq8On"
+        ]
+      },
+      {
+        "key": "comp",
+        "label": "Comp",
+        "controls": [
+          "compOn",
+          "compThreshold",
+          "compRatio",
+          "compKnee",
+          "compAttack",
+          "compRelease",
+          "compMakeup",
+          "compKind",
+          "compMix",
+          "compDetectorOversampling"
+        ]
+      },
+      {
+        "key": "order",
+        "label": "Order",
+        "controls": [
+          "order"
+        ]
+      }
+    ]
+  },
   "manual": [
     "Five stages, each omx-dsp's instance face of the console's own kernel, run one after the other; each has its own switch:",
     "",
@@ -615,5 +1126,19 @@
     "comp, and the rest follow in lexicographic order (1 is input > filters > gate > comp > EQ, ... 119 is",
     "comp > EQ > gate > filters > input). Plus the host's bypass. The latency reported is the sum of the",
     "stages': the gate's and the compressor's 4x detector paths while they are engaged, else zero."
-  ]
+  ],
+  "console": {
+    "$comment": "FreeMixer/openmixer integration/waves-2026-10 has no channel-strip stage: its strip is the trim, the EQ (with the HPF and LPF), the gate and the dynamics stages themselves. Racked as a plugin (the insert rack's kinds, channel-contract.ts INSERT_RACK_KINDS) it is drawn by the generic plugin editor.",
+    "placement": {
+      "strips": [
+        "input",
+        "fxReturn",
+        "main",
+        "aux",
+        "mix",
+        "matrix"
+      ],
+      "group": "plugins"
+    }
+  }
 }

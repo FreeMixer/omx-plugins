@@ -181,5 +181,174 @@
       "name": "20 kHz",
       "ref": "GEQ_BAND_RANGE"
     }
-  ]
+  ],
+  "portHints": {
+    "band01": {
+      "unit": "units:db"
+    },
+    "band02": {
+      "unit": "units:db"
+    },
+    "band03": {
+      "unit": "units:db"
+    },
+    "band04": {
+      "unit": "units:db"
+    },
+    "band05": {
+      "unit": "units:db"
+    },
+    "band06": {
+      "unit": "units:db"
+    },
+    "band07": {
+      "unit": "units:db"
+    },
+    "band08": {
+      "unit": "units:db"
+    },
+    "band09": {
+      "unit": "units:db"
+    },
+    "band10": {
+      "unit": "units:db"
+    },
+    "band11": {
+      "unit": "units:db"
+    },
+    "band12": {
+      "unit": "units:db"
+    },
+    "band13": {
+      "unit": "units:db"
+    },
+    "band14": {
+      "unit": "units:db"
+    },
+    "band15": {
+      "unit": "units:db"
+    },
+    "band16": {
+      "unit": "units:db"
+    },
+    "band17": {
+      "unit": "units:db"
+    },
+    "band18": {
+      "unit": "units:db"
+    },
+    "band19": {
+      "unit": "units:db"
+    },
+    "band20": {
+      "unit": "units:db"
+    },
+    "band21": {
+      "unit": "units:db"
+    },
+    "band22": {
+      "unit": "units:db"
+    },
+    "band23": {
+      "unit": "units:db"
+    },
+    "band24": {
+      "unit": "units:db"
+    },
+    "band25": {
+      "unit": "units:db"
+    },
+    "band26": {
+      "unit": "units:db"
+    },
+    "band27": {
+      "unit": "units:db"
+    },
+    "band28": {
+      "unit": "units:db"
+    },
+    "band29": {
+      "unit": "units:db"
+    },
+    "band30": {
+      "unit": "units:db"
+    },
+    "band31": {
+      "unit": "units:db"
+    },
+    "enabled": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "latency": {
+      "props": [
+        "lv2:integer",
+        "lv2:reportsLatency"
+      ],
+      "unit": "units:frame"
+    }
+  },
+  "panel": {
+    "family": "geq",
+    "roles": {},
+    "sections": [
+      {
+        "key": "geq",
+        "label": "Geq",
+        "controls": [
+          "band01",
+          "band02",
+          "band03",
+          "band04",
+          "band05",
+          "band06",
+          "band07",
+          "band08",
+          "band09",
+          "band10",
+          "band11",
+          "band12",
+          "band13",
+          "band14",
+          "band15",
+          "band16",
+          "band17",
+          "band18",
+          "band19",
+          "band20",
+          "band21",
+          "band22",
+          "band23",
+          "band24",
+          "band25",
+          "band26",
+          "band27",
+          "band28",
+          "band29",
+          "band30",
+          "band31"
+        ]
+      }
+    ]
+  },
+  "console": {
+    "$comment": "The console has the geq stage in its walk (packages/declarations/stages/geq.json, \"contract\": null) and draws no panel, chip or card for it today; racked as a plugin it is drawn by the generic plugin editor.",
+    "placement": {
+      "strips": [
+        "input",
+        "fxReturn",
+        "aux",
+        "mix",
+        "matrix",
+        "main",
+        "fxSend",
+        "mixMinus"
+      ],
+      "group": "walk",
+      "stage": "geq",
+      "after": "reverb",
+      "fxGroup": "eq"
+    }
+  }
 }
