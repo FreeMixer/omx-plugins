@@ -7,6 +7,11 @@
  * Every number comes from generated/omx_{{kernel}}_params.h (tools/gen.mjs, from {{stem}}.decl.json);
  * the DSP is omx-dsp's {{kernel}} kernel, reached through omx_{{kernel}}_core.h, the binding both faces
  * share. This file adds no arithmetic on the audio path: drain the events, resolve, run.
+ *
+ * Extensions: params, latency, audio-ports, state; org.openmixer.declaration/1, panel-description/1
+ * and param-contract/1; clap.remote-controls (the panel's sections as pages of eight) and
+ * clap.track-info (a placement's defaults, the contract's per-kind ones, on every parameter the host
+ * or a state has not set).
 {{#keyed}} *
  * Audio ports: the main stereo pair in and out, and a second, mono, non-main input, the sidechain
  * key. A host that routes nothing to the key (no second port in the process call, no channel, or
@@ -23,7 +28,9 @@
 #include "clap/ext/audio-ports.h"
 #include "clap/ext/latency.h"
 #include "clap/ext/params.h"
+#include "clap/ext/remote-controls.h"
 #include "clap/ext/state.h"
+#include "clap/ext/track-info.h"
 #include "clap/factory/plugin-factory.h"
 #include "clap/plugin.h"
 #include "clap/process.h"
@@ -51,6 +58,9 @@ typedef struct {
   _Atomic float applied[G_PARAMS]; /* the APPLIED values, published after each drain */
   _Atomic uint32_t latency;        /* the frames the host was last told of */
   int active, processing;
+  const clap_host_track_info_t *track_info; /* the host's clap.track-info, when it offers one */
+  unsigned char touched[G_PARAMS];          /* set by the host or a state: a placement default leaves it */
+  _Atomic uint32_t placed;                  /* a placement for the audio thread to apply, plus one; 0 none */
 } G;
 
 static float g_min(uint32_t i) { return i < G_DECLARED ? OMX_{{K}}_PARAMS[i].min : 0.0f; }
@@ -68,22 +78,57 @@ static void g_publish(G *g) {
   for (uint32_t i = 0; i < G_PARAMS; ++i) atomic_store_explicit(&g->applied[i], g->values[i], memory_order_relaxed);
 }
 
-/** Frame 0: every value event in the block is applied before the kernel runs. */
+/** The placement's defaults (OMX_{{K}}_PANEL's placement defaults) on every parameter that has one and
+ * that neither the host nor a state has set: the placement's value, or the parameter's own default
+ * where the placement states none. */
+static void g_place(G *g, uint32_t placement) {
+  const struct omx_panel_rows *r = &OMX_{{K}}_PANEL;
+  for (uint32_t k = 0; k < r->default_count; ++k) {
+    const uint32_t i = r->defaults[k].param;
+    if (g->touched[i]) continue;
+    g->values[i] = g_def(i);
+    for (uint32_t j = 0; j < r->default_count; ++j)
+      if (r->defaults[j].param == i && r->defaults[j].placement == placement) g->values[i] = g_clamp(i, r->defaults[j].value);
+  }
+}
+
+/** Frame 0: a placement the host changed while active, then every value event in the block, are
+ * applied before the kernel runs. */
 static void g_drain(G *g, const clap_input_events_t *in) {
+  const uint32_t placed = atomic_exchange_explicit(&g->placed, 0, memory_order_acquire);
+  if (placed) g_place(g, placed - 1);
   if (!in) return;
   const uint32_t n = in->size(in);
   for (uint32_t k = 0; k < n; ++k) {
     const clap_event_header_t *h = in->get(in, k);
     if (!h || h->space_id != CLAP_CORE_EVENT_SPACE_ID || h->type != CLAP_EVENT_PARAM_VALUE) continue;
     const clap_event_param_value_t *e = (const clap_event_param_value_t *)h;
-    if (e->param_id < G_PARAMS) g->values[e->param_id] = g_clamp(e->param_id, e->value);
+    if (e->param_id < G_PARAMS) {
+      g->values[e->param_id] = g_clamp(e->param_id, e->value);
+      g->touched[e->param_id] = 1;
+    }
   }
+}
+
+/** Where the host placed the instance, from its clap.track-info: enum omx_clap_panel_placement. */
+static uint32_t g_placement(const G *g) {
+  clap_track_info_t info;
+  memset(&info, 0, sizeof info);
+  if (!g->track_info || !g->track_info->get(g->host, &info)) return OMX_CLAP_PLACEMENT_INSERT;
+  if (info.flags & CLAP_TRACK_INFO_IS_FOR_RETURN_TRACK) return OMX_CLAP_PLACEMENT_RETURN;
+  if (info.flags & CLAP_TRACK_INFO_IS_FOR_BUS) return OMX_CLAP_PLACEMENT_BUS;
+  if (info.flags & CLAP_TRACK_INFO_IS_FOR_MASTER) return OMX_CLAP_PLACEMENT_MASTER;
+  return OMX_CLAP_PLACEMENT_INSERT;
 }
 
 /* ---- clap_plugin ------------------------------------------------------------------------ */
 
 static bool g_init(const clap_plugin_t *p) {
-  (void)p;
+  G *g = (G *)p->plugin_data;
+  if (g->host && g->host->get_extension)
+    g->track_info = (const clap_host_track_info_t *)g->host->get_extension(g->host, CLAP_EXT_TRACK_INFO);
+  g_place(g, g_placement(g));
+  g_publish(g);
   return true;
 }
 
@@ -284,7 +329,10 @@ static bool g_state_load(const clap_plugin_t *p, const clap_istream_t *s) {
     if (!eq) continue;
     *eq = 0;
     for (uint32_t i = 0; i < G_DECLARED; ++i) {
-      if (strcmp(line, OMX_{{K}}_PARAMS[i].symbol) == 0) g->values[i] = g_clamp(i, strtod(eq + 1, NULL));
+      if (strcmp(line, OMX_{{K}}_PARAMS[i].symbol) == 0) {
+        g->values[i] = g_clamp(i, strtod(eq + 1, NULL));
+        g->touched[i] = 1;
+      }
     }
   }
   g_publish(g);
@@ -332,6 +380,76 @@ static bool g_panel_get(const clap_plugin_t *p, uint32_t table, uint32_t index, 
 static const omx_clap_plugin_panel_description_t G_PANEL_EXT = {g_panel_fingerprint, g_panel_family, g_panel_count,
                                                                 g_panel_get};
 
+/* ---- org.openmixer.param-contract/1: OMX_{{K}}_PARAM_CONTRACT, the bypass last --------------- */
+
+static uint32_t g_contract_version(const clap_plugin_t *p) {
+  (void)p;
+  return OMX_{{K}}_PARAM_CONTRACT_VERSION;
+}
+
+static const char *g_contract_fingerprint(const clap_plugin_t *p) {
+  (void)p;
+  return OMX_{{K}}_PARAM_CONTRACT_FINGERPRINT;
+}
+
+static bool g_contract_get(const clap_plugin_t *p, uint32_t id, omx_clap_param_contract_info_t *info) {
+  (void)p;
+  return omx_param_contract_get(OMX_{{K}}_PARAM_CONTRACT, G_DECLARED, id, id < G_DECLARED ? OMX_{{K}}_PARAMS[id].symbol : NULL,
+                                info);
+}
+
+static uint32_t g_contract_migrations(const clap_plugin_t *p) {
+  (void)p;
+  return 0;
+}
+
+static bool g_contract_migration(const clap_plugin_t *p, uint32_t index, omx_clap_param_migration_t *step) {
+  (void)p;
+  (void)index;
+  (void)step;
+  return false;
+}
+
+static const omx_clap_plugin_param_contract_t G_CONTRACT_EXT = {g_contract_version, g_contract_fingerprint, g_contract_get,
+                                                                g_contract_migrations, g_contract_migration};
+
+/* ---- clap.remote-controls: the panel's pages, OMX_{{K}}_PANEL_PAGES ------------------------ */
+
+static uint32_t g_pages_count(const clap_plugin_t *p) {
+  (void)p;
+  return OMX_{{K}}_PANEL_PAGE_COUNT;
+}
+
+static bool g_pages_get(const clap_plugin_t *p, uint32_t index, clap_remote_controls_page_t *page) {
+  (void)p;
+  if (index >= OMX_{{K}}_PANEL_PAGE_COUNT) return false;
+  const struct omx_panel_page_row *r = &OMX_{{K}}_PANEL_PAGES[index];
+  memset(page, 0, sizeof *page);
+  snprintf(page->section_name, sizeof page->section_name, "%s", r->section_name);
+  page->page_id = index;
+  snprintf(page->page_name, sizeof page->page_name, "%s", r->page_name);
+  for (uint32_t k = 0; k < CLAP_REMOTE_CONTROLS_COUNT; ++k) page->param_ids[k] = r->ids[k];
+  page->is_for_preset = false;
+  return true;
+}
+
+static const clap_plugin_remote_controls_t G_PAGES_EXT = {g_pages_count, g_pages_get};
+
+/* ---- clap.track-info: the placement's defaults, applied now or by the audio thread -------- */
+
+static void g_track_info_changed(const clap_plugin_t *p) {
+  G *g = (G *)p->plugin_data;
+  const uint32_t placement = g_placement(g);
+  if (g->active) {
+    atomic_store_explicit(&g->placed, placement + 1, memory_order_release);
+    return;
+  }
+  g_place(g, placement);
+  g_publish(g);
+}
+
+static const clap_plugin_track_info_t G_TRACK_INFO_EXT = {g_track_info_changed};
+
 static const void *g_get_extension(const clap_plugin_t *p, const char *id) {
   (void)p;
   if (strcmp(id, CLAP_EXT_PARAMS) == 0) return &G_PARAMS_EXT;
@@ -340,6 +458,9 @@ static const void *g_get_extension(const clap_plugin_t *p, const char *id) {
   if (strcmp(id, CLAP_EXT_STATE) == 0) return &G_STATE_EXT;
   if (strcmp(id, OMX_CLAP_EXT_DECLARATION) == 0) return &G_DECL_EXT;
   if (strcmp(id, OMX_PANEL_DESCRIPTION_ID) == 0) return &G_PANEL_EXT;
+  if (strcmp(id, OMX_PARAM_CONTRACT_ID) == 0) return &G_CONTRACT_EXT;
+  if (strcmp(id, CLAP_EXT_REMOTE_CONTROLS) == 0) return &G_PAGES_EXT;
+  if (strcmp(id, CLAP_EXT_TRACK_INFO) == 0) return &G_TRACK_INFO_EXT;
   return NULL;
 }
 
