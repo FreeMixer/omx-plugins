@@ -211,7 +211,7 @@
     "bundle loads this one."
   ],
   "console": {
-    "$comment": "As FreeMixer/openmixer integration/waves-2026-10 draws its gate stage and its key (ProcessingStrip.vue): GateCurve beside the gate's encoders (thresholdDb, rangeDb, ratio, attackMs, holdMs, releaseMs, hysteresisDb), the knee as readouts (knee_start, knee_end are not drawn as controls), then the KEY section (key source select; the voice-band button, key HP/LP and listen have no parameter here). Chip: STAGE_CHIP_PARAMS.gate. Card: useStripOverview's gate controls.",
+    "$comment": "The OpenMixer console draws its gate stage and its key (the processing strip): GateCurve beside the gate's encoders (thresholdDb, rangeDb, ratio, attackMs, holdMs, releaseMs, hysteresisDb), the knee as readouts (knee_start, knee_end are not drawn as controls), then the KEY section (key source select; the voice-band button, key HP/LP and listen have no parameter here). Chip: STAGE_CHIP_PARAMS.gate. Card: useStripOverview's gate controls.",
     "placement": {
       "strips": [
         "input",

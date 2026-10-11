@@ -197,7 +197,7 @@
     ]
   },
   "console": {
-    "$comment": "As FreeMixer/openmixer integration/waves-2026-10 draws its drive stage: FxPanel's TransferCurve over DrivePanel.vue (curve, band, hfRolloff and oversample selects, then driveDb, character, bandHz, mix, trimDb, then the autoGain and stereoLink switches and a latency readout; oversample has no parameter here). Chip: FxSummaryValue of STAGE_KEY_FIELD.drive (driveDb). Card: useStripOverview's drive controls.",
+    "$comment": "The OpenMixer console draws its drive stage: FxPanel's TransferCurve over the drive panel (curve, band, hfRolloff and oversample selects, then driveDb, character, bandHz, mix, trimDb, then the autoGain and stereoLink switches and a latency readout; oversample has no parameter here). Chip: FxSummaryValue of STAGE_KEY_FIELD.drive (driveDb). Card: useStripOverview's drive controls.",
     "placement": {
       "strips": [
         "input",
