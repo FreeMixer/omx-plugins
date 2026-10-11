@@ -210,7 +210,9 @@ function chainKernels(file, d) {
 function shippedSymbols(d, tag) {
   try {
     const text = execFileSync('git', ['-C', d.tree, 'show', `${tag}:plugins/${d.stem}/generated/omx_${d.kernel}_params.h`], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
-    return [...text.matchAll(/^\s*\{ "([A-Za-z0-9_]+)", "/gm)].map((m) => m[1]);
+    // the rows of the parameter table alone: the header holds other tables of strings after it
+    const table = text.slice(text.indexOf(`OMX_${d.kernel.toUpperCase()}_PARAMS[`)).split('\n};')[0];
+    return [...table.matchAll(/^\s*\{ "([A-Za-z0-9_]+)", "/gm)].map((m) => m[1]);
   } catch {
     return undefined;
   }
