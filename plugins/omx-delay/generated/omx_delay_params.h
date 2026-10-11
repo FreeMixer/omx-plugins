@@ -12,6 +12,7 @@
 #include <stddef.h>
 
 #include "omx_panel_description.h"
+#include "omx_param_contract.h"
 #include "omx_plugin_param.h"
 
 enum {
@@ -60,6 +61,18 @@ static const omx_plugin_param OMX_DELAY_PARAMS[OMX_DELAY_PARAM_COUNT] = {
 /* org.openmixer.declaration/1: the declaration's plain description and the digest of its parameters. */
 #define OMX_DELAY_DECL_SOURCE "omx delay: Time 0 to 2000 ms, Feedback 0 to 0.99, Tone 0 to 1, Mix 0 to 1, Pingpong 0 to 1"
 #define OMX_DELAY_DECL_DIGEST "b4d6be38d03fd4d086d878edf93bcbc5f6d678cbbbb742ddf597e3b7f160cafd"
+
+/* org.openmixer.param-contract/1 (tools/param-contract.mjs): each parameter's unit, scale and step, in
+ * id order; the host's bypass, the last id, is the face's. */
+#define OMX_DELAY_PARAM_CONTRACT_VERSION 1u
+#define OMX_DELAY_PARAM_CONTRACT_FINGERPRINT "f39cf962749ce695e21f8faeac517b7291b7979f9e916ae08e40259942463563"
+static const struct omx_param_contract_row OMX_DELAY_PARAM_CONTRACT[OMX_DELAY_PARAM_COUNT] = {
+  { 2u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* fxDelayTime ms */
+  { 0u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* fxDelayFeedback none */
+  { 0u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* tone none */
+  { 0u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* mix none */
+  { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* pingpong none */
+};
 
 /* org.openmixer.panel-description/1 (tools/panel-description.mjs): the declaration's panel as the rows
  * include/omx_panel_description.h serves, parameter ids the declaration's. Family delay. */

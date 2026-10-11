@@ -12,6 +12,7 @@
 #include <stddef.h>
 
 #include "omx_panel_description.h"
+#include "omx_param_contract.h"
 #include "omx_plugin_param.h"
 
 enum {
@@ -190,6 +191,44 @@ static const omx_plugin_param OMX_GEQ_PARAMS[OMX_GEQ_PARAM_COUNT] = {
 /* org.openmixer.declaration/1: the declaration's plain description and the digest of its parameters. */
 #define OMX_GEQ_DECL_SOURCE "omx geq: 20 Hz -15 to 15 dB, 25 Hz -15 to 15 dB, 31.5 Hz -15 to 15 dB, 40 Hz -15 to 15 dB, 50 Hz -15 to 15 dB, 63 Hz -15 to 15 dB, 80 Hz -15 to 15 dB, 100 Hz -15 to 15 dB, 125 Hz -15 to 15 dB, 160 Hz -15 to 15 dB, 200 Hz -15 to 15 dB, 250 Hz -15 to 15 dB, 315 Hz -15 to 15 dB, 400 Hz -15 to 15 dB, 500 Hz -15 to 15 dB, 630 Hz -15 to 15 dB, 800 Hz -15 to 15 dB, 1 kHz -15 to 15 dB, 1.25 kHz -15 to 15 dB, 1.6 kHz -15 to 15 dB, 2 kHz -15 to 15 dB, 2.5 kHz -15 to 15 dB, 3.15 kHz -15 to 15 dB, 4 kHz -15 to 15 dB, 5 kHz -15 to 15 dB, 6.3 kHz -15 to 15 dB, 8 kHz -15 to 15 dB, 10 kHz -15 to 15 dB, 12.5 kHz -15 to 15 dB, 16 kHz -15 to 15 dB, 20 kHz -15 to 15 dB"
 #define OMX_GEQ_DECL_DIGEST "d0a6a22360a6ce7914f59d4b3eb245c16250f1a772ad308a64bbe05698fe2f48"
+
+/* org.openmixer.param-contract/1 (tools/param-contract.mjs): each parameter's unit, scale and step, in
+ * id order; the host's bypass, the last id, is the face's. */
+#define OMX_GEQ_PARAM_CONTRACT_VERSION 1u
+#define OMX_GEQ_PARAM_CONTRACT_FINGERPRINT "fab8d4a312ea7b485a3ec91d008ddb735c80c3739231b7002744998eb423d5f0"
+static const struct omx_param_contract_row OMX_GEQ_PARAM_CONTRACT[OMX_GEQ_PARAM_COUNT] = {
+  { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* band01 db */
+  { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* band02 db */
+  { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* band03 db */
+  { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* band04 db */
+  { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* band05 db */
+  { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* band06 db */
+  { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* band07 db */
+  { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* band08 db */
+  { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* band09 db */
+  { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* band10 db */
+  { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* band11 db */
+  { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* band12 db */
+  { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* band13 db */
+  { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* band14 db */
+  { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* band15 db */
+  { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* band16 db */
+  { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* band17 db */
+  { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* band18 db */
+  { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* band19 db */
+  { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* band20 db */
+  { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* band21 db */
+  { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* band22 db */
+  { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* band23 db */
+  { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* band24 db */
+  { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* band25 db */
+  { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* band26 db */
+  { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* band27 db */
+  { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* band28 db */
+  { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* band29 db */
+  { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* band30 db */
+  { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* band31 db */
+};
 
 /* org.openmixer.panel-description/1 (tools/panel-description.mjs): the declaration's panel as the rows
  * include/omx_panel_description.h serves, parameter ids the declaration's. Family eq. */

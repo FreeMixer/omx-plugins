@@ -12,6 +12,7 @@
 #include <stddef.h>
 
 #include "omx_panel_description.h"
+#include "omx_param_contract.h"
 #include "omx_plugin_param.h"
 
 enum {
@@ -85,6 +86,23 @@ static const omx_plugin_param OMX_GATE_PARAMS[OMX_GATE_PARAM_COUNT] = {
 /* org.openmixer.declaration/1: the declaration's plain description and the digest of its parameters. */
 #define OMX_GATE_DECL_SOURCE "omx keyed-gate: Key 0 to 1, Threshold -80 to 0 dB, Ratio 1 to 100, Range -90 to 0 dB, Attack 0 to 500 ms, Release 0 to 5000 ms, Knee Start -80 to 0 dB, Knee End -80 to 0 dB, Hold 0 to 2000 ms, Hysteresis 0 to 24 dB"
 #define OMX_GATE_DECL_DIGEST "da939093462b901312c31e455170d4fe564bddcabc0fb19934c7b69ea74c0c6f"
+
+/* org.openmixer.param-contract/1 (tools/param-contract.mjs): each parameter's unit, scale and step, in
+ * id order; the host's bypass, the last id, is the face's. */
+#define OMX_GATE_PARAM_CONTRACT_VERSION 1u
+#define OMX_GATE_PARAM_CONTRACT_FINGERPRINT "f295be9733e981170b924333170c26001c255f217366e0debb39300c56374acc"
+static const struct omx_param_contract_row OMX_GATE_PARAM_CONTRACT[OMX_GATE_PARAM_COUNT] = {
+  { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* key_external none */
+  { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* threshold db */
+  { 0u, OMX_CLAP_SCALE_LOG, 0.0 }, /* ratio none */
+  { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* range db */
+  { 2u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* attack ms */
+  { 2u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* release ms */
+  { 13u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* knee_start db */
+  { 13u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* knee_end db */
+  { 2u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* hold ms */
+  { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* hysteresis db */
+};
 
 /* org.openmixer.panel-description/1 (tools/panel-description.mjs): the declaration's panel as the rows
  * include/omx_panel_description.h serves, parameter ids the declaration's. Family gate. */

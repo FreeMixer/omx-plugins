@@ -12,6 +12,7 @@
 #include <stddef.h>
 
 #include "omx_panel_description.h"
+#include "omx_param_contract.h"
 #include "omx_plugin_param.h"
 
 enum {
@@ -75,6 +76,21 @@ static const omx_plugin_param OMX_DEESSER_PARAMS[OMX_DEESSER_PARAM_COUNT] = {
 /* org.openmixer.declaration/1: the declaration's plain description and the digest of its parameters. */
 #define OMX_DEESSER_DECL_SOURCE "omx deesser: Freq 2000 to 16000 Hz, Width 0.25 to 4 oct, Threshold -60 to 0 dB, Ratio 1 to 20, Range -24 to 0 dB, Attack 0.1 to 50 ms, Release 5 to 500 ms, Mode 0 to 1"
 #define OMX_DEESSER_DECL_DIGEST "5229f9c0817d98fea312f088c1f8519628c36ef5f1d2b453b22f3ba0571f097f"
+
+/* org.openmixer.param-contract/1 (tools/param-contract.mjs): each parameter's unit, scale and step, in
+ * id order; the host's bypass, the last id, is the face's. */
+#define OMX_DEESSER_PARAM_CONTRACT_VERSION 1u
+#define OMX_DEESSER_PARAM_CONTRACT_FINGERPRINT "c1f4ca18b4f37fe235132c42929577c80979fdae6a0826697fc0e4175b7c7e27"
+static const struct omx_param_contract_row OMX_DEESSER_PARAM_CONTRACT[OMX_DEESSER_PARAM_COUNT] = {
+  { 16u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* deessFreq hz */
+  { 20u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* deessWidth oct */
+  { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* deessThreshold db */
+  { 0u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* deessRatio none */
+  { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* deessRange db */
+  { 2u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* deessAttack ms */
+  { 2u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* deessRelease ms */
+  { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* deessMode none */
+};
 
 /* org.openmixer.panel-description/1 (tools/panel-description.mjs): the declaration's panel as the rows
  * include/omx_panel_description.h serves, parameter ids the declaration's. Family deesser. */

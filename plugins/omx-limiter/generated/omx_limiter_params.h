@@ -12,6 +12,7 @@
 #include <stddef.h>
 
 #include "omx_panel_description.h"
+#include "omx_param_contract.h"
 #include "omx_plugin_param.h"
 
 enum {
@@ -50,6 +51,16 @@ static const omx_plugin_param OMX_LIMITER_PARAMS[OMX_LIMITER_PARAM_COUNT] = {
 /* org.openmixer.declaration/1: the declaration's plain description and the digest of its parameters. */
 #define OMX_LIMITER_DECL_SOURCE "omx limiter: Ceiling -12 to 0 dBFS, Lookahead 0.5 to 5 ms, Release 1 to 1000 ms"
 #define OMX_LIMITER_DECL_DIGEST "aaae50a0d0219bc9406793d74ddc52d57717d8a4433e4d39f174cd5ef6e4c52c"
+
+/* org.openmixer.param-contract/1 (tools/param-contract.mjs): each parameter's unit, scale and step, in
+ * id order; the host's bypass, the last id, is the face's. */
+#define OMX_LIMITER_PARAM_CONTRACT_VERSION 1u
+#define OMX_LIMITER_PARAM_CONTRACT_FINGERPRINT "5eac6b3d4921ead5ed21ef89862a7f21ca7a6aca16cd6c5d49a320f0e52fb65e"
+static const struct omx_param_contract_row OMX_LIMITER_PARAM_CONTRACT[OMX_LIMITER_PARAM_COUNT] = {
+  { 256u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* ceilingDb dbfs */
+  { 2u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* lookaheadMs ms */
+  { 2u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* releaseMs ms */
+};
 
 /* org.openmixer.panel-description/1 (tools/panel-description.mjs): the declaration's panel as the rows
  * include/omx_panel_description.h serves, parameter ids the declaration's. Family limiter. */

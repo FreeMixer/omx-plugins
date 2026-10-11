@@ -41,6 +41,7 @@ import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { faceBinding } from './instance-face.mjs';
 import { DISPLAY_KINDS, DISPLAY_SOURCES, FAMILIES, PLACEMENTS, WIDGETS, panelDescription, panelFingerprint } from './panel-description.mjs';
+import { CONTRACT_VERSION, contractFingerprint, contractOf } from './param-contract.mjs';
 import { PIN_FILE, controlOf, eqDefaultBands, findName, kernelControls, locateContract, paramKernel, pinOf, resolveParam } from './omx-contract.mjs';
 import { bandsMacro, baseOf, expandVariant, variantStems } from './variants.mjs';
 import { omxdspInclude, render } from './template.mjs';
@@ -399,6 +400,7 @@ export function emitParamsHeader(d) {
 #include <stddef.h>
 
 #include "omx_panel_description.h"
+#include "omx_param_contract.h"
 #include "omx_plugin_param.h"
 ${d.variantOf ? `
 /* The band count of this variant of plugins/${d.variantOf.stem}: the instance face's compile-time count. */
@@ -431,6 +433,14 @@ ${d.params.map((p) => [['MIN', p.min], ['MAX', p.max], ['DEFAULT', p.def]].map((
 /* org.openmixer.declaration/1: the declaration's plain description and the digest of its parameters. */
 #define OMX_${K}_DECL_SOURCE "${sourceOf(d).replace(/"/g, '\\"')}"
 #define OMX_${K}_DECL_DIGEST "${digestOf(d.params)}"
+
+/* org.openmixer.param-contract/1 (tools/param-contract.mjs): each parameter's unit, scale and step, in
+ * id order; the host's bypass, the last id, is the face's. */
+#define OMX_${K}_PARAM_CONTRACT_VERSION ${CONTRACT_VERSION}u
+#define OMX_${K}_PARAM_CONTRACT_FINGERPRINT "${contractFingerprint(contractOf(d, scaleOf))}"
+static const struct omx_param_contract_row OMX_${K}_PARAM_CONTRACT[${P}_COUNT] = {
+${contractOf(d, scaleOf).slice(0, -1).map((r) => `  { ${r.unitEnum}u, OMX_CLAP_SCALE_${r.scale.toUpperCase()}, ${r.step}.0 }, /* ${r.symbol} ${r.unit} */`).join('\n')}
+};
 
 ${emitPanelRows(d)}
 /* LV2 port indices (tools/gen.mjs lv2Ports): audio, then parameter i at FIRST_PARAM + i, then these. */

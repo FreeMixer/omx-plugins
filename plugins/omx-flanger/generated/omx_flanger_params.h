@@ -12,6 +12,7 @@
 #include <stddef.h>
 
 #include "omx_panel_description.h"
+#include "omx_param_contract.h"
 #include "omx_plugin_param.h"
 
 enum {
@@ -55,6 +56,17 @@ static const omx_plugin_param OMX_FLANGER_PARAMS[OMX_FLANGER_PARAM_COUNT] = {
 /* org.openmixer.declaration/1: the declaration's plain description and the digest of its parameters. */
 #define OMX_FLANGER_DECL_SOURCE "omx flanger: Rate 0.05 to 5 Hz, Depth 0 to 5 ms, Feedback -0.95 to 0.95, Mix 0 to 100 %"
 #define OMX_FLANGER_DECL_DIGEST "323560b13042be1596a25511cdd1cabcddfc4f976cb7c1ab68f318f2ad8fc73e"
+
+/* org.openmixer.param-contract/1 (tools/param-contract.mjs): each parameter's unit, scale and step, in
+ * id order; the host's bypass, the last id, is the face's. */
+#define OMX_FLANGER_PARAM_CONTRACT_VERSION 1u
+#define OMX_FLANGER_PARAM_CONTRACT_FINGERPRINT "5fe17545e5852d6db37874ddaaadb5ba6a87a1b375a97ac936251fd39b6db747"
+static const struct omx_param_contract_row OMX_FLANGER_PARAM_CONTRACT[OMX_FLANGER_PARAM_COUNT] = {
+  { 16u, OMX_CLAP_SCALE_LOG, 0.0 }, /* rate hz */
+  { 2u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* depth ms */
+  { 0u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* feedback none */
+  { 14u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* mix pc */
+};
 
 /* org.openmixer.panel-description/1 (tools/panel-description.mjs): the declaration's panel as the rows
  * include/omx_panel_description.h serves, parameter ids the declaration's. Family modulation. */

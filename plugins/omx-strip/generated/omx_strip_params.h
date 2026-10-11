@@ -12,6 +12,7 @@
 #include <stddef.h>
 
 #include "omx_panel_description.h"
+#include "omx_param_contract.h"
 #include "omx_plugin_param.h"
 
 /* The band count of the chain's filter: its instance face's compile-time count, omx-contract's OMX_EQ_BAND_COUNTS_EQ8_MAX. */
@@ -293,6 +294,64 @@ static const omx_plugin_param OMX_STRIP_PARAMS[OMX_STRIP_PARAM_COUNT] = {
 /* org.openmixer.declaration/1: the declaration's plain description and the digest of its parameters. */
 #define OMX_STRIP_DECL_SOURCE "omx strip: Input 0 to 1, Trim -24 to 24 dB, Filters 0 to 1, HPF 0 to 1, HPF Freq 20 to 1000 Hz, HPF Slope 12 to 24 dB/oct, LPF 0 to 1, LPF Freq 1000 to 20000 Hz, LPF Slope 12 to 24 dB/oct, Gate 0 to 1, Gate Threshold -80 to 0 dB, Gate Ratio 1 to 100, Gate Range -90 to 0 dB, Gate Attack 0 to 500 ms, Gate Release 0 to 5000 ms, Gate Knee Start -80 to 0 dB, Gate Knee End -80 to 0 dB, Gate Hold 0 to 2000 ms, Gate Hysteresis 0 to 24 dB, EQ 0 to 1, EQ 1 Type 0 to 5, EQ 1 Freq 20 to 20000 Hz, EQ 1 Gain -15 to 15 dB, EQ 1 Q 0.3 to 116, EQ 1 0 to 1, EQ 2 Type 0 to 5, EQ 2 Freq 20 to 20000 Hz, EQ 2 Gain -15 to 15 dB, EQ 2 Q 0.3 to 116, EQ 2 0 to 1, EQ 3 Type 0 to 5, EQ 3 Freq 20 to 20000 Hz, EQ 3 Gain -15 to 15 dB, EQ 3 Q 0.3 to 116, EQ 3 0 to 1, EQ 4 Type 0 to 5, EQ 4 Freq 20 to 20000 Hz, EQ 4 Gain -15 to 15 dB, EQ 4 Q 0.3 to 116, EQ 4 0 to 1, Comp 0 to 1, Comp Threshold -60 to 0 dB, Comp Ratio 1 to 20, Comp Knee 0 to 24 dB, Comp Attack 0.1 to 100 ms, Comp Release 5 to 3000 ms, Comp Makeup 0 to 24 dB, Comp Kind 0 to 1, Comp Mix 0 to 100 %, Comp Detector Oversampling 0 to 2, Order 0 to 119"
 #define OMX_STRIP_DECL_DIGEST "7bc2f63aae815b41303644971f60fdc441e2c9407e093d98200c1c9e1ae0ea2d"
+
+/* org.openmixer.param-contract/1 (tools/param-contract.mjs): each parameter's unit, scale and step, in
+ * id order; the host's bypass, the last id, is the face's. */
+#define OMX_STRIP_PARAM_CONTRACT_VERSION 1u
+#define OMX_STRIP_PARAM_CONTRACT_FINGERPRINT "032f9a0d66fb6790b8d94798ae488c7151e6eace152d7543cc7496cc9f864845"
+static const struct omx_param_contract_row OMX_STRIP_PARAM_CONTRACT[OMX_STRIP_PARAM_COUNT] = {
+  { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* trimOn none */
+  { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* trimDb db */
+  { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* filterOn none */
+  { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* hpfOn none */
+  { 16u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* hpfFreq hz */
+  { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* hpfSlope none */
+  { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* lpfOn none */
+  { 16u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* lpfFreq hz */
+  { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* lpfSlope none */
+  { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* gateOn none */
+  { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* gateThreshold db */
+  { 0u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* gateRatio none */
+  { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* gateRange db */
+  { 2u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* gateAttack ms */
+  { 2u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* gateRelease ms */
+  { 13u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* gateKneeStart db */
+  { 13u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* gateKneeEnd db */
+  { 2u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* gateHold ms */
+  { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* gateHysteresis db */
+  { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* eqOn none */
+  { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* eq1Type none */
+  { 16u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* eq1Freq hz */
+  { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* eq1Gain db */
+  { 0u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* eq1Q none */
+  { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* eq1On none */
+  { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* eq2Type none */
+  { 16u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* eq2Freq hz */
+  { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* eq2Gain db */
+  { 0u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* eq2Q none */
+  { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* eq2On none */
+  { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* eq3Type none */
+  { 16u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* eq3Freq hz */
+  { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* eq3Gain db */
+  { 0u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* eq3Q none */
+  { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* eq3On none */
+  { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* eq4Type none */
+  { 16u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* eq4Freq hz */
+  { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* eq4Gain db */
+  { 0u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* eq4Q none */
+  { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* eq4On none */
+  { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* compOn none */
+  { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* compThreshold db */
+  { 0u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* compRatio none */
+  { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* compKnee db */
+  { 2u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* compAttack ms */
+  { 2u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* compRelease ms */
+  { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* compMakeup db */
+  { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* compKind none */
+  { 14u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* compMix pc */
+  { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* compDetectorOversampling none */
+  { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* order none */
+};
 
 /* org.openmixer.panel-description/1 (tools/panel-description.mjs): the declaration's panel as the rows
  * include/omx_panel_description.h serves, parameter ids the declaration's. Family none. */

@@ -12,6 +12,7 @@
 #include <stddef.h>
 
 #include "omx_panel_description.h"
+#include "omx_param_contract.h"
 #include "omx_plugin_param.h"
 
 enum {
@@ -75,6 +76,21 @@ static const omx_plugin_param OMX_ROTARY_PARAMS[OMX_ROTARY_PARAM_COUNT] = {
 /* org.openmixer.declaration/1: the declaration's plain description and the digest of its parameters. */
 #define OMX_ROTARY_DECL_SOURCE "omx rotary: Horn Slow 0.1 to 2 Hz, Horn Fast 3 to 10 Hz, Drum Slow 0.1 to 2 Hz, Drum Fast 3 to 10 Hz, Accel 0.25 to 4 x, Balance -100 to 100 %, Mix 0 to 100 %, Speed 0 to 2"
 #define OMX_ROTARY_DECL_DIGEST "0f1ffd01a7af4af40fdfb19f71a56ccec05cd0ed038c21237374b29ea4d347e3"
+
+/* org.openmixer.param-contract/1 (tools/param-contract.mjs): each parameter's unit, scale and step, in
+ * id order; the host's bypass, the last id, is the face's. */
+#define OMX_ROTARY_PARAM_CONTRACT_VERSION 1u
+#define OMX_ROTARY_PARAM_CONTRACT_FINGERPRINT "7b064efba0e9985f2c12b82e577a32aeecd9502f6fcfce98f373d8a88d720c79"
+static const struct omx_param_contract_row OMX_ROTARY_PARAM_CONTRACT[OMX_ROTARY_PARAM_COUNT] = {
+  { 16u, OMX_CLAP_SCALE_LOG, 0.0 }, /* hornSlowHz hz */
+  { 16u, OMX_CLAP_SCALE_LOG, 0.0 }, /* hornFastHz hz */
+  { 16u, OMX_CLAP_SCALE_LOG, 0.0 }, /* drumSlowHz hz */
+  { 16u, OMX_CLAP_SCALE_LOG, 0.0 }, /* drumFastHz hz */
+  { 15u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* accel coef */
+  { 14u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* balance pc */
+  { 14u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* mix pc */
+  { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* speed none */
+};
 
 /* org.openmixer.panel-description/1 (tools/panel-description.mjs): the declaration's panel as the rows
  * include/omx_panel_description.h serves, parameter ids the declaration's. Family modulation. */

@@ -12,6 +12,7 @@
 #include <stddef.h>
 
 #include "omx_panel_description.h"
+#include "omx_param_contract.h"
 #include "omx_plugin_param.h"
 
 enum {
@@ -85,6 +86,23 @@ static const omx_plugin_param OMX_DRIVE_PARAMS[OMX_DRIVE_PARAM_COUNT] = {
 /* org.openmixer.declaration/1: the declaration's plain description and the digest of its parameters. */
 #define OMX_DRIVE_DECL_SOURCE "omx drive: Drive 0 to 36 dB, Character -1 to 1, Band Frequency 20 to 20000 Hz, Mix 0 to 100 %, Trim -24 to 12 dB, Curve 0 to 3, Band 0 to 3, Auto Gain 0 to 1, Stereo Link 0 to 1, HF Roll-off 0 to 16000"
 #define OMX_DRIVE_DECL_DIGEST "b53c3fb88d798020fa4916d7c259c609a36baa22a20f8e28105e53e2506b73d2"
+
+/* org.openmixer.param-contract/1 (tools/param-contract.mjs): each parameter's unit, scale and step, in
+ * id order; the host's bypass, the last id, is the face's. */
+#define OMX_DRIVE_PARAM_CONTRACT_VERSION 1u
+#define OMX_DRIVE_PARAM_CONTRACT_FINGERPRINT "89ad3ebcf54d0bcc336f3b09611d36d77357718d60aa9085f71e334d8a7a135f"
+static const struct omx_param_contract_row OMX_DRIVE_PARAM_CONTRACT[OMX_DRIVE_PARAM_COUNT] = {
+  { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* amount db */
+  { 0u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* character none */
+  { 16u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* bandFreq hz */
+  { 14u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* mix pc */
+  { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* trim db */
+  { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* curve none */
+  { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* band none */
+  { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* autoGain none */
+  { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* stereoLink none */
+  { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* hfRolloff none */
+};
 
 /* org.openmixer.panel-description/1 (tools/panel-description.mjs): the declaration's panel as the rows
  * include/omx_panel_description.h serves, parameter ids the declaration's. Family drive.

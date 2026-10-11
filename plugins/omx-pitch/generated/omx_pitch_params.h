@@ -12,6 +12,7 @@
 #include <stddef.h>
 
 #include "omx_panel_description.h"
+#include "omx_param_contract.h"
 #include "omx_plugin_param.h"
 
 enum {
@@ -50,6 +51,16 @@ static const omx_plugin_param OMX_PITCH_PARAMS[OMX_PITCH_PARAM_COUNT] = {
 /* org.openmixer.declaration/1: the declaration's plain description and the digest of its parameters. */
 #define OMX_PITCH_DECL_SOURCE "omx pitch: Semitones -12 to 12, Cents -50 to 50, Mix 0 to 100"
 #define OMX_PITCH_DECL_DIGEST "be51e9f044d94539dbfc82ff4669e9327b5e9199863a6e0b37c64ca700988836"
+
+/* org.openmixer.param-contract/1 (tools/param-contract.mjs): each parameter's unit, scale and step, in
+ * id order; the host's bypass, the last id, is the face's. */
+#define OMX_PITCH_PARAM_CONTRACT_VERSION 1u
+#define OMX_PITCH_PARAM_CONTRACT_FINGERPRINT "ed5daf3af04017ecb41d0c0768b37ff624e5e60510bf46c5ace19aa3c68c62ea"
+static const struct omx_param_contract_row OMX_PITCH_PARAM_CONTRACT[OMX_PITCH_PARAM_COUNT] = {
+  { 0u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* semitones none */
+  { 0u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* cents none */
+  { 0u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* mix none */
+};
 
 /* org.openmixer.panel-description/1 (tools/panel-description.mjs): the declaration's panel as the rows
  * include/omx_panel_description.h serves, parameter ids the declaration's. Family pitch. */
