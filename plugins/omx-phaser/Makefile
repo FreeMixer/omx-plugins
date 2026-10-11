@@ -7,7 +7,8 @@
 #
 #   make            build/omx-phaser.clap and build/omx-phaser.lv2/ (binary, TTL, MOD GUI)
 #   make test       freshness of every generated file, the parameters as declared, every parameter
-#                   live, the phaser kernel-identity oracle, the panel description both faces serve,
+#                   live, the phaser kernel-identity oracle, the panel description both faces serve, the
+#                   CLAP face's parameter contract, remote controls and track-info,
 #                   the MOD GUI checks, and the host checks (omx-clap-scan, lv2info) where installed
 #   make gen        regenerate generated/ from the declaration (commit the result)
 #   make install    DESTDIR/PREFIX/LIBDIR/CLAPDIR: $(CLAPDIR)/omx-phaser.clap, $(LIBDIR)/lv2/omx-phaser.lv2/
@@ -47,7 +48,8 @@ CLAPDIR ?= $(PREFIX)/lib/clap
 
 TTL      := $(GEN)/$(NAME).lv2
 TTL_SRCS := $(shell find $(TTL) -type f 2>/dev/null)
-CORE     := omx_phaser_core.h $(GEN)/omx_phaser_params.h $(ROOT)/include/omx_panel_description.h
+CORE     := omx_phaser_core.h $(GEN)/omx_phaser_params.h $(ROOT)/include/omx_panel_description.h \
+            $(ROOT)/include/omx_param_contract.h
 
 all: $(B)/$(NAME).clap $(BUNDLE)/$(NAME).so $(BUNDLE)/manifest.ttl
 
@@ -72,6 +74,9 @@ $(B)/clap-probe: $(ROOT)/tools/clap-probe.c | $(B)
 $(B)/panel-probe: $(ROOT)/tools/panel-probe.c $(ROOT)/include/omx_panel_description.h | $(B)
 	$(CC) $(CFLAGS) $(WARN) -I$(ROOT)/include $(ABI_CFLAGS) -o $@ $< $(LILV) -ldl
 
+$(B)/clap-ext-probe: $(ROOT)/tools/clap-ext-probe.c $(ROOT)/include/omx_param_contract.h | $(B)
+	$(CC) $(CFLAGS) $(WARN) -I$(ROOT)/include $(ABI_CFLAGS) -o $@ $< -ldl
+
 $(B)/phaser-oracle: test/phaser-oracle.c $(CORE) | $(B)
 	$(CC) $(CFLAGS) $(WARN) -I$(GEN) -I$(ROOT)/include $(DSP_CFLAGS) $(ABI_CFLAGS) -o $@ $< $(LILV) -ldl $(LDLIBS)
 
@@ -86,9 +91,11 @@ check:
 # The parameter test: the built CLAP face's parameters are the declaration's, and every one of them
 # reaches the kernel. The kernel-identity test: both faces, sample for sample, against omx-dsp's
 # phaser kernel called directly. The panel test: org.openmixer.panel-description/1 read from
-# each built face as a host reads it, equal to the declaration's panel. Every test runs, and the target fails if any failed, so a new
+# each built face as a host reads it, equal to the declaration's panel. The CLAP extension test: the
+# parameter contract, the remote-control pages and each placement's defaults, read as a host reads
+# them, equal to the declaration's. Every test runs, and the target fails if any failed, so a new
 # plugin shows all its red tests at once.
-test: all check $(B)/clap-probe $(B)/panel-probe $(B)/phaser-oracle
+test: all check $(B)/clap-probe $(B)/panel-probe $(B)/clap-ext-probe $(B)/phaser-oracle
 	@fail=0; \
 	$(B)/clap-probe params $(B)/$(NAME).clap > $(B)/clap-params.txt && \
 	  node $(ROOT)/tools/clap-params-check.mjs $(CURDIR) $(B)/clap-params.txt || fail=1; \
@@ -99,6 +106,8 @@ test: all check $(B)/clap-probe $(B)/panel-probe $(B)/phaser-oracle
 	  node $(ROOT)/tools/panel-check.mjs $(CURDIR) clap $(B)/panel-clap.txt || fail=1; \
 	$(B)/panel-probe lv2 $(BUNDLE) $(URI) > $(B)/panel-lv2.txt && \
 	  node $(ROOT)/tools/panel-check.mjs $(CURDIR) lv2 $(B)/panel-lv2.txt || fail=1; \
+	$(B)/clap-ext-probe $(B)/$(NAME).clap > $(B)/clap-ext.txt && \
+	  node $(ROOT)/tools/clap-ext-check.mjs $(CURDIR) $(B)/clap-ext.txt || fail=1; \
 	sh $(ROOT)/tools/modgui-test.sh $(CURDIR) || fail=1; \
 	sh $(ROOT)/tools/host-check.sh $(B)/$(NAME).clap $(BUNDLE) $(URI) $(CLAP_ID) || fail=1; \
 	exit $$fail
