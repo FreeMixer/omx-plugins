@@ -140,8 +140,16 @@
     }
   },
   "panel": {
-    "family": "comp",
-    "roles": {},
+    "family": "dynamics",
+    "roles": {
+      "threshold": "thresholdDb",
+      "ratio": "ratio",
+      "attack": "attackMs",
+      "release": "releaseMs",
+      "knee": "kneeDb",
+      "makeup": "makeupDb",
+      "mix": "mixPct"
+    },
     "sections": [
       {
         "key": "comp",
