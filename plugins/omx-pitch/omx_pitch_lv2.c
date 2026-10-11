@@ -11,8 +11,10 @@
  * (lv2:enabled; 0 is the bypass) and `latency`. A parameter port the host left unconnected reads
  * its declared default.
  */
+#include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include <lv2/core/lv2.h>
 
@@ -74,8 +76,32 @@ static void run(LV2_Handle h, uint32_t frames) {
 
 static void cleanup(LV2_Handle h) { free(h); }
 
+/* org.openmixer.panel-description/1: the declaration's panel, OMX_PITCH_PANEL, its parameter ids the
+ * LV2 port indices. */
+static const char *panel_fingerprint(void *h) {
+  (void)h;
+  return OMX_PITCH_PANEL.fingerprint;
+}
+
+static uint32_t panel_family(void *h) {
+  (void)h;
+  return OMX_PITCH_PANEL.family;
+}
+
+static uint32_t panel_count(void *h, uint32_t table) {
+  (void)h;
+  return omx_panel_count(&OMX_PITCH_PANEL, table);
+}
+
+static bool panel_get(void *h, uint32_t table, uint32_t index, void *out) {
+  (void)h;
+  return omx_panel_get(&OMX_PITCH_PANEL, table, index, out, OMX_PITCH_LV2_PORT_FIRST_PARAM);
+}
+
+static const omx_lv2_panel_description_t PANEL = {panel_fingerprint, panel_family, panel_count, panel_get};
+
 static const void *extension_data(const char *uri) {
-  (void)uri;
+  if (strcmp(uri, OMX_PANEL_DESCRIPTION_ID) == 0) return &PANEL;
   return NULL;
 }
 

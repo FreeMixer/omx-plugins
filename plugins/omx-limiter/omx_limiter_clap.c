@@ -283,6 +283,31 @@ static const char *g_decl_digest(const clap_plugin_t *p) {
 
 static const omx_clap_plugin_declaration_t G_DECL_EXT = {g_decl_source, g_decl_digest};
 
+/* ---- org.openmixer.panel-description/1: the declaration's panel, OMX_LIMITER_PANEL ------------ */
+
+static const char *g_panel_fingerprint(const clap_plugin_t *p) {
+  (void)p;
+  return OMX_LIMITER_PANEL.fingerprint;
+}
+
+static uint32_t g_panel_family(const clap_plugin_t *p) {
+  (void)p;
+  return OMX_LIMITER_PANEL.family;
+}
+
+static uint32_t g_panel_count(const clap_plugin_t *p, uint32_t table) {
+  (void)p;
+  return omx_panel_count(&OMX_LIMITER_PANEL, table);
+}
+
+static bool g_panel_get(const clap_plugin_t *p, uint32_t table, uint32_t index, void *out) {
+  (void)p;
+  return omx_panel_get(&OMX_LIMITER_PANEL, table, index, out, 0);
+}
+
+static const omx_clap_plugin_panel_description_t G_PANEL_EXT = {g_panel_fingerprint, g_panel_family, g_panel_count,
+                                                                g_panel_get};
+
 static const void *g_get_extension(const clap_plugin_t *p, const char *id) {
   (void)p;
   if (strcmp(id, CLAP_EXT_PARAMS) == 0) return &G_PARAMS_EXT;
@@ -290,6 +315,7 @@ static const void *g_get_extension(const clap_plugin_t *p, const char *id) {
   if (strcmp(id, CLAP_EXT_AUDIO_PORTS) == 0) return &G_PORTS_EXT;
   if (strcmp(id, CLAP_EXT_STATE) == 0) return &G_STATE_EXT;
   if (strcmp(id, OMX_CLAP_EXT_DECLARATION) == 0) return &G_DECL_EXT;
+  if (strcmp(id, OMX_PANEL_DESCRIPTION_ID) == 0) return &G_PANEL_EXT;
   return NULL;
 }
 
