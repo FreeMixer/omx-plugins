@@ -4,8 +4,8 @@ name: release
 
 # A version tag builds omx-plugins-clap and omx-plugins-lv2 as RPMs (Fedora 44, x86_64 and aarch64) and
 # DEBs (bookworm and trixie, amd64 and arm64), signs them, publishes them into the rpm/ and deb/ trees of
-# the FreeMixer Pages repository and attaches them to the GitHub release. Anything else builds unsigned
-# trees and publishes nothing. Everything is in FreeMixer/.github; the secrets are the organisation's.
+# the FreeMixer Pages repository and attaches them to the GitHub release, with the bookworm arm64 DEBs
+# repacked as a Zynthian tarball beside them. Anything else builds unsigned trees and publishes nothing. Everything is in FreeMixer/.github; the secrets are the organisation's.
 # The build dependencies the distributions do not carry (omx-dsp-devel, omx-clap-core-devel,
 # omx-clap-host) come from the FreeMixer channel, inside the build containers only.
 
@@ -63,3 +63,69 @@ jobs:
       requires: ''
       channel-deps: true
     secrets: inherit
+
+  # The bookworm DEBs just built, repacked as one tarball laid out for a Zynthian's plugin directories
+  # (tools/zynthian-bundle.sh): no rebuild, the same files the packages carry, checked and every LV2
+  # plugin instantiated on the target architecture. arm64 at release; the pull-request dry run packs the
+  # amd64 build the same way.
+  zynthian:
+    name: Zynthian tarball (bookworm, ${{ (github.event_name != 'push' && inputs.arm == false) && 'amd64' || 'arm64' }})
+    needs: deb
+    if: ${{ !cancelled() && needs.deb.result == 'success' }}
+    runs-on: ${{ (github.event_name != 'push' && inputs.arm == false) && (inputs.runner || 'ubuntu-latest') || 'ubuntu-24.04-arm' }}
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    container:
+      image: debian:bookworm
+    env:
+      ARCH: ${{ (github.event_name != 'push' && inputs.arm == false) && 'amd64' || 'arm64' }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Install the packing and probing tools
+        run: |
+          apt-get update -qq
+          apt-get install -y -qq --no-install-recommends make file binutils lilv-utils
+
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: omx-plugins-debs-bookworm-${{ env.ARCH }}
+          path: debs
+
+      - name: Pack, check and probe
+        run: tools/zynthian-bundle.sh debs "$ARCH" zynthian
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: omx-plugins-zynthian-${{ env.ARCH }}
+          path: zynthian/*
+          if-no-files-found: error
+          retention-days: 30
+
+  # attached beside the DEBs; the deb job's own release step has created the release by now
+  zynthian-release:
+    name: Attach the Zynthian tarball to the release
+    needs: zynthian
+    if: ${{ !cancelled() && needs.zynthian.result == 'success' && github.ref_type == 'tag' && (github.event_name == 'push' || inputs.publish == true) }}
+    runs-on: ${{ inputs.runner || 'ubuntu-latest' }}
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: omx-plugins-zynthian-arm64
+          path: zynthian
+
+      - name: Attach, never creating a release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          set -eu
+          gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null || { echo "::error::no release for $TAG"; exit 1; }
+          gh release upload "$TAG" zynthian/* --clobber --repo "$GITHUB_REPOSITORY"
