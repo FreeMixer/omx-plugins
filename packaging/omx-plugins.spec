@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # Copyright (C) 2026 Pau Aliagas <linuxnow@gmail.com>
 Name: omx-plugins
-Version: 0.3.0
+Version: 0.4.0
 Release: 1%{?dist}
 License: GPL-3.0-or-later
 Summary: The OpenMixer console's delay, drive, EQ, channel strip, keyed gate and effects, as plugins for your DAW
@@ -157,6 +157,12 @@ host that runs the plugins in its own process without loading .clap files.
 # END GENERATED lv2-files
 
 %changelog
+* Sun Oct 11 2026 Pau Aliagas <linuxnow@gmail.com> - 0.4.0-1
+- **libomxplugins**: one static library with a table of every plugin's CLAP
+  entry, so a host links the plugins in-process without dlopen. The devel
+  package ships `libomxplugins.a`, `omx-plugins/omx_clap_static.h` and
+  `omxplugins.pc`; `omx_clap_static_find(id)` returns a plugin's entry and
+  `omx_clap_static_entry` is one entry whose factory lists them all.
 * Sat Oct 10 2026 Pau Aliagas <linuxnow@gmail.com> - 0.3.0-1
 - New plugin, **omx comp** (CLAP and LV2): the console's compressor.
   Threshold, ratio and knee set how hard it holds the level down, attack and
