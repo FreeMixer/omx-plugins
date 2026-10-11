@@ -76,7 +76,7 @@ static const struct omx_param_contract_row OMX_DELAY_PARAM_CONTRACT[OMX_DELAY_PA
 
 /* org.openmixer.panel-description/1 (tools/panel-description.mjs): the declaration's panel as the rows
  * include/omx_panel_description.h serves, parameter ids the declaration's. Family delay. */
-#define OMX_DELAY_PANEL_FINGERPRINT "d8693730e2af6e305110f8665f5300d32a157fe967d3ea801b6eb0b5361ba08f"
+#define OMX_DELAY_PANEL_FINGERPRINT "f791b248278bd5ec0eb51d5b4f1a031dd3bf1156af26252f337b19e52d309ae3"
 static const struct omx_panel_section_row OMX_DELAY_PANEL_SECTIONS[] = {
   { "delay", "fx.delay.section.delay", "Delay" },
 };
@@ -94,13 +94,21 @@ static const struct omx_panel_role_row OMX_DELAY_PANEL_ROLES[] = {
   { "pingpong", 0u, 4u },
   { "mix", 0u, 3u },
 };
+static const struct omx_panel_default_row OMX_DELAY_PANEL_DEFAULTS[] = {
+  { OMX_CLAP_PLACEMENT_RETURN, 3u, 1 },
+};
+/* clap.remote-controls/2: the pages of the page rule over the sections. */
+static const struct omx_panel_page_row OMX_DELAY_PANEL_PAGES[] = {
+  { "Delay", "Delay", { 0u, 1u, 2u, 4u, 3u, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID } },
+};
+#define OMX_DELAY_PANEL_PAGE_COUNT 1u
 static const struct omx_panel_rows OMX_DELAY_PANEL = {
   OMX_DELAY_PANEL_FINGERPRINT, OMX_CLAP_FAMILY_DELAY,
   OMX_DELAY_PANEL_SECTIONS, 1u,
   OMX_DELAY_PANEL_CONTROLS, 5u,
   OMX_DELAY_PANEL_ROLES, 5u,
   NULL, 0u,
-  NULL, 0u,
+  OMX_DELAY_PANEL_DEFAULTS, 1u,
 };
 
 /* LV2 port indices (tools/gen.mjs lv2Ports): audio, then parameter i at FIRST_PARAM + i, then these. */

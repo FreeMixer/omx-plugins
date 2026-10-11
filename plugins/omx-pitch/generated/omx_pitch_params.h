@@ -73,6 +73,11 @@ static const struct omx_panel_control_row OMX_PITCH_PANEL_CONTROLS[] = {
   { 1u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.pitch.cents", "Cents", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
   { 2u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.pitch.mix", "Mix", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
 };
+/* clap.remote-controls/2: the pages of the page rule over the sections. */
+static const struct omx_panel_page_row OMX_PITCH_PANEL_PAGES[] = {
+  { "Pitch", "Pitch", { 0u, 1u, 2u, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID } },
+};
+#define OMX_PITCH_PANEL_PAGE_COUNT 1u
 static const struct omx_panel_rows OMX_PITCH_PANEL = {
   OMX_PITCH_PANEL_FINGERPRINT, OMX_CLAP_FAMILY_PITCH,
   OMX_PITCH_PANEL_SECTIONS, 1u,

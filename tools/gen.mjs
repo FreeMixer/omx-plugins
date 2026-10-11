@@ -40,7 +40,7 @@ import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 
 import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { faceBinding } from './instance-face.mjs';
-import { DISPLAY_KINDS, DISPLAY_SOURCES, FAMILIES, PLACEMENTS, WIDGETS, panelDescription, panelFingerprint } from './panel-description.mjs';
+import { DISPLAY_KINDS, DISPLAY_SOURCES, FAMILIES, PLACEMENTS, WIDGETS, pagesOf, panelDescription, panelFingerprint } from './panel-description.mjs';
 import { CONTRACT_VERSION, contractFingerprint, contractOf } from './param-contract.mjs';
 import { PIN_FILE, controlOf, eqDefaultBands, findName, kernelControls, locateContract, paramKernel, pinOf, resolveParam } from './omx-contract.mjs';
 import { bandsMacro, baseOf, expandVariant, variantStems } from './variants.mjs';
@@ -375,7 +375,12 @@ function emitPanelRows(d) {
  * Declared roles not published:
 ${unpublished}` : ''} */
 #define OMX_${K}_PANEL_FINGERPRINT "${panelFingerprint(x)}"
-${tables.map(array).join('')}static const struct omx_panel_rows OMX_${K}_PANEL = {
+${tables.map(array).join('')}/* clap.remote-controls/2: the pages of the page rule over the sections. */
+static const struct omx_panel_page_row OMX_${K}_PANEL_PAGES[] = {
+${pagesOf(x, d).map((g) => `  { ${cstr(g.sectionName)}, ${cstr(g.pageName)}, { ${g.ids.map(id).join(', ')} } },`).join('\n')}
+};
+#define OMX_${K}_PANEL_PAGE_COUNT ${pagesOf(x, d).length}u
+static const struct omx_panel_rows OMX_${K}_PANEL = {
   OMX_${K}_PANEL_FINGERPRINT, OMX_CLAP_FAMILY_${FAMILIES[FAMILIES.indexOf(x.family)].toUpperCase()},
 ${tables.map((t) => `  ${ref(t)},`).join('\n')}
 };

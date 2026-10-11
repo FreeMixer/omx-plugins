@@ -269,6 +269,14 @@ static const struct omx_panel_control_row OMX_GEQ_PANEL_CONTROLS[] = {
   { 29u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.geq.band30", "16 kHz", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
   { 30u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.geq.band31", "20 kHz", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
 };
+/* clap.remote-controls/2: the pages of the page rule over the sections. */
+static const struct omx_panel_page_row OMX_GEQ_PANEL_PAGES[] = {
+  { "Geq", "Geq 1", { 0u, 1u, 2u, 3u, 4u, 5u, 6u, 7u } },
+  { "Geq", "Geq 2", { 8u, 9u, 10u, 11u, 12u, 13u, 14u, 15u } },
+  { "Geq", "Geq 3", { 16u, 17u, 18u, 19u, 20u, 21u, 22u, 23u } },
+  { "Geq", "Geq 4", { 24u, 25u, 26u, 27u, 28u, 29u, 30u, OMX_CLAP_PANEL_INVALID_ID } },
+};
+#define OMX_GEQ_PANEL_PAGE_COUNT 4u
 static const struct omx_panel_rows OMX_GEQ_PANEL = {
   OMX_GEQ_PANEL_FINGERPRINT, OMX_CLAP_FAMILY_EQ,
   OMX_GEQ_PANEL_SECTIONS, 1u,

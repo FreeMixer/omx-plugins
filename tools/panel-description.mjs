@@ -130,7 +130,37 @@ export function panelDescription(d) {
     return [{ kind, section, sectionKey: sections[section].key, source: 'family', meters: [null, null], curve: null, floor: null, labelKey: key(`${ns}.display.${kind}`, 'display label key'), label: label(s.label, `section '${s.key}'`) }];
   });
 
-  return { family, sections, controls, roles, unpublished, displays, defaults: [] };
+  // the contract's per-kind defaults: each channel kind the placement it is, the value inside the travel
+  const defaults = d.params.flatMap((p, i) =>
+    Object.entries(p.byKind ?? {}).map(([kind, value]) => {
+      const placement = PLACEMENT_OF_KIND[kind];
+      if (!placement) throw new Error(`${where}: '${p.symbol}' comes up differently on a ${kind} channel, which has no placement of ${PANEL_ID}; add it to PLACEMENT_OF_KIND`);
+      if (!(value >= p.min && value <= p.max) || (p.kind && !Number.isInteger(value))) throw new Error(`${where}: '${p.symbol}' on ${kind} comes up at ${value}, outside its travel`);
+      return { placement, symbol: p.symbol, param: i, value };
+    }),
+  );
+
+  return { family, sections, controls, roles, unpublished, displays, defaults };
+}
+
+/** A channel kind whose default a contract travel states (byKind) -> the placement it is. */
+const PLACEMENT_OF_KIND = { fxReturn: 'return', main: 'master' };
+
+/** The surface's slots per page, CLAP_REMOTE_CONTROLS_COUNT. */
+export const PAGE_SIZE = 8;
+
+/** The pages of clap.remote-controls/2 by the page rule: each section's controls in order, cut into
+ * pages of eight, a section of several pages numbering them; a short page's slots are null. */
+export function pagesOf(x, d) {
+  return d.panel.sections.flatMap((s, section) => {
+    const ids = x.controls.filter((c) => c.section === section).map((c) => c.param);
+    const count = Math.ceil(ids.length / PAGE_SIZE);
+    return [...Array(count).keys()].map((k) => {
+      const slots = ids.slice(k * PAGE_SIZE, (k + 1) * PAGE_SIZE);
+      while (slots.length < PAGE_SIZE) slots.push(null);
+      return { section, sectionName: s.label, pageName: count > 1 ? `${s.label} ${k + 1}` : s.label, ids: slots };
+    });
+  });
 }
 
 /** The shortest decimal that round-trips to the same binary64, -0 written 0. */

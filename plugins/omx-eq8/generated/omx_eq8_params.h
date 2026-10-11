@@ -380,6 +380,16 @@ static const struct omx_panel_control_row OMX_EQ8_PANEL_CONTROLS[] = {
 static const struct omx_panel_display_row OMX_EQ8_PANEL_DISPLAYS[] = {
   { OMX_CLAP_DISPLAY_EQ_RESPONSE, 0u, OMX_CLAP_DISPLAY_FROM_FAMILY, { OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID }, 0u, OMX_CLAP_PANEL_INVALID_ID, 0.0, "fx.eq.display.eq_response", "EQ" },
 };
+/* clap.remote-controls/2: the pages of the page rule over the sections. */
+static const struct omx_panel_page_row OMX_EQ8_PANEL_PAGES[] = {
+  { "EQ", "EQ 1", { 0u, 1u, 2u, 3u, 4u, 5u, 6u, 7u } },
+  { "EQ", "EQ 2", { 8u, 9u, 10u, 11u, 12u, 13u, 14u, 15u } },
+  { "EQ", "EQ 3", { 16u, 17u, 18u, 19u, 20u, 21u, 22u, 23u } },
+  { "EQ", "EQ 4", { 24u, 25u, 26u, 27u, 28u, 29u, 30u, 31u } },
+  { "EQ", "EQ 5", { 32u, 33u, 34u, 35u, 36u, 37u, 38u, 39u } },
+  { "EQ", "EQ 6", { 40u, 41u, 42u, 43u, 44u, 45u, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID } },
+};
+#define OMX_EQ8_PANEL_PAGE_COUNT 6u
 static const struct omx_panel_rows OMX_EQ8_PANEL = {
   OMX_EQ8_PANEL_FINGERPRINT, OMX_CLAP_FAMILY_EQ,
   OMX_EQ8_PANEL_SECTIONS, 1u,

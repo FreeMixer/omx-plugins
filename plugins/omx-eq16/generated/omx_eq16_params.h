@@ -660,6 +660,21 @@ static const struct omx_panel_control_row OMX_EQ16_PANEL_CONTROLS[] = {
 static const struct omx_panel_display_row OMX_EQ16_PANEL_DISPLAYS[] = {
   { OMX_CLAP_DISPLAY_EQ_RESPONSE, 0u, OMX_CLAP_DISPLAY_FROM_FAMILY, { OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID }, 0u, OMX_CLAP_PANEL_INVALID_ID, 0.0, "fx.eq.display.eq_response", "EQ" },
 };
+/* clap.remote-controls/2: the pages of the page rule over the sections. */
+static const struct omx_panel_page_row OMX_EQ16_PANEL_PAGES[] = {
+  { "EQ", "EQ 1", { 0u, 1u, 2u, 3u, 4u, 5u, 6u, 7u } },
+  { "EQ", "EQ 2", { 8u, 9u, 10u, 11u, 12u, 13u, 14u, 15u } },
+  { "EQ", "EQ 3", { 16u, 17u, 18u, 19u, 20u, 21u, 22u, 23u } },
+  { "EQ", "EQ 4", { 24u, 25u, 26u, 27u, 28u, 29u, 30u, 31u } },
+  { "EQ", "EQ 5", { 32u, 33u, 34u, 35u, 36u, 37u, 38u, 39u } },
+  { "EQ", "EQ 6", { 40u, 41u, 42u, 43u, 44u, 45u, 46u, 47u } },
+  { "EQ", "EQ 7", { 48u, 49u, 50u, 51u, 52u, 53u, 54u, 55u } },
+  { "EQ", "EQ 8", { 56u, 57u, 58u, 59u, 60u, 61u, 62u, 63u } },
+  { "EQ", "EQ 9", { 64u, 65u, 66u, 67u, 68u, 69u, 70u, 71u } },
+  { "EQ", "EQ 10", { 72u, 73u, 74u, 75u, 76u, 77u, 78u, 79u } },
+  { "EQ", "EQ 11", { 80u, 81u, 82u, 83u, 84u, 85u, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID } },
+};
+#define OMX_EQ16_PANEL_PAGE_COUNT 11u
 static const struct omx_panel_rows OMX_EQ16_PANEL = {
   OMX_EQ16_PANEL_FINGERPRINT, OMX_CLAP_FAMILY_EQ,
   OMX_EQ16_PANEL_SECTIONS, 1u,

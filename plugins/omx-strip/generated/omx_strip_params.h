@@ -417,6 +417,20 @@ static const struct omx_panel_control_row OMX_STRIP_PANEL_CONTROLS[] = {
   { 49u, 4u, OMX_CLAP_WIDGET_AUTO, "fx.strip.comp_detector_oversampling", "Comp Detector Oversampling", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
   { 50u, 5u, OMX_CLAP_WIDGET_KNOB, "fx.strip.order", "Order", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
 };
+/* clap.remote-controls/2: the pages of the page rule over the sections. */
+static const struct omx_panel_page_row OMX_STRIP_PANEL_PAGES[] = {
+  { "Input", "Input", { 0u, 1u, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID } },
+  { "Filters", "Filters", { 2u, 3u, 4u, 5u, 6u, 7u, 8u, OMX_CLAP_PANEL_INVALID_ID } },
+  { "Gate", "Gate 1", { 9u, 10u, 11u, 12u, 13u, 14u, 15u, 16u } },
+  { "Gate", "Gate 2", { 17u, 18u, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID } },
+  { "EQ", "EQ 1", { 19u, 20u, 21u, 22u, 23u, 24u, 25u, 26u } },
+  { "EQ", "EQ 2", { 27u, 28u, 29u, 30u, 31u, 32u, 33u, 34u } },
+  { "EQ", "EQ 3", { 35u, 36u, 37u, 38u, 39u, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID } },
+  { "Comp", "Comp 1", { 40u, 41u, 42u, 43u, 44u, 45u, 46u, 47u } },
+  { "Comp", "Comp 2", { 48u, 49u, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID } },
+  { "Order", "Order", { 50u, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID } },
+};
+#define OMX_STRIP_PANEL_PAGE_COUNT 10u
 static const struct omx_panel_rows OMX_STRIP_PANEL = {
   OMX_STRIP_PANEL_FINGERPRINT, OMX_CLAP_FAMILY_NONE,
   OMX_STRIP_PANEL_SECTIONS, 6u,

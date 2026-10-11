@@ -115,6 +115,12 @@ static const struct omx_panel_control_row OMX_COMP_PANEL_CONTROLS[] = {
   { 7u, 0u, OMX_CLAP_WIDGET_AUTO, "fx.comp.kind", "Kind", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
   { 8u, 0u, OMX_CLAP_WIDGET_AUTO, "fx.comp.detector_oversampling", "Detector Oversampling", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
 };
+/* clap.remote-controls/2: the pages of the page rule over the sections. */
+static const struct omx_panel_page_row OMX_COMP_PANEL_PAGES[] = {
+  { "Comp", "Comp 1", { 0u, 1u, 2u, 3u, 4u, 5u, 6u, 7u } },
+  { "Comp", "Comp 2", { 8u, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID } },
+};
+#define OMX_COMP_PANEL_PAGE_COUNT 2u
 static const struct omx_panel_rows OMX_COMP_PANEL = {
   OMX_COMP_PANEL_FINGERPRINT, OMX_CLAP_FAMILY_DYNAMICS,
   OMX_COMP_PANEL_SECTIONS, 1u,

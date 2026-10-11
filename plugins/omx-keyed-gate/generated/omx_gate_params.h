@@ -125,6 +125,12 @@ static const struct omx_panel_control_row OMX_GATE_PANEL_CONTROLS[] = {
 static const struct omx_panel_display_row OMX_GATE_PANEL_DISPLAYS[] = {
   { OMX_CLAP_DISPLAY_TRANSFER_CURVE, 0u, OMX_CLAP_DISPLAY_FROM_FAMILY, { OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID }, 0u, OMX_CLAP_PANEL_INVALID_ID, 0.0, "fx.gate.display.transfer_curve", "Keyed-gate" },
 };
+/* clap.remote-controls/2: the pages of the page rule over the sections. */
+static const struct omx_panel_page_row OMX_GATE_PANEL_PAGES[] = {
+  { "Keyed-gate", "Keyed-gate 1", { 0u, 1u, 2u, 3u, 4u, 5u, 6u, 7u } },
+  { "Keyed-gate", "Keyed-gate 2", { 8u, 9u, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID } },
+};
+#define OMX_GATE_PANEL_PAGE_COUNT 2u
 static const struct omx_panel_rows OMX_GATE_PANEL = {
   OMX_GATE_PANEL_FINGERPRINT, OMX_CLAP_FAMILY_GATE,
   OMX_GATE_PANEL_SECTIONS, 1u,
