@@ -1,1 +1,3 @@
 usr/include/omx-plugins
+usr/lib/*/libomxplugins.a
+usr/lib/*/pkgconfig/omxplugins.pc
