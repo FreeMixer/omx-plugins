@@ -51,7 +51,11 @@ CLAP id is in the table once, and each one is created through its factory, activ
    echoes, ping-pong, mix and bypass computed from the definition of a delay, not from omx-dsp;
 5. **MOD GUI**: fresh, carrying every declared control with its travel and default, valid under
    `sord_validate`, and stale when the declaration moves;
-6. **host check**: `omx-clap-scan` loads the CLAP file, `lv2ls`/`lv2info` read the LV2 bundle.
+6. **host check**: `omx-clap-scan` loads the CLAP file, `lv2ls`/`lv2info` read the LV2 bundle;
+7. **port groups** (`tools/port-groups-probe.c`, `tools/port-groups-check.mjs`): the LV2 bundle,
+   read through lilv, holds one `pg:Group` per panel section (its `lv2:symbol` the section's key, its
+   `rdfs:label` the section's label), and each parameter a section lists carries `pg:group` naming
+   it; no other port is grouped.
 
 For omx-strip, steps 3 and 4 are one **strip oracle** (`test/strip-oracle.c`): at 44.1, 48, 96
 and 192 kHz, on both builds, in each of the 24 stage orders and at the defaults, the output equals
