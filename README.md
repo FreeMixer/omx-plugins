@@ -358,7 +358,9 @@ hosts look without configuration (`/usr/lib/clap` on every distribution, the pat
 `/usr/lib/lv2` on Debian). Rescan plugins in your host and look for the **omx** plugins under openmixer.
 
 Every release also carries the packages on its
-[GitHub release page](https://github.com/FreeMixer/omx-plugins/releases).
+[GitHub release page](https://github.com/FreeMixer/omx-plugins/releases), and for a Zynthian without
+the apt channel, `omx-plugins-zynthian-<version>-arm64.tar.gz`: copy its `lv2/` bundles into
+`/zynthian/zynthian-plugins/lv2` and rescan the LV2 plugins from Zynthian's admin menu.
 
 Projects that build on the plugins' parameters and instance code install the headers instead of
 copying them: `omx-plugins-devel` on Fedora, `omx-plugins-dev` on Debian (they land in
