@@ -106,5 +106,20 @@ $(LIB_PC): lib/omxplugins.pc.in Makefile .github/pins.txt | $(LIB_B)
 
 $(LIB_B):
 	@mkdir -p $@
+
+# The consumer's proof: install-devel into a stage, then a C host built only from the staged
+# omxplugins.pc (no -ldl, and dlopen must not be among its symbols) opens every face through the
+# table. The ids it expects are each plugin folder's CLAP_ID, in folder order: the plugins' own.
+LIB_STAGE := $(abspath $(LIB_B)/stage)
+CLAP_IDS   = $(foreach p,$(PLUGINS),$(shell sed -n 's/^CLAP_ID *:= *//p' $(p)Makefile))
+lib-test: lib
+	rm -rf $(LIB_STAGE)
+	$(MAKE) -s install-devel DESTDIR= PREFIX=$(LIB_STAGE) LIBDIR=$(LIB_STAGE)/lib
+	PKG_CONFIG_PATH=$(LIB_STAGE)/lib/pkgconfig$${PKG_CONFIG_PATH:+:$$PKG_CONFIG_PATH} && export PKG_CONFIG_PATH && \
+	  $(CC) $(CPPFLAGS) $(CFLAGS) $(LIB_WARN) $$($(PKG_CONFIG) --cflags omxplugins) -o $(LIB_B)/static-table-host \
+	    tools/test/static-table-host.c $(LDFLAGS) $$($(PKG_CONFIG) --libs omxplugins)
+	@if nm -u $(LIB_B)/static-table-host | grep -qw dlopen; then echo "FAIL static-table-host calls dlopen"; exit 1; fi
+	@echo "PASS static-table-host links libomxplugins through omxplugins.pc, without dlopen"
+	$(LIB_B)/static-table-host $(CLAP_IDS)
 version:
 	@echo $(VERSION)
