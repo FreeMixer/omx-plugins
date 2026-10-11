@@ -290,6 +290,7 @@ function resolveParams(file, d) {
       out.max = Math.max(out.max, u.max);
     }
     if (t.kind) out.kind = t.kind;
+    if (t.byKind) out.byKind = t.byKind;
     if (t.points) out.points = t.points;
     if (t.values) out.values = t.values;
     return out;
