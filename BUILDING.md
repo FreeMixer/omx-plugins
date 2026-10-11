@@ -57,6 +57,12 @@ CLAP id is in the table once, and each one is created through its factory, activ
    `org.openmixer.panel-description/1` read back: the family, the sections, every listed parameter as
    a control in its section and order, the roles and displays equal the declaration's panel, and the
    fingerprint is the SHA-256 of what it serves.
+8. **CLAP extensions** (`tools/clap-ext-probe.c`, `tools/clap-ext-check.mjs`): the CLAP face's
+   `org.openmixer.param-contract/1` (each parameter's symbol, unit, scale and step, version 1, the
+   fingerprint of what it serves), its `clap.remote-controls` pages (each section's controls, eight
+   a page) and its `clap.track-info`: under each placement, before and after activation, every
+   parameter comes up at the contract's default for that kind of channel (a delay's or reverb's mix
+   fully wet on a return), else its own, and a value the host set stays.
 
 For omx-strip, steps 3 and 4 are one **strip oracle** (`test/strip-oracle.c`): at 44.1, 48, 96
 and 192 kHz, on both builds, in each of the 24 stage orders and at the defaults, the output equals
@@ -72,10 +78,11 @@ plugins/<name>/
   omx_<kernel>_lv2.c      the LV2 face, plain C
   generated/              written by `make gen`, committed: the parameter header and the LV2 bundle
   test/                   the probe and the oracle
-include/                  shared C shapes (no DSP): omx_panel_description.h, the panel description
-                          extension and its rows; omx_clap_static.h, libomxplugins' table
+include/                  shared C shapes (no DSP): omx_panel_description.h and omx_param_contract.h,
+                          the openmixer extensions and their rows; omx_clap_static.h, libomxplugins' table
 lib/                      omx_clap_static.c (the table's rows are generated) and omxplugins.pc.in
-tools/                    gen.mjs (header + TTL), panel-description.mjs (the panel description),
+tools/                    gen.mjs (header + TTL), panel-description.mjs and param-contract.mjs (the
+                          extensions' rows),
                           modgui-gen.mjs (MOD GUI), the test helpers,
                           omx-new-plugin.mjs (the wizard), plugin-recipe.mjs (completeness)
 recipes/                  plugin.recipe.json, the templates tools/gen.mjs writes from
