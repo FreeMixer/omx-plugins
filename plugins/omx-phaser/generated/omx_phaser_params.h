@@ -9,6 +9,9 @@
  * The include guard is omx-dsp's own <omxdsp/params/omx_phaser_params.h>: included first, this
  * table is the one the kernel's instance header reads.
  */
+#include <stddef.h>
+
+#include "omx_panel_description.h"
 #include "omx_plugin_param.h"
 
 enum {
@@ -62,6 +65,29 @@ static const omx_plugin_param OMX_PHASER_PARAMS[OMX_PHASER_PARAM_COUNT] = {
 /* org.openmixer.declaration/1: the declaration's plain description and the digest of its parameters. */
 #define OMX_PHASER_DECL_SOURCE "omx phaser: Rate 0.05 to 5 Hz, Base 50 to 2000 Hz, Depth 0 to 6 oct, Stages 2 to 12, Feedback -0.9 to 0.9, Mix 0 to 100 %"
 #define OMX_PHASER_DECL_DIGEST "d39a2a6935c7d0e32234d86d28aa84bcb731db7c680d1cd28dd517edff5fe512"
+
+/* org.openmixer.panel-description/1 (tools/panel-description.mjs): the declaration's panel as the rows
+ * include/omx_panel_description.h serves, parameter ids the declaration's. Family modulation. */
+#define OMX_PHASER_PANEL_FINGERPRINT "fbbb4453869b48ce4bd45faefa1f546ca7275b357f77f76117559f4f19a882f1"
+static const struct omx_panel_section_row OMX_PHASER_PANEL_SECTIONS[] = {
+  { "phaser", "fx.phaser.section.phaser", "Phaser" },
+};
+static const struct omx_panel_control_row OMX_PHASER_PANEL_CONTROLS[] = {
+  { 0u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.phaser.rate_hz", "Rate", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 1u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.phaser.base_hz", "Base", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 2u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.phaser.depth_oct", "Depth", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 3u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.phaser.stages", "Stages", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 4u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.phaser.feedback", "Feedback", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 5u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.phaser.mix", "Mix", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+};
+static const struct omx_panel_rows OMX_PHASER_PANEL = {
+  OMX_PHASER_PANEL_FINGERPRINT, OMX_CLAP_FAMILY_MODULATION,
+  OMX_PHASER_PANEL_SECTIONS, 1u,
+  OMX_PHASER_PANEL_CONTROLS, 6u,
+  NULL, 0u,
+  NULL, 0u,
+  NULL, 0u,
+};
 
 /* LV2 port indices (tools/gen.mjs lv2Ports): audio, then parameter i at FIRST_PARAM + i, then these. */
 #define OMX_PHASER_LV2_PORT_IN_L 0u

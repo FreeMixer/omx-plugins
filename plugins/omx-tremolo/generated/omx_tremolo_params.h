@@ -9,6 +9,9 @@
  * The include guard is omx-dsp's own <omxdsp/params/omx_tremolo_params.h>: included first, this
  * table is the one the kernel's instance header reads.
  */
+#include <stddef.h>
+
+#include "omx_panel_description.h"
 #include "omx_plugin_param.h"
 
 enum {
@@ -52,6 +55,27 @@ static const omx_plugin_param OMX_TREMOLO_PARAMS[OMX_TREMOLO_PARAM_COUNT] = {
 /* org.openmixer.declaration/1: the declaration's plain description and the digest of its parameters. */
 #define OMX_TREMOLO_DECL_SOURCE "omx tremolo: Rate 0.1 to 20 Hz, Depth 0 to 100 %, Mix 0 to 100 %, Mode 0 to 1"
 #define OMX_TREMOLO_DECL_DIGEST "b57991962924d939b9966fa18b44ce86bb73f3c940611aaf165dd227ec9b6d1a"
+
+/* org.openmixer.panel-description/1 (tools/panel-description.mjs): the declaration's panel as the rows
+ * include/omx_panel_description.h serves, parameter ids the declaration's. Family modulation. */
+#define OMX_TREMOLO_PANEL_FINGERPRINT "a1b0075a4a93b51b7c4a8acfa98adfe935a211d009a76029fd4741a9c328d92d"
+static const struct omx_panel_section_row OMX_TREMOLO_PANEL_SECTIONS[] = {
+  { "tremolo", "fx.tremolo.section.tremolo", "Tremolo" },
+};
+static const struct omx_panel_control_row OMX_TREMOLO_PANEL_CONTROLS[] = {
+  { 0u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.tremolo.rate_hz", "Rate", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 1u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.tremolo.depth", "Depth", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 2u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.tremolo.mix", "Mix", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 3u, 0u, OMX_CLAP_WIDGET_AUTO, "fx.tremolo.mode", "Mode", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+};
+static const struct omx_panel_rows OMX_TREMOLO_PANEL = {
+  OMX_TREMOLO_PANEL_FINGERPRINT, OMX_CLAP_FAMILY_MODULATION,
+  OMX_TREMOLO_PANEL_SECTIONS, 1u,
+  OMX_TREMOLO_PANEL_CONTROLS, 4u,
+  NULL, 0u,
+  NULL, 0u,
+  NULL, 0u,
+};
 
 /* LV2 port indices (tools/gen.mjs lv2Ports): audio, then parameter i at FIRST_PARAM + i, then these. */
 #define OMX_TREMOLO_LV2_PORT_IN_L 0u

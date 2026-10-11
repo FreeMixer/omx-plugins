@@ -9,6 +9,9 @@
  * The include guard is omx-dsp's own <omxdsp/params/omx_geq_params.h>: included first, this
  * table is the one the kernel's instance header reads.
  */
+#include <stddef.h>
+
+#include "omx_panel_description.h"
 #include "omx_plugin_param.h"
 
 enum {
@@ -187,6 +190,54 @@ static const omx_plugin_param OMX_GEQ_PARAMS[OMX_GEQ_PARAM_COUNT] = {
 /* org.openmixer.declaration/1: the declaration's plain description and the digest of its parameters. */
 #define OMX_GEQ_DECL_SOURCE "omx geq: 20 Hz -15 to 15 dB, 25 Hz -15 to 15 dB, 31.5 Hz -15 to 15 dB, 40 Hz -15 to 15 dB, 50 Hz -15 to 15 dB, 63 Hz -15 to 15 dB, 80 Hz -15 to 15 dB, 100 Hz -15 to 15 dB, 125 Hz -15 to 15 dB, 160 Hz -15 to 15 dB, 200 Hz -15 to 15 dB, 250 Hz -15 to 15 dB, 315 Hz -15 to 15 dB, 400 Hz -15 to 15 dB, 500 Hz -15 to 15 dB, 630 Hz -15 to 15 dB, 800 Hz -15 to 15 dB, 1 kHz -15 to 15 dB, 1.25 kHz -15 to 15 dB, 1.6 kHz -15 to 15 dB, 2 kHz -15 to 15 dB, 2.5 kHz -15 to 15 dB, 3.15 kHz -15 to 15 dB, 4 kHz -15 to 15 dB, 5 kHz -15 to 15 dB, 6.3 kHz -15 to 15 dB, 8 kHz -15 to 15 dB, 10 kHz -15 to 15 dB, 12.5 kHz -15 to 15 dB, 16 kHz -15 to 15 dB, 20 kHz -15 to 15 dB"
 #define OMX_GEQ_DECL_DIGEST "d0a6a22360a6ce7914f59d4b3eb245c16250f1a772ad308a64bbe05698fe2f48"
+
+/* org.openmixer.panel-description/1 (tools/panel-description.mjs): the declaration's panel as the rows
+ * include/omx_panel_description.h serves, parameter ids the declaration's. Family eq. */
+#define OMX_GEQ_PANEL_FINGERPRINT "0e1c91e752ac6e2d20cab54dc1467faea29cefc0173069d4a85b94deb2bcb246"
+static const struct omx_panel_section_row OMX_GEQ_PANEL_SECTIONS[] = {
+  { "geq", "fx.geq.section.geq", "Geq" },
+};
+static const struct omx_panel_control_row OMX_GEQ_PANEL_CONTROLS[] = {
+  { 0u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.geq.band01", "20 Hz", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 1u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.geq.band02", "25 Hz", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 2u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.geq.band03", "31.5 Hz", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 3u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.geq.band04", "40 Hz", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 4u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.geq.band05", "50 Hz", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 5u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.geq.band06", "63 Hz", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 6u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.geq.band07", "80 Hz", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 7u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.geq.band08", "100 Hz", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 8u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.geq.band09", "125 Hz", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 9u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.geq.band10", "160 Hz", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 10u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.geq.band11", "200 Hz", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 11u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.geq.band12", "250 Hz", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 12u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.geq.band13", "315 Hz", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 13u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.geq.band14", "400 Hz", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 14u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.geq.band15", "500 Hz", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 15u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.geq.band16", "630 Hz", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 16u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.geq.band17", "800 Hz", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 17u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.geq.band18", "1 kHz", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 18u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.geq.band19", "1.25 kHz", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 19u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.geq.band20", "1.6 kHz", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 20u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.geq.band21", "2 kHz", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 21u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.geq.band22", "2.5 kHz", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 22u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.geq.band23", "3.15 kHz", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 23u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.geq.band24", "4 kHz", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 24u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.geq.band25", "5 kHz", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 25u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.geq.band26", "6.3 kHz", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 26u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.geq.band27", "8 kHz", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 27u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.geq.band28", "10 kHz", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 28u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.geq.band29", "12.5 kHz", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 29u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.geq.band30", "16 kHz", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 30u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.geq.band31", "20 kHz", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+};
+static const struct omx_panel_rows OMX_GEQ_PANEL = {
+  OMX_GEQ_PANEL_FINGERPRINT, OMX_CLAP_FAMILY_EQ,
+  OMX_GEQ_PANEL_SECTIONS, 1u,
+  OMX_GEQ_PANEL_CONTROLS, 31u,
+  NULL, 0u,
+  NULL, 0u,
+  NULL, 0u,
+};
 
 /* LV2 port indices (tools/gen.mjs lv2Ports): audio, then parameter i at FIRST_PARAM + i, then these. */
 #define OMX_GEQ_LV2_PORT_IN_L 0u

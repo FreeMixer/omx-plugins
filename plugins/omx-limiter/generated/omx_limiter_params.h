@@ -9,6 +9,9 @@
  * The include guard is omx-dsp's own <omxdsp/params/omx_limiter_params.h>: included first, this
  * table is the one the kernel's instance header reads.
  */
+#include <stddef.h>
+
+#include "omx_panel_description.h"
 #include "omx_plugin_param.h"
 
 enum {
@@ -47,6 +50,26 @@ static const omx_plugin_param OMX_LIMITER_PARAMS[OMX_LIMITER_PARAM_COUNT] = {
 /* org.openmixer.declaration/1: the declaration's plain description and the digest of its parameters. */
 #define OMX_LIMITER_DECL_SOURCE "omx limiter: Ceiling -12 to 0 dBFS, Lookahead 0.5 to 5 ms, Release 1 to 1000 ms"
 #define OMX_LIMITER_DECL_DIGEST "aaae50a0d0219bc9406793d74ddc52d57717d8a4433e4d39f174cd5ef6e4c52c"
+
+/* org.openmixer.panel-description/1 (tools/panel-description.mjs): the declaration's panel as the rows
+ * include/omx_panel_description.h serves, parameter ids the declaration's. Family limiter. */
+#define OMX_LIMITER_PANEL_FINGERPRINT "8df8a83b852fddc361ada0411c80cd19c6319ef58e93ecc8a704596713eaa987"
+static const struct omx_panel_section_row OMX_LIMITER_PANEL_SECTIONS[] = {
+  { "limiter", "fx.limiter.section.limiter", "Limiter" },
+};
+static const struct omx_panel_control_row OMX_LIMITER_PANEL_CONTROLS[] = {
+  { 0u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.limiter.ceiling_db", "Ceiling", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 1u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.limiter.lookahead_ms", "Lookahead", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 2u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.limiter.release_ms", "Release", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+};
+static const struct omx_panel_rows OMX_LIMITER_PANEL = {
+  OMX_LIMITER_PANEL_FINGERPRINT, OMX_CLAP_FAMILY_LIMITER,
+  OMX_LIMITER_PANEL_SECTIONS, 1u,
+  OMX_LIMITER_PANEL_CONTROLS, 3u,
+  NULL, 0u,
+  NULL, 0u,
+  NULL, 0u,
+};
 
 /* LV2 port indices (tools/gen.mjs lv2Ports): audio, then parameter i at FIRST_PARAM + i, then these. */
 #define OMX_LIMITER_LV2_PORT_IN_L 0u

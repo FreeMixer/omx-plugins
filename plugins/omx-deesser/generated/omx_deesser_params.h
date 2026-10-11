@@ -9,6 +9,9 @@
  * The include guard is omx-dsp's own <omxdsp/params/omx_deesser_params.h>: included first, this
  * table is the one the kernel's instance header reads.
  */
+#include <stddef.h>
+
+#include "omx_panel_description.h"
 #include "omx_plugin_param.h"
 
 enum {
@@ -72,6 +75,31 @@ static const omx_plugin_param OMX_DEESSER_PARAMS[OMX_DEESSER_PARAM_COUNT] = {
 /* org.openmixer.declaration/1: the declaration's plain description and the digest of its parameters. */
 #define OMX_DEESSER_DECL_SOURCE "omx deesser: Freq 2000 to 16000 Hz, Width 0.25 to 4 oct, Threshold -60 to 0 dB, Ratio 1 to 20, Range -24 to 0 dB, Attack 0.1 to 50 ms, Release 5 to 500 ms, Mode 0 to 1"
 #define OMX_DEESSER_DECL_DIGEST "5229f9c0817d98fea312f088c1f8519628c36ef5f1d2b453b22f3ba0571f097f"
+
+/* org.openmixer.panel-description/1 (tools/panel-description.mjs): the declaration's panel as the rows
+ * include/omx_panel_description.h serves, parameter ids the declaration's. Family deesser. */
+#define OMX_DEESSER_PANEL_FINGERPRINT "ad86f28401225341755603516a93c9e121d347c77400d495bddefed4a17d3794"
+static const struct omx_panel_section_row OMX_DEESSER_PANEL_SECTIONS[] = {
+  { "deesser", "fx.deesser.section.deesser", "Deesser" },
+};
+static const struct omx_panel_control_row OMX_DEESSER_PANEL_CONTROLS[] = {
+  { 0u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.deesser.deess_freq", "Freq", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 1u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.deesser.deess_width", "Width", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 2u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.deesser.deess_threshold", "Threshold", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 3u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.deesser.deess_ratio", "Ratio", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 4u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.deesser.deess_range", "Range", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 5u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.deesser.deess_attack", "Attack", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 6u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.deesser.deess_release", "Release", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 7u, 0u, OMX_CLAP_WIDGET_AUTO, "fx.deesser.deess_mode", "Mode", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+};
+static const struct omx_panel_rows OMX_DEESSER_PANEL = {
+  OMX_DEESSER_PANEL_FINGERPRINT, OMX_CLAP_FAMILY_DEESSER,
+  OMX_DEESSER_PANEL_SECTIONS, 1u,
+  OMX_DEESSER_PANEL_CONTROLS, 8u,
+  NULL, 0u,
+  NULL, 0u,
+  NULL, 0u,
+};
 
 /* LV2 port indices (tools/gen.mjs lv2Ports): audio, then parameter i at FIRST_PARAM + i, then these. */
 #define OMX_DEESSER_LV2_PORT_IN_L 0u

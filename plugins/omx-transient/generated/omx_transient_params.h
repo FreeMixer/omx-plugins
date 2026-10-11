@@ -9,6 +9,9 @@
  * The include guard is omx-dsp's own <omxdsp/params/omx_transient_params.h>: included first, this
  * table is the one the kernel's instance header reads.
  */
+#include <stddef.h>
+
+#include "omx_panel_description.h"
 #include "omx_plugin_param.h"
 
 enum {
@@ -57,6 +60,28 @@ static const omx_plugin_param OMX_TRANSIENT_PARAMS[OMX_TRANSIENT_PARAM_COUNT] = 
 /* org.openmixer.declaration/1: the declaration's plain description and the digest of its parameters. */
 #define OMX_TRANSIENT_DECL_SOURCE "omx transient: Attack -24 to 24 dB, Sustain -24 to 24 dB, Attack Time 2 to 50 ms, Sustain Time 50 to 2000 ms, Output -24 to 12 dB"
 #define OMX_TRANSIENT_DECL_DIGEST "b735a9f45b45b01b0ef5660e8ac5e43729aaab9fd5b9c7cce4976934c82759a5"
+
+/* org.openmixer.panel-description/1 (tools/panel-description.mjs): the declaration's panel as the rows
+ * include/omx_panel_description.h serves, parameter ids the declaration's. Family none. */
+#define OMX_TRANSIENT_PANEL_FINGERPRINT "628f9caf28b29c12b3c738305685d5d19caa64b1582d097fb87efc2a3ef1cecf"
+static const struct omx_panel_section_row OMX_TRANSIENT_PANEL_SECTIONS[] = {
+  { "transient", "fx.transient.section.transient", "Transient" },
+};
+static const struct omx_panel_control_row OMX_TRANSIENT_PANEL_CONTROLS[] = {
+  { 0u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.transient.attack_db", "Attack", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 1u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.transient.sustain_db", "Sustain", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 2u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.transient.attack_time_ms", "Attack Time", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 3u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.transient.sustain_time_ms", "Sustain Time", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 4u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.transient.output_db", "Output", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+};
+static const struct omx_panel_rows OMX_TRANSIENT_PANEL = {
+  OMX_TRANSIENT_PANEL_FINGERPRINT, OMX_CLAP_FAMILY_NONE,
+  OMX_TRANSIENT_PANEL_SECTIONS, 1u,
+  OMX_TRANSIENT_PANEL_CONTROLS, 5u,
+  NULL, 0u,
+  NULL, 0u,
+  NULL, 0u,
+};
 
 /* LV2 port indices (tools/gen.mjs lv2Ports): audio, then parameter i at FIRST_PARAM + i, then these. */
 #define OMX_TRANSIENT_LV2_PORT_IN_L 0u

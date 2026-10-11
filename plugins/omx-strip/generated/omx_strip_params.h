@@ -9,6 +9,9 @@
  * The include guard is omx-dsp's own <omxdsp/params/omx_strip_params.h>: included first, this
  * table is the one the kernel's instance header reads.
  */
+#include <stddef.h>
+
+#include "omx_panel_description.h"
 #include "omx_plugin_param.h"
 
 /* The band count of the chain's filter: its instance face's compile-time count, omx-contract's OMX_EQ_BAND_COUNTS_EQ8_MAX. */
@@ -290,6 +293,79 @@ static const omx_plugin_param OMX_STRIP_PARAMS[OMX_STRIP_PARAM_COUNT] = {
 /* org.openmixer.declaration/1: the declaration's plain description and the digest of its parameters. */
 #define OMX_STRIP_DECL_SOURCE "omx strip: Input 0 to 1, Trim -24 to 24 dB, Filters 0 to 1, HPF 0 to 1, HPF Freq 20 to 1000 Hz, HPF Slope 12 to 24 dB/oct, LPF 0 to 1, LPF Freq 1000 to 20000 Hz, LPF Slope 12 to 24 dB/oct, Gate 0 to 1, Gate Threshold -80 to 0 dB, Gate Ratio 1 to 100, Gate Range -90 to 0 dB, Gate Attack 0 to 500 ms, Gate Release 0 to 5000 ms, Gate Knee Start -80 to 0 dB, Gate Knee End -80 to 0 dB, Gate Hold 0 to 2000 ms, Gate Hysteresis 0 to 24 dB, EQ 0 to 1, EQ 1 Type 0 to 5, EQ 1 Freq 20 to 20000 Hz, EQ 1 Gain -15 to 15 dB, EQ 1 Q 0.3 to 116, EQ 1 0 to 1, EQ 2 Type 0 to 5, EQ 2 Freq 20 to 20000 Hz, EQ 2 Gain -15 to 15 dB, EQ 2 Q 0.3 to 116, EQ 2 0 to 1, EQ 3 Type 0 to 5, EQ 3 Freq 20 to 20000 Hz, EQ 3 Gain -15 to 15 dB, EQ 3 Q 0.3 to 116, EQ 3 0 to 1, EQ 4 Type 0 to 5, EQ 4 Freq 20 to 20000 Hz, EQ 4 Gain -15 to 15 dB, EQ 4 Q 0.3 to 116, EQ 4 0 to 1, Comp 0 to 1, Comp Threshold -60 to 0 dB, Comp Ratio 1 to 20, Comp Knee 0 to 24 dB, Comp Attack 0.1 to 100 ms, Comp Release 5 to 3000 ms, Comp Makeup 0 to 24 dB, Comp Kind 0 to 1, Comp Mix 0 to 100 %, Comp Detector Oversampling 0 to 2, Order 0 to 119"
 #define OMX_STRIP_DECL_DIGEST "7bc2f63aae815b41303644971f60fdc441e2c9407e093d98200c1c9e1ae0ea2d"
+
+/* org.openmixer.panel-description/1 (tools/panel-description.mjs): the declaration's panel as the rows
+ * include/omx_panel_description.h serves, parameter ids the declaration's. Family none. */
+#define OMX_STRIP_PANEL_FINGERPRINT "3a3b6f04f026307aef653813b27845ed62462d2b51981e0e5e6ef65a248055e1"
+static const struct omx_panel_section_row OMX_STRIP_PANEL_SECTIONS[] = {
+  { "trim", "fx.strip.section.trim", "Input" },
+  { "filter", "fx.strip.section.filter", "Filters" },
+  { "gate", "fx.strip.section.gate", "Gate" },
+  { "eq", "fx.strip.section.eq", "EQ" },
+  { "comp", "fx.strip.section.comp", "Comp" },
+  { "order", "fx.strip.section.order", "Order" },
+};
+static const struct omx_panel_control_row OMX_STRIP_PANEL_CONTROLS[] = {
+  { 0u, 0u, OMX_CLAP_WIDGET_SWITCH, "fx.strip.trim_on", "Input", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 1u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.strip.trim_db", "Trim", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 2u, 1u, OMX_CLAP_WIDGET_SWITCH, "fx.strip.filter_on", "Filters", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 3u, 1u, OMX_CLAP_WIDGET_SWITCH, "fx.strip.hpf_on", "HPF", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 4u, 1u, OMX_CLAP_WIDGET_KNOB, "fx.strip.hpf_freq", "HPF Freq", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 5u, 1u, OMX_CLAP_WIDGET_AUTO, "fx.strip.hpf_slope", "HPF Slope", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 6u, 1u, OMX_CLAP_WIDGET_SWITCH, "fx.strip.lpf_on", "LPF", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 7u, 1u, OMX_CLAP_WIDGET_KNOB, "fx.strip.lpf_freq", "LPF Freq", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 8u, 1u, OMX_CLAP_WIDGET_AUTO, "fx.strip.lpf_slope", "LPF Slope", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 9u, 2u, OMX_CLAP_WIDGET_SWITCH, "fx.strip.gate_on", "Gate", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 10u, 2u, OMX_CLAP_WIDGET_KNOB, "fx.strip.gate_threshold", "Gate Threshold", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 11u, 2u, OMX_CLAP_WIDGET_KNOB, "fx.strip.gate_ratio", "Gate Ratio", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 12u, 2u, OMX_CLAP_WIDGET_KNOB, "fx.strip.gate_range", "Gate Range", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 13u, 2u, OMX_CLAP_WIDGET_KNOB, "fx.strip.gate_attack", "Gate Attack", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 14u, 2u, OMX_CLAP_WIDGET_KNOB, "fx.strip.gate_release", "Gate Release", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 15u, 2u, OMX_CLAP_WIDGET_KNOB, "fx.strip.gate_knee_start", "Gate Knee Start", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 16u, 2u, OMX_CLAP_WIDGET_KNOB, "fx.strip.gate_knee_end", "Gate Knee End", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 17u, 2u, OMX_CLAP_WIDGET_KNOB, "fx.strip.gate_hold", "Gate Hold", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 18u, 2u, OMX_CLAP_WIDGET_KNOB, "fx.strip.gate_hysteresis", "Gate Hysteresis", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 19u, 3u, OMX_CLAP_WIDGET_SWITCH, "fx.strip.eq_on", "EQ", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 20u, 3u, OMX_CLAP_WIDGET_AUTO, "fx.strip.eq1_type", "EQ 1 Type", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 21u, 3u, OMX_CLAP_WIDGET_KNOB, "fx.strip.eq1_freq", "EQ 1 Freq", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 22u, 3u, OMX_CLAP_WIDGET_KNOB, "fx.strip.eq1_gain", "EQ 1 Gain", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 23u, 3u, OMX_CLAP_WIDGET_KNOB, "fx.strip.eq1_q", "EQ 1 Q", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 24u, 3u, OMX_CLAP_WIDGET_SWITCH, "fx.strip.eq1_on", "EQ 1", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 25u, 3u, OMX_CLAP_WIDGET_AUTO, "fx.strip.eq2_type", "EQ 2 Type", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 26u, 3u, OMX_CLAP_WIDGET_KNOB, "fx.strip.eq2_freq", "EQ 2 Freq", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 27u, 3u, OMX_CLAP_WIDGET_KNOB, "fx.strip.eq2_gain", "EQ 2 Gain", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 28u, 3u, OMX_CLAP_WIDGET_KNOB, "fx.strip.eq2_q", "EQ 2 Q", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 29u, 3u, OMX_CLAP_WIDGET_SWITCH, "fx.strip.eq2_on", "EQ 2", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 30u, 3u, OMX_CLAP_WIDGET_AUTO, "fx.strip.eq3_type", "EQ 3 Type", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 31u, 3u, OMX_CLAP_WIDGET_KNOB, "fx.strip.eq3_freq", "EQ 3 Freq", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 32u, 3u, OMX_CLAP_WIDGET_KNOB, "fx.strip.eq3_gain", "EQ 3 Gain", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 33u, 3u, OMX_CLAP_WIDGET_KNOB, "fx.strip.eq3_q", "EQ 3 Q", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 34u, 3u, OMX_CLAP_WIDGET_SWITCH, "fx.strip.eq3_on", "EQ 3", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 35u, 3u, OMX_CLAP_WIDGET_AUTO, "fx.strip.eq4_type", "EQ 4 Type", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 36u, 3u, OMX_CLAP_WIDGET_KNOB, "fx.strip.eq4_freq", "EQ 4 Freq", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 37u, 3u, OMX_CLAP_WIDGET_KNOB, "fx.strip.eq4_gain", "EQ 4 Gain", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 38u, 3u, OMX_CLAP_WIDGET_KNOB, "fx.strip.eq4_q", "EQ 4 Q", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 39u, 3u, OMX_CLAP_WIDGET_SWITCH, "fx.strip.eq4_on", "EQ 4", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 40u, 4u, OMX_CLAP_WIDGET_SWITCH, "fx.strip.comp_on", "Comp", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 41u, 4u, OMX_CLAP_WIDGET_KNOB, "fx.strip.comp_threshold", "Comp Threshold", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 42u, 4u, OMX_CLAP_WIDGET_KNOB, "fx.strip.comp_ratio", "Comp Ratio", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 43u, 4u, OMX_CLAP_WIDGET_KNOB, "fx.strip.comp_knee", "Comp Knee", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 44u, 4u, OMX_CLAP_WIDGET_KNOB, "fx.strip.comp_attack", "Comp Attack", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 45u, 4u, OMX_CLAP_WIDGET_KNOB, "fx.strip.comp_release", "Comp Release", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 46u, 4u, OMX_CLAP_WIDGET_KNOB, "fx.strip.comp_makeup", "Comp Makeup", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 47u, 4u, OMX_CLAP_WIDGET_AUTO, "fx.strip.comp_kind", "Comp Kind", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 48u, 4u, OMX_CLAP_WIDGET_KNOB, "fx.strip.comp_mix", "Comp Mix", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 49u, 4u, OMX_CLAP_WIDGET_AUTO, "fx.strip.comp_detector_oversampling", "Comp Detector Oversampling", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 50u, 5u, OMX_CLAP_WIDGET_KNOB, "fx.strip.order", "Order", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+};
+static const struct omx_panel_rows OMX_STRIP_PANEL = {
+  OMX_STRIP_PANEL_FINGERPRINT, OMX_CLAP_FAMILY_NONE,
+  OMX_STRIP_PANEL_SECTIONS, 6u,
+  OMX_STRIP_PANEL_CONTROLS, 51u,
+  NULL, 0u,
+  NULL, 0u,
+  NULL, 0u,
+};
 
 /* LV2 port indices (tools/gen.mjs lv2Ports): audio, then parameter i at FIRST_PARAM + i, then these. */
 #define OMX_STRIP_LV2_PORT_IN_L 0u

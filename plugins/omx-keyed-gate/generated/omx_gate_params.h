@@ -9,6 +9,9 @@
  * The include guard is omx-dsp's own <omxdsp/params/omx_gate_params.h>: included first, this
  * table is the one the kernel's instance header reads.
  */
+#include <stddef.h>
+
+#include "omx_panel_description.h"
 #include "omx_plugin_param.h"
 
 enum {
@@ -82,6 +85,36 @@ static const omx_plugin_param OMX_GATE_PARAMS[OMX_GATE_PARAM_COUNT] = {
 /* org.openmixer.declaration/1: the declaration's plain description and the digest of its parameters. */
 #define OMX_GATE_DECL_SOURCE "omx keyed-gate: Key 0 to 1, Threshold -80 to 0 dB, Ratio 1 to 100, Range -90 to 0 dB, Attack 0 to 500 ms, Release 0 to 5000 ms, Knee Start -80 to 0 dB, Knee End -80 to 0 dB, Hold 0 to 2000 ms, Hysteresis 0 to 24 dB"
 #define OMX_GATE_DECL_DIGEST "da939093462b901312c31e455170d4fe564bddcabc0fb19934c7b69ea74c0c6f"
+
+/* org.openmixer.panel-description/1 (tools/panel-description.mjs): the declaration's panel as the rows
+ * include/omx_panel_description.h serves, parameter ids the declaration's. Family gate. */
+#define OMX_GATE_PANEL_FINGERPRINT "2999bdfc36c763e8f1da8b6005fc3b6c8fd41e919a51897430c0462e260b90df"
+static const struct omx_panel_section_row OMX_GATE_PANEL_SECTIONS[] = {
+  { "gate", "fx.gate.section.gate", "Keyed-gate" },
+};
+static const struct omx_panel_control_row OMX_GATE_PANEL_CONTROLS[] = {
+  { 0u, 0u, OMX_CLAP_WIDGET_AUTO, "fx.gate.key_external", "Key", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 1u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.gate.threshold", "Threshold", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 2u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.gate.ratio", "Ratio", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 3u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.gate.range", "Range", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 4u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.gate.attack", "Attack", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 5u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.gate.release", "Release", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 6u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.gate.knee_start", "Knee Start", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 7u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.gate.knee_end", "Knee End", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 8u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.gate.hold", "Hold", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 9u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.gate.hysteresis", "Hysteresis", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+};
+static const struct omx_panel_display_row OMX_GATE_PANEL_DISPLAYS[] = {
+  { OMX_CLAP_DISPLAY_TRANSFER_CURVE, 0u, OMX_CLAP_DISPLAY_FROM_FAMILY, { OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID }, 0u, OMX_CLAP_PANEL_INVALID_ID, 0.0, "fx.gate.display.transfer_curve", "Keyed-gate" },
+};
+static const struct omx_panel_rows OMX_GATE_PANEL = {
+  OMX_GATE_PANEL_FINGERPRINT, OMX_CLAP_FAMILY_GATE,
+  OMX_GATE_PANEL_SECTIONS, 1u,
+  OMX_GATE_PANEL_CONTROLS, 10u,
+  NULL, 0u,
+  OMX_GATE_PANEL_DISPLAYS, 1u,
+  NULL, 0u,
+};
 
 /* LV2 port indices (tools/gen.mjs lv2Ports): audio, then parameter i at FIRST_PARAM + i, then these. */
 #define OMX_GATE_LV2_PORT_IN_L 0u

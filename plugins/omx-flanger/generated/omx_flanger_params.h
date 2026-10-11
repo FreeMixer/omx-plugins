@@ -9,6 +9,9 @@
  * The include guard is omx-dsp's own <omxdsp/params/omx_flanger_params.h>: included first, this
  * table is the one the kernel's instance header reads.
  */
+#include <stddef.h>
+
+#include "omx_panel_description.h"
 #include "omx_plugin_param.h"
 
 enum {
@@ -52,6 +55,27 @@ static const omx_plugin_param OMX_FLANGER_PARAMS[OMX_FLANGER_PARAM_COUNT] = {
 /* org.openmixer.declaration/1: the declaration's plain description and the digest of its parameters. */
 #define OMX_FLANGER_DECL_SOURCE "omx flanger: Rate 0.05 to 5 Hz, Depth 0 to 5 ms, Feedback -0.95 to 0.95, Mix 0 to 100 %"
 #define OMX_FLANGER_DECL_DIGEST "323560b13042be1596a25511cdd1cabcddfc4f976cb7c1ab68f318f2ad8fc73e"
+
+/* org.openmixer.panel-description/1 (tools/panel-description.mjs): the declaration's panel as the rows
+ * include/omx_panel_description.h serves, parameter ids the declaration's. Family modulation. */
+#define OMX_FLANGER_PANEL_FINGERPRINT "526499ffb2bf8035cfc0a54178dfa6b0fa735d06afb5be6d9c2f9ab86e4583fa"
+static const struct omx_panel_section_row OMX_FLANGER_PANEL_SECTIONS[] = {
+  { "flanger", "fx.flanger.section.flanger", "Flanger" },
+};
+static const struct omx_panel_control_row OMX_FLANGER_PANEL_CONTROLS[] = {
+  { 0u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.flanger.rate", "Rate", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 1u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.flanger.depth", "Depth", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 2u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.flanger.feedback", "Feedback", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 3u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.flanger.mix", "Mix", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+};
+static const struct omx_panel_rows OMX_FLANGER_PANEL = {
+  OMX_FLANGER_PANEL_FINGERPRINT, OMX_CLAP_FAMILY_MODULATION,
+  OMX_FLANGER_PANEL_SECTIONS, 1u,
+  OMX_FLANGER_PANEL_CONTROLS, 4u,
+  NULL, 0u,
+  NULL, 0u,
+  NULL, 0u,
+};
 
 /* LV2 port indices (tools/gen.mjs lv2Ports): audio, then parameter i at FIRST_PARAM + i, then these. */
 #define OMX_FLANGER_LV2_PORT_IN_L 0u
