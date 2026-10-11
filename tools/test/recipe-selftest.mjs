@@ -325,6 +325,8 @@ async function main() {
     ['declValid', 'declaration', () => edit(`${P}/omx-drive.decl.json`, (s) => JSON.stringify((({ console: _c, ...d }) => d)(JSON.parse(s)), null, 2))],
     ['declValid', 'declaration', () => edit(`${P}/omx-drive.decl.json`, (s) => s.replace('"chip": "{amount}"', '"chip": "{drive}"'))],
     ['declValid', 'declaration', () => edit(`${P}/omx-drive.decl.json`, (s) => s.replace('"bandFreq",\n            "mix"', '"bandFreq",\n            "wet"'))],
+    ['declValid', 'declaration', () => edit(`${P}/omx-drive.decl.json`, (s) => s.replace('"family": "drive"', '"family": "saturation"'))],
+    ['declValid', 'declaration', () => edit(`${P}/omx-drive.decl.json`, (s) => s.replace('"tone": "character"', '"character": "character"'))],
     ['paramsByReference', 'params-by-reference', () => edit(`${P}/omx-drive.decl.json`, (s) => s.replace('"ref": "DRIVE_AMOUNT_RANGE"', '"ref": "DRIVE_AMOUNT_RANGE", "min": 0'))],
   ];
   for (const [family, id, breakIt] of SABOTAGE) {
@@ -450,11 +452,17 @@ static inline void omx_wobble_instance_run(OmxWobbleInstance *s, const float *in
   await refused('a reference into another kernel', (a) => { a.params[0].ref = 'FX_DELAY_TIME_RANGE'; }, '/params/0/ref');
   await refused('a derived field written wrong', (a) => { a.clap.id = 'org.openmixer.trem'; }, '/clap/id');
   await refused('a face argument no parameter binds', (a) => { a.params.splice(2, 1); }, '/params');
-  await refused('a panel naming no parameter', (a) => { a.panel = { family: 'modulation', roles: {}, sections: [{ key: 'wobble', label: 'Wobble', controls: ['rateHz', 'speed'] }] }; }, '/panel/sections');
+  await refused('a panel naming no parameter', (a) => { a.panel = { family: 'modulation', roles: { rate: 'rateHz' }, sections: [{ key: 'wobble', label: 'Wobble', controls: ['rateHz', 'speed'] }] }; }, '/panel/sections');
   await refused('a console chip naming no parameter', (a) => { a.console = { placement: { strips: ['input'], group: 'insert' }, chip: '{rateHz} · {speed}' }; }, '/console/chip');
   await refused('a panel that leaves a parameter off the MOD GUI', (a) => {
-    a.panel = { family: 'modulation', roles: {}, sections: [{ key: 'wobble', label: 'Wobble', controls: ['rateHz', 'depth', 'mix'] }] };
+    a.panel = { family: 'modulation', roles: { rate: 'rateHz' }, sections: [{ key: 'wobble', label: 'Wobble', controls: ['rateHz', 'depth', 'mix'] }] };
   }, '/panel');
+  const panelOf = (family, roles) => ({ family, roles, sections: [{ key: 'wobble', label: 'Wobble', controls: ['rateHz', 'depth', 'mix', 'mode'] }] });
+  await refused('a panel family the console does not know', (a) => { a.panel = panelOf('wobble', {}); }, '/panel/family');
+  await refused('a role outside its family', (a) => { a.panel = panelOf('modulation', { rate: 'rateHz', time: 'depth' }); }, '/panel/roles/time');
+  await refused('a family with none of its roles', (a) => { a.panel = panelOf('modulation', {}); }, '/panel/roles');
+  await refused('a list of symbols for a role that does not repeat by band', (a) => { a.panel = panelOf('modulation', { rate: ['rateHz', 'depth'] }); }, '/panel/roles/rate');
+  await refused('a role naming no parameter', (a) => { a.panel = panelOf('modulation', { rate: 'speed' }); }, '/panel/roles/rate');
   {
     const f = parseFace(`static inline int omx_wobble_instance_init(OmxWobbleInstance *s, float sr) { return 1; }
 static inline void omx_wobble_instance_resolve(OmxWobbleInstance *s, int bypass, float rate, float depth) { }

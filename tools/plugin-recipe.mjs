@@ -214,6 +214,33 @@ export function globRe(glob) {
   return new RegExp(`^${re}$`);
 }
 
+/** Every way the `panel` block leaves the console's vocabulary or names no declared parameter: its
+ * family outside `$defs.family`, a role outside its family's (`$defs.familyRoles`), a list of symbols
+ * for a role that is not indexed, a family other than none with no role, and a section, role or widget
+ * naming no parameter. The families of `$defs.family` and of `$defs.familyRoles` are one list. */
+export function panelErrors(schema, decl, symbols) {
+  const errs = [];
+  const p = decl.panel;
+  if (!p) return errs;
+  const families = schema.$defs.family.enum;
+  const tables = schema.$defs.familyRoles.properties;
+  const indexed = new Set(schema.$defs.indexedRole.enum);
+  if (families.join() !== Object.keys(tables).join()) errs.push(`schema: $defs.family (${families.join(', ')}) and $defs.familyRoles (${Object.keys(tables).join(', ')}) are not one list`);
+  for (const s of p.sections ?? []) for (const c of s.controls) if (!symbols.has(c)) errs.push(`/panel/sections: section '${s.key}' names '${c}', no parameter`);
+  if (families.includes(p.family)) {
+    const own = tables[p.family]?.enum ?? [];
+    const roles = Object.entries(p.roles ?? {});
+    if (p.family !== 'none' && roles.length === 0) errs.push(`/panel/roles: family '${p.family}' names none of its roles (${own.join(', ')})`);
+    for (const [role, sym] of roles) {
+      if (!own.includes(role)) errs.push(`/panel/roles/${role}: not a role of family '${p.family}'${own.length ? ` (${own.join(', ')})` : ''}`);
+      if (Array.isArray(sym) && !indexed.has(role)) errs.push(`/panel/roles/${role}: names a list, and only an indexed role (${[...indexed].join(', ')}) repeats by band`);
+      for (const x of [sym].flat()) if (!symbols.has(x)) errs.push(`/panel/roles/${role}: '${x}' is no parameter`);
+    }
+  }
+  for (const sym of Object.keys(p.widgets ?? {})) if (!symbols.has(sym)) errs.push(`/panel/widgets/${sym}: is no parameter`);
+  return errs;
+}
+
 /** Every name the `console` block (spec §8) gives that is no declared parameter: the card's
  * controls, the chip's `{holes}`, the console panel's controls and widgets. */
 export function consoleErrors(decl, symbols) {
@@ -254,8 +281,7 @@ export const CHECKERS = {
     // a chain's generated switches and `order` are parameters too
     const generated = [...(facts.decl.chain ?? []).map((el) => `${el.id}On`), ...(facts.decl.order === 'permutable' ? ['order'] : [])];
     const symbols = new Set([...declParams(facts.decl).map((p) => p.symbol), ...generated]);
-    for (const s of facts.decl.panel?.sections ?? []) for (const c of s.controls) if (!symbols.has(c)) errs.push(`/panel: section '${s.key}' names '${c}', no parameter`);
-    for (const [role, sym] of Object.entries(facts.decl.panel?.roles ?? {})) if (!symbols.has(sym)) errs.push(`/panel/roles/${role}: '${sym}' is no parameter`);
+    errs.push(...panelErrors(schema, facts.decl, symbols));
     errs.push(...consoleErrors(facts.decl, symbols));
     return errs.length ? missing(`plugins/${facts.stem}/${facts.stem}.decl.json: ${errs.join('; ')}`) : ok(`plugins/${facts.stem}/${facts.stem}.decl.json`);
   },
