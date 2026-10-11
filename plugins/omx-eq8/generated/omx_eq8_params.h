@@ -12,6 +12,7 @@
 #include <stddef.h>
 
 #include "omx_panel_description.h"
+#include "omx_param_contract.h"
 #include "omx_plugin_param.h"
 
 /* The band count of this variant of plugins/omx-eq: the instance face's compile-time count. */
@@ -268,6 +269,59 @@ static const omx_plugin_param OMX_EQ8_PARAMS[OMX_EQ8_PARAM_COUNT] = {
 /* org.openmixer.declaration/1: the declaration's plain description and the digest of its parameters. */
 #define OMX_EQ8_DECL_SOURCE "omx eq8: HPF On 0 to 1, HPF Frequency 20 to 1000 Hz, HPF Slope 12 to 24 dB/oct, LPF On 0 to 1, LPF Frequency 1000 to 20000 Hz, LPF Slope 12 to 24 dB/oct, Band 1 Type 0 to 5, Band 1 Frequency 20 to 20000 Hz, Band 1 Gain -15 to 15 dB, Band 1 Q 0.3 to 116, Band 1 On 0 to 1, Band 2 Type 0 to 5, Band 2 Frequency 20 to 20000 Hz, Band 2 Gain -15 to 15 dB, Band 2 Q 0.3 to 116, Band 2 On 0 to 1, Band 3 Type 0 to 5, Band 3 Frequency 20 to 20000 Hz, Band 3 Gain -15 to 15 dB, Band 3 Q 0.3 to 116, Band 3 On 0 to 1, Band 4 Type 0 to 5, Band 4 Frequency 20 to 20000 Hz, Band 4 Gain -15 to 15 dB, Band 4 Q 0.3 to 116, Band 4 On 0 to 1, Band 5 Type 0 to 5, Band 5 Frequency 20 to 20000 Hz, Band 5 Gain -15 to 15 dB, Band 5 Q 0.3 to 116, Band 5 On 0 to 1, Band 6 Type 0 to 5, Band 6 Frequency 20 to 20000 Hz, Band 6 Gain -15 to 15 dB, Band 6 Q 0.3 to 116, Band 6 On 0 to 1, Band 7 Type 0 to 5, Band 7 Frequency 20 to 20000 Hz, Band 7 Gain -15 to 15 dB, Band 7 Q 0.3 to 116, Band 7 On 0 to 1, Band 8 Type 0 to 5, Band 8 Frequency 20 to 20000 Hz, Band 8 Gain -15 to 15 dB, Band 8 Q 0.3 to 116, Band 8 On 0 to 1"
 #define OMX_EQ8_DECL_DIGEST "c3aed8574463db0f192ce1c2001a47944578978db7ebdfd2cadcd5602dc271a0"
+
+/* org.openmixer.param-contract/1 (tools/param-contract.mjs): each parameter's unit, scale and step, in
+ * id order; the host's bypass, the last id, is the face's. */
+#define OMX_EQ8_PARAM_CONTRACT_VERSION 1u
+#define OMX_EQ8_PARAM_CONTRACT_FINGERPRINT "04ad70b4428ffd6220699e3264e3000c489a665d580fc1c99403a98aeb23d4a3"
+static const struct omx_param_contract_row OMX_EQ8_PARAM_CONTRACT[OMX_EQ8_PARAM_COUNT] = {
+  { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* hpf_on none */
+  { 16u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* hpf_freq hz */
+  { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* hpf_slope none */
+  { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* lpf_on none */
+  { 16u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* lpf_freq hz */
+  { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* lpf_slope none */
+  { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b1_type none */
+  { 16u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b1_freq hz */
+  { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* b1_gain db */
+  { 0u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* b1_q none */
+  { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b1_on none */
+  { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b2_type none */
+  { 16u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b2_freq hz */
+  { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* b2_gain db */
+  { 0u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* b2_q none */
+  { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b2_on none */
+  { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b3_type none */
+  { 16u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b3_freq hz */
+  { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* b3_gain db */
+  { 0u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* b3_q none */
+  { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b3_on none */
+  { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b4_type none */
+  { 16u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b4_freq hz */
+  { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* b4_gain db */
+  { 0u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* b4_q none */
+  { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b4_on none */
+  { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b5_type none */
+  { 16u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b5_freq hz */
+  { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* b5_gain db */
+  { 0u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* b5_q none */
+  { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b5_on none */
+  { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b6_type none */
+  { 16u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b6_freq hz */
+  { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* b6_gain db */
+  { 0u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* b6_q none */
+  { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b6_on none */
+  { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b7_type none */
+  { 16u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b7_freq hz */
+  { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* b7_gain db */
+  { 0u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* b7_q none */
+  { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b7_on none */
+  { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b8_type none */
+  { 16u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b8_freq hz */
+  { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* b8_gain db */
+  { 0u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* b8_q none */
+  { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b8_on none */
+};
 
 /* org.openmixer.panel-description/1 (tools/panel-description.mjs): the declaration's panel as the rows
  * include/omx_panel_description.h serves, parameter ids the declaration's. Family eq. */

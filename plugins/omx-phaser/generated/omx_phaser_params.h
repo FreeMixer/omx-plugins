@@ -12,6 +12,7 @@
 #include <stddef.h>
 
 #include "omx_panel_description.h"
+#include "omx_param_contract.h"
 #include "omx_plugin_param.h"
 
 enum {
@@ -65,6 +66,19 @@ static const omx_plugin_param OMX_PHASER_PARAMS[OMX_PHASER_PARAM_COUNT] = {
 /* org.openmixer.declaration/1: the declaration's plain description and the digest of its parameters. */
 #define OMX_PHASER_DECL_SOURCE "omx phaser: Rate 0.05 to 5 Hz, Base 50 to 2000 Hz, Depth 0 to 6 oct, Stages 2 to 12, Feedback -0.9 to 0.9, Mix 0 to 100 %"
 #define OMX_PHASER_DECL_DIGEST "d39a2a6935c7d0e32234d86d28aa84bcb731db7c680d1cd28dd517edff5fe512"
+
+/* org.openmixer.param-contract/1 (tools/param-contract.mjs): each parameter's unit, scale and step, in
+ * id order; the host's bypass, the last id, is the face's. */
+#define OMX_PHASER_PARAM_CONTRACT_VERSION 1u
+#define OMX_PHASER_PARAM_CONTRACT_FINGERPRINT "f925eca3b9e38384db12fcb338a98f666937a5ddc198c60121e28c17a3a965aa"
+static const struct omx_param_contract_row OMX_PHASER_PARAM_CONTRACT[OMX_PHASER_PARAM_COUNT] = {
+  { 16u, OMX_CLAP_SCALE_LOG, 0.0 }, /* rateHz hz */
+  { 16u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* baseHz hz */
+  { 20u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* depthOct oct */
+  { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* stages none */
+  { 0u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* feedback none */
+  { 14u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* mix pc */
+};
 
 /* org.openmixer.panel-description/1 (tools/panel-description.mjs): the declaration's panel as the rows
  * include/omx_panel_description.h serves, parameter ids the declaration's. Family modulation. */

@@ -12,6 +12,7 @@
 #include <stddef.h>
 
 #include "omx_panel_description.h"
+#include "omx_param_contract.h"
 #include "omx_plugin_param.h"
 
 enum {
@@ -55,6 +56,17 @@ static const omx_plugin_param OMX_TREMOLO_PARAMS[OMX_TREMOLO_PARAM_COUNT] = {
 /* org.openmixer.declaration/1: the declaration's plain description and the digest of its parameters. */
 #define OMX_TREMOLO_DECL_SOURCE "omx tremolo: Rate 0.1 to 20 Hz, Depth 0 to 100 %, Mix 0 to 100 %, Mode 0 to 1"
 #define OMX_TREMOLO_DECL_DIGEST "b57991962924d939b9966fa18b44ce86bb73f3c940611aaf165dd227ec9b6d1a"
+
+/* org.openmixer.param-contract/1 (tools/param-contract.mjs): each parameter's unit, scale and step, in
+ * id order; the host's bypass, the last id, is the face's. */
+#define OMX_TREMOLO_PARAM_CONTRACT_VERSION 1u
+#define OMX_TREMOLO_PARAM_CONTRACT_FINGERPRINT "7eda7f36d4553d98706b108002422d309b187291a28efb210a2d3c6369dee62f"
+static const struct omx_param_contract_row OMX_TREMOLO_PARAM_CONTRACT[OMX_TREMOLO_PARAM_COUNT] = {
+  { 16u, OMX_CLAP_SCALE_LOG, 0.0 }, /* rateHz hz */
+  { 14u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* depth pc */
+  { 14u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* mix pc */
+  { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* mode none */
+};
 
 /* org.openmixer.panel-description/1 (tools/panel-description.mjs): the declaration's panel as the rows
  * include/omx_panel_description.h serves, parameter ids the declaration's. Family modulation. */

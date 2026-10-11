@@ -12,6 +12,7 @@
 #include <stddef.h>
 
 #include "omx_panel_description.h"
+#include "omx_param_contract.h"
 #include "omx_plugin_param.h"
 
 enum {
@@ -80,6 +81,22 @@ static const omx_plugin_param OMX_COMP_PARAMS[OMX_COMP_PARAM_COUNT] = {
 /* org.openmixer.declaration/1: the declaration's plain description and the digest of its parameters. */
 #define OMX_COMP_DECL_SOURCE "omx comp: Threshold -60 to 0 dB, Ratio 1 to 20, Knee 0 to 24 dB, Attack 0.1 to 100 ms, Release 5 to 3000 ms, Makeup 0 to 24 dB, Mix 0 to 100 %, Kind 0 to 1, Detector Oversampling 0 to 2"
 #define OMX_COMP_DECL_DIGEST "3a67a30c58264f094b79beb7cdb105698661368e85fe2f8e24506fe0f898d0ab"
+
+/* org.openmixer.param-contract/1 (tools/param-contract.mjs): each parameter's unit, scale and step, in
+ * id order; the host's bypass, the last id, is the face's. */
+#define OMX_COMP_PARAM_CONTRACT_VERSION 1u
+#define OMX_COMP_PARAM_CONTRACT_FINGERPRINT "1692a0ff7a6e46f2d5b3ec4bf1546d7eec3fcf78ec01250ad9be50e60501630f"
+static const struct omx_param_contract_row OMX_COMP_PARAM_CONTRACT[OMX_COMP_PARAM_COUNT] = {
+  { 13u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* thresholdDb db */
+  { 0u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* ratio none */
+  { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* kneeDb db */
+  { 2u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* attackMs ms */
+  { 2u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* releaseMs ms */
+  { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* makeupDb db */
+  { 14u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* mixPct pc */
+  { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* kind none */
+  { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* detectorOversampling none */
+};
 
 /* org.openmixer.panel-description/1 (tools/panel-description.mjs): the declaration's panel as the rows
  * include/omx_panel_description.h serves, parameter ids the declaration's. Family dynamics. */

@@ -12,6 +12,7 @@
 #include <stddef.h>
 
 #include "omx_panel_description.h"
+#include "omx_param_contract.h"
 #include "omx_plugin_param.h"
 
 enum {
@@ -100,6 +101,26 @@ static const omx_plugin_param OMX_REVERB_PARAMS[OMX_REVERB_PARAM_COUNT] = {
 /* org.openmixer.declaration/1: the declaration's plain description and the digest of its parameters. */
 #define OMX_REVERB_DECL_SOURCE "omx reverb: Plate Mod Depth 0 to 400 %, Mix 0 to 1, Size 0 to 1, Damping 0 to 1, Width 0 to 1, Predelay 0 to 100 ms, Lowcut 0 to 20000 Hz, Highcut 0 to 20000 Hz, Reverse 50 to 500 ms, Hold 10 to 2000 ms, Release 1 to 500 ms, Gate Threshold -80 to 0 dBFS, Algorithm 0 to 4"
 #define OMX_REVERB_DECL_DIGEST "a42c6e20426afd868f08938af4dfb54b487bdf4d8a5d9b13f75a967319df7009"
+
+/* org.openmixer.param-contract/1 (tools/param-contract.mjs): each parameter's unit, scale and step, in
+ * id order; the host's bypass, the last id, is the face's. */
+#define OMX_REVERB_PARAM_CONTRACT_VERSION 1u
+#define OMX_REVERB_PARAM_CONTRACT_FINGERPRINT "3c6d0c052481f1fbafefc5f64bb8f16b76d00dfea1598888d5c90129a2e4a99d"
+static const struct omx_param_contract_row OMX_REVERB_PARAM_CONTRACT[OMX_REVERB_PARAM_COUNT] = {
+  { 14u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* plateModDepth pc */
+  { 0u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* mix none */
+  { 0u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* size none */
+  { 0u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* damping none */
+  { 0u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* width none */
+  { 2u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* predelay ms */
+  { 16u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* lowcut hz */
+  { 16u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* highcut hz */
+  { 2u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* reverse ms */
+  { 2u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* hold ms */
+  { 2u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* release ms */
+  { 256u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* gateThreshold dbfs */
+  { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* algorithm none */
+};
 
 /* org.openmixer.panel-description/1 (tools/panel-description.mjs): the declaration's panel as the rows
  * include/omx_panel_description.h serves, parameter ids the declaration's. Family reverb. */
