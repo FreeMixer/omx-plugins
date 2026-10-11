@@ -69,13 +69,17 @@ and Zynthian find them, with a MOD GUI where the plugin has one. They run the
 console's own DSP, so they sound like the desk.
 
 %package devel
-Summary: Headers of the OpenMixer plugins, for projects that build on them
+Summary: Headers and static library of the OpenMixer plugins, for projects that build on them
 Requires: omx-dsp-devel >= 0.5.2
+Requires: clap-devel
 
 %description devel
 The headers other projects include to use the OpenMixer plugins' parameters and
 instance code, such as omx_delay_core.h and each plugin's generated
-parameter header, installed in %{_includedir}/omx-plugins.
+parameter header, installed in %{_includedir}/omx-plugins, and
+libomxplugins.a (pkg-config omxplugins): every plugin's CLAP face in one
+static library, with the table of their entries in omx_clap_static.h, for a
+host that runs the plugins in its own process without loading .clap files.
 
 %prep
 %autosetup
@@ -86,7 +90,7 @@ parameter header, installed in %{_includedir}/omx-plugins.
 
 %install
 %make_install PREFIX=%{_prefix} LIBDIR=%{_libdir} CLAPDIR=/usr/lib/clap
-%{__make} install-devel DESTDIR=%{buildroot} PREFIX=%{_prefix}
+%{__make} install-devel DESTDIR=%{buildroot} PREFIX=%{_prefix} LIBDIR=%{_libdir}
 
 %check
 %make_build test
@@ -124,6 +128,8 @@ parameter header, installed in %{_includedir}/omx-plugins.
 %files devel
 %license LICENSE
 %{_includedir}/omx-plugins/
+%{_libdir}/libomxplugins.a
+%{_libdir}/pkgconfig/omxplugins.pc
 
 %files lv2
 %license LICENSE
