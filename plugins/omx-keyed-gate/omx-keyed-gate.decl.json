@@ -183,7 +183,8 @@
           "knee_end",
           "hold",
           "hysteresis"
-        ]
+        ],
+        "graph": "dynamics-curve"
       }
     ]
   },

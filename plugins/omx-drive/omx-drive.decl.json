@@ -192,7 +192,8 @@
           "autoGain",
           "stereoLink",
           "hfRolloff"
-        ]
+        ],
+        "graph": "transfer-curve"
       }
     ]
   },
