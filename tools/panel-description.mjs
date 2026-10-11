@@ -20,7 +20,7 @@ export const PANEL_ID = 'org.openmixer.panel-description/1';
 /** The extension's families, by enum value. */
 export const FAMILIES = ['none', 'gate', 'dynamics', 'limiter', 'deesser', 'eq', 'filter', 'drive', 'modulation', 'delay', 'reverb', 'pitch'];
 
-/** A declaration's panel family -> the extension's. */
+/** A declaration's panel family -> the extension's; any other is `none`. */
 export const FAMILY_OF = {
   chorus: 'modulation', flanger: 'modulation', phaser: 'modulation', rotary: 'modulation', tremolo: 'modulation',
   comp: 'dynamics', deesser: 'deesser', delay: 'delay', drive: 'drive', eq: 'eq', geq: 'eq', gate: 'gate',
@@ -78,8 +78,8 @@ export const snake = (s) => s.replace(/([a-z0-9])([A-Z])/g, '$1_$2').toLowerCase
 export function panelDescription(d) {
   const where = `plugins/${d.stem}`;
   const panel = d.panel;
-  const family = FAMILY_OF[panel.family];
-  if (!family) throw new Error(`${where}: panel family '${panel.family}' has no family of ${PANEL_ID}; add it to FAMILY_OF in tools/panel-description.mjs`);
+  // a family the extension has no place for (a new kernel's, as the wizard drafts it) is none: no house view
+  const family = FAMILY_OF[panel.family] ?? 'none';
   const ns = `fx.${d.face ?? d.kernel}`;
   const id = new Map(d.params.map((p, i) => [p.symbol, i]));
   const param = (sym) => d.params[id.get(sym)];
