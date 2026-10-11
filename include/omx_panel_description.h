@@ -204,6 +204,14 @@ struct omx_panel_default_row {
   double value;
 };
 
+/** One page of clap.remote-controls/2, by the page rule: a section's controls in order, eight a page;
+ * an empty slot is OMX_CLAP_PANEL_INVALID_ID. */
+#define OMX_PANEL_PAGE_SIZE 8
+struct omx_panel_page_row {
+  const char *section_name, *page_name;
+  uint32_t ids[OMX_PANEL_PAGE_SIZE];
+};
+
 /** One plugin's description. Parameter ids are the declaration's (the CLAP ids). */
 struct omx_panel_rows {
   const char *fingerprint;

@@ -108,6 +108,11 @@ static const struct omx_panel_control_row OMX_ROTARY_PANEL_CONTROLS[] = {
   { 6u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.rotary.mix", "Mix", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
   { 7u, 0u, OMX_CLAP_WIDGET_AUTO, "fx.rotary.speed", "Speed", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
 };
+/* clap.remote-controls/2: the pages of the page rule over the sections. */
+static const struct omx_panel_page_row OMX_ROTARY_PANEL_PAGES[] = {
+  { "Rotary", "Rotary", { 0u, 1u, 2u, 3u, 4u, 5u, 6u, 7u } },
+};
+#define OMX_ROTARY_PANEL_PAGE_COUNT 1u
 static const struct omx_panel_rows OMX_ROTARY_PANEL = {
   OMX_ROTARY_PANEL_FINGERPRINT, OMX_CLAP_FAMILY_MODULATION,
   OMX_ROTARY_PANEL_SECTIONS, 1u,

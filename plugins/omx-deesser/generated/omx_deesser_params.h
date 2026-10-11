@@ -108,6 +108,11 @@ static const struct omx_panel_control_row OMX_DEESSER_PANEL_CONTROLS[] = {
   { 6u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.deesser.deess_release", "Release", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
   { 7u, 0u, OMX_CLAP_WIDGET_AUTO, "fx.deesser.deess_mode", "Mode", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
 };
+/* clap.remote-controls/2: the pages of the page rule over the sections. */
+static const struct omx_panel_page_row OMX_DEESSER_PANEL_PAGES[] = {
+  { "Deesser", "Deesser", { 0u, 1u, 2u, 3u, 4u, 5u, 6u, 7u } },
+};
+#define OMX_DEESSER_PANEL_PAGE_COUNT 1u
 static const struct omx_panel_rows OMX_DEESSER_PANEL = {
   OMX_DEESSER_PANEL_FINGERPRINT, OMX_CLAP_FAMILY_DEESSER,
   OMX_DEESSER_PANEL_SECTIONS, 1u,

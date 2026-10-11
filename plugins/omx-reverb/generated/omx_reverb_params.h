@@ -124,7 +124,7 @@ static const struct omx_param_contract_row OMX_REVERB_PARAM_CONTRACT[OMX_REVERB_
 
 /* org.openmixer.panel-description/1 (tools/panel-description.mjs): the declaration's panel as the rows
  * include/omx_panel_description.h serves, parameter ids the declaration's. Family reverb. */
-#define OMX_REVERB_PANEL_FINGERPRINT "c78b59368fe5184029ce63cb469d8d2a6c201fa7b62a6cd281b9c1de62e0f026"
+#define OMX_REVERB_PANEL_FINGERPRINT "d70457a6cb5f835d6428fbab49c9c9539916301441e00fb1a31449cb7adf85d1"
 static const struct omx_panel_section_row OMX_REVERB_PANEL_SECTIONS[] = {
   { "reverb", "fx.reverb.section.reverb", "Reverb" },
 };
@@ -143,13 +143,22 @@ static const struct omx_panel_control_row OMX_REVERB_PANEL_CONTROLS[] = {
   { 11u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.reverb.gate_threshold", "Gate Threshold", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
   { 12u, 0u, OMX_CLAP_WIDGET_AUTO, "fx.reverb.algorithm", "Algorithm", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
 };
+static const struct omx_panel_default_row OMX_REVERB_PANEL_DEFAULTS[] = {
+  { OMX_CLAP_PLACEMENT_RETURN, 1u, 1 },
+};
+/* clap.remote-controls/2: the pages of the page rule over the sections. */
+static const struct omx_panel_page_row OMX_REVERB_PANEL_PAGES[] = {
+  { "Reverb", "Reverb 1", { 0u, 1u, 2u, 3u, 4u, 5u, 6u, 7u } },
+  { "Reverb", "Reverb 2", { 8u, 9u, 10u, 11u, 12u, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID } },
+};
+#define OMX_REVERB_PANEL_PAGE_COUNT 2u
 static const struct omx_panel_rows OMX_REVERB_PANEL = {
   OMX_REVERB_PANEL_FINGERPRINT, OMX_CLAP_FAMILY_REVERB,
   OMX_REVERB_PANEL_SECTIONS, 1u,
   OMX_REVERB_PANEL_CONTROLS, 13u,
   NULL, 0u,
   NULL, 0u,
-  NULL, 0u,
+  OMX_REVERB_PANEL_DEFAULTS, 1u,
 };
 
 /* LV2 port indices (tools/gen.mjs lv2Ports): audio, then parameter i at FIRST_PARAM + i, then these. */

@@ -80,6 +80,11 @@ static const struct omx_panel_control_row OMX_TREMOLO_PANEL_CONTROLS[] = {
   { 2u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.tremolo.mix", "Mix", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
   { 3u, 0u, OMX_CLAP_WIDGET_AUTO, "fx.tremolo.mode", "Mode", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
 };
+/* clap.remote-controls/2: the pages of the page rule over the sections. */
+static const struct omx_panel_page_row OMX_TREMOLO_PANEL_PAGES[] = {
+  { "Tremolo", "Tremolo", { 0u, 1u, 2u, 3u, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID } },
+};
+#define OMX_TREMOLO_PANEL_PAGE_COUNT 1u
 static const struct omx_panel_rows OMX_TREMOLO_PANEL = {
   OMX_TREMOLO_PANEL_FINGERPRINT, OMX_CLAP_FAMILY_MODULATION,
   OMX_TREMOLO_PANEL_SECTIONS, 1u,

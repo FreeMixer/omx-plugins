@@ -94,6 +94,11 @@ static const struct omx_panel_control_row OMX_PHASER_PANEL_CONTROLS[] = {
   { 4u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.phaser.feedback", "Feedback", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
   { 5u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.phaser.mix", "Mix", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
 };
+/* clap.remote-controls/2: the pages of the page rule over the sections. */
+static const struct omx_panel_page_row OMX_PHASER_PANEL_PAGES[] = {
+  { "Phaser", "Phaser", { 0u, 1u, 2u, 3u, 4u, 5u, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID } },
+};
+#define OMX_PHASER_PANEL_PAGE_COUNT 1u
 static const struct omx_panel_rows OMX_PHASER_PANEL = {
   OMX_PHASER_PANEL_FINGERPRINT, OMX_CLAP_FAMILY_MODULATION,
   OMX_PHASER_PANEL_SECTIONS, 1u,

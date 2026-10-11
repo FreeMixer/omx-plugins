@@ -80,6 +80,11 @@ static const struct omx_panel_control_row OMX_FLANGER_PANEL_CONTROLS[] = {
   { 2u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.flanger.feedback", "Feedback", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
   { 3u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.flanger.mix", "Mix", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
 };
+/* clap.remote-controls/2: the pages of the page rule over the sections. */
+static const struct omx_panel_page_row OMX_FLANGER_PANEL_PAGES[] = {
+  { "Flanger", "Flanger", { 0u, 1u, 2u, 3u, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID } },
+};
+#define OMX_FLANGER_PANEL_PAGE_COUNT 1u
 static const struct omx_panel_rows OMX_FLANGER_PANEL = {
   OMX_FLANGER_PANEL_FINGERPRINT, OMX_CLAP_FAMILY_MODULATION,
   OMX_FLANGER_PANEL_SECTIONS, 1u,

@@ -73,6 +73,11 @@ static const struct omx_panel_control_row OMX_LIMITER_PANEL_CONTROLS[] = {
   { 1u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.limiter.lookahead_ms", "Lookahead", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
   { 2u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.limiter.release_ms", "Release", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
 };
+/* clap.remote-controls/2: the pages of the page rule over the sections. */
+static const struct omx_panel_page_row OMX_LIMITER_PANEL_PAGES[] = {
+  { "Limiter", "Limiter", { 0u, 1u, 2u, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID } },
+};
+#define OMX_LIMITER_PANEL_PAGE_COUNT 1u
 static const struct omx_panel_rows OMX_LIMITER_PANEL = {
   OMX_LIMITER_PANEL_FINGERPRINT, OMX_CLAP_FAMILY_LIMITER,
   OMX_LIMITER_PANEL_SECTIONS, 1u,
