@@ -3,6 +3,7 @@
 # Copyright (C) 2026 Pau Aliagas <linuxnow@gmail.com>
 
 export DEB_BUILD_MAINT_OPTIONS = hardening=+all
+include /usr/share/dpkg/architecture.mk
 
 %:
 	dh $@
@@ -10,7 +11,8 @@ export DEB_BUILD_MAINT_OPTIONS = hardening=+all
 # CLAP and LV2 hosts look in /usr/lib/clap and /usr/lib/lv2, not in the multiarch directory
 override_dh_auto_install:
 	dh_auto_install -- PREFIX=/usr LIBDIR=/usr/lib
-	$(MAKE) install-devel DESTDIR=$(CURDIR)/debian/tmp PREFIX=/usr
+	# libomxplugins.a and omxplugins.pc are the -dev package's, in the multiarch directory
+	$(MAKE) install-devel DESTDIR=$(CURDIR)/debian/tmp PREFIX=/usr LIBDIR=/usr/lib/$(DEB_HOST_MULTIARCH)
 
 override_dh_auto_test:
 ifeq (,$(filter nocheck,$(DEB_BUILD_OPTIONS)))
