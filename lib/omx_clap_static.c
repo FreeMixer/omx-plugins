@@ -15,6 +15,25 @@
 
 const struct omx_clap_static_plugin OMX_CLAP_STATIC_PLUGINS[] = {
     /* BEGIN GENERATED clap-table: tools/gen.mjs, one row per shipped plugin */
+    {"org.openmixer.chorus", &omx_clap_entry_chorus},
+    {"org.openmixer.comp", &omx_clap_entry_comp},
+    {"org.openmixer.deesser", &omx_clap_entry_deesser},
+    {"org.openmixer.delay", &omx_clap_entry_delay},
+    {"org.openmixer.drive", &omx_clap_entry_drive},
+    {"org.openmixer.eq8", &omx_clap_entry_eq8},
+    {"org.openmixer.eq16", &omx_clap_entry_eq16},
+    {"org.openmixer.eq32", &omx_clap_entry_eq32},
+    {"org.openmixer.flanger", &omx_clap_entry_flanger},
+    {"org.openmixer.geq", &omx_clap_entry_geq},
+    {"org.openmixer.keyed-gate", &omx_clap_entry_gate},
+    {"org.openmixer.limiter", &omx_clap_entry_limiter},
+    {"org.openmixer.phaser", &omx_clap_entry_phaser},
+    {"org.openmixer.pitch", &omx_clap_entry_pitch},
+    {"org.openmixer.reverb", &omx_clap_entry_reverb},
+    {"org.openmixer.rotary", &omx_clap_entry_rotary},
+    {"org.openmixer.strip", &omx_clap_entry_strip},
+    {"org.openmixer.transient", &omx_clap_entry_transient},
+    {"org.openmixer.tremolo", &omx_clap_entry_tremolo},
     /* END GENERATED clap-table */
 };
 

@@ -46,6 +46,25 @@ extern const clap_plugin_entry_t omx_clap_static_entry;
 
 /* Each face's entry by name, for a host that wants a link error when a plugin is missing. */
 /* BEGIN GENERATED clap-entries: tools/gen.mjs, one line per shipped plugin */
+extern const clap_plugin_entry_t omx_clap_entry_chorus;
+extern const clap_plugin_entry_t omx_clap_entry_comp;
+extern const clap_plugin_entry_t omx_clap_entry_deesser;
+extern const clap_plugin_entry_t omx_clap_entry_delay;
+extern const clap_plugin_entry_t omx_clap_entry_drive;
+extern const clap_plugin_entry_t omx_clap_entry_eq8;
+extern const clap_plugin_entry_t omx_clap_entry_eq16;
+extern const clap_plugin_entry_t omx_clap_entry_eq32;
+extern const clap_plugin_entry_t omx_clap_entry_flanger;
+extern const clap_plugin_entry_t omx_clap_entry_geq;
+extern const clap_plugin_entry_t omx_clap_entry_gate;
+extern const clap_plugin_entry_t omx_clap_entry_limiter;
+extern const clap_plugin_entry_t omx_clap_entry_phaser;
+extern const clap_plugin_entry_t omx_clap_entry_pitch;
+extern const clap_plugin_entry_t omx_clap_entry_reverb;
+extern const clap_plugin_entry_t omx_clap_entry_rotary;
+extern const clap_plugin_entry_t omx_clap_entry_strip;
+extern const clap_plugin_entry_t omx_clap_entry_transient;
+extern const clap_plugin_entry_t omx_clap_entry_tremolo;
 /* END GENERATED clap-entries */
 
 #ifdef __cplusplus
