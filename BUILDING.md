@@ -51,7 +51,12 @@ CLAP id is in the table once, and each one is created through its factory, activ
    echoes, ping-pong, mix and bypass computed from the definition of a delay, not from omx-dsp;
 5. **MOD GUI**: fresh, carrying every declared control with its travel and default, valid under
    `sord_validate`, and stale when the declaration moves;
-6. **host check**: `omx-clap-scan` loads the CLAP file, `lv2ls`/`lv2info` read the LV2 bundle.
+6. **host check**: `omx-clap-scan` loads the CLAP file, `lv2ls`/`lv2info` read the LV2 bundle;
+7. **panel description** (`tools/panel-probe.c`, `tools/panel-check.mjs`): each built face is opened
+   as a host opens it (the `.clap` through `clap_entry`, the LV2 bundle through lilv) and its
+   `org.openmixer.panel-description/1` read back: the family, the sections, every listed parameter as
+   a control in its section and order, the roles and displays equal the declaration's panel, and the
+   fingerprint is the SHA-256 of what it serves.
 
 For omx-strip, steps 3 and 4 are one **strip oracle** (`test/strip-oracle.c`): at 44.1, 48, 96
 and 192 kHz, on both builds, in each of the 24 stage orders and at the defaults, the output equals
@@ -67,9 +72,11 @@ plugins/<name>/
   omx_<kernel>_lv2.c      the LV2 face, plain C
   generated/              written by `make gen`, committed: the parameter header and the LV2 bundle
   test/                   the probe and the oracle
-include/                  shared C shapes (no DSP), and omx_clap_static.h, libomxplugins' table
+include/                  shared C shapes (no DSP): omx_panel_description.h, the panel description
+                          extension and its rows; omx_clap_static.h, libomxplugins' table
 lib/                      omx_clap_static.c (the table's rows are generated) and omxplugins.pc.in
-tools/                    gen.mjs (header + TTL), modgui-gen.mjs (MOD GUI), the test helpers,
+tools/                    gen.mjs (header + TTL), panel-description.mjs (the panel description),
+                          modgui-gen.mjs (MOD GUI), the test helpers,
                           omx-new-plugin.mjs (the wizard), plugin-recipe.mjs (completeness)
 recipes/                  plugin.recipe.json, the templates tools/gen.mjs writes from
 schema/                   plugin.decl.schema.json, the shape of a declaration

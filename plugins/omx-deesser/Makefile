@@ -7,8 +7,8 @@
 #
 #   make            build/omx-deesser.clap and build/omx-deesser.lv2/ (binary, TTL, MOD GUI)
 #   make test       freshness of every generated file, the parameters as declared, every parameter
-#                   live, the deesser kernel-identity oracle, the MOD GUI checks, and the
-#                   host checks (omx-clap-scan, lv2info) where installed
+#                   live, the deesser kernel-identity oracle, the panel description both faces serve,
+#                   the MOD GUI checks, and the host checks (omx-clap-scan, lv2info) where installed
 #   make gen        regenerate generated/ from the declaration (commit the result)
 #   make install    DESTDIR/PREFIX/LIBDIR/CLAPDIR: $(CLAPDIR)/omx-deesser.clap, $(LIBDIR)/lv2/omx-deesser.lv2/
 #
@@ -47,7 +47,7 @@ CLAPDIR ?= $(PREFIX)/lib/clap
 
 TTL      := $(GEN)/$(NAME).lv2
 TTL_SRCS := $(shell find $(TTL) -type f 2>/dev/null)
-CORE     := omx_deesser_core.h $(GEN)/omx_deesser_params.h
+CORE     := omx_deesser_core.h $(GEN)/omx_deesser_params.h $(ROOT)/include/omx_panel_description.h
 
 all: $(B)/$(NAME).clap $(BUNDLE)/$(NAME).so $(BUNDLE)/manifest.ttl
 
@@ -69,6 +69,9 @@ $(B):
 $(B)/clap-probe: $(ROOT)/tools/clap-probe.c | $(B)
 	$(CC) $(CFLAGS) $(WARN) $(ABI_CFLAGS) -o $@ $< -ldl
 
+$(B)/panel-probe: $(ROOT)/tools/panel-probe.c $(ROOT)/include/omx_panel_description.h | $(B)
+	$(CC) $(CFLAGS) $(WARN) -I$(ROOT)/include $(ABI_CFLAGS) -o $@ $< $(LILV) -ldl
+
 $(B)/deesser-oracle: test/deesser-oracle.c $(CORE) | $(B)
 	$(CC) $(CFLAGS) $(WARN) -I$(GEN) -I$(ROOT)/include $(DSP_CFLAGS) $(ABI_CFLAGS) -o $@ $< $(LILV) -ldl $(LDLIBS)
 
@@ -82,15 +85,20 @@ check:
 
 # The parameter test: the built CLAP face's parameters are the declaration's, and every one of them
 # reaches the kernel. The kernel-identity test: both faces, sample for sample, against omx-dsp's
-# deesser kernel called directly. Every test runs, and the target fails if any failed, so a new
+# deesser kernel called directly. The panel test: org.openmixer.panel-description/1 read from
+# each built face as a host reads it, equal to the declaration's panel. Every test runs, and the target fails if any failed, so a new
 # plugin shows all its red tests at once.
-test: all check $(B)/clap-probe $(B)/deesser-oracle
+test: all check $(B)/clap-probe $(B)/panel-probe $(B)/deesser-oracle
 	@fail=0; \
 	$(B)/clap-probe params $(B)/$(NAME).clap > $(B)/clap-params.txt && \
 	  node $(ROOT)/tools/clap-params-check.mjs $(CURDIR) $(B)/clap-params.txt || fail=1; \
 	$(B)/clap-probe live $(B)/$(NAME).clap || fail=1; \
 	$(B)/deesser-oracle clap $(B)/$(NAME).clap || fail=1; \
 	$(B)/deesser-oracle lv2 $(BUNDLE) $(URI) || fail=1; \
+	$(B)/panel-probe clap $(B)/$(NAME).clap > $(B)/panel-clap.txt && \
+	  node $(ROOT)/tools/panel-check.mjs $(CURDIR) clap $(B)/panel-clap.txt || fail=1; \
+	$(B)/panel-probe lv2 $(BUNDLE) $(URI) > $(B)/panel-lv2.txt && \
+	  node $(ROOT)/tools/panel-check.mjs $(CURDIR) lv2 $(B)/panel-lv2.txt || fail=1; \
 	sh $(ROOT)/tools/modgui-test.sh $(CURDIR) || fail=1; \
 	sh $(ROOT)/tools/host-check.sh $(B)/$(NAME).clap $(BUNDLE) $(URI) $(CLAP_ID) || fail=1; \
 	exit $$fail

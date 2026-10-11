@@ -6,8 +6,8 @@
 #
 #   make            build/{{stem}}.clap and build/{{stem}}.lv2/ (binary, TTL{{#panel}}, MOD GUI{{/panel}})
 #   make test       freshness of every generated file, the parameters as declared, every parameter
-#                   live, the {{kernel}} kernel-identity oracle{{#panel}}, the MOD GUI checks{{/panel}}, and the
-#                   host checks (omx-clap-scan, lv2info) where installed
+#                   live, the {{kernel}} kernel-identity oracle, the panel description both faces serve{{#panel}},
+#                   the MOD GUI checks{{/panel}}, and the host checks (omx-clap-scan, lv2info) where installed
 #   make gen        regenerate generated/ from the declaration (commit the result)
 #   make install    DESTDIR/PREFIX/LIBDIR/CLAPDIR: $(CLAPDIR)/{{stem}}.clap, $(LIBDIR)/lv2/{{stem}}.lv2/
 #
@@ -46,7 +46,7 @@ CLAPDIR ?= $(PREFIX)/lib/clap
 
 TTL      := $(GEN)/$(NAME).lv2
 TTL_SRCS := $(shell find $(TTL) -type f 2>/dev/null)
-CORE     := omx_{{kernel}}_core.h $(GEN)/omx_{{kernel}}_params.h
+CORE     := omx_{{kernel}}_core.h $(GEN)/omx_{{kernel}}_params.h $(ROOT)/include/omx_panel_description.h
 
 all: $(B)/$(NAME).clap $(BUNDLE)/$(NAME).so $(BUNDLE)/manifest.ttl
 
@@ -68,6 +68,9 @@ $(B):
 $(B)/clap-probe: $(ROOT)/tools/clap-probe.c | $(B)
 	$(CC) $(CFLAGS) $(WARN) $(ABI_CFLAGS) -o $@ $< -ldl
 
+$(B)/panel-probe: $(ROOT)/tools/panel-probe.c $(ROOT)/include/omx_panel_description.h | $(B)
+	$(CC) $(CFLAGS) $(WARN) -I$(ROOT)/include $(ABI_CFLAGS) -o $@ $< $(LILV) -ldl
+
 $(B)/{{kernel}}-oracle: test/{{kernel}}-oracle.c $(CORE) | $(B)
 	$(CC) $(CFLAGS) $(WARN) -I$(GEN) -I$(ROOT)/include $(DSP_CFLAGS) $(ABI_CFLAGS) -o $@ $< $(LILV) -ldl $(LDLIBS)
 
@@ -81,15 +84,20 @@ check:
 {{/panel}}
 # The parameter test: the built CLAP face's parameters are the declaration's, and every one of them
 # reaches the kernel. The kernel-identity test: both faces, sample for sample, against omx-dsp's
-# {{kernel}} kernel called directly. Every test runs, and the target fails if any failed, so a new
+# {{kernel}} kernel called directly. The panel test: org.openmixer.panel-description/1 read from
+# each built face as a host reads it, equal to the declaration's panel. Every test runs, and the target fails if any failed, so a new
 # plugin shows all its red tests at once.
-test: all check $(B)/clap-probe $(B)/{{kernel}}-oracle
+test: all check $(B)/clap-probe $(B)/panel-probe $(B)/{{kernel}}-oracle
 	@fail=0; \
 	$(B)/clap-probe params $(B)/$(NAME).clap > $(B)/clap-params.txt && \
 	  node $(ROOT)/tools/clap-params-check.mjs $(CURDIR) $(B)/clap-params.txt || fail=1; \
 	$(B)/clap-probe live $(B)/$(NAME).clap || fail=1; \
 	$(B)/{{kernel}}-oracle clap $(B)/$(NAME).clap || fail=1; \
 	$(B)/{{kernel}}-oracle lv2 $(BUNDLE) $(URI) || fail=1; \
+	$(B)/panel-probe clap $(B)/$(NAME).clap > $(B)/panel-clap.txt && \
+	  node $(ROOT)/tools/panel-check.mjs $(CURDIR) clap $(B)/panel-clap.txt || fail=1; \
+	$(B)/panel-probe lv2 $(BUNDLE) $(URI) > $(B)/panel-lv2.txt && \
+	  node $(ROOT)/tools/panel-check.mjs $(CURDIR) lv2 $(B)/panel-lv2.txt || fail=1; \
 {{#panel}}	sh $(ROOT)/tools/modgui-test.sh $(CURDIR) || fail=1; \
 {{/panel}}	sh $(ROOT)/tools/host-check.sh $(B)/$(NAME).clap $(BUNDLE) $(URI) $(CLAP_ID) || fail=1; \
 	exit $$fail
