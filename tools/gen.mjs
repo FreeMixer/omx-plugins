@@ -100,17 +100,32 @@ export function prepareDecl(file, d, stem, dir = dirname(file)) {
   return { ...d, dir: resolve(dir), tree: treeOf(file) };
 }
 
+/** The panel family (schema `$defs.family`, the console's closed set) of a kernel whose own name is
+ * none of them; a kernel named after a family is that family, any other kernel `none`. */
+export const FAMILY_OF_KERNEL = Object.freeze({
+  comp: 'dynamics', transient: 'dynamics', chorus: 'modulation', flanger: 'modulation', phaser: 'modulation',
+  tremolo: 'modulation', rotary: 'modulation', geq: 'eq',
+});
+
+/** The panel family a kernel's plugin draws as: FAMILY_OF_KERNEL's, else the family of its own name. */
+export function familyOfKernel(kernel) {
+  const families = JSON.parse(readFileSync(join(ROOT, 'schema', 'plugin.decl.schema.json'), 'utf8')).$defs.family.enum;
+  const family = FAMILY_OF_KERNEL[kernel] ?? kernel;
+  return families.includes(family) ? family : 'none';
+}
+
 /** The panel the wizard drafts for a plugin generated from its instance face: one section, every
- * parameter in declaration order, so the MOD GUI draws every parameter until a person groups them. */
+ * parameter in declaration order, so the MOD GUI draws every parameter until a person groups them;
+ * its family the kernel's, its roles left to a person. */
 export function defaultPanel(d) {
   if (d.binding === 'chain') {
     // one section per element, by its id (spec §15.2: the elements are drawn, never placed, apart)
     const sections = d.chain.map((el) => ({ key: el.id, label: elementName(el), controls: [`${el.id}On`, ...el.params.map((p) => p.symbol)] }));
     if (d.order === 'permutable') sections.push({ key: 'order', label: 'Order', controls: ['order'] });
-    return { family: d.kernel, roles: {}, sections };
+    return { family: familyOfKernel(d.kernel), roles: {}, sections };
   }
   const label = d.name.replace(/^omx /, '');
-  return { family: d.kernel, roles: {}, sections: [{ key: d.kernel, label: label[0].toUpperCase() + label.slice(1), controls: d.params.map((p) => p.symbol) }] };
+  return { family: familyOfKernel(d.kernel), roles: {}, sections: [{ key: d.kernel, label: label[0].toUpperCase() + label.slice(1), controls: d.params.map((p) => p.symbol) }] };
 }
 
 /** A plugin whose folder tools/gen.mjs writes whole from the declaration: over one instance face,
