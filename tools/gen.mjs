@@ -21,7 +21,8 @@
  *
  * and, from every plugin folder at once, the regions of the shared files between a `BEGIN
  * GENERATED <name>` line and its `END GENERATED <name>` line (SHARED below): the README's catalogue
- * and sections, the RPM %files lists and CI's installed-file lists. Adding a plugin touches only its
+ * and sections, the RPM %files lists, CI's installed-file lists and libomxplugins' table of CLAP
+ * entries (include/omx_clap_static.h, lib/omx_clap_static.c). Adding a plugin touches only its
  * folder; two plugins' changes merge in either order.
  *
  * and the hint view tools/test/port-hints.json (git-ignored), assembled from every declaration's
@@ -852,6 +853,12 @@ export const SHARED = {
   },
   '.github/workflows/ci.yml': {
     plugins: (ds) => [`shorts="${ds.map((d) => d.stem.replace(/^omx-/, '')).join(' ')}"`, `kernels="${ds.map((d) => d.kernel).join(' ')}"`],
+  },  // libomxplugins: each face's entry, defined by omx_<kernel>_clap.c, listed by its CLAP id
+  'include/omx_clap_static.h': {
+    'clap-entries': (ds) => ds.map((d) => `extern const clap_plugin_entry_t omx_clap_entry_${d.kernel};`),
+  },
+  'lib/omx_clap_static.c': {
+    'clap-table': (ds) => ds.map((d) => `{"${d.clap.id}", &omx_clap_entry_${d.kernel}},`),
   },
 };
 
