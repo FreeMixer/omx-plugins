@@ -11,7 +11,10 @@
  *      argument it names; only the package description (prose) is left.
  *   1b. The generators: `gen.mjs --check` is green on that tree and red, naming the file or the
  *      argument, for a hand edit to the generated binding, a declaration that moved, a face whose
- *      argument no control names, and a hand edit to a shared file; each restored, green.
+ *      argument no control names, and a hand edit to a shared file; each restored, green. The
+ *      look: `look.mjs --check` is red for a token source that moved and for a hand edit to
+ *      tools/look.json, green restored; the cascade resolves the most specific rule, the later at
+ *      equal specificity, and follows var(), refusing a cycle.
  *   2. Its commit plan, applied literally in a throwaway repository, keeps the commit protocol
  *      (tools/commit-plan-check.mjs); two commits swapped, or two concerns in one commit, break it.
  *   3. Every checker family of the completeness test: break the artifact on a copy of the tree
@@ -236,6 +239,33 @@ async function main() {
   sabotageGen('a declaration that moved a parameter\'s name', `${P_}/omx-wobble.decl.json`, (t) => t.replace('"name": "Depth"', '"name": "Depth Amount"'), `STALE ${P_}/generated/omx_wobble_params.h`);
   sabotageGen('a face whose argument no contract control names', face, (t) => t.replace('float depth,', 'float intensity,'), "resolve argument 'intensity'");
   sabotageGen('a hand edit to a shared file', 'README.md', (t) => t.replace('| **omx wobble** |', '| **omx wobble (beta)** |'), 'STALE README.md');
+  {
+    // the look: tools/look.json is what tools/look/tokens.css resolves to, and nothing else
+    const look = () => spawnSync('node', [join(tree, 'tools', 'look.mjs'), '--check'], { cwd: tree, encoding: 'utf8' });
+    expect(look().status === 0, 'look.mjs --check is green on the tree');
+    for (const [what, file, mutate] of [
+      ['a token source that moved', 'tools/look/tokens.css', (t) => t.replace('--accent: #28c8e6;', '--accent: #29c8e6;')],
+      ['a hand edit to tools/look.json', 'tools/look.json', (t) => t.replace('"#28c8e6"', '"#29c8e6"')],
+    ]) {
+      const at = join(tree, file), was = readFileSync(at, 'utf8');
+      writeFileSync(at, mutate(was));
+      const red = look();
+      writeFileSync(at, was);
+      expect(red.status !== 0 && red.stderr.includes('STALE tools/look.json') && look().status === 0, `sabotage look: ${what} goes red, green restored${red.status ? '' : ' (STAYED GREEN)'}`);
+    }
+    const { resolveTokens } = await import(join(tree, 'tools', 'look.mjs'));
+    const css = ':root { --a: #111; --b: var(--a); } :root[data-theme="light"] { --a: #222222; } :root[data-theme="light"][data-accent="cyan"] { --a: #333; } :root[data-theme="light"] { --c: #444; } :root[data-theme="light"] { --c: #555; }';
+    const at = (theme, accent) => resolveTokens(css, { theme, accent });
+    expect(at('dark', 'cyan')['--b'] === '#111111' && at('light', 'orange')['--b'] === '#222222' && at('light', 'cyan')['--b'] === '#333333' && at('light', 'cyan')['--c'] === '#555555',
+      'look: the most specific rule wins, the later at equal specificity, and var() is followed');
+    let cycle = '';
+    try {
+      resolveTokens(':root { --a: var(--b); --b: var(--a); }', { theme: 'dark' });
+    } catch (e) {
+      cycle = e.message;
+    }
+    expect(/cycle/.test(cycle), `look: a var() cycle is refused (${cycle || 'ACCEPTED'})`);
+  }
   {
     const was = readFileSync(join(tree, P_, 'omx_wobble_core.h'), 'utf8');
     writeFileSync(join(tree, P_, 'omx_wobble_core.h'), `${was}\n`);

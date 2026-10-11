@@ -8,8 +8,9 @@
  *
  * ONE declaration: plugins/<stem>/<stem>.decl.json, read by tools/gen.mjs's loadDecl. Its `panel`
  * block gives the family and the sections; every control's symbol, travel, default and label is its
- * LV2 port's, from gen.mjs's lv2Ports exactly as the TTL is. The colours and the font are the dark
- * theme's `openmixer` look, resolved once into tools/look.json. This file types no travel and no colour.
+ * LV2 port's, from gen.mjs's lv2Ports exactly as the TTL is. The colours and the font are the omx look's,
+ * tools/look.json, which tools/look.mjs resolves from tools/look/tokens.css. This file types no travel
+ * and no colour.
  *
  * Written into plugins/<stem>/generated/<stem>.lv2/: `modgui.ttl` and `modgui/` (template,
  * stylesheet, screenshot, thumbnail, knob film strip). The images are rasterised here from the
@@ -24,10 +25,10 @@ import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync
 import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { choicesOf, loadDecl, lv2Ports, pluginDirs } from './gen.mjs';
+import { LOOK_JSON, LOOK_TOKENS } from './look.mjs';
 import { canvas, disc, encodePng, rgbOf, roundRect, segment } from './raster.mjs';
 
-const TOOLS = dirname(fileURLToPath(import.meta.url));
-export const LOOK_JSON = join(TOOLS, 'look.json');
+export { LOOK_JSON };
 export const MODGUI_TTL = 'modgui.ttl';
 export const MODGUI_DIR = 'modgui';
 /** An integer travel with more steps than this is a continuous knob; fewer is a selector. */
@@ -116,9 +117,8 @@ export function layout(panel) {
 /** The look: tools/look.json, every colour a plain #rrggbb. */
 export function loadLook() {
   const look = JSON.parse(readFileSync(LOOK_JSON, 'utf8'));
-  const need = ['--surface', '--surface-2', '--surface-3', '--border-strong', '--ink', '--ink-dim', '--accent', '--font-ui'];
   const tokens = {};
-  for (const k of need) {
+  for (const k of LOOK_TOKENS) {
     const v = look.tokens?.[k];
     if (typeof v !== 'string' || !v) throw new Error(`modgui-gen: tools/look.json resolves no ${k}`);
     if (k !== '--font-ui') rgbOf(v);

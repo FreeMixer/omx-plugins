@@ -1,7 +1,9 @@
 {
-  "$comment": "The look the MOD GUI wears (tools/modgui-gen.mjs): the OpenMixer console's dark theme, resolved once into plain values: colours are #rrggbb, nothing here is a var(). Re-resolve and regenerate when that look changes.",
+  "$comment": "GENERATED — DO NOT EDIT BY HAND. The look the MOD GUI wears (tools/modgui-gen.mjs): tools/look/tokens.css resolved by tools/look.mjs at the look it names, every colour a plain #rrggbb. Regenerate: `node tools/look.mjs`, then commit the result.",
   "theme": "dark",
-  "personality": "openmixer",
+  "accent": "cyan",
+  "finish": "aluminium",
+  "style": "modern",
   "tokens": {
     "--surface": "#15191e",
     "--surface-2": "#1c2127",
