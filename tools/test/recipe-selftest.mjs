@@ -452,6 +452,22 @@ static inline void omx_wobble_instance_run(OmxWobbleInstance *s, const float *in
   await refused('a face argument no parameter binds', (a) => { a.params.splice(2, 1); }, '/params');
   await refused('a panel naming no parameter', (a) => { a.panel = { family: 'modulation', roles: {}, sections: [{ key: 'wobble', label: 'Wobble', controls: ['rateHz', 'speed'] }] }; }, '/panel/sections');
   await refused('a console chip naming no parameter', (a) => { a.console = { placement: { strips: ['input'], group: 'insert' }, chip: '{rateHz} · {speed}' }; }, '/console/chip');
+  await refused('a widget outside the shared list', (a) => { a.panel = { ...a.panel, widgets: { rateHz: 'choice' } }; }, '/panel/widgets/rateHz');
+  await refused('a widget that cannot draw its parameter', (a) => { a.panel = { ...a.panel, widgets: { mode: 'knob' } }; }, '/panel');
+  await refused('a switch for a travel', (a) => { a.panel = { ...a.panel, widgets: { depth: 'switch' } }; }, '/panel');
+  {
+    // the MOD GUI draws a control with the widget its panel names, else its kind's
+    const { generateModgui } = await import(join(ROOT, 'tools', 'modgui-gen.mjs'));
+    const d = loadDecl(join(ROOT, 'plugins', 'omx-drive'));
+    const files = (widgets) => new Map(generateModgui({ ...d, panel: { ...d.panel, widgets } }).map(([p, b]) => [p, b.toString('latin1')]));
+    const auto = files(undefined), named = files({ amount: 'fader', curve: 'selector' });
+    const tpl = (m) => m.get('modgui/icon-omx-drive.html');
+    expect(/omx-knob-image" mod-role="input-control-port" mod-port-symbol="amount"/.test(tpl(auto)) && !auto.has('modgui/knobs/omx-fader.png'),
+      'modgui: a control the panel names no widget for takes its kind\'s (amount a knob, no fader film)');
+    expect(/omx-fader-image" mod-role="input-control-port" mod-port-symbol="amount"/.test(tpl(named)) && named.has('modgui/knobs/omx-fader.png') &&
+      named.get('modgui/stylesheet-omx-drive.css').includes('.omx-fader-image') && tpl(named).includes('mod-port-symbol="curve" mod-widget="custom-select"'),
+      'modgui: the panel\'s widgets are drawn (amount a fader with its film, curve a selector)');
+  }
   await refused('a panel that leaves a parameter off the MOD GUI', (a) => {
     a.panel = { family: 'modulation', roles: {}, sections: [{ key: 'wobble', label: 'Wobble', controls: ['rateHz', 'depth', 'mix'] }] };
   }, '/panel');
