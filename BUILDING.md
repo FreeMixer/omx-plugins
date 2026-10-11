@@ -116,5 +116,10 @@ packages for bookworm and trixie and runs `make test` unless `nocheck` is set. T
 
 A `v<version>` tag runs `.github/workflows/release.yml`: RPMs for Fedora 44 (x86_64, aarch64)
 and DEBs for bookworm and trixie (amd64, arm64), signed and published into the FreeMixer package
-channel and attached to the GitHub release. Pull requests run the same workflow as a dry run that
-signs and publishes nothing.
+channel and attached to the GitHub release. Beside them goes
+`omx-plugins-zynthian-<version>-arm64.tar.gz`: the files of the bookworm arm64 `omx-plugins-lv2` and
+`omx-plugins-clap` packages, repacked by `tools/zynthian-bundle.sh` as `lv2/` and `clap/` directories for
+a Zynthian's plugin directories, after checking every ELF (architecture, glibc no newer than bookworm's
+2.36, no library a bare bookworm lacks, `clap_entry` in every CLAP) and running every LV2 plugin
+through `lv2bench` on arm64. Pull requests run the same workflow as a dry run that signs and publishes
+nothing; there the tarball is packed and checked from the amd64 build.
