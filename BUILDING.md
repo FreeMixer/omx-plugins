@@ -69,7 +69,8 @@ plugins/<name>/
   test/                   the probe and the oracle
 include/                  shared C shapes (no DSP), and omx_clap_static.h, libomxplugins' table
 lib/                      omx_clap_static.c (the table's rows are generated) and omxplugins.pc.in
-tools/                    gen.mjs (header + TTL), modgui-gen.mjs (MOD GUI), the test helpers,
+tools/                    gen.mjs (header + TTL), modgui-gen.mjs (MOD GUI), look.mjs (its look.json,
+                          from look/tokens.css, the omx look's tokens), the test helpers,
                           omx-new-plugin.mjs (the wizard), plugin-recipe.mjs (completeness)
 recipes/                  plugin.recipe.json, the templates tools/gen.mjs writes from
 schema/                   plugin.decl.schema.json, the shape of a declaration
