@@ -177,25 +177,6 @@
       "stage": "comp",
       "after": "deEsser",
       "fxGroup": "dynamics"
-    },
-    "panel": {
-      "sections": [
-        {
-          "key": "comp",
-          "label": "Comp",
-          "controls": [
-            "thresholdDb",
-            "ratio",
-            "kneeDb",
-            "attackMs",
-            "releaseMs",
-            "makeupDb",
-            "mixPct",
-            "kind",
-            "detectorOversampling"
-          ]
-        }
-      ]
     }
   }
 }

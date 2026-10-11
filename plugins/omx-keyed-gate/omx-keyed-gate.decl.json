@@ -171,18 +171,25 @@
     "sections": [
       {
         "key": "gate",
-        "label": "Keyed-gate",
+        "label": "Gate",
         "controls": [
-          "key_external",
           "threshold",
-          "ratio",
           "range",
+          "ratio",
           "attack",
-          "release",
-          "knee_start",
-          "knee_end",
           "hold",
-          "hysteresis"
+          "release",
+          "hysteresis",
+          "knee_start",
+          "knee_end"
+        ],
+        "graph": "dynamics-curve"
+      },
+      {
+        "key": "key",
+        "label": "Key",
+        "controls": [
+          "key_external"
         ]
       }
     ]
@@ -235,31 +242,6 @@
         "release"
       ]
     },
-    "chip": "THR {threshold}",
-    "panel": {
-      "sections": [
-        {
-          "key": "gate",
-          "label": "Gate",
-          "controls": [
-            "threshold",
-            "range",
-            "ratio",
-            "attack",
-            "hold",
-            "release",
-            "hysteresis"
-          ],
-          "graph": "dynamics-curve"
-        },
-        {
-          "key": "key",
-          "label": "Key",
-          "controls": [
-            "key_external"
-          ]
-        }
-      ]
-    }
+    "chip": "THR {threshold}"
   }
 }

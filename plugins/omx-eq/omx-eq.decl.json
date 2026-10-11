@@ -208,20 +208,33 @@
     "roles": {},
     "sections": [
       {
-        "key": "eq",
-        "label": "EQ",
+        "key": "bands",
+        "label": "Bands",
         "controls": [
-          "hpf_on",
-          "hpf_freq",
-          "hpf_slope",
-          "lpf_on",
-          "lpf_freq",
-          "lpf_slope",
+          "on",
           "type",
           "freq",
           "gain",
-          "q",
-          "on"
+          "q"
+        ],
+        "graph": "eq-curve"
+      },
+      {
+        "key": "hpf",
+        "label": "HPF",
+        "controls": [
+          "hpf_on",
+          "hpf_slope",
+          "hpf_freq"
+        ]
+      },
+      {
+        "key": "lpf",
+        "label": "LPF",
+        "controls": [
+          "lpf_on",
+          "lpf_slope",
+          "lpf_freq"
         ]
       }
     ]
@@ -260,40 +273,6 @@
         "hpf_freq"
       ]
     },
-    "chip": "HPF {hpf_freq}",
-    "panel": {
-      "sections": [
-        {
-          "key": "bands",
-          "label": "Bands",
-          "controls": [
-            "on",
-            "type",
-            "freq",
-            "gain",
-            "q"
-          ],
-          "graph": "eq-curve"
-        },
-        {
-          "key": "hpf",
-          "label": "HPF",
-          "controls": [
-            "hpf_on",
-            "hpf_slope",
-            "hpf_freq"
-          ]
-        },
-        {
-          "key": "lpf",
-          "label": "LPF",
-          "controls": [
-            "lpf_on",
-            "lpf_slope",
-            "lpf_freq"
-          ]
-        }
-      ]
-    }
+    "chip": "HPF {hpf_freq}"
   }
 }

@@ -90,12 +90,13 @@
         "key": "delay",
         "label": "Delay",
         "controls": [
+          "pingpong",
           "fxDelayTime",
           "fxDelayFeedback",
-          "tone",
-          "pingpong",
-          "mix"
-        ]
+          "mix",
+          "tone"
+        ],
+        "graph": "delay-taps"
       }
     ]
   },
@@ -136,22 +137,6 @@
         "mix"
       ]
     },
-    "chip": "{fxDelayTime}",
-    "panel": {
-      "sections": [
-        {
-          "key": "delay",
-          "label": "Delay",
-          "controls": [
-            "pingpong",
-            "fxDelayTime",
-            "fxDelayFeedback",
-            "mix",
-            "tone"
-          ],
-          "graph": "delay-taps"
-        }
-      ]
-    }
+    "chip": "{fxDelayTime}"
   }
 }

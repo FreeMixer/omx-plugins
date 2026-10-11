@@ -93,19 +93,6 @@
       "group": "tail",
       "stage": "limiter",
       "after": "plugins"
-    },
-    "panel": {
-      "sections": [
-        {
-          "key": "limiter",
-          "label": "Limiter",
-          "controls": [
-            "ceilingDb",
-            "lookaheadMs",
-            "releaseMs"
-          ]
-        }
-      ]
     }
   }
 }

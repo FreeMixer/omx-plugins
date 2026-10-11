@@ -182,17 +182,18 @@
         "key": "drive",
         "label": "Drive",
         "controls": [
+          "curve",
+          "band",
+          "hfRolloff",
           "amount",
           "character",
           "bandFreq",
           "mix",
           "trim",
-          "curve",
-          "band",
           "autoGain",
-          "stereoLink",
-          "hfRolloff"
-        ]
+          "stereoLink"
+        ],
+        "graph": "transfer-curve"
       }
     ]
   },
@@ -221,27 +222,6 @@
         "mix"
       ]
     },
-    "chip": "{amount}",
-    "panel": {
-      "sections": [
-        {
-          "key": "drive",
-          "label": "Drive",
-          "controls": [
-            "curve",
-            "band",
-            "hfRolloff",
-            "amount",
-            "character",
-            "bandFreq",
-            "mix",
-            "trim",
-            "autoGain",
-            "stereoLink"
-          ],
-          "graph": "transfer-curve"
-        }
-      ]
-    }
+    "chip": "{amount}"
   }
 }

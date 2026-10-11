@@ -181,19 +181,38 @@
         "key": "reverb",
         "label": "Reverb",
         "controls": [
-          "plateModDepth",
-          "mix",
+          "algorithm",
           "size",
           "damping",
-          "width",
           "predelay",
+          "width",
+          "mix",
           "lowcut",
-          "highcut",
-          "reverse",
+          "highcut"
+        ],
+        "graph": "decay-envelope"
+      },
+      {
+        "key": "reverse",
+        "label": "Reverse",
+        "controls": [
+          "reverse"
+        ]
+      },
+      {
+        "key": "gated",
+        "label": "Gated",
+        "controls": [
           "hold",
           "release",
-          "gateThreshold",
-          "algorithm"
+          "gateThreshold"
+        ]
+      },
+      {
+        "key": "plate",
+        "label": "Plate",
+        "controls": [
+          "plateModDepth"
         ]
       }
     ]
@@ -223,48 +242,6 @@
         "mix"
       ]
     },
-    "chip": "{size}",
-    "panel": {
-      "sections": [
-        {
-          "key": "reverb",
-          "label": "Reverb",
-          "controls": [
-            "algorithm",
-            "size",
-            "damping",
-            "predelay",
-            "width",
-            "mix",
-            "lowcut",
-            "highcut"
-          ],
-          "graph": "decay-envelope"
-        },
-        {
-          "key": "reverse",
-          "label": "Reverse",
-          "controls": [
-            "reverse"
-          ]
-        },
-        {
-          "key": "gated",
-          "label": "Gated",
-          "controls": [
-            "hold",
-            "release",
-            "gateThreshold"
-          ]
-        },
-        {
-          "key": "plate",
-          "label": "Plate",
-          "controls": [
-            "plateModDepth"
-          ]
-        }
-      ]
-    }
+    "chip": "{size}"
   }
 }
