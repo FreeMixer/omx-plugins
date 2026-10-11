@@ -110,7 +110,6 @@ export function expandVariant(contractDir, base, variant) {
   if (base.console) {
     d.console = { ...base.console };
     if (base.console.card) d.console.card = { ...base.console.card, show: perBandList(base.console.card.show, per, n) };
-    if (base.console.panel) d.console.panel = panelOf(base.console.panel);
   }
   for (const k of ['noun', 'description', 'summary']) if (d[k] !== undefined) d[k] = fillBands(d[k], n);
   if (d.manual) d.manual = d.manual.map((l) => fillBands(l, n));

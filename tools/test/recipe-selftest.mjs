@@ -17,7 +17,8 @@
  *   3. Every checker family of the completeness test: break the artifact on a copy of the tree
  *      (omx-drive), and the test names that entry and its wizard step; restore, and it is green.
  *      The declaration's schema check among them: a declaration with no panel, with no console
- *      block, or whose console chip or console panel names no parameter, is red.
+ *      block, with a second panel in its console block, whose console chip or panel names no
+ *      parameter, or whose panel draws a parameter twice, is red.
  *   4. The recipe: a new required entry makes every plugin red; an entry naming a checker that does
  *      not exist breaks the recipe.
  *   5. The wizard refuses, before writing: a kernel omx-contract lacks, a kernel with no instance
@@ -320,11 +321,13 @@ async function main() {
     ['noText', 'no-dpf', () => add(`${P}/dpf_shell.h`, '#include "DistrhoPlugin.hpp"\n')],
     ['noCopiedDsp', 'no-copied-dsp', () => add(`${P}/copied.h`, `static inline float ${dspName}(float x) {\n  return x;\n}\n`)],
     ['noCopiedDsp', 'no-copied-dsp', () => add(`${P}/engine.h`, '#include "mix_drive.h"\n')],
-    // every plugin declares its panel and its console block, each naming declared parameters only
+    // every plugin declares its one panel and its console block, each naming declared parameters only
     ['declValid', 'declaration', () => edit(`${P}/omx-drive.decl.json`, (s) => JSON.stringify((({ panel: _p, ...d }) => d)(JSON.parse(s)), null, 2))],
     ['declValid', 'declaration', () => edit(`${P}/omx-drive.decl.json`, (s) => JSON.stringify((({ console: _c, ...d }) => d)(JSON.parse(s)), null, 2))],
     ['declValid', 'declaration', () => edit(`${P}/omx-drive.decl.json`, (s) => s.replace('"chip": "{amount}"', '"chip": "{drive}"'))],
-    ['declValid', 'declaration', () => edit(`${P}/omx-drive.decl.json`, (s) => s.replace('"bandFreq",\n            "mix"', '"bandFreq",\n            "wet"'))],
+    ['declValid', 'declaration', () => edit(`${P}/omx-drive.decl.json`, (s) => s.replace('"bandFreq",\n          "mix"', '"bandFreq",\n          "wet"'))],
+    ['declValid', 'declaration', () => edit(`${P}/omx-drive.decl.json`, (s) => s.replace('"bandFreq",\n          "mix"', '"bandFreq",\n          "amount"'))],
+    ['declValid', 'declaration', () => edit(`${P}/omx-drive.decl.json`, (s) => JSON.stringify((({ console: c, panel: p, ...d }) => ({ ...d, panel: p, console: { ...c, panel: { sections: p.sections } } }))(JSON.parse(s)), null, 2))],
     ['paramsByReference', 'params-by-reference', () => edit(`${P}/omx-drive.decl.json`, (s) => s.replace('"ref": "DRIVE_AMOUNT_RANGE"', '"ref": "DRIVE_AMOUNT_RANGE", "min": 0'))],
   ];
   for (const [family, id, breakIt] of SABOTAGE) {

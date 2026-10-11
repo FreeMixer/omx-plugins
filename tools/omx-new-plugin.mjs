@@ -494,7 +494,7 @@ async function main(argv) {
     if (draft.unbound.length) console.log(`note: contract controls the face takes no argument for, left out: ${draft.unbound.join(', ')}`);
     console.log('settle each mark, then run the same command again:');
     for (const m of reviewMarks(draft.decl)) console.log(`  [ ] ${m}`);
-    console.log('  [ ] review each parameter\'s name; group the "panel" into sections, add the "console" card, chip and panel the console draws, "summary" or "manual" where wanted');
+    console.log('  [ ] review each parameter\'s name; group the "panel" into sections (the one panel the MOD GUI and the console draw), add the "console" card and chip, "summary" or "manual" where wanted');
     return;
   }
 
