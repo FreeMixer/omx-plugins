@@ -129,8 +129,10 @@
     }
   },
   "panel": {
-    "family": "rotary",
-    "roles": {},
+    "family": "modulation",
+    "roles": {
+      "mix": "mix"
+    },
     "sections": [
       {
         "key": "rotary",

@@ -167,7 +167,17 @@
   },
   "panel": {
     "family": "gate",
-    "roles": {},
+    "roles": {
+      "threshold": "threshold",
+      "range": "range",
+      "attack": "attack",
+      "release": "release",
+      "hold": "hold",
+      "knee_start": "knee_start",
+      "knee_end": "knee_end",
+      "hysteresis": "hysteresis",
+      "ratio": "ratio"
+    },
     "sections": [
       {
         "key": "gate",

@@ -82,8 +82,14 @@
     }
   },
   "panel": {
-    "family": "chorus",
-    "roles": {},
+    "family": "modulation",
+    "roles": {
+      "rate": "rate",
+      "depth": "depth",
+      "voices": "voices",
+      "spread": "spread",
+      "mix": "mix"
+    },
     "sections": [
       {
         "key": "chorus",

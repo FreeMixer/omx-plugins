@@ -121,7 +121,16 @@
   },
   "panel": {
     "family": "deesser",
-    "roles": {},
+    "roles": {
+      "frequency": "deessFreq",
+      "threshold": "deessThreshold",
+      "range": "deessRange",
+      "width": "deessWidth",
+      "ratio": "deessRatio",
+      "attack": "deessAttack",
+      "release": "deessRelease",
+      "mode": "deessMode"
+    },
     "sections": [
       {
         "key": "deesser",

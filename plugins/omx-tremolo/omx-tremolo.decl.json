@@ -86,8 +86,12 @@
     }
   },
   "panel": {
-    "family": "tremolo",
-    "roles": {},
+    "family": "modulation",
+    "roles": {
+      "rate": "rateHz",
+      "depth": "depth",
+      "mix": "mix"
+    },
     "sections": [
       {
         "key": "tremolo",

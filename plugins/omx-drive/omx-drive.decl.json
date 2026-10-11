@@ -167,15 +167,10 @@
     "family": "drive",
     "roles": {
       "drive": "amount",
-      "character": "character",
-      "band": "bandFreq",
+      "tone": "character",
+      "model": "curve",
       "mix": "mix",
-      "trim": "trim",
-      "curve": "curve",
-      "bandMode": "band",
-      "autoGain": "autoGain",
-      "stereoLink": "stereoLink",
-      "hfRolloff": "hfRolloff"
+      "output": "trim"
     },
     "sections": [
       {

@@ -59,7 +59,11 @@
   },
   "panel": {
     "family": "pitch",
-    "roles": {},
+    "roles": {
+      "shift": "semitones",
+      "fine": "cents",
+      "mix": "mix"
+    },
     "sections": [
       {
         "key": "pitch",
