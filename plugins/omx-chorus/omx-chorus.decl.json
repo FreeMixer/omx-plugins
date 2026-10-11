@@ -89,11 +89,11 @@
         "key": "chorus",
         "label": "Chorus",
         "controls": [
-          "spread",
           "rate",
           "depth",
           "voices",
-          "mix"
+          "mix",
+          "spread"
         ]
       }
     ]
@@ -116,21 +116,6 @@
       "after": "rotary",
       "fxGroup": "modulation"
     },
-    "chip": "{rate}",
-    "panel": {
-      "sections": [
-        {
-          "key": "chorus",
-          "label": "Chorus",
-          "controls": [
-            "rate",
-            "depth",
-            "voices",
-            "mix",
-            "spread"
-          ]
-        }
-      ]
-    }
+    "chip": "{rate}"
   }
 }

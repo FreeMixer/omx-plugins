@@ -124,17 +124,17 @@
     "roles": {},
     "sections": [
       {
-        "key": "deesser",
-        "label": "Deesser",
+        "key": "deEsser",
+        "label": "De-esser",
         "controls": [
+          "deessMode",
           "deessFreq",
           "deessWidth",
           "deessThreshold",
           "deessRatio",
           "deessRange",
           "deessAttack",
-          "deessRelease",
-          "deessMode"
+          "deessRelease"
         ]
       }
     ]
@@ -157,24 +157,6 @@
       "after": "eq",
       "fxGroup": "dynamics"
     },
-    "chip": "FREQ {deessFreq} · THR {deessThreshold}",
-    "panel": {
-      "sections": [
-        {
-          "key": "deEsser",
-          "label": "De-esser",
-          "controls": [
-            "deessMode",
-            "deessFreq",
-            "deessWidth",
-            "deessThreshold",
-            "deessRatio",
-            "deessRange",
-            "deessAttack",
-            "deessRelease"
-          ]
-        }
-      ]
-    }
+    "chip": "FREQ {deessFreq} · THR {deessThreshold}"
   }
 }
