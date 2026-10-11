@@ -9,6 +9,9 @@
  * The include guard is omx-dsp's own <omxdsp/params/omx_pitch_params.h>: included first, this
  * table is the one the kernel's instance header reads.
  */
+#include <stddef.h>
+
+#include "omx_panel_description.h"
 #include "omx_plugin_param.h"
 
 enum {
@@ -47,6 +50,26 @@ static const omx_plugin_param OMX_PITCH_PARAMS[OMX_PITCH_PARAM_COUNT] = {
 /* org.openmixer.declaration/1: the declaration's plain description and the digest of its parameters. */
 #define OMX_PITCH_DECL_SOURCE "omx pitch: Semitones -12 to 12, Cents -50 to 50, Mix 0 to 100"
 #define OMX_PITCH_DECL_DIGEST "be51e9f044d94539dbfc82ff4669e9327b5e9199863a6e0b37c64ca700988836"
+
+/* org.openmixer.panel-description/1 (tools/panel-description.mjs): the declaration's panel as the rows
+ * include/omx_panel_description.h serves, parameter ids the declaration's. Family pitch. */
+#define OMX_PITCH_PANEL_FINGERPRINT "59dd23c8633c726edaad6473796e3f0cb9da2c480c5a7d7f49667a733957fd7f"
+static const struct omx_panel_section_row OMX_PITCH_PANEL_SECTIONS[] = {
+  { "pitch", "fx.pitch.section.pitch", "Pitch" },
+};
+static const struct omx_panel_control_row OMX_PITCH_PANEL_CONTROLS[] = {
+  { 0u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.pitch.semitones", "Semitones", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 1u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.pitch.cents", "Cents", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 2u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.pitch.mix", "Mix", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+};
+static const struct omx_panel_rows OMX_PITCH_PANEL = {
+  OMX_PITCH_PANEL_FINGERPRINT, OMX_CLAP_FAMILY_PITCH,
+  OMX_PITCH_PANEL_SECTIONS, 1u,
+  OMX_PITCH_PANEL_CONTROLS, 3u,
+  NULL, 0u,
+  NULL, 0u,
+  NULL, 0u,
+};
 
 /* LV2 port indices (tools/gen.mjs lv2Ports): audio, then parameter i at FIRST_PARAM + i, then these. */
 #define OMX_PITCH_LV2_PORT_IN_L 0u

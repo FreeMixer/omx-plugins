@@ -9,6 +9,9 @@
  * The include guard is omx-dsp's own <omxdsp/params/omx_rotary_params.h>: included first, this
  * table is the one the kernel's instance header reads.
  */
+#include <stddef.h>
+
+#include "omx_panel_description.h"
 #include "omx_plugin_param.h"
 
 enum {
@@ -72,6 +75,31 @@ static const omx_plugin_param OMX_ROTARY_PARAMS[OMX_ROTARY_PARAM_COUNT] = {
 /* org.openmixer.declaration/1: the declaration's plain description and the digest of its parameters. */
 #define OMX_ROTARY_DECL_SOURCE "omx rotary: Horn Slow 0.1 to 2 Hz, Horn Fast 3 to 10 Hz, Drum Slow 0.1 to 2 Hz, Drum Fast 3 to 10 Hz, Accel 0.25 to 4 x, Balance -100 to 100 %, Mix 0 to 100 %, Speed 0 to 2"
 #define OMX_ROTARY_DECL_DIGEST "0f1ffd01a7af4af40fdfb19f71a56ccec05cd0ed038c21237374b29ea4d347e3"
+
+/* org.openmixer.panel-description/1 (tools/panel-description.mjs): the declaration's panel as the rows
+ * include/omx_panel_description.h serves, parameter ids the declaration's. Family modulation. */
+#define OMX_ROTARY_PANEL_FINGERPRINT "1bc9415cc9a6c69a36db0621b2a57ed1a3aa53b5ab7c95579075a328d60086a2"
+static const struct omx_panel_section_row OMX_ROTARY_PANEL_SECTIONS[] = {
+  { "rotary", "fx.rotary.section.rotary", "Rotary" },
+};
+static const struct omx_panel_control_row OMX_ROTARY_PANEL_CONTROLS[] = {
+  { 0u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.rotary.horn_slow_hz", "Horn Slow", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 1u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.rotary.horn_fast_hz", "Horn Fast", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 2u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.rotary.drum_slow_hz", "Drum Slow", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 3u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.rotary.drum_fast_hz", "Drum Fast", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 4u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.rotary.accel", "Accel", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 5u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.rotary.balance", "Balance", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 6u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.rotary.mix", "Mix", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 7u, 0u, OMX_CLAP_WIDGET_AUTO, "fx.rotary.speed", "Speed", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+};
+static const struct omx_panel_rows OMX_ROTARY_PANEL = {
+  OMX_ROTARY_PANEL_FINGERPRINT, OMX_CLAP_FAMILY_MODULATION,
+  OMX_ROTARY_PANEL_SECTIONS, 1u,
+  OMX_ROTARY_PANEL_CONTROLS, 8u,
+  NULL, 0u,
+  NULL, 0u,
+  NULL, 0u,
+};
 
 /* LV2 port indices (tools/gen.mjs lv2Ports): audio, then parameter i at FIRST_PARAM + i, then these. */
 #define OMX_ROTARY_LV2_PORT_IN_L 0u

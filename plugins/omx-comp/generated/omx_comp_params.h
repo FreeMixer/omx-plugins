@@ -9,6 +9,9 @@
  * The include guard is omx-dsp's own <omxdsp/params/omx_comp_params.h>: included first, this
  * table is the one the kernel's instance header reads.
  */
+#include <stddef.h>
+
+#include "omx_panel_description.h"
 #include "omx_plugin_param.h"
 
 enum {
@@ -77,6 +80,32 @@ static const omx_plugin_param OMX_COMP_PARAMS[OMX_COMP_PARAM_COUNT] = {
 /* org.openmixer.declaration/1: the declaration's plain description and the digest of its parameters. */
 #define OMX_COMP_DECL_SOURCE "omx comp: Threshold -60 to 0 dB, Ratio 1 to 20, Knee 0 to 24 dB, Attack 0.1 to 100 ms, Release 5 to 3000 ms, Makeup 0 to 24 dB, Mix 0 to 100 %, Kind 0 to 1, Detector Oversampling 0 to 2"
 #define OMX_COMP_DECL_DIGEST "3a67a30c58264f094b79beb7cdb105698661368e85fe2f8e24506fe0f898d0ab"
+
+/* org.openmixer.panel-description/1 (tools/panel-description.mjs): the declaration's panel as the rows
+ * include/omx_panel_description.h serves, parameter ids the declaration's. Family dynamics. */
+#define OMX_COMP_PANEL_FINGERPRINT "14b97881290de0e729d42aa0b5693d94f5fc1b2598dde5d6ed8e20e8fe429b81"
+static const struct omx_panel_section_row OMX_COMP_PANEL_SECTIONS[] = {
+  { "comp", "fx.comp.section.comp", "Comp" },
+};
+static const struct omx_panel_control_row OMX_COMP_PANEL_CONTROLS[] = {
+  { 0u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.comp.threshold_db", "Threshold", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 1u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.comp.ratio", "Ratio", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 2u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.comp.knee_db", "Knee", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 3u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.comp.attack_ms", "Attack", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 4u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.comp.release_ms", "Release", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 5u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.comp.makeup_db", "Makeup", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 6u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.comp.mix_pct", "Mix", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 7u, 0u, OMX_CLAP_WIDGET_AUTO, "fx.comp.kind", "Kind", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 8u, 0u, OMX_CLAP_WIDGET_AUTO, "fx.comp.detector_oversampling", "Detector Oversampling", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+};
+static const struct omx_panel_rows OMX_COMP_PANEL = {
+  OMX_COMP_PANEL_FINGERPRINT, OMX_CLAP_FAMILY_DYNAMICS,
+  OMX_COMP_PANEL_SECTIONS, 1u,
+  OMX_COMP_PANEL_CONTROLS, 9u,
+  NULL, 0u,
+  NULL, 0u,
+  NULL, 0u,
+};
 
 /* LV2 port indices (tools/gen.mjs lv2Ports): audio, then parameter i at FIRST_PARAM + i, then these. */
 #define OMX_COMP_LV2_PORT_IN_L 0u

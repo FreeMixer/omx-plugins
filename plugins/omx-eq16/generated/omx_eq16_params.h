@@ -9,6 +9,9 @@
  * The include guard is omx-dsp's own <omxdsp/params/omx_eq16_params.h>: included first, this
  * table is the one the kernel's instance header reads.
  */
+#include <stddef.h>
+
+#include "omx_panel_description.h"
 #include "omx_plugin_param.h"
 
 /* The band count of this variant of plugins/omx-eq: the instance face's compile-time count. */
@@ -465,6 +468,112 @@ static const omx_plugin_param OMX_EQ16_PARAMS[OMX_EQ16_PARAM_COUNT] = {
 /* org.openmixer.declaration/1: the declaration's plain description and the digest of its parameters. */
 #define OMX_EQ16_DECL_SOURCE "omx eq16: HPF On 0 to 1, HPF Frequency 20 to 1000 Hz, HPF Slope 12 to 24 dB/oct, LPF On 0 to 1, LPF Frequency 1000 to 20000 Hz, LPF Slope 12 to 24 dB/oct, Band 1 Type 0 to 5, Band 1 Frequency 20 to 20000 Hz, Band 1 Gain -15 to 15 dB, Band 1 Q 0.3 to 116, Band 1 On 0 to 1, Band 2 Type 0 to 5, Band 2 Frequency 20 to 20000 Hz, Band 2 Gain -15 to 15 dB, Band 2 Q 0.3 to 116, Band 2 On 0 to 1, Band 3 Type 0 to 5, Band 3 Frequency 20 to 20000 Hz, Band 3 Gain -15 to 15 dB, Band 3 Q 0.3 to 116, Band 3 On 0 to 1, Band 4 Type 0 to 5, Band 4 Frequency 20 to 20000 Hz, Band 4 Gain -15 to 15 dB, Band 4 Q 0.3 to 116, Band 4 On 0 to 1, Band 5 Type 0 to 5, Band 5 Frequency 20 to 20000 Hz, Band 5 Gain -15 to 15 dB, Band 5 Q 0.3 to 116, Band 5 On 0 to 1, Band 6 Type 0 to 5, Band 6 Frequency 20 to 20000 Hz, Band 6 Gain -15 to 15 dB, Band 6 Q 0.3 to 116, Band 6 On 0 to 1, Band 7 Type 0 to 5, Band 7 Frequency 20 to 20000 Hz, Band 7 Gain -15 to 15 dB, Band 7 Q 0.3 to 116, Band 7 On 0 to 1, Band 8 Type 0 to 5, Band 8 Frequency 20 to 20000 Hz, Band 8 Gain -15 to 15 dB, Band 8 Q 0.3 to 116, Band 8 On 0 to 1, Band 9 Type 0 to 5, Band 9 Frequency 20 to 20000 Hz, Band 9 Gain -15 to 15 dB, Band 9 Q 0.3 to 116, Band 9 On 0 to 1, Band 10 Type 0 to 5, Band 10 Frequency 20 to 20000 Hz, Band 10 Gain -15 to 15 dB, Band 10 Q 0.3 to 116, Band 10 On 0 to 1, Band 11 Type 0 to 5, Band 11 Frequency 20 to 20000 Hz, Band 11 Gain -15 to 15 dB, Band 11 Q 0.3 to 116, Band 11 On 0 to 1, Band 12 Type 0 to 5, Band 12 Frequency 20 to 20000 Hz, Band 12 Gain -15 to 15 dB, Band 12 Q 0.3 to 116, Band 12 On 0 to 1, Band 13 Type 0 to 5, Band 13 Frequency 20 to 20000 Hz, Band 13 Gain -15 to 15 dB, Band 13 Q 0.3 to 116, Band 13 On 0 to 1, Band 14 Type 0 to 5, Band 14 Frequency 20 to 20000 Hz, Band 14 Gain -15 to 15 dB, Band 14 Q 0.3 to 116, Band 14 On 0 to 1, Band 15 Type 0 to 5, Band 15 Frequency 20 to 20000 Hz, Band 15 Gain -15 to 15 dB, Band 15 Q 0.3 to 116, Band 15 On 0 to 1, Band 16 Type 0 to 5, Band 16 Frequency 20 to 20000 Hz, Band 16 Gain -15 to 15 dB, Band 16 Q 0.3 to 116, Band 16 On 0 to 1"
 #define OMX_EQ16_DECL_DIGEST "7b5f7b1f46ebc116414f68203cf8240c72c0154227d0169c0da832ee9aad2c56"
+
+/* org.openmixer.panel-description/1 (tools/panel-description.mjs): the declaration's panel as the rows
+ * include/omx_panel_description.h serves, parameter ids the declaration's. Family eq. */
+#define OMX_EQ16_PANEL_FINGERPRINT "2757c26bd7a037e9341e9b2311920bd083df5a5e134593f5181d6860e1e33d4f"
+static const struct omx_panel_section_row OMX_EQ16_PANEL_SECTIONS[] = {
+  { "eq", "fx.eq.section.eq", "EQ" },
+};
+static const struct omx_panel_control_row OMX_EQ16_PANEL_CONTROLS[] = {
+  { 0u, 0u, OMX_CLAP_WIDGET_SWITCH, "fx.eq.hpf_on", "HPF On", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 1u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.eq.hpf_freq", "HPF Frequency", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 2u, 0u, OMX_CLAP_WIDGET_AUTO, "fx.eq.hpf_slope", "HPF Slope", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 3u, 0u, OMX_CLAP_WIDGET_SWITCH, "fx.eq.lpf_on", "LPF On", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 4u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.eq.lpf_freq", "LPF Frequency", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 5u, 0u, OMX_CLAP_WIDGET_AUTO, "fx.eq.lpf_slope", "LPF Slope", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 6u, 0u, OMX_CLAP_WIDGET_AUTO, "fx.eq.b1_type", "Band 1 Type", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 7u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.eq.b1_freq", "Band 1 Frequency", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 8u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.eq.b1_gain", "Band 1 Gain", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 9u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.eq.b1_q", "Band 1 Q", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 10u, 0u, OMX_CLAP_WIDGET_SWITCH, "fx.eq.b1_on", "Band 1 On", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 11u, 0u, OMX_CLAP_WIDGET_AUTO, "fx.eq.b2_type", "Band 2 Type", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 12u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.eq.b2_freq", "Band 2 Frequency", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 13u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.eq.b2_gain", "Band 2 Gain", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 14u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.eq.b2_q", "Band 2 Q", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 15u, 0u, OMX_CLAP_WIDGET_SWITCH, "fx.eq.b2_on", "Band 2 On", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 16u, 0u, OMX_CLAP_WIDGET_AUTO, "fx.eq.b3_type", "Band 3 Type", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 17u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.eq.b3_freq", "Band 3 Frequency", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 18u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.eq.b3_gain", "Band 3 Gain", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 19u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.eq.b3_q", "Band 3 Q", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 20u, 0u, OMX_CLAP_WIDGET_SWITCH, "fx.eq.b3_on", "Band 3 On", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 21u, 0u, OMX_CLAP_WIDGET_AUTO, "fx.eq.b4_type", "Band 4 Type", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 22u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.eq.b4_freq", "Band 4 Frequency", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 23u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.eq.b4_gain", "Band 4 Gain", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 24u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.eq.b4_q", "Band 4 Q", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 25u, 0u, OMX_CLAP_WIDGET_SWITCH, "fx.eq.b4_on", "Band 4 On", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 26u, 0u, OMX_CLAP_WIDGET_AUTO, "fx.eq.b5_type", "Band 5 Type", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 27u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.eq.b5_freq", "Band 5 Frequency", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 28u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.eq.b5_gain", "Band 5 Gain", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 29u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.eq.b5_q", "Band 5 Q", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 30u, 0u, OMX_CLAP_WIDGET_SWITCH, "fx.eq.b5_on", "Band 5 On", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 31u, 0u, OMX_CLAP_WIDGET_AUTO, "fx.eq.b6_type", "Band 6 Type", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 32u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.eq.b6_freq", "Band 6 Frequency", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 33u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.eq.b6_gain", "Band 6 Gain", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 34u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.eq.b6_q", "Band 6 Q", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 35u, 0u, OMX_CLAP_WIDGET_SWITCH, "fx.eq.b6_on", "Band 6 On", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 36u, 0u, OMX_CLAP_WIDGET_AUTO, "fx.eq.b7_type", "Band 7 Type", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 37u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.eq.b7_freq", "Band 7 Frequency", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 38u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.eq.b7_gain", "Band 7 Gain", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 39u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.eq.b7_q", "Band 7 Q", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 40u, 0u, OMX_CLAP_WIDGET_SWITCH, "fx.eq.b7_on", "Band 7 On", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 41u, 0u, OMX_CLAP_WIDGET_AUTO, "fx.eq.b8_type", "Band 8 Type", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 42u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.eq.b8_freq", "Band 8 Frequency", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 43u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.eq.b8_gain", "Band 8 Gain", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 44u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.eq.b8_q", "Band 8 Q", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 45u, 0u, OMX_CLAP_WIDGET_SWITCH, "fx.eq.b8_on", "Band 8 On", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 46u, 0u, OMX_CLAP_WIDGET_AUTO, "fx.eq.b9_type", "Band 9 Type", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 47u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.eq.b9_freq", "Band 9 Frequency", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 48u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.eq.b9_gain", "Band 9 Gain", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 49u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.eq.b9_q", "Band 9 Q", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 50u, 0u, OMX_CLAP_WIDGET_SWITCH, "fx.eq.b9_on", "Band 9 On", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 51u, 0u, OMX_CLAP_WIDGET_AUTO, "fx.eq.b10_type", "Band 10 Type", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 52u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.eq.b10_freq", "Band 10 Frequency", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 53u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.eq.b10_gain", "Band 10 Gain", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 54u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.eq.b10_q", "Band 10 Q", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 55u, 0u, OMX_CLAP_WIDGET_SWITCH, "fx.eq.b10_on", "Band 10 On", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 56u, 0u, OMX_CLAP_WIDGET_AUTO, "fx.eq.b11_type", "Band 11 Type", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 57u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.eq.b11_freq", "Band 11 Frequency", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 58u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.eq.b11_gain", "Band 11 Gain", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 59u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.eq.b11_q", "Band 11 Q", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 60u, 0u, OMX_CLAP_WIDGET_SWITCH, "fx.eq.b11_on", "Band 11 On", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 61u, 0u, OMX_CLAP_WIDGET_AUTO, "fx.eq.b12_type", "Band 12 Type", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 62u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.eq.b12_freq", "Band 12 Frequency", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 63u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.eq.b12_gain", "Band 12 Gain", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 64u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.eq.b12_q", "Band 12 Q", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 65u, 0u, OMX_CLAP_WIDGET_SWITCH, "fx.eq.b12_on", "Band 12 On", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 66u, 0u, OMX_CLAP_WIDGET_AUTO, "fx.eq.b13_type", "Band 13 Type", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 67u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.eq.b13_freq", "Band 13 Frequency", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 68u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.eq.b13_gain", "Band 13 Gain", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 69u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.eq.b13_q", "Band 13 Q", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 70u, 0u, OMX_CLAP_WIDGET_SWITCH, "fx.eq.b13_on", "Band 13 On", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 71u, 0u, OMX_CLAP_WIDGET_AUTO, "fx.eq.b14_type", "Band 14 Type", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 72u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.eq.b14_freq", "Band 14 Frequency", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 73u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.eq.b14_gain", "Band 14 Gain", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 74u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.eq.b14_q", "Band 14 Q", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 75u, 0u, OMX_CLAP_WIDGET_SWITCH, "fx.eq.b14_on", "Band 14 On", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 76u, 0u, OMX_CLAP_WIDGET_AUTO, "fx.eq.b15_type", "Band 15 Type", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 77u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.eq.b15_freq", "Band 15 Frequency", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 78u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.eq.b15_gain", "Band 15 Gain", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 79u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.eq.b15_q", "Band 15 Q", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 80u, 0u, OMX_CLAP_WIDGET_SWITCH, "fx.eq.b15_on", "Band 15 On", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 81u, 0u, OMX_CLAP_WIDGET_AUTO, "fx.eq.b16_type", "Band 16 Type", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 82u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.eq.b16_freq", "Band 16 Frequency", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 83u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.eq.b16_gain", "Band 16 Gain", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 84u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.eq.b16_q", "Band 16 Q", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 85u, 0u, OMX_CLAP_WIDGET_SWITCH, "fx.eq.b16_on", "Band 16 On", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+};
+static const struct omx_panel_display_row OMX_EQ16_PANEL_DISPLAYS[] = {
+  { OMX_CLAP_DISPLAY_EQ_RESPONSE, 0u, OMX_CLAP_DISPLAY_FROM_FAMILY, { OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID }, 0u, OMX_CLAP_PANEL_INVALID_ID, 0.0, "fx.eq.display.eq_response", "EQ" },
+};
+static const struct omx_panel_rows OMX_EQ16_PANEL = {
+  OMX_EQ16_PANEL_FINGERPRINT, OMX_CLAP_FAMILY_EQ,
+  OMX_EQ16_PANEL_SECTIONS, 1u,
+  OMX_EQ16_PANEL_CONTROLS, 86u,
+  NULL, 0u,
+  OMX_EQ16_PANEL_DISPLAYS, 1u,
+  NULL, 0u,
+};
 
 /* LV2 port indices (tools/gen.mjs lv2Ports): audio, then parameter i at FIRST_PARAM + i, then these. */
 #define OMX_EQ16_LV2_PORT_IN_L 0u

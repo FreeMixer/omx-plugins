@@ -9,6 +9,9 @@
  * The include guard is omx-dsp's own <omxdsp/params/omx_reverb_params.h>: included first, this
  * table is the one the kernel's instance header reads.
  */
+#include <stddef.h>
+
+#include "omx_panel_description.h"
 #include "omx_plugin_param.h"
 
 enum {
@@ -97,6 +100,36 @@ static const omx_plugin_param OMX_REVERB_PARAMS[OMX_REVERB_PARAM_COUNT] = {
 /* org.openmixer.declaration/1: the declaration's plain description and the digest of its parameters. */
 #define OMX_REVERB_DECL_SOURCE "omx reverb: Plate Mod Depth 0 to 400 %, Mix 0 to 1, Size 0 to 1, Damping 0 to 1, Width 0 to 1, Predelay 0 to 100 ms, Lowcut 0 to 20000 Hz, Highcut 0 to 20000 Hz, Reverse 50 to 500 ms, Hold 10 to 2000 ms, Release 1 to 500 ms, Gate Threshold -80 to 0 dBFS, Algorithm 0 to 4"
 #define OMX_REVERB_DECL_DIGEST "a42c6e20426afd868f08938af4dfb54b487bdf4d8a5d9b13f75a967319df7009"
+
+/* org.openmixer.panel-description/1 (tools/panel-description.mjs): the declaration's panel as the rows
+ * include/omx_panel_description.h serves, parameter ids the declaration's. Family reverb. */
+#define OMX_REVERB_PANEL_FINGERPRINT "c78b59368fe5184029ce63cb469d8d2a6c201fa7b62a6cd281b9c1de62e0f026"
+static const struct omx_panel_section_row OMX_REVERB_PANEL_SECTIONS[] = {
+  { "reverb", "fx.reverb.section.reverb", "Reverb" },
+};
+static const struct omx_panel_control_row OMX_REVERB_PANEL_CONTROLS[] = {
+  { 0u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.reverb.plate_mod_depth", "Plate Mod Depth", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 1u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.reverb.mix", "Mix", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 2u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.reverb.size", "Size", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 3u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.reverb.damping", "Damping", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 4u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.reverb.width", "Width", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 5u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.reverb.predelay", "Predelay", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 6u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.reverb.lowcut", "Lowcut", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 7u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.reverb.highcut", "Highcut", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 8u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.reverb.reverse", "Reverse", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 9u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.reverb.hold", "Hold", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 10u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.reverb.release", "Release", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 11u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.reverb.gate_threshold", "Gate Threshold", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 12u, 0u, OMX_CLAP_WIDGET_AUTO, "fx.reverb.algorithm", "Algorithm", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+};
+static const struct omx_panel_rows OMX_REVERB_PANEL = {
+  OMX_REVERB_PANEL_FINGERPRINT, OMX_CLAP_FAMILY_REVERB,
+  OMX_REVERB_PANEL_SECTIONS, 1u,
+  OMX_REVERB_PANEL_CONTROLS, 13u,
+  NULL, 0u,
+  NULL, 0u,
+  NULL, 0u,
+};
 
 /* LV2 port indices (tools/gen.mjs lv2Ports): audio, then parameter i at FIRST_PARAM + i, then these. */
 #define OMX_REVERB_LV2_PORT_IN_L 0u

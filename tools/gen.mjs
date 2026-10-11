@@ -40,6 +40,7 @@ import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 
 import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { faceBinding } from './instance-face.mjs';
+import { DISPLAY_KINDS, DISPLAY_SOURCES, FAMILIES, PLACEMENTS, WIDGETS, panelDescription, panelFingerprint } from './panel-description.mjs';
 import { PIN_FILE, controlOf, eqDefaultBands, findName, kernelControls, locateContract, paramKernel, pinOf, resolveParam } from './omx-contract.mjs';
 import { bandsMacro, baseOf, expandVariant, variantStems } from './variants.mjs';
 import { omxdspInclude, render } from './template.mjs';
@@ -347,6 +348,37 @@ export function lv2Ports(d) {
 
 const cf = (n) => `${Number.isInteger(n) ? `${n}.0` : `${n}`}f`;
 const macro = (s) => s.replace(/([a-z0-9])([A-Z])/g, '$1_$2').toUpperCase();
+const cstr = (s) => `"${s.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`;
+
+/** The rows of org.openmixer.panel-description/1 in the parameter header: each table of
+ * tools/panel-description.mjs as C, and OMX_<K>_PANEL, the description a face serves. */
+function emitPanelRows(d) {
+  const K = d.kernel.toUpperCase();
+  const x = panelDescription(d);
+  const NONE = 'OMX_CLAP_PANEL_INVALID_ID';
+  const id = (n) => (n === null || n === undefined ? NONE : `${n}u`);
+  const enumOf = (prefix, list, v) => `OMX_CLAP_${prefix}_${list[list.indexOf(v)].toUpperCase()}`;
+  const tables = [
+    ['SECTIONS', 'section', x.sections.map((s) => `{ ${cstr(s.key)}, ${cstr(s.labelKey)}, ${cstr(s.label)} }`)],
+    ['CONTROLS', 'control', x.controls.map((c) => `{ ${c.param}u, ${c.section}u, ${enumOf('WIDGET', WIDGETS, c.widget)}, ${cstr(c.labelKey)}, ${cstr(c.label)}, ${id(c.visible)}, 0x${c.mask.toString(16)}u }`)],
+    ['ROLES', 'role', x.roles.map((r) => `{ ${cstr(r.role)}, ${r.index}u, ${r.param}u }`)],
+    ['DISPLAYS', 'display', x.displays.map((v) => `{ ${enumOf('DISPLAY', DISPLAY_KINDS, v.kind)}, ${v.section}u, OMX_CLAP_DISPLAY_FROM_${DISPLAY_SOURCES[DISPLAY_SOURCES.indexOf(v.source)].toUpperCase()}, { ${id(v.meters[0])}, ${id(v.meters[1])} }, ${v.curve ?? 0}u, ${NONE}, 0.0, ${cstr(v.labelKey)}, ${cstr(v.label)} }`)],
+    ['DEFAULTS', 'default', x.defaults.map((p) => `{ ${enumOf('PLACEMENT', PLACEMENTS, p.placement)}, ${p.param}u, ${p.value} }`)],
+  ];
+  const array = ([T, row, rows]) => (rows.length ? `static const struct omx_panel_${row}_row OMX_${K}_PANEL_${T}[] = {\n${rows.map((r) => `  ${r},`).join('\n')}\n};\n` : '');
+  const ref = ([T, , rows]) => (rows.length ? `OMX_${K}_PANEL_${T}, ${rows.length}u` : 'NULL, 0u');
+  const unpublished = x.unpublished.map((u) => ` *   ${u.role} (${u.symbol}): ${u.why}`).join('\n');
+  return `/* org.openmixer.panel-description/1 (tools/panel-description.mjs): the declaration's panel as the rows
+ * include/omx_panel_description.h serves, parameter ids the declaration's. Family ${x.family}.${unpublished ? `
+ * Declared roles not published:
+${unpublished}` : ''} */
+#define OMX_${K}_PANEL_FINGERPRINT "${panelFingerprint(x)}"
+${tables.map(array).join('')}static const struct omx_panel_rows OMX_${K}_PANEL = {
+  OMX_${K}_PANEL_FINGERPRINT, OMX_CLAP_FAMILY_${FAMILIES[FAMILIES.indexOf(x.family)].toUpperCase()},
+${tables.map((t) => `  ${ref(t)},`).join('\n')}
+};
+`;
+}
 
 export function emitParamsHeader(d) {
   const K = d.kernel.toUpperCase();
@@ -363,6 +395,9 @@ export function emitParamsHeader(d) {
  * The include guard is omx-dsp's own <omxdsp/params/omx_${d.kernel}_params.h>: included first, this
  * table is the one the kernel's instance header reads.
  */
+#include <stddef.h>
+
+#include "omx_panel_description.h"
 #include "omx_plugin_param.h"
 ${d.variantOf ? `
 /* The band count of this variant of plugins/${d.variantOf.stem}: the instance face's compile-time count. */
@@ -396,6 +431,7 @@ ${d.params.map((p) => [['MIN', p.min], ['MAX', p.max], ['DEFAULT', p.def]].map((
 #define OMX_${K}_DECL_SOURCE "${sourceOf(d).replace(/"/g, '\\"')}"
 #define OMX_${K}_DECL_DIGEST "${digestOf(d.params)}"
 
+${emitPanelRows(d)}
 /* LV2 port indices (tools/gen.mjs lv2Ports): audio, then parameter i at FIRST_PARAM + i, then these. */
 ${ports.filter((p) => !p.param).map((p) => `#define OMX_${K}_LV2_PORT_${macro(p.symbol)} ${p.index}u`).join('\n')}
 #define OMX_${K}_LV2_PORT_FIRST_PARAM ${firstParam}u

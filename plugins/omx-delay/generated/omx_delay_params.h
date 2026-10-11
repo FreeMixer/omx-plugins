@@ -9,6 +9,9 @@
  * The include guard is omx-dsp's own <omxdsp/params/omx_delay_params.h>: included first, this
  * table is the one the kernel's instance header reads.
  */
+#include <stddef.h>
+
+#include "omx_panel_description.h"
 #include "omx_plugin_param.h"
 
 enum {
@@ -57,6 +60,35 @@ static const omx_plugin_param OMX_DELAY_PARAMS[OMX_DELAY_PARAM_COUNT] = {
 /* org.openmixer.declaration/1: the declaration's plain description and the digest of its parameters. */
 #define OMX_DELAY_DECL_SOURCE "omx delay: Time 0 to 2000 ms, Feedback 0 to 0.99, Tone 0 to 1, Mix 0 to 1, Pingpong 0 to 1"
 #define OMX_DELAY_DECL_DIGEST "b4d6be38d03fd4d086d878edf93bcbc5f6d678cbbbb742ddf597e3b7f160cafd"
+
+/* org.openmixer.panel-description/1 (tools/panel-description.mjs): the declaration's panel as the rows
+ * include/omx_panel_description.h serves, parameter ids the declaration's. Family delay. */
+#define OMX_DELAY_PANEL_FINGERPRINT "d8693730e2af6e305110f8665f5300d32a157fe967d3ea801b6eb0b5361ba08f"
+static const struct omx_panel_section_row OMX_DELAY_PANEL_SECTIONS[] = {
+  { "delay", "fx.delay.section.delay", "Delay" },
+};
+static const struct omx_panel_control_row OMX_DELAY_PANEL_CONTROLS[] = {
+  { 0u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.delay.fx_delay_time", "Time", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 1u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.delay.fx_delay_feedback", "Feedback", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 2u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.delay.tone", "Tone", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 4u, 0u, OMX_CLAP_WIDGET_SWITCH, "fx.delay.pingpong", "Pingpong", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 3u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.delay.mix", "Mix", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+};
+static const struct omx_panel_role_row OMX_DELAY_PANEL_ROLES[] = {
+  { "time", 0u, 0u },
+  { "feedback", 0u, 1u },
+  { "tone", 0u, 2u },
+  { "pingpong", 0u, 4u },
+  { "mix", 0u, 3u },
+};
+static const struct omx_panel_rows OMX_DELAY_PANEL = {
+  OMX_DELAY_PANEL_FINGERPRINT, OMX_CLAP_FAMILY_DELAY,
+  OMX_DELAY_PANEL_SECTIONS, 1u,
+  OMX_DELAY_PANEL_CONTROLS, 5u,
+  OMX_DELAY_PANEL_ROLES, 5u,
+  NULL, 0u,
+  NULL, 0u,
+};
 
 /* LV2 port indices (tools/gen.mjs lv2Ports): audio, then parameter i at FIRST_PARAM + i, then these. */
 #define OMX_DELAY_LV2_PORT_IN_L 0u
