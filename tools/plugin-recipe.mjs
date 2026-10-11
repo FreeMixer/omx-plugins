@@ -215,22 +215,13 @@ export function globRe(glob) {
 }
 
 /** Every name the `console` block (spec §8) gives that is no declared parameter: the card's
- * controls, the chip's `{holes}`, the console panel's controls and widgets. */
+ * controls and the chip's `{holes}`. */
 export function consoleErrors(decl, symbols) {
   const errs = [];
   const c = decl.console ?? {};
   const holes = (t) => [...(t ?? '').matchAll(/\{([A-Za-z][A-Za-z0-9_]*)\}/g)].map((m) => m[1]);
   for (const sym of c.card?.show ?? []) if (!sym.startsWith('readout:') && !symbols.has(sym)) errs.push(`/console/card/show: '${sym}' is no parameter`);
   for (const [at, t] of [['/console/chip', c.chip], ['/console/card/summary', c.card?.summary]]) for (const h of holes(t)) if (!symbols.has(h)) errs.push(`${at}: {${h}} is no parameter`);
-  const seen = new Set();
-  for (const sec of c.panel?.sections ?? []) {
-    for (const sym of sec.controls) {
-      if (!symbols.has(sym)) errs.push(`/console/panel: section '${sec.key}' names '${sym}', no parameter`);
-      else if (seen.has(sym)) errs.push(`/console/panel: '${sym}' is in two sections`);
-      seen.add(sym);
-    }
-  }
-  for (const sym of Object.keys(c.panel?.widgets ?? {})) if (!symbols.has(sym)) errs.push(`/console/panel/widgets/${sym}: is no parameter`);
   return errs;
 }
 
@@ -254,7 +245,15 @@ export const CHECKERS = {
     // a chain's generated switches and `order` are parameters too
     const generated = [...(facts.decl.chain ?? []).map((el) => `${el.id}On`), ...(facts.decl.order === 'permutable' ? ['order'] : [])];
     const symbols = new Set([...declParams(facts.decl).map((p) => p.symbol), ...generated]);
-    for (const s of facts.decl.panel?.sections ?? []) for (const c of s.controls) if (!symbols.has(c)) errs.push(`/panel: section '${s.key}' names '${c}', no parameter`);
+    const drawn = new Set();
+    for (const s of facts.decl.panel?.sections ?? []) {
+      for (const c of s.controls) {
+        if (!symbols.has(c)) errs.push(`/panel: section '${s.key}' names '${c}', no parameter`);
+        else if (drawn.has(c)) errs.push(`/panel: '${c}' is in two sections`);
+        drawn.add(c);
+      }
+    }
+    for (const sym of Object.keys(facts.decl.panel?.widgets ?? {})) if (!symbols.has(sym)) errs.push(`/panel/widgets/${sym}: is no parameter`);
     for (const [role, sym] of Object.entries(facts.decl.panel?.roles ?? {})) if (!symbols.has(sym)) errs.push(`/panel/roles/${role}: '${sym}' is no parameter`);
     errs.push(...consoleErrors(facts.decl, symbols));
     return errs.length ? missing(`plugins/${facts.stem}/${facts.stem}.decl.json: ${errs.join('; ')}`) : ok(`plugins/${facts.stem}/${facts.stem}.decl.json`);
