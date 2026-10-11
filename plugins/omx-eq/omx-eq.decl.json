@@ -222,7 +222,8 @@
           "gain",
           "q",
           "on"
-        ]
+        ],
+        "graph": "eq-curve"
       }
     ]
   },
