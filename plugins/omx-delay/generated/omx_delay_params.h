@@ -76,16 +76,16 @@ static const struct omx_param_contract_row OMX_DELAY_PARAM_CONTRACT[OMX_DELAY_PA
 
 /* org.openmixer.panel-description/1 (tools/panel-description.mjs): the declaration's panel as the rows
  * include/omx_panel_description.h serves, parameter ids the declaration's. Family delay. */
-#define OMX_DELAY_PANEL_FINGERPRINT "f791b248278bd5ec0eb51d5b4f1a031dd3bf1156af26252f337b19e52d309ae3"
+#define OMX_DELAY_PANEL_FINGERPRINT "3ee3b70736f1ffe34135550e50bed76ff533efa807a588be1dd150144a79357b"
 static const struct omx_panel_section_row OMX_DELAY_PANEL_SECTIONS[] = {
   { "delay", "fx.delay.section.delay", "Delay" },
 };
 static const struct omx_panel_control_row OMX_DELAY_PANEL_CONTROLS[] = {
+  { 4u, 0u, OMX_CLAP_WIDGET_SWITCH, "fx.delay.pingpong", "Pingpong", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
   { 0u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.delay.fx_delay_time", "Time", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
   { 1u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.delay.fx_delay_feedback", "Feedback", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
-  { 2u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.delay.tone", "Tone", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
-  { 4u, 0u, OMX_CLAP_WIDGET_SWITCH, "fx.delay.pingpong", "Pingpong", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
   { 3u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.delay.mix", "Mix", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 2u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.delay.tone", "Tone", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
 };
 static const struct omx_panel_role_row OMX_DELAY_PANEL_ROLES[] = {
   { "time", 0u, 0u },
@@ -99,7 +99,7 @@ static const struct omx_panel_default_row OMX_DELAY_PANEL_DEFAULTS[] = {
 };
 /* clap.remote-controls/2: the pages of the page rule over the sections. */
 static const struct omx_panel_page_row OMX_DELAY_PANEL_PAGES[] = {
-  { "Delay", "Delay", { 0u, 1u, 2u, 4u, 3u, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID } },
+  { "Delay", "Delay", { 4u, 0u, 1u, 3u, 2u, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID } },
 };
 #define OMX_DELAY_PANEL_PAGE_COUNT 1u
 static const struct omx_panel_rows OMX_DELAY_PANEL = {

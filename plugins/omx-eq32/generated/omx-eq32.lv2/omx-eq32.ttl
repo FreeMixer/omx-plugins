@@ -4,6 +4,7 @@
 @prefix doap:  <http://usefulinc.com/ns/doap#> .
 @prefix foaf:  <http://xmlns.com/foaf/0.1/> .
 @prefix lv2:   <http://lv2plug.in/ns/lv2core#> .
+@prefix pg:    <http://lv2plug.in/ns/ext/port-groups#> .
 @prefix pprops: <http://lv2plug.in/ns/ext/port-props#> .
 @prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
@@ -56,7 +57,8 @@
         lv2:default 0 ;
         lv2:minimum 0 ;
         lv2:maximum 1 ;
-        lv2:portProperty lv2:toggled
+        lv2:portProperty lv2:toggled ;
+        pg:group <urn:openmixer:eq32#hpf>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -68,7 +70,8 @@
         lv2:maximum 1000 ;
         lv2:portProperty lv2:integer ;
         lv2:portProperty pprops:logarithmic ;
-        units:unit units:hz
+        units:unit units:hz ;
+        pg:group <urn:openmixer:eq32#hpf>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -81,7 +84,8 @@
         lv2:portProperty lv2:integer , lv2:enumeration ;
         lv2:scalePoint
             [ rdfs:label "12 dB/oct" ; rdf:value 12 ] ,
-            [ rdfs:label "24 dB/oct" ; rdf:value 24 ]
+            [ rdfs:label "24 dB/oct" ; rdf:value 24 ] ;
+        pg:group <urn:openmixer:eq32#hpf>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -91,7 +95,8 @@
         lv2:default 0 ;
         lv2:minimum 0 ;
         lv2:maximum 1 ;
-        lv2:portProperty lv2:toggled
+        lv2:portProperty lv2:toggled ;
+        pg:group <urn:openmixer:eq32#lpf>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -103,7 +108,8 @@
         lv2:maximum 20000 ;
         lv2:portProperty lv2:integer ;
         lv2:portProperty pprops:logarithmic ;
-        units:unit units:hz
+        units:unit units:hz ;
+        pg:group <urn:openmixer:eq32#lpf>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -116,7 +122,8 @@
         lv2:portProperty lv2:integer , lv2:enumeration ;
         lv2:scalePoint
             [ rdfs:label "12 dB/oct" ; rdf:value 12 ] ,
-            [ rdfs:label "24 dB/oct" ; rdf:value 24 ]
+            [ rdfs:label "24 dB/oct" ; rdf:value 24 ] ;
+        pg:group <urn:openmixer:eq32#lpf>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -133,7 +140,8 @@
             [ rdfs:label "High Shelf" ; rdf:value 2 ] ,
             [ rdfs:label "Notch" ; rdf:value 3 ] ,
             [ rdfs:label "All-pass 1st" ; rdf:value 4 ] ,
-            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ]
+            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ] ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -145,7 +153,8 @@
         lv2:maximum 20000 ;
         lv2:portProperty lv2:integer ;
         lv2:portProperty pprops:logarithmic ;
-        units:unit units:hz
+        units:unit units:hz ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -155,7 +164,8 @@
         lv2:default 0 ;
         lv2:minimum -15 ;
         lv2:maximum 15 ;
-        units:unit units:db
+        units:unit units:db ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -164,7 +174,8 @@
         lv2:name "Band 1 Q" ;
         lv2:default 1 ;
         lv2:minimum 0.3 ;
-        lv2:maximum 116
+        lv2:maximum 116 ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -174,7 +185,8 @@
         lv2:default 0 ;
         lv2:minimum 0 ;
         lv2:maximum 1 ;
-        lv2:portProperty lv2:toggled
+        lv2:portProperty lv2:toggled ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -191,7 +203,8 @@
             [ rdfs:label "High Shelf" ; rdf:value 2 ] ,
             [ rdfs:label "Notch" ; rdf:value 3 ] ,
             [ rdfs:label "All-pass 1st" ; rdf:value 4 ] ,
-            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ]
+            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ] ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -203,7 +216,8 @@
         lv2:maximum 20000 ;
         lv2:portProperty lv2:integer ;
         lv2:portProperty pprops:logarithmic ;
-        units:unit units:hz
+        units:unit units:hz ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -213,7 +227,8 @@
         lv2:default 0 ;
         lv2:minimum -15 ;
         lv2:maximum 15 ;
-        units:unit units:db
+        units:unit units:db ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -222,7 +237,8 @@
         lv2:name "Band 2 Q" ;
         lv2:default 1 ;
         lv2:minimum 0.3 ;
-        lv2:maximum 116
+        lv2:maximum 116 ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -232,7 +248,8 @@
         lv2:default 0 ;
         lv2:minimum 0 ;
         lv2:maximum 1 ;
-        lv2:portProperty lv2:toggled
+        lv2:portProperty lv2:toggled ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -249,7 +266,8 @@
             [ rdfs:label "High Shelf" ; rdf:value 2 ] ,
             [ rdfs:label "Notch" ; rdf:value 3 ] ,
             [ rdfs:label "All-pass 1st" ; rdf:value 4 ] ,
-            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ]
+            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ] ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -261,7 +279,8 @@
         lv2:maximum 20000 ;
         lv2:portProperty lv2:integer ;
         lv2:portProperty pprops:logarithmic ;
-        units:unit units:hz
+        units:unit units:hz ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -271,7 +290,8 @@
         lv2:default 0 ;
         lv2:minimum -15 ;
         lv2:maximum 15 ;
-        units:unit units:db
+        units:unit units:db ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -280,7 +300,8 @@
         lv2:name "Band 3 Q" ;
         lv2:default 1 ;
         lv2:minimum 0.3 ;
-        lv2:maximum 116
+        lv2:maximum 116 ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -290,7 +311,8 @@
         lv2:default 0 ;
         lv2:minimum 0 ;
         lv2:maximum 1 ;
-        lv2:portProperty lv2:toggled
+        lv2:portProperty lv2:toggled ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -307,7 +329,8 @@
             [ rdfs:label "High Shelf" ; rdf:value 2 ] ,
             [ rdfs:label "Notch" ; rdf:value 3 ] ,
             [ rdfs:label "All-pass 1st" ; rdf:value 4 ] ,
-            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ]
+            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ] ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -319,7 +342,8 @@
         lv2:maximum 20000 ;
         lv2:portProperty lv2:integer ;
         lv2:portProperty pprops:logarithmic ;
-        units:unit units:hz
+        units:unit units:hz ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -329,7 +353,8 @@
         lv2:default 0 ;
         lv2:minimum -15 ;
         lv2:maximum 15 ;
-        units:unit units:db
+        units:unit units:db ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -338,7 +363,8 @@
         lv2:name "Band 4 Q" ;
         lv2:default 1 ;
         lv2:minimum 0.3 ;
-        lv2:maximum 116
+        lv2:maximum 116 ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -348,7 +374,8 @@
         lv2:default 0 ;
         lv2:minimum 0 ;
         lv2:maximum 1 ;
-        lv2:portProperty lv2:toggled
+        lv2:portProperty lv2:toggled ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -365,7 +392,8 @@
             [ rdfs:label "High Shelf" ; rdf:value 2 ] ,
             [ rdfs:label "Notch" ; rdf:value 3 ] ,
             [ rdfs:label "All-pass 1st" ; rdf:value 4 ] ,
-            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ]
+            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ] ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -377,7 +405,8 @@
         lv2:maximum 20000 ;
         lv2:portProperty lv2:integer ;
         lv2:portProperty pprops:logarithmic ;
-        units:unit units:hz
+        units:unit units:hz ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -387,7 +416,8 @@
         lv2:default 0 ;
         lv2:minimum -15 ;
         lv2:maximum 15 ;
-        units:unit units:db
+        units:unit units:db ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -396,7 +426,8 @@
         lv2:name "Band 5 Q" ;
         lv2:default 1 ;
         lv2:minimum 0.3 ;
-        lv2:maximum 116
+        lv2:maximum 116 ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -406,7 +437,8 @@
         lv2:default 0 ;
         lv2:minimum 0 ;
         lv2:maximum 1 ;
-        lv2:portProperty lv2:toggled
+        lv2:portProperty lv2:toggled ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -423,7 +455,8 @@
             [ rdfs:label "High Shelf" ; rdf:value 2 ] ,
             [ rdfs:label "Notch" ; rdf:value 3 ] ,
             [ rdfs:label "All-pass 1st" ; rdf:value 4 ] ,
-            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ]
+            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ] ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -435,7 +468,8 @@
         lv2:maximum 20000 ;
         lv2:portProperty lv2:integer ;
         lv2:portProperty pprops:logarithmic ;
-        units:unit units:hz
+        units:unit units:hz ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -445,7 +479,8 @@
         lv2:default 0 ;
         lv2:minimum -15 ;
         lv2:maximum 15 ;
-        units:unit units:db
+        units:unit units:db ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -454,7 +489,8 @@
         lv2:name "Band 6 Q" ;
         lv2:default 1 ;
         lv2:minimum 0.3 ;
-        lv2:maximum 116
+        lv2:maximum 116 ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -464,7 +500,8 @@
         lv2:default 0 ;
         lv2:minimum 0 ;
         lv2:maximum 1 ;
-        lv2:portProperty lv2:toggled
+        lv2:portProperty lv2:toggled ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -481,7 +518,8 @@
             [ rdfs:label "High Shelf" ; rdf:value 2 ] ,
             [ rdfs:label "Notch" ; rdf:value 3 ] ,
             [ rdfs:label "All-pass 1st" ; rdf:value 4 ] ,
-            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ]
+            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ] ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -493,7 +531,8 @@
         lv2:maximum 20000 ;
         lv2:portProperty lv2:integer ;
         lv2:portProperty pprops:logarithmic ;
-        units:unit units:hz
+        units:unit units:hz ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -503,7 +542,8 @@
         lv2:default 0 ;
         lv2:minimum -15 ;
         lv2:maximum 15 ;
-        units:unit units:db
+        units:unit units:db ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -512,7 +552,8 @@
         lv2:name "Band 7 Q" ;
         lv2:default 1 ;
         lv2:minimum 0.3 ;
-        lv2:maximum 116
+        lv2:maximum 116 ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -522,7 +563,8 @@
         lv2:default 0 ;
         lv2:minimum 0 ;
         lv2:maximum 1 ;
-        lv2:portProperty lv2:toggled
+        lv2:portProperty lv2:toggled ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -539,7 +581,8 @@
             [ rdfs:label "High Shelf" ; rdf:value 2 ] ,
             [ rdfs:label "Notch" ; rdf:value 3 ] ,
             [ rdfs:label "All-pass 1st" ; rdf:value 4 ] ,
-            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ]
+            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ] ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -551,7 +594,8 @@
         lv2:maximum 20000 ;
         lv2:portProperty lv2:integer ;
         lv2:portProperty pprops:logarithmic ;
-        units:unit units:hz
+        units:unit units:hz ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -561,7 +605,8 @@
         lv2:default 0 ;
         lv2:minimum -15 ;
         lv2:maximum 15 ;
-        units:unit units:db
+        units:unit units:db ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -570,7 +615,8 @@
         lv2:name "Band 8 Q" ;
         lv2:default 1 ;
         lv2:minimum 0.3 ;
-        lv2:maximum 116
+        lv2:maximum 116 ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -580,7 +626,8 @@
         lv2:default 0 ;
         lv2:minimum 0 ;
         lv2:maximum 1 ;
-        lv2:portProperty lv2:toggled
+        lv2:portProperty lv2:toggled ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -597,7 +644,8 @@
             [ rdfs:label "High Shelf" ; rdf:value 2 ] ,
             [ rdfs:label "Notch" ; rdf:value 3 ] ,
             [ rdfs:label "All-pass 1st" ; rdf:value 4 ] ,
-            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ]
+            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ] ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -609,7 +657,8 @@
         lv2:maximum 20000 ;
         lv2:portProperty lv2:integer ;
         lv2:portProperty pprops:logarithmic ;
-        units:unit units:hz
+        units:unit units:hz ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -619,7 +668,8 @@
         lv2:default 0 ;
         lv2:minimum -15 ;
         lv2:maximum 15 ;
-        units:unit units:db
+        units:unit units:db ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -628,7 +678,8 @@
         lv2:name "Band 9 Q" ;
         lv2:default 1 ;
         lv2:minimum 0.3 ;
-        lv2:maximum 116
+        lv2:maximum 116 ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -638,7 +689,8 @@
         lv2:default 0 ;
         lv2:minimum 0 ;
         lv2:maximum 1 ;
-        lv2:portProperty lv2:toggled
+        lv2:portProperty lv2:toggled ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -655,7 +707,8 @@
             [ rdfs:label "High Shelf" ; rdf:value 2 ] ,
             [ rdfs:label "Notch" ; rdf:value 3 ] ,
             [ rdfs:label "All-pass 1st" ; rdf:value 4 ] ,
-            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ]
+            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ] ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -667,7 +720,8 @@
         lv2:maximum 20000 ;
         lv2:portProperty lv2:integer ;
         lv2:portProperty pprops:logarithmic ;
-        units:unit units:hz
+        units:unit units:hz ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -677,7 +731,8 @@
         lv2:default 0 ;
         lv2:minimum -15 ;
         lv2:maximum 15 ;
-        units:unit units:db
+        units:unit units:db ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -686,7 +741,8 @@
         lv2:name "Band 10 Q" ;
         lv2:default 1 ;
         lv2:minimum 0.3 ;
-        lv2:maximum 116
+        lv2:maximum 116 ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -696,7 +752,8 @@
         lv2:default 0 ;
         lv2:minimum 0 ;
         lv2:maximum 1 ;
-        lv2:portProperty lv2:toggled
+        lv2:portProperty lv2:toggled ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -713,7 +770,8 @@
             [ rdfs:label "High Shelf" ; rdf:value 2 ] ,
             [ rdfs:label "Notch" ; rdf:value 3 ] ,
             [ rdfs:label "All-pass 1st" ; rdf:value 4 ] ,
-            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ]
+            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ] ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -725,7 +783,8 @@
         lv2:maximum 20000 ;
         lv2:portProperty lv2:integer ;
         lv2:portProperty pprops:logarithmic ;
-        units:unit units:hz
+        units:unit units:hz ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -735,7 +794,8 @@
         lv2:default 0 ;
         lv2:minimum -15 ;
         lv2:maximum 15 ;
-        units:unit units:db
+        units:unit units:db ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -744,7 +804,8 @@
         lv2:name "Band 11 Q" ;
         lv2:default 1 ;
         lv2:minimum 0.3 ;
-        lv2:maximum 116
+        lv2:maximum 116 ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -754,7 +815,8 @@
         lv2:default 0 ;
         lv2:minimum 0 ;
         lv2:maximum 1 ;
-        lv2:portProperty lv2:toggled
+        lv2:portProperty lv2:toggled ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -771,7 +833,8 @@
             [ rdfs:label "High Shelf" ; rdf:value 2 ] ,
             [ rdfs:label "Notch" ; rdf:value 3 ] ,
             [ rdfs:label "All-pass 1st" ; rdf:value 4 ] ,
-            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ]
+            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ] ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -783,7 +846,8 @@
         lv2:maximum 20000 ;
         lv2:portProperty lv2:integer ;
         lv2:portProperty pprops:logarithmic ;
-        units:unit units:hz
+        units:unit units:hz ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -793,7 +857,8 @@
         lv2:default 0 ;
         lv2:minimum -15 ;
         lv2:maximum 15 ;
-        units:unit units:db
+        units:unit units:db ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -802,7 +867,8 @@
         lv2:name "Band 12 Q" ;
         lv2:default 1 ;
         lv2:minimum 0.3 ;
-        lv2:maximum 116
+        lv2:maximum 116 ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -812,7 +878,8 @@
         lv2:default 0 ;
         lv2:minimum 0 ;
         lv2:maximum 1 ;
-        lv2:portProperty lv2:toggled
+        lv2:portProperty lv2:toggled ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -829,7 +896,8 @@
             [ rdfs:label "High Shelf" ; rdf:value 2 ] ,
             [ rdfs:label "Notch" ; rdf:value 3 ] ,
             [ rdfs:label "All-pass 1st" ; rdf:value 4 ] ,
-            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ]
+            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ] ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -841,7 +909,8 @@
         lv2:maximum 20000 ;
         lv2:portProperty lv2:integer ;
         lv2:portProperty pprops:logarithmic ;
-        units:unit units:hz
+        units:unit units:hz ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -851,7 +920,8 @@
         lv2:default 0 ;
         lv2:minimum -15 ;
         lv2:maximum 15 ;
-        units:unit units:db
+        units:unit units:db ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -860,7 +930,8 @@
         lv2:name "Band 13 Q" ;
         lv2:default 1 ;
         lv2:minimum 0.3 ;
-        lv2:maximum 116
+        lv2:maximum 116 ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -870,7 +941,8 @@
         lv2:default 0 ;
         lv2:minimum 0 ;
         lv2:maximum 1 ;
-        lv2:portProperty lv2:toggled
+        lv2:portProperty lv2:toggled ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -887,7 +959,8 @@
             [ rdfs:label "High Shelf" ; rdf:value 2 ] ,
             [ rdfs:label "Notch" ; rdf:value 3 ] ,
             [ rdfs:label "All-pass 1st" ; rdf:value 4 ] ,
-            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ]
+            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ] ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -899,7 +972,8 @@
         lv2:maximum 20000 ;
         lv2:portProperty lv2:integer ;
         lv2:portProperty pprops:logarithmic ;
-        units:unit units:hz
+        units:unit units:hz ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -909,7 +983,8 @@
         lv2:default 0 ;
         lv2:minimum -15 ;
         lv2:maximum 15 ;
-        units:unit units:db
+        units:unit units:db ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -918,7 +993,8 @@
         lv2:name "Band 14 Q" ;
         lv2:default 1 ;
         lv2:minimum 0.3 ;
-        lv2:maximum 116
+        lv2:maximum 116 ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -928,7 +1004,8 @@
         lv2:default 0 ;
         lv2:minimum 0 ;
         lv2:maximum 1 ;
-        lv2:portProperty lv2:toggled
+        lv2:portProperty lv2:toggled ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -945,7 +1022,8 @@
             [ rdfs:label "High Shelf" ; rdf:value 2 ] ,
             [ rdfs:label "Notch" ; rdf:value 3 ] ,
             [ rdfs:label "All-pass 1st" ; rdf:value 4 ] ,
-            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ]
+            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ] ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -957,7 +1035,8 @@
         lv2:maximum 20000 ;
         lv2:portProperty lv2:integer ;
         lv2:portProperty pprops:logarithmic ;
-        units:unit units:hz
+        units:unit units:hz ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -967,7 +1046,8 @@
         lv2:default 0 ;
         lv2:minimum -15 ;
         lv2:maximum 15 ;
-        units:unit units:db
+        units:unit units:db ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -976,7 +1056,8 @@
         lv2:name "Band 15 Q" ;
         lv2:default 1 ;
         lv2:minimum 0.3 ;
-        lv2:maximum 116
+        lv2:maximum 116 ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -986,7 +1067,8 @@
         lv2:default 0 ;
         lv2:minimum 0 ;
         lv2:maximum 1 ;
-        lv2:portProperty lv2:toggled
+        lv2:portProperty lv2:toggled ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1003,7 +1085,8 @@
             [ rdfs:label "High Shelf" ; rdf:value 2 ] ,
             [ rdfs:label "Notch" ; rdf:value 3 ] ,
             [ rdfs:label "All-pass 1st" ; rdf:value 4 ] ,
-            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ]
+            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ] ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1015,7 +1098,8 @@
         lv2:maximum 20000 ;
         lv2:portProperty lv2:integer ;
         lv2:portProperty pprops:logarithmic ;
-        units:unit units:hz
+        units:unit units:hz ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1025,7 +1109,8 @@
         lv2:default 0 ;
         lv2:minimum -15 ;
         lv2:maximum 15 ;
-        units:unit units:db
+        units:unit units:db ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1034,7 +1119,8 @@
         lv2:name "Band 16 Q" ;
         lv2:default 1 ;
         lv2:minimum 0.3 ;
-        lv2:maximum 116
+        lv2:maximum 116 ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1044,7 +1130,8 @@
         lv2:default 0 ;
         lv2:minimum 0 ;
         lv2:maximum 1 ;
-        lv2:portProperty lv2:toggled
+        lv2:portProperty lv2:toggled ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1061,7 +1148,8 @@
             [ rdfs:label "High Shelf" ; rdf:value 2 ] ,
             [ rdfs:label "Notch" ; rdf:value 3 ] ,
             [ rdfs:label "All-pass 1st" ; rdf:value 4 ] ,
-            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ]
+            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ] ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1073,7 +1161,8 @@
         lv2:maximum 20000 ;
         lv2:portProperty lv2:integer ;
         lv2:portProperty pprops:logarithmic ;
-        units:unit units:hz
+        units:unit units:hz ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1083,7 +1172,8 @@
         lv2:default 0 ;
         lv2:minimum -15 ;
         lv2:maximum 15 ;
-        units:unit units:db
+        units:unit units:db ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1092,7 +1182,8 @@
         lv2:name "Band 17 Q" ;
         lv2:default 1 ;
         lv2:minimum 0.3 ;
-        lv2:maximum 116
+        lv2:maximum 116 ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1102,7 +1193,8 @@
         lv2:default 0 ;
         lv2:minimum 0 ;
         lv2:maximum 1 ;
-        lv2:portProperty lv2:toggled
+        lv2:portProperty lv2:toggled ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1119,7 +1211,8 @@
             [ rdfs:label "High Shelf" ; rdf:value 2 ] ,
             [ rdfs:label "Notch" ; rdf:value 3 ] ,
             [ rdfs:label "All-pass 1st" ; rdf:value 4 ] ,
-            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ]
+            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ] ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1131,7 +1224,8 @@
         lv2:maximum 20000 ;
         lv2:portProperty lv2:integer ;
         lv2:portProperty pprops:logarithmic ;
-        units:unit units:hz
+        units:unit units:hz ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1141,7 +1235,8 @@
         lv2:default 0 ;
         lv2:minimum -15 ;
         lv2:maximum 15 ;
-        units:unit units:db
+        units:unit units:db ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1150,7 +1245,8 @@
         lv2:name "Band 18 Q" ;
         lv2:default 1 ;
         lv2:minimum 0.3 ;
-        lv2:maximum 116
+        lv2:maximum 116 ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1160,7 +1256,8 @@
         lv2:default 0 ;
         lv2:minimum 0 ;
         lv2:maximum 1 ;
-        lv2:portProperty lv2:toggled
+        lv2:portProperty lv2:toggled ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1177,7 +1274,8 @@
             [ rdfs:label "High Shelf" ; rdf:value 2 ] ,
             [ rdfs:label "Notch" ; rdf:value 3 ] ,
             [ rdfs:label "All-pass 1st" ; rdf:value 4 ] ,
-            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ]
+            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ] ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1189,7 +1287,8 @@
         lv2:maximum 20000 ;
         lv2:portProperty lv2:integer ;
         lv2:portProperty pprops:logarithmic ;
-        units:unit units:hz
+        units:unit units:hz ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1199,7 +1298,8 @@
         lv2:default 0 ;
         lv2:minimum -15 ;
         lv2:maximum 15 ;
-        units:unit units:db
+        units:unit units:db ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1208,7 +1308,8 @@
         lv2:name "Band 19 Q" ;
         lv2:default 1 ;
         lv2:minimum 0.3 ;
-        lv2:maximum 116
+        lv2:maximum 116 ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1218,7 +1319,8 @@
         lv2:default 0 ;
         lv2:minimum 0 ;
         lv2:maximum 1 ;
-        lv2:portProperty lv2:toggled
+        lv2:portProperty lv2:toggled ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1235,7 +1337,8 @@
             [ rdfs:label "High Shelf" ; rdf:value 2 ] ,
             [ rdfs:label "Notch" ; rdf:value 3 ] ,
             [ rdfs:label "All-pass 1st" ; rdf:value 4 ] ,
-            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ]
+            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ] ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1247,7 +1350,8 @@
         lv2:maximum 20000 ;
         lv2:portProperty lv2:integer ;
         lv2:portProperty pprops:logarithmic ;
-        units:unit units:hz
+        units:unit units:hz ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1257,7 +1361,8 @@
         lv2:default 0 ;
         lv2:minimum -15 ;
         lv2:maximum 15 ;
-        units:unit units:db
+        units:unit units:db ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1266,7 +1371,8 @@
         lv2:name "Band 20 Q" ;
         lv2:default 1 ;
         lv2:minimum 0.3 ;
-        lv2:maximum 116
+        lv2:maximum 116 ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1276,7 +1382,8 @@
         lv2:default 0 ;
         lv2:minimum 0 ;
         lv2:maximum 1 ;
-        lv2:portProperty lv2:toggled
+        lv2:portProperty lv2:toggled ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1293,7 +1400,8 @@
             [ rdfs:label "High Shelf" ; rdf:value 2 ] ,
             [ rdfs:label "Notch" ; rdf:value 3 ] ,
             [ rdfs:label "All-pass 1st" ; rdf:value 4 ] ,
-            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ]
+            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ] ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1305,7 +1413,8 @@
         lv2:maximum 20000 ;
         lv2:portProperty lv2:integer ;
         lv2:portProperty pprops:logarithmic ;
-        units:unit units:hz
+        units:unit units:hz ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1315,7 +1424,8 @@
         lv2:default 0 ;
         lv2:minimum -15 ;
         lv2:maximum 15 ;
-        units:unit units:db
+        units:unit units:db ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1324,7 +1434,8 @@
         lv2:name "Band 21 Q" ;
         lv2:default 1 ;
         lv2:minimum 0.3 ;
-        lv2:maximum 116
+        lv2:maximum 116 ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1334,7 +1445,8 @@
         lv2:default 0 ;
         lv2:minimum 0 ;
         lv2:maximum 1 ;
-        lv2:portProperty lv2:toggled
+        lv2:portProperty lv2:toggled ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1351,7 +1463,8 @@
             [ rdfs:label "High Shelf" ; rdf:value 2 ] ,
             [ rdfs:label "Notch" ; rdf:value 3 ] ,
             [ rdfs:label "All-pass 1st" ; rdf:value 4 ] ,
-            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ]
+            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ] ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1363,7 +1476,8 @@
         lv2:maximum 20000 ;
         lv2:portProperty lv2:integer ;
         lv2:portProperty pprops:logarithmic ;
-        units:unit units:hz
+        units:unit units:hz ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1373,7 +1487,8 @@
         lv2:default 0 ;
         lv2:minimum -15 ;
         lv2:maximum 15 ;
-        units:unit units:db
+        units:unit units:db ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1382,7 +1497,8 @@
         lv2:name "Band 22 Q" ;
         lv2:default 1 ;
         lv2:minimum 0.3 ;
-        lv2:maximum 116
+        lv2:maximum 116 ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1392,7 +1508,8 @@
         lv2:default 0 ;
         lv2:minimum 0 ;
         lv2:maximum 1 ;
-        lv2:portProperty lv2:toggled
+        lv2:portProperty lv2:toggled ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1409,7 +1526,8 @@
             [ rdfs:label "High Shelf" ; rdf:value 2 ] ,
             [ rdfs:label "Notch" ; rdf:value 3 ] ,
             [ rdfs:label "All-pass 1st" ; rdf:value 4 ] ,
-            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ]
+            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ] ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1421,7 +1539,8 @@
         lv2:maximum 20000 ;
         lv2:portProperty lv2:integer ;
         lv2:portProperty pprops:logarithmic ;
-        units:unit units:hz
+        units:unit units:hz ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1431,7 +1550,8 @@
         lv2:default 0 ;
         lv2:minimum -15 ;
         lv2:maximum 15 ;
-        units:unit units:db
+        units:unit units:db ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1440,7 +1560,8 @@
         lv2:name "Band 23 Q" ;
         lv2:default 1 ;
         lv2:minimum 0.3 ;
-        lv2:maximum 116
+        lv2:maximum 116 ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1450,7 +1571,8 @@
         lv2:default 0 ;
         lv2:minimum 0 ;
         lv2:maximum 1 ;
-        lv2:portProperty lv2:toggled
+        lv2:portProperty lv2:toggled ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1467,7 +1589,8 @@
             [ rdfs:label "High Shelf" ; rdf:value 2 ] ,
             [ rdfs:label "Notch" ; rdf:value 3 ] ,
             [ rdfs:label "All-pass 1st" ; rdf:value 4 ] ,
-            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ]
+            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ] ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1479,7 +1602,8 @@
         lv2:maximum 20000 ;
         lv2:portProperty lv2:integer ;
         lv2:portProperty pprops:logarithmic ;
-        units:unit units:hz
+        units:unit units:hz ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1489,7 +1613,8 @@
         lv2:default 0 ;
         lv2:minimum -15 ;
         lv2:maximum 15 ;
-        units:unit units:db
+        units:unit units:db ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1498,7 +1623,8 @@
         lv2:name "Band 24 Q" ;
         lv2:default 1 ;
         lv2:minimum 0.3 ;
-        lv2:maximum 116
+        lv2:maximum 116 ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1508,7 +1634,8 @@
         lv2:default 0 ;
         lv2:minimum 0 ;
         lv2:maximum 1 ;
-        lv2:portProperty lv2:toggled
+        lv2:portProperty lv2:toggled ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1525,7 +1652,8 @@
             [ rdfs:label "High Shelf" ; rdf:value 2 ] ,
             [ rdfs:label "Notch" ; rdf:value 3 ] ,
             [ rdfs:label "All-pass 1st" ; rdf:value 4 ] ,
-            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ]
+            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ] ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1537,7 +1665,8 @@
         lv2:maximum 20000 ;
         lv2:portProperty lv2:integer ;
         lv2:portProperty pprops:logarithmic ;
-        units:unit units:hz
+        units:unit units:hz ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1547,7 +1676,8 @@
         lv2:default 0 ;
         lv2:minimum -15 ;
         lv2:maximum 15 ;
-        units:unit units:db
+        units:unit units:db ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1556,7 +1686,8 @@
         lv2:name "Band 25 Q" ;
         lv2:default 1 ;
         lv2:minimum 0.3 ;
-        lv2:maximum 116
+        lv2:maximum 116 ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1566,7 +1697,8 @@
         lv2:default 0 ;
         lv2:minimum 0 ;
         lv2:maximum 1 ;
-        lv2:portProperty lv2:toggled
+        lv2:portProperty lv2:toggled ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1583,7 +1715,8 @@
             [ rdfs:label "High Shelf" ; rdf:value 2 ] ,
             [ rdfs:label "Notch" ; rdf:value 3 ] ,
             [ rdfs:label "All-pass 1st" ; rdf:value 4 ] ,
-            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ]
+            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ] ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1595,7 +1728,8 @@
         lv2:maximum 20000 ;
         lv2:portProperty lv2:integer ;
         lv2:portProperty pprops:logarithmic ;
-        units:unit units:hz
+        units:unit units:hz ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1605,7 +1739,8 @@
         lv2:default 0 ;
         lv2:minimum -15 ;
         lv2:maximum 15 ;
-        units:unit units:db
+        units:unit units:db ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1614,7 +1749,8 @@
         lv2:name "Band 26 Q" ;
         lv2:default 1 ;
         lv2:minimum 0.3 ;
-        lv2:maximum 116
+        lv2:maximum 116 ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1624,7 +1760,8 @@
         lv2:default 0 ;
         lv2:minimum 0 ;
         lv2:maximum 1 ;
-        lv2:portProperty lv2:toggled
+        lv2:portProperty lv2:toggled ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1641,7 +1778,8 @@
             [ rdfs:label "High Shelf" ; rdf:value 2 ] ,
             [ rdfs:label "Notch" ; rdf:value 3 ] ,
             [ rdfs:label "All-pass 1st" ; rdf:value 4 ] ,
-            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ]
+            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ] ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1653,7 +1791,8 @@
         lv2:maximum 20000 ;
         lv2:portProperty lv2:integer ;
         lv2:portProperty pprops:logarithmic ;
-        units:unit units:hz
+        units:unit units:hz ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1663,7 +1802,8 @@
         lv2:default 0 ;
         lv2:minimum -15 ;
         lv2:maximum 15 ;
-        units:unit units:db
+        units:unit units:db ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1672,7 +1812,8 @@
         lv2:name "Band 27 Q" ;
         lv2:default 1 ;
         lv2:minimum 0.3 ;
-        lv2:maximum 116
+        lv2:maximum 116 ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1682,7 +1823,8 @@
         lv2:default 0 ;
         lv2:minimum 0 ;
         lv2:maximum 1 ;
-        lv2:portProperty lv2:toggled
+        lv2:portProperty lv2:toggled ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1699,7 +1841,8 @@
             [ rdfs:label "High Shelf" ; rdf:value 2 ] ,
             [ rdfs:label "Notch" ; rdf:value 3 ] ,
             [ rdfs:label "All-pass 1st" ; rdf:value 4 ] ,
-            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ]
+            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ] ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1711,7 +1854,8 @@
         lv2:maximum 20000 ;
         lv2:portProperty lv2:integer ;
         lv2:portProperty pprops:logarithmic ;
-        units:unit units:hz
+        units:unit units:hz ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1721,7 +1865,8 @@
         lv2:default 0 ;
         lv2:minimum -15 ;
         lv2:maximum 15 ;
-        units:unit units:db
+        units:unit units:db ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1730,7 +1875,8 @@
         lv2:name "Band 28 Q" ;
         lv2:default 1 ;
         lv2:minimum 0.3 ;
-        lv2:maximum 116
+        lv2:maximum 116 ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1740,7 +1886,8 @@
         lv2:default 0 ;
         lv2:minimum 0 ;
         lv2:maximum 1 ;
-        lv2:portProperty lv2:toggled
+        lv2:portProperty lv2:toggled ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1757,7 +1904,8 @@
             [ rdfs:label "High Shelf" ; rdf:value 2 ] ,
             [ rdfs:label "Notch" ; rdf:value 3 ] ,
             [ rdfs:label "All-pass 1st" ; rdf:value 4 ] ,
-            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ]
+            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ] ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1769,7 +1917,8 @@
         lv2:maximum 20000 ;
         lv2:portProperty lv2:integer ;
         lv2:portProperty pprops:logarithmic ;
-        units:unit units:hz
+        units:unit units:hz ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1779,7 +1928,8 @@
         lv2:default 0 ;
         lv2:minimum -15 ;
         lv2:maximum 15 ;
-        units:unit units:db
+        units:unit units:db ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1788,7 +1938,8 @@
         lv2:name "Band 29 Q" ;
         lv2:default 1 ;
         lv2:minimum 0.3 ;
-        lv2:maximum 116
+        lv2:maximum 116 ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1798,7 +1949,8 @@
         lv2:default 0 ;
         lv2:minimum 0 ;
         lv2:maximum 1 ;
-        lv2:portProperty lv2:toggled
+        lv2:portProperty lv2:toggled ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1815,7 +1967,8 @@
             [ rdfs:label "High Shelf" ; rdf:value 2 ] ,
             [ rdfs:label "Notch" ; rdf:value 3 ] ,
             [ rdfs:label "All-pass 1st" ; rdf:value 4 ] ,
-            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ]
+            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ] ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1827,7 +1980,8 @@
         lv2:maximum 20000 ;
         lv2:portProperty lv2:integer ;
         lv2:portProperty pprops:logarithmic ;
-        units:unit units:hz
+        units:unit units:hz ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1837,7 +1991,8 @@
         lv2:default 0 ;
         lv2:minimum -15 ;
         lv2:maximum 15 ;
-        units:unit units:db
+        units:unit units:db ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1846,7 +2001,8 @@
         lv2:name "Band 30 Q" ;
         lv2:default 1 ;
         lv2:minimum 0.3 ;
-        lv2:maximum 116
+        lv2:maximum 116 ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1856,7 +2012,8 @@
         lv2:default 0 ;
         lv2:minimum 0 ;
         lv2:maximum 1 ;
-        lv2:portProperty lv2:toggled
+        lv2:portProperty lv2:toggled ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1873,7 +2030,8 @@
             [ rdfs:label "High Shelf" ; rdf:value 2 ] ,
             [ rdfs:label "Notch" ; rdf:value 3 ] ,
             [ rdfs:label "All-pass 1st" ; rdf:value 4 ] ,
-            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ]
+            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ] ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1885,7 +2043,8 @@
         lv2:maximum 20000 ;
         lv2:portProperty lv2:integer ;
         lv2:portProperty pprops:logarithmic ;
-        units:unit units:hz
+        units:unit units:hz ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1895,7 +2054,8 @@
         lv2:default 0 ;
         lv2:minimum -15 ;
         lv2:maximum 15 ;
-        units:unit units:db
+        units:unit units:db ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1904,7 +2064,8 @@
         lv2:name "Band 31 Q" ;
         lv2:default 1 ;
         lv2:minimum 0.3 ;
-        lv2:maximum 116
+        lv2:maximum 116 ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1914,7 +2075,8 @@
         lv2:default 0 ;
         lv2:minimum 0 ;
         lv2:maximum 1 ;
-        lv2:portProperty lv2:toggled
+        lv2:portProperty lv2:toggled ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1931,7 +2093,8 @@
             [ rdfs:label "High Shelf" ; rdf:value 2 ] ,
             [ rdfs:label "Notch" ; rdf:value 3 ] ,
             [ rdfs:label "All-pass 1st" ; rdf:value 4 ] ,
-            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ]
+            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ] ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1943,7 +2106,8 @@
         lv2:maximum 20000 ;
         lv2:portProperty lv2:integer ;
         lv2:portProperty pprops:logarithmic ;
-        units:unit units:hz
+        units:unit units:hz ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1953,7 +2117,8 @@
         lv2:default 0 ;
         lv2:minimum -15 ;
         lv2:maximum 15 ;
-        units:unit units:db
+        units:unit units:db ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1962,7 +2127,8 @@
         lv2:name "Band 32 Q" ;
         lv2:default 1 ;
         lv2:minimum 0.3 ;
-        lv2:maximum 116
+        lv2:maximum 116 ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1972,7 +2138,8 @@
         lv2:default 0 ;
         lv2:minimum 0 ;
         lv2:maximum 1 ;
-        lv2:portProperty lv2:toggled
+        lv2:portProperty lv2:toggled ;
+        pg:group <urn:openmixer:eq32#bands>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -1994,3 +2161,18 @@
         lv2:portProperty lv2:reportsLatency , lv2:integer ;
         units:unit units:frame
     ] .
+
+<urn:openmixer:eq32#bands>
+    a pg:Group ;
+    lv2:symbol "bands" ;
+    rdfs:label "Bands" .
+
+<urn:openmixer:eq32#hpf>
+    a pg:Group ;
+    lv2:symbol "hpf" ;
+    rdfs:label "HPF" .
+
+<urn:openmixer:eq32#lpf>
+    a pg:Group ;
+    lv2:symbol "lpf" ;
+    rdfs:label "LPF" .

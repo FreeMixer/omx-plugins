@@ -105,37 +105,51 @@ static const struct omx_param_contract_row OMX_GATE_PARAM_CONTRACT[OMX_GATE_PARA
 };
 
 /* org.openmixer.panel-description/1 (tools/panel-description.mjs): the declaration's panel as the rows
- * include/omx_panel_description.h serves, parameter ids the declaration's. Family gate. */
-#define OMX_GATE_PANEL_FINGERPRINT "2999bdfc36c763e8f1da8b6005fc3b6c8fd41e919a51897430c0462e260b90df"
+ * include/omx_panel_description.h serves, parameter ids the declaration's. Family gate.
+ * Declared roles not published:
+ *   ratio (ratio): the ratio role takes ratio, coef, not no unit */
+#define OMX_GATE_PANEL_FINGERPRINT "4c014a0639d0df200be7be72ad1015beee79579eb485b83dafc02d3a03a5beed"
 static const struct omx_panel_section_row OMX_GATE_PANEL_SECTIONS[] = {
-  { "gate", "fx.gate.section.gate", "Keyed-gate" },
+  { "gate", "fx.gate.section.gate", "Gate" },
+  { "key", "fx.gate.section.key", "Key" },
 };
 static const struct omx_panel_control_row OMX_GATE_PANEL_CONTROLS[] = {
-  { 0u, 0u, OMX_CLAP_WIDGET_AUTO, "fx.gate.key_external", "Key", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
   { 1u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.gate.threshold", "Threshold", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
-  { 2u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.gate.ratio", "Ratio", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
   { 3u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.gate.range", "Range", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 2u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.gate.ratio", "Ratio", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
   { 4u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.gate.attack", "Attack", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 8u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.gate.hold", "Hold", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
   { 5u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.gate.release", "Release", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 9u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.gate.hysteresis", "Hysteresis", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
   { 6u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.gate.knee_start", "Knee Start", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
   { 7u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.gate.knee_end", "Knee End", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
-  { 8u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.gate.hold", "Hold", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
-  { 9u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.gate.hysteresis", "Hysteresis", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 0u, 1u, OMX_CLAP_WIDGET_AUTO, "fx.gate.key_external", "Key", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+};
+static const struct omx_panel_role_row OMX_GATE_PANEL_ROLES[] = {
+  { "threshold", 0u, 1u },
+  { "range", 0u, 3u },
+  { "attack", 0u, 4u },
+  { "release", 0u, 5u },
+  { "hold", 0u, 8u },
+  { "knee_start", 0u, 6u },
+  { "knee_end", 0u, 7u },
+  { "hysteresis", 0u, 9u },
 };
 static const struct omx_panel_display_row OMX_GATE_PANEL_DISPLAYS[] = {
-  { OMX_CLAP_DISPLAY_TRANSFER_CURVE, 0u, OMX_CLAP_DISPLAY_FROM_FAMILY, { OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID }, 0u, OMX_CLAP_PANEL_INVALID_ID, 0.0, "fx.gate.display.transfer_curve", "Keyed-gate" },
+  { OMX_CLAP_DISPLAY_TRANSFER_CURVE, 0u, OMX_CLAP_DISPLAY_FROM_FAMILY, { OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID }, 0u, OMX_CLAP_PANEL_INVALID_ID, 0.0, "fx.gate.display.transfer_curve", "Gate" },
 };
 /* clap.remote-controls/2: the pages of the page rule over the sections. */
 static const struct omx_panel_page_row OMX_GATE_PANEL_PAGES[] = {
-  { "Keyed-gate", "Keyed-gate 1", { 0u, 1u, 2u, 3u, 4u, 5u, 6u, 7u } },
-  { "Keyed-gate", "Keyed-gate 2", { 8u, 9u, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID } },
+  { "Gate", "Gate 1", { 1u, 3u, 2u, 4u, 8u, 5u, 9u, 6u } },
+  { "Gate", "Gate 2", { 7u, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID } },
+  { "Key", "Key", { 0u, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID } },
 };
-#define OMX_GATE_PANEL_PAGE_COUNT 2u
+#define OMX_GATE_PANEL_PAGE_COUNT 3u
 static const struct omx_panel_rows OMX_GATE_PANEL = {
   OMX_GATE_PANEL_FINGERPRINT, OMX_CLAP_FAMILY_GATE,
-  OMX_GATE_PANEL_SECTIONS, 1u,
+  OMX_GATE_PANEL_SECTIONS, 2u,
   OMX_GATE_PANEL_CONTROLS, 10u,
-  NULL, 0u,
+  OMX_GATE_PANEL_ROLES, 8u,
   OMX_GATE_PANEL_DISPLAYS, 1u,
   NULL, 0u,
 };

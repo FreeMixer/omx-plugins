@@ -75,28 +75,36 @@ static const struct omx_param_contract_row OMX_CHORUS_PARAM_CONTRACT[OMX_CHORUS_
 };
 
 /* org.openmixer.panel-description/1 (tools/panel-description.mjs): the declaration's panel as the rows
- * include/omx_panel_description.h serves, parameter ids the declaration's. Family modulation. */
-#define OMX_CHORUS_PANEL_FINGERPRINT "5d54fd1fc306ce2f80504f687c6c77f9cce6213239c75b80c880a0237e766c85"
+ * include/omx_panel_description.h serves, parameter ids the declaration's. Family modulation.
+ * Declared roles not published:
+ *   depth (depth): the depth role takes none, pc, coef, not ms */
+#define OMX_CHORUS_PANEL_FINGERPRINT "f74674fc0273db9c13b04bcefbdde42d9faa30dd64fec72cd7b881bfb1d98b2f"
 static const struct omx_panel_section_row OMX_CHORUS_PANEL_SECTIONS[] = {
   { "chorus", "fx.chorus.section.chorus", "Chorus" },
 };
 static const struct omx_panel_control_row OMX_CHORUS_PANEL_CONTROLS[] = {
-  { 0u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.chorus.spread", "Spread", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
   { 1u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.chorus.rate", "Rate", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
   { 2u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.chorus.depth", "Depth", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
   { 3u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.chorus.voices", "Voices", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
   { 4u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.chorus.mix", "Mix", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 0u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.chorus.spread", "Spread", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+};
+static const struct omx_panel_role_row OMX_CHORUS_PANEL_ROLES[] = {
+  { "rate", 0u, 1u },
+  { "voices", 0u, 3u },
+  { "spread", 0u, 0u },
+  { "mix", 0u, 4u },
 };
 /* clap.remote-controls/2: the pages of the page rule over the sections. */
 static const struct omx_panel_page_row OMX_CHORUS_PANEL_PAGES[] = {
-  { "Chorus", "Chorus", { 0u, 1u, 2u, 3u, 4u, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID } },
+  { "Chorus", "Chorus", { 1u, 2u, 3u, 4u, 0u, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID } },
 };
 #define OMX_CHORUS_PANEL_PAGE_COUNT 1u
 static const struct omx_panel_rows OMX_CHORUS_PANEL = {
   OMX_CHORUS_PANEL_FINGERPRINT, OMX_CLAP_FAMILY_MODULATION,
   OMX_CHORUS_PANEL_SECTIONS, 1u,
   OMX_CHORUS_PANEL_CONTROLS, 5u,
-  NULL, 0u,
+  OMX_CHORUS_PANEL_ROLES, 4u,
   NULL, 0u,
   NULL, 0u,
 };

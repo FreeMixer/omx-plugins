@@ -124,39 +124,54 @@ static const struct omx_param_contract_row OMX_REVERB_PARAM_CONTRACT[OMX_REVERB_
 
 /* org.openmixer.panel-description/1 (tools/panel-description.mjs): the declaration's panel as the rows
  * include/omx_panel_description.h serves, parameter ids the declaration's. Family reverb. */
-#define OMX_REVERB_PANEL_FINGERPRINT "d70457a6cb5f835d6428fbab49c9c9539916301441e00fb1a31449cb7adf85d1"
+#define OMX_REVERB_PANEL_FINGERPRINT "7626d07e785ceff25b3603d57d7ad73c2bf132c17ab248bf6d227e1d2e93a722"
 static const struct omx_panel_section_row OMX_REVERB_PANEL_SECTIONS[] = {
   { "reverb", "fx.reverb.section.reverb", "Reverb" },
+  { "reverse", "fx.reverb.section.reverse", "Reverse" },
+  { "gated", "fx.reverb.section.gated", "Gated" },
+  { "plate", "fx.reverb.section.plate", "Plate" },
 };
 static const struct omx_panel_control_row OMX_REVERB_PANEL_CONTROLS[] = {
-  { 0u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.reverb.plate_mod_depth", "Plate Mod Depth", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
-  { 1u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.reverb.mix", "Mix", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 12u, 0u, OMX_CLAP_WIDGET_AUTO, "fx.reverb.algorithm", "Algorithm", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
   { 2u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.reverb.size", "Size", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
   { 3u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.reverb.damping", "Damping", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
-  { 4u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.reverb.width", "Width", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
   { 5u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.reverb.predelay", "Predelay", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 4u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.reverb.width", "Width", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 1u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.reverb.mix", "Mix", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
   { 6u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.reverb.lowcut", "Lowcut", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
   { 7u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.reverb.highcut", "Highcut", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
-  { 8u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.reverb.reverse", "Reverse", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
-  { 9u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.reverb.hold", "Hold", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
-  { 10u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.reverb.release", "Release", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
-  { 11u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.reverb.gate_threshold", "Gate Threshold", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
-  { 12u, 0u, OMX_CLAP_WIDGET_AUTO, "fx.reverb.algorithm", "Algorithm", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 8u, 1u, OMX_CLAP_WIDGET_KNOB, "fx.reverb.reverse", "Reverse", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 9u, 2u, OMX_CLAP_WIDGET_KNOB, "fx.reverb.hold", "Hold", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 10u, 2u, OMX_CLAP_WIDGET_KNOB, "fx.reverb.release", "Release", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 11u, 2u, OMX_CLAP_WIDGET_KNOB, "fx.reverb.gate_threshold", "Gate Threshold", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 0u, 3u, OMX_CLAP_WIDGET_KNOB, "fx.reverb.plate_mod_depth", "Plate Mod Depth", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+};
+static const struct omx_panel_role_row OMX_REVERB_PANEL_ROLES[] = {
+  { "size", 0u, 2u },
+  { "algorithm", 0u, 12u },
+  { "predelay", 0u, 5u },
+  { "damping", 0u, 3u },
+  { "width", 0u, 4u },
+  { "low_cut", 0u, 6u },
+  { "high_cut", 0u, 7u },
+  { "mix", 0u, 1u },
 };
 static const struct omx_panel_default_row OMX_REVERB_PANEL_DEFAULTS[] = {
   { OMX_CLAP_PLACEMENT_RETURN, 1u, 1 },
 };
 /* clap.remote-controls/2: the pages of the page rule over the sections. */
 static const struct omx_panel_page_row OMX_REVERB_PANEL_PAGES[] = {
-  { "Reverb", "Reverb 1", { 0u, 1u, 2u, 3u, 4u, 5u, 6u, 7u } },
-  { "Reverb", "Reverb 2", { 8u, 9u, 10u, 11u, 12u, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID } },
+  { "Reverb", "Reverb", { 12u, 2u, 3u, 5u, 4u, 1u, 6u, 7u } },
+  { "Reverse", "Reverse", { 8u, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID } },
+  { "Gated", "Gated", { 9u, 10u, 11u, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID } },
+  { "Plate", "Plate", { 0u, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID } },
 };
-#define OMX_REVERB_PANEL_PAGE_COUNT 2u
+#define OMX_REVERB_PANEL_PAGE_COUNT 4u
 static const struct omx_panel_rows OMX_REVERB_PANEL = {
   OMX_REVERB_PANEL_FINGERPRINT, OMX_CLAP_FAMILY_REVERB,
-  OMX_REVERB_PANEL_SECTIONS, 1u,
+  OMX_REVERB_PANEL_SECTIONS, 4u,
   OMX_REVERB_PANEL_CONTROLS, 13u,
-  NULL, 0u,
+  OMX_REVERB_PANEL_ROLES, 8u,
   NULL, 0u,
   OMX_REVERB_PANEL_DEFAULTS, 1u,
 };

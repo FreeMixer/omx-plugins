@@ -70,7 +70,7 @@ static const struct omx_param_contract_row OMX_TREMOLO_PARAM_CONTRACT[OMX_TREMOL
 
 /* org.openmixer.panel-description/1 (tools/panel-description.mjs): the declaration's panel as the rows
  * include/omx_panel_description.h serves, parameter ids the declaration's. Family modulation. */
-#define OMX_TREMOLO_PANEL_FINGERPRINT "a1b0075a4a93b51b7c4a8acfa98adfe935a211d009a76029fd4741a9c328d92d"
+#define OMX_TREMOLO_PANEL_FINGERPRINT "ea8780516cae00fd4bd65468243ec11aeb98b3b9afda8d95b3addb72f3da5a2a"
 static const struct omx_panel_section_row OMX_TREMOLO_PANEL_SECTIONS[] = {
   { "tremolo", "fx.tremolo.section.tremolo", "Tremolo" },
 };
@@ -79,6 +79,11 @@ static const struct omx_panel_control_row OMX_TREMOLO_PANEL_CONTROLS[] = {
   { 1u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.tremolo.depth", "Depth", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
   { 2u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.tremolo.mix", "Mix", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
   { 3u, 0u, OMX_CLAP_WIDGET_AUTO, "fx.tremolo.mode", "Mode", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+};
+static const struct omx_panel_role_row OMX_TREMOLO_PANEL_ROLES[] = {
+  { "rate", 0u, 0u },
+  { "depth", 0u, 1u },
+  { "mix", 0u, 2u },
 };
 /* clap.remote-controls/2: the pages of the page rule over the sections. */
 static const struct omx_panel_page_row OMX_TREMOLO_PANEL_PAGES[] = {
@@ -89,7 +94,7 @@ static const struct omx_panel_rows OMX_TREMOLO_PANEL = {
   OMX_TREMOLO_PANEL_FINGERPRINT, OMX_CLAP_FAMILY_MODULATION,
   OMX_TREMOLO_PANEL_SECTIONS, 1u,
   OMX_TREMOLO_PANEL_CONTROLS, 4u,
-  NULL, 0u,
+  OMX_TREMOLO_PANEL_ROLES, 3u,
   NULL, 0u,
   NULL, 0u,
 };

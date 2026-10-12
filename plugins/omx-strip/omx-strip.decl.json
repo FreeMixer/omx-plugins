@@ -725,7 +725,7 @@
     "+50 order"
   ],
   "panel": {
-    "family": "strip",
+    "family": "none",
     "roles": {},
     "sections": [
       {
@@ -836,7 +836,7 @@
     "0.3.0 changed the parameter list (the Input and Filters switches, the gate's knee, hold and hysteresis, the compressor's kind, mix and detector oversampling, five-stage orders): a session saved with 0.2.0 does not load as it was, though at 0.2.0's settings the strip sounds the same, sample for sample."
   ],
   "console": {
-    "$comment": "FreeMixer/openmixer integration/waves-2026-10 has no channel-strip stage: its strip is the trim, the EQ (with the HPF and LPF), the gate and the dynamics stages themselves. Racked as a plugin (the insert rack's kinds, channel-contract.ts INSERT_RACK_KINDS) it is drawn by the generic plugin editor.",
+    "$comment": "The OpenMixer console has no channel-strip stage: its strip is the trim, the EQ (with the HPF and LPF), the gate and the dynamics stages themselves. Racked as a plugin in a channel's insert rack, it is drawn by the generic plugin editor.",
     "placement": {
       "strips": [
         "input",

@@ -64,7 +64,7 @@ static const struct omx_param_contract_row OMX_LIMITER_PARAM_CONTRACT[OMX_LIMITE
 
 /* org.openmixer.panel-description/1 (tools/panel-description.mjs): the declaration's panel as the rows
  * include/omx_panel_description.h serves, parameter ids the declaration's. Family limiter. */
-#define OMX_LIMITER_PANEL_FINGERPRINT "8df8a83b852fddc361ada0411c80cd19c6319ef58e93ecc8a704596713eaa987"
+#define OMX_LIMITER_PANEL_FINGERPRINT "5b5052495463e37e4a8540c1c9343419e7f328ade7d9186920937d12c3c0ffdd"
 static const struct omx_panel_section_row OMX_LIMITER_PANEL_SECTIONS[] = {
   { "limiter", "fx.limiter.section.limiter", "Limiter" },
 };
@@ -72,6 +72,11 @@ static const struct omx_panel_control_row OMX_LIMITER_PANEL_CONTROLS[] = {
   { 0u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.limiter.ceiling_db", "Ceiling", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
   { 1u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.limiter.lookahead_ms", "Lookahead", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
   { 2u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.limiter.release_ms", "Release", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+};
+static const struct omx_panel_role_row OMX_LIMITER_PANEL_ROLES[] = {
+  { "ceiling", 0u, 0u },
+  { "release", 0u, 2u },
+  { "lookahead", 0u, 1u },
 };
 /* clap.remote-controls/2: the pages of the page rule over the sections. */
 static const struct omx_panel_page_row OMX_LIMITER_PANEL_PAGES[] = {
@@ -82,7 +87,7 @@ static const struct omx_panel_rows OMX_LIMITER_PANEL = {
   OMX_LIMITER_PANEL_FINGERPRINT, OMX_CLAP_FAMILY_LIMITER,
   OMX_LIMITER_PANEL_SECTIONS, 1u,
   OMX_LIMITER_PANEL_CONTROLS, 3u,
-  NULL, 0u,
+  OMX_LIMITER_PANEL_ROLES, 3u,
   NULL, 0u,
   NULL, 0u,
 };

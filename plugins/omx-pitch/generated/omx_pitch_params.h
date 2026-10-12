@@ -63,8 +63,11 @@ static const struct omx_param_contract_row OMX_PITCH_PARAM_CONTRACT[OMX_PITCH_PA
 };
 
 /* org.openmixer.panel-description/1 (tools/panel-description.mjs): the declaration's panel as the rows
- * include/omx_panel_description.h serves, parameter ids the declaration's. Family pitch. */
-#define OMX_PITCH_PANEL_FINGERPRINT "59dd23c8633c726edaad6473796e3f0cb9da2c480c5a7d7f49667a733957fd7f"
+ * include/omx_panel_description.h serves, parameter ids the declaration's. Family pitch.
+ * Declared roles not published:
+ *   shift (semitones): the shift role takes semitone12TET, cent, not no unit
+ *   fine (cents): the fine role takes cent, not no unit */
+#define OMX_PITCH_PANEL_FINGERPRINT "306ffa35aed518cd21ab460772a0a8b69e4860f2ccf61f9594c067e324e8817f"
 static const struct omx_panel_section_row OMX_PITCH_PANEL_SECTIONS[] = {
   { "pitch", "fx.pitch.section.pitch", "Pitch" },
 };
@@ -72,6 +75,9 @@ static const struct omx_panel_control_row OMX_PITCH_PANEL_CONTROLS[] = {
   { 0u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.pitch.semitones", "Semitones", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
   { 1u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.pitch.cents", "Cents", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
   { 2u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.pitch.mix", "Mix", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+};
+static const struct omx_panel_role_row OMX_PITCH_PANEL_ROLES[] = {
+  { "mix", 0u, 2u },
 };
 /* clap.remote-controls/2: the pages of the page rule over the sections. */
 static const struct omx_panel_page_row OMX_PITCH_PANEL_PAGES[] = {
@@ -82,7 +88,7 @@ static const struct omx_panel_rows OMX_PITCH_PANEL = {
   OMX_PITCH_PANEL_FINGERPRINT, OMX_CLAP_FAMILY_PITCH,
   OMX_PITCH_PANEL_SECTIONS, 1u,
   OMX_PITCH_PANEL_CONTROLS, 3u,
-  NULL, 0u,
+  OMX_PITCH_PANEL_ROLES, 1u,
   NULL, 0u,
   NULL, 0u,
 };

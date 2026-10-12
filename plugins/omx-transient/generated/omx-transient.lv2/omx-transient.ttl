@@ -4,6 +4,7 @@
 @prefix doap:  <http://usefulinc.com/ns/doap#> .
 @prefix foaf:  <http://xmlns.com/foaf/0.1/> .
 @prefix lv2:   <http://lv2plug.in/ns/lv2core#> .
+@prefix pg:    <http://lv2plug.in/ns/ext/port-groups#> .
 @prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix units: <http://lv2plug.in/ns/extensions/units#> .
 
@@ -54,7 +55,8 @@
         lv2:default 0 ;
         lv2:minimum -24 ;
         lv2:maximum 24 ;
-        units:unit units:db
+        units:unit units:db ;
+        pg:group <urn:openmixer:transient#transient>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -64,7 +66,8 @@
         lv2:default 0 ;
         lv2:minimum -24 ;
         lv2:maximum 24 ;
-        units:unit units:db
+        units:unit units:db ;
+        pg:group <urn:openmixer:transient#transient>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -74,7 +77,8 @@
         lv2:default 10 ;
         lv2:minimum 2 ;
         lv2:maximum 50 ;
-        units:unit units:ms
+        units:unit units:ms ;
+        pg:group <urn:openmixer:transient#transient>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -85,7 +89,8 @@
         lv2:minimum 50 ;
         lv2:maximum 2000 ;
         lv2:portProperty lv2:integer ;
-        units:unit units:ms
+        units:unit units:ms ;
+        pg:group <urn:openmixer:transient#transient>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -95,7 +100,8 @@
         lv2:default 0 ;
         lv2:minimum -24 ;
         lv2:maximum 12 ;
-        units:unit units:db
+        units:unit units:db ;
+        pg:group <urn:openmixer:transient#transient>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -117,3 +123,8 @@
         lv2:portProperty lv2:reportsLatency , lv2:integer ;
         units:unit units:frame
     ] .
+
+<urn:openmixer:transient#transient>
+    a pg:Group ;
+    lv2:symbol "transient" ;
+    rdfs:label "Transient" .

@@ -75,8 +75,8 @@ static const struct omx_param_contract_row OMX_TRANSIENT_PARAM_CONTRACT[OMX_TRAN
 };
 
 /* org.openmixer.panel-description/1 (tools/panel-description.mjs): the declaration's panel as the rows
- * include/omx_panel_description.h serves, parameter ids the declaration's. Family none. */
-#define OMX_TRANSIENT_PANEL_FINGERPRINT "628f9caf28b29c12b3c738305685d5d19caa64b1582d097fb87efc2a3ef1cecf"
+ * include/omx_panel_description.h serves, parameter ids the declaration's. Family dynamics. */
+#define OMX_TRANSIENT_PANEL_FINGERPRINT "cc0d525db5334b14fb27fb979f88c90e5d4313605ab6634ae2984e52e100538f"
 static const struct omx_panel_section_row OMX_TRANSIENT_PANEL_SECTIONS[] = {
   { "transient", "fx.transient.section.transient", "Transient" },
 };
@@ -87,16 +87,20 @@ static const struct omx_panel_control_row OMX_TRANSIENT_PANEL_CONTROLS[] = {
   { 3u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.transient.sustain_time_ms", "Sustain Time", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
   { 4u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.transient.output_db", "Output", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
 };
+static const struct omx_panel_role_row OMX_TRANSIENT_PANEL_ROLES[] = {
+  { "attack", 0u, 2u },
+  { "output", 0u, 4u },
+};
 /* clap.remote-controls/2: the pages of the page rule over the sections. */
 static const struct omx_panel_page_row OMX_TRANSIENT_PANEL_PAGES[] = {
   { "Transient", "Transient", { 0u, 1u, 2u, 3u, 4u, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID } },
 };
 #define OMX_TRANSIENT_PANEL_PAGE_COUNT 1u
 static const struct omx_panel_rows OMX_TRANSIENT_PANEL = {
-  OMX_TRANSIENT_PANEL_FINGERPRINT, OMX_CLAP_FAMILY_NONE,
+  OMX_TRANSIENT_PANEL_FINGERPRINT, OMX_CLAP_FAMILY_DYNAMICS,
   OMX_TRANSIENT_PANEL_SECTIONS, 1u,
   OMX_TRANSIENT_PANEL_CONTROLS, 5u,
-  NULL, 0u,
+  OMX_TRANSIENT_PANEL_ROLES, 2u,
   NULL, 0u,
   NULL, 0u,
 };
