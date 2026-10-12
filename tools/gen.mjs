@@ -21,7 +21,8 @@
  *
  * and, from every plugin folder at once, the regions of the shared files between a `BEGIN
  * GENERATED <name>` line and its `END GENERATED <name>` line (SHARED below): the README's catalogue
- * and sections, the RPM %files lists and CI's installed-file lists. Adding a plugin touches only its
+ * and sections, the RPM %files lists, CI's installed-file lists and libomxplugins' table of CLAP
+ * entries (include/omx_clap_static.h, lib/omx_clap_static.c). Adding a plugin touches only its
  * folder; two plugins' changes merge in either order.
  *
  * and the hint view tools/test/port-hints.json (git-ignored), assembled from every declaration's
@@ -99,17 +100,32 @@ export function prepareDecl(file, d, stem, dir = dirname(file)) {
   return { ...d, dir: resolve(dir), tree: treeOf(file) };
 }
 
+/** The panel family (schema `$defs.family`, the console's closed set) of a kernel whose own name is
+ * none of them; a kernel named after a family is that family, any other kernel `none`. */
+export const FAMILY_OF_KERNEL = Object.freeze({
+  comp: 'dynamics', transient: 'dynamics', chorus: 'modulation', flanger: 'modulation', phaser: 'modulation',
+  tremolo: 'modulation', rotary: 'modulation', geq: 'eq',
+});
+
+/** The panel family a kernel's plugin draws as: FAMILY_OF_KERNEL's, else the family of its own name. */
+export function familyOfKernel(kernel) {
+  const families = JSON.parse(readFileSync(join(ROOT, 'schema', 'plugin.decl.schema.json'), 'utf8')).$defs.family.enum;
+  const family = FAMILY_OF_KERNEL[kernel] ?? kernel;
+  return families.includes(family) ? family : 'none';
+}
+
 /** The panel the wizard drafts for a plugin generated from its instance face: one section, every
- * parameter in declaration order, so the MOD GUI draws every parameter until a person groups them. */
+ * parameter in declaration order, so the MOD GUI draws every parameter until a person groups them;
+ * its family the kernel's, its roles left to a person. */
 export function defaultPanel(d) {
   if (d.binding === 'chain') {
     // one section per element, by its id (spec §15.2: the elements are drawn, never placed, apart)
     const sections = d.chain.map((el) => ({ key: el.id, label: elementName(el), controls: [`${el.id}On`, ...el.params.map((p) => p.symbol)] }));
     if (d.order === 'permutable') sections.push({ key: 'order', label: 'Order', controls: ['order'] });
-    return { family: d.kernel, roles: {}, sections };
+    return { family: familyOfKernel(d.kernel), roles: {}, sections };
   }
   const label = d.name.replace(/^omx /, '');
-  return { family: d.kernel, roles: {}, sections: [{ key: d.kernel, label: label[0].toUpperCase() + label.slice(1), controls: d.params.map((p) => p.symbol) }] };
+  return { family: familyOfKernel(d.kernel), roles: {}, sections: [{ key: d.kernel, label: label[0].toUpperCase() + label.slice(1), controls: d.params.map((p) => p.symbol) }] };
 }
 
 /** A plugin whose folder tools/gen.mjs writes whole from the declaration: over one instance face,
@@ -434,6 +450,8 @@ export function emitPluginTtl(d) {
         const points = choices.map((c) => `            [ rdfs:label ${ttlStr(c.label)} ; rdf:value ${c.value} ]`);
         lines.push(`        lv2:scalePoint\n${points.join(' ,\n')} ;`);
       }
+      const group = groupOf(d, q.symbol);
+      if (group) lines.push(`        pg:group <${groupUri(d, group)}> ;`);
     } else if (p.sidechain) {
       // optional: a host that routes nothing to the key gets the effect's own detector
       lines.push('        lv2:portProperty lv2:isSideChain , lv2:connectionOptional ;');
@@ -448,7 +466,7 @@ export function emitPluginTtl(d) {
 @prefix doap:  <http://usefulinc.com/ns/doap#> .
 @prefix foaf:  <http://xmlns.com/foaf/0.1/> .
 @prefix lv2:   <http://lv2plug.in/ns/lv2core#> .
-${d.params.some((q) => scaleOf(q) === 'log') ? '@prefix pprops: <http://lv2plug.in/ns/ext/port-props#> .\n' : ''}${d.params.some((q) => choicesOf(q)) ? '@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .\n' : ''}@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+${d.panel ? '@prefix pg:    <http://lv2plug.in/ns/ext/port-groups#> .\n' : ''}${d.params.some((q) => scaleOf(q) === 'log') ? '@prefix pprops: <http://lv2plug.in/ns/ext/port-props#> .\n' : ''}${d.params.some((q) => choicesOf(q)) ? '@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .\n' : ''}@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix units: <http://lv2plug.in/ns/extensions/units#> .
 
 <${d.url}>
@@ -467,8 +485,17 @@ ${d.params.some((q) => scaleOf(q) === 'log') ? '@prefix pprops: <http://lv2plug.
     lv2:optionalFeature lv2:hardRTCapable ;
     lv2:port
 ${lv2Ports(d).map(port).join(' ,\n')} .
-`;
+${(d.panel?.sections ?? []).map((g) => `
+<${groupUri(d, g)}>
+    a pg:Group ;
+    lv2:symbol "${g.key}" ;
+    rdfs:label ${ttlStr(g.label)} .
+`).join('')}`;
 }
+
+/** The panel section a parameter is drawn in: its LV2 port group (pg:Group), one per section. */
+const groupOf = (d, symbol) => d.panel?.sections.find((s) => s.controls.includes(symbol));
+const groupUri = (d, section) => `${d.lv2.uri}#${section.key}`;
 
 // ---- a plugin generated from its instance face (`binding: instance`) ---------------------------
 
@@ -852,6 +879,12 @@ export const SHARED = {
   },
   '.github/workflows/ci.yml': {
     plugins: (ds) => [`shorts="${ds.map((d) => d.stem.replace(/^omx-/, '')).join(' ')}"`, `kernels="${ds.map((d) => d.kernel).join(' ')}"`],
+  },  // libomxplugins: each face's entry, defined by omx_<kernel>_clap.c, listed by its CLAP id
+  'include/omx_clap_static.h': {
+    'clap-entries': (ds) => ds.map((d) => `extern const clap_plugin_entry_t omx_clap_entry_${d.kernel};`),
+  },
+  'lib/omx_clap_static.c': {
+    'clap-table': (ds) => ds.map((d) => `{"${d.clap.id}", &omx_clap_entry_${d.kernel}},`),
   },
 };
 

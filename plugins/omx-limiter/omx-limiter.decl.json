@@ -8,7 +8,7 @@
   "name": "omx limiter",
   "vendor": "openmixer",
   "url": "https://github.com/FreeMixer/omx-plugins",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "The precision limiter: a look-ahead, true-peak, stereo-linked brickwall.",
   "clap": {
     "id": "org.openmixer.limiter",
@@ -68,7 +68,11 @@
   },
   "panel": {
     "family": "limiter",
-    "roles": {},
+    "roles": {
+      "ceiling": "ceilingDb",
+      "release": "releaseMs",
+      "lookahead": "lookaheadMs"
+    },
     "sections": [
       {
         "key": "limiter",
@@ -93,19 +97,6 @@
       "group": "tail",
       "stage": "limiter",
       "after": "plugins"
-    },
-    "panel": {
-      "sections": [
-        {
-          "key": "limiter",
-          "label": "Limiter",
-          "controls": [
-            "ceilingDb",
-            "lookaheadMs",
-            "releaseMs"
-          ]
-        }
-      ]
     }
   }
 }

@@ -24,10 +24,20 @@ for apt.
 
 ```sh
 make                      # every plugin: plugins/<name>/build/
-make test                 # every plugin's tests
+make test                 # every plugin's tests, then the static table's (make lib-test)
 make install DESTDIR=/tmp/stage LIBDIR=/usr/lib64   # <CLAPDIR>/*.clap (default /usr/lib/clap, any LIBDIR), <LIBDIR>/lv2/*.lv2/
+make install-devel DESTDIR=/tmp/stage LIBDIR=/usr/lib64   # headers, <LIBDIR>/libomxplugins.a, <LIBDIR>/pkgconfig/omxplugins.pc
 make version              # the release version
 ```
+
+`make` also builds `build/lib/libomxplugins.a`: every shipped plugin's CLAP face, compiled with
+`-DOMX_CLAP_STATIC` (the face then defines only its `omx_clap_entry_<kernel>`, not CLAP's
+`clap_entry`, so all of them link into one program), and `lib/omx_clap_static.c`, the table of those
+entries by CLAP id that `include/omx_clap_static.h` declares. A host links it through
+`pkg-config omxplugins` and opens any plugin in-process, with no `.clap` file and no `dlopen`.
+`make lib-test` installs the devel files into `build/lib/stage`, builds
+`tools/test/static-table-host.c` from the staged `omxplugins.pc` alone and runs it: every plugin's
+CLAP id is in the table once, and each one is created through its factory, activated and run.
 
 `make test` for a plugin runs, in order:
 
@@ -41,7 +51,11 @@ make version              # the release version
    echoes, ping-pong, mix and bypass computed from the definition of a delay, not from omx-dsp;
 5. **MOD GUI**: fresh, carrying every declared control with its travel and default, valid under
    `sord_validate`, and stale when the declaration moves;
-6. **host check**: `omx-clap-scan` loads the CLAP file, `lv2ls`/`lv2info` read the LV2 bundle.
+6. **host check**: `omx-clap-scan` loads the CLAP file, `lv2ls`/`lv2info` read the LV2 bundle;
+7. **port groups** (`tools/port-groups-probe.c`, `tools/port-groups-check.mjs`): the LV2 bundle,
+   read through lilv, holds one `pg:Group` per panel section (its `lv2:symbol` the section's key, its
+   `rdfs:label` the section's label), and each parameter a section lists carries `pg:group` naming
+   it; no other port is grouped.
 
 For omx-strip, steps 3 and 4 are one **strip oracle** (`test/strip-oracle.c`): at 44.1, 48, 96
 and 192 kHz, on both builds, in each of the 24 stage orders and at the defaults, the output equals
@@ -57,7 +71,8 @@ plugins/<name>/
   omx_<kernel>_lv2.c      the LV2 face, plain C
   generated/              written by `make gen`, committed: the parameter header and the LV2 bundle
   test/                   the probe and the oracle
-include/                  shared C shapes (no DSP)
+include/                  shared C shapes (no DSP), and omx_clap_static.h, libomxplugins' table
+lib/                      omx_clap_static.c (the table's rows are generated) and omxplugins.pc.in
 tools/                    gen.mjs (header + TTL), modgui-gen.mjs (MOD GUI), the test helpers,
                           omx-new-plugin.mjs (the wizard), plugin-recipe.mjs (completeness)
 recipes/                  plugin.recipe.json, the templates tools/gen.mjs writes from
@@ -96,7 +111,8 @@ installed omx-dsp requires, equal to `.github/pins.txt`.
 
 `node tools/gen.mjs` also refills the shared files' generated regions from every plugin folder: the
 README's catalogue and sections (a declaration's `summary` and `manual`, else its description and
-parameters), the RPM `%files` lists and CI's installed-file lists. The package descriptions are
+parameters), the RPM `%files` lists, CI's installed-file lists and libomxplugins' table of CLAP
+entries. The package descriptions are
 prose; the completeness test checks they name every shipped plugin. The older plugins (delay,
 drive, the EQs, strip, keyed gate) keep their hand-written faces and bindings.
 
@@ -109,9 +125,11 @@ keeps its generated files fresh.
 
 ## Packages
 
-`packaging/omx-plugins.spec` builds `omx-plugins-clap`, `omx-plugins-lv2` and the `omx-plugins`
-metapackage that requires both, and runs `make test` in `%check`; `debian/` builds the same three
-packages for bookworm and trixie and runs `make test` unless `nocheck` is set. The version lives in three places that CI keeps equal: the top-level
+`packaging/omx-plugins.spec` builds `omx-plugins-clap`, `omx-plugins-lv2`, the `omx-plugins`
+metapackage that requires both, and `omx-plugins-devel` (the headers, `libomxplugins.a` and
+`omxplugins.pc`), and runs `make test` in `%check`; `debian/` builds the same packages for bookworm
+and trixie (`omx-plugins-dev`, with the archive in the multiarch directory) and runs `make test`
+unless `nocheck` is set. The version lives in three places that CI keeps equal: the top-level
 `Makefile` (`make version`), the spec's `Version:` and the top of `debian/changelog`.
 
 A `v<version>` tag runs `.github/workflows/release.yml`: RPMs for Fedora 44 (x86_64, aarch64)

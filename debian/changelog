@@ -1,3 +1,13 @@
+omx-plugins (0.4.0) unstable; urgency=medium
+
+  * **libomxplugins**: one static library with a table of every plugin's
+    CLAP entry, so a host links the plugins in-process without dlopen. The
+    dev package ships libomxplugins.a, omx-plugins/omx_clap_static.h and
+    omxplugins.pc; omx_clap_static_find(id) returns a plugin's entry and
+    omx_clap_static_entry is one entry whose factory lists them all.
+
+ -- Pau Aliagas <linuxnow@gmail.com>  Sun, 11 Oct 2026 18:30:00 +0200
+
 omx-plugins (0.3.0) unstable; urgency=medium
 
   * New plugin, **omx comp** (CLAP and LV2): the console's compressor.

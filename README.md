@@ -364,7 +364,21 @@ the apt channel, `omx-plugins-zynthian-<version>-arm64.tar.gz`: copy its `lv2/` 
 
 Projects that build on the plugins' parameters and instance code install the headers instead of
 copying them: `omx-plugins-devel` on Fedora, `omx-plugins-dev` on Debian (they land in
-`/usr/include/omx-plugins`).
+`/usr/include/omx-plugins`). The same package carries `libomxplugins.a` (`pkg-config omxplugins`):
+every plugin's CLAP face in one static library, for a host that runs them in its own process
+without loading `.clap` files. `<omx-plugins/omx_clap_static.h>` lists their entries by CLAP id:
+
+```c
+#include <omx-plugins/omx_clap_static.h>
+
+const clap_plugin_entry_t *e = omx_clap_static_find("org.openmixer.delay");
+e->init("");
+const clap_plugin_factory_t *f = e->get_factory(CLAP_PLUGIN_FACTORY_ID);
+const clap_plugin_t *delay = f->create_plugin(f, host, "org.openmixer.delay");
+```
+
+`OMX_CLAP_STATIC_PLUGINS` (`OMX_CLAP_STATIC_COUNT` rows of `{id, entry}`) walks them all, and
+`omx_clap_static_entry` is all of them behind one CLAP entry and one plugin factory.
 
 To build from source, see [BUILDING.md](BUILDING.md).
 

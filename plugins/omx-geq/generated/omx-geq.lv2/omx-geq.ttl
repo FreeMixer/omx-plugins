@@ -4,6 +4,7 @@
 @prefix doap:  <http://usefulinc.com/ns/doap#> .
 @prefix foaf:  <http://xmlns.com/foaf/0.1/> .
 @prefix lv2:   <http://lv2plug.in/ns/lv2core#> .
+@prefix pg:    <http://lv2plug.in/ns/ext/port-groups#> .
 @prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix units: <http://lv2plug.in/ns/extensions/units#> .
 
@@ -17,7 +18,7 @@
     doap:name "omx geq" ;
     doap:license <https://www.gnu.org/licenses/gpl-3.0.html> ;
     lv2:project <https://github.com/FreeMixer/omx-plugins> ;
-    lv2:minorVersion 3 ;
+    lv2:minorVersion 4 ;
     lv2:microVersion 0 ;
     rdfs:comment "The console's 31-band graphic EQ: one fader per ISO third-octave band from 20 Hz to 20 kHz, each cutting or boosting by up to 15 dB." ;
     lv2:optionalFeature lv2:hardRTCapable ;
@@ -54,7 +55,8 @@
         lv2:default 0 ;
         lv2:minimum -15 ;
         lv2:maximum 15 ;
-        units:unit units:db
+        units:unit units:db ;
+        pg:group <urn:openmixer:geq#geq>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -64,7 +66,8 @@
         lv2:default 0 ;
         lv2:minimum -15 ;
         lv2:maximum 15 ;
-        units:unit units:db
+        units:unit units:db ;
+        pg:group <urn:openmixer:geq#geq>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -74,7 +77,8 @@
         lv2:default 0 ;
         lv2:minimum -15 ;
         lv2:maximum 15 ;
-        units:unit units:db
+        units:unit units:db ;
+        pg:group <urn:openmixer:geq#geq>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -84,7 +88,8 @@
         lv2:default 0 ;
         lv2:minimum -15 ;
         lv2:maximum 15 ;
-        units:unit units:db
+        units:unit units:db ;
+        pg:group <urn:openmixer:geq#geq>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -94,7 +99,8 @@
         lv2:default 0 ;
         lv2:minimum -15 ;
         lv2:maximum 15 ;
-        units:unit units:db
+        units:unit units:db ;
+        pg:group <urn:openmixer:geq#geq>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -104,7 +110,8 @@
         lv2:default 0 ;
         lv2:minimum -15 ;
         lv2:maximum 15 ;
-        units:unit units:db
+        units:unit units:db ;
+        pg:group <urn:openmixer:geq#geq>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -114,7 +121,8 @@
         lv2:default 0 ;
         lv2:minimum -15 ;
         lv2:maximum 15 ;
-        units:unit units:db
+        units:unit units:db ;
+        pg:group <urn:openmixer:geq#geq>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -124,7 +132,8 @@
         lv2:default 0 ;
         lv2:minimum -15 ;
         lv2:maximum 15 ;
-        units:unit units:db
+        units:unit units:db ;
+        pg:group <urn:openmixer:geq#geq>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -134,7 +143,8 @@
         lv2:default 0 ;
         lv2:minimum -15 ;
         lv2:maximum 15 ;
-        units:unit units:db
+        units:unit units:db ;
+        pg:group <urn:openmixer:geq#geq>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -144,7 +154,8 @@
         lv2:default 0 ;
         lv2:minimum -15 ;
         lv2:maximum 15 ;
-        units:unit units:db
+        units:unit units:db ;
+        pg:group <urn:openmixer:geq#geq>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -154,7 +165,8 @@
         lv2:default 0 ;
         lv2:minimum -15 ;
         lv2:maximum 15 ;
-        units:unit units:db
+        units:unit units:db ;
+        pg:group <urn:openmixer:geq#geq>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -164,7 +176,8 @@
         lv2:default 0 ;
         lv2:minimum -15 ;
         lv2:maximum 15 ;
-        units:unit units:db
+        units:unit units:db ;
+        pg:group <urn:openmixer:geq#geq>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -174,7 +187,8 @@
         lv2:default 0 ;
         lv2:minimum -15 ;
         lv2:maximum 15 ;
-        units:unit units:db
+        units:unit units:db ;
+        pg:group <urn:openmixer:geq#geq>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -184,7 +198,8 @@
         lv2:default 0 ;
         lv2:minimum -15 ;
         lv2:maximum 15 ;
-        units:unit units:db
+        units:unit units:db ;
+        pg:group <urn:openmixer:geq#geq>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -194,7 +209,8 @@
         lv2:default 0 ;
         lv2:minimum -15 ;
         lv2:maximum 15 ;
-        units:unit units:db
+        units:unit units:db ;
+        pg:group <urn:openmixer:geq#geq>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -204,7 +220,8 @@
         lv2:default 0 ;
         lv2:minimum -15 ;
         lv2:maximum 15 ;
-        units:unit units:db
+        units:unit units:db ;
+        pg:group <urn:openmixer:geq#geq>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -214,7 +231,8 @@
         lv2:default 0 ;
         lv2:minimum -15 ;
         lv2:maximum 15 ;
-        units:unit units:db
+        units:unit units:db ;
+        pg:group <urn:openmixer:geq#geq>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -224,7 +242,8 @@
         lv2:default 0 ;
         lv2:minimum -15 ;
         lv2:maximum 15 ;
-        units:unit units:db
+        units:unit units:db ;
+        pg:group <urn:openmixer:geq#geq>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -234,7 +253,8 @@
         lv2:default 0 ;
         lv2:minimum -15 ;
         lv2:maximum 15 ;
-        units:unit units:db
+        units:unit units:db ;
+        pg:group <urn:openmixer:geq#geq>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -244,7 +264,8 @@
         lv2:default 0 ;
         lv2:minimum -15 ;
         lv2:maximum 15 ;
-        units:unit units:db
+        units:unit units:db ;
+        pg:group <urn:openmixer:geq#geq>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -254,7 +275,8 @@
         lv2:default 0 ;
         lv2:minimum -15 ;
         lv2:maximum 15 ;
-        units:unit units:db
+        units:unit units:db ;
+        pg:group <urn:openmixer:geq#geq>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -264,7 +286,8 @@
         lv2:default 0 ;
         lv2:minimum -15 ;
         lv2:maximum 15 ;
-        units:unit units:db
+        units:unit units:db ;
+        pg:group <urn:openmixer:geq#geq>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -274,7 +297,8 @@
         lv2:default 0 ;
         lv2:minimum -15 ;
         lv2:maximum 15 ;
-        units:unit units:db
+        units:unit units:db ;
+        pg:group <urn:openmixer:geq#geq>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -284,7 +308,8 @@
         lv2:default 0 ;
         lv2:minimum -15 ;
         lv2:maximum 15 ;
-        units:unit units:db
+        units:unit units:db ;
+        pg:group <urn:openmixer:geq#geq>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -294,7 +319,8 @@
         lv2:default 0 ;
         lv2:minimum -15 ;
         lv2:maximum 15 ;
-        units:unit units:db
+        units:unit units:db ;
+        pg:group <urn:openmixer:geq#geq>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -304,7 +330,8 @@
         lv2:default 0 ;
         lv2:minimum -15 ;
         lv2:maximum 15 ;
-        units:unit units:db
+        units:unit units:db ;
+        pg:group <urn:openmixer:geq#geq>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -314,7 +341,8 @@
         lv2:default 0 ;
         lv2:minimum -15 ;
         lv2:maximum 15 ;
-        units:unit units:db
+        units:unit units:db ;
+        pg:group <urn:openmixer:geq#geq>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -324,7 +352,8 @@
         lv2:default 0 ;
         lv2:minimum -15 ;
         lv2:maximum 15 ;
-        units:unit units:db
+        units:unit units:db ;
+        pg:group <urn:openmixer:geq#geq>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -334,7 +363,8 @@
         lv2:default 0 ;
         lv2:minimum -15 ;
         lv2:maximum 15 ;
-        units:unit units:db
+        units:unit units:db ;
+        pg:group <urn:openmixer:geq#geq>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -344,7 +374,8 @@
         lv2:default 0 ;
         lv2:minimum -15 ;
         lv2:maximum 15 ;
-        units:unit units:db
+        units:unit units:db ;
+        pg:group <urn:openmixer:geq#geq>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -354,7 +385,8 @@
         lv2:default 0 ;
         lv2:minimum -15 ;
         lv2:maximum 15 ;
-        units:unit units:db
+        units:unit units:db ;
+        pg:group <urn:openmixer:geq#geq>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -376,3 +408,8 @@
         lv2:portProperty lv2:reportsLatency , lv2:integer ;
         units:unit units:frame
     ] .
+
+<urn:openmixer:geq#geq>
+    a pg:Group ;
+    lv2:symbol "geq" ;
+    rdfs:label "Geq" .

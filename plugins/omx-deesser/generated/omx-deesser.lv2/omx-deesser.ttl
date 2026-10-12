@@ -4,6 +4,7 @@
 @prefix doap:  <http://usefulinc.com/ns/doap#> .
 @prefix foaf:  <http://xmlns.com/foaf/0.1/> .
 @prefix lv2:   <http://lv2plug.in/ns/lv2core#> .
+@prefix pg:    <http://lv2plug.in/ns/ext/port-groups#> .
 @prefix pprops: <http://lv2plug.in/ns/ext/port-props#> .
 @prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
@@ -19,7 +20,7 @@
     doap:name "omx deesser" ;
     doap:license <https://www.gnu.org/licenses/gpl-3.0.html> ;
     lv2:project <https://github.com/FreeMixer/omx-plugins> ;
-    lv2:minorVersion 3 ;
+    lv2:minorVersion 4 ;
     lv2:microVersion 0 ;
     rdfs:comment "The console's de-esser: a detector on a band around the sibilance drives the compressor's gain computer, and the reduction lands on that band alone or on the whole signal." ;
     lv2:optionalFeature lv2:hardRTCapable ;
@@ -58,7 +59,8 @@
         lv2:maximum 16000 ;
         lv2:portProperty lv2:integer ;
         lv2:portProperty pprops:logarithmic ;
-        units:unit units:hz
+        units:unit units:hz ;
+        pg:group <urn:openmixer:deesser#deEsser>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -68,7 +70,8 @@
         lv2:default 1 ;
         lv2:minimum 0.25 ;
         lv2:maximum 4 ;
-        units:unit units:oct
+        units:unit units:oct ;
+        pg:group <urn:openmixer:deesser#deEsser>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -78,7 +81,8 @@
         lv2:default -30 ;
         lv2:minimum -60 ;
         lv2:maximum 0 ;
-        units:unit units:db
+        units:unit units:db ;
+        pg:group <urn:openmixer:deesser#deEsser>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -87,7 +91,8 @@
         lv2:name "Ratio" ;
         lv2:default 4 ;
         lv2:minimum 1 ;
-        lv2:maximum 20
+        lv2:maximum 20 ;
+        pg:group <urn:openmixer:deesser#deEsser>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -97,7 +102,8 @@
         lv2:default -12 ;
         lv2:minimum -24 ;
         lv2:maximum 0 ;
-        units:unit units:db
+        units:unit units:db ;
+        pg:group <urn:openmixer:deesser#deEsser>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -107,7 +113,8 @@
         lv2:default 1 ;
         lv2:minimum 0.1 ;
         lv2:maximum 50 ;
-        units:unit units:ms
+        units:unit units:ms ;
+        pg:group <urn:openmixer:deesser#deEsser>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -118,7 +125,8 @@
         lv2:minimum 5 ;
         lv2:maximum 500 ;
         lv2:portProperty lv2:integer ;
-        units:unit units:ms
+        units:unit units:ms ;
+        pg:group <urn:openmixer:deesser#deEsser>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -131,7 +139,8 @@
         lv2:portProperty lv2:integer , lv2:enumeration ;
         lv2:scalePoint
             [ rdfs:label "Split" ; rdf:value 0 ] ,
-            [ rdfs:label "Wideband" ; rdf:value 1 ]
+            [ rdfs:label "Wideband" ; rdf:value 1 ] ;
+        pg:group <urn:openmixer:deesser#deEsser>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -153,3 +162,8 @@
         lv2:portProperty lv2:reportsLatency , lv2:integer ;
         units:unit units:frame
     ] .
+
+<urn:openmixer:deesser#deEsser>
+    a pg:Group ;
+    lv2:symbol "deEsser" ;
+    rdfs:label "De-esser" .

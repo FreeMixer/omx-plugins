@@ -9,7 +9,7 @@
   "noun": "31-band graphic EQ",
   "vendor": "openmixer",
   "url": "https://github.com/FreeMixer/omx-plugins",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "The console's 31-band graphic EQ: one fader per ISO third-octave band from 20 Hz to 20 kHz, each cutting or boosting by up to 15 dB.",
   "summary": "The console's 31-band graphic EQ: one fader per ISO third-octave band, 20 Hz to 20 kHz, ±15 dB each, designed in double precision so the lowest bands hold their shape at 192 kHz. Stereo, zero latency, 44.1 to 192 kHz.",
   "clap": {
@@ -290,8 +290,42 @@
     }
   },
   "panel": {
-    "family": "geq",
-    "roles": {},
+    "family": "eq",
+    "roles": {
+      "band_gain": [
+        "band01",
+        "band02",
+        "band03",
+        "band04",
+        "band05",
+        "band06",
+        "band07",
+        "band08",
+        "band09",
+        "band10",
+        "band11",
+        "band12",
+        "band13",
+        "band14",
+        "band15",
+        "band16",
+        "band17",
+        "band18",
+        "band19",
+        "band20",
+        "band21",
+        "band22",
+        "band23",
+        "band24",
+        "band25",
+        "band26",
+        "band27",
+        "band28",
+        "band29",
+        "band30",
+        "band31"
+      ]
+    },
     "sections": [
       {
         "key": "geq",
