@@ -20,7 +20,7 @@
 NAME       := omx-transient
 URI        := urn:openmixer:transient
 CLAP_ID    := org.openmixer.transient
-OMXDSP_MIN ?= 0.5.2
+OMXDSP_MIN ?= 0.6.0
 ROOT       := $(abspath ../..)
 GEN        := generated
 B          := build
