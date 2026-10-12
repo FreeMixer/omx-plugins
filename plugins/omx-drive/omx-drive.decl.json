@@ -197,7 +197,7 @@
     ]
   },
   "console": {
-    "$comment": "The OpenMixer console draws its drive stage: FxPanel's TransferCurve over the drive panel (curve, band, hfRolloff and oversample selects, then driveDb, character, bandHz, mix, trimDb, then the autoGain and stereoLink switches and a latency readout; oversample has no parameter here). Chip: FxSummaryValue of STAGE_KEY_FIELD.drive (driveDb). Card: useStripOverview's drive controls.",
+    "$comment": "The OpenMixer console draws its drive stage: the transfer curve above the drive panel (curve, band, hfRolloff and oversample selects, then driveDb, character, bandHz, mix, trimDb, then the autoGain and stereoLink switches and a latency readout; oversample has no parameter here). Its chip shows driveDb. Its overview card carries the drive's controls.",
     "placement": {
       "strips": [
         "input",

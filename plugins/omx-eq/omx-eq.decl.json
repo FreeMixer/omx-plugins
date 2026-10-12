@@ -237,7 +237,7 @@
     "signal untouched."
   ],
   "console": {
-    "$comment": "The OpenMixer console draws its eq stage: EqCurve over the eq encoder bank, a chip per band (on, type, freq, gain, q) plus the HPF and LPF (on, slope, cutoff); the console's bands are a list the operator adds to, these variants' are fixed. Chip: STAGE_CHIP_PARAMS.eq, shown while the HPF is on. Card: one gain per band, then the HPF frequency (useStripOverview).",
+    "$comment": "The OpenMixer console draws its eq stage: the EQ curve above the encoder bank, a chip per band (on, type, freq, gain, q) plus the HPF and LPF (on, slope, cutoff); the console's bands are a list the operator adds to, these variants' are fixed. Its chip shows the HPF while the HPF is on. Its overview card carries one gain per band, then the HPF frequency.",
     "placement": {
       "strips": [
         "input",

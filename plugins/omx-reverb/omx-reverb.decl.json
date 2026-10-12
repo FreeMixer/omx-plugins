@@ -199,7 +199,7 @@
     ]
   },
   "console": {
-    "$comment": "The OpenMixer console draws its reverb stage: FxPanel's StageTimeCurve (decay) over the reverb panel (preset and algorithm selects, then size, damping, predelayMs, width, mix, lowcut, highcut, then the reverse, gated or plate row of the chosen algorithm). Chip: FxSummaryValue of STAGE_KEY_FIELD.reverb (size). Card: useStripOverview's reverb controls.",
+    "$comment": "The OpenMixer console draws its reverb stage: the decay drawn over time, above the reverb panel (preset and algorithm selects, then size, damping, predelayMs, width, mix, lowcut, highcut, then the reverse, gated or plate row of the chosen algorithm). Its chip shows size. Its overview card carries the reverb's controls.",
     "placement": {
       "strips": [
         "input",
