@@ -1,3 +1,23 @@
+omx-plugins (0.5.0) unstable; urgency=medium
+
+  * The faces follow omx-dsp 0.6.0, the oldest release they build against now.
+  * omx pitch reports its latency at full mix: its shortest delay plus half
+    its window, 883 frames at 44.1 kHz, and 0 below 100 %, where the dry
+    signal is on time. The CLAP face takes a new latency at its next
+    activation and asks the host for that restart when the mix crosses 100 %;
+    the LV2 latency port follows the mix.
+  * Every face serves its panel description, read from its declaration.
+  * The CLAP faces carry the extensions their declaration names: the parameter
+    contract, remote-control pages and each placement's defaults.
+  * Each plugin declares its panel once; the console's sections and graphs are
+    part of it.
+  * The panels use one widget vocabulary, the console's names.
+  * The LV2 faces group their ports, one group per panel section.
+  * The MOD GUI look is generated from its design tokens.
+  * The declarations' comments are in plain words.
+
+ -- Pau Aliagas <linuxnow@gmail.com>  Mon, 12 Oct 2026 18:00:00 +0200
+
 omx-plugins (0.4.0) unstable; urgency=medium
 
   * **libomxplugins**: one static library with a table of every plugin's
