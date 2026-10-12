@@ -725,7 +725,7 @@
     "+50 order"
   ],
   "panel": {
-    "family": "strip",
+    "family": "none",
     "roles": {},
     "sections": [
       {

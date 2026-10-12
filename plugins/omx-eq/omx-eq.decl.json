@@ -205,7 +205,19 @@
   },
   "panel": {
     "family": "eq",
-    "roles": {},
+    "roles": {
+      "band_type": "type",
+      "band_freq": "freq",
+      "band_gain": "gain",
+      "band_q": "q",
+      "band_on": "on",
+      "hpf_freq": "hpf_freq",
+      "hpf_slope": "hpf_slope",
+      "hpf_on": "hpf_on",
+      "lpf_freq": "lpf_freq",
+      "lpf_slope": "lpf_slope",
+      "lpf_on": "lpf_on"
+    },
     "sections": [
       {
         "key": "bands",

@@ -175,7 +175,16 @@
   },
   "panel": {
     "family": "reverb",
-    "roles": {},
+    "roles": {
+      "size": "size",
+      "algorithm": "algorithm",
+      "predelay": "predelay",
+      "damping": "damping",
+      "width": "width",
+      "low_cut": "lowcut",
+      "high_cut": "highcut",
+      "mix": "mix"
+    },
     "sections": [
       {
         "key": "reverb",
