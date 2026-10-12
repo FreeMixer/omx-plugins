@@ -235,6 +235,15 @@
             "$ref": "#/$defs/portHint"
           }
         },
+        "latencyChecks": {
+          "type": "array",
+          "minItems": 1,
+          "title": "Latency checks",
+          "description": "The latency each face reports, held to what the kernel does: for each entry the identity test (test/<kernel>-oracle.c), at every declared rate, through the CLAP face and the LV2 face, sets the named parameters (the rest at their defaults), runs a unit impulse and reads the reported latency, after the restart a CLAP face asks for. `impulse`: the impulse's peak lands within one frame of the reported latency (the kernel's delay can be fractional; the report is its rounding), and a report of 0 would not. A number: the reported latency is that many frames. Left out, no latency is measured beyond the identity test's own check that the faces report the kernel's.",
+          "items": {
+            "$ref": "#/$defs/latencyCheck"
+          }
+        },
         "panel": {
           "$ref": "#/$defs/panel"
         },
@@ -820,6 +829,38 @@
       ],
       "title": "Graph",
       "description": "The graph kinds a panel section may draw, computed by the renderer from the section's controls: the console draws eq-curve (EqCurve), dynamics-curve (GateCurve, CompCurve), transfer-curve (drive's TransferCurve), delay-taps and decay-envelope (StageTimeCurve's delay taps and reverb decay) today; lfo is spec §8's. A new kind is added here once, and in each renderer."
+    },
+    "latencyCheck": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "values",
+        "reports"
+      ],
+      "properties": {
+        "values": {
+          "type": "object",
+          "description": "The parameters the check sets, by symbol; every other parameter is at its default.",
+          "propertyNames": {
+            "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+          },
+          "additionalProperties": {
+            "type": "number"
+          }
+        },
+        "reports": {
+          "description": "`impulse`: the reported latency is where an impulse lands. A number: the frames the faces report.",
+          "anyOf": [
+            {
+              "const": "impulse"
+            },
+            {
+              "type": "integer",
+              "minimum": 0
+            }
+          ]
+        }
+      }
     },
     "console": {
       "type": "object",

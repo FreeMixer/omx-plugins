@@ -682,6 +682,22 @@ export function oraclePlan(params, controls = [], { engaged = [] } = {}) {
   return [...moves, ...release, ...choices];
 }
 
+/** The declaration's latency checks in the oracle's shape (`latencyChecks` in the schema): each a row of
+ * every parameter's value, the named ones set and the rest at their defaults, then what the faces
+ * report (-1: where an impulse lands) and the set values in words. */
+export function latencyRows(d) {
+  return (d.latencyChecks ?? []).map((c, k) => {
+    for (const [sym, x] of Object.entries(c.values)) {
+      const p = d.params.find((q) => q.symbol === sym);
+      if (!p) throw new Error(`plugins/${d.stem}: latencyChecks[${k}] sets '${sym}', which is no parameter`);
+      if (!(p.min <= x && x <= p.max)) throw new Error(`plugins/${d.stem}: latencyChecks[${k}] sets '${sym}' to ${x}, outside ${p.min}..${p.max}`);
+    }
+    const v = d.params.map((p) => (p.symbol in c.values ? c.values[p.symbol] : p.def));
+    const label = Object.entries(c.values).map(([sym, x]) => `${sym} ${x}`).join(', ') || 'the defaults';
+    return { row: `{${v.map(cfloat).join(', ')}}, ${c.reports === 'impulse' ? -1 : c.reports}, ${JSON.stringify(label)}` };
+  });
+}
+
 /** The parameters the plan holds at their default, for the oracle's comment: `[{ symbol }]`. */
 const heldOf = (d) => d.params.filter((p, i) => d.controls?.[i]?.rearms).map((p) => ({ symbol: p.symbol }));
 
@@ -721,6 +737,7 @@ export function generateInstance(d) {
     keyed: face.keyed, keyPort: face.keyed ? macro(d.sidechain.symbol) : '', keySymbol: face.keyed ? d.sidechain.symbol : '',
     plan: oraclePlan(d.params, d.controls ?? []), held: heldOf(d), stretch: oracleStretch(face), steps: d.params.map((p) => cfloat(stepOf(p))).join(', '),
     chain: false,
+    latencyChecks: latencyRows(d), measuresLatency: Boolean(d.latencyChecks),
   };
   return {
     Makefile: withBanner(render(template('Makefile.tmpl'), view), d, '#'),
@@ -866,6 +883,7 @@ export function generateChain(d) {
     keyed, keyPort: keyed ? macro(d.sidechain.symbol) : '', keySymbol: keyed ? d.sidechain.symbol : '',
     plan: oraclePlan(d.params, d.controls ?? [], { engaged: d.params.map((p, i) => i).filter((i) => d.params[i].own === 'switch' && d.params[i].element) }),
     held: heldOf(d), stretch: keyed ? 64 : 1, steps: d.params.map((p) => cfloat(stepOf(p))).join(', '),
+    latencyChecks: latencyRows(d), measuresLatency: Boolean(d.latencyChecks),
     // the single-face fields the shared templates read, empty for a chain
     faceType: '', srType: '', binding: [], arrays: [], renames: [],
   };
