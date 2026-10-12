@@ -20,13 +20,6 @@ export const PANEL_ID = 'org.openmixer.panel-description/1';
 /** The extension's families, by enum value. */
 export const FAMILIES = ['none', 'gate', 'dynamics', 'limiter', 'deesser', 'eq', 'filter', 'drive', 'modulation', 'delay', 'reverb', 'pitch'];
 
-/** A declaration's panel family -> the extension's; any other is `none`. */
-export const FAMILY_OF = {
-  chorus: 'modulation', flanger: 'modulation', phaser: 'modulation', rotary: 'modulation', tremolo: 'modulation',
-  comp: 'dynamics', deesser: 'deesser', delay: 'delay', drive: 'drive', eq: 'eq', geq: 'eq', gate: 'gate',
-  limiter: 'limiter', pitch: 'pitch', reverb: 'reverb', strip: 'none', transient: 'none',
-};
-
 /** The widgets, by enum value. A toggle is a switch, a labelled integer AUTO (a selector needs
  * CLAP_PARAM_IS_ENUM, which the faces do not set; a declared `choice` is AUTO too), any other travel a
  * knob; a declared `widgets` entry wins. */
@@ -78,8 +71,9 @@ export const snake = (s) => s.replace(/([a-z0-9])([A-Z])/g, '$1_$2').toLowerCase
 export function panelDescription(d) {
   const where = `plugins/${d.stem}`;
   const panel = d.panel;
-  // a family the extension has no place for (a new kernel's, as the wizard drafts it) is none: no house view
-  const family = FAMILY_OF[panel.family] ?? 'none';
+  // the declaration's family is one of the extension's (the schema's $defs.family is the same closed
+  // set); a family the extension has no place for is none: no house view
+  const family = FAMILIES.includes(panel.family) ? panel.family : 'none';
   const ns = `fx.${d.face ?? d.kernel}`;
   const id = new Map(d.params.map((p, i) => [p.symbol, i]));
   const param = (sym) => d.params[id.get(sym)];
@@ -114,13 +108,16 @@ export function panelDescription(d) {
 
   const table = ROLES[family];
   const roles = [], unpublished = [];
-  for (const [role, sym] of Object.entries(panel.roles ?? {})) {
-    const p = param(sym);
-    if (!p) throw new Error(`${where}: role '${role}' names '${sym}', no parameter`);
-    const unit = UNIT_OF[p.unit];
-    if (!table[role]) unpublished.push({ role, symbol: sym, why: `not a role of the ${family} family` });
-    else if (!table[role].includes(unit)) unpublished.push({ role, symbol: sym, why: `the ${role} role takes ${table[role].join(', ')}, not ${p.unit || 'no unit'}` });
-    else roles.push({ role, index: 0, symbol: sym, param: id.get(sym) });
+  // an indexed role (an EQ band's) names every band's symbol in order: one row per band, its index the band's
+  for (const [role, syms] of Object.entries(panel.roles ?? {})) {
+    [syms].flat().forEach((sym, index) => {
+      const p = param(sym);
+      if (!p) throw new Error(`${where}: role '${role}' names '${sym}', no parameter`);
+      const unit = UNIT_OF[p.unit];
+      if (!table[role]) unpublished.push({ role, symbol: sym, why: `not a role of the ${family} family` });
+      else if (!table[role].includes(unit)) unpublished.push({ role, symbol: sym, why: `the ${role} role takes ${table[role].join(', ')}, not ${p.unit || 'no unit'}` });
+      else roles.push({ role, index, symbol: sym, param: id.get(sym) });
+    });
   }
 
   const displays = panel.sections.flatMap((s, section) => {

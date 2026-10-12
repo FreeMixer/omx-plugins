@@ -105,12 +105,16 @@ export function expandVariant(contractDir, base, variant) {
   };
   if (base.portHints) d.portHints = perBandKeys(base.portHints, per, n);
   const sections = (ss) => ss.map((x) => ({ ...x, controls: perBandList(x.controls, per, n) }));
-  const panelOf = (pn) => ({ ...pn, sections: sections(pn.sections), ...(pn.widgets ? { widgets: perBandKeys(pn.widgets, per, n) } : {}) });
+  const panelOf = (pn) => ({
+    ...pn,
+    ...(pn.roles ? { roles: perBandRoles(pn.roles, per, n) } : {}),
+    sections: sections(pn.sections),
+    ...(pn.widgets ? { widgets: perBandKeys(pn.widgets, per, n) } : {}),
+  });
   if (base.panel) d.panel = panelOf(base.panel);
   if (base.console) {
     d.console = { ...base.console };
     if (base.console.card) d.console.card = { ...base.console.card, show: perBandList(base.console.card.show, per, n) };
-    if (base.console.panel) d.console.panel = panelOf(base.console.panel);
   }
   for (const k of ['noun', 'description', 'summary']) if (d[k] !== undefined) d[k] = fillBands(d[k], n);
   if (d.manual) d.manual = d.manual.map((l) => fillBands(l, n));
@@ -126,6 +130,13 @@ function perBandKeys(obj, per, n) {
     else for (let b = 1; b <= n; b++) out[`b${b}_${sym}`] = v;
   }
   return out;
+}
+
+/** Roles with each one played by a per-band symbol played by every band's, `b1_<symbol>` to `b<n>_<symbol>`. */
+function perBandRoles(roles, per, n) {
+  const perBand = new Set(per.map((p) => p.symbol));
+  return Object.fromEntries(Object.entries(roles).map(([role, sym]) =>
+    [role, perBand.has(sym) ? Array.from({ length: n }, (_x, b) => `b${b + 1}_${sym}`) : sym]));
 }
 
 /** A list of symbols with its per-band ones repeated band by band, as the parameters are: where the

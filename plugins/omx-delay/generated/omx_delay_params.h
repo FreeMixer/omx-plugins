@@ -63,16 +63,16 @@ static const omx_plugin_param OMX_DELAY_PARAMS[OMX_DELAY_PARAM_COUNT] = {
 
 /* org.openmixer.panel-description/1 (tools/panel-description.mjs): the declaration's panel as the rows
  * include/omx_panel_description.h serves, parameter ids the declaration's. Family delay. */
-#define OMX_DELAY_PANEL_FINGERPRINT "d8693730e2af6e305110f8665f5300d32a157fe967d3ea801b6eb0b5361ba08f"
+#define OMX_DELAY_PANEL_FINGERPRINT "b229558e6b54e1b55a0ebdc5d0204c0ce8e3ed6f916c29ae00730150dd75d32d"
 static const struct omx_panel_section_row OMX_DELAY_PANEL_SECTIONS[] = {
   { "delay", "fx.delay.section.delay", "Delay" },
 };
 static const struct omx_panel_control_row OMX_DELAY_PANEL_CONTROLS[] = {
+  { 4u, 0u, OMX_CLAP_WIDGET_SWITCH, "fx.delay.pingpong", "Pingpong", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
   { 0u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.delay.fx_delay_time", "Time", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
   { 1u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.delay.fx_delay_feedback", "Feedback", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
-  { 2u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.delay.tone", "Tone", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
-  { 4u, 0u, OMX_CLAP_WIDGET_SWITCH, "fx.delay.pingpong", "Pingpong", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
   { 3u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.delay.mix", "Mix", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 2u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.delay.tone", "Tone", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
 };
 static const struct omx_panel_role_row OMX_DELAY_PANEL_ROLES[] = {
   { "time", 0u, 0u },

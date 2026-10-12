@@ -82,8 +82,10 @@ static const omx_plugin_param OMX_COMP_PARAMS[OMX_COMP_PARAM_COUNT] = {
 #define OMX_COMP_DECL_DIGEST "3a67a30c58264f094b79beb7cdb105698661368e85fe2f8e24506fe0f898d0ab"
 
 /* org.openmixer.panel-description/1 (tools/panel-description.mjs): the declaration's panel as the rows
- * include/omx_panel_description.h serves, parameter ids the declaration's. Family dynamics. */
-#define OMX_COMP_PANEL_FINGERPRINT "14b97881290de0e729d42aa0b5693d94f5fc1b2598dde5d6ed8e20e8fe429b81"
+ * include/omx_panel_description.h serves, parameter ids the declaration's. Family dynamics.
+ * Declared roles not published:
+ *   ratio (ratio): the ratio role takes ratio, coef, not no unit */
+#define OMX_COMP_PANEL_FINGERPRINT "c8b0a7834df0ca29287182919d720312350e499c29b14bfd42be43f0078a70d8"
 static const struct omx_panel_section_row OMX_COMP_PANEL_SECTIONS[] = {
   { "comp", "fx.comp.section.comp", "Comp" },
 };
@@ -98,11 +100,19 @@ static const struct omx_panel_control_row OMX_COMP_PANEL_CONTROLS[] = {
   { 7u, 0u, OMX_CLAP_WIDGET_AUTO, "fx.comp.kind", "Kind", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
   { 8u, 0u, OMX_CLAP_WIDGET_AUTO, "fx.comp.detector_oversampling", "Detector Oversampling", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
 };
+static const struct omx_panel_role_row OMX_COMP_PANEL_ROLES[] = {
+  { "threshold", 0u, 0u },
+  { "attack", 0u, 3u },
+  { "release", 0u, 4u },
+  { "knee", 0u, 2u },
+  { "makeup", 0u, 5u },
+  { "mix", 0u, 6u },
+};
 static const struct omx_panel_rows OMX_COMP_PANEL = {
   OMX_COMP_PANEL_FINGERPRINT, OMX_CLAP_FAMILY_DYNAMICS,
   OMX_COMP_PANEL_SECTIONS, 1u,
   OMX_COMP_PANEL_CONTROLS, 9u,
-  NULL, 0u,
+  OMX_COMP_PANEL_ROLES, 6u,
   NULL, 0u,
   NULL, 0u,
 };

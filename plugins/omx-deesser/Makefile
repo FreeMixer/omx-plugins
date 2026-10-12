@@ -8,7 +8,8 @@
 #   make            build/omx-deesser.clap and build/omx-deesser.lv2/ (binary, TTL, MOD GUI)
 #   make test       freshness of every generated file, the parameters as declared, every parameter
 #                   live, the deesser kernel-identity oracle, the panel description both faces serve,
-#                   the MOD GUI checks, and the host checks (omx-clap-scan, lv2info) where installed
+#                   the LV2 port groups, the MOD GUI checks, and the host checks (omx-clap-scan, lv2info)
+#                   where installed
 #   make gen        regenerate generated/ from the declaration (commit the result)
 #   make install    DESTDIR/PREFIX/LIBDIR/CLAPDIR: $(CLAPDIR)/omx-deesser.clap, $(LIBDIR)/lv2/omx-deesser.lv2/
 #
@@ -72,6 +73,9 @@ $(B)/clap-probe: $(ROOT)/tools/clap-probe.c | $(B)
 $(B)/panel-probe: $(ROOT)/tools/panel-probe.c $(ROOT)/include/omx_panel_description.h | $(B)
 	$(CC) $(CFLAGS) $(WARN) -I$(ROOT)/include $(ABI_CFLAGS) -o $@ $< $(LILV) -ldl
 
+$(B)/port-groups-probe: $(ROOT)/tools/port-groups-probe.c | $(B)
+	$(CC) $(CFLAGS) $(WARN) -o $@ $< $(LILV)
+
 $(B)/deesser-oracle: test/deesser-oracle.c $(CORE) | $(B)
 	$(CC) $(CFLAGS) $(WARN) -I$(GEN) -I$(ROOT)/include $(DSP_CFLAGS) $(ABI_CFLAGS) -o $@ $< $(LILV) -ldl $(LDLIBS)
 
@@ -86,9 +90,10 @@ check:
 # The parameter test: the built CLAP face's parameters are the declaration's, and every one of them
 # reaches the kernel. The kernel-identity test: both faces, sample for sample, against omx-dsp's
 # deesser kernel called directly. The panel test: org.openmixer.panel-description/1 read from
-# each built face as a host reads it, equal to the declaration's panel. Every test runs, and the target fails if any failed, so a new
-# plugin shows all its red tests at once.
-test: all check $(B)/clap-probe $(B)/panel-probe $(B)/deesser-oracle
+# each built face as a host reads it, equal to the declaration's panel. The port-group test: the LV2
+# bundle, read through lilv, puts each panel section's parameters in that section's pg:Group. Every
+# test runs, and the target fails if any failed, so a new plugin shows all its red tests at once.
+test: all check $(B)/clap-probe $(B)/panel-probe $(B)/port-groups-probe $(B)/deesser-oracle
 	@fail=0; \
 	$(B)/clap-probe params $(B)/$(NAME).clap > $(B)/clap-params.txt && \
 	  node $(ROOT)/tools/clap-params-check.mjs $(CURDIR) $(B)/clap-params.txt || fail=1; \
@@ -99,6 +104,8 @@ test: all check $(B)/clap-probe $(B)/panel-probe $(B)/deesser-oracle
 	  node $(ROOT)/tools/panel-check.mjs $(CURDIR) clap $(B)/panel-clap.txt || fail=1; \
 	$(B)/panel-probe lv2 $(BUNDLE) $(URI) > $(B)/panel-lv2.txt && \
 	  node $(ROOT)/tools/panel-check.mjs $(CURDIR) lv2 $(B)/panel-lv2.txt || fail=1; \
+	$(B)/port-groups-probe $(BUNDLE) $(URI) > $(B)/port-groups.txt && \
+	  node $(ROOT)/tools/port-groups-check.mjs $(CURDIR) $(B)/port-groups.txt || fail=1; \
 	sh $(ROOT)/tools/modgui-test.sh $(CURDIR) || fail=1; \
 	sh $(ROOT)/tools/host-check.sh $(B)/$(NAME).clap $(BUNDLE) $(URI) $(CLAP_ID) || fail=1; \
 	exit $$fail

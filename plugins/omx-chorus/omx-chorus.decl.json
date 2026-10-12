@@ -82,24 +82,30 @@
     }
   },
   "panel": {
-    "family": "chorus",
-    "roles": {},
+    "family": "modulation",
+    "roles": {
+      "rate": "rate",
+      "depth": "depth",
+      "voices": "voices",
+      "spread": "spread",
+      "mix": "mix"
+    },
     "sections": [
       {
         "key": "chorus",
         "label": "Chorus",
         "controls": [
-          "spread",
           "rate",
           "depth",
           "voices",
-          "mix"
+          "mix",
+          "spread"
         ]
       }
     ]
   },
   "console": {
-    "$comment": "As FreeMixer/openmixer integration/waves-2026-10 draws its chorus stage: the panel is ModulationPanel.vue (rateHz, depthMs, voices, mix, spread), the FX chip FxSummaryValue of STAGE_KEY_FIELD.chorus (rateHz); the overview card shows the engage switch only.",
+    "$comment": "The OpenMixer console draws its chorus stage: the panel is the modulation panel (rateHz, depthMs, voices, mix, spread); the stage's chip in the FX row shows rateHz; the overview card shows the engage switch only.",
     "placement": {
       "strips": [
         "input",
@@ -116,21 +122,6 @@
       "after": "rotary",
       "fxGroup": "modulation"
     },
-    "chip": "{rate}",
-    "panel": {
-      "sections": [
-        {
-          "key": "chorus",
-          "label": "Chorus",
-          "controls": [
-            "rate",
-            "depth",
-            "voices",
-            "mix",
-            "spread"
-          ]
-        }
-      ]
-    }
+    "chip": "{rate}"
   }
 }

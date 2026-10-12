@@ -193,7 +193,7 @@ static const omx_plugin_param OMX_GEQ_PARAMS[OMX_GEQ_PARAM_COUNT] = {
 
 /* org.openmixer.panel-description/1 (tools/panel-description.mjs): the declaration's panel as the rows
  * include/omx_panel_description.h serves, parameter ids the declaration's. Family eq. */
-#define OMX_GEQ_PANEL_FINGERPRINT "0e1c91e752ac6e2d20cab54dc1467faea29cefc0173069d4a85b94deb2bcb246"
+#define OMX_GEQ_PANEL_FINGERPRINT "15fc7d3f65d09905e64ee66fd8616a72326bab5425dc8bfcefe4bf559ce9a904"
 static const struct omx_panel_section_row OMX_GEQ_PANEL_SECTIONS[] = {
   { "geq", "fx.geq.section.geq", "Geq" },
 };
@@ -230,11 +230,44 @@ static const struct omx_panel_control_row OMX_GEQ_PANEL_CONTROLS[] = {
   { 29u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.geq.band30", "16 kHz", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
   { 30u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.geq.band31", "20 kHz", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
 };
+static const struct omx_panel_role_row OMX_GEQ_PANEL_ROLES[] = {
+  { "band_gain", 0u, 0u },
+  { "band_gain", 1u, 1u },
+  { "band_gain", 2u, 2u },
+  { "band_gain", 3u, 3u },
+  { "band_gain", 4u, 4u },
+  { "band_gain", 5u, 5u },
+  { "band_gain", 6u, 6u },
+  { "band_gain", 7u, 7u },
+  { "band_gain", 8u, 8u },
+  { "band_gain", 9u, 9u },
+  { "band_gain", 10u, 10u },
+  { "band_gain", 11u, 11u },
+  { "band_gain", 12u, 12u },
+  { "band_gain", 13u, 13u },
+  { "band_gain", 14u, 14u },
+  { "band_gain", 15u, 15u },
+  { "band_gain", 16u, 16u },
+  { "band_gain", 17u, 17u },
+  { "band_gain", 18u, 18u },
+  { "band_gain", 19u, 19u },
+  { "band_gain", 20u, 20u },
+  { "band_gain", 21u, 21u },
+  { "band_gain", 22u, 22u },
+  { "band_gain", 23u, 23u },
+  { "band_gain", 24u, 24u },
+  { "band_gain", 25u, 25u },
+  { "band_gain", 26u, 26u },
+  { "band_gain", 27u, 27u },
+  { "band_gain", 28u, 28u },
+  { "band_gain", 29u, 29u },
+  { "band_gain", 30u, 30u },
+};
 static const struct omx_panel_rows OMX_GEQ_PANEL = {
   OMX_GEQ_PANEL_FINGERPRINT, OMX_CLAP_FAMILY_EQ,
   OMX_GEQ_PANEL_SECTIONS, 1u,
   OMX_GEQ_PANEL_CONTROLS, 31u,
-  NULL, 0u,
+  OMX_GEQ_PANEL_ROLES, 31u,
   NULL, 0u,
   NULL, 0u,
 };

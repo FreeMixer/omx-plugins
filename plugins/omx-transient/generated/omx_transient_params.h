@@ -62,8 +62,8 @@ static const omx_plugin_param OMX_TRANSIENT_PARAMS[OMX_TRANSIENT_PARAM_COUNT] = 
 #define OMX_TRANSIENT_DECL_DIGEST "b735a9f45b45b01b0ef5660e8ac5e43729aaab9fd5b9c7cce4976934c82759a5"
 
 /* org.openmixer.panel-description/1 (tools/panel-description.mjs): the declaration's panel as the rows
- * include/omx_panel_description.h serves, parameter ids the declaration's. Family none. */
-#define OMX_TRANSIENT_PANEL_FINGERPRINT "628f9caf28b29c12b3c738305685d5d19caa64b1582d097fb87efc2a3ef1cecf"
+ * include/omx_panel_description.h serves, parameter ids the declaration's. Family dynamics. */
+#define OMX_TRANSIENT_PANEL_FINGERPRINT "cc0d525db5334b14fb27fb979f88c90e5d4313605ab6634ae2984e52e100538f"
 static const struct omx_panel_section_row OMX_TRANSIENT_PANEL_SECTIONS[] = {
   { "transient", "fx.transient.section.transient", "Transient" },
 };
@@ -74,11 +74,15 @@ static const struct omx_panel_control_row OMX_TRANSIENT_PANEL_CONTROLS[] = {
   { 3u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.transient.sustain_time_ms", "Sustain Time", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
   { 4u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.transient.output_db", "Output", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
 };
+static const struct omx_panel_role_row OMX_TRANSIENT_PANEL_ROLES[] = {
+  { "attack", 0u, 2u },
+  { "output", 0u, 4u },
+};
 static const struct omx_panel_rows OMX_TRANSIENT_PANEL = {
-  OMX_TRANSIENT_PANEL_FINGERPRINT, OMX_CLAP_FAMILY_NONE,
+  OMX_TRANSIENT_PANEL_FINGERPRINT, OMX_CLAP_FAMILY_DYNAMICS,
   OMX_TRANSIENT_PANEL_SECTIONS, 1u,
   OMX_TRANSIENT_PANEL_CONTROLS, 5u,
-  NULL, 0u,
+  OMX_TRANSIENT_PANEL_ROLES, 2u,
   NULL, 0u,
   NULL, 0u,
 };

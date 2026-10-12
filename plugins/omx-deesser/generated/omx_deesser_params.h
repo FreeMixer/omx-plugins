@@ -77,12 +77,15 @@ static const omx_plugin_param OMX_DEESSER_PARAMS[OMX_DEESSER_PARAM_COUNT] = {
 #define OMX_DEESSER_DECL_DIGEST "5229f9c0817d98fea312f088c1f8519628c36ef5f1d2b453b22f3ba0571f097f"
 
 /* org.openmixer.panel-description/1 (tools/panel-description.mjs): the declaration's panel as the rows
- * include/omx_panel_description.h serves, parameter ids the declaration's. Family deesser. */
-#define OMX_DEESSER_PANEL_FINGERPRINT "ad86f28401225341755603516a93c9e121d347c77400d495bddefed4a17d3794"
+ * include/omx_panel_description.h serves, parameter ids the declaration's. Family deesser.
+ * Declared roles not published:
+ *   ratio (deessRatio): the ratio role takes ratio, coef, not no unit */
+#define OMX_DEESSER_PANEL_FINGERPRINT "ea5b7494d1b44b2d78d36b42c5435a81eb7979eb776513e0295d4e11e3686b96"
 static const struct omx_panel_section_row OMX_DEESSER_PANEL_SECTIONS[] = {
-  { "deesser", "fx.deesser.section.deesser", "Deesser" },
+  { "de_esser", "fx.deesser.section.de_esser", "De-esser" },
 };
 static const struct omx_panel_control_row OMX_DEESSER_PANEL_CONTROLS[] = {
+  { 7u, 0u, OMX_CLAP_WIDGET_AUTO, "fx.deesser.deess_mode", "Mode", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
   { 0u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.deesser.deess_freq", "Freq", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
   { 1u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.deesser.deess_width", "Width", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
   { 2u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.deesser.deess_threshold", "Threshold", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
@@ -90,13 +93,21 @@ static const struct omx_panel_control_row OMX_DEESSER_PANEL_CONTROLS[] = {
   { 4u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.deesser.deess_range", "Range", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
   { 5u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.deesser.deess_attack", "Attack", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
   { 6u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.deesser.deess_release", "Release", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
-  { 7u, 0u, OMX_CLAP_WIDGET_AUTO, "fx.deesser.deess_mode", "Mode", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+};
+static const struct omx_panel_role_row OMX_DEESSER_PANEL_ROLES[] = {
+  { "frequency", 0u, 0u },
+  { "threshold", 0u, 2u },
+  { "range", 0u, 4u },
+  { "width", 0u, 1u },
+  { "attack", 0u, 5u },
+  { "release", 0u, 6u },
+  { "mode", 0u, 7u },
 };
 static const struct omx_panel_rows OMX_DEESSER_PANEL = {
   OMX_DEESSER_PANEL_FINGERPRINT, OMX_CLAP_FAMILY_DEESSER,
   OMX_DEESSER_PANEL_SECTIONS, 1u,
   OMX_DEESSER_PANEL_CONTROLS, 8u,
-  NULL, 0u,
+  OMX_DEESSER_PANEL_ROLES, 7u,
   NULL, 0u,
   NULL, 0u,
 };
