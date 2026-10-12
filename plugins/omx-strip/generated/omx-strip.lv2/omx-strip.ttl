@@ -4,6 +4,7 @@
 @prefix doap:  <http://usefulinc.com/ns/doap#> .
 @prefix foaf:  <http://xmlns.com/foaf/0.1/> .
 @prefix lv2:   <http://lv2plug.in/ns/lv2core#> .
+@prefix pg:    <http://lv2plug.in/ns/ext/port-groups#> .
 @prefix pprops: <http://lv2plug.in/ns/ext/port-props#> .
 @prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
@@ -56,7 +57,8 @@
         lv2:default 1 ;
         lv2:minimum 0 ;
         lv2:maximum 1 ;
-        lv2:portProperty lv2:toggled
+        lv2:portProperty lv2:toggled ;
+        pg:group <urn:openmixer:strip#trim>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -66,7 +68,8 @@
         lv2:default 0 ;
         lv2:minimum -24 ;
         lv2:maximum 24 ;
-        units:unit units:db
+        units:unit units:db ;
+        pg:group <urn:openmixer:strip#trim>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -76,7 +79,8 @@
         lv2:default 1 ;
         lv2:minimum 0 ;
         lv2:maximum 1 ;
-        lv2:portProperty lv2:toggled
+        lv2:portProperty lv2:toggled ;
+        pg:group <urn:openmixer:strip#filter>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -86,7 +90,8 @@
         lv2:default 0 ;
         lv2:minimum 0 ;
         lv2:maximum 1 ;
-        lv2:portProperty lv2:toggled
+        lv2:portProperty lv2:toggled ;
+        pg:group <urn:openmixer:strip#filter>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -98,7 +103,8 @@
         lv2:maximum 1000 ;
         lv2:portProperty lv2:integer ;
         lv2:portProperty pprops:logarithmic ;
-        units:unit units:hz
+        units:unit units:hz ;
+        pg:group <urn:openmixer:strip#filter>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -111,7 +117,8 @@
         lv2:portProperty lv2:integer , lv2:enumeration ;
         lv2:scalePoint
             [ rdfs:label "12 dB/oct" ; rdf:value 12 ] ,
-            [ rdfs:label "24 dB/oct" ; rdf:value 24 ]
+            [ rdfs:label "24 dB/oct" ; rdf:value 24 ] ;
+        pg:group <urn:openmixer:strip#filter>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -121,7 +128,8 @@
         lv2:default 0 ;
         lv2:minimum 0 ;
         lv2:maximum 1 ;
-        lv2:portProperty lv2:toggled
+        lv2:portProperty lv2:toggled ;
+        pg:group <urn:openmixer:strip#filter>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -133,7 +141,8 @@
         lv2:maximum 20000 ;
         lv2:portProperty lv2:integer ;
         lv2:portProperty pprops:logarithmic ;
-        units:unit units:hz
+        units:unit units:hz ;
+        pg:group <urn:openmixer:strip#filter>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -146,7 +155,8 @@
         lv2:portProperty lv2:integer , lv2:enumeration ;
         lv2:scalePoint
             [ rdfs:label "12 dB/oct" ; rdf:value 12 ] ,
-            [ rdfs:label "24 dB/oct" ; rdf:value 24 ]
+            [ rdfs:label "24 dB/oct" ; rdf:value 24 ] ;
+        pg:group <urn:openmixer:strip#filter>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -156,7 +166,8 @@
         lv2:default 0 ;
         lv2:minimum 0 ;
         lv2:maximum 1 ;
-        lv2:portProperty lv2:toggled
+        lv2:portProperty lv2:toggled ;
+        pg:group <urn:openmixer:strip#gate>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -166,7 +177,8 @@
         lv2:default -40 ;
         lv2:minimum -80 ;
         lv2:maximum 0 ;
-        units:unit units:db
+        units:unit units:db ;
+        pg:group <urn:openmixer:strip#gate>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -175,7 +187,8 @@
         lv2:name "Gate Ratio" ;
         lv2:default 16 ;
         lv2:minimum 1 ;
-        lv2:maximum 100
+        lv2:maximum 100 ;
+        pg:group <urn:openmixer:strip#gate>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -185,7 +198,8 @@
         lv2:default -90 ;
         lv2:minimum -90 ;
         lv2:maximum 0 ;
-        units:unit units:db
+        units:unit units:db ;
+        pg:group <urn:openmixer:strip#gate>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -195,7 +209,8 @@
         lv2:default 1 ;
         lv2:minimum 0 ;
         lv2:maximum 500 ;
-        units:unit units:ms
+        units:unit units:ms ;
+        pg:group <urn:openmixer:strip#gate>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -205,7 +220,8 @@
         lv2:default 100 ;
         lv2:minimum 0 ;
         lv2:maximum 5000 ;
-        units:unit units:ms
+        units:unit units:ms ;
+        pg:group <urn:openmixer:strip#gate>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -216,7 +232,8 @@
         lv2:minimum -80 ;
         lv2:maximum 0 ;
         lv2:portProperty lv2:integer ;
-        units:unit units:db
+        units:unit units:db ;
+        pg:group <urn:openmixer:strip#gate>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -227,7 +244,8 @@
         lv2:minimum -80 ;
         lv2:maximum 0 ;
         lv2:portProperty lv2:integer ;
-        units:unit units:db
+        units:unit units:db ;
+        pg:group <urn:openmixer:strip#gate>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -238,7 +256,8 @@
         lv2:minimum 0 ;
         lv2:maximum 2000 ;
         lv2:portProperty lv2:integer ;
-        units:unit units:ms
+        units:unit units:ms ;
+        pg:group <urn:openmixer:strip#gate>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -248,7 +267,8 @@
         lv2:default 3 ;
         lv2:minimum 0 ;
         lv2:maximum 24 ;
-        units:unit units:db
+        units:unit units:db ;
+        pg:group <urn:openmixer:strip#gate>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -258,7 +278,8 @@
         lv2:default 1 ;
         lv2:minimum 0 ;
         lv2:maximum 1 ;
-        lv2:portProperty lv2:toggled
+        lv2:portProperty lv2:toggled ;
+        pg:group <urn:openmixer:strip#eq>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -275,7 +296,8 @@
             [ rdfs:label "High Shelf" ; rdf:value 2 ] ,
             [ rdfs:label "Notch" ; rdf:value 3 ] ,
             [ rdfs:label "All-pass 1st" ; rdf:value 4 ] ,
-            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ]
+            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ] ;
+        pg:group <urn:openmixer:strip#eq>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -287,7 +309,8 @@
         lv2:maximum 20000 ;
         lv2:portProperty lv2:integer ;
         lv2:portProperty pprops:logarithmic ;
-        units:unit units:hz
+        units:unit units:hz ;
+        pg:group <urn:openmixer:strip#eq>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -297,7 +320,8 @@
         lv2:default 0 ;
         lv2:minimum -15 ;
         lv2:maximum 15 ;
-        units:unit units:db
+        units:unit units:db ;
+        pg:group <urn:openmixer:strip#eq>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -306,7 +330,8 @@
         lv2:name "EQ 1 Q" ;
         lv2:default 1 ;
         lv2:minimum 0.3 ;
-        lv2:maximum 116
+        lv2:maximum 116 ;
+        pg:group <urn:openmixer:strip#eq>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -316,7 +341,8 @@
         lv2:default 0 ;
         lv2:minimum 0 ;
         lv2:maximum 1 ;
-        lv2:portProperty lv2:toggled
+        lv2:portProperty lv2:toggled ;
+        pg:group <urn:openmixer:strip#eq>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -333,7 +359,8 @@
             [ rdfs:label "High Shelf" ; rdf:value 2 ] ,
             [ rdfs:label "Notch" ; rdf:value 3 ] ,
             [ rdfs:label "All-pass 1st" ; rdf:value 4 ] ,
-            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ]
+            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ] ;
+        pg:group <urn:openmixer:strip#eq>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -345,7 +372,8 @@
         lv2:maximum 20000 ;
         lv2:portProperty lv2:integer ;
         lv2:portProperty pprops:logarithmic ;
-        units:unit units:hz
+        units:unit units:hz ;
+        pg:group <urn:openmixer:strip#eq>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -355,7 +383,8 @@
         lv2:default 0 ;
         lv2:minimum -15 ;
         lv2:maximum 15 ;
-        units:unit units:db
+        units:unit units:db ;
+        pg:group <urn:openmixer:strip#eq>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -364,7 +393,8 @@
         lv2:name "EQ 2 Q" ;
         lv2:default 1 ;
         lv2:minimum 0.3 ;
-        lv2:maximum 116
+        lv2:maximum 116 ;
+        pg:group <urn:openmixer:strip#eq>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -374,7 +404,8 @@
         lv2:default 0 ;
         lv2:minimum 0 ;
         lv2:maximum 1 ;
-        lv2:portProperty lv2:toggled
+        lv2:portProperty lv2:toggled ;
+        pg:group <urn:openmixer:strip#eq>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -391,7 +422,8 @@
             [ rdfs:label "High Shelf" ; rdf:value 2 ] ,
             [ rdfs:label "Notch" ; rdf:value 3 ] ,
             [ rdfs:label "All-pass 1st" ; rdf:value 4 ] ,
-            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ]
+            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ] ;
+        pg:group <urn:openmixer:strip#eq>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -403,7 +435,8 @@
         lv2:maximum 20000 ;
         lv2:portProperty lv2:integer ;
         lv2:portProperty pprops:logarithmic ;
-        units:unit units:hz
+        units:unit units:hz ;
+        pg:group <urn:openmixer:strip#eq>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -413,7 +446,8 @@
         lv2:default 0 ;
         lv2:minimum -15 ;
         lv2:maximum 15 ;
-        units:unit units:db
+        units:unit units:db ;
+        pg:group <urn:openmixer:strip#eq>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -422,7 +456,8 @@
         lv2:name "EQ 3 Q" ;
         lv2:default 1 ;
         lv2:minimum 0.3 ;
-        lv2:maximum 116
+        lv2:maximum 116 ;
+        pg:group <urn:openmixer:strip#eq>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -432,7 +467,8 @@
         lv2:default 0 ;
         lv2:minimum 0 ;
         lv2:maximum 1 ;
-        lv2:portProperty lv2:toggled
+        lv2:portProperty lv2:toggled ;
+        pg:group <urn:openmixer:strip#eq>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -449,7 +485,8 @@
             [ rdfs:label "High Shelf" ; rdf:value 2 ] ,
             [ rdfs:label "Notch" ; rdf:value 3 ] ,
             [ rdfs:label "All-pass 1st" ; rdf:value 4 ] ,
-            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ]
+            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ] ;
+        pg:group <urn:openmixer:strip#eq>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -461,7 +498,8 @@
         lv2:maximum 20000 ;
         lv2:portProperty lv2:integer ;
         lv2:portProperty pprops:logarithmic ;
-        units:unit units:hz
+        units:unit units:hz ;
+        pg:group <urn:openmixer:strip#eq>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -471,7 +509,8 @@
         lv2:default 0 ;
         lv2:minimum -15 ;
         lv2:maximum 15 ;
-        units:unit units:db
+        units:unit units:db ;
+        pg:group <urn:openmixer:strip#eq>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -480,7 +519,8 @@
         lv2:name "EQ 4 Q" ;
         lv2:default 1 ;
         lv2:minimum 0.3 ;
-        lv2:maximum 116
+        lv2:maximum 116 ;
+        pg:group <urn:openmixer:strip#eq>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -490,7 +530,8 @@
         lv2:default 0 ;
         lv2:minimum 0 ;
         lv2:maximum 1 ;
-        lv2:portProperty lv2:toggled
+        lv2:portProperty lv2:toggled ;
+        pg:group <urn:openmixer:strip#eq>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -500,7 +541,8 @@
         lv2:default 0 ;
         lv2:minimum 0 ;
         lv2:maximum 1 ;
-        lv2:portProperty lv2:toggled
+        lv2:portProperty lv2:toggled ;
+        pg:group <urn:openmixer:strip#comp>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -510,7 +552,8 @@
         lv2:default -18 ;
         lv2:minimum -60 ;
         lv2:maximum 0 ;
-        units:unit units:db
+        units:unit units:db ;
+        pg:group <urn:openmixer:strip#comp>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -519,7 +562,8 @@
         lv2:name "Comp Ratio" ;
         lv2:default 4 ;
         lv2:minimum 1 ;
-        lv2:maximum 20
+        lv2:maximum 20 ;
+        pg:group <urn:openmixer:strip#comp>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -529,7 +573,8 @@
         lv2:default 6 ;
         lv2:minimum 0 ;
         lv2:maximum 24 ;
-        units:unit units:db
+        units:unit units:db ;
+        pg:group <urn:openmixer:strip#comp>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -539,7 +584,8 @@
         lv2:default 5 ;
         lv2:minimum 0.1 ;
         lv2:maximum 100 ;
-        units:unit units:ms
+        units:unit units:ms ;
+        pg:group <urn:openmixer:strip#comp>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -549,7 +595,8 @@
         lv2:default 200 ;
         lv2:minimum 5 ;
         lv2:maximum 3000 ;
-        units:unit units:ms
+        units:unit units:ms ;
+        pg:group <urn:openmixer:strip#comp>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -559,7 +606,8 @@
         lv2:default 0 ;
         lv2:minimum 0 ;
         lv2:maximum 24 ;
-        units:unit units:db
+        units:unit units:db ;
+        pg:group <urn:openmixer:strip#comp>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -572,7 +620,8 @@
         lv2:portProperty lv2:integer , lv2:enumeration ;
         lv2:scalePoint
             [ rdfs:label "Compressor" ; rdf:value 0 ] ,
-            [ rdfs:label "Limiter" ; rdf:value 1 ]
+            [ rdfs:label "Limiter" ; rdf:value 1 ] ;
+        pg:group <urn:openmixer:strip#comp>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -583,7 +632,8 @@
         lv2:minimum 0 ;
         lv2:maximum 100 ;
         lv2:portProperty lv2:integer ;
-        units:unit units:pc
+        units:unit units:pc ;
+        pg:group <urn:openmixer:strip#comp>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -597,7 +647,8 @@
         lv2:scalePoint
             [ rdfs:label "Auto" ; rdf:value 0 ] ,
             [ rdfs:label "Off" ; rdf:value 1 ] ,
-            [ rdfs:label "4x" ; rdf:value 2 ]
+            [ rdfs:label "4x" ; rdf:value 2 ] ;
+        pg:group <urn:openmixer:strip#comp>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -607,7 +658,8 @@
         lv2:default 0 ;
         lv2:minimum 0 ;
         lv2:maximum 119 ;
-        lv2:portProperty lv2:integer
+        lv2:portProperty lv2:integer ;
+        pg:group <urn:openmixer:strip#order>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -629,3 +681,33 @@
         lv2:portProperty lv2:reportsLatency , lv2:integer ;
         units:unit units:frame
     ] .
+
+<urn:openmixer:strip#trim>
+    a pg:Group ;
+    lv2:symbol "trim" ;
+    rdfs:label "Input" .
+
+<urn:openmixer:strip#filter>
+    a pg:Group ;
+    lv2:symbol "filter" ;
+    rdfs:label "Filters" .
+
+<urn:openmixer:strip#gate>
+    a pg:Group ;
+    lv2:symbol "gate" ;
+    rdfs:label "Gate" .
+
+<urn:openmixer:strip#eq>
+    a pg:Group ;
+    lv2:symbol "eq" ;
+    rdfs:label "EQ" .
+
+<urn:openmixer:strip#comp>
+    a pg:Group ;
+    lv2:symbol "comp" ;
+    rdfs:label "Comp" .
+
+<urn:openmixer:strip#order>
+    a pg:Group ;
+    lv2:symbol "order" ;
+    rdfs:label "Order" .
