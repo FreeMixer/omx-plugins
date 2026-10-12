@@ -9,6 +9,10 @@
  * The include guard is omx-dsp's own <omxdsp/params/omx_gate_params.h>: included first, this
  * table is the one the kernel's instance header reads.
  */
+#include <stddef.h>
+
+#include "omx_panel_description.h"
+#include "omx_param_contract.h"
 #include "omx_plugin_param.h"
 
 enum {
@@ -82,6 +86,73 @@ static const omx_plugin_param OMX_GATE_PARAMS[OMX_GATE_PARAM_COUNT] = {
 /* org.openmixer.declaration/1: the declaration's plain description and the digest of its parameters. */
 #define OMX_GATE_DECL_SOURCE "omx keyed-gate: Key 0 to 1, Threshold -80 to 0 dB, Ratio 1 to 100, Range -90 to 0 dB, Attack 0 to 500 ms, Release 0 to 5000 ms, Knee Start -80 to 0 dB, Knee End -80 to 0 dB, Hold 0 to 2000 ms, Hysteresis 0 to 24 dB"
 #define OMX_GATE_DECL_DIGEST "da939093462b901312c31e455170d4fe564bddcabc0fb19934c7b69ea74c0c6f"
+
+/* org.openmixer.param-contract/1 (tools/param-contract.mjs): each parameter's unit, scale and step, in
+ * id order; the host's bypass, the last id, is the face's. */
+#define OMX_GATE_PARAM_CONTRACT_VERSION 1u
+#define OMX_GATE_PARAM_CONTRACT_FINGERPRINT "f295be9733e981170b924333170c26001c255f217366e0debb39300c56374acc"
+static const struct omx_param_contract_row OMX_GATE_PARAM_CONTRACT[OMX_GATE_PARAM_COUNT] = {
+  { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* key_external none */
+  { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* threshold db */
+  { 0u, OMX_CLAP_SCALE_LOG, 0.0 }, /* ratio none */
+  { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* range db */
+  { 2u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* attack ms */
+  { 2u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* release ms */
+  { 13u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* knee_start db */
+  { 13u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* knee_end db */
+  { 2u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* hold ms */
+  { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* hysteresis db */
+};
+
+/* org.openmixer.panel-description/1 (tools/panel-description.mjs): the declaration's panel as the rows
+ * include/omx_panel_description.h serves, parameter ids the declaration's. Family gate.
+ * Declared roles not published:
+ *   ratio (ratio): the ratio role takes ratio, coef, not no unit */
+#define OMX_GATE_PANEL_FINGERPRINT "4c014a0639d0df200be7be72ad1015beee79579eb485b83dafc02d3a03a5beed"
+static const struct omx_panel_section_row OMX_GATE_PANEL_SECTIONS[] = {
+  { "gate", "fx.gate.section.gate", "Gate" },
+  { "key", "fx.gate.section.key", "Key" },
+};
+static const struct omx_panel_control_row OMX_GATE_PANEL_CONTROLS[] = {
+  { 1u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.gate.threshold", "Threshold", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 3u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.gate.range", "Range", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 2u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.gate.ratio", "Ratio", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 4u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.gate.attack", "Attack", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 8u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.gate.hold", "Hold", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 5u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.gate.release", "Release", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 9u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.gate.hysteresis", "Hysteresis", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 6u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.gate.knee_start", "Knee Start", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 7u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.gate.knee_end", "Knee End", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 0u, 1u, OMX_CLAP_WIDGET_AUTO, "fx.gate.key_external", "Key", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+};
+static const struct omx_panel_role_row OMX_GATE_PANEL_ROLES[] = {
+  { "threshold", 0u, 1u },
+  { "range", 0u, 3u },
+  { "attack", 0u, 4u },
+  { "release", 0u, 5u },
+  { "hold", 0u, 8u },
+  { "knee_start", 0u, 6u },
+  { "knee_end", 0u, 7u },
+  { "hysteresis", 0u, 9u },
+};
+static const struct omx_panel_display_row OMX_GATE_PANEL_DISPLAYS[] = {
+  { OMX_CLAP_DISPLAY_TRANSFER_CURVE, 0u, OMX_CLAP_DISPLAY_FROM_FAMILY, { OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID }, 0u, OMX_CLAP_PANEL_INVALID_ID, 0.0, "fx.gate.display.transfer_curve", "Gate" },
+};
+/* clap.remote-controls/2: the pages of the page rule over the sections. */
+static const struct omx_panel_page_row OMX_GATE_PANEL_PAGES[] = {
+  { "Gate", "Gate 1", { 1u, 3u, 2u, 4u, 8u, 5u, 9u, 6u } },
+  { "Gate", "Gate 2", { 7u, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID } },
+  { "Key", "Key", { 0u, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID } },
+};
+#define OMX_GATE_PANEL_PAGE_COUNT 3u
+static const struct omx_panel_rows OMX_GATE_PANEL = {
+  OMX_GATE_PANEL_FINGERPRINT, OMX_CLAP_FAMILY_GATE,
+  OMX_GATE_PANEL_SECTIONS, 2u,
+  OMX_GATE_PANEL_CONTROLS, 10u,
+  OMX_GATE_PANEL_ROLES, 8u,
+  OMX_GATE_PANEL_DISPLAYS, 1u,
+  NULL, 0u,
+};
 
 /* LV2 port indices (tools/gen.mjs lv2Ports): audio, then parameter i at FIRST_PARAM + i, then these. */
 #define OMX_GATE_LV2_PORT_IN_L 0u

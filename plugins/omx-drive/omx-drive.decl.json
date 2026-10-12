@@ -167,37 +167,33 @@
     "family": "drive",
     "roles": {
       "drive": "amount",
-      "character": "character",
-      "band": "bandFreq",
+      "tone": "character",
+      "model": "curve",
       "mix": "mix",
-      "trim": "trim",
-      "curve": "curve",
-      "bandMode": "band",
-      "autoGain": "autoGain",
-      "stereoLink": "stereoLink",
-      "hfRolloff": "hfRolloff"
+      "output": "trim"
     },
     "sections": [
       {
         "key": "drive",
         "label": "Drive",
         "controls": [
+          "curve",
+          "band",
+          "hfRolloff",
           "amount",
           "character",
           "bandFreq",
           "mix",
           "trim",
-          "curve",
-          "band",
           "autoGain",
-          "stereoLink",
-          "hfRolloff"
-        ]
+          "stereoLink"
+        ],
+        "graph": "transfer-curve"
       }
     ]
   },
   "console": {
-    "$comment": "As FreeMixer/openmixer integration/waves-2026-10 draws its drive stage: FxPanel's TransferCurve over DrivePanel.vue (curve, band, hfRolloff and oversample selects, then driveDb, character, bandHz, mix, trimDb, then the autoGain and stereoLink switches and a latency readout; oversample has no parameter here). Chip: FxSummaryValue of STAGE_KEY_FIELD.drive (driveDb). Card: useStripOverview's drive controls.",
+    "$comment": "The OpenMixer console draws its drive stage: the transfer curve above the drive panel (curve, band, hfRolloff and oversample selects, then driveDb, character, bandHz, mix, trimDb, then the autoGain and stereoLink switches and a latency readout; oversample has no parameter here). Its chip shows driveDb. Its overview card carries the drive's controls.",
     "placement": {
       "strips": [
         "input",
@@ -221,27 +217,6 @@
         "mix"
       ]
     },
-    "chip": "{amount}",
-    "panel": {
-      "sections": [
-        {
-          "key": "drive",
-          "label": "Drive",
-          "controls": [
-            "curve",
-            "band",
-            "hfRolloff",
-            "amount",
-            "character",
-            "bandFreq",
-            "mix",
-            "trim",
-            "autoGain",
-            "stereoLink"
-          ],
-          "graph": "transfer-curve"
-        }
-      ]
-    }
+    "chip": "{amount}"
   }
 }

@@ -167,22 +167,39 @@
   },
   "panel": {
     "family": "gate",
-    "roles": {},
+    "roles": {
+      "threshold": "threshold",
+      "range": "range",
+      "attack": "attack",
+      "release": "release",
+      "hold": "hold",
+      "knee_start": "knee_start",
+      "knee_end": "knee_end",
+      "hysteresis": "hysteresis",
+      "ratio": "ratio"
+    },
     "sections": [
       {
         "key": "gate",
-        "label": "Keyed-gate",
+        "label": "Gate",
         "controls": [
-          "key_external",
           "threshold",
-          "ratio",
           "range",
+          "ratio",
           "attack",
-          "release",
-          "knee_start",
-          "knee_end",
           "hold",
-          "hysteresis"
+          "release",
+          "hysteresis",
+          "knee_start",
+          "knee_end"
+        ],
+        "graph": "dynamics-curve"
+      },
+      {
+        "key": "key",
+        "label": "Key",
+        "controls": [
+          "key_external"
         ]
       }
     ]
@@ -211,7 +228,7 @@
     "bundle loads this one."
   ],
   "console": {
-    "$comment": "As FreeMixer/openmixer integration/waves-2026-10 draws its gate stage and its key (ProcessingStrip.vue): GateCurve beside the gate's encoders (thresholdDb, rangeDb, ratio, attackMs, holdMs, releaseMs, hysteresisDb), the knee as readouts (knee_start, knee_end are not drawn as controls), then the KEY section (key source select; the voice-band button, key HP/LP and listen have no parameter here). Chip: STAGE_CHIP_PARAMS.gate. Card: useStripOverview's gate controls.",
+    "$comment": "The OpenMixer console draws its gate stage and its key in the processing strip: the gate's curve beside its encoders (thresholdDb, rangeDb, ratio, attackMs, holdMs, releaseMs, hysteresisDb), the knee as readouts (knee_start, knee_end are not drawn as controls), then the KEY section (key source select; the voice-band button, key HP/LP and listen have no parameter here). Its chip shows the gate's main settings. Its overview card carries the gate's controls.",
     "placement": {
       "strips": [
         "input",
@@ -235,31 +252,6 @@
         "release"
       ]
     },
-    "chip": "THR {threshold}",
-    "panel": {
-      "sections": [
-        {
-          "key": "gate",
-          "label": "Gate",
-          "controls": [
-            "threshold",
-            "range",
-            "ratio",
-            "attack",
-            "hold",
-            "release",
-            "hysteresis"
-          ],
-          "graph": "dynamics-curve"
-        },
-        {
-          "key": "key",
-          "label": "Key",
-          "controls": [
-            "key_external"
-          ]
-        }
-      ]
-    }
+    "chip": "THR {threshold}"
   }
 }

@@ -11,13 +11,17 @@
  *      argument it names; only the package description (prose) is left.
  *   1b. The generators: `gen.mjs --check` is green on that tree and red, naming the file or the
  *      argument, for a hand edit to the generated binding, a declaration that moved, a face whose
- *      argument no control names, and a hand edit to a shared file; each restored, green.
+ *      argument no control names, and a hand edit to a shared file; each restored, green. The
+ *      look: `look.mjs --check` is red for a token source that moved and for a hand edit to
+ *      tools/look.json, green restored; the cascade resolves the most specific rule, the later at
+ *      equal specificity, and follows var(), refusing a cycle.
  *   2. Its commit plan, applied literally in a throwaway repository, keeps the commit protocol
  *      (tools/commit-plan-check.mjs); two commits swapped, or two concerns in one commit, break it.
  *   3. Every checker family of the completeness test: break the artifact on a copy of the tree
  *      (omx-drive), and the test names that entry and its wizard step; restore, and it is green.
  *      The declaration's schema check among them: a declaration with no panel, with no console
- *      block, or whose console chip or console panel names no parameter, is red.
+ *      block, with a second panel in its console block, whose console chip or panel names no
+ *      parameter, or whose panel draws a parameter twice, is red.
  *   4. The recipe: a new required entry makes every plugin red; an entry naming a checker that does
  *      not exist breaks the recipe.
  *   5. The wizard refuses, before writing: a kernel omx-contract lacks, a kernel with no instance
@@ -237,6 +241,33 @@ async function main() {
   sabotageGen('a face whose argument no contract control names', face, (t) => t.replace('float depth,', 'float intensity,'), "resolve argument 'intensity'");
   sabotageGen('a hand edit to a shared file', 'README.md', (t) => t.replace('| **omx wobble** |', '| **omx wobble (beta)** |'), 'STALE README.md');
   {
+    // the look: tools/look.json is what tools/look/tokens.css resolves to, and nothing else
+    const look = () => spawnSync('node', [join(tree, 'tools', 'look.mjs'), '--check'], { cwd: tree, encoding: 'utf8' });
+    expect(look().status === 0, 'look.mjs --check is green on the tree');
+    for (const [what, file, mutate] of [
+      ['a token source that moved', 'tools/look/tokens.css', (t) => t.replace('--accent: #28c8e6;', '--accent: #29c8e6;')],
+      ['a hand edit to tools/look.json', 'tools/look.json', (t) => t.replace('"#28c8e6"', '"#29c8e6"')],
+    ]) {
+      const at = join(tree, file), was = readFileSync(at, 'utf8');
+      writeFileSync(at, mutate(was));
+      const red = look();
+      writeFileSync(at, was);
+      expect(red.status !== 0 && red.stderr.includes('STALE tools/look.json') && look().status === 0, `sabotage look: ${what} goes red, green restored${red.status ? '' : ' (STAYED GREEN)'}`);
+    }
+    const { resolveTokens } = await import(join(tree, 'tools', 'look.mjs'));
+    const css = ':root { --a: #111; --b: var(--a); } :root[data-theme="light"] { --a: #222222; } :root[data-theme="light"][data-accent="cyan"] { --a: #333; } :root[data-theme="light"] { --c: #444; } :root[data-theme="light"] { --c: #555; }';
+    const at = (theme, accent) => resolveTokens(css, { theme, accent });
+    expect(at('dark', 'cyan')['--b'] === '#111111' && at('light', 'orange')['--b'] === '#222222' && at('light', 'cyan')['--b'] === '#333333' && at('light', 'cyan')['--c'] === '#555555',
+      'look: the most specific rule wins, the later at equal specificity, and var() is followed');
+    let cycle = '';
+    try {
+      resolveTokens(':root { --a: var(--b); --b: var(--a); }', { theme: 'dark' });
+    } catch (e) {
+      cycle = e.message;
+    }
+    expect(/cycle/.test(cycle), `look: a var() cycle is refused (${cycle || 'ACCEPTED'})`);
+  }
+  {
     const was = readFileSync(join(tree, P_, 'omx_wobble_core.h'), 'utf8');
     writeFileSync(join(tree, P_, 'omx_wobble_core.h'), `${was}\n`);
     const r = gapLines(await checkPlugin(tree, recipe, 'omx-wobble'));
@@ -320,11 +351,15 @@ async function main() {
     ['noText', 'no-dpf', () => add(`${P}/dpf_shell.h`, '#include "DistrhoPlugin.hpp"\n')],
     ['noCopiedDsp', 'no-copied-dsp', () => add(`${P}/copied.h`, `static inline float ${dspName}(float x) {\n  return x;\n}\n`)],
     ['noCopiedDsp', 'no-copied-dsp', () => add(`${P}/engine.h`, '#include "mix_drive.h"\n')],
-    // every plugin declares its panel and its console block, each naming declared parameters only
+    // every plugin declares its one panel and its console block, each naming declared parameters only
     ['declValid', 'declaration', () => edit(`${P}/omx-drive.decl.json`, (s) => JSON.stringify((({ panel: _p, ...d }) => d)(JSON.parse(s)), null, 2))],
     ['declValid', 'declaration', () => edit(`${P}/omx-drive.decl.json`, (s) => JSON.stringify((({ console: _c, ...d }) => d)(JSON.parse(s)), null, 2))],
     ['declValid', 'declaration', () => edit(`${P}/omx-drive.decl.json`, (s) => s.replace('"chip": "{amount}"', '"chip": "{drive}"'))],
-    ['declValid', 'declaration', () => edit(`${P}/omx-drive.decl.json`, (s) => s.replace('"bandFreq",\n            "mix"', '"bandFreq",\n            "wet"'))],
+    ['declValid', 'declaration', () => edit(`${P}/omx-drive.decl.json`, (s) => s.replace('"bandFreq",\n          "mix"', '"bandFreq",\n          "wet"'))],
+    ['declValid', 'declaration', () => edit(`${P}/omx-drive.decl.json`, (s) => s.replace('"bandFreq",\n          "mix"', '"bandFreq",\n          "amount"'))],
+    ['declValid', 'declaration', () => edit(`${P}/omx-drive.decl.json`, (s) => JSON.stringify((({ console: c, panel: p, ...d }) => ({ ...d, panel: p, console: { ...c, panel: { sections: p.sections } } }))(JSON.parse(s)), null, 2))],
+    ['declValid', 'declaration', () => edit(`${P}/omx-drive.decl.json`, (s) => s.replace('"family": "drive"', '"family": "saturation"'))],
+    ['declValid', 'declaration', () => edit(`${P}/omx-drive.decl.json`, (s) => s.replace('"tone": "character"', '"character": "character"'))],
     ['paramsByReference', 'params-by-reference', () => edit(`${P}/omx-drive.decl.json`, (s) => s.replace('"ref": "DRIVE_AMOUNT_RANGE"', '"ref": "DRIVE_AMOUNT_RANGE", "min": 0'))],
   ];
   for (const [family, id, breakIt] of SABOTAGE) {
@@ -450,11 +485,33 @@ static inline void omx_wobble_instance_run(OmxWobbleInstance *s, const float *in
   await refused('a reference into another kernel', (a) => { a.params[0].ref = 'FX_DELAY_TIME_RANGE'; }, '/params/0/ref');
   await refused('a derived field written wrong', (a) => { a.clap.id = 'org.openmixer.trem'; }, '/clap/id');
   await refused('a face argument no parameter binds', (a) => { a.params.splice(2, 1); }, '/params');
-  await refused('a panel naming no parameter', (a) => { a.panel = { family: 'modulation', roles: {}, sections: [{ key: 'wobble', label: 'Wobble', controls: ['rateHz', 'speed'] }] }; }, '/panel/sections');
+  await refused('a panel naming no parameter', (a) => { a.panel = { family: 'modulation', roles: { rate: 'rateHz' }, sections: [{ key: 'wobble', label: 'Wobble', controls: ['rateHz', 'speed'] }] }; }, '/panel/sections');
   await refused('a console chip naming no parameter', (a) => { a.console = { placement: { strips: ['input'], group: 'insert' }, chip: '{rateHz} · {speed}' }; }, '/console/chip');
+  await refused('a widget outside the shared list', (a) => { a.panel = { ...a.panel, widgets: { rateHz: 'choice' } }; }, '/panel/widgets/rateHz');
+  await refused('a widget that cannot draw its parameter', (a) => { a.panel = { ...a.panel, widgets: { mode: 'knob' } }; }, '/panel');
+  await refused('a switch for a travel', (a) => { a.panel = { ...a.panel, widgets: { depth: 'switch' } }; }, '/panel');
+  {
+    // the MOD GUI draws a control with the widget its panel names, else its kind's
+    const { generateModgui } = await import(join(ROOT, 'tools', 'modgui-gen.mjs'));
+    const d = loadDecl(join(ROOT, 'plugins', 'omx-drive'));
+    const files = (widgets) => new Map(generateModgui({ ...d, panel: { ...d.panel, widgets } }).map(([p, b]) => [p, b.toString('latin1')]));
+    const auto = files(undefined), named = files({ amount: 'fader', curve: 'selector' });
+    const tpl = (m) => m.get('modgui/icon-omx-drive.html');
+    expect(/omx-knob-image" mod-role="input-control-port" mod-port-symbol="amount"/.test(tpl(auto)) && !auto.has('modgui/knobs/omx-fader.png'),
+      'modgui: a control the panel names no widget for takes its kind\'s (amount a knob, no fader film)');
+    expect(/omx-fader-image" mod-role="input-control-port" mod-port-symbol="amount"/.test(tpl(named)) && named.has('modgui/knobs/omx-fader.png') &&
+      named.get('modgui/stylesheet-omx-drive.css').includes('.omx-fader-image') && tpl(named).includes('mod-port-symbol="curve" mod-widget="custom-select"'),
+      'modgui: the panel\'s widgets are drawn (amount a fader with its film, curve a selector)');
+  }
   await refused('a panel that leaves a parameter off the MOD GUI', (a) => {
-    a.panel = { family: 'modulation', roles: {}, sections: [{ key: 'wobble', label: 'Wobble', controls: ['rateHz', 'depth', 'mix'] }] };
+    a.panel = { family: 'modulation', roles: { rate: 'rateHz' }, sections: [{ key: 'wobble', label: 'Wobble', controls: ['rateHz', 'depth', 'mix'] }] };
   }, '/panel');
+  const panelOf = (family, roles) => ({ family, roles, sections: [{ key: 'wobble', label: 'Wobble', controls: ['rateHz', 'depth', 'mix', 'mode'] }] });
+  await refused('a panel family the console does not know', (a) => { a.panel = panelOf('wobble', {}); }, '/panel/family');
+  await refused('a role outside its family', (a) => { a.panel = panelOf('modulation', { rate: 'rateHz', time: 'depth' }); }, '/panel/roles/time');
+  await refused('a family with none of its roles', (a) => { a.panel = panelOf('modulation', {}); }, '/panel/roles');
+  await refused('a list of symbols for a role that does not repeat by band', (a) => { a.panel = panelOf('modulation', { rate: ['rateHz', 'depth'] }); }, '/panel/roles/rate');
+  await refused('a role naming no parameter', (a) => { a.panel = panelOf('modulation', { rate: 'speed' }); }, '/panel/roles/rate');
   {
     const f = parseFace(`static inline int omx_wobble_instance_init(OmxWobbleInstance *s, float sr) { return 1; }
 static inline void omx_wobble_instance_resolve(OmxWobbleInstance *s, int bypass, float rate, float depth) { }

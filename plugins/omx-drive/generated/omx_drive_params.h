@@ -9,6 +9,10 @@
  * The include guard is omx-dsp's own <omxdsp/params/omx_drive_params.h>: included first, this
  * table is the one the kernel's instance header reads.
  */
+#include <stddef.h>
+
+#include "omx_panel_description.h"
+#include "omx_param_contract.h"
 #include "omx_plugin_param.h"
 
 enum {
@@ -82,6 +86,66 @@ static const omx_plugin_param OMX_DRIVE_PARAMS[OMX_DRIVE_PARAM_COUNT] = {
 /* org.openmixer.declaration/1: the declaration's plain description and the digest of its parameters. */
 #define OMX_DRIVE_DECL_SOURCE "omx drive: Drive 0 to 36 dB, Character -1 to 1, Band Frequency 20 to 20000 Hz, Mix 0 to 100 %, Trim -24 to 12 dB, Curve 0 to 3, Band 0 to 3, Auto Gain 0 to 1, Stereo Link 0 to 1, HF Roll-off 0 to 16000"
 #define OMX_DRIVE_DECL_DIGEST "b53c3fb88d798020fa4916d7c259c609a36baa22a20f8e28105e53e2506b73d2"
+
+/* org.openmixer.param-contract/1 (tools/param-contract.mjs): each parameter's unit, scale and step, in
+ * id order; the host's bypass, the last id, is the face's. */
+#define OMX_DRIVE_PARAM_CONTRACT_VERSION 1u
+#define OMX_DRIVE_PARAM_CONTRACT_FINGERPRINT "89ad3ebcf54d0bcc336f3b09611d36d77357718d60aa9085f71e334d8a7a135f"
+static const struct omx_param_contract_row OMX_DRIVE_PARAM_CONTRACT[OMX_DRIVE_PARAM_COUNT] = {
+  { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* amount db */
+  { 0u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* character none */
+  { 16u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* bandFreq hz */
+  { 14u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* mix pc */
+  { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* trim db */
+  { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* curve none */
+  { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* band none */
+  { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* autoGain none */
+  { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* stereoLink none */
+  { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* hfRolloff none */
+};
+
+/* org.openmixer.panel-description/1 (tools/panel-description.mjs): the declaration's panel as the rows
+ * include/omx_panel_description.h serves, parameter ids the declaration's. Family drive. */
+#define OMX_DRIVE_PANEL_FINGERPRINT "e967420a72f79dbf4e551deb13da2df89bd0a5713e60d22210978d662851b4de"
+static const struct omx_panel_section_row OMX_DRIVE_PANEL_SECTIONS[] = {
+  { "drive", "fx.drive.section.drive", "Drive" },
+};
+static const struct omx_panel_control_row OMX_DRIVE_PANEL_CONTROLS[] = {
+  { 5u, 0u, OMX_CLAP_WIDGET_AUTO, "fx.drive.curve", "Curve", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 6u, 0u, OMX_CLAP_WIDGET_AUTO, "fx.drive.band", "Band", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 9u, 0u, OMX_CLAP_WIDGET_AUTO, "fx.drive.hf_rolloff", "HF Roll-off", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 0u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.drive.amount", "Drive", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 1u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.drive.character", "Character", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 2u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.drive.band_freq", "Band Frequency", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 3u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.drive.mix", "Mix", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 4u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.drive.trim", "Trim", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 7u, 0u, OMX_CLAP_WIDGET_SWITCH, "fx.drive.auto_gain", "Auto Gain", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 8u, 0u, OMX_CLAP_WIDGET_SWITCH, "fx.drive.stereo_link", "Stereo Link", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+};
+static const struct omx_panel_role_row OMX_DRIVE_PANEL_ROLES[] = {
+  { "drive", 0u, 0u },
+  { "tone", 0u, 1u },
+  { "model", 0u, 5u },
+  { "mix", 0u, 3u },
+  { "output", 0u, 4u },
+};
+static const struct omx_panel_display_row OMX_DRIVE_PANEL_DISPLAYS[] = {
+  { OMX_CLAP_DISPLAY_TRANSFER_CURVE, 0u, OMX_CLAP_DISPLAY_FROM_FAMILY, { OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID }, 0u, OMX_CLAP_PANEL_INVALID_ID, 0.0, "fx.drive.display.transfer_curve", "Drive" },
+};
+/* clap.remote-controls/2: the pages of the page rule over the sections. */
+static const struct omx_panel_page_row OMX_DRIVE_PANEL_PAGES[] = {
+  { "Drive", "Drive 1", { 5u, 6u, 9u, 0u, 1u, 2u, 3u, 4u } },
+  { "Drive", "Drive 2", { 7u, 8u, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID } },
+};
+#define OMX_DRIVE_PANEL_PAGE_COUNT 2u
+static const struct omx_panel_rows OMX_DRIVE_PANEL = {
+  OMX_DRIVE_PANEL_FINGERPRINT, OMX_CLAP_FAMILY_DRIVE,
+  OMX_DRIVE_PANEL_SECTIONS, 1u,
+  OMX_DRIVE_PANEL_CONTROLS, 10u,
+  OMX_DRIVE_PANEL_ROLES, 5u,
+  OMX_DRIVE_PANEL_DISPLAYS, 1u,
+  NULL, 0u,
+};
 
 /* LV2 port indices (tools/gen.mjs lv2Ports): audio, then parameter i at FIRST_PARAM + i, then these. */
 #define OMX_DRIVE_LV2_PORT_IN_L 0u

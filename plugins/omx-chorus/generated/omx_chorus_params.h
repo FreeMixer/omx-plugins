@@ -9,6 +9,10 @@
  * The include guard is omx-dsp's own <omxdsp/params/omx_chorus_params.h>: included first, this
  * table is the one the kernel's instance header reads.
  */
+#include <stddef.h>
+
+#include "omx_panel_description.h"
+#include "omx_param_contract.h"
 #include "omx_plugin_param.h"
 
 enum {
@@ -57,6 +61,53 @@ static const omx_plugin_param OMX_CHORUS_PARAMS[OMX_CHORUS_PARAM_COUNT] = {
 /* org.openmixer.declaration/1: the declaration's plain description and the digest of its parameters. */
 #define OMX_CHORUS_DECL_SOURCE "omx chorus: Spread 0 to 0.5, Rate 0.05 to 8 Hz, Depth 0 to 12 ms, Voices 1 to 4, Mix 0 to 100 %"
 #define OMX_CHORUS_DECL_DIGEST "7e9d7de96f6b48a792b97d200fa3c98c64f705c253f31637301752d03a5a2e51"
+
+/* org.openmixer.param-contract/1 (tools/param-contract.mjs): each parameter's unit, scale and step, in
+ * id order; the host's bypass, the last id, is the face's. */
+#define OMX_CHORUS_PARAM_CONTRACT_VERSION 1u
+#define OMX_CHORUS_PARAM_CONTRACT_FINGERPRINT "0ed178cc68e5aec571483b30d59a2e0bbce5baebe61b7b209cb069601584a0ad"
+static const struct omx_param_contract_row OMX_CHORUS_PARAM_CONTRACT[OMX_CHORUS_PARAM_COUNT] = {
+  { 0u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* spread none */
+  { 16u, OMX_CLAP_SCALE_LOG, 0.0 }, /* rate hz */
+  { 2u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* depth ms */
+  { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* voices none */
+  { 14u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* mix pc */
+};
+
+/* org.openmixer.panel-description/1 (tools/panel-description.mjs): the declaration's panel as the rows
+ * include/omx_panel_description.h serves, parameter ids the declaration's. Family modulation.
+ * Declared roles not published:
+ *   depth (depth): the depth role takes none, pc, coef, not ms */
+#define OMX_CHORUS_PANEL_FINGERPRINT "f74674fc0273db9c13b04bcefbdde42d9faa30dd64fec72cd7b881bfb1d98b2f"
+static const struct omx_panel_section_row OMX_CHORUS_PANEL_SECTIONS[] = {
+  { "chorus", "fx.chorus.section.chorus", "Chorus" },
+};
+static const struct omx_panel_control_row OMX_CHORUS_PANEL_CONTROLS[] = {
+  { 1u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.chorus.rate", "Rate", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 2u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.chorus.depth", "Depth", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 3u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.chorus.voices", "Voices", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 4u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.chorus.mix", "Mix", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 0u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.chorus.spread", "Spread", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+};
+static const struct omx_panel_role_row OMX_CHORUS_PANEL_ROLES[] = {
+  { "rate", 0u, 1u },
+  { "voices", 0u, 3u },
+  { "spread", 0u, 0u },
+  { "mix", 0u, 4u },
+};
+/* clap.remote-controls/2: the pages of the page rule over the sections. */
+static const struct omx_panel_page_row OMX_CHORUS_PANEL_PAGES[] = {
+  { "Chorus", "Chorus", { 1u, 2u, 3u, 4u, 0u, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID } },
+};
+#define OMX_CHORUS_PANEL_PAGE_COUNT 1u
+static const struct omx_panel_rows OMX_CHORUS_PANEL = {
+  OMX_CHORUS_PANEL_FINGERPRINT, OMX_CLAP_FAMILY_MODULATION,
+  OMX_CHORUS_PANEL_SECTIONS, 1u,
+  OMX_CHORUS_PANEL_CONTROLS, 5u,
+  OMX_CHORUS_PANEL_ROLES, 4u,
+  NULL, 0u,
+  NULL, 0u,
+};
 
 /* LV2 port indices (tools/gen.mjs lv2Ports): audio, then parameter i at FIRST_PARAM + i, then these. */
 #define OMX_CHORUS_LV2_PORT_IN_L 0u
