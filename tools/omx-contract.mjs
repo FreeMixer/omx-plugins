@@ -213,6 +213,8 @@ export function resolveParam(dir, kernel, p) {
       def = band.freqHz;
     }
     const out = { min: num(t.min, at), max: num(t.max, at), def: num(def, at), unit: t.unit ?? '', from: at };
+    // the default a channel kind comes up at instead (a return's wet mix), where the travel names one
+    if (t.byKind && !p.forKind) out.byKind = Object.fromEntries(Object.entries(t.byKind).map(([k, v]) => [k, num(v, at)]));
     if (typeof t.step === 'number' && t.step >= 1 && Number.isInteger(out.min) && Number.isInteger(out.max)) out.kind = 'integer';
     return out;
   }

@@ -59,7 +59,10 @@ jobs:
 
       - name: Every generated file is fresh, built or not
         id: handback-gen
-        run: node tools/gen.mjs --check
+        run: |
+          set -euo pipefail
+          node tools/gen.mjs --check
+          node tools/look.mjs --check
 
       - name: make test, and nothing skipped
         id: handback-test

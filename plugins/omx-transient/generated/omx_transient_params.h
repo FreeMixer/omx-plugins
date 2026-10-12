@@ -9,6 +9,10 @@
  * The include guard is omx-dsp's own <omxdsp/params/omx_transient_params.h>: included first, this
  * table is the one the kernel's instance header reads.
  */
+#include <stddef.h>
+
+#include "omx_panel_description.h"
+#include "omx_param_contract.h"
 #include "omx_plugin_param.h"
 
 enum {
@@ -57,6 +61,49 @@ static const omx_plugin_param OMX_TRANSIENT_PARAMS[OMX_TRANSIENT_PARAM_COUNT] = 
 /* org.openmixer.declaration/1: the declaration's plain description and the digest of its parameters. */
 #define OMX_TRANSIENT_DECL_SOURCE "omx transient: Attack -24 to 24 dB, Sustain -24 to 24 dB, Attack Time 2 to 50 ms, Sustain Time 50 to 2000 ms, Output -24 to 12 dB"
 #define OMX_TRANSIENT_DECL_DIGEST "b735a9f45b45b01b0ef5660e8ac5e43729aaab9fd5b9c7cce4976934c82759a5"
+
+/* org.openmixer.param-contract/1 (tools/param-contract.mjs): each parameter's unit, scale and step, in
+ * id order; the host's bypass, the last id, is the face's. */
+#define OMX_TRANSIENT_PARAM_CONTRACT_VERSION 1u
+#define OMX_TRANSIENT_PARAM_CONTRACT_FINGERPRINT "bbc6e30c71502797c8ff2202acbfef52074f75a9b2ab3e5110adabacdabed242"
+static const struct omx_param_contract_row OMX_TRANSIENT_PARAM_CONTRACT[OMX_TRANSIENT_PARAM_COUNT] = {
+  { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* attackDb db */
+  { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* sustainDb db */
+  { 2u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* attackTimeMs ms */
+  { 2u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* sustainTimeMs ms */
+  { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* outputDb db */
+};
+
+/* org.openmixer.panel-description/1 (tools/panel-description.mjs): the declaration's panel as the rows
+ * include/omx_panel_description.h serves, parameter ids the declaration's. Family dynamics. */
+#define OMX_TRANSIENT_PANEL_FINGERPRINT "cc0d525db5334b14fb27fb979f88c90e5d4313605ab6634ae2984e52e100538f"
+static const struct omx_panel_section_row OMX_TRANSIENT_PANEL_SECTIONS[] = {
+  { "transient", "fx.transient.section.transient", "Transient" },
+};
+static const struct omx_panel_control_row OMX_TRANSIENT_PANEL_CONTROLS[] = {
+  { 0u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.transient.attack_db", "Attack", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 1u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.transient.sustain_db", "Sustain", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 2u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.transient.attack_time_ms", "Attack Time", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 3u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.transient.sustain_time_ms", "Sustain Time", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 4u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.transient.output_db", "Output", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+};
+static const struct omx_panel_role_row OMX_TRANSIENT_PANEL_ROLES[] = {
+  { "attack", 0u, 2u },
+  { "output", 0u, 4u },
+};
+/* clap.remote-controls/2: the pages of the page rule over the sections. */
+static const struct omx_panel_page_row OMX_TRANSIENT_PANEL_PAGES[] = {
+  { "Transient", "Transient", { 0u, 1u, 2u, 3u, 4u, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID } },
+};
+#define OMX_TRANSIENT_PANEL_PAGE_COUNT 1u
+static const struct omx_panel_rows OMX_TRANSIENT_PANEL = {
+  OMX_TRANSIENT_PANEL_FINGERPRINT, OMX_CLAP_FAMILY_DYNAMICS,
+  OMX_TRANSIENT_PANEL_SECTIONS, 1u,
+  OMX_TRANSIENT_PANEL_CONTROLS, 5u,
+  OMX_TRANSIENT_PANEL_ROLES, 2u,
+  NULL, 0u,
+  NULL, 0u,
+};
 
 /* LV2 port indices (tools/gen.mjs lv2Ports): audio, then parameter i at FIRST_PARAM + i, then these. */
 #define OMX_TRANSIENT_LV2_PORT_IN_L 0u

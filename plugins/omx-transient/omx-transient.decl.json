@@ -88,8 +88,11 @@
     }
   },
   "panel": {
-    "family": "transient",
-    "roles": {},
+    "family": "dynamics",
+    "roles": {
+      "attack": "attackTimeMs",
+      "output": "outputDb"
+    },
     "sections": [
       {
         "key": "transient",
@@ -105,7 +108,7 @@
     ]
   },
   "console": {
-    "$comment": "FreeMixer/openmixer integration/waves-2026-10 has no transient stage. Racked as a plugin (the insert rack's kinds, channel-contract.ts INSERT_RACK_KINDS) it is drawn by the generic plugin editor.",
+    "$comment": "The OpenMixer console has no transient stage. Racked as a plugin in a channel's insert rack, it is drawn by the generic plugin editor.",
     "placement": {
       "strips": [
         "input",

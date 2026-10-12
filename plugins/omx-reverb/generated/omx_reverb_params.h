@@ -9,6 +9,10 @@
  * The include guard is omx-dsp's own <omxdsp/params/omx_reverb_params.h>: included first, this
  * table is the one the kernel's instance header reads.
  */
+#include <stddef.h>
+
+#include "omx_panel_description.h"
+#include "omx_param_contract.h"
 #include "omx_plugin_param.h"
 
 enum {
@@ -97,6 +101,80 @@ static const omx_plugin_param OMX_REVERB_PARAMS[OMX_REVERB_PARAM_COUNT] = {
 /* org.openmixer.declaration/1: the declaration's plain description and the digest of its parameters. */
 #define OMX_REVERB_DECL_SOURCE "omx reverb: Plate Mod Depth 0 to 400 %, Mix 0 to 1, Size 0 to 1, Damping 0 to 1, Width 0 to 1, Predelay 0 to 100 ms, Lowcut 0 to 20000 Hz, Highcut 0 to 20000 Hz, Reverse 50 to 500 ms, Hold 10 to 2000 ms, Release 1 to 500 ms, Gate Threshold -80 to 0 dBFS, Algorithm 0 to 4"
 #define OMX_REVERB_DECL_DIGEST "a42c6e20426afd868f08938af4dfb54b487bdf4d8a5d9b13f75a967319df7009"
+
+/* org.openmixer.param-contract/1 (tools/param-contract.mjs): each parameter's unit, scale and step, in
+ * id order; the host's bypass, the last id, is the face's. */
+#define OMX_REVERB_PARAM_CONTRACT_VERSION 1u
+#define OMX_REVERB_PARAM_CONTRACT_FINGERPRINT "3c6d0c052481f1fbafefc5f64bb8f16b76d00dfea1598888d5c90129a2e4a99d"
+static const struct omx_param_contract_row OMX_REVERB_PARAM_CONTRACT[OMX_REVERB_PARAM_COUNT] = {
+  { 14u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* plateModDepth pc */
+  { 0u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* mix none */
+  { 0u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* size none */
+  { 0u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* damping none */
+  { 0u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* width none */
+  { 2u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* predelay ms */
+  { 16u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* lowcut hz */
+  { 16u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* highcut hz */
+  { 2u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* reverse ms */
+  { 2u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* hold ms */
+  { 2u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* release ms */
+  { 256u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* gateThreshold dbfs */
+  { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* algorithm none */
+};
+
+/* org.openmixer.panel-description/1 (tools/panel-description.mjs): the declaration's panel as the rows
+ * include/omx_panel_description.h serves, parameter ids the declaration's. Family reverb. */
+#define OMX_REVERB_PANEL_FINGERPRINT "7626d07e785ceff25b3603d57d7ad73c2bf132c17ab248bf6d227e1d2e93a722"
+static const struct omx_panel_section_row OMX_REVERB_PANEL_SECTIONS[] = {
+  { "reverb", "fx.reverb.section.reverb", "Reverb" },
+  { "reverse", "fx.reverb.section.reverse", "Reverse" },
+  { "gated", "fx.reverb.section.gated", "Gated" },
+  { "plate", "fx.reverb.section.plate", "Plate" },
+};
+static const struct omx_panel_control_row OMX_REVERB_PANEL_CONTROLS[] = {
+  { 12u, 0u, OMX_CLAP_WIDGET_AUTO, "fx.reverb.algorithm", "Algorithm", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 2u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.reverb.size", "Size", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 3u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.reverb.damping", "Damping", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 5u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.reverb.predelay", "Predelay", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 4u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.reverb.width", "Width", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 1u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.reverb.mix", "Mix", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 6u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.reverb.lowcut", "Lowcut", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 7u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.reverb.highcut", "Highcut", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 8u, 1u, OMX_CLAP_WIDGET_KNOB, "fx.reverb.reverse", "Reverse", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 9u, 2u, OMX_CLAP_WIDGET_KNOB, "fx.reverb.hold", "Hold", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 10u, 2u, OMX_CLAP_WIDGET_KNOB, "fx.reverb.release", "Release", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 11u, 2u, OMX_CLAP_WIDGET_KNOB, "fx.reverb.gate_threshold", "Gate Threshold", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 0u, 3u, OMX_CLAP_WIDGET_KNOB, "fx.reverb.plate_mod_depth", "Plate Mod Depth", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+};
+static const struct omx_panel_role_row OMX_REVERB_PANEL_ROLES[] = {
+  { "size", 0u, 2u },
+  { "algorithm", 0u, 12u },
+  { "predelay", 0u, 5u },
+  { "damping", 0u, 3u },
+  { "width", 0u, 4u },
+  { "low_cut", 0u, 6u },
+  { "high_cut", 0u, 7u },
+  { "mix", 0u, 1u },
+};
+static const struct omx_panel_default_row OMX_REVERB_PANEL_DEFAULTS[] = {
+  { OMX_CLAP_PLACEMENT_RETURN, 1u, 1 },
+};
+/* clap.remote-controls/2: the pages of the page rule over the sections. */
+static const struct omx_panel_page_row OMX_REVERB_PANEL_PAGES[] = {
+  { "Reverb", "Reverb", { 12u, 2u, 3u, 5u, 4u, 1u, 6u, 7u } },
+  { "Reverse", "Reverse", { 8u, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID } },
+  { "Gated", "Gated", { 9u, 10u, 11u, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID } },
+  { "Plate", "Plate", { 0u, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID } },
+};
+#define OMX_REVERB_PANEL_PAGE_COUNT 4u
+static const struct omx_panel_rows OMX_REVERB_PANEL = {
+  OMX_REVERB_PANEL_FINGERPRINT, OMX_CLAP_FAMILY_REVERB,
+  OMX_REVERB_PANEL_SECTIONS, 4u,
+  OMX_REVERB_PANEL_CONTROLS, 13u,
+  OMX_REVERB_PANEL_ROLES, 8u,
+  NULL, 0u,
+  OMX_REVERB_PANEL_DEFAULTS, 1u,
+};
 
 /* LV2 port indices (tools/gen.mjs lv2Ports): audio, then parameter i at FIRST_PARAM + i, then these. */
 #define OMX_REVERB_LV2_PORT_IN_L 0u
