@@ -9,6 +9,10 @@
  * The include guard is omx-dsp's own <omxdsp/params/omx_tremolo_params.h>: included first, this
  * table is the one the kernel's instance header reads.
  */
+#include <stddef.h>
+
+#include "omx_panel_description.h"
+#include "omx_param_contract.h"
 #include "omx_plugin_param.h"
 
 enum {
@@ -52,6 +56,48 @@ static const omx_plugin_param OMX_TREMOLO_PARAMS[OMX_TREMOLO_PARAM_COUNT] = {
 /* org.openmixer.declaration/1: the declaration's plain description and the digest of its parameters. */
 #define OMX_TREMOLO_DECL_SOURCE "omx tremolo: Rate 0.1 to 20 Hz, Depth 0 to 100 %, Mix 0 to 100 %, Mode 0 to 1"
 #define OMX_TREMOLO_DECL_DIGEST "b57991962924d939b9966fa18b44ce86bb73f3c940611aaf165dd227ec9b6d1a"
+
+/* org.openmixer.param-contract/1 (tools/param-contract.mjs): each parameter's unit, scale and step, in
+ * id order; the host's bypass, the last id, is the face's. */
+#define OMX_TREMOLO_PARAM_CONTRACT_VERSION 1u
+#define OMX_TREMOLO_PARAM_CONTRACT_FINGERPRINT "7eda7f36d4553d98706b108002422d309b187291a28efb210a2d3c6369dee62f"
+static const struct omx_param_contract_row OMX_TREMOLO_PARAM_CONTRACT[OMX_TREMOLO_PARAM_COUNT] = {
+  { 16u, OMX_CLAP_SCALE_LOG, 0.0 }, /* rateHz hz */
+  { 14u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* depth pc */
+  { 14u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* mix pc */
+  { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* mode none */
+};
+
+/* org.openmixer.panel-description/1 (tools/panel-description.mjs): the declaration's panel as the rows
+ * include/omx_panel_description.h serves, parameter ids the declaration's. Family modulation. */
+#define OMX_TREMOLO_PANEL_FINGERPRINT "ea8780516cae00fd4bd65468243ec11aeb98b3b9afda8d95b3addb72f3da5a2a"
+static const struct omx_panel_section_row OMX_TREMOLO_PANEL_SECTIONS[] = {
+  { "tremolo", "fx.tremolo.section.tremolo", "Tremolo" },
+};
+static const struct omx_panel_control_row OMX_TREMOLO_PANEL_CONTROLS[] = {
+  { 0u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.tremolo.rate_hz", "Rate", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 1u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.tremolo.depth", "Depth", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 2u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.tremolo.mix", "Mix", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 3u, 0u, OMX_CLAP_WIDGET_AUTO, "fx.tremolo.mode", "Mode", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+};
+static const struct omx_panel_role_row OMX_TREMOLO_PANEL_ROLES[] = {
+  { "rate", 0u, 0u },
+  { "depth", 0u, 1u },
+  { "mix", 0u, 2u },
+};
+/* clap.remote-controls/2: the pages of the page rule over the sections. */
+static const struct omx_panel_page_row OMX_TREMOLO_PANEL_PAGES[] = {
+  { "Tremolo", "Tremolo", { 0u, 1u, 2u, 3u, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID } },
+};
+#define OMX_TREMOLO_PANEL_PAGE_COUNT 1u
+static const struct omx_panel_rows OMX_TREMOLO_PANEL = {
+  OMX_TREMOLO_PANEL_FINGERPRINT, OMX_CLAP_FAMILY_MODULATION,
+  OMX_TREMOLO_PANEL_SECTIONS, 1u,
+  OMX_TREMOLO_PANEL_CONTROLS, 4u,
+  OMX_TREMOLO_PANEL_ROLES, 3u,
+  NULL, 0u,
+  NULL, 0u,
+};
 
 /* LV2 port indices (tools/gen.mjs lv2Ports): audio, then parameter i at FIRST_PARAM + i, then these. */
 #define OMX_TREMOLO_LV2_PORT_IN_L 0u

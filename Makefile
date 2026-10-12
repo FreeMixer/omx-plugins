@@ -27,10 +27,10 @@ PLUGINS := $(sort $(dir $(wildcard plugins/*/Makefile)))
 PREFIX     ?= /usr
 INCLUDEDIR ?= $(PREFIX)/include
 LIBDIR     ?= $(PREFIX)/lib
-# Every header a consumer includes: the shared parameter type, then each shipped plugin's generated
+# Every header a consumer includes: the shared parameter type, the panel description and parameter contract rows, then each shipped plugin's generated
 # parameter header and its instance header (the DSP shell around the omx-dsp kernel). A plugin's
 # headers are the .h files beside its Makefile and in its generated/ directory.
-HEADERS := include/omx_plugin_param.h include/omx_clap_static.h $(foreach p,$(PLUGINS),$(wildcard $(p)*.h) $(wildcard $(p)generated/*.h))
+HEADERS := include/omx_plugin_param.h include/omx_panel_description.h include/omx_param_contract.h include/omx_clap_static.h $(foreach p,$(PLUGINS),$(wildcard $(p)*.h) $(wildcard $(p)generated/*.h))
 
 # libomxplugins.a: each shipped plugin's CLAP face built with -DOMX_CLAP_STATIC (no `clap_entry`;
 # its `omx_clap_entry_<kernel>` stays) and lib/omx_clap_static.c, the table of those entries by CLAP
@@ -99,7 +99,7 @@ $(LIB_B)/omx_clap_static.o: lib/omx_clap_static.c include/omx_clap_static.h | $(
 
 # One rule per face: its generated headers sit in its own folder.
 define face_rule
-$(LIB_B)/$(notdir $(1:.c=.o)): $(1) $(wildcard $(dir $(1))*.h $(dir $(1))generated/*.h) | $(LIB_B)
+$(LIB_B)/$(notdir $(1:.c=.o)): $(1) $(wildcard $(dir $(1))*.h $(dir $(1))generated/*.h) include/omx_panel_description.h include/omx_param_contract.h | $(LIB_B)
 	$$(CC) $$(CPPFLAGS) $$(CFLAGS) $$(LIB_WARN) $$(LIB_FLAGS) -I$(dir $(1))generated $$(lib_cflags) -c -o $$@ $$<
 endef
 $(foreach f,$(CLAP_FACES),$(eval $(call face_rule,$(f))))

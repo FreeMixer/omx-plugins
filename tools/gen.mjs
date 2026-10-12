@@ -40,6 +40,8 @@ import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 
 import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { faceBinding } from './instance-face.mjs';
+import { DISPLAY_KINDS, DISPLAY_SOURCES, FAMILIES, PLACEMENTS, WIDGETS, pagesOf, panelDescription, panelFingerprint } from './panel-description.mjs';
+import { CONTRACT_VERSION, contractFingerprint, contractOf } from './param-contract.mjs';
 import { PIN_FILE, controlOf, eqDefaultBands, findName, kernelControls, locateContract, paramKernel, pinOf, resolveParam } from './omx-contract.mjs';
 import { bandsMacro, baseOf, expandVariant, variantStems } from './variants.mjs';
 import { omxdspInclude, render } from './template.mjs';
@@ -100,17 +102,32 @@ export function prepareDecl(file, d, stem, dir = dirname(file)) {
   return { ...d, dir: resolve(dir), tree: treeOf(file) };
 }
 
+/** The panel family (schema `$defs.family`, the console's closed set) of a kernel whose own name is
+ * none of them; a kernel named after a family is that family, any other kernel `none`. */
+export const FAMILY_OF_KERNEL = Object.freeze({
+  comp: 'dynamics', transient: 'dynamics', chorus: 'modulation', flanger: 'modulation', phaser: 'modulation',
+  tremolo: 'modulation', rotary: 'modulation', geq: 'eq',
+});
+
+/** The panel family a kernel's plugin draws as: FAMILY_OF_KERNEL's, else the family of its own name. */
+export function familyOfKernel(kernel) {
+  const families = JSON.parse(readFileSync(join(ROOT, 'schema', 'plugin.decl.schema.json'), 'utf8')).$defs.family.enum;
+  const family = FAMILY_OF_KERNEL[kernel] ?? kernel;
+  return families.includes(family) ? family : 'none';
+}
+
 /** The panel the wizard drafts for a plugin generated from its instance face: one section, every
- * parameter in declaration order, so the MOD GUI draws every parameter until a person groups them. */
+ * parameter in declaration order, so the MOD GUI draws every parameter until a person groups them;
+ * its family the kernel's, its roles left to a person. */
 export function defaultPanel(d) {
   if (d.binding === 'chain') {
     // one section per element, by its id (spec §15.2: the elements are drawn, never placed, apart)
     const sections = d.chain.map((el) => ({ key: el.id, label: elementName(el), controls: [`${el.id}On`, ...el.params.map((p) => p.symbol)] }));
     if (d.order === 'permutable') sections.push({ key: 'order', label: 'Order', controls: ['order'] });
-    return { family: d.kernel, roles: {}, sections };
+    return { family: familyOfKernel(d.kernel), roles: {}, sections };
   }
   const label = d.name.replace(/^omx /, '');
-  return { family: d.kernel, roles: {}, sections: [{ key: d.kernel, label: label[0].toUpperCase() + label.slice(1), controls: d.params.map((p) => p.symbol) }] };
+  return { family: familyOfKernel(d.kernel), roles: {}, sections: [{ key: d.kernel, label: label[0].toUpperCase() + label.slice(1), controls: d.params.map((p) => p.symbol) }] };
 }
 
 /** A plugin whose folder tools/gen.mjs writes whole from the declaration: over one instance face,
@@ -208,7 +225,9 @@ function chainKernels(file, d) {
 function shippedSymbols(d, tag) {
   try {
     const text = execFileSync('git', ['-C', d.tree, 'show', `${tag}:plugins/${d.stem}/generated/omx_${d.kernel}_params.h`], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
-    return [...text.matchAll(/^\s*\{ "([A-Za-z0-9_]+)", "/gm)].map((m) => m[1]);
+    // the rows of the parameter table alone: the header holds other tables of strings after it
+    const table = text.slice(text.indexOf(`OMX_${d.kernel.toUpperCase()}_PARAMS[`)).split('\n};')[0];
+    return [...table.matchAll(/^\s*\{ "([A-Za-z0-9_]+)", "/gm)].map((m) => m[1]);
   } catch {
     return undefined;
   }
@@ -289,6 +308,7 @@ function resolveParams(file, d) {
       out.max = Math.max(out.max, u.max);
     }
     if (t.kind) out.kind = t.kind;
+    if (t.byKind) out.byKind = t.byKind;
     if (t.points) out.points = t.points;
     if (t.values) out.values = t.values;
     return out;
@@ -347,6 +367,42 @@ export function lv2Ports(d) {
 
 const cf = (n) => `${Number.isInteger(n) ? `${n}.0` : `${n}`}f`;
 const macro = (s) => s.replace(/([a-z0-9])([A-Z])/g, '$1_$2').toUpperCase();
+const cstr = (s) => `"${s.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`;
+
+/** The rows of org.openmixer.panel-description/1 in the parameter header: each table of
+ * tools/panel-description.mjs as C, and OMX_<K>_PANEL, the description a face serves. */
+function emitPanelRows(d) {
+  const K = d.kernel.toUpperCase();
+  const x = panelDescription(d);
+  const NONE = 'OMX_CLAP_PANEL_INVALID_ID';
+  const id = (n) => (n === null || n === undefined ? NONE : `${n}u`);
+  const enumOf = (prefix, list, v) => `OMX_CLAP_${prefix}_${list[list.indexOf(v)].toUpperCase()}`;
+  const tables = [
+    ['SECTIONS', 'section', x.sections.map((s) => `{ ${cstr(s.key)}, ${cstr(s.labelKey)}, ${cstr(s.label)} }`)],
+    ['CONTROLS', 'control', x.controls.map((c) => `{ ${c.param}u, ${c.section}u, ${enumOf('WIDGET', WIDGETS, c.widget)}, ${cstr(c.labelKey)}, ${cstr(c.label)}, ${id(c.visible)}, 0x${c.mask.toString(16)}u }`)],
+    ['ROLES', 'role', x.roles.map((r) => `{ ${cstr(r.role)}, ${r.index}u, ${r.param}u }`)],
+    ['DISPLAYS', 'display', x.displays.map((v) => `{ ${enumOf('DISPLAY', DISPLAY_KINDS, v.kind)}, ${v.section}u, OMX_CLAP_DISPLAY_FROM_${DISPLAY_SOURCES[DISPLAY_SOURCES.indexOf(v.source)].toUpperCase()}, { ${id(v.meters[0])}, ${id(v.meters[1])} }, ${v.curve ?? 0}u, ${NONE}, 0.0, ${cstr(v.labelKey)}, ${cstr(v.label)} }`)],
+    ['DEFAULTS', 'default', x.defaults.map((p) => `{ ${enumOf('PLACEMENT', PLACEMENTS, p.placement)}, ${p.param}u, ${p.value} }`)],
+  ];
+  const array = ([T, row, rows]) => (rows.length ? `static const struct omx_panel_${row}_row OMX_${K}_PANEL_${T}[] = {\n${rows.map((r) => `  ${r},`).join('\n')}\n};\n` : '');
+  const ref = ([T, , rows]) => (rows.length ? `OMX_${K}_PANEL_${T}, ${rows.length}u` : 'NULL, 0u');
+  const unpublished = x.unpublished.map((u) => ` *   ${u.role} (${u.symbol}): ${u.why}`).join('\n');
+  return `/* org.openmixer.panel-description/1 (tools/panel-description.mjs): the declaration's panel as the rows
+ * include/omx_panel_description.h serves, parameter ids the declaration's. Family ${x.family}.${unpublished ? `
+ * Declared roles not published:
+${unpublished}` : ''} */
+#define OMX_${K}_PANEL_FINGERPRINT "${panelFingerprint(x)}"
+${tables.map(array).join('')}/* clap.remote-controls/2: the pages of the page rule over the sections. */
+static const struct omx_panel_page_row OMX_${K}_PANEL_PAGES[] = {
+${pagesOf(x, d).map((g) => `  { ${cstr(g.sectionName)}, ${cstr(g.pageName)}, { ${g.ids.map(id).join(', ')} } },`).join('\n')}
+};
+#define OMX_${K}_PANEL_PAGE_COUNT ${pagesOf(x, d).length}u
+static const struct omx_panel_rows OMX_${K}_PANEL = {
+  OMX_${K}_PANEL_FINGERPRINT, OMX_CLAP_FAMILY_${FAMILIES[FAMILIES.indexOf(x.family)].toUpperCase()},
+${tables.map((t) => `  ${ref(t)},`).join('\n')}
+};
+`;
+}
 
 export function emitParamsHeader(d) {
   const K = d.kernel.toUpperCase();
@@ -363,6 +419,10 @@ export function emitParamsHeader(d) {
  * The include guard is omx-dsp's own <omxdsp/params/omx_${d.kernel}_params.h>: included first, this
  * table is the one the kernel's instance header reads.
  */
+#include <stddef.h>
+
+#include "omx_panel_description.h"
+#include "omx_param_contract.h"
 #include "omx_plugin_param.h"
 ${d.variantOf ? `
 /* The band count of this variant of plugins/${d.variantOf.stem}: the instance face's compile-time count. */
@@ -396,6 +456,15 @@ ${d.params.map((p) => [['MIN', p.min], ['MAX', p.max], ['DEFAULT', p.def]].map((
 #define OMX_${K}_DECL_SOURCE "${sourceOf(d).replace(/"/g, '\\"')}"
 #define OMX_${K}_DECL_DIGEST "${digestOf(d.params)}"
 
+/* org.openmixer.param-contract/1 (tools/param-contract.mjs): each parameter's unit, scale and step, in
+ * id order; the host's bypass, the last id, is the face's. */
+#define OMX_${K}_PARAM_CONTRACT_VERSION ${CONTRACT_VERSION}u
+#define OMX_${K}_PARAM_CONTRACT_FINGERPRINT "${contractFingerprint(contractOf(d, scaleOf))}"
+static const struct omx_param_contract_row OMX_${K}_PARAM_CONTRACT[${P}_COUNT] = {
+${contractOf(d, scaleOf).slice(0, -1).map((r) => `  { ${r.unitEnum}u, OMX_CLAP_SCALE_${r.scale.toUpperCase()}, ${r.step}.0 }, /* ${r.symbol} ${r.unit} */`).join('\n')}
+};
+
+${emitPanelRows(d)}
 /* LV2 port indices (tools/gen.mjs lv2Ports): audio, then parameter i at FIRST_PARAM + i, then these. */
 ${ports.filter((p) => !p.param).map((p) => `#define OMX_${K}_LV2_PORT_${macro(p.symbol)} ${p.index}u`).join('\n')}
 #define OMX_${K}_LV2_PORT_FIRST_PARAM ${firstParam}u
@@ -435,6 +504,8 @@ export function emitPluginTtl(d) {
         const points = choices.map((c) => `            [ rdfs:label ${ttlStr(c.label)} ; rdf:value ${c.value} ]`);
         lines.push(`        lv2:scalePoint\n${points.join(' ,\n')} ;`);
       }
+      const group = groupOf(d, q.symbol);
+      if (group) lines.push(`        pg:group <${groupUri(d, group)}> ;`);
     } else if (p.sidechain) {
       // optional: a host that routes nothing to the key gets the effect's own detector
       lines.push('        lv2:portProperty lv2:isSideChain , lv2:connectionOptional ;');
@@ -449,7 +520,7 @@ export function emitPluginTtl(d) {
 @prefix doap:  <http://usefulinc.com/ns/doap#> .
 @prefix foaf:  <http://xmlns.com/foaf/0.1/> .
 @prefix lv2:   <http://lv2plug.in/ns/lv2core#> .
-${d.params.some((q) => scaleOf(q) === 'log') ? '@prefix pprops: <http://lv2plug.in/ns/ext/port-props#> .\n' : ''}${d.params.some((q) => choicesOf(q)) ? '@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .\n' : ''}@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+${d.panel ? '@prefix pg:    <http://lv2plug.in/ns/ext/port-groups#> .\n' : ''}${d.params.some((q) => scaleOf(q) === 'log') ? '@prefix pprops: <http://lv2plug.in/ns/ext/port-props#> .\n' : ''}${d.params.some((q) => choicesOf(q)) ? '@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .\n' : ''}@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix units: <http://lv2plug.in/ns/extensions/units#> .
 
 <${d.url}>
@@ -468,8 +539,17 @@ ${d.params.some((q) => scaleOf(q) === 'log') ? '@prefix pprops: <http://lv2plug.
     lv2:optionalFeature lv2:hardRTCapable ;
     lv2:port
 ${lv2Ports(d).map(port).join(' ,\n')} .
-`;
+${(d.panel?.sections ?? []).map((g) => `
+<${groupUri(d, g)}>
+    a pg:Group ;
+    lv2:symbol "${g.key}" ;
+    rdfs:label ${ttlStr(g.label)} .
+`).join('')}`;
 }
+
+/** The panel section a parameter is drawn in: its LV2 port group (pg:Group), one per section. */
+const groupOf = (d, symbol) => d.panel?.sections.find((s) => s.controls.includes(symbol));
+const groupUri = (d, section) => `${d.lv2.uri}#${section.key}`;
 
 // ---- a plugin generated from its instance face (`binding: instance`) ---------------------------
 

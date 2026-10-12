@@ -175,31 +175,59 @@
   },
   "panel": {
     "family": "reverb",
-    "roles": {},
+    "roles": {
+      "size": "size",
+      "algorithm": "algorithm",
+      "predelay": "predelay",
+      "damping": "damping",
+      "width": "width",
+      "low_cut": "lowcut",
+      "high_cut": "highcut",
+      "mix": "mix"
+    },
     "sections": [
       {
         "key": "reverb",
         "label": "Reverb",
         "controls": [
-          "plateModDepth",
-          "mix",
+          "algorithm",
           "size",
           "damping",
-          "width",
           "predelay",
+          "width",
+          "mix",
           "lowcut",
-          "highcut",
-          "reverse",
+          "highcut"
+        ],
+        "graph": "decay-envelope"
+      },
+      {
+        "key": "reverse",
+        "label": "Reverse",
+        "controls": [
+          "reverse"
+        ]
+      },
+      {
+        "key": "gated",
+        "label": "Gated",
+        "controls": [
           "hold",
           "release",
-          "gateThreshold",
-          "algorithm"
+          "gateThreshold"
+        ]
+      },
+      {
+        "key": "plate",
+        "label": "Plate",
+        "controls": [
+          "plateModDepth"
         ]
       }
     ]
   },
   "console": {
-    "$comment": "As FreeMixer/openmixer integration/waves-2026-10 draws its reverb stage: FxPanel's StageTimeCurve (decay) over ReverbPanel.vue (preset and algorithm selects, then size, damping, predelayMs, width, mix, lowcut, highcut, then the reverse, gated or plate row of the chosen algorithm). Chip: FxSummaryValue of STAGE_KEY_FIELD.reverb (size). Card: useStripOverview's reverb controls.",
+    "$comment": "The OpenMixer console draws its reverb stage: the decay drawn over time, above the reverb panel (preset and algorithm selects, then size, damping, predelayMs, width, mix, lowcut, highcut, then the reverse, gated or plate row of the chosen algorithm). Its chip shows size. Its overview card carries the reverb's controls.",
     "placement": {
       "strips": [
         "input",
@@ -223,48 +251,6 @@
         "mix"
       ]
     },
-    "chip": "{size}",
-    "panel": {
-      "sections": [
-        {
-          "key": "reverb",
-          "label": "Reverb",
-          "controls": [
-            "algorithm",
-            "size",
-            "damping",
-            "predelay",
-            "width",
-            "mix",
-            "lowcut",
-            "highcut"
-          ],
-          "graph": "decay-envelope"
-        },
-        {
-          "key": "reverse",
-          "label": "Reverse",
-          "controls": [
-            "reverse"
-          ]
-        },
-        {
-          "key": "gated",
-          "label": "Gated",
-          "controls": [
-            "hold",
-            "release",
-            "gateThreshold"
-          ]
-        },
-        {
-          "key": "plate",
-          "label": "Plate",
-          "controls": [
-            "plateModDepth"
-          ]
-        }
-      ]
-    }
+    "chip": "{size}"
   }
 }

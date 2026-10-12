@@ -9,6 +9,10 @@
  * The include guard is omx-dsp's own <omxdsp/params/omx_comp_params.h>: included first, this
  * table is the one the kernel's instance header reads.
  */
+#include <stddef.h>
+
+#include "omx_panel_description.h"
+#include "omx_param_contract.h"
 #include "omx_plugin_param.h"
 
 enum {
@@ -77,6 +81,64 @@ static const omx_plugin_param OMX_COMP_PARAMS[OMX_COMP_PARAM_COUNT] = {
 /* org.openmixer.declaration/1: the declaration's plain description and the digest of its parameters. */
 #define OMX_COMP_DECL_SOURCE "omx comp: Threshold -60 to 0 dB, Ratio 1 to 20, Knee 0 to 24 dB, Attack 0.1 to 100 ms, Release 5 to 3000 ms, Makeup 0 to 24 dB, Mix 0 to 100 %, Kind 0 to 1, Detector Oversampling 0 to 2"
 #define OMX_COMP_DECL_DIGEST "3a67a30c58264f094b79beb7cdb105698661368e85fe2f8e24506fe0f898d0ab"
+
+/* org.openmixer.param-contract/1 (tools/param-contract.mjs): each parameter's unit, scale and step, in
+ * id order; the host's bypass, the last id, is the face's. */
+#define OMX_COMP_PARAM_CONTRACT_VERSION 1u
+#define OMX_COMP_PARAM_CONTRACT_FINGERPRINT "1692a0ff7a6e46f2d5b3ec4bf1546d7eec3fcf78ec01250ad9be50e60501630f"
+static const struct omx_param_contract_row OMX_COMP_PARAM_CONTRACT[OMX_COMP_PARAM_COUNT] = {
+  { 13u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* thresholdDb db */
+  { 0u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* ratio none */
+  { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* kneeDb db */
+  { 2u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* attackMs ms */
+  { 2u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* releaseMs ms */
+  { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* makeupDb db */
+  { 14u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* mixPct pc */
+  { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* kind none */
+  { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* detectorOversampling none */
+};
+
+/* org.openmixer.panel-description/1 (tools/panel-description.mjs): the declaration's panel as the rows
+ * include/omx_panel_description.h serves, parameter ids the declaration's. Family dynamics.
+ * Declared roles not published:
+ *   ratio (ratio): the ratio role takes ratio, coef, not no unit */
+#define OMX_COMP_PANEL_FINGERPRINT "c8b0a7834df0ca29287182919d720312350e499c29b14bfd42be43f0078a70d8"
+static const struct omx_panel_section_row OMX_COMP_PANEL_SECTIONS[] = {
+  { "comp", "fx.comp.section.comp", "Comp" },
+};
+static const struct omx_panel_control_row OMX_COMP_PANEL_CONTROLS[] = {
+  { 0u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.comp.threshold_db", "Threshold", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 1u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.comp.ratio", "Ratio", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 2u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.comp.knee_db", "Knee", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 3u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.comp.attack_ms", "Attack", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 4u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.comp.release_ms", "Release", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 5u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.comp.makeup_db", "Makeup", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 6u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.comp.mix_pct", "Mix", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 7u, 0u, OMX_CLAP_WIDGET_AUTO, "fx.comp.kind", "Kind", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 8u, 0u, OMX_CLAP_WIDGET_AUTO, "fx.comp.detector_oversampling", "Detector Oversampling", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+};
+static const struct omx_panel_role_row OMX_COMP_PANEL_ROLES[] = {
+  { "threshold", 0u, 0u },
+  { "attack", 0u, 3u },
+  { "release", 0u, 4u },
+  { "knee", 0u, 2u },
+  { "makeup", 0u, 5u },
+  { "mix", 0u, 6u },
+};
+/* clap.remote-controls/2: the pages of the page rule over the sections. */
+static const struct omx_panel_page_row OMX_COMP_PANEL_PAGES[] = {
+  { "Comp", "Comp 1", { 0u, 1u, 2u, 3u, 4u, 5u, 6u, 7u } },
+  { "Comp", "Comp 2", { 8u, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID } },
+};
+#define OMX_COMP_PANEL_PAGE_COUNT 2u
+static const struct omx_panel_rows OMX_COMP_PANEL = {
+  OMX_COMP_PANEL_FINGERPRINT, OMX_CLAP_FAMILY_DYNAMICS,
+  OMX_COMP_PANEL_SECTIONS, 1u,
+  OMX_COMP_PANEL_CONTROLS, 9u,
+  OMX_COMP_PANEL_ROLES, 6u,
+  NULL, 0u,
+  NULL, 0u,
+};
 
 /* LV2 port indices (tools/gen.mjs lv2Ports): audio, then parameter i at FIRST_PARAM + i, then these. */
 #define OMX_COMP_LV2_PORT_IN_L 0u

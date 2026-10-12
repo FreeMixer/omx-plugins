@@ -140,8 +140,16 @@
     }
   },
   "panel": {
-    "family": "comp",
-    "roles": {},
+    "family": "dynamics",
+    "roles": {
+      "threshold": "thresholdDb",
+      "ratio": "ratio",
+      "attack": "attackMs",
+      "release": "releaseMs",
+      "knee": "kneeDb",
+      "makeup": "makeupDb",
+      "mix": "mixPct"
+    },
     "sections": [
       {
         "key": "comp",
@@ -177,25 +185,6 @@
       "stage": "comp",
       "after": "deEsser",
       "fxGroup": "dynamics"
-    },
-    "panel": {
-      "sections": [
-        {
-          "key": "comp",
-          "label": "Comp",
-          "controls": [
-            "thresholdDb",
-            "ratio",
-            "kneeDb",
-            "attackMs",
-            "releaseMs",
-            "makeupDb",
-            "mixPct",
-            "kind",
-            "detectorOversampling"
-          ]
-        }
-      ]
     }
   }
 }
