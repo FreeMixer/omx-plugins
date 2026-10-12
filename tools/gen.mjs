@@ -450,6 +450,8 @@ export function emitPluginTtl(d) {
         const points = choices.map((c) => `            [ rdfs:label ${ttlStr(c.label)} ; rdf:value ${c.value} ]`);
         lines.push(`        lv2:scalePoint\n${points.join(' ,\n')} ;`);
       }
+      const group = groupOf(d, q.symbol);
+      if (group) lines.push(`        pg:group <${groupUri(d, group)}> ;`);
     } else if (p.sidechain) {
       // optional: a host that routes nothing to the key gets the effect's own detector
       lines.push('        lv2:portProperty lv2:isSideChain , lv2:connectionOptional ;');
@@ -464,7 +466,7 @@ export function emitPluginTtl(d) {
 @prefix doap:  <http://usefulinc.com/ns/doap#> .
 @prefix foaf:  <http://xmlns.com/foaf/0.1/> .
 @prefix lv2:   <http://lv2plug.in/ns/lv2core#> .
-${d.params.some((q) => scaleOf(q) === 'log') ? '@prefix pprops: <http://lv2plug.in/ns/ext/port-props#> .\n' : ''}${d.params.some((q) => choicesOf(q)) ? '@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .\n' : ''}@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+${d.panel ? '@prefix pg:    <http://lv2plug.in/ns/ext/port-groups#> .\n' : ''}${d.params.some((q) => scaleOf(q) === 'log') ? '@prefix pprops: <http://lv2plug.in/ns/ext/port-props#> .\n' : ''}${d.params.some((q) => choicesOf(q)) ? '@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .\n' : ''}@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix units: <http://lv2plug.in/ns/extensions/units#> .
 
 <${d.url}>
@@ -483,8 +485,17 @@ ${d.params.some((q) => scaleOf(q) === 'log') ? '@prefix pprops: <http://lv2plug.
     lv2:optionalFeature lv2:hardRTCapable ;
     lv2:port
 ${lv2Ports(d).map(port).join(' ,\n')} .
-`;
+${(d.panel?.sections ?? []).map((g) => `
+<${groupUri(d, g)}>
+    a pg:Group ;
+    lv2:symbol "${g.key}" ;
+    rdfs:label ${ttlStr(g.label)} .
+`).join('')}`;
 }
+
+/** The panel section a parameter is drawn in: its LV2 port group (pg:Group), one per section. */
+const groupOf = (d, symbol) => d.panel?.sections.find((s) => s.controls.includes(symbol));
+const groupUri = (d, section) => `${d.lv2.uri}#${section.key}`;
 
 // ---- a plugin generated from its instance face (`binding: instance`) ---------------------------
 
