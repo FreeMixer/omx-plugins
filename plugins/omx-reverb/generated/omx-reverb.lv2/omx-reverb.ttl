@@ -4,6 +4,7 @@
 @prefix doap:  <http://usefulinc.com/ns/doap#> .
 @prefix foaf:  <http://xmlns.com/foaf/0.1/> .
 @prefix lv2:   <http://lv2plug.in/ns/lv2core#> .
+@prefix pg:    <http://lv2plug.in/ns/ext/port-groups#> .
 @prefix pprops: <http://lv2plug.in/ns/ext/port-props#> .
 @prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
@@ -19,7 +20,7 @@
     doap:name "omx reverb" ;
     doap:license <https://www.gnu.org/licenses/gpl-3.0.html> ;
     lv2:project <https://github.com/FreeMixer/omx-plugins> ;
-    lv2:minorVersion 3 ;
+    lv2:minorVersion 4 ;
     lv2:microVersion 0 ;
     rdfs:comment "The console's reverb: room, plate, hall, reverse and gated algorithms with pre-delay, size, damping, width and low and high cuts, mixed with the dry signal." ;
     lv2:optionalFeature lv2:hardRTCapable ;
@@ -57,7 +58,8 @@
         lv2:minimum 0 ;
         lv2:maximum 400 ;
         lv2:portProperty lv2:integer ;
-        units:unit units:pc
+        units:unit units:pc ;
+        pg:group <urn:openmixer:reverb#plate>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -66,7 +68,8 @@
         lv2:name "Mix" ;
         lv2:default 0.3 ;
         lv2:minimum 0 ;
-        lv2:maximum 1
+        lv2:maximum 1 ;
+        pg:group <urn:openmixer:reverb#reverb>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -75,7 +78,8 @@
         lv2:name "Size" ;
         lv2:default 0.7 ;
         lv2:minimum 0 ;
-        lv2:maximum 1
+        lv2:maximum 1 ;
+        pg:group <urn:openmixer:reverb#reverb>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -84,7 +88,8 @@
         lv2:name "Damping" ;
         lv2:default 0.5 ;
         lv2:minimum 0 ;
-        lv2:maximum 1
+        lv2:maximum 1 ;
+        pg:group <urn:openmixer:reverb#reverb>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -93,7 +98,8 @@
         lv2:name "Width" ;
         lv2:default 1 ;
         lv2:minimum 0 ;
-        lv2:maximum 1
+        lv2:maximum 1 ;
+        pg:group <urn:openmixer:reverb#reverb>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -104,7 +110,8 @@
         lv2:minimum 0 ;
         lv2:maximum 100 ;
         lv2:portProperty lv2:integer ;
-        units:unit units:ms
+        units:unit units:ms ;
+        pg:group <urn:openmixer:reverb#reverb>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -116,7 +123,8 @@
         lv2:maximum 20000 ;
         lv2:portProperty lv2:integer ;
         lv2:portProperty pprops:logarithmic ;
-        units:unit units:hz
+        units:unit units:hz ;
+        pg:group <urn:openmixer:reverb#reverb>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -128,7 +136,8 @@
         lv2:maximum 20000 ;
         lv2:portProperty lv2:integer ;
         lv2:portProperty pprops:logarithmic ;
-        units:unit units:hz
+        units:unit units:hz ;
+        pg:group <urn:openmixer:reverb#reverb>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -139,7 +148,8 @@
         lv2:minimum 50 ;
         lv2:maximum 500 ;
         lv2:portProperty lv2:integer ;
-        units:unit units:ms
+        units:unit units:ms ;
+        pg:group <urn:openmixer:reverb#reverse>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -150,7 +160,8 @@
         lv2:minimum 10 ;
         lv2:maximum 2000 ;
         lv2:portProperty lv2:integer ;
-        units:unit units:ms
+        units:unit units:ms ;
+        pg:group <urn:openmixer:reverb#gated>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -161,7 +172,8 @@
         lv2:minimum 1 ;
         lv2:maximum 500 ;
         lv2:portProperty lv2:integer ;
-        units:unit units:ms
+        units:unit units:ms ;
+        pg:group <urn:openmixer:reverb#gated>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -171,7 +183,8 @@
         lv2:default -40 ;
         lv2:minimum -80 ;
         lv2:maximum 0 ;
-        lv2:portProperty lv2:integer
+        lv2:portProperty lv2:integer ;
+        pg:group <urn:openmixer:reverb#gated>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -187,7 +200,8 @@
             [ rdfs:label "Plate" ; rdf:value 1 ] ,
             [ rdfs:label "Hall" ; rdf:value 2 ] ,
             [ rdfs:label "Reverse" ; rdf:value 3 ] ,
-            [ rdfs:label "Gated" ; rdf:value 4 ]
+            [ rdfs:label "Gated" ; rdf:value 4 ] ;
+        pg:group <urn:openmixer:reverb#reverb>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -209,3 +223,23 @@
         lv2:portProperty lv2:reportsLatency , lv2:integer ;
         units:unit units:frame
     ] .
+
+<urn:openmixer:reverb#reverb>
+    a pg:Group ;
+    lv2:symbol "reverb" ;
+    rdfs:label "Reverb" .
+
+<urn:openmixer:reverb#reverse>
+    a pg:Group ;
+    lv2:symbol "reverse" ;
+    rdfs:label "Reverse" .
+
+<urn:openmixer:reverb#gated>
+    a pg:Group ;
+    lv2:symbol "gated" ;
+    rdfs:label "Gated" .
+
+<urn:openmixer:reverb#plate>
+    a pg:Group ;
+    lv2:symbol "plate" ;
+    rdfs:label "Plate" .

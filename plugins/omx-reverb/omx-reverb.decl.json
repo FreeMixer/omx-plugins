@@ -8,7 +8,7 @@
   "name": "omx reverb",
   "vendor": "openmixer",
   "url": "https://github.com/FreeMixer/omx-plugins",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "The console's reverb: room, plate, hall, reverse and gated algorithms with pre-delay, size, damping, width and low and high cuts, mixed with the dry signal.",
   "clap": {
     "id": "org.openmixer.reverb",
@@ -175,25 +175,53 @@
   },
   "panel": {
     "family": "reverb",
-    "roles": {},
+    "roles": {
+      "size": "size",
+      "algorithm": "algorithm",
+      "predelay": "predelay",
+      "damping": "damping",
+      "width": "width",
+      "low_cut": "lowcut",
+      "high_cut": "highcut",
+      "mix": "mix"
+    },
     "sections": [
       {
         "key": "reverb",
         "label": "Reverb",
         "controls": [
-          "plateModDepth",
-          "mix",
+          "algorithm",
           "size",
           "damping",
-          "width",
           "predelay",
+          "width",
+          "mix",
           "lowcut",
-          "highcut",
-          "reverse",
+          "highcut"
+        ],
+        "graph": "decay-envelope"
+      },
+      {
+        "key": "reverse",
+        "label": "Reverse",
+        "controls": [
+          "reverse"
+        ]
+      },
+      {
+        "key": "gated",
+        "label": "Gated",
+        "controls": [
           "hold",
           "release",
-          "gateThreshold",
-          "algorithm"
+          "gateThreshold"
+        ]
+      },
+      {
+        "key": "plate",
+        "label": "Plate",
+        "controls": [
+          "plateModDepth"
         ]
       }
     ]
@@ -223,48 +251,6 @@
         "mix"
       ]
     },
-    "chip": "{size}",
-    "panel": {
-      "sections": [
-        {
-          "key": "reverb",
-          "label": "Reverb",
-          "controls": [
-            "algorithm",
-            "size",
-            "damping",
-            "predelay",
-            "width",
-            "mix",
-            "lowcut",
-            "highcut"
-          ],
-          "graph": "decay-envelope"
-        },
-        {
-          "key": "reverse",
-          "label": "Reverse",
-          "controls": [
-            "reverse"
-          ]
-        },
-        {
-          "key": "gated",
-          "label": "Gated",
-          "controls": [
-            "hold",
-            "release",
-            "gateThreshold"
-          ]
-        },
-        {
-          "key": "plate",
-          "label": "Plate",
-          "controls": [
-            "plateModDepth"
-          ]
-        }
-      ]
-    }
+    "chip": "{size}"
   }
 }

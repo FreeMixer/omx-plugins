@@ -9,7 +9,7 @@
   "noun": "keyed gate",
   "vendor": "openmixer",
   "url": "https://github.com/FreeMixer/omx-plugins",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "The OpenMixer console's channel gate with an external key: the stereo signal is gated while the detector listens to the sidechain input the host routes to it, or to the signal itself with the key unconnected or set to Self. One gain drives both legs. An attack under 0.5 ms engages 4x detector oversampling, which adds 72 frames of latency, reported to the host. The DSP is omx-dsp's <omxdsp/fx/omx_gate_instance.h>, the console's own gate.",
   "summary": "The console's channel gate with a sidechain key: the detector listens to the key your host routes to it, or to the signal itself. One gain for both legs, so the stereo image never shifts. Real-time safe, 44.1 to 192 kHz.",
   "clap": {
@@ -167,22 +167,39 @@
   },
   "panel": {
     "family": "gate",
-    "roles": {},
+    "roles": {
+      "threshold": "threshold",
+      "range": "range",
+      "attack": "attack",
+      "release": "release",
+      "hold": "hold",
+      "knee_start": "knee_start",
+      "knee_end": "knee_end",
+      "hysteresis": "hysteresis",
+      "ratio": "ratio"
+    },
     "sections": [
       {
         "key": "gate",
-        "label": "Keyed-gate",
+        "label": "Gate",
         "controls": [
-          "key_external",
           "threshold",
-          "ratio",
           "range",
+          "ratio",
           "attack",
-          "release",
-          "knee_start",
-          "knee_end",
           "hold",
-          "hysteresis"
+          "release",
+          "hysteresis",
+          "knee_start",
+          "knee_end"
+        ],
+        "graph": "dynamics-curve"
+      },
+      {
+        "key": "key",
+        "label": "Key",
+        "controls": [
+          "key_external"
         ]
       }
     ]
@@ -235,31 +252,6 @@
         "release"
       ]
     },
-    "chip": "THR {threshold}",
-    "panel": {
-      "sections": [
-        {
-          "key": "gate",
-          "label": "Gate",
-          "controls": [
-            "threshold",
-            "range",
-            "ratio",
-            "attack",
-            "hold",
-            "release",
-            "hysteresis"
-          ],
-          "graph": "dynamics-curve"
-        },
-        {
-          "key": "key",
-          "label": "Key",
-          "controls": [
-            "key_external"
-          ]
-        }
-      ]
-    }
+    "chip": "THR {threshold}"
   }
 }

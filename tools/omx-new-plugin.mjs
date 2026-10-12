@@ -37,7 +37,7 @@ import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { bindFace, instanceHeader, parseFace } from './instance-face.mjs';
 import { PIN_FILE, contractPin, controlOf, items, kernelControls, kernelExists, locateContract, resolveParam } from './omx-contract.mjs';
-import { ROOT, checkPlugin, consoleErrors, gapLines, layerOfPath, loadRecipe, loadSchema, pluginFacts, pluginStems, validate } from './plugin-recipe.mjs';
+import { ROOT, checkPlugin, consoleErrors, gapLines, layerOfPath, loadRecipe, loadSchema, panelErrors, pluginFacts, pluginStems, validate } from './plugin-recipe.mjs';
 import { chainBindings, defaultPanel, prepareDecl } from './gen.mjs';
 import { pinOfTtl } from './port-hints.mjs';
 import { omxdspInclude } from './template.mjs';
@@ -173,9 +173,18 @@ export function draftDeclaration(kernel, src, { root = ROOT, recipe = loadRecipe
   fillDerived(decl, { schema, version: treeVersion(root, recipe) }, recipe);
   // every plugin declares its panel (the MOD GUI: one section of every parameter until a person
   // groups them) and its console block (where the console may place it: a person's choice)
-  decl.panel = defaultPanel(decl);
+  decl.panel = draftPanel(schema, decl);
   decl.console = { placement: { strips: [`${REVIEW}: the strip kinds that may host it (input, fxReturn, aux, mix, matrix, main, ...)`], group: `${REVIEW}: walk, tail or plugins (the console's channel layout)` } };
   return { refusals: [], decl: canonical(schema, decl), unbound: controls.filter((c) => !bound.binding.some((b) => b.param.symbol === c.name)).map((c) => c.name) };
+}
+
+/** gen.mjs's default panel, and for a family other than none a REVIEW mark where its roles go: which
+ * parameter plays each of the family's roles is a person's reading. */
+function draftPanel(schema, decl) {
+  const panel = defaultPanel(decl);
+  const roles = schema.$defs.familyRoles.properties[panel.family]?.enum ?? [];
+  if (roles.length) panel.roles = { [roles[0]]: `${REVIEW}: the parameter playing each role of the ${panel.family} family the panel draws (${roles.join(', ')}), one per role` };
+  return panel;
 }
 
 function fillDerived(decl, ctx, recipe, refuse) {
@@ -240,19 +249,16 @@ export async function planPlugin(declIn, src, { root = ROOT, recipe = loadRecipe
   const bound = bindFace(src.face, decl.params, controls);
   for (const e of bound.errors) refuse('/params', e);
 
-  await checkPanelConsole(decl, symbols, resolved, refuse, root);
+  await checkPanelConsole(schema, decl, symbols, resolved, refuse, root);
 
   return { ok: refusals.length === 0, refusals, decl: canonical(schema, decl), resolved, binding: bound.binding, renames: bound.renames, pin: src.pin };
 }
 
-/** The panel and the console name declared parameters, and the panel draws every one of them as
- * the MOD GUI generator draws it (selectors included). */
-async function checkPanelConsole(decl, symbols, resolved, refuse, root) {
-  // the panel and the console name declared parameters
-  for (const s of decl.panel?.sections ?? []) for (const c of s.controls) if (!symbols.has(c)) refuse('/panel/sections', `section '${s.key}' names '${c}', which is no parameter`);
-  for (const [role, sym] of Object.entries(decl.panel?.roles ?? {})) if (!symbols.has(sym)) refuse(`/panel/roles/${role}`, `'${sym}' is no parameter`);
-  for (const sym of Object.keys(decl.panel?.widgets ?? {})) if (!symbols.has(sym)) refuse(`/panel/widgets/${sym}`, 'is no parameter');
-  for (const e of consoleErrors(decl, symbols)) refuse(e.split(':')[0], e.slice(e.indexOf(':') + 2));
+/** The panel speaks the console's family and role vocabulary, the panel and the console name declared
+ * parameters, and the panel draws every one of them as the MOD GUI generator draws it (selectors included). */
+async function checkPanelConsole(schema, decl, symbols, resolved, refuse, root) {
+  // the panel's family and roles are the console's; the panel and the console name declared parameters
+  for (const e of [...panelErrors(schema, decl, symbols), ...consoleErrors(decl, symbols)]) refuse(e.split(':')[0], e.slice(e.indexOf(':') + 2));
 
   // the panel, drawn as the MOD GUI generator draws it (every parameter on it, selectors included)
   if (decl.panel && !refuse.count()) {
@@ -344,7 +350,7 @@ export function draftChain(kernels, chainSrc, { root = ROOT, recipe = loadRecipe
   };
   fillDerived(decl, { schema, version: treeVersion(root, recipe) }, recipe);
   // as a single plugin's: the panel one section per element, the console placement a person's choice
-  decl.panel = defaultPanel(decl);
+  decl.panel = draftPanel(schema, decl);
   decl.console = { placement: { strips: [`${REVIEW}: the strip kinds that may host it (input, fxReturn, aux, mix, matrix, main, ...)`], group: `${REVIEW}: walk, tail or plugins (the console's channel layout)` } };
   return { refusals: [], decl: canonical(schema, decl), notes };
 }
@@ -383,7 +389,7 @@ export async function planChain(declIn, chainSrc, { root = ROOT, recipe = loadRe
     refuse('/chain', e.message);
     return { ok: false, refusals };
   }
-  await checkPanelConsole(decl, new Set(d.params.map((p) => p.symbol)), d.params, refuse, root);
+  await checkPanelConsole(schema, decl, new Set(d.params.map((p) => p.symbol)), d.params, refuse, root);
   const renames = bound.flatMap((b) => b.renames);
   return { ok: refusals.length === 0, refusals, decl: canonical(schema, decl), resolved: d.params, binding: bound.flatMap((b) => b.binding), renames, pin: chainSrc.pin };
 }
@@ -494,7 +500,7 @@ async function main(argv) {
     if (draft.unbound.length) console.log(`note: contract controls the face takes no argument for, left out: ${draft.unbound.join(', ')}`);
     console.log('settle each mark, then run the same command again:');
     for (const m of reviewMarks(draft.decl)) console.log(`  [ ] ${m}`);
-    console.log('  [ ] review each parameter\'s name; group the "panel" into sections, add the "console" card, chip and panel the console draws, "summary" or "manual" where wanted');
+    console.log('  [ ] review each parameter\'s name; group the "panel" into sections (the one panel the MOD GUI and the console draw), add the "console" card and chip, "summary" or "manual" where wanted');
     return;
   }
 

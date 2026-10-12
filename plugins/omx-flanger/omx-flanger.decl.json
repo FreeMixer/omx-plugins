@@ -8,7 +8,7 @@
   "name": "omx flanger",
   "vendor": "openmixer",
   "url": "https://github.com/FreeMixer/omx-plugins",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "The console's flanger: one modulated short delay with signed feedback, swept by one oscillator and mixed with the dry signal.",
   "clap": {
     "id": "org.openmixer.flanger",
@@ -72,8 +72,13 @@
     }
   },
   "panel": {
-    "family": "flanger",
-    "roles": {},
+    "family": "modulation",
+    "roles": {
+      "rate": "rate",
+      "depth": "depth",
+      "feedback": "feedback",
+      "mix": "mix"
+    },
     "sections": [
       {
         "key": "flanger",
@@ -105,20 +110,6 @@
       "after": "chorus",
       "fxGroup": "modulation"
     },
-    "chip": "{rate}",
-    "panel": {
-      "sections": [
-        {
-          "key": "flanger",
-          "label": "Flanger",
-          "controls": [
-            "rate",
-            "depth",
-            "feedback",
-            "mix"
-          ]
-        }
-      ]
-    }
+    "chip": "{rate}"
   }
 }

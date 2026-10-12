@@ -8,7 +8,7 @@
   "name": "omx chorus",
   "vendor": "openmixer",
   "url": "https://github.com/FreeMixer/omx-plugins",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "The console's chorus: up to four voices read one modulated delay line, the right leg's sweep offset by the spread, mixed with the dry signal.",
   "clap": {
     "id": "org.openmixer.chorus",
@@ -82,18 +82,24 @@
     }
   },
   "panel": {
-    "family": "chorus",
-    "roles": {},
+    "family": "modulation",
+    "roles": {
+      "rate": "rate",
+      "depth": "depth",
+      "voices": "voices",
+      "spread": "spread",
+      "mix": "mix"
+    },
     "sections": [
       {
         "key": "chorus",
         "label": "Chorus",
         "controls": [
-          "spread",
           "rate",
           "depth",
           "voices",
-          "mix"
+          "mix",
+          "spread"
         ]
       }
     ]
@@ -116,21 +122,6 @@
       "after": "rotary",
       "fxGroup": "modulation"
     },
-    "chip": "{rate}",
-    "panel": {
-      "sections": [
-        {
-          "key": "chorus",
-          "label": "Chorus",
-          "controls": [
-            "rate",
-            "depth",
-            "voices",
-            "mix",
-            "spread"
-          ]
-        }
-      ]
-    }
+    "chip": "{rate}"
   }
 }

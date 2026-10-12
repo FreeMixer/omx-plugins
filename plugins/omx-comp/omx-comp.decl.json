@@ -8,7 +8,7 @@
   "name": "omx comp",
   "vendor": "openmixer",
   "url": "https://github.com/FreeMixer/omx-plugins",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "The console's compressor: threshold, ratio and knee set how hard it holds the level down, attack and release how fast, with makeup gain and a dry/wet mix. Kind picks the RMS detector (Compressor) or the peak detector (Limiter), and detector oversampling can run the control path at 4x. The DSP is omx-dsp's <omxdsp/fx/omx_comp_instance.h>, the console's own compressor.",
   "clap": {
     "id": "org.openmixer.comp",
@@ -140,8 +140,16 @@
     }
   },
   "panel": {
-    "family": "comp",
-    "roles": {},
+    "family": "dynamics",
+    "roles": {
+      "threshold": "thresholdDb",
+      "ratio": "ratio",
+      "attack": "attackMs",
+      "release": "releaseMs",
+      "knee": "kneeDb",
+      "makeup": "makeupDb",
+      "mix": "mixPct"
+    },
     "sections": [
       {
         "key": "comp",
@@ -177,25 +185,6 @@
       "stage": "comp",
       "after": "deEsser",
       "fxGroup": "dynamics"
-    },
-    "panel": {
-      "sections": [
-        {
-          "key": "comp",
-          "label": "Comp",
-          "controls": [
-            "thresholdDb",
-            "ratio",
-            "kneeDb",
-            "attackMs",
-            "releaseMs",
-            "makeupDb",
-            "mixPct",
-            "kind",
-            "detectorOversampling"
-          ]
-        }
-      ]
     }
   }
 }

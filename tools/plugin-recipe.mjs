@@ -214,23 +214,49 @@ export function globRe(glob) {
   return new RegExp(`^${re}$`);
 }
 
+/** Every way the `panel` block leaves the console's vocabulary or names no declared parameter: its
+ * family outside `$defs.family`, a role outside its family's (`$defs.familyRoles`), a list of symbols
+ * for a role that is not indexed, a family other than none with no role, a section, role or widget
+ * naming no parameter, and a parameter drawn in two sections. The families of `$defs.family` and of
+ * `$defs.familyRoles` are one list. */
+export function panelErrors(schema, decl, symbols) {
+  const errs = [];
+  const p = decl.panel;
+  if (!p) return errs;
+  const families = schema.$defs.family.enum;
+  const tables = schema.$defs.familyRoles.properties;
+  const indexed = new Set(schema.$defs.indexedRole.enum);
+  if (families.join() !== Object.keys(tables).join()) errs.push(`schema: $defs.family (${families.join(', ')}) and $defs.familyRoles (${Object.keys(tables).join(', ')}) are not one list`);
+  const drawn = new Set();
+  for (const s of p.sections ?? []) {
+    for (const c of s.controls) {
+      if (!symbols.has(c)) errs.push(`/panel/sections: section '${s.key}' names '${c}', no parameter`);
+      else if (drawn.has(c)) errs.push(`/panel/sections: '${c}' is in two sections`);
+      drawn.add(c);
+    }
+  }
+  if (families.includes(p.family)) {
+    const own = tables[p.family]?.enum ?? [];
+    const roles = Object.entries(p.roles ?? {});
+    if (p.family !== 'none' && roles.length === 0) errs.push(`/panel/roles: family '${p.family}' names none of its roles (${own.join(', ')})`);
+    for (const [role, sym] of roles) {
+      if (!own.includes(role)) errs.push(`/panel/roles/${role}: not a role of family '${p.family}'${own.length ? ` (${own.join(', ')})` : ''}`);
+      if (Array.isArray(sym) && !indexed.has(role)) errs.push(`/panel/roles/${role}: names a list, and only an indexed role (${[...indexed].join(', ')}) repeats by band`);
+      for (const x of [sym].flat()) if (!symbols.has(x)) errs.push(`/panel/roles/${role}: '${x}' is no parameter`);
+    }
+  }
+  for (const sym of Object.keys(p.widgets ?? {})) if (!symbols.has(sym)) errs.push(`/panel/widgets/${sym}: is no parameter`);
+  return errs;
+}
+
 /** Every name the `console` block (spec §8) gives that is no declared parameter: the card's
- * controls, the chip's `{holes}`, the console panel's controls and widgets. */
+ * controls and the chip's `{holes}`. */
 export function consoleErrors(decl, symbols) {
   const errs = [];
   const c = decl.console ?? {};
   const holes = (t) => [...(t ?? '').matchAll(/\{([A-Za-z][A-Za-z0-9_]*)\}/g)].map((m) => m[1]);
   for (const sym of c.card?.show ?? []) if (!sym.startsWith('readout:') && !symbols.has(sym)) errs.push(`/console/card/show: '${sym}' is no parameter`);
   for (const [at, t] of [['/console/chip', c.chip], ['/console/card/summary', c.card?.summary]]) for (const h of holes(t)) if (!symbols.has(h)) errs.push(`${at}: {${h}} is no parameter`);
-  const seen = new Set();
-  for (const sec of c.panel?.sections ?? []) {
-    for (const sym of sec.controls) {
-      if (!symbols.has(sym)) errs.push(`/console/panel: section '${sec.key}' names '${sym}', no parameter`);
-      else if (seen.has(sym)) errs.push(`/console/panel: '${sym}' is in two sections`);
-      seen.add(sym);
-    }
-  }
-  for (const sym of Object.keys(c.panel?.widgets ?? {})) if (!symbols.has(sym)) errs.push(`/console/panel/widgets/${sym}: is no parameter`);
   return errs;
 }
 
@@ -254,8 +280,7 @@ export const CHECKERS = {
     // a chain's generated switches and `order` are parameters too
     const generated = [...(facts.decl.chain ?? []).map((el) => `${el.id}On`), ...(facts.decl.order === 'permutable' ? ['order'] : [])];
     const symbols = new Set([...declParams(facts.decl).map((p) => p.symbol), ...generated]);
-    for (const s of facts.decl.panel?.sections ?? []) for (const c of s.controls) if (!symbols.has(c)) errs.push(`/panel: section '${s.key}' names '${c}', no parameter`);
-    for (const [role, sym] of Object.entries(facts.decl.panel?.roles ?? {})) if (!symbols.has(sym)) errs.push(`/panel/roles/${role}: '${sym}' is no parameter`);
+    errs.push(...panelErrors(schema, facts.decl, symbols));
     errs.push(...consoleErrors(facts.decl, symbols));
     return errs.length ? missing(`plugins/${facts.stem}/${facts.stem}.decl.json: ${errs.join('; ')}`) : ok(`plugins/${facts.stem}/${facts.stem}.decl.json`);
   },
