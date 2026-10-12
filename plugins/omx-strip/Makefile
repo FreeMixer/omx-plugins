@@ -7,8 +7,8 @@
 #
 #   make            build/omx-strip.clap and build/omx-strip.lv2/ (binary, TTL, MOD GUI)
 #   make test       freshness of every generated file, the parameters as declared, every parameter
-#                   live, the strip kernel-identity oracle, the MOD GUI checks, and the
-#                   host checks (omx-clap-scan, lv2info) where installed
+#                   live, the strip kernel-identity oracle, the LV2 port groups, the MOD GUI
+#                   checks, and the host checks (omx-clap-scan, lv2info) where installed
 #   make gen        regenerate generated/ from the declaration (commit the result)
 #   make install    DESTDIR/PREFIX/LIBDIR/CLAPDIR: $(CLAPDIR)/omx-strip.clap, $(LIBDIR)/lv2/omx-strip.lv2/
 #
@@ -69,6 +69,9 @@ $(B):
 $(B)/clap-probe: $(ROOT)/tools/clap-probe.c | $(B)
 	$(CC) $(CFLAGS) $(WARN) $(ABI_CFLAGS) -o $@ $< -ldl
 
+$(B)/port-groups-probe: $(ROOT)/tools/port-groups-probe.c | $(B)
+	$(CC) $(CFLAGS) $(WARN) -o $@ $< $(LILV)
+
 $(B)/strip-oracle: test/strip-oracle.c $(CORE) | $(B)
 	$(CC) $(CFLAGS) $(WARN) -I$(GEN) -I$(ROOT)/include $(DSP_CFLAGS) $(ABI_CFLAGS) -o $@ $< $(LILV) -ldl $(LDLIBS)
 
@@ -82,15 +85,18 @@ check:
 
 # The parameter test: the built CLAP face's parameters are the declaration's, and every one of them
 # reaches the kernel. The kernel-identity test: both faces, sample for sample, against omx-dsp's
-# strip kernel called directly. Every test runs, and the target fails if any failed, so a new
+# strip kernel called directly. The port-group test: the LV2 bundle, read through lilv, puts each
+# panel section's parameters in that section's pg:Group. Every test runs, and the target fails if any failed, so a new
 # plugin shows all its red tests at once.
-test: all check $(B)/clap-probe $(B)/strip-oracle
+test: all check $(B)/clap-probe $(B)/port-groups-probe $(B)/strip-oracle
 	@fail=0; \
 	$(B)/clap-probe params $(B)/$(NAME).clap > $(B)/clap-params.txt && \
 	  node $(ROOT)/tools/clap-params-check.mjs $(CURDIR) $(B)/clap-params.txt || fail=1; \
 	$(B)/clap-probe live $(B)/$(NAME).clap || fail=1; \
 	$(B)/strip-oracle clap $(B)/$(NAME).clap || fail=1; \
 	$(B)/strip-oracle lv2 $(BUNDLE) $(URI) || fail=1; \
+	$(B)/port-groups-probe $(BUNDLE) $(URI) > $(B)/port-groups.txt && \
+	  node $(ROOT)/tools/port-groups-check.mjs $(CURDIR) $(B)/port-groups.txt || fail=1; \
 	sh $(ROOT)/tools/modgui-test.sh $(CURDIR) || fail=1; \
 	sh $(ROOT)/tools/host-check.sh $(B)/$(NAME).clap $(BUNDLE) $(URI) $(CLAP_ID) || fail=1; \
 	exit $$fail
