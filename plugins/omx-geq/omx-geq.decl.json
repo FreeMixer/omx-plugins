@@ -290,8 +290,42 @@
     }
   },
   "panel": {
-    "family": "geq",
-    "roles": {},
+    "family": "eq",
+    "roles": {
+      "band_gain": [
+        "band01",
+        "band02",
+        "band03",
+        "band04",
+        "band05",
+        "band06",
+        "band07",
+        "band08",
+        "band09",
+        "band10",
+        "band11",
+        "band12",
+        "band13",
+        "band14",
+        "band15",
+        "band16",
+        "band17",
+        "band18",
+        "band19",
+        "band20",
+        "band21",
+        "band22",
+        "band23",
+        "band24",
+        "band25",
+        "band26",
+        "band27",
+        "band28",
+        "band29",
+        "band30",
+        "band31"
+      ]
+    },
     "sections": [
       {
         "key": "geq",
@@ -333,7 +367,7 @@
     ]
   },
   "console": {
-    "$comment": "The console has the geq stage in its walk (packages/declarations/stages/geq.json, \"contract\": null) and draws no panel, chip or card for it today; racked as a plugin it is drawn by the generic plugin editor.",
+    "$comment": "The console has the geq stage in its walk, with no contract yet, and draws no panel, chip or card for it today; racked as a plugin it is drawn by the generic plugin editor.",
     "placement": {
       "strips": [
         "input",

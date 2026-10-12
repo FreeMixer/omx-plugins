@@ -9,6 +9,10 @@
  * The include guard is omx-dsp's own <omxdsp/params/omx_delay_params.h>: included first, this
  * table is the one the kernel's instance header reads.
  */
+#include <stddef.h>
+
+#include "omx_panel_description.h"
+#include "omx_param_contract.h"
 #include "omx_plugin_param.h"
 
 enum {
@@ -57,6 +61,55 @@ static const omx_plugin_param OMX_DELAY_PARAMS[OMX_DELAY_PARAM_COUNT] = {
 /* org.openmixer.declaration/1: the declaration's plain description and the digest of its parameters. */
 #define OMX_DELAY_DECL_SOURCE "omx delay: Time 0 to 2000 ms, Feedback 0 to 0.99, Tone 0 to 1, Mix 0 to 1, Pingpong 0 to 1"
 #define OMX_DELAY_DECL_DIGEST "b4d6be38d03fd4d086d878edf93bcbc5f6d678cbbbb742ddf597e3b7f160cafd"
+
+/* org.openmixer.param-contract/1 (tools/param-contract.mjs): each parameter's unit, scale and step, in
+ * id order; the host's bypass, the last id, is the face's. */
+#define OMX_DELAY_PARAM_CONTRACT_VERSION 1u
+#define OMX_DELAY_PARAM_CONTRACT_FINGERPRINT "f39cf962749ce695e21f8faeac517b7291b7979f9e916ae08e40259942463563"
+static const struct omx_param_contract_row OMX_DELAY_PARAM_CONTRACT[OMX_DELAY_PARAM_COUNT] = {
+  { 2u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* fxDelayTime ms */
+  { 0u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* fxDelayFeedback none */
+  { 0u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* tone none */
+  { 0u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* mix none */
+  { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* pingpong none */
+};
+
+/* org.openmixer.panel-description/1 (tools/panel-description.mjs): the declaration's panel as the rows
+ * include/omx_panel_description.h serves, parameter ids the declaration's. Family delay. */
+#define OMX_DELAY_PANEL_FINGERPRINT "3ee3b70736f1ffe34135550e50bed76ff533efa807a588be1dd150144a79357b"
+static const struct omx_panel_section_row OMX_DELAY_PANEL_SECTIONS[] = {
+  { "delay", "fx.delay.section.delay", "Delay" },
+};
+static const struct omx_panel_control_row OMX_DELAY_PANEL_CONTROLS[] = {
+  { 4u, 0u, OMX_CLAP_WIDGET_SWITCH, "fx.delay.pingpong", "Pingpong", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 0u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.delay.fx_delay_time", "Time", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 1u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.delay.fx_delay_feedback", "Feedback", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 3u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.delay.mix", "Mix", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 2u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.delay.tone", "Tone", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+};
+static const struct omx_panel_role_row OMX_DELAY_PANEL_ROLES[] = {
+  { "time", 0u, 0u },
+  { "feedback", 0u, 1u },
+  { "tone", 0u, 2u },
+  { "pingpong", 0u, 4u },
+  { "mix", 0u, 3u },
+};
+static const struct omx_panel_default_row OMX_DELAY_PANEL_DEFAULTS[] = {
+  { OMX_CLAP_PLACEMENT_RETURN, 3u, 1 },
+};
+/* clap.remote-controls/2: the pages of the page rule over the sections. */
+static const struct omx_panel_page_row OMX_DELAY_PANEL_PAGES[] = {
+  { "Delay", "Delay", { 4u, 0u, 1u, 3u, 2u, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID } },
+};
+#define OMX_DELAY_PANEL_PAGE_COUNT 1u
+static const struct omx_panel_rows OMX_DELAY_PANEL = {
+  OMX_DELAY_PANEL_FINGERPRINT, OMX_CLAP_FAMILY_DELAY,
+  OMX_DELAY_PANEL_SECTIONS, 1u,
+  OMX_DELAY_PANEL_CONTROLS, 5u,
+  OMX_DELAY_PANEL_ROLES, 5u,
+  NULL, 0u,
+  OMX_DELAY_PANEL_DEFAULTS, 1u,
+};
 
 /* LV2 port indices (tools/gen.mjs lv2Ports): audio, then parameter i at FIRST_PARAM + i, then these. */
 #define OMX_DELAY_LV2_PORT_IN_L 0u

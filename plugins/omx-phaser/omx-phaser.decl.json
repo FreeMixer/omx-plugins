@@ -94,8 +94,13 @@
     }
   },
   "panel": {
-    "family": "phaser",
-    "roles": {},
+    "family": "modulation",
+    "roles": {
+      "rate": "rateHz",
+      "depth": "depthOct",
+      "feedback": "feedback",
+      "mix": "mix"
+    },
     "sections": [
       {
         "key": "phaser",
@@ -112,7 +117,7 @@
     ]
   },
   "console": {
-    "$comment": "The console has the phaser stage in its walk (packages/declarations/stages/phaser.json, \"contract\": null) and draws no panel, chip or card for it today; racked as a plugin it is drawn by the generic plugin editor.",
+    "$comment": "The console has the phaser stage in its walk, with no contract yet, and draws no panel, chip or card for it today; racked as a plugin it is drawn by the generic plugin editor.",
     "placement": {
       "strips": [
         "input",
