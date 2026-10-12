@@ -8,7 +8,7 @@
   "name": "omx pitch",
   "vendor": "openmixer",
   "url": "https://github.com/FreeMixer/omx-plugins",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "The console's pitch shifter: shifts both channels up or down by semitones and cents, without changing their length, mixed with the dry signal.",
   "clap": {
     "id": "org.openmixer.pitch",
@@ -57,6 +57,20 @@
       "unit": "units:frame"
     }
   },
+  "latencyChecks": [
+    {
+      "values": {
+        "mix": 100
+      },
+      "reports": "impulse"
+    },
+    {
+      "values": {
+        "mix": 50
+      },
+      "reports": 0
+    }
+  ],
   "panel": {
     "family": "pitch",
     "roles": {

@@ -53,7 +53,9 @@ typedef struct {
   OmxEq16Core core;
   float values[G_PARAMS];          /* audio-thread owned */
   _Atomic float applied[G_PARAMS]; /* the APPLIED values, published after each drain */
-  _Atomic uint32_t latency;        /* the frames the host was last told of */
+  _Atomic uint32_t latency;        /* the frames the host was told of at the last activation */
+  _Atomic int restart_asked;       /* a restart asked for since, for a latency the values moved */
+  const clap_host_latency_t *host_latency; /* the host's clap.latency, when it offers one */
   int active, processing;
   const clap_host_track_info_t *track_info; /* the host's clap.track-info, when it offers one */
   unsigned char touched[G_PARAMS];          /* set by the host or a state: a placement default leaves it */
@@ -124,6 +126,8 @@ static bool g_init(const clap_plugin_t *p) {
   G *g = (G *)p->plugin_data;
   if (g->host && g->host->get_extension)
     g->track_info = (const clap_host_track_info_t *)g->host->get_extension(g->host, CLAP_EXT_TRACK_INFO);
+  if (g->host && g->host->get_extension)
+    g->host_latency = (const clap_host_latency_t *)g->host->get_extension(g->host, CLAP_EXT_LATENCY);
   g_place(g, g_placement(g));
   g_publish(g);
   return true;
@@ -138,13 +142,17 @@ static bool g_activate(const clap_plugin_t *p, double sample_rate, uint32_t min_
   if (g->active || !(sample_rate > 0.0)) return false;
   omx_eq16_core_init(&g->core, (uint32_t)sample_rate);
   /* The latency the host reads after activation is the one the current values give: resolved on a
-   * probe instance, so the running core's state is not touched before its first block. */
+   * probe instance, so the running core's state is not touched before its first block. Activation is
+   * the one place the CLAP latency extension lets it change, and where the host is told it did. */
   OmxEq16Core *probe = (OmxEq16Core *)malloc(sizeof *probe);
   if (!probe) return false;
   omx_eq16_core_init(probe, (uint32_t)sample_rate);
   omx_eq16_core_resolve(probe, g->values, g->values[G_BYPASS] > 0.5f);
-  atomic_store(&g->latency, omx_eq16_core_latency(probe));
+  const uint32_t lat = omx_eq16_core_latency(probe);
   free(probe);
+  if (atomic_exchange(&g->latency, lat) != lat && g->host_latency && g->host_latency->changed)
+    g->host_latency->changed(g->host);
+  atomic_store(&g->restart_asked, 0);
   g->active = 1;
   return true;
 }
@@ -174,12 +182,12 @@ static clap_process_status g_process(const clap_plugin_t *p, const clap_process_
   omx_eq16_core_resolve(&g->core, g->values, g->values[G_BYPASS] > 0.5f);
   omx_eq16_core_run(&g->core, ai->data32[0], ai->data32[1], ao->data32[0], ao->data32[1], pr->frames_count);
   g_publish(g);
-  /* A parameter that moves the kernel's latency: the host is asked to restart and read it again. */
-  const uint32_t lat = omx_eq16_core_latency(&g->core);
-  if (lat != atomic_load_explicit(&g->latency, memory_order_relaxed)) {
-    atomic_store_explicit(&g->latency, lat, memory_order_relaxed);
-    if (g->host && g->host->request_restart) g->host->request_restart(g->host);
-  }
+  /* A parameter that moves the kernel's latency (as the pitch shifter's mix crossing 100 % does):
+   * the reported latency holds until the next activation, and the host is asked, once, for the
+   * restart that brings it. */
+  if (omx_eq16_core_latency(&g->core) != atomic_load_explicit(&g->latency, memory_order_relaxed) &&
+      !atomic_exchange_explicit(&g->restart_asked, 1, memory_order_relaxed) && g->host && g->host->request_restart)
+    g->host->request_restart(g->host);
   return CLAP_PROCESS_CONTINUE;
 }
 

@@ -20,7 +20,7 @@
 NAME       := omx-drive
 URI        := urn:openmixer:drive
 CLAP_ID    := org.openmixer.drive
-OMXDSP_MIN ?= 0.5.2
+OMXDSP_MIN ?= 0.6.0
 ROOT       := $(abspath ../..)
 GEN        := generated
 B          := build

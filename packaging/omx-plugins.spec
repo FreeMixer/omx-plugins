@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # Copyright (C) 2026 Pau Aliagas <linuxnow@gmail.com>
 Name: omx-plugins
-Version: 0.4.0
+Version: 0.5.0
 Release: 1%{?dist}
 License: GPL-3.0-or-later
 Summary: The OpenMixer console's delay, drive, EQ, channel strip, keyed gate and effects, as plugins for your DAW
@@ -12,7 +12,7 @@ Source0: %{url}/archive/v%{version}/%{name}-%{version}.tar.gz
 BuildRequires: gcc
 BuildRequires: make
 BuildRequires: pkgconf-pkg-config
-BuildRequires: omx-dsp-devel >= 0.5.2
+BuildRequires: omx-dsp-devel >= 0.6.0
 BuildRequires: omx-clap-core-devel
 BuildRequires: clap-devel
 BuildRequires: lv2-devel
@@ -70,7 +70,7 @@ console's own DSP, so they sound like the desk.
 
 %package devel
 Summary: Headers and static library of the OpenMixer plugins, for projects that build on them
-Requires: omx-dsp-devel >= 0.5.2
+Requires: omx-dsp-devel >= 0.6.0
 Requires: clap-devel
 
 %description devel
@@ -157,6 +157,22 @@ host that runs the plugins in its own process without loading .clap files.
 # END GENERATED lv2-files
 
 %changelog
+* Mon Oct 12 2026 Pau Aliagas <linuxnow@gmail.com> - 0.5.0-1
+- The faces follow omx-dsp 0.6.0, the oldest release they build against now.
+- omx pitch reports its latency at full mix: its shortest delay plus half its
+  window, 883 frames at 44.1 kHz, and 0 below 100 %, where the dry signal is
+  on time. The CLAP face takes a new latency at its next activation and asks
+  the host for that restart when the mix crosses 100 %; the LV2 latency port
+  follows the mix.
+- Every face serves its panel description, read from its declaration.
+- The CLAP faces carry the extensions their declaration names: the parameter
+  contract, remote-control pages and each placement's defaults.
+- Each plugin declares its panel once; the console's sections and graphs are
+  part of it.
+- The panels use one widget vocabulary, the console's names.
+- The LV2 faces group their ports, one group per panel section.
+- The MOD GUI look is generated from its design tokens.
+- The declarations' comments are in plain words.
 * Sun Oct 11 2026 Pau Aliagas <linuxnow@gmail.com> - 0.4.0-1
 - **libomxplugins**: one static library with a table of every plugin's CLAP
   entry, so a host links the plugins in-process without dlopen. The devel

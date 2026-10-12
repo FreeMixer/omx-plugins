@@ -16,7 +16,9 @@
  * read only under one value is reached). All of it runs through ONE instance of the face. Parameters are found BY NAME (CLAP) or BY
  * SYMBOL (LV2, through lilv), so a renumbered face cannot pass by accident. Two guards keep the test
  * honest: the reference must move the signal, and a reference with any ONE parameter one step off must
- * differ from the face (the sabotage arm), so a wrong or dead coefficient is seen.
+ * differ from the face (the sabotage arm), so a wrong or dead coefficient is seen. A CLAP face's
+ * reported latency holds while it is active and moves only at the activation after the restart it
+ * asks for, as the CLAP latency extension says.
  */
 #include <dlfcn.h>
 #include <math.h>
@@ -401,12 +403,16 @@ static void reference(double sr, int off, const float *key, const float *il, con
 typedef struct Driver Driver;
 struct Driver {
   /* the whole plan through ONE fresh instance; `*latency` is read back */
-  bool (*run)(void *face, double sr, const float *key, const float *il, const float *ir, float *ol, float *orr,
-              uint32_t *latency);
+  bool (*run)(void *face, const Block *plan, size_t nblocks, double sr, const float *key, const float *il,
+              const float *ir, float *ol, float *orr, uint32_t *latency);
   void *face;
 };
 
 static bool same(const float *a, const float *b, uint32_t n) { return memcmp(a, b, (size_t)n * sizeof(float)) == 0; }
+
+/* Set by a CLAP run whose face reported a latency other than the activation's while active, or
+ * reported a new one after the run without asking the host for the restart that reads it. */
+static bool latency_broke;
 
 /* The plan through the face and the reference; `keyed` hands both the key, else no key is routed.
  * `seen[p]` is set when a reference with parameter p one step off differs from the face's output. */
@@ -426,7 +432,8 @@ static void run_checks(const char *face, Driver *d, double sr, bool keyed, bool 
   uint32_t want = 0;
   reference(sr, -1, key, il, ir, wl, wr, &want);
   uint32_t lat = 99;
-  bool ran = d->run(d->face, sr, key, il, ir, ol, orr, &lat);
+  latency_broke = false;
+  bool ran = d->run(d->face, PLAN, NBLOCKS, sr, key, il, ir, ol, orr, &lat);
   bool ident = ran && same(ol, wl, n) && same(orr, wr, n);
   for (uint32_t i = 0; ran && !ident && i < n; i++)
     if (memcmp(ol + i, wl + i, sizeof(float)) != 0 || memcmp(orr + i, wr + i, sizeof(float)) != 0) {
@@ -441,6 +448,8 @@ static void run_checks(const char *face, Driver *d, double sr, bool keyed, bool 
   check(!same(wl, il, n) || !same(wr, ir, n), face, sr, what);
   snprintf(what, sizeof what, "published latency is the kernel's%s", pass);
   check(ran && lat == want, face, sr, what);
+  snprintf(what, sizeof what, "the reported latency moves only at activation, after a restart asked for%s", pass);
+  check(ran && !latency_broke, face, sr, what);
   if (KEYED && keyed) {
     /* the key must reach the detector: the same plan with no key routed differs */
     reference(sr, -1, NULL, il, ir, xl, xr, NULL);
@@ -474,7 +483,13 @@ static const void *h_ext(const clap_host_t *h, const char *id) {
   return NULL;
 }
 static void h_noop(const clap_host_t *h) { (void)h; }
-static const clap_host_t HOST = {CLAP_VERSION_INIT, NULL, "eq8-oracle", "openmixer", "", "0.1", h_ext, h_noop,
+/* A restart the face asked for: the run deactivates and activates it again, as a host does. */
+static bool restart_asked;
+static void h_restart(const clap_host_t *h) {
+  (void)h;
+  restart_asked = true;
+}
+static const clap_host_t HOST = {CLAP_VERSION_INIT, NULL, "eq8-oracle", "openmixer", "", "0.1", h_ext, h_restart,
                                  h_noop, h_noop};
 
 typedef struct {
@@ -508,22 +523,25 @@ static bool clap_param(const clap_plugin_params_t *pp, const clap_plugin_t *p, c
   return false;
 }
 
-static bool clap_run(void *face, double sr, const float *key, const float *il, const float *ir, float *ol, float *orr,
-                     uint32_t *latency) {
+static bool clap_run(void *face, const Block *plan, size_t nblocks, double sr, const float *key, const float *il,
+                     const float *ir, float *ol, float *orr, uint32_t *latency) {
   ClapFace *c = (ClapFace *)face;
   const clap_plugin_descriptor_t *desc = c->factory->get_plugin_descriptor(c->factory, 0);
   const clap_plugin_t *p = c->factory->create_plugin(c->factory, &HOST, desc->id);
   if (!p || !p->init(p)) return false;
   const clap_plugin_params_t *pp = (const clap_plugin_params_t *)p->get_extension(p, CLAP_EXT_PARAMS);
   const clap_plugin_latency_t *lat = (const clap_plugin_latency_t *)p->get_extension(p, CLAP_EXT_LATENCY);
+  restart_asked = false;
   bool ok = pp && lat && p->activate(p, sr, 1, longest_block(sr)) && p->start_processing(p);
+  const uint32_t activated = ok ? lat->get(p) : 0;
   clap_id ids[NP + 1];
   for (uint32_t i = 0; ok && i < NP; i++) ok = clap_param(pp, p, OMX_EQ8_PARAMS[i].name, &ids[i]);
   ok = ok && clap_param(pp, p, NULL, &ids[NP]);
   clap_output_events_t out = {NULL, ev_push};
   uint32_t at = 0;
-  for (size_t b = 0; ok && b < NBLOCKS * STRETCH; b++) {
-    const Block *k = &PLAN[b / STRETCH];
+  for (size_t b = 0; ok && b < nblocks * STRETCH; b++) {
+    const Block *k = &plan[b / STRETCH];
+    if (lat->get(p) != activated) latency_broke = true;
     Events evs = {.n = 0};
     for (uint32_t i = 0; i <= NP; i++) {
       clap_event_param_value_t *e = &evs.ev[evs.n++];
@@ -542,6 +560,12 @@ static bool clap_run(void *face, double sr, const float *key, const float *il, c
                          .out_events = &out};
     ok = p->process(p, &pr) != CLAP_PROCESS_ERROR;
     at += frames;
+  }
+  if (ok && lat->get(p) != activated) latency_broke = true;
+  if (ok && restart_asked) {
+    p->stop_processing(p);
+    p->deactivate(p);
+    ok = p->activate(p, sr, 1, longest_block(sr)) && p->start_processing(p);
   }
   if (ok && latency) *latency = lat->get(p);
   p->stop_processing(p);
@@ -579,8 +603,8 @@ static int32_t port_of(const Lv2Face *l, const char *symbol) {
   return port ? (int32_t)lilv_port_get_index(l->plugin, port) : -1;
 }
 
-static bool lv2_run(void *face, double sr, const float *key, const float *il, const float *ir, float *ol, float *orr,
-                    uint32_t *latency) {
+static bool lv2_run(void *face, const Block *plan, size_t nblocks, double sr, const float *key, const float *il,
+                    const float *ir, float *ol, float *orr, uint32_t *latency) {
   Lv2Face *l = (Lv2Face *)face;
   LilvInstance *inst = lilv_plugin_instantiate(l->plugin, sr, NULL);
   if (!inst) return false;
@@ -601,8 +625,8 @@ static bool lv2_run(void *face, double sr, const float *key, const float *il, co
   for (uint32_t i = 0; ok && i < NP + 2; i++) lilv_instance_connect_port(inst, (uint32_t)cp[i], &cv[i]);
   if (ok) lilv_instance_activate(inst);
   uint32_t at = 0;
-  for (size_t b = 0; ok && b < NBLOCKS * STRETCH; b++) {
-    const Block *k = &PLAN[b / STRETCH];
+  for (size_t b = 0; ok && b < nblocks * STRETCH; b++) {
+    const Block *k = &plan[b / STRETCH];
     for (uint32_t i = 0; i < NP; i++) cv[i] = k->v[i];
     cv[NP] = k->bypass ? 0.0f : 1.0f;
     lilv_instance_connect_port(inst, (uint32_t)ap[0], (void *)(il + at));
