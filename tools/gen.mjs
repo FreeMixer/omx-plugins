@@ -99,6 +99,7 @@ export function prepareDecl(file, d, stem, dir = dirname(file)) {
   }
   if (d.sidechain && (seen.has(d.sidechain.symbol) || FIXED_PORTS.includes(d.sidechain.symbol))) throw new Error(`${file}: sidechain symbol '${d.sidechain.symbol}' is taken`);
   if (d.binding === 'chain') checkShipped(file, d);
+  if (d.meters && d.binding !== 'instance') throw new Error(`${file}: "meters" are read from an instance face; this declaration's binding is ${d.binding ?? 'its own'}`);
   return { ...d, dir: resolve(dir), tree: treeOf(file) };
 }
 
@@ -698,6 +699,25 @@ export function latencyRows(d) {
   });
 }
 
+/** The declaration's meters in the faces' shape (`meters` in the schema, docs/meters.md): each its CLAP
+ * id (its index), its name, the instance field it reads and its display floor, the low end of the
+ * `floor` parameter's travel. */
+export function meterRows(d) {
+  const taken = new Set([...d.params.map((p) => p.symbol), ...FIXED_PORTS]);
+  return (d.meters ?? []).map((m, k) => {
+    const where = `plugins/${d.stem}: meters[${k}]`;
+    if (m.kind !== 'gain_reduction') throw new Error(`${where}: kind '${m.kind}' is not gain_reduction`);
+    if (!/^[A-Za-z][A-Za-z0-9_]*$/.test(m.id ?? '')) throw new Error(`${where}: id '${m.id}' is not a symbol`);
+    if (taken.has(m.id)) throw new Error(`${where}: id '${m.id}' is taken`);
+    taken.add(m.id);
+    if (!/^[a-z_][a-z0-9_]*(\.[a-z_][a-z0-9_]*)*$/.test(m.field ?? '')) throw new Error(`${where}: field '${m.field}' is not a member path`);
+    const p = d.params.find((q) => q.symbol === m.floor);
+    if (!p) throw new Error(`${where}: floor '${m.floor}' is no parameter`);
+    if (!(p.min < 0)) throw new Error(`${where}: floor '${m.floor}' starts at ${p.min}, not below 0 dB`);
+    return { meterIndex: k, meterName: m.id, meterField: m.field, meterFloor: `${p.min}` };
+  });
+}
+
 /** The parameters the plan holds at their default, for the oracle's comment: `[{ symbol }]`. */
 const heldOf = (d) => d.params.filter((p, i) => d.controls?.[i]?.rearms).map((p) => ({ symbol: p.symbol }));
 
@@ -738,6 +758,7 @@ export function generateInstance(d) {
     plan: oraclePlan(d.params, d.controls ?? []), held: heldOf(d), stretch: oracleStretch(face), steps: d.params.map((p) => cfloat(stepOf(p))).join(', '),
     chain: false,
     latencyChecks: latencyRows(d), measuresLatency: Boolean(d.latencyChecks),
+    meters: meterRows(d), metered: Boolean(d.meters), meterCount: (d.meters ?? []).length,
   };
   return {
     Makefile: withBanner(render(template('Makefile.tmpl'), view), d, '#'),
