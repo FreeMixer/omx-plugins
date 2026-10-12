@@ -105,50 +105,44 @@ static const struct omx_param_contract_row OMX_DRIVE_PARAM_CONTRACT[OMX_DRIVE_PA
 };
 
 /* org.openmixer.panel-description/1 (tools/panel-description.mjs): the declaration's panel as the rows
- * include/omx_panel_description.h serves, parameter ids the declaration's. Family drive.
- * Declared roles not published:
- *   character (character): not a role of the drive family
- *   band (bandFreq): not a role of the drive family
- *   trim (trim): not a role of the drive family
- *   curve (curve): not a role of the drive family
- *   bandMode (band): not a role of the drive family
- *   autoGain (autoGain): not a role of the drive family
- *   stereoLink (stereoLink): not a role of the drive family
- *   hfRolloff (hfRolloff): not a role of the drive family */
-#define OMX_DRIVE_PANEL_FINGERPRINT "212acc1e7db0dfe8c2d66d3ad35daed0e5ee70fcab8e81a20c68a2e4788e8c80"
+ * include/omx_panel_description.h serves, parameter ids the declaration's. Family drive. */
+#define OMX_DRIVE_PANEL_FINGERPRINT "e967420a72f79dbf4e551deb13da2df89bd0a5713e60d22210978d662851b4de"
 static const struct omx_panel_section_row OMX_DRIVE_PANEL_SECTIONS[] = {
   { "drive", "fx.drive.section.drive", "Drive" },
 };
 static const struct omx_panel_control_row OMX_DRIVE_PANEL_CONTROLS[] = {
+  { 5u, 0u, OMX_CLAP_WIDGET_AUTO, "fx.drive.curve", "Curve", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 6u, 0u, OMX_CLAP_WIDGET_AUTO, "fx.drive.band", "Band", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 9u, 0u, OMX_CLAP_WIDGET_AUTO, "fx.drive.hf_rolloff", "HF Roll-off", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
   { 0u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.drive.amount", "Drive", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
   { 1u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.drive.character", "Character", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
   { 2u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.drive.band_freq", "Band Frequency", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
   { 3u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.drive.mix", "Mix", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
   { 4u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.drive.trim", "Trim", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
-  { 5u, 0u, OMX_CLAP_WIDGET_AUTO, "fx.drive.curve", "Curve", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
-  { 6u, 0u, OMX_CLAP_WIDGET_AUTO, "fx.drive.band", "Band", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
   { 7u, 0u, OMX_CLAP_WIDGET_SWITCH, "fx.drive.auto_gain", "Auto Gain", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
   { 8u, 0u, OMX_CLAP_WIDGET_SWITCH, "fx.drive.stereo_link", "Stereo Link", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
-  { 9u, 0u, OMX_CLAP_WIDGET_AUTO, "fx.drive.hf_rolloff", "HF Roll-off", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
 };
 static const struct omx_panel_role_row OMX_DRIVE_PANEL_ROLES[] = {
   { "drive", 0u, 0u },
+  { "tone", 0u, 1u },
+  { "model", 0u, 5u },
   { "mix", 0u, 3u },
+  { "output", 0u, 4u },
 };
 static const struct omx_panel_display_row OMX_DRIVE_PANEL_DISPLAYS[] = {
   { OMX_CLAP_DISPLAY_TRANSFER_CURVE, 0u, OMX_CLAP_DISPLAY_FROM_FAMILY, { OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID }, 0u, OMX_CLAP_PANEL_INVALID_ID, 0.0, "fx.drive.display.transfer_curve", "Drive" },
 };
 /* clap.remote-controls/2: the pages of the page rule over the sections. */
 static const struct omx_panel_page_row OMX_DRIVE_PANEL_PAGES[] = {
-  { "Drive", "Drive 1", { 0u, 1u, 2u, 3u, 4u, 5u, 6u, 7u } },
-  { "Drive", "Drive 2", { 8u, 9u, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID } },
+  { "Drive", "Drive 1", { 5u, 6u, 9u, 0u, 1u, 2u, 3u, 4u } },
+  { "Drive", "Drive 2", { 7u, 8u, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID } },
 };
 #define OMX_DRIVE_PANEL_PAGE_COUNT 2u
 static const struct omx_panel_rows OMX_DRIVE_PANEL = {
   OMX_DRIVE_PANEL_FINGERPRINT, OMX_CLAP_FAMILY_DRIVE,
   OMX_DRIVE_PANEL_SECTIONS, 1u,
   OMX_DRIVE_PANEL_CONTROLS, 10u,
-  OMX_DRIVE_PANEL_ROLES, 2u,
+  OMX_DRIVE_PANEL_ROLES, 5u,
   OMX_DRIVE_PANEL_DISPLAYS, 1u,
   NULL, 0u,
 };

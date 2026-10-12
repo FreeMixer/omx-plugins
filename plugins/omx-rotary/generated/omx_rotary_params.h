@@ -94,7 +94,7 @@ static const struct omx_param_contract_row OMX_ROTARY_PARAM_CONTRACT[OMX_ROTARY_
 
 /* org.openmixer.panel-description/1 (tools/panel-description.mjs): the declaration's panel as the rows
  * include/omx_panel_description.h serves, parameter ids the declaration's. Family modulation. */
-#define OMX_ROTARY_PANEL_FINGERPRINT "1bc9415cc9a6c69a36db0621b2a57ed1a3aa53b5ab7c95579075a328d60086a2"
+#define OMX_ROTARY_PANEL_FINGERPRINT "b64b377d922b9cc677876ee7959372502ed855881f59c953cdce3a9d4fa8a9ae"
 static const struct omx_panel_section_row OMX_ROTARY_PANEL_SECTIONS[] = {
   { "rotary", "fx.rotary.section.rotary", "Rotary" },
 };
@@ -108,6 +108,9 @@ static const struct omx_panel_control_row OMX_ROTARY_PANEL_CONTROLS[] = {
   { 6u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.rotary.mix", "Mix", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
   { 7u, 0u, OMX_CLAP_WIDGET_AUTO, "fx.rotary.speed", "Speed", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
 };
+static const struct omx_panel_role_row OMX_ROTARY_PANEL_ROLES[] = {
+  { "mix", 0u, 6u },
+};
 /* clap.remote-controls/2: the pages of the page rule over the sections. */
 static const struct omx_panel_page_row OMX_ROTARY_PANEL_PAGES[] = {
   { "Rotary", "Rotary", { 0u, 1u, 2u, 3u, 4u, 5u, 6u, 7u } },
@@ -117,7 +120,7 @@ static const struct omx_panel_rows OMX_ROTARY_PANEL = {
   OMX_ROTARY_PANEL_FINGERPRINT, OMX_CLAP_FAMILY_MODULATION,
   OMX_ROTARY_PANEL_SECTIONS, 1u,
   OMX_ROTARY_PANEL_CONTROLS, 8u,
-  NULL, 0u,
+  OMX_ROTARY_PANEL_ROLES, 1u,
   NULL, 0u,
   NULL, 0u,
 };

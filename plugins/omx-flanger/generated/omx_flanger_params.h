@@ -69,8 +69,10 @@ static const struct omx_param_contract_row OMX_FLANGER_PARAM_CONTRACT[OMX_FLANGE
 };
 
 /* org.openmixer.panel-description/1 (tools/panel-description.mjs): the declaration's panel as the rows
- * include/omx_panel_description.h serves, parameter ids the declaration's. Family modulation. */
-#define OMX_FLANGER_PANEL_FINGERPRINT "526499ffb2bf8035cfc0a54178dfa6b0fa735d06afb5be6d9c2f9ab86e4583fa"
+ * include/omx_panel_description.h serves, parameter ids the declaration's. Family modulation.
+ * Declared roles not published:
+ *   depth (depth): the depth role takes none, pc, coef, not ms */
+#define OMX_FLANGER_PANEL_FINGERPRINT "efbf83c2361c47c85db68bcf5e339be2cc1679cbb35e2ce2c50eb8e39a6907a6"
 static const struct omx_panel_section_row OMX_FLANGER_PANEL_SECTIONS[] = {
   { "flanger", "fx.flanger.section.flanger", "Flanger" },
 };
@@ -79,6 +81,11 @@ static const struct omx_panel_control_row OMX_FLANGER_PANEL_CONTROLS[] = {
   { 1u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.flanger.depth", "Depth", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
   { 2u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.flanger.feedback", "Feedback", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
   { 3u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.flanger.mix", "Mix", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+};
+static const struct omx_panel_role_row OMX_FLANGER_PANEL_ROLES[] = {
+  { "rate", 0u, 0u },
+  { "feedback", 0u, 2u },
+  { "mix", 0u, 3u },
 };
 /* clap.remote-controls/2: the pages of the page rule over the sections. */
 static const struct omx_panel_page_row OMX_FLANGER_PANEL_PAGES[] = {
@@ -89,7 +96,7 @@ static const struct omx_panel_rows OMX_FLANGER_PANEL = {
   OMX_FLANGER_PANEL_FINGERPRINT, OMX_CLAP_FAMILY_MODULATION,
   OMX_FLANGER_PANEL_SECTIONS, 1u,
   OMX_FLANGER_PANEL_CONTROLS, 4u,
-  NULL, 0u,
+  OMX_FLANGER_PANEL_ROLES, 3u,
   NULL, 0u,
   NULL, 0u,
 };

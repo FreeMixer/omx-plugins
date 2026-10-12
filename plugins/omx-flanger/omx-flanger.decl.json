@@ -72,8 +72,13 @@
     }
   },
   "panel": {
-    "family": "flanger",
-    "roles": {},
+    "family": "modulation",
+    "roles": {
+      "rate": "rate",
+      "depth": "depth",
+      "feedback": "feedback",
+      "mix": "mix"
+    },
     "sections": [
       {
         "key": "flanger",
@@ -88,7 +93,7 @@
     ]
   },
   "console": {
-    "$comment": "As FreeMixer/openmixer integration/waves-2026-10 draws its flanger stage: ModulationPanel.vue (rateHz, depthMs, feedback, mix). Chip: FxSummaryValue of STAGE_KEY_FIELD.flanger (rateHz); the overview card shows the engage switch only.",
+    "$comment": "The OpenMixer console draws its flanger stage: the modulation panel (rateHz, depthMs, feedback, mix). Its chip shows rateHz; the overview card shows the engage switch only.",
     "placement": {
       "strips": [
         "input",
@@ -105,20 +110,6 @@
       "after": "chorus",
       "fxGroup": "modulation"
     },
-    "chip": "{rate}",
-    "panel": {
-      "sections": [
-        {
-          "key": "flanger",
-          "label": "Flanger",
-          "controls": [
-            "rate",
-            "depth",
-            "feedback",
-            "mix"
-          ]
-        }
-      ]
-    }
+    "chip": "{rate}"
   }
 }

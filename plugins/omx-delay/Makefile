@@ -8,8 +8,9 @@
 #   make            build/omx-delay.clap and build/omx-delay.lv2/ (binary, TTL, MOD GUI)
 #   make test       freshness of every generated file, the parameters as declared, every parameter
 #                   live, the delay kernel-identity oracle, the panel description both faces serve, the
-#                   CLAP face's parameter contract, remote controls and track-info,
-#                   the MOD GUI checks, and the host checks (omx-clap-scan, lv2info) where installed
+#                   CLAP face's parameter contract, remote controls and track-info, the LV2 port
+#                   groups, the MOD GUI checks, and the host checks (omx-clap-scan, lv2info) where
+#                   installed
 #   make gen        regenerate generated/ from the declaration (commit the result)
 #   make install    DESTDIR/PREFIX/LIBDIR/CLAPDIR: $(CLAPDIR)/omx-delay.clap, $(LIBDIR)/lv2/omx-delay.lv2/
 #
@@ -77,6 +78,9 @@ $(B)/panel-probe: $(ROOT)/tools/panel-probe.c $(ROOT)/include/omx_panel_descript
 $(B)/clap-ext-probe: $(ROOT)/tools/clap-ext-probe.c $(ROOT)/include/omx_param_contract.h | $(B)
 	$(CC) $(CFLAGS) $(WARN) -I$(ROOT)/include $(ABI_CFLAGS) -o $@ $< -ldl
 
+$(B)/port-groups-probe: $(ROOT)/tools/port-groups-probe.c | $(B)
+	$(CC) $(CFLAGS) $(WARN) -o $@ $< $(LILV)
+
 $(B)/delay-oracle: test/delay-oracle.c $(CORE) | $(B)
 	$(CC) $(CFLAGS) $(WARN) -I$(GEN) -I$(ROOT)/include $(DSP_CFLAGS) $(ABI_CFLAGS) -o $@ $< $(LILV) -ldl $(LDLIBS)
 
@@ -93,9 +97,10 @@ check:
 # delay kernel called directly. The panel test: org.openmixer.panel-description/1 read from
 # each built face as a host reads it, equal to the declaration's panel. The CLAP extension test: the
 # parameter contract, the remote-control pages and each placement's defaults, read as a host reads
-# them, equal to the declaration's. Every test runs, and the target fails if any failed, so a new
-# plugin shows all its red tests at once.
-test: all check $(B)/clap-probe $(B)/panel-probe $(B)/clap-ext-probe $(B)/delay-oracle
+# them, equal to the declaration's. The port-group test: the LV2 bundle, read through lilv, puts each
+# panel section's parameters in that section's pg:Group. Every test runs, and the target fails if any
+# failed, so a new plugin shows all its red tests at once.
+test: all check $(B)/clap-probe $(B)/panel-probe $(B)/clap-ext-probe $(B)/port-groups-probe $(B)/delay-oracle
 	@fail=0; \
 	$(B)/clap-probe params $(B)/$(NAME).clap > $(B)/clap-params.txt && \
 	  node $(ROOT)/tools/clap-params-check.mjs $(CURDIR) $(B)/clap-params.txt || fail=1; \
@@ -108,6 +113,8 @@ test: all check $(B)/clap-probe $(B)/panel-probe $(B)/clap-ext-probe $(B)/delay-
 	  node $(ROOT)/tools/panel-check.mjs $(CURDIR) lv2 $(B)/panel-lv2.txt || fail=1; \
 	$(B)/clap-ext-probe $(B)/$(NAME).clap > $(B)/clap-ext.txt && \
 	  node $(ROOT)/tools/clap-ext-check.mjs $(CURDIR) $(B)/clap-ext.txt || fail=1; \
+	$(B)/port-groups-probe $(BUNDLE) $(URI) > $(B)/port-groups.txt && \
+	  node $(ROOT)/tools/port-groups-check.mjs $(CURDIR) $(B)/port-groups.txt || fail=1; \
 	sh $(ROOT)/tools/modgui-test.sh $(CURDIR) || fail=1; \
 	sh $(ROOT)/tools/host-check.sh $(B)/$(NAME).clap $(BUNDLE) $(URI) $(CLAP_ID) || fail=1; \
 	exit $$fail
