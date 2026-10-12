@@ -54,6 +54,16 @@ static inline uint32_t omx_deesser_core_latency(const OmxDeesserCore *c) {
   return (uint32_t)lrintf((float)(omx_deesser_instance_latency(&c->inst)));
 }
 
+/** Meter `i`'s reading (the declaration's `meters`, in order): the kernel's own, after the last block. */
+static inline float omx_deesser_core_meter(const OmxDeesserCore *c, uint32_t i) {
+  switch (i) {
+  case 0:
+    return c->inst.state.band.gr_min_db;
+  default:
+    return 0.0f;
+  }
+}
+
 /** One block, stereo; the outputs may alias the inputs. */
 static inline void omx_deesser_core_run(OmxDeesserCore *c, const float *in_l, const float *in_r, float *out_l,
                                          float *out_r, uint32_t frames) {
