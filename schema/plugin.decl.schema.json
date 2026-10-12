@@ -576,16 +576,34 @@
       ],
       "additionalProperties": false,
       "title": "Panel",
-      "description": "The plugin's one panel, which every renderer draws: the MOD GUI (tools/modgui-gen.mjs reads it), the OpenMixer console and, later, a native window. A family, each control's role, each control's widget, and the sections in drawing order, each with the graph drawn over it. Every plugin declares one, and it draws every parameter; the wizard drafts one section of every parameter.",
+      "description": "The plugin's one panel, which every renderer draws: the MOD GUI (tools/modgui-gen.mjs reads it), the OpenMixer console and, later, a native window. A family, each control's role, each control's widget, and the sections in drawing order, each with the graph drawn over it. Every plugin declares one, and it draws every parameter; the wizard drafts one section of every parameter, its family from the kernel's.",
       "properties": {
         "family": {
-          "type": "string",
-          "pattern": "^[a-z][a-z0-9-]*$"
+          "$ref": "#/$defs/family"
         },
         "roles": {
           "type": "object",
+          "title": "Roles",
+          "description": "Each role the family's panel draws, by name, to the parameter that plays it: a symbol, or for an indexed role (`$defs.indexedRole`, an EQ band's) the symbols of every band in order. A role is one of its family's (`$defs.familyRoles`); a family other than none names at least one. In a declaration with variants a per-band symbol stands for every band's.",
+          "propertyNames": {
+            "pattern": "^[a-z][a-z_]*$"
+          },
           "additionalProperties": {
-            "type": "string"
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+              },
+              {
+                "type": "array",
+                "minItems": 1,
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+                }
+              }
+            ]
           }
         },
         "sections": {
@@ -598,7 +616,7 @@
         "widgets": {
           "type": "object",
           "title": "Widgets",
-          "description": "Each control's widget, by parameter symbol: one of the shared widgets every renderer has. A control left out takes its renderer's default for its kind (a toggle a switch, a labelled integer a choice, a travel a knob).",
+          "description": "Each control's widget, by parameter symbol: one of the shared widgets every renderer has. A control left out takes its renderer's default for its kind (a toggle a switch, labelled values or an integer of a few steps a selector, any other travel a knob).",
           "propertyNames": {
             "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
           },
@@ -608,15 +626,188 @@
         }
       }
     },
+    "family": {
+      "enum": [
+        "none",
+        "gate",
+        "dynamics",
+        "limiter",
+        "deesser",
+        "eq",
+        "filter",
+        "drive",
+        "modulation",
+        "delay",
+        "reverb",
+        "pitch"
+      ],
+      "title": "Family",
+      "description": "The panel families the console accepts, a closed set: the family names which panel the console draws and which roles it reads. An effect no family fits is `none` (the console draws its generic editor). The list is the console's; a family is added there first, then here, with its roles in `familyRoles`."
+    },
+    "familyRoles": {
+      "title": "Roles of each family",
+      "description": "Each family's roles, the only ones the console reads for it (a role outside its family is dropped). One entry per `family`, which tools/plugin-recipe.mjs holds equal.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "none": {
+          "not": {}
+        },
+        "gate": {
+          "enum": [
+            "threshold",
+            "range",
+            "attack",
+            "release",
+            "hold",
+            "knee_start",
+            "knee_end",
+            "hysteresis",
+            "ratio",
+            "key_listen"
+          ]
+        },
+        "dynamics": {
+          "enum": [
+            "threshold",
+            "ratio",
+            "attack",
+            "release",
+            "knee",
+            "makeup",
+            "lookahead",
+            "mix",
+            "output"
+          ]
+        },
+        "limiter": {
+          "enum": [
+            "ceiling",
+            "release",
+            "lookahead",
+            "threshold",
+            "mix",
+            "output"
+          ]
+        },
+        "deesser": {
+          "enum": [
+            "frequency",
+            "threshold",
+            "range",
+            "width",
+            "ratio",
+            "attack",
+            "release",
+            "knee",
+            "mode",
+            "listen",
+            "mix",
+            "output"
+          ]
+        },
+        "eq": {
+          "enum": [
+            "band_type",
+            "band_freq",
+            "band_gain",
+            "band_q",
+            "band_on",
+            "hpf_freq",
+            "hpf_slope",
+            "hpf_on",
+            "lpf_freq",
+            "lpf_slope",
+            "lpf_on",
+            "output"
+          ]
+        },
+        "filter": {
+          "enum": [
+            "cutoff",
+            "resonance",
+            "filter_type",
+            "mix",
+            "output"
+          ]
+        },
+        "drive": {
+          "enum": [
+            "drive",
+            "tone",
+            "model",
+            "mix",
+            "output"
+          ]
+        },
+        "modulation": {
+          "enum": [
+            "rate",
+            "depth",
+            "feedback",
+            "voices",
+            "spread",
+            "shape",
+            "mix",
+            "output"
+          ]
+        },
+        "delay": {
+          "enum": [
+            "time",
+            "feedback",
+            "tone",
+            "sync",
+            "division",
+            "pingpong",
+            "mix",
+            "output"
+          ]
+        },
+        "reverb": {
+          "enum": [
+            "size",
+            "decay",
+            "algorithm",
+            "predelay",
+            "damping",
+            "width",
+            "low_cut",
+            "high_cut",
+            "mix",
+            "output"
+          ]
+        },
+        "pitch": {
+          "enum": [
+            "shift",
+            "fine",
+            "mix",
+            "output"
+          ]
+        }
+      }
+    },
+    "indexedRole": {
+      "enum": [
+        "band_type",
+        "band_freq",
+        "band_gain",
+        "band_q",
+        "band_on"
+      ],
+      "title": "Indexed role",
+      "description": "The roles that repeat by index, one parameter per band: the only roles that may name a list of symbols."
+    },
     "widget": {
       "enum": [
         "knob",
         "fader",
         "switch",
-        "choice"
+        "selector"
       ],
       "title": "Widget",
-      "description": "The shared widgets a control is drawn with. A new one is added here once, and in each renderer, for every plugin."
+      "description": "The shared widgets a control is drawn with, by the names the console reads (its `auto` is a control left out of `widgets`): a knob or a fader for a travel, a switch for a toggle, a selector for an integer travel or labelled values. The schema, tools/modgui-gen.mjs and the console read this one list; a new one is added here once, and in each renderer, for every plugin."
     },
     "graph": {
       "enum": [

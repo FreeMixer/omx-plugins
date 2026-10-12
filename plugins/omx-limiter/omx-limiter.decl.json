@@ -68,7 +68,11 @@
   },
   "panel": {
     "family": "limiter",
-    "roles": {},
+    "roles": {
+      "ceiling": "ceilingDb",
+      "release": "releaseMs",
+      "lookahead": "lookaheadMs"
+    },
     "sections": [
       {
         "key": "limiter",

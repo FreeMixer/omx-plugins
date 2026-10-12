@@ -72,8 +72,13 @@
     }
   },
   "panel": {
-    "family": "flanger",
-    "roles": {},
+    "family": "modulation",
+    "roles": {
+      "rate": "rate",
+      "depth": "depth",
+      "feedback": "feedback",
+      "mix": "mix"
+    },
     "sections": [
       {
         "key": "flanger",
