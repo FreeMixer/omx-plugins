@@ -88,7 +88,7 @@
     ]
   },
   "console": {
-    "$comment": "The OpenMixer console draws its flanger stage: the modulation panel (rateHz, depthMs, feedback, mix). Chip: FxSummaryValue of STAGE_KEY_FIELD.flanger (rateHz); the overview card shows the engage switch only.",
+    "$comment": "The OpenMixer console draws its flanger stage: the modulation panel (rateHz, depthMs, feedback, mix). Its chip shows rateHz; the overview card shows the engage switch only.",
     "placement": {
       "strips": [
         "input",
