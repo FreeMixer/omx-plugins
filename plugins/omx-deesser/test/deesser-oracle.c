@@ -19,6 +19,10 @@
  * differ from the face (the sabotage arm), so a wrong or dead coefficient is seen. A CLAP face's
  * reported latency holds while it is active and moves only at the activation after the restart it
  * asks for, as the CLAP latency extension says.
+ * The declaration's meters: after every block of the plan, through the CLAP face's clap.meters/1 at
+ * every declared rate, each reads what the reference's instance holds at its declared field (0 while
+ * bypassed), bit for bit; the plan must make the kernel reduce gain, and nothing is read before the
+ * first block (docs/meters.md).
  */
 #include <dlfcn.h>
 #include <math.h>
@@ -35,6 +39,7 @@
 
 #include <omxdsp/fx/omx_deesser_instance.h>
 #include <omxdsp/omx_denormal.h>
+#include "omx_clap_meters.h"
 
 #define NP OMX_DEESSER_PARAM_COUNT
 /* 1 when the face takes a sidechain key (spec 2026-10-09-plugin-from-contract §15.1). */
@@ -81,6 +86,15 @@ static const Block PLAN[] = {
 static const float STEP[NP] = { 1.0f, 0.0375f, 0.6f, 0.19f, 0.24f, 0.499f, 1.0f, 1.0f };
 
 static int failures;
+
+/* The meters, the declaration's `meters` in order: each one's name and display floor; what the
+ * reference's instance holds at its field after every block of the plan (0 bypassed), and what the
+ * CLAP face's clap.meters/1 reported then (NaN: nothing). Set for the CLAP run of the plan only. */
+#define NM 1u
+static const char *const METER_NAMES[NM] = { "deessGr", };
+static const double METER_FLOORS[NM] = { -24, };
+static float *meters_want, *meters_got;
+static bool meters_early, meters_listed;
 
 static void check(bool ok, const char *face, double sr, const char *what) {
   if (!ok) failures++;
@@ -174,6 +188,9 @@ static void reference(double sr, int off, const float *key, const float *il, con
       (void)key;
       omx_deesser_instance_run(&inst, il + at, ir + at, ol + at, orr + at, frames);
 #endif
+      if (meters_want) {
+        meters_want[(b * STRETCH + r) * NM + 0u] = k->bypass ? 0.0f : inst.state.band.gr_min_db;
+      }
       at += frames;
     }
   }
@@ -209,11 +226,20 @@ static void run_checks(const char *face, Driver *d, double sr, bool keyed, bool 
   const char *pass = KEYED ? (keyed ? " (keyed)" : " (no key)") : "";
   char what[200];
   omx_denormals_off(); /* the faces run with flush-to-zero; so does the reference */
+  const bool metering = strcmp(face, "clap") == 0;
+  const uint32_t nm = (uint32_t)NBLOCKS * STRETCH * NM;
+  float *mwant = calloc(nm, sizeof(float)), *mgot = calloc(nm, sizeof(float));
+  if (!mwant || !mgot) abort();
+  meters_want = mwant;
   uint32_t want = 0;
   reference(sr, -1, key, il, ir, wl, wr, &want);
+  meters_want = NULL;
+  meters_got = metering ? mgot : NULL;
+  meters_early = meters_listed = false;
   uint32_t lat = 99;
   latency_broke = false;
   bool ran = d->run(d->face, PLAN, NBLOCKS, sr, key, il, ir, ol, orr, &lat);
+  meters_got = NULL;
   bool ident = ran && same(ol, wl, n) && same(orr, wr, n);
   for (uint32_t i = 0; ran && !ident && i < n; i++)
     if (memcmp(ol + i, wl + i, sizeof(float)) != 0 || memcmp(orr + i, wr + i, sizeof(float)) != 0) {
@@ -230,6 +256,27 @@ static void run_checks(const char *face, Driver *d, double sr, bool keyed, bool 
   check(ran && lat == want, face, sr, what);
   snprintf(what, sizeof what, "the reported latency moves only at activation, after a restart asked for%s", pass);
   check(ran && !latency_broke, face, sr, what);
+  if (metering) {
+    bool reduces = false, agrees = ran;
+    for (uint32_t i = 0; i < nm; i++) {
+      reduces = reduces || mwant[i] < 0.0f;
+      if (agrees && memcmp(&mwant[i], &mgot[i], sizeof(float)) != 0) {
+        fprintf(stderr, "  meter %s differs after block %u: got %.9g, kernel %.9g\n", METER_NAMES[i % NM], i / NM,
+                (double)mgot[i], (double)mwant[i]);
+        agrees = false;
+      }
+    }
+    snprintf(what, sizeof what, "clap.meters/1 lists the declaration's meters%s", pass);
+    check(ran && meters_listed, face, sr, what);
+    snprintf(what, sizeof what, "each meter is the kernel's reading after every block, 0 bypassed%s", pass);
+    check(agrees, face, sr, what);
+    snprintf(what, sizeof what, "the kernel reduces gain in the plan%s", pass);
+    check(reduces, face, sr, what);
+    snprintf(what, sizeof what, "no meter value before the first block%s", pass);
+    check(ran && !meters_early, face, sr, what);
+  }
+  free(mwant);
+  free(mgot);
   if (KEYED && keyed) {
     /* the key must reach the detector: the same plan with no key routed differs */
     reference(sr, -1, NULL, il, ir, xl, xr, NULL);
@@ -303,6 +350,19 @@ static bool clap_param(const clap_plugin_params_t *pp, const clap_plugin_t *p, c
   return false;
 }
 
+/* The face's meter list is the declaration's: the names, ids and floors, gain reductions of one channel. */
+static bool meters_listed_ok(const clap_plugin_meters_t *mx, const clap_plugin_t *p) {
+  if (mx->count(p) != NM) return false;
+  for (uint32_t m = 0; m < NM; m++) {
+    clap_meter_info_t info;
+    if (!mx->get_info(p, m, &info) || info.id != m || strcmp(info.name, METER_NAMES[m]) != 0 ||
+        info.kind != CLAP_METER_KIND_GAIN_REDUCTION || info.channel_count != 1 || info.min_value != METER_FLOORS[m] ||
+        info.max_value != 0.0)
+      return false;
+  }
+  return true;
+}
+
 static bool clap_run(void *face, const Block *plan, size_t nblocks, double sr, const float *key, const float *il,
                      const float *ir, float *ol, float *orr, uint32_t *latency) {
   ClapFace *c = (ClapFace *)face;
@@ -314,6 +374,10 @@ static bool clap_run(void *face, const Block *plan, size_t nblocks, double sr, c
   restart_asked = false;
   bool ok = pp && lat && p->activate(p, sr, 1, longest_block(sr)) && p->start_processing(p);
   const uint32_t activated = ok ? lat->get(p) : 0;
+  const clap_plugin_meters_t *mx = (const clap_plugin_meters_t *)p->get_extension(p, CLAP_EXT_METERS);
+  double early;
+  if (meters_got) meters_listed = mx && meters_listed_ok(mx, p);
+  if (meters_got && ok && mx && mx->get_values(p, 0, &early, 1) != 0) meters_early = true;
   clap_id ids[NP + 1];
   for (uint32_t i = 0; ok && i < NP; i++) ok = clap_param(pp, p, OMX_DEESSER_PARAMS[i].name, &ids[i]);
   ok = ok && clap_param(pp, p, NULL, &ids[NP]);
@@ -339,6 +403,10 @@ static bool clap_run(void *face, const Block *plan, size_t nblocks, double sr, c
                          .audio_inputs_count = key ? 2u : 1u, .audio_outputs_count = 1, .in_events = &in,
                          .out_events = &out};
     ok = p->process(p, &pr) != CLAP_PROCESS_ERROR;
+    for (uint32_t m = 0; meters_got && m < NM; m++) {
+      double v;
+      meters_got[b * NM + m] = mx && mx->get_values(p, m, &v, 1) == 1 ? (float)v : NAN;
+    }
     at += frames;
   }
   if (ok && lat->get(p) != activated) latency_broke = true;
