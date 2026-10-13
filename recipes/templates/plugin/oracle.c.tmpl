@@ -56,7 +56,7 @@
 _Static_assert({{count}} == {{extent}}, "the declaration names one {{arg}} parameter per band of the face");
 {{/arrays}}
 #define NP OMX_{{K}}_PARAM_COUNT
-/* 1 when the face takes a sidechain key (spec 2026-10-09-plugin-from-contract §15.1). */
+/* 1 when the face takes a sidechain key. */
 #define KEYED {{#keyed}}1{{/keyed}}{{^keyed}}0{{/keyed}}
 /* Each block of the plan is processed this many times in a row, the same values each time. */
 #define STRETCH {{stretch}}u

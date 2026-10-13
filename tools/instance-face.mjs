@@ -3,7 +3,7 @@
 /*
  * instance-face.mjs — omx-dsp's instance face of one kernel (<omxdsp/fx/omx_<kernel>_instance.h>),
  * read for the generated binding: its prototypes, and each `resolve` argument bound BY NAME to the
- * declaration's parameter whose contract control it is (spec 2026-10-09-plugin-from-contract §2).
+ * declaration's parameter whose contract control it is.
  *
  * The shape the generated binding calls:
  *
@@ -73,7 +73,7 @@ export function parseFace(text, kernel) {
   const odd = scalar.filter((a) => !a.extent && !/^(float|int)$/.test(a.type));
   if (odd.length) return { error: `omx_${kernel}_instance_resolve takes ${odd.map((a) => `${a.type} ${a.name}`).join(', ')}, not one scalar (or one per-band array) per control` };
   const runWant = [`${T} *`, 'const float *', 'const float *', 'float *', 'float *', 'uint32_t'];
-  // a keyed face takes the key block first (spec §15.1): NULL is the kernel's own detector
+  // a keyed face takes the key block first: NULL is the kernel's own detector
   const runKeyed = [`${T} *`, 'const float *', ...runWant.slice(1)];
   const runTypes = run.map((a) => a.type).join('|');
   const keyed = runTypes === runKeyed.join('|') && run[1].name === 'key';

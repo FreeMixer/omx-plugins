@@ -40,7 +40,7 @@
  *      that does not list the kernel is refused, never read some other way. The plan ends with a
  *      full-scale burst and a quiet tail, then each value of every choice over a burst and tail of
  *      its own with the other parameters stepped once for its second tail.
- *   8. A chain (spec §15.2), on the real faces eq, gate and comp: `--from-contract eq,gate,comp`
+ *   8. A chain, on the real faces eq, gate and comp: `--from-contract eq,gate,comp`
  *      drafts one element per kernel and refuses a kernel with no face; the settled chain is
  *      written whole, its parameter list flattened (each element's switch, then its parameters,
  *      then `order`), and its `make test` is green: both faces bit-identical to the chain of faces

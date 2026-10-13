@@ -9,7 +9,7 @@
  * is allocated, locked or called into the system, in process or at activate.
  *
  * GENERATED — DO NOT EDIT BY HAND. Produced by tools/gen.mjs from plugins/omx-strip/omx-strip.decl.json and
- * each face's resolve() prototype (spec 2026-10-09-plugin-from-contract §15.2).
+ * each face's resolve() prototype.
  * filter: `bandType` is not a parameter; it is passed at "default".
  * filter: `freq` is not a parameter; it is passed at "default".
  * filter: `gain` is not a parameter; it is passed at "default".
