@@ -1,3 +1,13 @@
+omx-plugins (0.5.1) unstable; urgency=medium
+
+  * omx deesser reports its gain reduction: the CLAP face serves the
+    kernel's gain reduction per block through clap.meters/1, and its oracle
+    holds that meter to the kernel at every rate.
+  * A plugin declares its meters in its declaration; the generator serves
+    them through clap.meters/1 and checks them in the oracle.
+
+ -- Pau Aliagas <linuxnow@gmail.com>  Tue, 13 Oct 2026 04:30:00 +0200
+
 omx-plugins (0.5.0) unstable; urgency=medium
 
   * The faces follow omx-dsp 0.6.0, the oldest release they build against now.
