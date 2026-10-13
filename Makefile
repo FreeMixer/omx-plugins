@@ -12,6 +12,9 @@
 #     make completeness  every plugin against recipes/plugin.recipe.json, each gap naming its wizard step;
 #                        a gap not in recipes/completeness-debt.json fails, and so does a paid debt entry
 #     make selftest      the recipe's checkers, wizard and commit protocol, each sabotaged (needs git)
+#   make meters-abi   include/omx_clap_meters.h against omx-clap-core's clap_meters.h: same id, enums, sizeof and
+#                    offsetof (tools/meters-abi-check.sh; fetches omx-clap-core's header by the installed tag, so it
+#                    needs the network and is not part of `make test`, which the package builds run offline)
 #   make strip-crosscheck   omx-strip, a chain, against the hand-ported strip it replaced, bit for bit at
 #                    the old plugin's settings (tools/test/strip-crosscheck.sh; needs the git history)
 #   make install    DESTDIR, PREFIX, LIBDIR, CLAPDIR: $(CLAPDIR)/<name>.clap and $(LIBDIR)/lv2/<name>.lv2/
@@ -52,7 +55,7 @@ LIB_FLAGS  := -fPIC -fvisibility=hidden -DOMX_CLAP_STATIC -Iinclude
 # read only by the targets that build the archive, so `make version` and the rest need no omx-dsp
 lib_cflags = $(shell $(PKG_CONFIG) --cflags omxdsp omx-clap-core clap)
 
-.PHONY: all lib lib-test test hints look install install-devel clean version recipe-test completeness selftest strip-crosscheck
+.PHONY: all lib lib-test test hints look install install-devel clean version recipe-test completeness selftest strip-crosscheck meters-abi
 all: lib
 	@for p in $(PLUGINS); do $(MAKE) -C $$p all || exit 1; done
 lib: $(LIB) $(LIB_PC)
@@ -75,6 +78,9 @@ completeness:
 	node tools/plugin-recipe.mjs
 selftest:
 	node tools/test/recipe-selftest.mjs
+meters-abi:
+	tools/meters-abi-check.sh
+	tools/meters-abi-check.sh --self-test
 strip-crosscheck:
 	sh tools/test/strip-crosscheck.sh
 install:
