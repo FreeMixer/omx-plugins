@@ -87,7 +87,7 @@ Plus the host's bypass.
 
 | Parameter | Range | Default |
 |---|---|---|
-| Time | 0 to 2000 ms, whole ms | 300 ms |
+| Time | 0 to 2000 ms, whole steps | 300 ms |
 | Feedback | 0 to 0.99 | 0.3 |
 | Mix (wet) | 0 to 1 | 0.3 |
 | Tone (0 bright, 1 dark repeats) | 0 to 1 | 0.3 |
@@ -117,9 +117,9 @@ Plus the host's bypass.
 
 | Section | Parameters |
 |---|---|
-| High-pass | on/off, 20 to 1000 Hz, 12 or 24 dB/oct |
-| Low-pass | on/off, 1 to 20 kHz, 12 or 24 dB/oct |
-| Bands 1 to 8 | each on/off, type, frequency (20 Hz to 20 kHz), gain (±15 dB), Q (0.3 to 8, a notch to 116) |
+| High-pass | on/off, 20 to 1000 Hz, whole steps; slope 12 dB/oct / 24 dB/oct |
+| Low-pass | on/off, 1000 to 20000 Hz, whole steps; slope 12 dB/oct / 24 dB/oct |
+| Bands 1 to 8 | each on/off, type, frequency (20 to 20000 Hz, whole steps), gain (-15 to 15 dB), Q (0.3 to 116; its top for a notch only) |
 
 Plus the host's bypass, which is the whole EQ's switch. Every band and filter starts off, so a freshly loaded instance passes the
 signal untouched.
@@ -128,9 +128,9 @@ signal untouched.
 
 | Section | Parameters |
 |---|---|
-| High-pass | on/off, 20 to 1000 Hz, 12 or 24 dB/oct |
-| Low-pass | on/off, 1 to 20 kHz, 12 or 24 dB/oct |
-| Bands 1 to 16 | each on/off, type, frequency (20 Hz to 20 kHz), gain (±15 dB), Q (0.3 to 8, a notch to 116) |
+| High-pass | on/off, 20 to 1000 Hz, whole steps; slope 12 dB/oct / 24 dB/oct |
+| Low-pass | on/off, 1000 to 20000 Hz, whole steps; slope 12 dB/oct / 24 dB/oct |
+| Bands 1 to 16 | each on/off, type, frequency (20 to 20000 Hz, whole steps), gain (-15 to 15 dB), Q (0.3 to 116; its top for a notch only) |
 
 Plus the host's bypass, which is the whole EQ's switch. Every band and filter starts off, so a freshly loaded instance passes the
 signal untouched.
@@ -139,9 +139,9 @@ signal untouched.
 
 | Section | Parameters |
 |---|---|
-| High-pass | on/off, 20 to 1000 Hz, 12 or 24 dB/oct |
-| Low-pass | on/off, 1 to 20 kHz, 12 or 24 dB/oct |
-| Bands 1 to 32 | each on/off, type, frequency (20 Hz to 20 kHz), gain (±15 dB), Q (0.3 to 8, a notch to 116) |
+| High-pass | on/off, 20 to 1000 Hz, whole steps; slope 12 dB/oct / 24 dB/oct |
+| Low-pass | on/off, 1000 to 20000 Hz, whole steps; slope 12 dB/oct / 24 dB/oct |
+| Bands 1 to 32 | each on/off, type, frequency (20 to 20000 Hz, whole steps), gain (-15 to 15 dB), Q (0.3 to 116; its top for a notch only) |
 
 Plus the host's bypass, which is the whole EQ's switch. Every band and filter starts off, so a freshly loaded instance passes the
 signal untouched.
@@ -209,9 +209,9 @@ key, or **Key** set to Self, it is the ordinary self-keyed gate.
 | Range | -90 to 0 dB | -90 dB |
 | Attack | 0 to 500 ms | 1 ms |
 | Release | 0 to 5000 ms | 100 ms |
-| Knee start | -80 to 0 dB | -43 dB |
-| Knee end | -80 to 0 dB | -37 dB |
-| Hold | 0 to 2000 ms | 10 ms |
+| Knee start | -80 to 0 dB, whole steps | -43 dB |
+| Knee end | -80 to 0 dB, whole steps | -37 dB |
+| Hold | 0 to 2000 ms, whole steps | 10 ms |
 | Hysteresis | 0 to 24 dB | 3 dB |
 
 Plus the host's bypass. An attack under 0.5 ms engages the 4x detector path, which adds 72 frames
