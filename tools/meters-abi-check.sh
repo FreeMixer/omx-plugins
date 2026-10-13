@@ -8,7 +8,7 @@
 # extension id, enum values, sizeof and offsetof for every structure.
 #
 #   tools/meters-abi-check.sh              the check
-#   tools/meters-abi-check.sh --self-test  a reordered field and a changed enum must each go red
+#   tools/meters-abi-check.sh --self-test  an added field and a changed enum must each go red
 #
 # omx-clap-core's header comes from, in order: $OMX_CLAP_CORE_METERS (a path), the tag of the
 # installed omx-clap-core (pkg-config) fetched from GitHub. The CLAP SDK headers come from pkg-config
@@ -52,7 +52,7 @@ core="$(core_header)"
 if [ "${1:-}" = --self-test ]; then
   fail=0
   compare "$HERE/include/omx_clap_meters.h" "$core" >/dev/null || { echo "self-test: the unsabotaged check is not green" >&2; exit 1; }
-  # sabotage 1: two fields swapped in the info struct
+  # sabotage 1: a field added to the info struct, ahead of kind
   sed 's/^    uint32_t kind; /    uint32_t flags_;\n    uint32_t kind; /' "$core" > "$scratch/s1.h"
   # sabotage 2: an enum value moved
   sed 's/CLAP_METER_KIND_LEVEL = 2/CLAP_METER_KIND_LEVEL = 3/' "$core" > "$scratch/s2.h"
