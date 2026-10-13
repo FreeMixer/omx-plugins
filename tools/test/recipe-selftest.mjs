@@ -727,6 +727,8 @@ static inline void omx_wobble_instance_run(OmxWobbleInstance *s, const float *${
     gate.fixed = { keySource: 'self' };
     gate.params = gate.params.filter((p) => p.symbol !== 'gateKeySource');
     comp.on = true;
+    // the detector topology's set carries no labels in the contract: the person names them, as omx-comp does
+    for (const p of comp.params.filter((x) => x.ref === 'DETECTOR_TOPOLOGY')) p.values = ['Feedforward', 'Feedback'];
     settled.order = 'permutable';
     settled.panel = defaultPanel(settled); // the settled elements' parameters, one section each
     const plan = await planChain(settled, csrc, { root: ct, recipe });
