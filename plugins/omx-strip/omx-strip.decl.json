@@ -384,7 +384,10 @@
           "name": "Comp Detector Oversampling",
           "ref": "DETECTOR_OVERSAMPLINGS"
         }
-      ]
+      ],
+      "fixed": {
+        "detectorTopology": "feedforward"
+      }
     }
   ],
   "order": "permutable",

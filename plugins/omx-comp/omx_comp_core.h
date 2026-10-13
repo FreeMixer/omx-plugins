@@ -46,7 +46,8 @@ static inline void omx_comp_core_resolve(OmxCompCore *c, const float *values, in
                                   /* makeup_db */ values[OMX_COMP_PARAM_MAKEUP_DB],
                                   /* mix_pct */ values[OMX_COMP_PARAM_MIX_PCT],
                                   /* kind */ (int)lrintf(values[OMX_COMP_PARAM_KIND]),
-                                  /* detector_oversampling */ (int)lrintf(values[OMX_COMP_PARAM_DETECTOR_OVERSAMPLING]));
+                                  /* detector_oversampling */ (int)lrintf(values[OMX_COMP_PARAM_DETECTOR_OVERSAMPLING]),
+                                  /* detector_topology */ (int)lrintf(values[OMX_COMP_PARAM_DETECTOR_TOPOLOGY]));
 }
 
 /** The latency the kernel adds, in samples. */

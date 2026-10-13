@@ -9,7 +9,7 @@
   "vendor": "openmixer",
   "url": "https://github.com/FreeMixer/omx-plugins",
   "version": "0.5.1",
-  "description": "The console's compressor: threshold, ratio and knee set how hard it holds the level down, attack and release how fast, with makeup gain and a dry/wet mix. Kind picks the RMS detector (Compressor) or the peak detector (Limiter), and detector oversampling can run the control path at 4x. The DSP is omx-dsp's <omxdsp/fx/omx_comp_instance.h>, the console's own compressor.",
+  "description": "The console's compressor: threshold, ratio and knee set how hard it holds the level down, attack and release how fast, with makeup gain and a dry/wet mix. Kind picks the RMS detector (Compressor) or the peak detector (Limiter), and detector oversampling can run the control path at 4x; detector topology has it hear the input (feedforward) or its own output (feedback). The DSP is omx-dsp's <omxdsp/fx/omx_comp_instance.h>, the console's own compressor.",
   "clap": {
     "id": "org.openmixer.comp",
     "features": [
@@ -75,6 +75,15 @@
       "symbol": "detectorOversampling",
       "name": "Detector Oversampling",
       "ref": "DETECTOR_OVERSAMPLINGS"
+    },
+    {
+      "symbol": "detectorTopology",
+      "name": "Detector Topology",
+      "ref": "DETECTOR_TOPOLOGY",
+      "values": [
+        "Feedforward",
+        "Feedback"
+      ]
     }
   ],
   "portHints": {
@@ -126,6 +135,16 @@
         "2 4x"
       ]
     },
+    "detectorTopology": {
+      "props": [
+        "lv2:enumeration",
+        "lv2:integer"
+      ],
+      "points": [
+        "0 Feedforward",
+        "1 Feedback"
+      ]
+    },
     "enabled": {
       "props": [
         "lv2:toggled"
@@ -163,13 +182,14 @@
           "makeupDb",
           "mixPct",
           "kind",
-          "detectorOversampling"
+          "detectorOversampling",
+          "detectorTopology"
         ]
       }
     ]
   },
   "console": {
-    "$comment": "The compressor as a dynamics stage of the console walk: one section of the nine controls, in declaration order. Its placement follows the other dynamics stages (gate, de-esser); the card, chip and graph the console draws for it are not declared yet.",
+    "$comment": "The compressor as a dynamics stage of the console walk: one section of the ten controls, in declaration order. Its placement follows the other dynamics stages (gate, de-esser); the card, chip and graph the console draws for it are not declared yet.",
     "placement": {
       "strips": [
         "input",
