@@ -244,6 +244,17 @@
             "$ref": "#/$defs/latencyCheck"
           }
         },
+        "oracles": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "title": "Oracles",
+          "description": "Hand-written oracles beside the generated identity test, each test/<name>.c in the plugin folder: an oracle moved from the console engine with its effect, run on the built faces at the nine RME rates (docs/new-plugin-from-contract.md). The generated Makefile builds each one and runs it in make test as `<name> clap <stem>.clap` and `<name> lv2 <bundle> <uri>`; tools/gen.mjs refuses a name whose file is missing. Left out, the identity test is the plugin's only oracle.",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*$"
+          }
+        },
         "meters": {
           "type": "array",
           "minItems": 1,

@@ -100,6 +100,10 @@ export function prepareDecl(file, d, stem, dir = dirname(file)) {
   if (d.sidechain && (seen.has(d.sidechain.symbol) || FIXED_PORTS.includes(d.sidechain.symbol))) throw new Error(`${file}: sidechain symbol '${d.sidechain.symbol}' is taken`);
   if (d.binding === 'chain') checkShipped(file, d);
   if (d.meters && d.binding !== 'instance') throw new Error(`${file}: "meters" are read from an instance face; this declaration's binding is ${d.binding ?? 'its own'}`);
+  for (const o of d.oracles ?? []) {
+    if (o === `${d.kernel}-oracle`) throw new Error(`${file}: oracle '${o}' is the generated identity test's name`);
+    if (!existsSync(join(dir, 'test', `${o}.c`))) throw new Error(`${file}: oracle '${o}' names test/${o}.c, which does not exist`);
+  }
   return { ...d, dir: resolve(dir), tree: treeOf(file) };
 }
 
@@ -578,6 +582,7 @@ export function templateView(d) {
     stem: d.stem, kernel: d.kernel, face: d.face ?? d.kernel, K: d.kernel.toUpperCase(), Kernel: d.kernel.replace(/(^|_)([a-z])/g, (_m, _u, c) => c.toUpperCase()),
     name: d.name, uri: d.lv2.uri, clapId: d.clap.id, description: d.description,
     omxdspMin: pinOf('omx-dsp', d.tree ?? ROOT), panel: Boolean(d.panel), params: d.params.map(paramRow),
+    oracles: (d.oracles ?? []).map((oracle) => ({ oracle })),
   };
 }
 
