@@ -97,6 +97,18 @@ would test the re-arm, not the identity. The flag is read from omx-contract's JS
 `kernels.<kernel>.controls` lists each kernel's controls in declared order. The oracle's header comment names each held parameter, and the sabotage arm still moves it
 by one step. The other parameters move as before.
 
+## Oracles beside the identity test
+
+The identity test proves the faces run omx-dsp's kernel; it does not say what the kernel does. When
+an effect moves out of the console engine, the engine's own oracle comes with it: the declaration
+names it in `oracles`, a list of names, and each `test/<name>.c` is written by hand (it is not
+generated, and `tools/gen.mjs` refuses a name whose file is missing). The generated Makefile builds
+each one as it builds the identity test and runs it in `make test` on both faces, as
+`<name> clap <stem>.clap` and `<name> lv2 <bundle> <uri>`. Such an oracle opens the built faces as a
+host does and reads only their audio, so an arm that read the kernel's state in the engine says what
+of it a host can see. It runs at the nine rates an RME interface clocks at (`OMX_RME_RATES`, 32 to
+192 kHz), the rates omx-dsp's own kernel oracles run at.
+
 ## A plugin made of several kernels: a chain
 
 `node tools/omx-new-plugin.mjs --from-contract <k1>,<k2>,... --stem omx-<x>` drafts a composite
