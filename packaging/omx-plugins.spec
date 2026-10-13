@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # Copyright (C) 2026 Pau Aliagas <linuxnow@gmail.com>
 Name: omx-plugins
-Version: 0.5.0
+Version: 0.5.1
 Release: 1%{?dist}
 License: GPL-3.0-or-later
 Summary: The OpenMixer console's delay, drive, EQ, channel strip, keyed gate and effects, as plugins for your DAW
@@ -157,6 +157,12 @@ host that runs the plugins in its own process without loading .clap files.
 # END GENERATED lv2-files
 
 %changelog
+* Tue Oct 13 2026 Pau Aliagas <linuxnow@gmail.com> - 0.5.1-1
+- omx deesser reports its gain reduction: the CLAP face serves the kernel's
+  gain reduction per block through clap.meters/1, and its oracle holds that
+  meter to the kernel at every rate.
+- A plugin declares its meters in its declaration; the generator serves them
+  through clap.meters/1 and checks them in the oracle.
 * Mon Oct 12 2026 Pau Aliagas <linuxnow@gmail.com> - 0.5.0-1
 - The faces follow omx-dsp 0.6.0, the oldest release they build against now.
 - omx pitch reports its latency at full mix: its shortest delay plus half its
