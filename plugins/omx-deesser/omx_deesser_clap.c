@@ -13,6 +13,8 @@
  * and param-contract/1; clap.remote-controls (the panel's sections as pages of eight) and
  * clap.track-info (a placement's defaults, the contract's per-kind ones, on every parameter the host
  * or a state has not set).
+ * clap.meters/1: the declaration's meters, each the kernel's own reading after the block, 0 while
+ * bypassed, published with one relaxed store (docs/meters.md).
  */
 #include <stdatomic.h>
 #include <stdbool.h>
@@ -37,6 +39,7 @@
 #include "omx_deesser_params.h"
 #include "omx_deesser_core.h"
 #include <omx-clap-host/omx_clap_ext.h>
+#include "omx_clap_meters.h"
 #include <omxdsp/omx_denormal.h> /* omx_denormals_off, per callback */
 
 #define G_DECLARED OMX_DEESSER_PARAM_COUNT
@@ -46,6 +49,15 @@
 
 static const char G_SOURCE[] = OMX_DEESSER_DECL_SOURCE;
 static const char G_DIGEST[] = OMX_DEESSER_DECL_DIGEST;
+
+/* The declaration's meters, in order: the index is the CLAP meter id. */
+#define G_METERS 1u
+static const struct {
+  const char *name;
+  double min;
+} G_METER_INFO[G_METERS] = {
+    {"deessGr", -24},
+};
 
 typedef struct {
   clap_plugin_t plugin;
@@ -60,6 +72,8 @@ typedef struct {
   const clap_host_track_info_t *track_info; /* the host's clap.track-info, when it offers one */
   unsigned char touched[G_PARAMS];          /* set by the host or a state: a placement default leaves it */
   _Atomic uint32_t placed;                  /* a placement for the audio thread to apply, plus one; 0 none */
+  _Atomic float meter[G_METERS];            /* each meter's reading after the last block */
+  _Atomic int metered;                      /* a block processed since activation */
 } G;
 
 static float g_min(uint32_t i) { return i < G_DECLARED ? OMX_DEESSER_PARAMS[i].min : 0.0f; }
@@ -153,11 +167,16 @@ static bool g_activate(const clap_plugin_t *p, double sample_rate, uint32_t min_
   if (atomic_exchange(&g->latency, lat) != lat && g->host_latency && g->host_latency->changed)
     g->host_latency->changed(g->host);
   atomic_store(&g->restart_asked, 0);
+  atomic_store(&g->metered, 0);
   g->active = 1;
   return true;
 }
 
-static void g_deactivate(const clap_plugin_t *p) { ((G *)p->plugin_data)->active = 0; }
+static void g_deactivate(const clap_plugin_t *p) {
+  G *g = (G *)p->plugin_data;
+  atomic_store(&g->metered, 0);
+  g->active = 0;
+}
 
 static bool g_start_processing(const clap_plugin_t *p) {
   ((G *)p->plugin_data)->processing = 1;
@@ -182,6 +201,11 @@ static clap_process_status g_process(const clap_plugin_t *p, const clap_process_
   omx_deesser_core_resolve(&g->core, g->values, g->values[G_BYPASS] > 0.5f);
   omx_deesser_core_run(&g->core, ai->data32[0], ai->data32[1], ao->data32[0], ao->data32[1], pr->frames_count);
   g_publish(g);
+  /* The kernel's readings of this block; a bypassed kernel's state is stale, and reads 0. */
+  const int bypassed = g->values[G_BYPASS] > 0.5f;
+  for (uint32_t i = 0; i < G_METERS; ++i)
+    atomic_store_explicit(&g->meter[i], bypassed ? 0.0f : omx_deesser_core_meter(&g->core, i), memory_order_relaxed);
+  atomic_store_explicit(&g->metered, 1, memory_order_release);
   /* A parameter that moves the kernel's latency (as the pitch shifter's mix crossing 100 % does):
    * the reported latency holds until the next activation, and the host is asked, once, for the
    * restart that brings it. */
@@ -434,6 +458,37 @@ static void g_track_info_changed(const clap_plugin_t *p) {
 
 static const clap_plugin_track_info_t G_TRACK_INFO_EXT = {g_track_info_changed};
 
+/* ---- clap.meters/1: the declaration's meters (docs/meters.md) ----------------------------- */
+
+static uint32_t g_meters_count(const clap_plugin_t *p) {
+  (void)p;
+  return G_METERS;
+}
+
+static bool g_meters_info(const clap_plugin_t *p, uint32_t index, clap_meter_info_t *info) {
+  (void)p;
+  if (index >= G_METERS) return false;
+  memset(info, 0, sizeof *info);
+  info->id = index;
+  snprintf(info->name, sizeof info->name, "%s", G_METER_INFO[index].name);
+  info->kind = CLAP_METER_KIND_GAIN_REDUCTION;
+  info->flags = CLAP_METER_IS_COHERENT;
+  info->channel_count = 1;
+  info->min_value = G_METER_INFO[index].min;
+  info->max_value = 0.0;
+  return true;
+}
+
+/** The last block's reading, from any thread; nothing before a block since activation. */
+static uint32_t g_meters_values(const clap_plugin_t *p, clap_id id, double *values, uint32_t capacity) {
+  G *g = (G *)p->plugin_data;
+  if (id >= G_METERS || capacity < 1 || !values || !atomic_load_explicit(&g->metered, memory_order_acquire)) return 0;
+  values[0] = (double)atomic_load_explicit(&g->meter[id], memory_order_relaxed);
+  return 1;
+}
+
+static const clap_plugin_meters_t G_METERS_EXT = {g_meters_count, g_meters_info, g_meters_values};
+
 static const void *g_get_extension(const clap_plugin_t *p, const char *id) {
   (void)p;
   if (strcmp(id, CLAP_EXT_PARAMS) == 0) return &G_PARAMS_EXT;
@@ -445,6 +500,7 @@ static const void *g_get_extension(const clap_plugin_t *p, const char *id) {
   if (strcmp(id, OMX_PARAM_CONTRACT_ID) == 0) return &G_CONTRACT_EXT;
   if (strcmp(id, CLAP_EXT_REMOTE_CONTROLS) == 0) return &G_PAGES_EXT;
   if (strcmp(id, CLAP_EXT_TRACK_INFO) == 0) return &G_TRACK_INFO_EXT;
+  if (strcmp(id, CLAP_EXT_METERS) == 0) return &G_METERS_EXT;
   return NULL;
 }
 
