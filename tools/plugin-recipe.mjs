@@ -25,7 +25,7 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { compareVersions, contractPin, declKernels, declParams, findName, kernelExists, locateContract, paramKernel } from './omx-contract.mjs';
+import { compareVersions, declKernels, declParams, findName, kernelExists, locateContract, packagingRange, paramKernel } from './omx-contract.mjs';
 import { omxdspInclude, render } from './template.mjs';
 import { baseOf, expandVariant, variantStems } from './variants.mjs';
 
@@ -141,7 +141,7 @@ export const RULES = {
   // a chain (spec §15.2) is generated whole, as an instance plugin is
   instance: (_root, _recipe, facts) => facts.decl?.binding === 'instance' || facts.decl?.binding === 'chain',
   panel: (_root, _recipe, facts) => Boolean(facts.decl?.panel) || facts.decl?.binding === 'instance' || facts.decl?.binding === 'chain',
-  byReference: (root, recipe) => compareVersions(contractPin(root), recipe.contract.byReferenceSince) >= 0,
+  byReference: (root, recipe) => compareVersions(packagingRange('omx-contract-devel', root).floor, recipe.contract.byReferenceSince) >= 0,
 };
 
 // ---- the checkers: one per artifact kind ---------------------------------------------------------
@@ -285,7 +285,7 @@ export const CHECKERS = {
     return errs.length ? missing(`plugins/${facts.stem}/${facts.stem}.decl.json: ${errs.join('; ')}`) : ok(`plugins/${facts.stem}/${facts.stem}.decl.json`);
   },
 
-  /** Each kernel's file is in omx-contract at the pinned release. */
+  /** Each kernel's file is in the installed omx-contract. */
   kernelFile(root, _recipe, facts) {
     if (!facts.decl) return missing(facts.error);
     const where = locateContract(root);
@@ -293,8 +293,8 @@ export const CHECKERS = {
     const ks = declKernels(facts.decl);
     const absent = ks.filter((k) => !kernelExists(where.dir, k));
     return absent.length
-      ? missing(`omx-contract ${where.pin} has no ${absent.map((k) => `data/kernels/${k}.json`).join(', ')} (a NEW kernel: the kernel recipe in omx-contract and omx-dsp, then move the pin; a composite declares its kernels)`)
-      : ok(`omx-contract ${where.pin}: ${ks.map((k) => `data/kernels/${k}.json`).join(', ')}`);
+      ? missing(`omx-contract ${where.version} has no ${absent.map((k) => `data/kernels/${k}.json`).join(', ')} (a NEW kernel: the kernel recipe in omx-contract and omx-dsp, then raise the packaging's omx-contract floor; a composite declares its kernels)`)
+      : ok(`omx-contract ${where.version}: ${ks.map((k) => `data/kernels/${k}.json`).join(', ')}`);
   },
 
   /** The named generated files are what tools/gen.mjs writes now. */

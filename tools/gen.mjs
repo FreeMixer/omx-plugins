@@ -42,7 +42,7 @@ import { fileURLToPath } from 'node:url';
 import { faceBinding } from './instance-face.mjs';
 import { DISPLAY_KINDS, DISPLAY_SOURCES, FAMILIES, PLACEMENTS, WIDGETS, pagesOf, panelDescription, panelFingerprint } from './panel-description.mjs';
 import { CONTRACT_VERSION, contractFingerprint, contractOf } from './param-contract.mjs';
-import { PIN_FILE, controlOf, eqDefaultBands, findName, kernelControls, locateContract, paramKernel, pinOf, resolveParam } from './omx-contract.mjs';
+import { SPEC_FILE, controlOf, eqDefaultBands, findName, kernelControls, locateContract, packagingRange, paramKernel, resolveParam } from './omx-contract.mjs';
 import { bandsMacro, baseOf, expandVariant, variantStems } from './variants.mjs';
 import { omxdspInclude, render } from './template.mjs';
 
@@ -262,16 +262,16 @@ function checkShipped(file, d) {
 }
 
 /** The tree a declaration sits in; a declaration copied out of its tree (a test's scratch copy)
- * reads this tree's pin. */
+ * reads this tree's packaging. */
 const treeOf = (file) => {
   const tree = resolve(dirname(file), '..', '..');
-  return existsSync(join(tree, PIN_FILE)) ? tree : ROOT;
+  return existsSync(join(tree, SPEC_FILE)) ? tree : ROOT;
 };
 
 /** The travel fields a parameter BY REFERENCE reads from omx-contract and must never retype. */
 export const TRAVEL_FIELDS = ['min', 'max', 'def', 'unit', 'kind'];
 
-/** Each parameter with its travel: read from omx-contract at the pin through its `ref`
+/** Each parameter with its travel: read from the installed omx-contract through its `ref`
  * (tools/omx-contract.mjs), or typed and marked `own` with the reason omx-contract declares no such
  * control (a switch of the plugin's face, the strip's stage order). A parameter is one or the other. */
 function resolveParams(file, d) {
@@ -593,7 +593,7 @@ export function templateView(d) {
   return {
     stem: d.stem, kernel: d.kernel, face: d.face ?? d.kernel, K: d.kernel.toUpperCase(), Kernel: d.kernel.replace(/(^|_)([a-z])/g, (_m, _u, c) => c.toUpperCase()),
     name: d.name, uri: d.lv2.uri, clapId: d.clap.id, description: d.description,
-    omxdspMin: pinOf('omx-dsp', d.tree ?? ROOT), panel: Boolean(d.panel), params: d.params.map(paramRow),
+    omxdspMin: packagingRange('omx-dsp-devel', d.tree ?? ROOT).floor, panel: Boolean(d.panel), params: d.params.map(paramRow),
   };
 }
 
