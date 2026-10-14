@@ -43,7 +43,7 @@ static const omx_plugin_param OMX_LIMITER_PARAMS[OMX_LIMITER_PARAM_COUNT] = {
 #define OMX_LIMITER_NAME "omx limiter"
 #define OMX_LIMITER_VENDOR "openmixer"
 #define OMX_LIMITER_URL "https://github.com/FreeMixer/omx-plugins"
-#define OMX_LIMITER_VERSION "0.6.0"
+#define OMX_LIMITER_VERSION "0.7.0"
 #define OMX_LIMITER_DESCRIPTION "The precision limiter: a look-ahead, true-peak, stereo-linked brickwall."
 #define OMX_LIMITER_CLAP_ID "org.openmixer.limiter"
 #define OMX_LIMITER_CLAP_FEATURES "audio-effect", "limiter", "stereo"
