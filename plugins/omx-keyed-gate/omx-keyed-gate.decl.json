@@ -91,6 +91,18 @@
       "name": "Hysteresis",
       "ref": "GATE_LIMITS",
       "field": "hysteresisDb"
+    },
+    {
+      "symbol": "key_hp",
+      "name": "Key High-pass",
+      "ref": "GATE_KEY_LIMITS",
+      "field": "hpHz"
+    },
+    {
+      "symbol": "key_lp",
+      "name": "Key Low-pass",
+      "ref": "GATE_KEY_LIMITS",
+      "field": "lpHz"
     }
   ],
   "sidechain": {
@@ -157,6 +169,18 @@
     "hysteresis": {
       "unit": "units:db"
     },
+    "key_hp": {
+      "props": [
+        "lv2:integer"
+      ],
+      "unit": "units:hz"
+    },
+    "key_lp": {
+      "props": [
+        "lv2:integer"
+      ],
+      "unit": "units:hz"
+    },
     "latency": {
       "props": [
         "lv2:integer",
@@ -199,7 +223,9 @@
         "key": "key",
         "label": "Key",
         "controls": [
-          "key_external"
+          "key_external",
+          "key_hp",
+          "key_lp"
         ]
       }
     ]
@@ -221,6 +247,8 @@
     "| Knee end | {range:knee_end} | {default:knee_end} |",
     "| Hold | {range:hold} | {default:hold} |",
     "| Hysteresis | {range:hysteresis} | {default:hysteresis} |",
+    "| Key high-pass | {range:key_hp} | {default:key_hp} |",
+    "| Key low-pass | {range:key_lp} | {default:key_lp} |",
     "",
     "Plus the host's bypass. An attack under 0.5 ms engages the 4x detector path, which adds 72 frames",
     "of latency, reported to the host; otherwise the latency is zero. Its LV2 URI, ports and defaults",
@@ -228,7 +256,7 @@
     "bundle loads this one."
   ],
   "console": {
-    "$comment": "The OpenMixer console draws its gate stage and its key in the processing strip: the gate's curve beside its encoders (thresholdDb, rangeDb, ratio, attackMs, holdMs, releaseMs, hysteresisDb), the knee as readouts (knee_start, knee_end are not drawn as controls), then the KEY section (key source select; the voice-band button, key HP/LP and listen have no parameter here). Its chip shows the gate's main settings. Its overview card carries the gate's controls.",
+    "$comment": "The OpenMixer console draws its gate stage and its key in the processing strip: the gate's curve beside its encoders (thresholdDb, rangeDb, ratio, attackMs, holdMs, releaseMs, hysteresisDb), the knee as readouts (knee_start, knee_end are not drawn as controls), then the KEY section (key source select, key HP and LP; the voice-band button and listen have no parameter here). Its chip shows the gate's main settings. Its overview card carries the gate's controls.",
     "placement": {
       "strips": [
         "input",

@@ -58,31 +58,31 @@ typedef struct {
 } Block;
 
 static const Block PLAN[] = {
-    { 64, 0.0f, 0, {1.0f, 0.0f, 75.25f, -45.0f, 50.0f, 1750.0f, -43.0f, 0.0f, 1500.0f, 12.0f}, 0 },
-    { 1, 0.0f, 0, {0.0f, -80.0f, 16.0f, -9.0f, 300.0f, 100.0f, -60.0f, -80.0f, 10.0f, 21.6f}, 0 },
-    { 333, 0.0f, 0, {1.0f, -20.0f, 50.5f, -81.0f, 175.0f, 100.0f, 0.0f, -20.0f, 1000.0f, 2.4f}, 0 },
-    { 512, 0.0f, 0, {0.0f, -40.0f, 90.1f, -36.0f, 1.0f, 1250.0f, -80.0f, -37.0f, 1800.0f, 14.4f}, 0 },
-    { 17, 0.0f, 0, {1.0f, -40.0f, 10.9f, -58.5f, 1.0f, 5000.0f, -20.0f, -40.0f, 200.0f, 8.4f}, 1 },
-    { 480, 0.0f, 0, {1.0f, -8.0f, 60.4f, -90.0f, 125.0f, 0.0f, -43.0f, -8.0f, 1200.0f, 3.0f}, 1 },
-    { 129, 0.0f, 0, {1.0f, -72.0f, 35.65f, -90.0f, 500.0f, 3750.0f, -40.0f, -72.0f, 700.0f, 3.0f}, 0 },
-    { 1024, 0.0f, 0, {1.0f, -32.0f, 16.0f, -67.5f, 0.0f, 100.0f, -8.0f, -32.0f, 10.0f, 6.0f}, 0 },
-    { 7, 0.0f, 0, {0.0f, -52.0f, 16.0f, 0.0f, 375.0f, 2500.0f, -72.0f, -52.0f, 10.0f, 24.0f}, 0 },
-    { 2500, 0.0f, 0, {1.0f, -40.0f, 25.75f, -90.0f, 1.0f, 4500.0f, -32.0f, -37.0f, 500.0f, 0.0f}, 0 },
-    { 600, 0.0f, 0, {0.0f, -40.0f, 100.0f, -22.5f, 250.0f, 500.0f, -52.0f, -37.0f, 2000.0f, 18.0f}, 0 },
-    { 3000, 0.0f, 0, {1.0f, -60.0f, 1.0f, -90.0f, 450.0f, 3000.0f, -43.0f, -60.0f, 0.0f, 3.0f}, 0 },
-    { 0, 10.0f, 1, {1.0f, -40.0f, 16.0f, -90.0f, 1.0f, 100.0f, -43.0f, -37.0f, 10.0f, 3.0f}, 0 },
-    { 0, 111.0f, 2, {1.0f, -40.0f, 16.0f, -90.0f, 1.0f, 100.0f, -43.0f, -37.0f, 10.0f, 3.0f}, 0 },
-    { 0, 10.0f, 1, {0.0f, -40.0f, 16.0f, -90.0f, 1.0f, 100.0f, -43.0f, -37.0f, 10.0f, 3.0f}, 0 },
-    { 0, 111.0f, 2, {0.0f, -40.0f, 16.0f, -90.0f, 1.0f, 100.0f, -43.0f, -37.0f, 10.0f, 3.0f}, 0 },
-    { 0, 111.0f, 2, {0.0f, -20.0f, 75.25f, -22.5f, 375.0f, 3750.0f, -20.0f, -20.0f, 1500.0f, 18.0f}, 0 },
-    { 0, 10.0f, 1, {1.0f, -40.0f, 16.0f, -90.0f, 1.0f, 100.0f, -43.0f, -37.0f, 10.0f, 3.0f}, 0 },
-    { 0, 111.0f, 2, {1.0f, -40.0f, 16.0f, -90.0f, 1.0f, 100.0f, -43.0f, -37.0f, 10.0f, 3.0f}, 0 },
-    { 0, 111.0f, 2, {1.0f, -20.0f, 75.25f, -22.5f, 375.0f, 3750.0f, -20.0f, -20.0f, 1500.0f, 18.0f}, 0 },
+    { 64, 0.0f, 0, {1.0f, 0.0f, 75.25f, -45.0f, 50.0f, 1750.0f, -43.0f, 0.0f, 1500.0f, 12.0f, 2000.0f, 7000.0f}, 0 },
+    { 1, 0.0f, 0, {0.0f, -80.0f, 16.0f, -9.0f, 300.0f, 100.0f, -60.0f, -80.0f, 10.0f, 21.6f, 12000.0f, 0.0f}, 0 },
+    { 333, 0.0f, 0, {1.0f, -20.0f, 50.5f, -81.0f, 175.0f, 100.0f, 0.0f, -20.0f, 1000.0f, 2.4f, 7000.0f, 0.0f}, 0 },
+    { 512, 0.0f, 0, {0.0f, -40.0f, 90.1f, -36.0f, 1.0f, 1250.0f, -80.0f, -37.0f, 1800.0f, 14.4f, 0.0f, 5000.0f}, 0 },
+    { 17, 0.0f, 0, {1.0f, -40.0f, 10.9f, -58.5f, 1.0f, 5000.0f, -20.0f, -40.0f, 200.0f, 8.4f, 0.0f, 20000.0f}, 1 },
+    { 480, 0.0f, 0, {1.0f, -8.0f, 60.4f, -90.0f, 125.0f, 0.0f, -43.0f, -8.0f, 1200.0f, 3.0f, 5000.0f, 0.0f}, 1 },
+    { 129, 0.0f, 0, {1.0f, -72.0f, 35.65f, -90.0f, 500.0f, 3750.0f, -40.0f, -72.0f, 700.0f, 3.0f, 20000.0f, 15000.0f}, 0 },
+    { 1024, 0.0f, 0, {1.0f, -32.0f, 16.0f, -67.5f, 0.0f, 100.0f, -8.0f, -32.0f, 10.0f, 6.0f, 0.0f, 0.0f}, 0 },
+    { 7, 0.0f, 0, {0.0f, -52.0f, 16.0f, 0.0f, 375.0f, 2500.0f, -72.0f, -52.0f, 10.0f, 24.0f, 15000.0f, 10000.0f}, 0 },
+    { 2500, 0.0f, 0, {1.0f, -40.0f, 25.75f, -90.0f, 1.0f, 4500.0f, -32.0f, -37.0f, 500.0f, 0.0f, 0.0f, 18000.0f}, 0 },
+    { 600, 0.0f, 0, {0.0f, -40.0f, 100.0f, -22.5f, 250.0f, 500.0f, -52.0f, -37.0f, 2000.0f, 18.0f, 10000.0f, 2000.0f}, 0 },
+    { 3000, 0.0f, 0, {1.0f, -60.0f, 1.0f, -90.0f, 450.0f, 3000.0f, -43.0f, -60.0f, 0.0f, 3.0f, 18000.0f, 12000.0f}, 0 },
+    { 0, 10.0f, 1, {1.0f, -40.0f, 16.0f, -90.0f, 1.0f, 100.0f, -43.0f, -37.0f, 10.0f, 3.0f, 0.0f, 0.0f}, 0 },
+    { 0, 111.0f, 2, {1.0f, -40.0f, 16.0f, -90.0f, 1.0f, 100.0f, -43.0f, -37.0f, 10.0f, 3.0f, 0.0f, 0.0f}, 0 },
+    { 0, 10.0f, 1, {0.0f, -40.0f, 16.0f, -90.0f, 1.0f, 100.0f, -43.0f, -37.0f, 10.0f, 3.0f, 0.0f, 0.0f}, 0 },
+    { 0, 111.0f, 2, {0.0f, -40.0f, 16.0f, -90.0f, 1.0f, 100.0f, -43.0f, -37.0f, 10.0f, 3.0f, 0.0f, 0.0f}, 0 },
+    { 0, 111.0f, 2, {0.0f, -20.0f, 75.25f, -22.5f, 375.0f, 3750.0f, -20.0f, -20.0f, 1500.0f, 18.0f, 15000.0f, 15000.0f}, 0 },
+    { 0, 10.0f, 1, {1.0f, -40.0f, 16.0f, -90.0f, 1.0f, 100.0f, -43.0f, -37.0f, 10.0f, 3.0f, 0.0f, 0.0f}, 0 },
+    { 0, 111.0f, 2, {1.0f, -40.0f, 16.0f, -90.0f, 1.0f, 100.0f, -43.0f, -37.0f, 10.0f, 3.0f, 0.0f, 0.0f}, 0 },
+    { 0, 111.0f, 2, {1.0f, -20.0f, 75.25f, -22.5f, 375.0f, 3750.0f, -20.0f, -20.0f, 1500.0f, 18.0f, 15000.0f, 15000.0f}, 0 },
 };
 #define NBLOCKS (sizeof PLAN / sizeof PLAN[0])
 
 /* One step of each parameter: what the sabotage arm moves it by. */
-static const float STEP[NP] = { 1.0f, 0.8f, 0.99f, 0.9f, 5.0f, 50.0f, 1.0f, 1.0f, 1.0f, 0.24f };
+static const float STEP[NP] = { 1.0f, 0.8f, 0.99f, 0.9f, 5.0f, 50.0f, 1.0f, 1.0f, 1.0f, 0.24f, 1.0f, 1.0f };
 
 static int failures;
 
@@ -171,7 +171,7 @@ static void reference(double sr, int off, const float *key, const float *il, con
     values_of(k, off, values);
     const uint32_t frames = frames_of(k, sr);
     for (uint32_t r = 0; r < STRETCH; r++) {
-      omx_gate_instance_resolve(&inst, k->bypass, (int)lrintf(values[OMX_GATE_PARAM_KEY_EXTERNAL]), values[OMX_GATE_PARAM_THRESHOLD], values[OMX_GATE_PARAM_RANGE], values[OMX_GATE_PARAM_KNEE_START], values[OMX_GATE_PARAM_KNEE_END], values[OMX_GATE_PARAM_ATTACK], values[OMX_GATE_PARAM_HOLD], values[OMX_GATE_PARAM_RELEASE], values[OMX_GATE_PARAM_HYSTERESIS], values[OMX_GATE_PARAM_RATIO]);
+      omx_gate_instance_resolve(&inst, k->bypass, (int)lrintf(values[OMX_GATE_PARAM_KEY_EXTERNAL]), values[OMX_GATE_PARAM_THRESHOLD], values[OMX_GATE_PARAM_RANGE], values[OMX_GATE_PARAM_KNEE_START], values[OMX_GATE_PARAM_KNEE_END], values[OMX_GATE_PARAM_ATTACK], values[OMX_GATE_PARAM_HOLD], values[OMX_GATE_PARAM_RELEASE], values[OMX_GATE_PARAM_HYSTERESIS], values[OMX_GATE_PARAM_RATIO], values[OMX_GATE_PARAM_KEY_HP], values[OMX_GATE_PARAM_KEY_LP]);
 #if KEYED
       omx_gate_instance_run(&inst, key ? key + at : NULL, il + at, ir + at, ol + at, orr + at, frames);
 #else

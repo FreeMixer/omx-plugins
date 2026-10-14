@@ -47,7 +47,9 @@ static inline void omx_gate_core_resolve(OmxGateCore *c, const float *values, in
                                   /* hold_ms */ values[OMX_GATE_PARAM_HOLD],
                                   /* release_ms */ values[OMX_GATE_PARAM_RELEASE],
                                   /* hysteresis_db */ values[OMX_GATE_PARAM_HYSTERESIS],
-                                  /* ratio */ values[OMX_GATE_PARAM_RATIO]);
+                                  /* ratio */ values[OMX_GATE_PARAM_RATIO],
+                                  /* hp_hz */ values[OMX_GATE_PARAM_KEY_HP],
+                                  /* lp_hz */ values[OMX_GATE_PARAM_KEY_LP]);
 }
 
 /** The latency the kernel adds, in samples. */

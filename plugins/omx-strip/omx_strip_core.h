@@ -16,6 +16,8 @@
  * filter: `q` is not a parameter; it is passed at "default".
  * filter: `bandOn` is not a parameter; it is passed at "off".
  * gate: `keySource` is not a parameter; it is passed at "self".
+ * gate: `hpHz` is not a parameter; it is passed at 0.
+ * gate: `lpHz` is not a parameter; it is passed at 0.
  * eq: `hpfOn` is not a parameter; it is passed at "off".
  * eq: `hpfFreq` is not a parameter; it is passed at {"defaultRef":"EQ_PASS_FILTER_DEFAULTS.hpfFreqHz"}.
  * eq: `hpfSlope` is not a parameter; it is passed at "default".
@@ -230,7 +232,9 @@ static inline void omx_strip_core_resolve(OmxStripCore *c, const float *values, 
                                   /* hold_ms */ values[OMX_STRIP_PARAM_GATE_HOLD],
                                   /* release_ms */ values[OMX_STRIP_PARAM_GATE_RELEASE],
                                   /* hysteresis_db */ values[OMX_STRIP_PARAM_GATE_HYSTERESIS],
-                                  /* ratio */ values[OMX_STRIP_PARAM_GATE_RATIO]);
+                                  /* ratio */ values[OMX_STRIP_PARAM_GATE_RATIO],
+                                  /* hp_hz */ 0.0f,
+                                  /* lp_hz */ 0.0f);
   omx_eq_instance_resolve(&c->eq, bypass || values[OMX_STRIP_PARAM_EQ_ON] < 0.5f,
                                   /* hpf_on */ 0,
                                   /* hpf_freq */ 80.0f,
