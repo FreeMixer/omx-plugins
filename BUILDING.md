@@ -68,6 +68,10 @@ CLAP id is in the table once, and each one is created through its factory, activ
    parameter comes up at the contract's default for that kind of channel (a delay's or reverb's mix
    fully wet on a return), else its own, and a value the host set stays.
 
+A plugin whose declaration lists `oracles` also runs each `test/<name>.c` on both builds: an oracle
+moved from the console engine with its effect, at the nine RME rates, reading only the faces' audio
+(omx-transient's `test/transient-arms.c`, the engine's transient arms).
+
 For omx-strip, steps 3 and 4 are one **strip oracle** (`test/strip-oracle.c`): at 44.1, 48, 96
 and 192 kHz, on both builds, in each of the 24 stage orders and at the defaults, the output equals
 omx-dsp's strip modules called in sequence by the oracle itself; bypass is the identity. omx-strip

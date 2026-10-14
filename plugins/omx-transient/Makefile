@@ -84,6 +84,10 @@ $(B)/port-groups-probe: $(ROOT)/tools/port-groups-probe.c | $(B)
 $(B)/transient-oracle: test/transient-oracle.c $(CORE) | $(B)
 	$(CC) $(CFLAGS) $(WARN) -I$(GEN) -I$(ROOT)/include $(DSP_CFLAGS) $(ABI_CFLAGS) -o $@ $< $(LILV) -ldl $(LDLIBS)
 
+# Hand-written (the declaration's `oracles`): moved from the console engine with the effect.
+$(B)/transient-arms: test/transient-arms.c $(CORE) | $(B)
+	$(CC) $(CFLAGS) $(WARN) -I$(GEN) -I$(ROOT)/include $(DSP_CFLAGS) $(ABI_CFLAGS) -o $@ $< $(LILV) -ldl -lpthread $(LDLIBS)
+
 gen:
 	node $(ROOT)/tools/gen.mjs $(CURDIR)
 	node $(ROOT)/tools/modgui-gen.mjs $(CURDIR)
@@ -100,13 +104,16 @@ check:
 # them, equal to the declaration's. The port-group test: the LV2 bundle, read through lilv, puts each
 # panel section's parameters in that section's pg:Group. Every test runs, and the target fails if any
 # failed, so a new plugin shows all its red tests at once.
-test: all check $(B)/clap-probe $(B)/panel-probe $(B)/clap-ext-probe $(B)/port-groups-probe $(B)/transient-oracle
+# transient-arms: the hand-written oracle the declaration names, on both faces.
+test: all check $(B)/clap-probe $(B)/panel-probe $(B)/clap-ext-probe $(B)/port-groups-probe $(B)/transient-oracle $(B)/transient-arms
 	@fail=0; \
 	$(B)/clap-probe params $(B)/$(NAME).clap > $(B)/clap-params.txt && \
 	  node $(ROOT)/tools/clap-params-check.mjs $(CURDIR) $(B)/clap-params.txt || fail=1; \
 	$(B)/clap-probe live $(B)/$(NAME).clap || fail=1; \
 	$(B)/transient-oracle clap $(B)/$(NAME).clap || fail=1; \
 	$(B)/transient-oracle lv2 $(BUNDLE) $(URI) || fail=1; \
+	$(B)/transient-arms clap $(B)/$(NAME).clap || fail=1; \
+	$(B)/transient-arms lv2 $(BUNDLE) $(URI) || fail=1; \
 	$(B)/panel-probe clap $(B)/$(NAME).clap > $(B)/panel-clap.txt && \
 	  node $(ROOT)/tools/panel-check.mjs $(CURDIR) clap $(B)/panel-clap.txt || fail=1; \
 	$(B)/panel-probe lv2 $(BUNDLE) $(URI) > $(B)/panel-lv2.txt && \
