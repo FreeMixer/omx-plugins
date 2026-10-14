@@ -461,11 +461,13 @@ static void arm_threads(Face *f, float sr) {
   if (opened) {
     tjob_run(&ref);
     pthread_t th[THREADS];
-    for (int k = 0; k < THREADS; k++) pthread_create(&th[k], NULL, tjob_run, &jobs[k]);
+    bool started[THREADS];
+    for (int k = 0; k < THREADS; k++) started[k] = pthread_create(&th[k], NULL, tjob_run, &jobs[k]) == 0;
     differ = 0u;
     for (int k = 0; k < THREADS; k++) {
-      pthread_join(th[k], NULL);
-      differ += !ref.ran || !jobs[k].ran || memcmp(jobs[k].ol, ref.ol, sizeof ref.ol) != 0 ||
+      /* a thread that never started is a failed arm, and is never joined */
+      if (started[k]) pthread_join(th[k], NULL);
+      differ += !started[k] || !ref.ran || !jobs[k].ran || memcmp(jobs[k].ol, ref.ol, sizeof ref.ol) != 0 ||
                 memcmp(jobs[k].orr, ref.orr, sizeof ref.orr) != 0;
     }
   }
