@@ -51,5 +51,9 @@
             lv2:index 8 ;
             lv2:symbol "detectorOversampling" ;
             lv2:name "Detector Oversampling" ;
+        ] , [
+            lv2:index 9 ;
+            lv2:symbol "detectorTopology" ;
+            lv2:name "Detector Topology" ;
         ] ;
     ] .

@@ -1,3 +1,13 @@
+omx-plugins (0.6.0) unstable; urgency=medium
+
+  * Built against omx-dsp 0.13.0 and omx-contract 2.6.0, the pair the
+    channel installs.
+  * omx comp takes the compressor's detector topology: Feedforward hears
+    the input, Feedback the compressor's own output. omx strip keeps its
+    parameters and runs its compressor feed-forward.
+
+ -- Pau Aliagas <linuxnow@gmail.com>  Tue, 13 Oct 2026 22:30:00 +0200
+
 omx-plugins (0.5.1) unstable; urgency=medium
 
   * omx deesser reports its gain reduction: the CLAP face serves the
