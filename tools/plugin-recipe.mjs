@@ -138,7 +138,7 @@ const escapeRe = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
 export const RULES = {
   always: () => true,
-  // a chain (spec §15.2) is generated whole, as an instance plugin is
+  // a chain is generated whole, as an instance plugin is
   instance: (_root, _recipe, facts) => facts.decl?.binding === 'instance' || facts.decl?.binding === 'chain',
   panel: (_root, _recipe, facts) => Boolean(facts.decl?.panel) || facts.decl?.binding === 'instance' || facts.decl?.binding === 'chain',
   byReference: (root, recipe) => compareVersions(contractPin(root), recipe.contract.byReferenceSince) >= 0,
@@ -249,7 +249,7 @@ export function panelErrors(schema, decl, symbols) {
   return errs;
 }
 
-/** Every name the `console` block (spec §8) gives that is no declared parameter: the card's
+/** Every name the `console` block gives that is no declared parameter: the card's
  * controls and the chip's `{holes}`. */
 export function consoleErrors(decl, symbols) {
   const errs = [];

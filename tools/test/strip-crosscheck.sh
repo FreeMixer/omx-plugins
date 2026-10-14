@@ -2,9 +2,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # Copyright (C) 2026 Pau Aliagas <linuxnow@gmail.com>
 #
-# strip-crosscheck.sh [<ref>] — omx-strip generated as a chain (spec 2026-10-09-plugin-from-contract
-# §15.2) against the hand-ported omx-strip it replaced, bit for bit at the old plugin's settings, at
-# every rate the contract declares (tools/test/clap-crosscheck.c, tools/test/strip-0.2.0.map).
+# strip-crosscheck.sh [<ref>] — omx-strip generated as a chain against the hand-ported omx-strip it replaced, bit for bit at the old plugin's
+# settings, at every rate the contract declares (tools/test/clap-crosscheck.c, tools/test/strip-0.2.0.map).
 #
 # The old plugin is built from <ref>, by default the newest commit whose declaration is not yet a
 # chain (its hand-written omx_strip.h and its own generated header together); the new one from this

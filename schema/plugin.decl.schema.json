@@ -153,7 +153,7 @@
             "chain"
           ],
           "title": "Binding",
-          "description": "`instance`: the plugin runs omx-dsp's instance face of its kernel (<omxdsp/fx/omx_<kernel>_instance.h>), and tools/gen.mjs generates the kernel binding, the kernel-identity test, both faces and the Makefile from this declaration; each parameter binds to the `resolve` argument named after its contract control. `chain`: a composite, its parameters generated from `chain` (spec 2026-10-09-plugin-from-contract §15.2): each element binds to its own kernel's instance face exactly as `instance` does, and the binding runs them in order. Left out, those files are the plugin's own (a composite, a face omx-dsp does not have)."
+          "description": "`instance`: the plugin runs omx-dsp's instance face of its kernel (<omxdsp/fx/omx_<kernel>_instance.h>), and tools/gen.mjs generates the kernel binding, the kernel-identity test, both faces and the Makefile from this declaration; each parameter binds to the `resolve` argument named after its contract control. `chain`: a composite, its parameters generated from `chain`: each element binds to its own kernel's instance face exactly as `instance` does, and the binding runs them in order. Left out, those files are the plugin's own (a composite, a face omx-dsp does not have)."
         },
         "params": {
           "type": "array",
@@ -848,7 +848,7 @@
         "decay-envelope"
       ],
       "title": "Graph",
-      "description": "The graph kinds a panel section may draw, computed by the renderer from the section's controls: the console draws eq-curve (EqCurve), dynamics-curve (GateCurve, CompCurve), transfer-curve (drive's TransferCurve), delay-taps and decay-envelope (StageTimeCurve's delay taps and reverb decay) today; lfo is spec §8's. A new kind is added here once, and in each renderer."
+      "description": "The graph kinds a panel section may draw, computed by the renderer from the section's controls: the console draws eq-curve (EqCurve), dynamics-curve (GateCurve, CompCurve), transfer-curve (drive's TransferCurve), delay-taps and decay-envelope (StageTimeCurve's delay taps and reverb decay) today. A new kind is added here once, and in each renderer."
     },
     "latencyCheck": {
       "type": "object",
@@ -922,7 +922,7 @@
         "placement"
       ],
       "title": "Console",
-      "description": "How the plugin shows in the OpenMixer console (spec 2026-10-09-plugin-from-contract §8), as the console draws it TODAY: where it may go, its overview card and its FX chip (its processing panel is the plugin's one `panel`). A part the console does not draw for this effect today is left out (the console then draws a racked plugin with its generic editor). The console's placement rules refuse a declaration that breaks them; the plugin cannot widen them.",
+      "description": "How the plugin shows in the OpenMixer console, as the console draws it TODAY: where it may go, its overview card and its FX chip (its processing panel is the plugin's one `panel`). A part the console does not draw for this effect today is left out (the console then draws a racked plugin with its generic editor). The console's placement rules refuse a declaration that breaks them; the plugin cannot widen them.",
       "properties": {
         "$comment": {
           "type": "string"
@@ -946,19 +946,19 @@
                 "pattern": "^[a-z][a-zA-Z0-9]*$"
               },
               "title": "Strip kinds",
-              "description": "The strip kinds that may host the plugin, in the console's names (packages/core ChannelKind: input, fxReturn, aux, mix, matrix, main, fxSend, mixMinus)."
+              "description": "The strip kinds that may host the plugin, in the console's names (input, fxReturn, aux, mix, matrix, main, fxSend, mixMinus)."
             },
             "group": {
               "type": "string",
               "pattern": "^[a-z][a-z0-9-]*$",
               "title": "Chain position group",
-              "description": "Where the console's channel layout (packages/web-ui utils/channelLayout.ts) puts it: `walk`, the reorderable chain of native stages (the strip's /order row); `tail`, a fixed member after the walk (the limiter); `plugins`, the hosted plugin rack (the insert rack's strip kinds)."
+              "description": "Where the console's channel layout puts it: `walk`, the reorderable chain of native stages (the strip's /order row); `tail`, a fixed member after the walk (the limiter); `plugins`, the hosted plugin rack (the insert rack's strip kinds)."
             },
             "stage": {
               "type": "string",
               "pattern": "^[a-z][a-zA-Z0-9]*$",
               "title": "Stage",
-              "description": "The console's native stage kind the plugin draws as today (packages/declarations/stages/<stage>.json, or the limiter's fixed tail stage)."
+              "description": "The console's native stage kind the plugin draws as today (or the limiter's fixed tail stage)."
             },
             "after": {
               "type": "string",
@@ -997,7 +997,7 @@
                 "type": "string",
                 "pattern": "^([A-Za-z][A-Za-z0-9_]*|readout:[a-z][A-Za-z0-9]*)$"
               },
-              "description": "The controls the card shows, by parameter symbol (spec §8 says one to three; the console's gate and EQ cards show more today), or `readout:<name>` for a readout the contract declares. A per-band symbol of a declaration with variants stands for every band's."
+              "description": "The controls the card shows, by parameter symbol (one to three; the console's gate and EQ cards show more today), or `readout:<name>` for a readout the contract declares. A per-band symbol of a declaration with variants stands for every band's."
             },
             "summary": {
               "type": "string",

@@ -9,7 +9,7 @@
  *                                 [--plan-json <file>] [--no-run]
  *   node tools/omx-new-plugin.mjs --from-contract <k1>,<k2>,... --stem omx-<x> [...]
  *
- * Several kernels draft a composite (`binding: chain`, spec 2026-10-09-plugin-from-contract §15.2):
+ * Several kernels draft a composite (`binding: chain`):
  * one element per kernel in the order given, each drafted as a single plugin's parameters are, and
  * each refused, naming the omx-dsp work, when its kernel has no instance face of the generated shape.
  *
@@ -111,7 +111,7 @@ export function kernelSources(kernel, { root = ROOT } = {}) {
   const inc = omxdspInclude();
   const header = instanceHeader(inc, kernel);
   let face;
-  if (!header) refusals.push({ field: 'omx-dsp', reason: `omx-dsp has no <omxdsp/fx/omx_${kernel}_instance.h>${inc ? '' : ' (no omx-dsp found: pkg-config omxdsp, or OMXDSP_INCLUDE)'}: the instance face is omx-dsp's work first (spec 2026-10-09-plugin-from-contract §2)` });
+  if (!header) refusals.push({ field: 'omx-dsp', reason: `omx-dsp has no <omxdsp/fx/omx_${kernel}_instance.h>${inc ? '' : ' (no omx-dsp found: pkg-config omxdsp, or OMXDSP_INCLUDE)'}: the instance face is omx-dsp's work first` });
   else {
     face = parseFace(readFileSync(header, 'utf8'), kernel);
     if (face.error) refusals.push({ field: 'omx-dsp', reason: `<omxdsp/fx/omx_${kernel}_instance.h>: ${face.error}; a plugin over it keeps a hand-written binding, or omx-dsp gives it a face of the generated shape` });
@@ -274,7 +274,7 @@ async function checkPanelConsole(schema, decl, symbols, resolved, refuse, root) 
   }
 }
 
-// ---- a composite: --from-contract <k1>,<k2>,... (spec 2026-10-09-plugin-from-contract §15.2) -------
+// ---- a composite: --from-contract <k1>,<k2>,... -------
 
 /** Each element's kernel sources (kernelSources), and every refusal among them, each naming its kernel. */
 export function chainSources(kernels, { root = ROOT } = {}) {

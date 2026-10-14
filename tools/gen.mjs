@@ -10,7 +10,7 @@
  *   plugins/<stem>/generated/<stem>.lv2/<stem>.ttl    the LV2 plugin description
  *
  * and, for a plugin whose declaration says `"binding": "instance"` (or `"chain"`: a composite whose
- * `chain` runs several kernels' faces in order, spec §15.2), the rest of its folder (the declaration
+ * `chain` runs several kernels' faces in order), the rest of its folder (the declaration
  * is then the folder's one hand-written file), from recipes/templates/plugin/:
  *
  *   plugins/<stem>/omx_<kernel>_core.h               the binding: each parameter to the resolve()
@@ -126,7 +126,7 @@ export function familyOfKernel(kernel) {
  * its family the kernel's, its roles left to a person. */
 export function defaultPanel(d) {
   if (d.binding === 'chain') {
-    // one section per element, by its id (spec §15.2: the elements are drawn, never placed, apart)
+    // one section per element, by its id (the elements are drawn, never placed, apart)
     const sections = d.chain.map((el) => ({ key: el.id, label: elementName(el), controls: [`${el.id}On`, ...el.params.map((p) => p.symbol)] }));
     if (d.order === 'permutable') sections.push({ key: 'order', label: 'Order', controls: ['order'] });
     return { family: familyOfKernel(d.kernel), roles: {}, sections };
@@ -139,7 +139,7 @@ export function defaultPanel(d) {
  * or a chain of them. */
 export const generatedBinding = (d) => d.binding === 'instance' || d.binding === 'chain';
 
-// ---- a composite: a chain of kernel faces (spec 2026-10-09-plugin-from-contract §15.2) -----------
+// ---- a composite: a chain of kernel faces -----------
 
 /** An element's name, the label of its switch and of its panel section: its `name`, else its id. */
 const elementName = (el) => el.name ?? `${el.id[0].toUpperCase()}${el.id.slice(1)}`;
@@ -249,7 +249,7 @@ export function symbolDiff(was, now) {
 }
 
 /** A chain converted from a released plugin (`shipped`: its release tag) keeps that plugin's ids
- * and symbols, or names every difference in `shippedDiff` (spec §15.2): CLAP ids are indices and LV2
+ * and symbols, or names every difference in `shippedDiff`: CLAP ids are indices and LV2
  * symbols are saved state, so a difference is a decision, never a side effect. */
 function checkShipped(file, d) {
   if (d.shipped === undefined) return;

@@ -41,7 +41,7 @@
 #include <omxdsp/omx_denormal.h>
 
 #define NP OMX_GATE_PARAM_COUNT
-/* 1 when the face takes a sidechain key (spec 2026-10-09-plugin-from-contract §15.1). */
+/* 1 when the face takes a sidechain key. */
 #define KEYED 1
 /* Each block of the plan is processed this many times in a row, the same values each time. */
 #define STRETCH 64u
