@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # Copyright (C) 2026 Pau Aliagas <linuxnow@gmail.com>
 Name: omx-plugins
-Version: 0.6.0
+Version: 0.7.0
 Release: 1%{?dist}
 License: GPL-3.0-or-later
 Summary: The OpenMixer console's delay, drive, EQ, channel strip, keyed gate and effects, as plugins for your DAW
@@ -12,7 +12,8 @@ Source0: %{url}/archive/v%{version}/%{name}-%{version}.tar.gz
 BuildRequires: gcc
 BuildRequires: make
 BuildRequires: pkgconf-pkg-config
-BuildRequires: omx-dsp-devel >= 0.13.0
+BuildRequires: omx-dsp-devel >= 0.15.0
+BuildRequires: omx-dsp-devel < 0.16
 BuildRequires: omx-clap-core-devel
 BuildRequires: clap-devel
 BuildRequires: lv2-devel
@@ -70,7 +71,8 @@ console's own DSP, so they sound like the desk.
 
 %package devel
 Summary: Headers and static library of the OpenMixer plugins, for projects that build on them
-Requires: omx-dsp-devel >= 0.13.0
+Requires: omx-dsp-devel >= 0.15.0
+Requires: omx-dsp-devel < 0.16
 Requires: clap-devel
 
 %description devel
@@ -157,6 +159,13 @@ host that runs the plugins in its own process without loading .clap files.
 # END GENERATED lv2-files
 
 %changelog
+* Wed Oct 14 2026 Pau Aliagas <linuxnow@gmail.com> - 0.7.0-1
+- Built against omx-dsp 0.15.0 (at least 0.15.0, below 0.16) and omx-
+  contract 2.6.0.
+- The manuals read every range, default and limit from the plugins'
+  parameters, which come from omx-contract, so a travel moved in the
+  contract moves the manual with it.
+
 * Tue Oct 13 2026 Pau Aliagas <linuxnow@gmail.com> - 0.6.0-1
 - Built against omx-dsp 0.13.0 and omx-contract 2.6.0, the pair the channel
   installs.
