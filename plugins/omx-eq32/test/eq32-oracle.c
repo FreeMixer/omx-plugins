@@ -47,7 +47,7 @@ _Static_assert(32 == OMX_EQ_INSTANCE_BANDS, "the declaration names one q paramet
 _Static_assert(32 == OMX_EQ_INSTANCE_BANDS, "the declaration names one band_on parameter per band of the face");
 
 #define NP OMX_EQ32_PARAM_COUNT
-/* 1 when the face takes a sidechain key (spec 2026-10-09-plugin-from-contract §15.1). */
+/* 1 when the face takes a sidechain key. */
 #define KEYED 0
 /* Each block of the plan is processed this many times in a row, the same values each time. */
 #define STRETCH 1u

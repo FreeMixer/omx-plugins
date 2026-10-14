@@ -57,6 +57,10 @@ jobs:
         id: handback-spdx
         run: tools/spdx-check.sh
 
+      - name: No tracked file points into a private repository
+        id: handback-private-refs
+        run: make private-refs
+
       - name: Every generated file is fresh, built or not
         id: handback-gen
         run: |

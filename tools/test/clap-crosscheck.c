@@ -3,7 +3,7 @@
 /*
  * clap-crosscheck.c — two built CLAP plugins, the same settings and the same signal, compared bit
  * for bit: what proves a regenerated plugin is the one it replaces (the strip as a chain against
- * the hand-ported strip it was, spec 2026-10-09-plugin-from-contract §15.2).
+ * the hand-ported strip it was).
  *
  *   clap-crosscheck <a.clap> <b.clap> <map>
  *

@@ -10,6 +10,8 @@
 #   make look       tools/look.json, the MOD GUI's colours and font, is what tools/look/tokens.css resolves to
 #   make manual     each declaration's manual follows omx-contract: a travel moved in a copy of the release moves
 #                   the README section's range and default (tools/test/manual-perturb.mjs)
+#   make private-refs  no tracked file (generated ones included) points into a private repository, issue, branch or path
+#                      (tools/private-refs-check.sh, with its --self-test); run by CI beside `make test`
 #   make recipe-test   the repository's own checks, run by CI beside `make test`:
 #     make completeness  every plugin against recipes/plugin.recipe.json, each gap naming its wizard step;
 #                        a gap not in recipes/completeness-debt.json fails, and so does a paid debt entry
@@ -57,7 +59,7 @@ LIB_FLAGS  := -fPIC -fvisibility=hidden -DOMX_CLAP_STATIC -Iinclude
 # read only by the targets that build the archive, so `make version` and the rest need no omx-dsp
 lib_cflags = $(shell $(PKG_CONFIG) --cflags omxdsp omx-clap-core clap)
 
-.PHONY: all lib lib-test test hints look manual install install-devel clean version recipe-test completeness selftest strip-crosscheck meters-abi
+.PHONY: all lib lib-test test hints look manual install install-devel clean version recipe-test completeness selftest private-refs strip-crosscheck meters-abi
 all: lib
 	@for p in $(PLUGINS); do $(MAKE) -C $$p all || exit 1; done
 lib: $(LIB) $(LIB_PC)
@@ -83,6 +85,9 @@ completeness:
 	node tools/plugin-recipe.mjs
 selftest:
 	node tools/test/recipe-selftest.mjs
+private-refs:
+	tools/private-refs-check.sh
+	tools/private-refs-check.sh --self-test
 meters-abi:
 	tools/meters-abi-check.sh
 	tools/meters-abi-check.sh --self-test
