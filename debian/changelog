@@ -1,7 +1,8 @@
 omx-plugins (0.7.0) unstable; urgency=medium
 
-  * Built against omx-dsp 0.15.0 (at least 0.15.0, below 0.16) and omx-
-    contract 2.6.0.
+  * Built against omx-dsp 0.17.0 (at least 0.17.0, below 0.18) and omx-
+    contract 2.10.1 (at least 2.10.1, below 2.11). No pins file: the
+    packaging declares both ranges and the build reads them from there.
   * The manuals read every range, default and limit from the plugins'
     parameters, which come from omx-contract, so a travel moved in the
     contract moves the manual with it.

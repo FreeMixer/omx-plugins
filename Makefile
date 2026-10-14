@@ -42,14 +42,26 @@ HEADERS := include/omx_plugin_param.h include/omx_panel_description.h include/om
 # libomxplugins.a: each shipped plugin's CLAP face built with -DOMX_CLAP_STATIC (no `clap_entry`;
 # its `omx_clap_entry_<kernel>` stays) and lib/omx_clap_static.c, the table of those entries by CLAP
 # id that tools/gen.mjs fills. Position-independent, so a shared object (the console's engine) can
-# link it. omxplugins.pc requires the omx-dsp .github/pins.txt names, whose archive the faces call.
+# link it. omxplugins.pc requires the omx-dsp range the packaging declares, whose archive the faces call.
 B          := build
 LIB_B      := $(B)/lib
 LIB        := $(LIB_B)/libomxplugins.a
 LIB_PC     := $(LIB_B)/omxplugins.pc
 CLAP_FACES := $(foreach p,$(PLUGINS),$(wildcard $(p)omx_*_clap.c))
 LIB_OBJS   := $(LIB_B)/omx_clap_static.o $(patsubst %.c,$(LIB_B)/%.o,$(notdir $(CLAP_FACES)))
-OMXDSP_PIN := $(shell awk '$$1 == "omx-dsp" { print $$3 }' .github/pins.txt)
+# The releases this tree builds against are declared once, in the packaging: packaging/omx-plugins.spec's
+# BuildRequires, a floor (>=) and a ceiling (<) per dependency; debian/control says the same
+# (tools/deps-check.sh). Building the archive stops first, naming the dependency, the range and what is
+# installed, when pkg-config finds a release outside it.
+SPEC       := packaging/omx-plugins.spec
+spec_floor   = $(shell sed -n 's/^BuildRequires: $(1) >= \([0-9.]*\)$$/\1/p' $(SPEC))
+spec_ceiling = $(shell sed -n 's/^BuildRequires: $(1) < \([0-9.]*\)$$/\1/p' $(SPEC))
+OMXDSP_MIN        := $(call spec_floor,omx-dsp-devel)
+OMXDSP_CEILING    := $(call spec_ceiling,omx-dsp-devel)
+CONTRACT_MIN      := $(call spec_floor,omx-contract-devel)
+CONTRACT_CEILING  := $(call spec_ceiling,omx-contract-devel)
+# $(call dep_check,<pkg-config name>,<floor>,<ceiling>): nothing, or a stop naming what is installed
+dep_check = $(if $(shell $(PKG_CONFIG) --atleast-version=$(2) $(1) && ! $(PKG_CONFIG) --atleast-version=$(3) $(1) && echo y),,$(error $(1) >= $(2), < $(3) is required ($(SPEC)); installed: $(or $(shell $(PKG_CONFIG) --modversion $(1) 2>/dev/null),none). Install omx-dsp-devel and omx-contract-devel (or libomxdsp-dev and libomx-contract-dev) from the channel: BUILDING.md))
 PKG_CONFIG ?= pkg-config
 CC         ?= cc
 AR         ?= ar
@@ -57,7 +69,7 @@ CFLAGS     ?= -O2 -g
 LIB_WARN   := -std=gnu11 -Wall -Wextra -Werror
 LIB_FLAGS  := -fPIC -fvisibility=hidden -DOMX_CLAP_STATIC -Iinclude
 # read only by the targets that build the archive, so `make version` and the rest need no omx-dsp
-lib_cflags = $(shell $(PKG_CONFIG) --cflags omxdsp omx-clap-core clap)
+lib_cflags = $(call dep_check,omxdsp,$(OMXDSP_MIN),$(OMXDSP_CEILING))$(call dep_check,omx-contract,$(CONTRACT_MIN),$(CONTRACT_CEILING))$(shell $(PKG_CONFIG) --cflags omxdsp omx-clap-core clap)
 
 .PHONY: all lib lib-test test hints look manual install install-devel clean version recipe-test completeness selftest private-refs strip-crosscheck meters-abi
 all: lib
@@ -120,9 +132,9 @@ $(LIB_B)/$(notdir $(1:.c=.o)): $(1) $(wildcard $(dir $(1))*.h $(dir $(1))generat
 endef
 $(foreach f,$(CLAP_FACES),$(eval $(call face_rule,$(f))))
 
-# The prefix, libdir and includedir are filled at install; the version and the omx-dsp pin here.
-$(LIB_PC): lib/omxplugins.pc.in Makefile .github/pins.txt | $(LIB_B)
-	sed -e 's,@VERSION@,$(VERSION),' -e 's,@OMXDSP_PIN@,$(OMXDSP_PIN),' $< > $@
+# The prefix, libdir and includedir are filled at install; the version and the omx-dsp range here.
+$(LIB_PC): lib/omxplugins.pc.in Makefile $(SPEC) | $(LIB_B)
+	sed -e 's,@VERSION@,$(VERSION),' -e 's,@OMXDSP_MIN@,$(OMXDSP_MIN),' -e 's,@OMXDSP_CEILING@,$(OMXDSP_CEILING),' $< > $@
 
 $(LIB_B):
 	@mkdir -p $@

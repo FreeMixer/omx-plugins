@@ -12,8 +12,8 @@ it holds more entries than at the merge-base with `origin/main`.
 - A plugin declares `kernels: [..]`, the omx-contract kernels its parameters reference: one entry
   is the normal case, several make a composite (omx strip), and then each parameter's `ref` names
   its kernel with `"kernel"` (ruling 10-07, by recommendation).
-- Moving `.github/pins.txt` to omx-contract >= 1.1.0 (`contract.byReferenceSince` in the
-  recipe) turns on params-by-reference for the WHOLE tree: from that pin every plugin must declare
+- Raising the packaging's omx-contract floor to >= 1.1.0 (`contract.byReferenceSince` in the
+  recipe) turns on params-by-reference for the WHOLE tree: from that floor every plugin must declare
   each parameter by `ref`, with no typed `min`/`max`/`def`/`unit`/`kind`, or `params-by-reference`
   goes red for it. That change migrates every declaration in the same PR, so the debt does not grow
   (a new gap is not added to `completeness-debt.json`; the debt only shrinks).

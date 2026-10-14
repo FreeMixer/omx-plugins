@@ -14,13 +14,13 @@
 #   make gen        regenerate generated/ from the declaration (commit the result)
 #   make install    DESTDIR/PREFIX/LIBDIR/CLAPDIR: $(CLAPDIR)/omx-transient.clap, $(LIBDIR)/lv2/omx-transient.lv2/
 #
-# Build deps: omx-dsp (pkg-config omxdsp, >= OMXDSP_MIN), omx-clap-core (the CLAP ABI's openmixer
-# extensions), clap, lv2; for the tests lilv and node.
+# Build deps: omx-dsp (pkg-config omxdsp, >= OMXDSP_MIN, the floor packaging/omx-plugins.spec declares),
+# omx-clap-core (the CLAP ABI's openmixer extensions), clap, lv2; for the tests lilv and node.
 
 NAME       := omx-transient
 URI        := urn:openmixer:transient
 CLAP_ID    := org.openmixer.transient
-OMXDSP_MIN ?= 0.15.0
+OMXDSP_MIN ?= 0.17.0
 ROOT       := $(abspath ../..)
 GEN        := generated
 B          := build
@@ -28,7 +28,7 @@ BUNDLE     := $(B)/$(NAME).lv2
 
 PKG_CONFIG ?= pkg-config
 ifeq ($(shell $(PKG_CONFIG) --atleast-version=$(OMXDSP_MIN) omxdsp && echo y),)
-$(error omx-dsp >= $(OMXDSP_MIN) not found by `$(PKG_CONFIG) omxdsp`: install omx-dsp-devel (see BUILDING.md))
+$(error omx-dsp >= $(OMXDSP_MIN) is required (packaging/omx-plugins.spec); `$(PKG_CONFIG) omxdsp` finds $(or $(shell $(PKG_CONFIG) --modversion omxdsp 2>/dev/null),none): install omx-dsp-devel or libomxdsp-dev from the channel (BUILDING.md))
 endif
 DSP_CFLAGS := $(shell $(PKG_CONFIG) --cflags omxdsp)
 DSP_LIBS   := $(shell $(PKG_CONFIG) --libs omxdsp)

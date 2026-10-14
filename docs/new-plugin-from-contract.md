@@ -8,7 +8,7 @@ How a plugin over an omx-dsp effect kernel is born, and what a person writes.
 
 | Input | Where | Who writes it |
 |---|---|---|
-| The kernel's controls: names, travels, choices | omx-contract, read only through its JSON render (`share/omx-contract/omx-contract.json`) at the pin | omx-contract |
+| The kernel's controls: names, travels, choices | the installed omx-contract, read only through its JSON render (`omx-contract.json` in `pkg-config --variable=datadir omx-contract`) | omx-contract |
 | The kernel's instance face: `init`, `resolve`, `run`, latency | omx-dsp, `<omxdsp/fx/omx_<kernel>_instance.h>` | omx-dsp |
 | The plugin: identity, design choices, `panel`, `console` | `plugins/<stem>/<stem>.decl.json`, the folder's ONE hand-written file | a person, from the wizard's draft |
 
@@ -25,7 +25,7 @@ git commit ...                                            # 4. the commit plan i
 
 Step 1 checks before it writes:
 
-- the kernel is in omx-contract at the pin (else: the omx-contract work, `tools/new-kernel.mjs`, is
+- the kernel is in the installed omx-contract (else: the omx-contract work, `tools/new-kernel.mjs`, is
   named and nothing is written);
 - omx-dsp has the kernel's instance face, in the shape the generated binding calls (`init(s, sr)`,
   `resolve(s, bypass, <one scalar per control>)`, `run(s, in_l, in_r, out_l, out_r, n)`); a kernel

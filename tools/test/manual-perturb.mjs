@@ -5,7 +5,7 @@
  * manual-perturb.mjs — a declaration's manual follows omx-contract (`make manual`, part of `make test`).
  *
  * For every shipped plugin whose declaration carries a `manual`, and every travel its parameters
- * read from omx-contract (each ref and field once), two moves, each in a fresh copy of the pinned
+ * read from omx-contract (each ref and field once), two moves, each in a fresh copy of the installed
  * release read through OMX_CONTRACT_DIR (tools/omx-contract.mjs perturbCopy):
  *
  *   1. the travel's upper limit goes out by one step: where the plugin's README section carried the
@@ -19,7 +19,7 @@
  * the resolved parameter where it was (a travel another choice widens past the moved limit) has
  * nothing to follow and is skipped.
  *
- * Needs omx-contract at the pin (tools/omx-contract.mjs locateContract). Exit 1 on any failure.
+ * Needs the installed omx-contract (tools/omx-contract.mjs locateContract). Exit 1 on any failure.
  */
 import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -32,7 +32,7 @@ if (!where.dir) {
   console.error(`manual-perturb: ${where.why}`);
   process.exit(1);
 }
-const pin = where.dir;
+const installed = where.dir;
 const section = (d) => SHARED['README.md'].sections([d]).join('\n');
 /** How many times `words` stand on their own in `text` (not inside a longer number). */
 const times = (text, words) => text.match(new RegExp(`(?<![\\w.-])${words.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?![\\w]|\\.\\d)`, 'g'))?.length ?? 0;
@@ -45,11 +45,11 @@ const fail = (m) => {
   console.log(`FAIL ${m}`);
 };
 
-/** The plugin at `dir` loaded against a copy of the pin's release with `p`'s travel moved. */
+/** The plugin at `dir` loaded against a copy of the installed release with `p`'s travel moved. */
 function against(dir, d, p, move) {
   const scratch = mkdtempSync(join(tmpdir(), 'manual-perturb-'));
   try {
-    perturbCopy(pin, scratch, paramKernel(d, p, pin), p, { move });
+    perturbCopy(installed, scratch, paramKernel(d, p, installed), p, { move });
     process.env.OMX_CONTRACT_DIR = scratch;
     return loadDecl(dir);
   } finally {
@@ -61,7 +61,7 @@ function against(dir, d, p, move) {
 let plugins = 0;
 let followed = 0;
 for (const dir of pluginDirs()) {
-  process.env.OMX_CONTRACT_DIR = pin;
+  process.env.OMX_CONTRACT_DIR = installed;
   const d = loadDecl(dir);
   delete process.env.OMX_CONTRACT_DIR;
   if (!d.manual) continue;
@@ -69,7 +69,7 @@ for (const dir of pluginDirs()) {
   const was = section(d);
   const seen = new Set();
   for (const p of d.params) {
-    if (p.ref === undefined || findName(pin, paramKernel(d, p, pin), p.ref).entry?.kind !== 'travels') continue;
+    if (p.ref === undefined || findName(installed, paramKernel(d, p, installed), p.ref).entry?.kind !== 'travels') continue;
     const own = p.defaultId === undefined && p.defaultRef === undefined && p.defaultBand === undefined;
     for (const [move, words] of [['max', rangeWords], ...(own ? [['default', defaultWords]] : [])]) {
       const key = `${p.ref}.${p.field ?? ''}:${move}`;
