@@ -576,6 +576,22 @@ export function paramRow(p) {
   return { name: p.name, range: `${p.min} to ${p.max}${unit}${p.kind === 'integer' ? ', whole steps' : ''}`, default: `${p.def}${unit}` };
 }
 
+/** The manual's own words around the numbers: each `{range:<symbol>}`, `{default:<symbol>}`,
+ * `{min:<symbol>}` and `{max:<symbol>}` in a line of `manual` reads that resolved parameter (its
+ * range and default as the parameter table words them, or its bare limit), so the README never
+ * retypes a number omx-contract or the declaration holds. A symbol no parameter has, or any other
+ * `{word:...}`, is refused. */
+export function fillManual(d, line) {
+  const out = line.replace(/\{(range|default|min|max):([A-Za-z][A-Za-z0-9_]*)\}/g, (_m, what, symbol) => {
+    const p = d.params.find((q) => q.symbol === symbol);
+    if (!p) throw new Error(`plugins/${d.stem}: its manual reads '${symbol}', which is none of its parameters`);
+    return what === 'min' || what === 'max' ? `${p[what]}` : paramRow(p)[what];
+  });
+  const left = out.match(/\{[a-z]+:[^}]*\}/);
+  if (left) throw new Error(`plugins/${d.stem}: its manual's ${left[0]} is none of {range|default|min|max:<symbol>}`);
+  return out;
+}
+
 /** The view every plugin template renders from. */
 export function templateView(d) {
   return {
@@ -968,7 +984,7 @@ export const SHARED = {
       '',
       `### ${d.name}`,
       '',
-      ...(d.manual ?? ['| Parameter | Range | Default |', '|---|---|---|', ...d.params.map(paramRow).map((r) => `| ${r.name} | ${r.range} | ${r.default} |`), '', "Plus the host's bypass."]),
+      ...(d.manual?.map((l) => fillManual(d, l)) ?? ['| Parameter | Range | Default |', '|---|---|---|', ...d.params.map(paramRow).map((r) => `| ${r.name} | ${r.range} | ${r.default} |`), '', "Plus the host's bypass."]),
     ]).concat(['']),
   },
   'packaging/omx-plugins.spec': {

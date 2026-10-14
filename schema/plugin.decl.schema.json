@@ -274,7 +274,7 @@
           },
           "minItems": 1,
           "title": "Manual",
-          "description": "The plugin's section of the README below its heading, one Markdown line per entry. Left out, the section is the parameter table generated from the resolved parameters, and \"Plus the host's bypass.\""
+          "description": "The plugin's section of the README below its heading, one Markdown line per entry. A number a parameter holds is never typed here: {range:<symbol>} and {default:<symbol>} read as the parameter table words them, {min:<symbol>} and {max:<symbol>} the bare limit, all from the resolved parameter. Left out, the section is the parameter table generated from the resolved parameters, and \"Plus the host's bypass.\""
         },
         "console": {
           "$ref": "#/$defs/console"
