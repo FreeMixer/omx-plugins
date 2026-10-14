@@ -6,7 +6,8 @@
 
 | What | Fedora | Debian | Used for |
 |---|---|---|---|
-| omx-dsp ≥ 0.6.0 (`pkg-config omxdsp`, which must require the omx-contract `.github/pins.txt` names) | `omx-dsp-devel` (channel) | `libomxdsp-dev` (channel) | the DSP: every kernel lives there, none here |
+| omx-dsp ≥ 0.17.0, < 0.18 (`pkg-config omxdsp`) | `omx-dsp-devel` (channel) | `libomxdsp-dev` (channel) | the DSP: every kernel lives there, none here |
+| omx-contract ≥ 2.10.1, < 2.11 (`pkg-config omx-contract`) | `omx-contract-devel` (channel) | `libomx-contract-dev` (channel) | the declarations: every parameter's travel, read from its installed `omx-contract.json`, and the EQ default rule (its C render; the generators build a small probe, so they need the C compiler too) |
 | openmixer CLAP extensions | `omx-clap-core-devel` (channel) | `libomx-clap-core-dev` (channel) | `<omx-clap-host/omx_clap_ext.h>` |
 | CLAP 1.2 headers | `clap-devel` | `clap-headers` (built from the pinned CLAP, see FreeMixer/.github) | the CLAP face |
 | LV2 headers | `lv2-devel` | `lv2-dev` | the LV2 face |
@@ -18,7 +19,14 @@
 
 The channel is FreeMixer's package repository: `https://freemixer.github.io/rpm/freemixer.repo` for
 dnf, `https://freemixer.github.io/deb/debian/<release> ./` (key `https://freemixer.github.io/deb/freemixer.asc`)
-for apt.
+for apt. With it configured, `dnf builddep packaging/omx-plugins.spec` or `apt-get build-dep ./` installs
+everything above.
+
+The ranges are written once, in the packaging: `packaging/omx-plugins.spec` (`BuildRequires`, a floor
+`>=` and the next minor as the ceiling `<`) and `debian/control` (the same, `>=` and `<<`);
+`tools/deps-check.sh` holds the two equal. Nothing else names a version: the Makefile reads the
+floors and ceilings from the spec, and building the archive stops, naming the dependency, the range
+and what `pkg-config` finds installed, when an installed release is outside it.
 
 ## Build, test, install
 
@@ -111,17 +119,15 @@ node tools/omx-new-plugin.mjs --from-contract <kernel>   # validates, generates 
 ```
 
 The declaration is the folder's one hand-written file. Every parameter names its travel BY
-REFERENCE into the kernel's file in omx-contract (`"ref"`, `"field"`), at the release `omx-contract`
-names in `.github/pins.txt`; no number is typed in a declaration. The release is read through its
-JSON render from `$OMX_CONTRACT_DIR`, a checkout of omx-contract beside this one, or the release
-tarball (fetched once into `build/omx-contract-<version>/`, which needs `curl`). The kernel must
+REFERENCE into the kernel's file in omx-contract (`"ref"`, `"field"`); no number is typed in a
+declaration. The release read is the installed one, through its JSON render (`omx-contract.json` in
+`pkg-config --variable=datadir omx-contract`), and its version must lie in the spec's range;
+`$OMX_CONTRACT_DIR`, a directory holding an `omx-contract.json`, stands in for it (the perturbation
+proofs point it at a moved copy). The kernel must
 have its instance face in omx-dsp (`<omxdsp/fx/omx_<kernel>_instance.h>`): each parameter binds to
 the `resolve()` argument named after its contract control, and `"binding": "instance"` makes
 `tools/gen.mjs` write the binding, the kernel-identity test, both faces and the Makefile. A kernel
 missing from omx-contract, or without a face of that shape, is refused with the work named.
-
-`tools/pins-check.sh` holds the packaging's requirement on omx-dsp, and the omx-contract the
-installed omx-dsp requires, equal to `.github/pins.txt`.
 
 `node tools/gen.mjs` also refills the shared files' generated regions from every plugin folder: the
 README's catalogue and sections (a declaration's `summary` and `manual`, else its description and
