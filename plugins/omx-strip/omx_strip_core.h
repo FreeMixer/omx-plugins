@@ -27,6 +27,7 @@
  * eq: `gain` is not a parameter; it is passed at "default".
  * eq: `q` is not a parameter; it is passed at "default".
  * eq: `bandOn` is not a parameter; it is passed at "off".
+ * comp: `detectorTopology` is not a parameter; it is passed at "feedforward".
  */
 #ifndef OMX_STRIP_CORE_H
 #define OMX_STRIP_CORE_H
@@ -251,7 +252,8 @@ static inline void omx_strip_core_resolve(OmxStripCore *c, const float *values, 
                                   /* makeup_db */ values[OMX_STRIP_PARAM_COMP_MAKEUP],
                                   /* mix_pct */ values[OMX_STRIP_PARAM_COMP_MIX],
                                   /* kind */ (int)lrintf(values[OMX_STRIP_PARAM_COMP_KIND]),
-                                  /* detector_oversampling */ (int)lrintf(values[OMX_STRIP_PARAM_COMP_DETECTOR_OVERSAMPLING]));
+                                  /* detector_oversampling */ (int)lrintf(values[OMX_STRIP_PARAM_COMP_DETECTOR_OVERSAMPLING]),
+                                  /* detector_topology */ 0);
   const float o = values[OMX_STRIP_PARAM_ORDER];
   const long row = o - o == 0.0f ? lrintf(o) : 0;
   c->order = row >= 0 && row < (long)OMX_STRIP_CHAIN_ORDERS ? (uint32_t)row : 0u;
