@@ -1,10 +1,9 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Pau Aliagas <linuxnow@gmail.com>
 /*
- * transient-arms.c — the transient designer's oracle, moved from the console engine (openmixer's
- * mix_transient.test.c, design docs/design/specs/2026-09-26-transient-designer.md §5): arms A–E, G
- * and H, the declared travel and the N-thread identity, run through each BUILT face at the nine
- * rates an RME interface clocks at (OMX_RME_RATES, 32 to 192 kHz).
+ * transient-arms.c — the transient designer's oracle, moved from the console engine with the effect:
+ * arms A–E, G and H, the declared travel and the N-thread identity, run through each BUILT face at
+ * the nine rates an RME interface clocks at (OMX_RME_RATES, 32 to 192 kHz).
  *
  *   transient-arms clap <omx-transient.clap>
  *   transient-arms lv2 <bundle-dir> <uri>
