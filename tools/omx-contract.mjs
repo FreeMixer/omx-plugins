@@ -1,9 +1,11 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Pau Aliagas <linuxnow@gmail.com>
 /*
- * omx-contract.mjs — where a plugin's parameter references are read from: omx-contract's RESOLVED
- * data (share/omx-contract/omx-contract.json: every reference and derivation already worked out) at
- * the version this repository pins (`omx-contract` in .github/pins.txt), and nowhere else.
+ * omx-contract.mjs — where a plugin's parameter references are read from: the RESOLVED data of the
+ * INSTALLED omx-contract (omx-contract.json in its data directory, `pkg-config --variable=datadir
+ * omx-contract`: every reference and derivation already worked out), and nowhere else. Which releases
+ * are acceptable is said once, in the packaging: packaging/omx-plugins.spec's BuildRequires on
+ * omx-contract-devel, a floor (>=) and a ceiling (<), the same range debian/control writes.
  *
  * A parameter in plugins/<stem>/<stem>.decl.json names its travel BY REFERENCE (`"ref"`, with an
  * optional `"field"` and `"forKind"`), never by retyped numbers. A name resolves in this order, and
@@ -15,12 +17,9 @@
  * A name found in ANOTHER kernel's file is refused (a plugin reads only its own kernel), as is a
  * name found in more than one place and a name found nowhere.
  *
- * The release is found, in order: $OMX_CONTRACT_DIR (a directory holding package.json and
- * share/omx-contract/omx-contract.json, lib/eq-defaults.mjs: the unpacked npm/release package); else
- * build/omx-contract-<pin>/ (this tool's earlier fetch); else a sibling git checkout ../omx-contract,
- * read at $OMX_CONTRACT_REF or the tag v<pin>; else the release tarball
- * openmixer-omx-contract-<pin>.tgz of github.com/FreeMixer/omx-contract, fetched with curl. In every
- * case the package.json version must equal the pin.
+ * $OMX_CONTRACT_DIR, a directory holding an omx-contract.json, stands in for the installed data
+ * directory: the perturbation proofs point it at a moved copy. Either way the release's version (the
+ * render's own `version`) must lie in the packaging's range, or nothing is read.
  */
 import { execFileSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -28,94 +27,76 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 export const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-export const PIN_FILE = '.github/pins.txt';
-export const RESOLVED = join('share', 'omx-contract', 'omx-contract.json');
-const RELEASE_URL = (v) => `https://github.com/FreeMixer/omx-contract/releases/download/v${v}/openmixer-omx-contract-${v}.tgz`;
+/** Where the packaging declares the releases this repository builds against. */
+export const SPEC_FILE = join('packaging', 'omx-plugins.spec');
+/** The resolved render, in omx-contract's data directory. */
+export const RESOLVED = 'omx-contract.json';
+const PKG_CONFIG = () => process.env.PKG_CONFIG || 'pkg-config';
 
-/** The pinned version of one source in .github/pins.txt (`name url version`), or undefined. */
-export function pinOf(name, root = ROOT) {
-  const f = join(root, PIN_FILE);
-  if (!existsSync(f)) return undefined;
-  for (const line of readFileSync(f, 'utf8').split('\n')) {
-    const w = line.trim().split(/\s+/);
-    if (w[0] === name && !line.trim().startsWith('#')) return w[2];
-  }
-  return undefined;
-}
-
-/** The omx-contract version a tree pins. */
-export function contractPin(root = ROOT) {
-  const v = pinOf('omx-contract', root);
-  if (!/^\d+\.\d+\.\d+$/.test(v ?? '')) throw new Error(`${PIN_FILE}: the omx-contract version '${v}' is not x.y.z`);
-  return v;
-}
-
-/** -1, 0 or 1, comparing two x.y.z versions. */
+/** -1, 0 or 1, comparing two dotted versions (a missing part is 0: 2.11 is 2.11.0). */
 export function compareVersions(a, b) {
-  const pa = a.split('.').map(Number), pb = b.split('.').map(Number);
-  for (let i = 0; i < 3; i++) if (pa[i] !== pb[i]) return pa[i] < pb[i] ? -1 : 1;
+  const pa = String(a).split('.').map(Number), pb = String(b).split('.').map(Number);
+  for (let i = 0; i < Math.max(pa.length, pb.length); i++) if ((pa[i] ?? 0) !== (pb[i] ?? 0)) return (pa[i] ?? 0) < (pb[i] ?? 0) ? -1 : 1;
   return 0;
 }
 
+/**
+ * The range packaging/omx-plugins.spec requires of the build dependency `pkg` (`omx-dsp-devel`,
+ * `omx-contract-devel`): `{ floor, ceiling }`, from its two BuildRequires lines `pkg >= floor` and
+ * `pkg < ceiling`. Throws when either is missing or written twice.
+ */
+export function packagingRange(pkg, root = ROOT) {
+  const file = join(root, SPEC_FILE);
+  if (!existsSync(file)) throw new Error(`${SPEC_FILE} is missing: the packaging is where the releases this tree builds against are declared`);
+  const spec = readFileSync(file, 'utf8');
+  const one = (op) => {
+    const found = [...spec.matchAll(new RegExp(`^BuildRequires: ${pkg.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')} ${op} ([0-9][0-9.]*)$`, 'gm'))];
+    if (found.length !== 1) throw new Error(`${SPEC_FILE}: ${found.length ? 'more than one' : 'no'} "BuildRequires: ${pkg} ${op} <version>" line`);
+    return found[0][1];
+  };
+  return { floor: one('>='), ceiling: one('<') };
+}
+
+const inRange = (v, r) => compareVersions(v, r.floor) >= 0 && compareVersions(v, r.ceiling) < 0;
+
 const versionOf = (dir) => {
   try {
-    return JSON.parse(readFileSync(join(dir, 'package.json'), 'utf8')).version;
+    return JSON.parse(readFileSync(join(dir, RESOLVED), 'utf8')).version;
   } catch {
     return undefined;
   }
 };
 
-function gitOk(repo, ...args) {
+/** The installed omx-contract's data directory (pkg-config), or undefined. */
+function installedDataDir() {
   try {
-    return execFileSync('git', ['-C', repo, ...args], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
+    return execFileSync(PKG_CONFIG(), ['--variable=datadir', 'omx-contract'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim() || undefined;
   } catch {
     return undefined;
   }
 }
 
-const complete = (dir) => existsSync(join(dir, RESOLVED)) && existsSync(join(dir, 'lib', 'eq-defaults.mjs'));
-
 /**
- * The directory omx-contract's release is read from, at the pin: `{ dir, pin, at }`, or `{ dir:
- * undefined, pin, why }` when no omx-contract at the pinned version is reachable.
+ * The directory omx-contract's resolved render is read from: `{ dir, version, range, at }`, or `{ dir:
+ * undefined, range, why }` when no omx-contract in the packaging's range is installed (nor given by
+ * OMX_CONTRACT_DIR).
  */
 export function locateContract(root = ROOT) {
-  const pin = contractPin(root);
-  const env = process.env.OMX_CONTRACT_DIR;
-  if (env) {
-    const v = versionOf(env);
-    if (!complete(env)) return { dir: undefined, pin, why: `OMX_CONTRACT_DIR=${env} holds no ${RESOLVED} and lib/eq-defaults.mjs` };
-    if (v !== pin) return { dir: undefined, pin, why: `OMX_CONTRACT_DIR=${env} is omx-contract ${v}, the pin is ${pin}` };
-    return { dir: env, pin, at: `${env} (omx-contract ${v})` };
-  }
-  const cache = join(root, 'build', `omx-contract-${pin}`);
-  if (versionOf(cache) === pin && complete(cache)) return { dir: cache, pin, at: `${cache} (omx-contract ${pin})` };
-  const sibling = join(root, '..', 'omx-contract');
-  if (existsSync(join(sibling, '.git'))) {
-    const refs = [process.env.OMX_CONTRACT_REF, `v${pin}`].filter(Boolean);
-    for (const ref of refs) {
-      const pkg = gitOk(sibling, 'show', `${ref}:package.json`);
-      if (pkg === undefined) continue;
-      let v;
-      try {
-        v = JSON.parse(pkg).version;
-      } catch {
-        continue;
-      }
-      if (v !== pin) continue;
-      mkdirSync(cache, { recursive: true });
-      execFileSync('sh', ['-c', 'git -C "$1" archive "$2" package.json data share lib | tar -x -C "$3"', 'sh', sibling, ref, cache]);
-      return { dir: cache, pin, at: `${sibling} at ${ref} (omx-contract ${pin})` };
-    }
-  }
+  let range;
   try {
-    mkdirSync(cache, { recursive: true });
-    execFileSync('sh', ['-c', 'curl -fsSL "$1" | tar -xz --strip-components=1 -C "$2"', 'sh', RELEASE_URL(pin), cache], { stdio: ['ignore', 'ignore', 'pipe'] });
+    range = packagingRange('omx-contract-devel', root);
   } catch (e) {
-    return { dir: undefined, pin, why: `omx-contract ${pin} is not at OMX_CONTRACT_DIR, in a sibling checkout or at ${RELEASE_URL(pin)}: ${String(e.stderr ?? e.message).trim()}` };
+    return { dir: undefined, why: e.message };
   }
-  if (versionOf(cache) === pin && complete(cache)) return { dir: cache, pin, at: `${RELEASE_URL(pin)} (omx-contract ${pin})` };
-  return { dir: undefined, pin, why: `the release fetched from ${RELEASE_URL(pin)} is not a complete omx-contract ${pin}` };
+  const want = `omx-contract >= ${range.floor}, < ${range.ceiling} (${SPEC_FILE})`;
+  const env = process.env.OMX_CONTRACT_DIR;
+  const dir = env || installedDataDir();
+  const at = env ? `OMX_CONTRACT_DIR=${env}` : dir;
+  if (!dir) return { dir: undefined, range, why: `no omx-contract is installed (\`${PKG_CONFIG()} --variable=datadir omx-contract\` finds none); this tree needs ${want}: install omx-contract-devel or libomx-contract-dev (BUILDING.md)` };
+  const version = versionOf(dir);
+  if (!version) return { dir: undefined, range, why: `${at} holds no readable ${RESOLVED}` };
+  if (!inRange(version, range)) return { dir: undefined, range, why: `${at} is omx-contract ${version}; this tree needs ${want}` };
+  return { dir, version, range, at: `${at} (omx-contract ${version})` };
 }
 
 const resolvedCache = new Map();
@@ -157,19 +138,53 @@ function sheetValue(dir, kernel, path, symbol) {
 
 const eqCache = new Map();
 /**
- * The default bands of an EQ with `count` bands, by omx-contract's own rule (lib/eq-defaults.mjs of
- * the release, run in a child node so this stays synchronous): `[{ type, freqHz, gainDb, q }]`.
+ * The default bands of an EQ with `count` bands, by omx-contract's own rule: its C render,
+ * omx_eq_default_centres() and omx_eq_default_type() of the installed <omxcontract/omx_contract_limits.h>
+ * (the package installs no JavaScript), run through a small probe built once into build/; gain and Q
+ * are EQ_BAND_DEFAULTS of the render at `dir`. `[{ type, freqHz, gainDb, q }]`.
  */
-export function eqDefaultBands(dir, count) {
+export function eqDefaultBands(dir, count, root = ROOT) {
   const key = `${dir}#${count}`;
   if (!eqCache.has(key)) {
-    const script = `import { eqDefaultBands, eqDefaultParams } from ${JSON.stringify(`file://${join(dir, 'lib', 'eq-defaults.mjs')}`)};
-import { readFileSync } from 'node:fs';
-const items = JSON.parse(readFileSync(${JSON.stringify(join(dir, RESOLVED))}, 'utf8')).items;
-console.log(JSON.stringify(eqDefaultBands(${Number(count)}, eqDefaultParams(new Map(Object.entries(items))))));`;
-    eqCache.set(key, JSON.parse(execFileSync(process.execPath, ['--input-type=module', '-e', script], { encoding: 'utf8' })));
+    const rows = execFileSync(eqProbe(root), [String(Number(count))], { encoding: 'utf8' }).trim().split('\n');
+    const types = items(dir).EQ_BAND_TYPES?.value;
+    const band = items(dir).EQ_BAND_DEFAULTS?.value;
+    if (!Array.isArray(types) || !band) throw new Error(`omx-contract at ${dir}: no EQ_BAND_TYPES or EQ_BAND_DEFAULTS`);
+    eqCache.set(key, rows.map((r) => {
+      const [t, hz] = r.split(' ');
+      return { type: types[Number(t)], freqHz: Number(hz), gainDb: band.gainDb, q: band.q };
+    }));
   }
   return eqCache.get(key);
+}
+
+let probe;
+/** build/eq-default-probe, compiled against the installed omx-contract (cc, pkg-config, -lm). */
+function eqProbe(root) {
+  if (probe) return probe;
+  const out = join(root, 'build', 'eq-default-probe');
+  mkdirSync(dirname(out), { recursive: true });
+  const src = `${out}.c`;
+  writeFileSync(src, `#include <stdio.h>
+#include <stdlib.h>
+#include <omxcontract/omx_contract_limits.h>
+int main(int argc, char **argv) {
+  static float hz[1024];
+  unsigned n = argc > 1 ? (unsigned)strtoul(argv[1], NULL, 10) : 0;
+  if (n == 0 || n > 1024 || omx_eq_default_centres(n, hz) != n) { fprintf(stderr, "eq-default-probe: no default bands for %u\\n", n); return 1; }
+  for (unsigned i = 0; i < n; i++) printf("%d %.6g\\n", omx_eq_default_type(i, n), (double)hz[i]);
+  return 0;
+}
+`);
+  let cflags;
+  try {
+    cflags = execFileSync(PKG_CONFIG(), ['--cflags', 'omx-contract'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim().split(/\s+/).filter(Boolean);
+  } catch (e) {
+    throw new Error(`the EQ default rule is omx-contract's C render, and \`${PKG_CONFIG()} --cflags omx-contract\` failed: ${String(e.stderr ?? e.message).trim()}`);
+  }
+  execFileSync(process.env.CC || 'cc', ['-O1', '-o', out, src, ...cflags, '-lm'], { stdio: ['ignore', 'ignore', 'inherit'] });
+  probe = out;
+  return out;
 }
 
 /** The band count of a strip type (`eq16`, ...) in EQ_BAND_COUNTS: its default. */
@@ -257,13 +272,14 @@ export function resolveParam(dir, kernel, p) {
 }
 
 /**
- * The perturbation proof's move: copy omx-contract's release at `src` to `dst` and move the default
+ * The perturbation proof's move: copy omx-contract's render at `src` to `dst` and move the default
  * of the travel parameter `p` (of `kernel`) references to its other end; with `move: 'max'`, move
  * the travel's upper limit out by one step (its own, else 1) instead. The copy is what a consumer
  * reads with OMX_CONTRACT_DIR=dst; every generated file must then follow, or be refused as stale.
  */
 export function perturbCopy(src, dst, kernel, p, { move = 'default' } = {}) {
-  execFileSync('cp', ['-R', join(src, 'share'), join(src, 'lib'), join(src, 'package.json'), dst]);
+  mkdirSync(dst, { recursive: true });
+  execFileSync('cp', [join(src, RESOLVED), dst]);
   const file = join(dst, RESOLVED);
   const data = JSON.parse(readFileSync(file, 'utf8'));
   const where = findNameIn(data.items, kernel, p.ref);

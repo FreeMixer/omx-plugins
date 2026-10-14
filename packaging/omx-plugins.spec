@@ -12,17 +12,19 @@ Source0: %{url}/archive/v%{version}/%{name}-%{version}.tar.gz
 BuildRequires: gcc
 BuildRequires: make
 BuildRequires: pkgconf-pkg-config
-BuildRequires: omx-dsp-devel >= 0.15.0
-BuildRequires: omx-dsp-devel < 0.16
+# The releases this tree builds against: a floor and the next minor as the ceiling, each once here and
+# the same in debian/control (tools/deps-check.sh). The Makefile and tools/gen.mjs read them from here.
+BuildRequires: omx-dsp-devel >= 0.17.0
+BuildRequires: omx-dsp-devel < 0.18
+BuildRequires: omx-contract-devel >= 2.10.1
+BuildRequires: omx-contract-devel < 2.11
 BuildRequires: omx-clap-core-devel
 BuildRequires: clap-devel
 BuildRequires: lv2-devel
 # %%check: the generators and checks are Node scripts; the hosts that load the built plugins
 BuildRequires: nodejs
-# the tests check the generated files against omx-contract's release, fetched once (tools/omx-contract.mjs)
-BuildRequires: curl
+# make selftest copies the tree with tar
 BuildRequires: tar
-BuildRequires: gzip
 BuildRequires: lilv
 BuildRequires: lilv-devel
 BuildRequires: sord
@@ -71,8 +73,8 @@ console's own DSP, so they sound like the desk.
 
 %package devel
 Summary: Headers and static library of the OpenMixer plugins, for projects that build on them
-Requires: omx-dsp-devel >= 0.15.0
-Requires: omx-dsp-devel < 0.16
+Requires: omx-dsp-devel >= 0.17.0
+Requires: omx-dsp-devel < 0.18
 Requires: clap-devel
 
 %description devel
@@ -160,8 +162,9 @@ host that runs the plugins in its own process without loading .clap files.
 
 %changelog
 * Wed Oct 14 2026 Pau Aliagas <linuxnow@gmail.com> - 0.7.0-1
-- Built against omx-dsp 0.15.0 (at least 0.15.0, below 0.16) and omx-
-  contract 2.6.0.
+- Built against omx-dsp 0.17.0 (at least 0.17.0, below 0.18) and omx-
+  contract 2.10.1 (at least 2.10.1, below 2.11). No pins file: the
+  packaging declares both ranges and the build reads them from there.
 - The manuals read every range, default and limit from the plugins'
   parameters, which come from omx-contract, so a travel moved in the
   contract moves the manual with it.
