@@ -254,9 +254,9 @@
   "manual": [
     "| Section | Parameters |",
     "|---|---|",
-    "| High-pass | on/off, 20 to 1000 Hz, 12 or 24 dB/oct |",
-    "| Low-pass | on/off, 1 to 20 kHz, 12 or 24 dB/oct |",
-    "| Bands 1 to {bands} | each on/off, type, frequency (20 Hz to 20 kHz), gain (±15 dB), Q (0.3 to 8, a notch to 116) |",
+    "| High-pass | on/off, {range:hpf_freq}; slope {range:hpf_slope} |",
+    "| Low-pass | on/off, {range:lpf_freq}; slope {range:lpf_slope} |",
+    "| Bands 1 to {bands} | each on/off, type, frequency ({range:b1_freq}), gain ({range:b1_gain}), Q ({range:b1_q}; its top for a notch only) |",
     "",
     "Plus the host's bypass, which is the whole EQ's switch. Every band and filter starts off, so a freshly loaded instance passes the",
     "signal untouched."

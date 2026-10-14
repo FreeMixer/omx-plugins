@@ -5,9 +5,11 @@
 # `install` and `clean`.
 #
 #   make            build every plugin
-#   make test       every plugin's tests (what the package builds run), then `make hints` and `make look`
+#   make test       every plugin's tests (what the package builds run), then `make hints`, `make look` and `make manual`
 #   make hints      no LV2 face lost a port hint: tools/port-hints.mjs against each declaration's `portHints` pin
 #   make look       tools/look.json, the MOD GUI's colours and font, is what tools/look/tokens.css resolves to
+#   make manual     each declaration's manual follows omx-contract: a travel moved in a copy of the release moves
+#                   the README section's range and default (tools/test/manual-perturb.mjs)
 #   make recipe-test   the repository's own checks, run by CI beside `make test`:
 #     make completeness  every plugin against recipes/plugin.recipe.json, each gap naming its wizard step;
 #                        a gap not in recipes/completeness-debt.json fails, and so does a paid debt entry
@@ -55,7 +57,7 @@ LIB_FLAGS  := -fPIC -fvisibility=hidden -DOMX_CLAP_STATIC -Iinclude
 # read only by the targets that build the archive, so `make version` and the rest need no omx-dsp
 lib_cflags = $(shell $(PKG_CONFIG) --cflags omxdsp omx-clap-core clap)
 
-.PHONY: all lib lib-test test hints look install install-devel clean version recipe-test completeness selftest strip-crosscheck meters-abi
+.PHONY: all lib lib-test test hints look manual install install-devel clean version recipe-test completeness selftest strip-crosscheck meters-abi
 all: lib
 	@for p in $(PLUGINS); do $(MAKE) -C $$p all || exit 1; done
 lib: $(LIB) $(LIB_PC)
@@ -65,12 +67,15 @@ test: lib
 	@$(MAKE) -s lib-test
 	@$(MAKE) -s hints
 	@$(MAKE) -s look
+	@$(MAKE) -s manual
 hints:
 	node tools/gen.mjs --check
 	node tools/gen.mjs
 	node tools/port-hints.mjs
 look:
 	node tools/look.mjs --check
+manual:
+	node tools/test/manual-perturb.mjs
 # A plugin is complete when it has every artifact the recipe lists and keeps every law; a new plugin
 # starts with `node tools/omx-new-plugin.mjs --from-contract <kernel>` (docs/new-plugin-from-contract.md).
 recipe-test: selftest completeness
