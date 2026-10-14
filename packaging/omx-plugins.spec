@@ -16,8 +16,8 @@ BuildRequires: pkgconf-pkg-config
 # the same in debian/control (tools/deps-check.sh). The Makefile and tools/gen.mjs read them from here.
 BuildRequires: omx-dsp-devel >= 0.18.0
 BuildRequires: omx-dsp-devel < 0.19
-BuildRequires: omx-contract-devel >= 2.10.1
-BuildRequires: omx-contract-devel < 2.11
+BuildRequires: omx-contract-devel >= 2.11.0
+BuildRequires: omx-contract-devel < 2.12
 BuildRequires: omx-clap-core-devel
 BuildRequires: clap-devel
 BuildRequires: lv2-devel
@@ -163,7 +163,7 @@ host that runs the plugins in its own process without loading .clap files.
 %changelog
 * Wed Oct 14 2026 Pau Aliagas <linuxnow@gmail.com> - 0.7.0-1
 - Built against omx-dsp 0.18.0 (at least 0.18.0, below 0.19) and omx-
-  contract 2.10.1 (at least 2.10.1, below 2.11). No pins file: the
+  contract 2.11.0 (at least 2.11.0, below 2.12). No pins file: the
   packaging declares both ranges and the build reads them from there.
 - The manuals read every range, default and limit from the plugins'
   parameters, which come from omx-contract, so a travel moved in the
