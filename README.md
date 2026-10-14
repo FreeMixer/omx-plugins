@@ -110,7 +110,7 @@ moved from 48 to 96 kHz sounds the same.
 | Band | Full / Low / High / Tilt | Full |
 | Auto Gain | off / on | on |
 | Stereo Link | off / on | on |
-| HF Roll-off | 0 / 12000 / 16000 | 0 |
+| HF Roll-off | Off / 12 kHz / 16 kHz | Off |
 | Oversampling | 1 / 2 / 4 | 4 |
 
 Plus the host's bypass.
