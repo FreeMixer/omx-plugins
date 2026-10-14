@@ -40,7 +40,7 @@ static const omx_plugin_param OMX_DRIVE_PARAMS[OMX_DRIVE_PARAM_COUNT] = {
   { "band", "Band", "", 0.0f, 3.0f, 0.0f, OMX_PLUGIN_PARAM_INTEGER },
   { "autoGain", "Auto Gain", "", 0.0f, 1.0f, 1.0f, OMX_PLUGIN_PARAM_TOGGLE },
   { "stereoLink", "Stereo Link", "", 0.0f, 1.0f, 1.0f, OMX_PLUGIN_PARAM_TOGGLE },
-  { "hfRolloff", "HF Roll-off", "", 0.0f, 16000.0f, 0.0f, OMX_PLUGIN_PARAM_INTEGER },
+  { "hfRolloff", "HF Roll-off", "", 0.0f, 2.0f, 0.0f, OMX_PLUGIN_PARAM_INTEGER },
   { "oversample", "Oversampling", "", 1.0f, 4.0f, 4.0f, OMX_PLUGIN_PARAM_INTEGER },
 };
 
@@ -73,7 +73,7 @@ static const omx_plugin_param OMX_DRIVE_PARAMS[OMX_DRIVE_PARAM_COUNT] = {
 #define OMX_DRIVE_PARAM_STEREO_LINK_MAX 1.0f
 #define OMX_DRIVE_PARAM_STEREO_LINK_DEFAULT 1.0f
 #define OMX_DRIVE_PARAM_HF_ROLLOFF_MIN 0.0f
-#define OMX_DRIVE_PARAM_HF_ROLLOFF_MAX 16000.0f
+#define OMX_DRIVE_PARAM_HF_ROLLOFF_MAX 2.0f
 #define OMX_DRIVE_PARAM_HF_ROLLOFF_DEFAULT 0.0f
 #define OMX_DRIVE_PARAM_OVERSAMPLE_MIN 1.0f
 #define OMX_DRIVE_PARAM_OVERSAMPLE_MAX 4.0f
@@ -89,13 +89,13 @@ static const omx_plugin_param OMX_DRIVE_PARAMS[OMX_DRIVE_PARAM_COUNT] = {
 #define OMX_DRIVE_CLAP_FEATURES "audio-effect", "distortion", "stereo"
 #define OMX_DRIVE_LV2_URI "urn:openmixer:drive"
 /* org.openmixer.declaration/1: the declaration's plain description and the digest of its parameters. */
-#define OMX_DRIVE_DECL_SOURCE "omx drive: Drive 0 to 36 dB, Character -1 to 1, Band Frequency 20 to 20000 Hz, Mix 0 to 100 %, Trim -24 to 12 dB, Curve 0 to 3, Band 0 to 3, Auto Gain 0 to 1, Stereo Link 0 to 1, HF Roll-off 0 to 16000, Oversampling 1 to 4"
-#define OMX_DRIVE_DECL_DIGEST "7ee94444d165c3d8c183a36401dd68a71e4980e6451ba24660fddc8b8c0399be"
+#define OMX_DRIVE_DECL_SOURCE "omx drive: Drive 0 to 36 dB, Character -1 to 1, Band Frequency 20 to 20000 Hz, Mix 0 to 100 %, Trim -24 to 12 dB, Curve 0 to 3, Band 0 to 3, Auto Gain 0 to 1, Stereo Link 0 to 1, HF Roll-off 0 to 2, Oversampling 1 to 4"
+#define OMX_DRIVE_DECL_DIGEST "0ace5ddc34e47ca5e4258c820757c6b1d5dc0c2172e8e71c39b036347f8e6e0c"
 
 /* org.openmixer.param-contract/1 (tools/param-contract.mjs): each parameter's unit, scale and step, in
  * id order; the host's bypass, the last id, is the face's. */
 #define OMX_DRIVE_PARAM_CONTRACT_VERSION 1u
-#define OMX_DRIVE_PARAM_CONTRACT_FINGERPRINT "05cb9e248d15154e837fbeda86132d0c6574a11d3facb2cf1fa06fc7f0361755"
+#define OMX_DRIVE_PARAM_CONTRACT_FINGERPRINT "3065b9d7e8f201797ac8c5a2c59ea85d661238af7683beac0aa97339fd0716fb"
 static const struct omx_param_contract_row OMX_DRIVE_PARAM_CONTRACT[OMX_DRIVE_PARAM_COUNT] = {
   { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* amount db */
   { 0u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* character none */
