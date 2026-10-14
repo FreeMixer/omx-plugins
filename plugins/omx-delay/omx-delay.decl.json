@@ -103,11 +103,11 @@
   "manual": [
     "| Parameter | Range | Default |",
     "|---|---|---|",
-    "| Time | 0 to 2000 ms, whole ms | 300 ms |",
-    "| Feedback | 0 to 0.99 | 0.3 |",
-    "| Mix (wet) | 0 to 1 | 0.3 |",
-    "| Tone (0 bright, 1 dark repeats) | 0 to 1 | 0.3 |",
-    "| Ping-pong | off / on | off |",
+    "| Time | {range:fxDelayTime} | {default:fxDelayTime} |",
+    "| Feedback | {range:fxDelayFeedback} | {default:fxDelayFeedback} |",
+    "| Mix (wet) | {range:mix} | {default:mix} |",
+    "| Tone (0 bright, 1 dark repeats) | {range:tone} | {default:tone} |",
+    "| Ping-pong | {range:pingpong} | {default:pingpong} |",
     "",
     "Plus the host's bypass. The tone filter holds the same corner at every sample rate, so a session",
     "moved from 48 to 96 kHz sounds the same."
