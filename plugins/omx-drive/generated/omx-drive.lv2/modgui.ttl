@@ -29,30 +29,34 @@
             lv2:name "HF Roll-off" ;
         ] , [
             lv2:index 3 ;
+            lv2:symbol "oversample" ;
+            lv2:name "Oversampling" ;
+        ] , [
+            lv2:index 4 ;
             lv2:symbol "amount" ;
             lv2:name "Drive" ;
         ] , [
-            lv2:index 4 ;
+            lv2:index 5 ;
             lv2:symbol "character" ;
             lv2:name "Character" ;
         ] , [
-            lv2:index 5 ;
+            lv2:index 6 ;
             lv2:symbol "bandFreq" ;
             lv2:name "Band Frequency" ;
         ] , [
-            lv2:index 6 ;
+            lv2:index 7 ;
             lv2:symbol "mix" ;
             lv2:name "Mix" ;
         ] , [
-            lv2:index 7 ;
+            lv2:index 8 ;
             lv2:symbol "trim" ;
             lv2:name "Trim" ;
         ] , [
-            lv2:index 8 ;
+            lv2:index 9 ;
             lv2:symbol "autoGain" ;
             lv2:name "Auto Gain" ;
         ] , [
-            lv2:index 9 ;
+            lv2:index 10 ;
             lv2:symbol "stereoLink" ;
             lv2:name "Stereo Link" ;
         ] ;

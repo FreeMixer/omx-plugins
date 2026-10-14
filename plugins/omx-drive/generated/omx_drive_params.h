@@ -26,7 +26,8 @@ enum {
   OMX_DRIVE_PARAM_AUTO_GAIN = 7,
   OMX_DRIVE_PARAM_STEREO_LINK = 8,
   OMX_DRIVE_PARAM_HF_ROLLOFF = 9,
-  OMX_DRIVE_PARAM_COUNT = 10
+  OMX_DRIVE_PARAM_OVERSAMPLE = 10,
+  OMX_DRIVE_PARAM_COUNT = 11
 };
 
 static const omx_plugin_param OMX_DRIVE_PARAMS[OMX_DRIVE_PARAM_COUNT] = {
@@ -40,6 +41,7 @@ static const omx_plugin_param OMX_DRIVE_PARAMS[OMX_DRIVE_PARAM_COUNT] = {
   { "autoGain", "Auto Gain", "", 0.0f, 1.0f, 1.0f, OMX_PLUGIN_PARAM_TOGGLE },
   { "stereoLink", "Stereo Link", "", 0.0f, 1.0f, 1.0f, OMX_PLUGIN_PARAM_TOGGLE },
   { "hfRolloff", "HF Roll-off", "", 0.0f, 16000.0f, 0.0f, OMX_PLUGIN_PARAM_INTEGER },
+  { "oversample", "Oversampling", "", 1.0f, 4.0f, 4.0f, OMX_PLUGIN_PARAM_INTEGER },
 };
 
 /* One macro per declared bound: what a C face reads where a constant is needed. */
@@ -73,6 +75,9 @@ static const omx_plugin_param OMX_DRIVE_PARAMS[OMX_DRIVE_PARAM_COUNT] = {
 #define OMX_DRIVE_PARAM_HF_ROLLOFF_MIN 0.0f
 #define OMX_DRIVE_PARAM_HF_ROLLOFF_MAX 16000.0f
 #define OMX_DRIVE_PARAM_HF_ROLLOFF_DEFAULT 0.0f
+#define OMX_DRIVE_PARAM_OVERSAMPLE_MIN 1.0f
+#define OMX_DRIVE_PARAM_OVERSAMPLE_MAX 4.0f
+#define OMX_DRIVE_PARAM_OVERSAMPLE_DEFAULT 4.0f
 
 /* The identity every face publishes. */
 #define OMX_DRIVE_NAME "omx drive"
@@ -84,13 +89,13 @@ static const omx_plugin_param OMX_DRIVE_PARAMS[OMX_DRIVE_PARAM_COUNT] = {
 #define OMX_DRIVE_CLAP_FEATURES "audio-effect", "distortion", "stereo"
 #define OMX_DRIVE_LV2_URI "urn:openmixer:drive"
 /* org.openmixer.declaration/1: the declaration's plain description and the digest of its parameters. */
-#define OMX_DRIVE_DECL_SOURCE "omx drive: Drive 0 to 36 dB, Character -1 to 1, Band Frequency 20 to 20000 Hz, Mix 0 to 100 %, Trim -24 to 12 dB, Curve 0 to 3, Band 0 to 3, Auto Gain 0 to 1, Stereo Link 0 to 1, HF Roll-off 0 to 16000"
-#define OMX_DRIVE_DECL_DIGEST "b53c3fb88d798020fa4916d7c259c609a36baa22a20f8e28105e53e2506b73d2"
+#define OMX_DRIVE_DECL_SOURCE "omx drive: Drive 0 to 36 dB, Character -1 to 1, Band Frequency 20 to 20000 Hz, Mix 0 to 100 %, Trim -24 to 12 dB, Curve 0 to 3, Band 0 to 3, Auto Gain 0 to 1, Stereo Link 0 to 1, HF Roll-off 0 to 16000, Oversampling 1 to 4"
+#define OMX_DRIVE_DECL_DIGEST "7ee94444d165c3d8c183a36401dd68a71e4980e6451ba24660fddc8b8c0399be"
 
 /* org.openmixer.param-contract/1 (tools/param-contract.mjs): each parameter's unit, scale and step, in
  * id order; the host's bypass, the last id, is the face's. */
 #define OMX_DRIVE_PARAM_CONTRACT_VERSION 1u
-#define OMX_DRIVE_PARAM_CONTRACT_FINGERPRINT "89ad3ebcf54d0bcc336f3b09611d36d77357718d60aa9085f71e334d8a7a135f"
+#define OMX_DRIVE_PARAM_CONTRACT_FINGERPRINT "05cb9e248d15154e837fbeda86132d0c6574a11d3facb2cf1fa06fc7f0361755"
 static const struct omx_param_contract_row OMX_DRIVE_PARAM_CONTRACT[OMX_DRIVE_PARAM_COUNT] = {
   { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* amount db */
   { 0u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* character none */
@@ -102,11 +107,12 @@ static const struct omx_param_contract_row OMX_DRIVE_PARAM_CONTRACT[OMX_DRIVE_PA
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* autoGain none */
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* stereoLink none */
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* hfRolloff none */
+  { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* oversample none */
 };
 
 /* org.openmixer.panel-description/1 (tools/panel-description.mjs): the declaration's panel as the rows
  * include/omx_panel_description.h serves, parameter ids the declaration's. Family drive. */
-#define OMX_DRIVE_PANEL_FINGERPRINT "e967420a72f79dbf4e551deb13da2df89bd0a5713e60d22210978d662851b4de"
+#define OMX_DRIVE_PANEL_FINGERPRINT "be6473460e82fb3bb4299f5763201893eaf9394e6c4594c68c305d41625a48bb"
 static const struct omx_panel_section_row OMX_DRIVE_PANEL_SECTIONS[] = {
   { "drive", "fx.drive.section.drive", "Drive" },
 };
@@ -114,6 +120,7 @@ static const struct omx_panel_control_row OMX_DRIVE_PANEL_CONTROLS[] = {
   { 5u, 0u, OMX_CLAP_WIDGET_AUTO, "fx.drive.curve", "Curve", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
   { 6u, 0u, OMX_CLAP_WIDGET_AUTO, "fx.drive.band", "Band", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
   { 9u, 0u, OMX_CLAP_WIDGET_AUTO, "fx.drive.hf_rolloff", "HF Roll-off", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 10u, 0u, OMX_CLAP_WIDGET_AUTO, "fx.drive.oversample", "Oversampling", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
   { 0u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.drive.amount", "Drive", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
   { 1u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.drive.character", "Character", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
   { 2u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.drive.band_freq", "Band Frequency", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
@@ -134,14 +141,14 @@ static const struct omx_panel_display_row OMX_DRIVE_PANEL_DISPLAYS[] = {
 };
 /* clap.remote-controls/2: the pages of the page rule over the sections. */
 static const struct omx_panel_page_row OMX_DRIVE_PANEL_PAGES[] = {
-  { "Drive", "Drive 1", { 5u, 6u, 9u, 0u, 1u, 2u, 3u, 4u } },
-  { "Drive", "Drive 2", { 7u, 8u, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID } },
+  { "Drive", "Drive 1", { 5u, 6u, 9u, 10u, 0u, 1u, 2u, 3u } },
+  { "Drive", "Drive 2", { 4u, 7u, 8u, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID } },
 };
 #define OMX_DRIVE_PANEL_PAGE_COUNT 2u
 static const struct omx_panel_rows OMX_DRIVE_PANEL = {
   OMX_DRIVE_PANEL_FINGERPRINT, OMX_CLAP_FAMILY_DRIVE,
   OMX_DRIVE_PANEL_SECTIONS, 1u,
-  OMX_DRIVE_PANEL_CONTROLS, 10u,
+  OMX_DRIVE_PANEL_CONTROLS, 11u,
   OMX_DRIVE_PANEL_ROLES, 5u,
   OMX_DRIVE_PANEL_DISPLAYS, 1u,
   NULL, 0u,
@@ -152,9 +159,9 @@ static const struct omx_panel_rows OMX_DRIVE_PANEL = {
 #define OMX_DRIVE_LV2_PORT_IN_R 1u
 #define OMX_DRIVE_LV2_PORT_OUT_L 2u
 #define OMX_DRIVE_LV2_PORT_OUT_R 3u
-#define OMX_DRIVE_LV2_PORT_ENABLED 14u
-#define OMX_DRIVE_LV2_PORT_LATENCY 15u
+#define OMX_DRIVE_LV2_PORT_ENABLED 15u
+#define OMX_DRIVE_LV2_PORT_LATENCY 16u
 #define OMX_DRIVE_LV2_PORT_FIRST_PARAM 4u
-#define OMX_DRIVE_LV2_PORT_COUNT 16u
+#define OMX_DRIVE_LV2_PORT_COUNT 17u
 
 #endif /* OMX_DRIVE_PARAMS_H */
