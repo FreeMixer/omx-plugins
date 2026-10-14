@@ -20,6 +20,7 @@ HERE="$(cd "$(dirname "$0")/.." && pwd)"
 ALLOW=(
   "tools/private-refs-check.sh"   # it spells the patterns it looks for
 )
+EXTRA_PATHSPEC=()                 # the self-test sets a bad one, to prove a git grep error is red
 
 # Extended regexps, matched case-insensitively. A new kind of pointer is one line here.
 PATTERNS=(
@@ -31,6 +32,8 @@ PATTERNS=(
   'packages/[a-z][a-z0-9-]+'                          # a path into the private repository's packages
   '\.vue([^A-Za-z0-9_]|$)'                            # its web UI components
   "openmixer's spec"                                  # its specification files
+  'docs/design/'                                      # its design documents
+  'harness/'                                          # its test harness
   '20[0-9]{2}-[0-9]{2}-[0-9]{2}-[a-z][a-z0-9-]+\.md'  # a dated specification file name
   'spec 20[0-9]{2}-[0-9]{2}-[0-9]{2}'                 # a citation of one
 )
@@ -41,7 +44,10 @@ check() { # <root>
   local excl=()
   for a in "${ALLOW[@]}"; do excl+=(":(exclude)${a%% *}"); done
   [ -n "$(git -C "$root" ls-files)" ] || { echo "private-refs-check: git lists no file" >&2; return 1; }
-  hits=$(git -C "$root" grep -nIiE "${args[@]}" -- . "${excl[@]}" | cut -c1-200 || true)
+  # git grep exits 1 for no match and 128 or more for an error; an error must not read as "no hits"
+  hits=$(git -C "$root" grep -nIiE "${args[@]}" -- . "${excl[@]}" "${EXTRA_PATHSPEC[@]}") || rc=$?
+  case "${rc:-0}" in 0|1) ;; *) echo "private-refs-check: git grep failed (exit $rc)" >&2; return 1 ;; esac
+  hits=$(printf '%s' "$hits" | cut -c1-200)
   [ -z "$hits" ] || { printf '%s\n' "$hits" >&2; fail=1; }
   [ "$fail" = 0 ] || { echo "private-refs-check: the lines above point into private repositories; state the fact instead" >&2; return 1; }
   echo "private-refs-check: no tracked file points into a private repository"
@@ -72,6 +78,10 @@ if [ "${1:-}" = --self-test ]; then
   sab spec-in-mjs    tools/gen.mjs                   "// openmixer's spec 2026-10-09-plugin-from-contract.md"
   sab ttl            plugins/x/generated/x.ttl       'rdfs:comment "see FreeMixer/openmixer#12" ;'
   sab header         plugins/x/generated/x.h         '/* packages/core/src/x.ts */'
+  sab design-dir     docs/a.md                       'the notes in docs/design/specs'
+  sab harness-dir    tools/gen.mjs                   '// harness/dsp-check.sh'
+  mk; git -C "$scratch/t" add -A
+  if ( EXTRA_PATHSPEC=(":(bogus)x"); check "$scratch/t" >/dev/null 2>&1 ); then echo "SABOTAGE git-grep-error: STAYED GREEN"; fail=1; else echo "SABOTAGE git-grep-error: red"; fi
   [ "$fail" = 0 ] || exit 1
   check "$HERE" >/dev/null || { echo "self-test: the repository is not green" >&2; exit 1; }
   echo "private-refs-check self-test: every sabotage red"
