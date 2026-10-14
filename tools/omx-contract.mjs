@@ -258,17 +258,22 @@ export function resolveParam(dir, kernel, p) {
 
 /**
  * The perturbation proof's move: copy omx-contract's release at `src` to `dst` and move the default
- * of the travel parameter `p` (of `kernel`) references to its other end. The copy is what a consumer
+ * of the travel parameter `p` (of `kernel`) references to its other end; with `move: 'max'`, move
+ * the travel's upper limit out by one step (its own, else 1) instead. The copy is what a consumer
  * reads with OMX_CONTRACT_DIR=dst; every generated file must then follow, or be refused as stale.
  */
-export function perturbCopy(src, dst, kernel, p) {
+export function perturbCopy(src, dst, kernel, p, { move = 'default' } = {}) {
   execFileSync('cp', ['-R', join(src, 'share'), join(src, 'lib'), join(src, 'package.json'), dst]);
   const file = join(dst, RESOLVED);
   const data = JSON.parse(readFileSync(file, 'utf8'));
   const where = findNameIn(data.items, kernel, p.ref);
   if (where.error) throw new Error(where.error);
   const e = data.items[p.ref];
-  if (e.kind === 'travels') {
+  if (move === 'max') {
+    if (e.kind !== 'travels') throw new Error(`${p.ref}: a ${e.kind} has no limit to move`);
+    const t = e.shape === 'table' ? e.value[p.field] : e.value;
+    t.max += typeof t.step === 'number' && t.step > 0 ? t.step : 1;
+  } else if (e.kind === 'travels') {
     const t = e.shape === 'table' ? e.value[p.field] : e.value;
     const def = t.default ?? t.min;
     t.default = def === t.max ? t.min : t.max;
