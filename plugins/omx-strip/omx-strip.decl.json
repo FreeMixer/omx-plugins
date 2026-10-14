@@ -148,7 +148,9 @@
         }
       ],
       "fixed": {
-        "keySource": "self"
+        "keySource": "self",
+        "hpHz": 0,
+        "lpHz": 0
       }
     },
     {
