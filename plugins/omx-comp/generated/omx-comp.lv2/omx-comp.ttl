@@ -19,9 +19,9 @@
     doap:name "omx comp" ;
     doap:license <https://www.gnu.org/licenses/gpl-3.0.html> ;
     lv2:project <https://github.com/FreeMixer/omx-plugins> ;
-    lv2:minorVersion 5 ;
-    lv2:microVersion 1 ;
-    rdfs:comment "The console's compressor: threshold, ratio and knee set how hard it holds the level down, attack and release how fast, with makeup gain and a dry/wet mix. Kind picks the RMS detector (Compressor) or the peak detector (Limiter), and detector oversampling can run the control path at 4x. The DSP is omx-dsp's <omxdsp/fx/omx_comp_instance.h>, the console's own compressor." ;
+    lv2:minorVersion 6 ;
+    lv2:microVersion 0 ;
+    rdfs:comment "The console's compressor: threshold, ratio and knee set how hard it holds the level down, attack and release how fast, with makeup gain and a dry/wet mix. Kind picks the RMS detector (Compressor) or the peak detector (Limiter), and detector oversampling can run the control path at 4x; detector topology has it hear the input (feedforward) or its own output (feedback). The DSP is omx-dsp's <omxdsp/fx/omx_comp_instance.h>, the console's own compressor." ;
     lv2:optionalFeature lv2:hardRTCapable ;
     lv2:port
     [
@@ -159,6 +159,20 @@
     [
         a lv2:ControlPort , lv2:InputPort ;
         lv2:index 13 ;
+        lv2:symbol "detectorTopology" ;
+        lv2:name "Detector Topology" ;
+        lv2:default 0 ;
+        lv2:minimum 0 ;
+        lv2:maximum 1 ;
+        lv2:portProperty lv2:integer , lv2:enumeration ;
+        lv2:scalePoint
+            [ rdfs:label "Feedforward" ; rdf:value 0 ] ,
+            [ rdfs:label "Feedback" ; rdf:value 1 ] ;
+        pg:group <urn:openmixer:comp#comp>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 14 ;
         lv2:symbol "enabled" ;
         lv2:name "Enabled" ;
         lv2:default 1 ;
@@ -169,7 +183,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:OutputPort ;
-        lv2:index 14 ;
+        lv2:index 15 ;
         lv2:symbol "latency" ;
         lv2:name "Latency" ;
         lv2:designation lv2:latency ;
