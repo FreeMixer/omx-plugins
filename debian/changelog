@@ -1,3 +1,14 @@
+omx-plugins (0.8.0) unstable; urgency=medium
+
+  * Library dependencies are a floor only, no ceiling: omx-dsp (>= 0.18.0,
+    the first release the plugins build and pass `make test` against; 0.17.0
+    does not link) and omx-contract (>= 2.11.0). tools/deps-check.sh fails
+    on any upper bound.
+  * The parameter-contract header names the LUFS unit (OMX_CLAP_UNIT_LUFS,
+    0x103), which openmixer's MAIN loudness target travels in.
+
+ -- Pau Aliagas <linuxnow@gmail.com>  Thu, 15 Oct 2026 12:00:00 +0000
+
 omx-plugins (0.7.0) unstable; urgency=medium
 
   * Built against omx-dsp 0.18.0 (at least 0.18.0, below 0.19) and omx-
