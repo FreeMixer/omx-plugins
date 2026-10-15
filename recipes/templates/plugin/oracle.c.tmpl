@@ -51,7 +51,7 @@
 {{^chain}}#include <omxdsp/fx/omx_{{face}}_instance.h>
 {{/chain}}{{#chain}}{{#faces}}#include <omxdsp/fx/omx_{{face}}_instance.h>
 {{/faces}}{{/chain}}#include <omxdsp/omx_denormal.h>
-{{#metered}}#include "omx_clap_meters.h"
+{{#metered}}#include <omx-clap-host/clap_meters.h>
 {{/metered}}{{#arrays}}
 _Static_assert({{count}} == {{extent}}, "the declaration names one {{arg}} parameter per band of the face");
 {{/arrays}}

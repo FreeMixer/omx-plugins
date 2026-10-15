@@ -39,7 +39,7 @@
 #include "omx_deesser_params.h"
 #include "omx_deesser_core.h"
 #include <omx-clap-host/omx_clap_ext.h>
-#include "omx_clap_meters.h"
+#include <omx-clap-host/clap_meters.h>
 #include <omxdsp/omx_denormal.h> /* omx_denormals_off, per callback */
 
 #define G_DECLARED OMX_DEESSER_PARAM_COUNT

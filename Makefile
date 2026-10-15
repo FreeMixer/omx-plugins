@@ -18,9 +18,8 @@
 #     make completeness  every plugin against recipes/plugin.recipe.json, each gap naming its wizard step;
 #                        a gap not in recipes/completeness-debt.json fails, and so does a paid debt entry
 #     make selftest      the recipe's checkers, wizard and commit protocol, each sabotaged (needs git)
-#   make meters-abi   include/omx_clap_meters.h against omx-clap-core's clap_meters.h: same id, enums, sizeof and
-#                    offsetof (tools/meters-abi-check.sh; fetches omx-clap-core's header by the installed tag, so it
-#                    needs the network and is not part of `make test`, which the package builds run offline)
+#   make meters-abi  the clap.meters/1 header omx-clap-core installs has the id, enums, sizeof and offsetof the
+#                    plugins are built for (tools/test/meters-abi-test.c, compile and run; part of `make test`)
 #   make strip-crosscheck   omx-strip, a chain, against the hand-ported strip it replaced, bit for bit at
 #                    the old plugin's settings (tools/test/strip-crosscheck.sh; needs the git history)
 #   make install    DESTDIR, PREFIX, LIBDIR, CLAPDIR: $(CLAPDIR)/<name>.clap and $(LIBDIR)/lv2/<name>.lv2/
@@ -81,6 +80,7 @@ test: lib units
 	@$(MAKE) -s hints
 	@$(MAKE) -s look
 	@$(MAKE) -s manual
+	@$(MAKE) -s meters-abi
 units:
 	node tools/test/param-units-check.mjs
 hints:
@@ -102,8 +102,10 @@ private-refs:
 	tools/private-refs-check.sh
 	tools/private-refs-check.sh --self-test
 meters-abi:
-	tools/meters-abi-check.sh
-	tools/meters-abi-check.sh --self-test
+	@mkdir -p build
+	$(CC) -std=gnu11 -Wall -Wextra -Werror $(shell $(PKG_CONFIG) --cflags omx-clap-core clap) -o build/meters-abi-test tools/test/meters-abi-test.c
+	build/meters-abi-test
+	@echo "ok   clap.meters/1 as omx-clap-core installs it: id, enums, sizeof and offsetof"
 strip-crosscheck:
 	sh tools/test/strip-crosscheck.sh
 install:
