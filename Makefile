@@ -98,6 +98,7 @@ completeness:
 	node tools/plugin-recipe.mjs
 selftest:
 	node tools/test/recipe-selftest.mjs
+	tools/qualify-release.sh --self-test
 private-refs:
 	tools/private-refs-check.sh
 	tools/private-refs-check.sh --self-test
