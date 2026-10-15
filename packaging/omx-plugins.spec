@@ -12,12 +12,10 @@ Source0: %{url}/archive/v%{version}/%{name}-%{version}.tar.gz
 BuildRequires: gcc
 BuildRequires: make
 BuildRequires: pkgconf-pkg-config
-# The releases this tree builds against: a floor and the next minor as the ceiling, each once here and
+# The releases this tree builds against: a floor each (no ceiling), once here and
 # the same in debian/control (tools/deps-check.sh). The Makefile and tools/gen.mjs read them from here.
 BuildRequires: omx-dsp-devel >= 0.18.0
-BuildRequires: omx-dsp-devel < 0.19
 BuildRequires: omx-contract-devel >= 2.11.0
-BuildRequires: omx-contract-devel < 2.12
 BuildRequires: omx-clap-core-devel
 BuildRequires: clap-devel
 BuildRequires: lv2-devel
@@ -74,7 +72,6 @@ console's own DSP, so they sound like the desk.
 %package devel
 Summary: Headers and static library of the OpenMixer plugins, for projects that build on them
 Requires: omx-dsp-devel >= 0.18.0
-Requires: omx-dsp-devel < 0.19
 Requires: clap-devel
 
 %description devel

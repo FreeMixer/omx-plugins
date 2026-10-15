@@ -5,7 +5,7 @@
  * INSTALLED omx-contract (omx-contract.json in its data directory, `pkg-config --variable=datadir
  * omx-contract`: every reference and derivation already worked out), and nowhere else. Which releases
  * are acceptable is said once, in the packaging: packaging/omx-plugins.spec's BuildRequires on
- * omx-contract-devel, a floor (>=) and a ceiling (<), the same range debian/control writes.
+ * omx-contract-devel, a floor (>=) with no ceiling, the same floor debian/control writes.
  *
  * A parameter in plugins/<stem>/<stem>.decl.json names its travel BY REFERENCE (`"ref"`, with an
  * optional `"field"` and `"forKind"`), never by retyped numbers. A name resolves in this order, and
@@ -42,8 +42,8 @@ export function compareVersions(a, b) {
 
 /**
  * The range packaging/omx-plugins.spec requires of the build dependency `pkg` (`omx-dsp-devel`,
- * `omx-contract-devel`): `{ floor, ceiling }`, from its two BuildRequires lines `pkg >= floor` and
- * `pkg < ceiling`. Throws when either is missing or written twice.
+ * `omx-contract-devel`): `{ floor }`, from its BuildRequires line `pkg >= floor`. Throws when it is
+ * missing or written twice.
  */
 export function packagingRange(pkg, root = ROOT) {
   const file = join(root, SPEC_FILE);
@@ -54,10 +54,10 @@ export function packagingRange(pkg, root = ROOT) {
     if (found.length !== 1) throw new Error(`${SPEC_FILE}: ${found.length ? 'more than one' : 'no'} "BuildRequires: ${pkg} ${op} <version>" line`);
     return found[0][1];
   };
-  return { floor: one('>='), ceiling: one('<') };
+  return { floor: one('>=') };
 }
 
-const inRange = (v, r) => compareVersions(v, r.floor) >= 0 && compareVersions(v, r.ceiling) < 0;
+const inRange = (v, r) => compareVersions(v, r.floor) >= 0;
 
 const versionOf = (dir) => {
   try {
@@ -88,7 +88,7 @@ export function locateContract(root = ROOT) {
   } catch (e) {
     return { dir: undefined, why: e.message };
   }
-  const want = `omx-contract >= ${range.floor}, < ${range.ceiling} (${SPEC_FILE})`;
+  const want = `omx-contract >= ${range.floor} (${SPEC_FILE})`;
   const env = process.env.OMX_CONTRACT_DIR;
   const dir = env || installedDataDir();
   const at = env ? `OMX_CONTRACT_DIR=${env}` : dir;
