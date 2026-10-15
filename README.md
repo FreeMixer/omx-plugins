@@ -110,7 +110,8 @@ moved from 48 to 96 kHz sounds the same.
 | Band | Full / Low / High / Tilt | Full |
 | Auto Gain | off / on | on |
 | Stereo Link | off / on | on |
-| HF Roll-off | 0 / 12000 / 16000 | 0 |
+| HF Roll-off | Off / 12 kHz / 16 kHz | Off |
+| Oversampling | 1 / 2 / 4 | 4 |
 
 Plus the host's bypass.
 
@@ -214,6 +215,8 @@ key, or **Key** set to Self, it is the ordinary self-keyed gate.
 | Knee end | -80 to 0 dB, whole steps | -37 dB |
 | Hold | 0 to 2000 ms, whole steps | 10 ms |
 | Hysteresis | 0 to 24 dB | 3 dB |
+| Key high-pass | 0 to 20000 Hz, whole steps | 0 Hz |
+| Key low-pass | 0 to 20000 Hz, whole steps | 0 Hz |
 
 Plus the host's bypass. An attack under 0.5 ms engages the 4x detector path, which adds 72 frames
 of latency, reported to the host; otherwise the latency is zero. Its LV2 URI, ports and defaults

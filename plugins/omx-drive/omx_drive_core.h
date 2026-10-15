@@ -47,7 +47,8 @@ static inline void omx_drive_core_resolve(OmxDriveCore *c, const float *values, 
                                   /* band */ (int)lrintf(values[OMX_DRIVE_PARAM_BAND]),
                                   /* auto_gain */ (int)lrintf(values[OMX_DRIVE_PARAM_AUTO_GAIN]),
                                   /* stereo_link */ (int)lrintf(values[OMX_DRIVE_PARAM_STEREO_LINK]),
-                                  /* hf_rolloff */ (int)lrintf(values[OMX_DRIVE_PARAM_HF_ROLLOFF]));
+                                  /* hf_rolloff */ (int)lrintf(values[OMX_DRIVE_PARAM_HF_ROLLOFF]),
+                                  /* oversample */ (int)lrintf(values[OMX_DRIVE_PARAM_OVERSAMPLE]));
 }
 
 /** The latency the kernel adds, in samples. */

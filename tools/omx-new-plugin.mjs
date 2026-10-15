@@ -9,14 +9,14 @@
  *                                 [--plan-json <file>] [--no-run]
  *   node tools/omx-new-plugin.mjs --from-contract <k1>,<k2>,... --stem omx-<x> [...]
  *
- * Several kernels draft a composite (`binding: chain`, spec 2026-10-09-plugin-from-contract §15.2):
+ * Several kernels draft a composite (`binding: chain`):
  * one element per kernel in the order given, each drafted as a single plugin's parameters are, and
  * each refused, naming the omx-dsp work, when its kernel has no instance face of the generated shape.
  *
  * The declaration plugins/<stem>/<stem>.decl.json is the input and the output; there is no
  * answers file.
  *
- * 1. Checks, writing nothing on a refusal: the kernel is in omx-contract at the pin (read through its
+ * 1. Checks, writing nothing on a refusal: the kernel is in the installed omx-contract (read through its
  *    JSON render, tools/omx-contract.mjs); omx-dsp has its instance face in the shape the generated
  *    binding calls, and every resolve() argument names one contract control (tools/instance-face.mjs).
  * 2. No declaration yet: DRAFTS one, a parameter per resolve() argument in its order, each by
@@ -36,7 +36,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { bindFace, instanceHeader, parseFace } from './instance-face.mjs';
-import { PIN_FILE, contractPin, controlOf, items, kernelControls, kernelExists, locateContract, resolveParam } from './omx-contract.mjs';
+import { controlOf, items, kernelControls, kernelExists, locateContract, resolveParam } from './omx-contract.mjs';
 import { ROOT, checkPlugin, consoleErrors, gapLines, layerOfPath, loadRecipe, loadSchema, panelErrors, pluginFacts, pluginStems, validate } from './plugin-recipe.mjs';
 import { chainBindings, defaultPanel, prepareDecl } from './gen.mjs';
 import { pinOfTtl } from './port-hints.mjs';
@@ -107,16 +107,16 @@ export function kernelSources(kernel, { root = ROOT } = {}) {
   const where = locateContract(root);
   if (!where.dir) refusals.push({ field: 'omx-contract', reason: where.why });
   else if (!kernelExists(where.dir, kernel))
-    refusals.push({ field: 'omx-contract', reason: `omx-contract ${where.pin} has no data/kernels/${kernel}.json: draft it there first (tools/new-kernel.mjs ${kernel}), develop against a sibling checkout (OMX_CONTRACT_DIR), release it, then move ${PIN_FILE}` });
+    refusals.push({ field: 'omx-contract', reason: `omx-contract ${where.version} has no data/kernels/${kernel}.json: draft it there first (tools/new-kernel.mjs ${kernel}), release it, then raise the omx-contract floor in packaging/omx-plugins.spec and debian/control` });
   const inc = omxdspInclude();
   const header = instanceHeader(inc, kernel);
   let face;
-  if (!header) refusals.push({ field: 'omx-dsp', reason: `omx-dsp has no <omxdsp/fx/omx_${kernel}_instance.h>${inc ? '' : ' (no omx-dsp found: pkg-config omxdsp, or OMXDSP_INCLUDE)'}: the instance face is omx-dsp's work first (spec 2026-10-09-plugin-from-contract §2)` });
+  if (!header) refusals.push({ field: 'omx-dsp', reason: `omx-dsp has no <omxdsp/fx/omx_${kernel}_instance.h>${inc ? '' : ' (no omx-dsp found: pkg-config omxdsp, or OMXDSP_INCLUDE)'}: the instance face is omx-dsp's work first` });
   else {
     face = parseFace(readFileSync(header, 'utf8'), kernel);
     if (face.error) refusals.push({ field: 'omx-dsp', reason: `<omxdsp/fx/omx_${kernel}_instance.h>: ${face.error}; a plugin over it keeps a hand-written binding, or omx-dsp gives it a face of the generated shape` });
   }
-  return { refusals, contract: where.dir, pin: where.pin, face: face?.error ? undefined : face, header };
+  return { refusals, contract: where.dir, release: where.version, face: face?.error ? undefined : face, header };
 }
 
 // ---- step 2: the draft -------------------------------------------------------------------------
@@ -251,7 +251,7 @@ export async function planPlugin(declIn, src, { root = ROOT, recipe = loadRecipe
 
   await checkPanelConsole(schema, decl, symbols, resolved, refuse, root);
 
-  return { ok: refusals.length === 0, refusals, decl: canonical(schema, decl), resolved, binding: bound.binding, renames: bound.renames, pin: src.pin };
+  return { ok: refusals.length === 0, refusals, decl: canonical(schema, decl), resolved, binding: bound.binding, renames: bound.renames, release: src.release };
 }
 
 /** The panel speaks the console's family and role vocabulary, the panel and the console name declared
@@ -274,14 +274,14 @@ async function checkPanelConsole(schema, decl, symbols, resolved, refuse, root) 
   }
 }
 
-// ---- a composite: --from-contract <k1>,<k2>,... (spec 2026-10-09-plugin-from-contract §15.2) -------
+// ---- a composite: --from-contract <k1>,<k2>,... -------
 
 /** Each element's kernel sources (kernelSources), and every refusal among them, each naming its kernel. */
 export function chainSources(kernels, { root = ROOT } = {}) {
   const srcs = kernels.map((k) => kernelSources(k, { root }));
   const refusals = srcs.flatMap((src, i) => src.refusals.map((r) => ({ ...r, field: `${kernels[i]}: ${r.field}` })));
   if (kernels.length < 2) refusals.push({ field: '--from-contract', reason: 'a chain runs two or more kernels' });
-  return { refusals, srcs, kernels, contract: srcs[0]?.contract, pin: srcs[0]?.pin };
+  return { refusals, srcs, kernels, contract: srcs[0]?.contract, release: srcs[0]?.release };
 }
 
 const cap = (w) => `${w[0].toUpperCase()}${w.slice(1)}`;
@@ -391,7 +391,7 @@ export async function planChain(declIn, chainSrc, { root = ROOT, recipe = loadRe
   }
   await checkPanelConsole(schema, decl, new Set(d.params.map((p) => p.symbol)), d.params, refuse, root);
   const renames = bound.flatMap((b) => b.renames);
-  return { ok: refusals.length === 0, refusals, decl: canonical(schema, decl), resolved: d.params, binding: bound.flatMap((b) => b.binding), renames, pin: chainSrc.pin };
+  return { ok: refusals.length === 0, refusals, decl: canonical(schema, decl), resolved: d.params, binding: bound.flatMap((b) => b.binding), renames, release: chainSrc.release };
 }
 
 // ---- writing: the declaration, then every generated file ---------------------------------------
@@ -448,7 +448,7 @@ export function writePlugin(plan, { root = ROOT } = {}) {
 
 /** One commit per layer that has files, in the recipe's layer order. */
 export function commitPlan(recipe, plan, files) {
-  const facts = { name: plan.decl.name, kernel: plan.decl.kernel, contractRelease: plan.pin };
+  const facts = { name: plan.decl.name, kernel: plan.decl.kernel, contractRelease: plan.release };
   const byLayer = new Map(recipe.layers.map((l) => [l.id, []]));
   const unmapped = [];
   for (const f of files) {
@@ -489,7 +489,7 @@ async function main(argv) {
 
   const src = kernelSources(kernel, { root });
   if (src.refusals.length) refused(src.refusals);
-  console.log(`omx-contract ${contractPin(root)}: data/kernels/${kernel}.json; omx-dsp: <omxdsp/fx/omx_${kernel}_instance.h> (${src.header})`);
+  console.log(`omx-contract ${locateContract(root).version}: data/kernels/${kernel}.json; omx-dsp: <omxdsp/fx/omx_${kernel}_instance.h> (${src.header})`);
 
   if (!existsSync(declPath)) {
     const draft = draftDeclaration(kernel, src, { root, recipe, stem });
@@ -539,7 +539,7 @@ async function finish(plan, { root, recipe, stem, argv, opt }) {
 async function chainMain(kernels, { root, recipe, stem, declPath, argv, opt }) {
   const src = chainSources(kernels, { root });
   if (src.refusals.length) refused(src.refusals);
-  console.log(`omx-contract ${contractPin(root)}: ${kernels.map((k) => `data/kernels/${k}.json`).join(', ')}; omx-dsp: ${src.srcs.map((x) => x.header).join(', ')}`);
+  console.log(`omx-contract ${locateContract(root).version}: ${kernels.map((k) => `data/kernels/${k}.json`).join(', ')}; omx-dsp: ${src.srcs.map((x) => x.header).join(', ')}`);
   if (!existsSync(declPath)) {
     const draft = draftChain(kernels, src, { root, recipe, stem });
     if (draft.refusals.length) refused(draft.refusals);

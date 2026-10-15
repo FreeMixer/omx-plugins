@@ -40,7 +40,7 @@
  *      that does not list the kernel is refused, never read some other way. The plan ends with a
  *      full-scale burst and a quiet tail, then each value of every choice over a burst and tail of
  *      its own with the other parameters stepped once for its second tail.
- *   8. A chain (spec §15.2), on the real faces eq, gate and comp: `--from-contract eq,gate,comp`
+ *   8. A chain, on the real faces eq, gate and comp: `--from-contract eq,gate,comp`
  *      drafts one element per kernel and refuses a kernel with no face; the settled chain is
  *      written whole, its parameter list flattened (each element's switch, then its parameters,
  *      then `order`), and its `make test` is green: both faces bit-identical to the chain of faces
@@ -86,22 +86,20 @@ function copyTree(dst) {
   execFileSync('sh', ['-c', 'xargs -0 tar -cf - | tar -xf - -C "$1"', 'sh', dst], { cwd: ROOT, input: files });
 }
 
-/** A stand-in omx-contract release: the pinned release's resolved render, with the items of each
+/** A stand-in omx-contract release: the installed release's resolved render, with the items of each
  * kernel given in place of that kernel's own (the rest of the tree still resolves against it), and
  * `listed` added to the render's `kernels` (each kernel's ordered controls). */
 function fakeContract(dst, kernels, listed) {
   const real = locateContract(ROOT);
-  if (!real.dir) throw new Error(`the stand-in starts from the pinned omx-contract: ${real.why}`);
-  mkdirSync(join(dst, 'share', 'omx-contract'), { recursive: true });
-  cpSync(join(real.dir, 'lib'), join(dst, 'lib'), { recursive: true });
-  cpSync(join(real.dir, 'package.json'), join(dst, 'package.json'));
-  const render = JSON.parse(readFileSync(join(real.dir, 'share', 'omx-contract', 'omx-contract.json'), 'utf8'));
+  if (!real.dir) throw new Error(`the stand-in starts from the installed omx-contract: ${real.why}`);
+  mkdirSync(dst, { recursive: true });
+  const render = JSON.parse(readFileSync(join(real.dir, 'omx-contract.json'), 'utf8'));
   for (const [k, v] of Object.entries(kernels)) {
     for (const [name, e] of Object.entries(render.items)) if (e.rel === `data/kernels/${k}.json`) delete render.items[name];
     for (const [name, e] of Object.entries(v)) render.items[name] = { rel: `data/kernels/${k}.json`, ...e };
   }
   if (listed) render.kernels = { ...(render.kernels ?? {}), ...listed };
-  writeFileSync(join(dst, 'share', 'omx-contract', 'omx-contract.json'), JSON.stringify(render, null, 2));
+  writeFileSync(join(dst, 'omx-contract.json'), JSON.stringify(render, null, 2));
 }
 
 const travel = (min, max, step, unit, def) => ({ kind: 'travels', shape: 'travel', value: { min, max, step, unit, default: def, defaultFrom: 'desk' } });
@@ -405,8 +403,8 @@ async function main() {
     mkdirSync(join(empty, 'plugins'), { recursive: true });
     cpSync(join(ROOT, 'recipes'), join(empty, 'recipes'), { recursive: true });
     cpSync(join(ROOT, 'schema'), join(empty, 'schema'), { recursive: true });
-    mkdirSync(join(empty, '.github'), { recursive: true });
-    cpSync(join(ROOT, '.github', 'pins.txt'), join(empty, '.github', 'pins.txt'));
+    mkdirSync(join(empty, 'packaging'), { recursive: true });
+    cpSync(join(ROOT, 'packaging', 'omx-plugins.spec'), join(empty, 'packaging', 'omx-plugins.spec'));
     const run = spawnSync('node', [join(ROOT, 'tools', 'plugin-recipe.mjs')], { env: { ...process.env, OMX_PLUGINS_ROOT: empty }, encoding: 'utf8' });
     expect(run.status === 1 && /no plugin to check/.test(run.stdout + run.stderr), `sabotage: a run over no plugin fails (exit ${run.status})`);
   }
@@ -548,7 +546,7 @@ static inline void omx_wobble_instance_run(OmxWobbleInstance *s, const float *${
   }
 
   // ---- 6. the port hints ---------------------------------------------------------------------
-  delete process.env.OMX_CONTRACT_DIR; // the real tree reads the release it pins
+  delete process.env.OMX_CONTRACT_DIR; // the real tree reads the installed release
   delete process.env.OMXDSP_INCLUDE;
   // ---- 5b. variants: one declaration, several band counts (tools/variants.mjs) ------------------
   {
@@ -660,7 +658,7 @@ static inline void omx_wobble_instance_run(OmxWobbleInstance *s, const float *${
         const timed = found.map((m) => ({ ms: Number(m[2]), signal: Number(m[3]), v: m[4].split(',').map((x) => x.trim()) }));
         return { oracle, timed, cols: rows.length ? rows[0].map((_, i) => rows.map((r) => r[i])) : [] };
       } finally {
-        delete process.env.OMX_CONTRACT_DIR; // as arm 6 left them: the real tree reads what it pins
+        delete process.env.OMX_CONTRACT_DIR; // as arm 6 left them: the real tree reads what is installed
         delete process.env.OMXDSP_INCLUDE;
       }
     };

@@ -4,7 +4,7 @@
  * variants.mjs — ONE declaration for several plugins that differ in a band count only.
  *
  * The channel EQ ships as omx-eq8, omx-eq16 and omx-eq32: one kernel, one instance face, three
- * numbers. By the one-home rule (spec 2026-10-09-plugin-from-contract §6, §7) the only fact that
+ * numbers. By the one-home rule the only fact that
  * differs between them is the band count, and its home is omx-contract's count sheet
  * (EQ_BAND_COUNTS.eq8.max, ...). So the plugins have ONE hand-written declaration,
  * plugins/<base>/<base>.decl.json, carrying

@@ -26,7 +26,9 @@ enum {
   OMX_GATE_PARAM_KNEE_END = 7,
   OMX_GATE_PARAM_HOLD = 8,
   OMX_GATE_PARAM_HYSTERESIS = 9,
-  OMX_GATE_PARAM_COUNT = 10
+  OMX_GATE_PARAM_KEY_HP = 10,
+  OMX_GATE_PARAM_KEY_LP = 11,
+  OMX_GATE_PARAM_COUNT = 12
 };
 
 static const omx_plugin_param OMX_GATE_PARAMS[OMX_GATE_PARAM_COUNT] = {
@@ -40,6 +42,8 @@ static const omx_plugin_param OMX_GATE_PARAMS[OMX_GATE_PARAM_COUNT] = {
   { "knee_end", "Knee End", "dB", -80.0f, 0.0f, -37.0f, OMX_PLUGIN_PARAM_INTEGER },
   { "hold", "Hold", "ms", 0.0f, 2000.0f, 10.0f, OMX_PLUGIN_PARAM_INTEGER },
   { "hysteresis", "Hysteresis", "dB", 0.0f, 24.0f, 3.0f, 0u },
+  { "key_hp", "Key High-pass", "Hz", 0.0f, 20000.0f, 0.0f, OMX_PLUGIN_PARAM_INTEGER },
+  { "key_lp", "Key Low-pass", "Hz", 0.0f, 20000.0f, 0.0f, OMX_PLUGIN_PARAM_INTEGER },
 };
 
 /* One macro per declared bound: what a C face reads where a constant is needed. */
@@ -73,24 +77,30 @@ static const omx_plugin_param OMX_GATE_PARAMS[OMX_GATE_PARAM_COUNT] = {
 #define OMX_GATE_PARAM_HYSTERESIS_MIN 0.0f
 #define OMX_GATE_PARAM_HYSTERESIS_MAX 24.0f
 #define OMX_GATE_PARAM_HYSTERESIS_DEFAULT 3.0f
+#define OMX_GATE_PARAM_KEY_HP_MIN 0.0f
+#define OMX_GATE_PARAM_KEY_HP_MAX 20000.0f
+#define OMX_GATE_PARAM_KEY_HP_DEFAULT 0.0f
+#define OMX_GATE_PARAM_KEY_LP_MIN 0.0f
+#define OMX_GATE_PARAM_KEY_LP_MAX 20000.0f
+#define OMX_GATE_PARAM_KEY_LP_DEFAULT 0.0f
 
 /* The identity every face publishes. */
 #define OMX_GATE_NAME "omx keyed-gate"
 #define OMX_GATE_VENDOR "openmixer"
 #define OMX_GATE_URL "https://github.com/FreeMixer/omx-plugins"
-#define OMX_GATE_VERSION "0.6.0"
+#define OMX_GATE_VERSION "0.7.0"
 #define OMX_GATE_DESCRIPTION "The OpenMixer console's channel gate with an external key: the stereo signal is gated while the detector listens to the sidechain input the host routes to it, or to the signal itself with the key unconnected or set to Self. One gain drives both legs. An attack under 0.5 ms engages 4x detector oversampling, which adds 72 frames of latency, reported to the host. The DSP is omx-dsp's <omxdsp/fx/omx_gate_instance.h>, the console's own gate."
 #define OMX_GATE_CLAP_ID "org.openmixer.keyed-gate"
 #define OMX_GATE_CLAP_FEATURES "audio-effect", "gate", "stereo"
 #define OMX_GATE_LV2_URI "urn:openmixer:keyed-gate"
 /* org.openmixer.declaration/1: the declaration's plain description and the digest of its parameters. */
-#define OMX_GATE_DECL_SOURCE "omx keyed-gate: Key 0 to 1, Threshold -80 to 0 dB, Ratio 1 to 100, Range -90 to 0 dB, Attack 0 to 500 ms, Release 0 to 5000 ms, Knee Start -80 to 0 dB, Knee End -80 to 0 dB, Hold 0 to 2000 ms, Hysteresis 0 to 24 dB"
-#define OMX_GATE_DECL_DIGEST "da939093462b901312c31e455170d4fe564bddcabc0fb19934c7b69ea74c0c6f"
+#define OMX_GATE_DECL_SOURCE "omx keyed-gate: Key 0 to 1, Threshold -80 to 0 dB, Ratio 1 to 100, Range -90 to 0 dB, Attack 0 to 500 ms, Release 0 to 5000 ms, Knee Start -80 to 0 dB, Knee End -80 to 0 dB, Hold 0 to 2000 ms, Hysteresis 0 to 24 dB, Key High-pass 0 to 20000 Hz, Key Low-pass 0 to 20000 Hz"
+#define OMX_GATE_DECL_DIGEST "89c6643026ff9a19b63266e7c5661b32863e3689620767db36a0707c46367fe8"
 
 /* org.openmixer.param-contract/1 (tools/param-contract.mjs): each parameter's unit, scale and step, in
  * id order; the host's bypass, the last id, is the face's. */
 #define OMX_GATE_PARAM_CONTRACT_VERSION 1u
-#define OMX_GATE_PARAM_CONTRACT_FINGERPRINT "f295be9733e981170b924333170c26001c255f217366e0debb39300c56374acc"
+#define OMX_GATE_PARAM_CONTRACT_FINGERPRINT "fb378b79e0e68a9b25293e3aeb0b134134cded48e07e07665f6f182c05092b3e"
 static const struct omx_param_contract_row OMX_GATE_PARAM_CONTRACT[OMX_GATE_PARAM_COUNT] = {
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* key_external none */
   { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* threshold db */
@@ -102,13 +112,15 @@ static const struct omx_param_contract_row OMX_GATE_PARAM_CONTRACT[OMX_GATE_PARA
   { 13u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* knee_end db */
   { 2u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* hold ms */
   { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* hysteresis db */
+  { 16u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* key_hp hz */
+  { 16u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* key_lp hz */
 };
 
 /* org.openmixer.panel-description/1 (tools/panel-description.mjs): the declaration's panel as the rows
  * include/omx_panel_description.h serves, parameter ids the declaration's. Family gate.
  * Declared roles not published:
  *   ratio (ratio): the ratio role takes ratio, coef, not no unit */
-#define OMX_GATE_PANEL_FINGERPRINT "4c014a0639d0df200be7be72ad1015beee79579eb485b83dafc02d3a03a5beed"
+#define OMX_GATE_PANEL_FINGERPRINT "2338bb0c4807cadf33fb1d7ca6c09000ec92aa5836e8257233ea801b166505df"
 static const struct omx_panel_section_row OMX_GATE_PANEL_SECTIONS[] = {
   { "gate", "fx.gate.section.gate", "Gate" },
   { "key", "fx.gate.section.key", "Key" },
@@ -124,6 +136,8 @@ static const struct omx_panel_control_row OMX_GATE_PANEL_CONTROLS[] = {
   { 6u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.gate.knee_start", "Knee Start", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
   { 7u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.gate.knee_end", "Knee End", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
   { 0u, 1u, OMX_CLAP_WIDGET_AUTO, "fx.gate.key_external", "Key", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 10u, 1u, OMX_CLAP_WIDGET_KNOB, "fx.gate.key_hp", "Key High-pass", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 11u, 1u, OMX_CLAP_WIDGET_KNOB, "fx.gate.key_lp", "Key Low-pass", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
 };
 static const struct omx_panel_role_row OMX_GATE_PANEL_ROLES[] = {
   { "threshold", 0u, 1u },
@@ -142,13 +156,13 @@ static const struct omx_panel_display_row OMX_GATE_PANEL_DISPLAYS[] = {
 static const struct omx_panel_page_row OMX_GATE_PANEL_PAGES[] = {
   { "Gate", "Gate 1", { 1u, 3u, 2u, 4u, 8u, 5u, 9u, 6u } },
   { "Gate", "Gate 2", { 7u, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID } },
-  { "Key", "Key", { 0u, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID } },
+  { "Key", "Key", { 0u, 10u, 11u, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID, OMX_CLAP_PANEL_INVALID_ID } },
 };
 #define OMX_GATE_PANEL_PAGE_COUNT 3u
 static const struct omx_panel_rows OMX_GATE_PANEL = {
   OMX_GATE_PANEL_FINGERPRINT, OMX_CLAP_FAMILY_GATE,
   OMX_GATE_PANEL_SECTIONS, 2u,
-  OMX_GATE_PANEL_CONTROLS, 10u,
+  OMX_GATE_PANEL_CONTROLS, 12u,
   OMX_GATE_PANEL_ROLES, 8u,
   OMX_GATE_PANEL_DISPLAYS, 1u,
   NULL, 0u,
@@ -161,8 +175,8 @@ static const struct omx_panel_rows OMX_GATE_PANEL = {
 #define OMX_GATE_LV2_PORT_OUT_L 3u
 #define OMX_GATE_LV2_PORT_OUT_R 4u
 #define OMX_GATE_LV2_PORT_ENABLED 5u
-#define OMX_GATE_LV2_PORT_LATENCY 16u
+#define OMX_GATE_LV2_PORT_LATENCY 18u
 #define OMX_GATE_LV2_PORT_FIRST_PARAM 6u
-#define OMX_GATE_LV2_PORT_COUNT 17u
+#define OMX_GATE_LV2_PORT_COUNT 19u
 
 #endif /* OMX_GATE_PARAMS_H */

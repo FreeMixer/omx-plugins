@@ -9,7 +9,7 @@
   "noun": "de-esser",
   "vendor": "openmixer",
   "url": "https://github.com/FreeMixer/omx-plugins",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "The console's de-esser: a detector on a band around the sibilance drives the compressor's gain computer, and the reduction lands on that band alone or on the whole signal.",
   "clap": {
     "id": "org.openmixer.deesser",
@@ -70,14 +70,6 @@
       ]
     }
   ],
-  "meters": [
-    {
-      "id": "deessGr",
-      "kind": "gain_reduction",
-      "field": "state.band.gr_min_db",
-      "floor": "deessRange"
-    }
-  ],
   "portHints": {
     "deessFreq": {
       "props": [
@@ -127,6 +119,14 @@
       "unit": "units:frame"
     }
   },
+  "meters": [
+    {
+      "id": "deessGr",
+      "kind": "gain_reduction",
+      "field": "state.band.gr_min_db",
+      "floor": "deessRange"
+    }
+  ],
   "panel": {
     "family": "deesser",
     "roles": {

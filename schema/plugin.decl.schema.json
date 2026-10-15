@@ -153,7 +153,7 @@
             "chain"
           ],
           "title": "Binding",
-          "description": "`instance`: the plugin runs omx-dsp's instance face of its kernel (<omxdsp/fx/omx_<kernel>_instance.h>), and tools/gen.mjs generates the kernel binding, the kernel-identity test, both faces and the Makefile from this declaration; each parameter binds to the `resolve` argument named after its contract control. `chain`: a composite, its parameters generated from `chain` (spec 2026-10-09-plugin-from-contract §15.2): each element binds to its own kernel's instance face exactly as `instance` does, and the binding runs them in order. Left out, those files are the plugin's own (a composite, a face omx-dsp does not have)."
+          "description": "`instance`: the plugin runs omx-dsp's instance face of its kernel (<omxdsp/fx/omx_<kernel>_instance.h>), and tools/gen.mjs generates the kernel binding, the kernel-identity test, both faces and the Makefile from this declaration; each parameter binds to the `resolve` argument named after its contract control. `chain`: a composite, its parameters generated from `chain`: each element binds to its own kernel's instance face exactly as `instance` does, and the binding runs them in order. Left out, those files are the plugin's own (a composite, a face omx-dsp does not have)."
         },
         "params": {
           "type": "array",
@@ -242,6 +242,17 @@
           "description": "The latency each face reports, held to what the kernel does: for each entry the identity test (test/<kernel>-oracle.c), at every declared rate, through the CLAP face and the LV2 face, sets the named parameters (the rest at their defaults), runs a unit impulse and reads the reported latency, after the restart a CLAP face asks for. `impulse`: the impulse's peak lands within one frame of the reported latency (the kernel's delay can be fractional; the report is its rounding), and a report of 0 would not. A number: the reported latency is that many frames. Left out, no latency is measured beyond the identity test's own check that the faces report the kernel's.",
           "items": {
             "$ref": "#/$defs/latencyCheck"
+          }
+        },
+        "oracles": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "title": "Oracles",
+          "description": "Hand-written oracles beside the generated identity test, each test/<name>.c in the plugin folder: an oracle moved from the console engine with its effect, run on the built faces at the nine RME rates (docs/new-plugin-from-contract.md). The generated Makefile builds each one and runs it in make test as `<name> clap <stem>.clap` and `<name> lv2 <bundle> <uri>`; tools/gen.mjs refuses a name whose file is missing. Left out, the identity test is the plugin's only oracle.",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*$"
           }
         },
         "meters": {
@@ -837,7 +848,7 @@
         "decay-envelope"
       ],
       "title": "Graph",
-      "description": "The graph kinds a panel section may draw, computed by the renderer from the section's controls: the console draws eq-curve (EqCurve), dynamics-curve (GateCurve, CompCurve), transfer-curve (drive's TransferCurve), delay-taps and decay-envelope (StageTimeCurve's delay taps and reverb decay) today; lfo is spec §8's. A new kind is added here once, and in each renderer."
+      "description": "The graph kinds a panel section may draw, computed by the renderer from the section's controls: the console draws eq-curve (EqCurve), dynamics-curve (GateCurve, CompCurve), transfer-curve (drive's TransferCurve), delay-taps and decay-envelope (StageTimeCurve's delay taps and reverb decay) today. A new kind is added here once, and in each renderer."
     },
     "latencyCheck": {
       "type": "object",
@@ -911,7 +922,7 @@
         "placement"
       ],
       "title": "Console",
-      "description": "How the plugin shows in the OpenMixer console (spec 2026-10-09-plugin-from-contract §8), as the console draws it TODAY: where it may go, its overview card and its FX chip (its processing panel is the plugin's one `panel`). A part the console does not draw for this effect today is left out (the console then draws a racked plugin with its generic editor). The console's placement rules refuse a declaration that breaks them; the plugin cannot widen them.",
+      "description": "How the plugin shows in the OpenMixer console, as the console draws it TODAY: where it may go, its overview card and its FX chip (its processing panel is the plugin's one `panel`). A part the console does not draw for this effect today is left out (the console then draws a racked plugin with its generic editor). The console's placement rules refuse a declaration that breaks them; the plugin cannot widen them.",
       "properties": {
         "$comment": {
           "type": "string"
@@ -935,19 +946,19 @@
                 "pattern": "^[a-z][a-zA-Z0-9]*$"
               },
               "title": "Strip kinds",
-              "description": "The strip kinds that may host the plugin, in the console's names (packages/core ChannelKind: input, fxReturn, aux, mix, matrix, main, fxSend, mixMinus)."
+              "description": "The strip kinds that may host the plugin, in the console's names (input, fxReturn, aux, mix, matrix, main, fxSend, mixMinus)."
             },
             "group": {
               "type": "string",
               "pattern": "^[a-z][a-z0-9-]*$",
               "title": "Chain position group",
-              "description": "Where the console's channel layout (packages/web-ui utils/channelLayout.ts) puts it: `walk`, the reorderable chain of native stages (the strip's /order row); `tail`, a fixed member after the walk (the limiter); `plugins`, the hosted plugin rack (the insert rack's strip kinds)."
+              "description": "Where the console's channel layout puts it: `walk`, the reorderable chain of native stages (the strip's /order row); `tail`, a fixed member after the walk (the limiter); `plugins`, the hosted plugin rack (the insert rack's strip kinds)."
             },
             "stage": {
               "type": "string",
               "pattern": "^[a-z][a-zA-Z0-9]*$",
               "title": "Stage",
-              "description": "The console's native stage kind the plugin draws as today (packages/declarations/stages/<stage>.json, or the limiter's fixed tail stage)."
+              "description": "The console's native stage kind the plugin draws as today (or the limiter's fixed tail stage)."
             },
             "after": {
               "type": "string",
@@ -986,7 +997,7 @@
                 "type": "string",
                 "pattern": "^([A-Za-z][A-Za-z0-9_]*|readout:[a-z][A-Za-z0-9]*)$"
               },
-              "description": "The controls the card shows, by parameter symbol (spec §8 says one to three; the console's gate and EQ cards show more today), or `readout:<name>` for a readout the contract declares. A per-band symbol of a declaration with variants stands for every band's."
+              "description": "The controls the card shows, by parameter symbol (one to three; the console's gate and EQ cards show more today), or `readout:<name>` for a readout the contract declares. A per-band symbol of a declaration with variants stands for every band's."
             },
             "summary": {
               "type": "string",

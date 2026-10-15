@@ -2,15 +2,14 @@
 <!-- Copyright (C) 2026 Pau Aliagas <linuxnow@gmail.com> -->
 # A plugin's meters
 
-A dynamics plugin that replaces a console stage owes the console the stage's gain-reduction meter
-(openmixer's spec `2026-10-02-lean-engine-effects-as-plugins.md` §8.2 and §8.4). This is how a
+A dynamics plugin that replaces a console stage owes the console the stage's gain-reduction meter. This is how a
 plugin here reports one.
 
 ## The interface
 
 `clap.meters/1`, the CLAP meters extension (free-audio/clap#521), and nothing else. It is the one
 omx-clap-core reads for meters since it removed `org.openmixer.meters/1` (omx-clap-core
-`docs/meters.md`, openmixer#1544): every channel of every meter becomes an output symbol, read at
+`docs/meters.md`): every channel of every meter becomes an output symbol, read at
 the host's idle rate through `get_values()`.
 
 No released CLAP SDK ships `clap/ext/draft/meters.h` yet, and omx-clap-core does not install its

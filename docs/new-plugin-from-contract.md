@@ -2,14 +2,13 @@
 <!-- Copyright (C) 2026 Pau Aliagas <linuxnow@gmail.com> -->
 # A new plugin from its contract
 
-How a plugin over an omx-dsp effect kernel is born, and what a person writes. It follows
-openmixer's spec `2026-10-09-plugin-from-contract.md` (§3, §5, §6, §7, §8, §10).
+How a plugin over an omx-dsp effect kernel is born, and what a person writes.
 
 ## The inputs
 
 | Input | Where | Who writes it |
 |---|---|---|
-| The kernel's controls: names, travels, choices | omx-contract, read only through its JSON render (`share/omx-contract/omx-contract.json`) at the pin | omx-contract |
+| The kernel's controls: names, travels, choices | the installed omx-contract, read only through its JSON render (`omx-contract.json` in `pkg-config --variable=datadir omx-contract`) | omx-contract |
 | The kernel's instance face: `init`, `resolve`, `run`, latency | omx-dsp, `<omxdsp/fx/omx_<kernel>_instance.h>` | omx-dsp |
 | The plugin: identity, design choices, `panel`, `console` | `plugins/<stem>/<stem>.decl.json`, the folder's ONE hand-written file | a person, from the wizard's draft |
 
@@ -26,7 +25,7 @@ git commit ...                                            # 4. the commit plan i
 
 Step 1 checks before it writes:
 
-- the kernel is in omx-contract at the pin (else: the omx-contract work, `tools/new-kernel.mjs`, is
+- the kernel is in the installed omx-contract (else: the omx-contract work, `tools/new-kernel.mjs`, is
   named and nothing is written);
 - omx-dsp has the kernel's instance face, in the shape the generated binding calls (`init(s, sr)`,
   `resolve(s, bypass, <one scalar per control>)`, `run(s, in_l, in_r, out_l, out_r, n)`); a kernel
@@ -36,13 +35,12 @@ Step 1 checks before it writes:
   parameter per band (`band01` … `band31`), the binding passes them in declaration order, and the
   generated code asserts their count is the extent. A keyed face takes the sidechain block first,
   `run(s, key, in_l, in_r, out_l, out_r, n)` (`NULL`: nothing routed, the kernel's own detector); its
-  declaration names the key port in `sidechain`, and the faces and the identity test carry the key
-  (spec §15.1);
+  declaration names the key port in `sidechain`, and the faces and the identity test carry the key;
 - every `resolve` argument binds to exactly one contract control BY NAME: the argument is the
   control's name in snake case (`attackDb` → `attack_db`). An argument that still carries an older
   short name (`attack_ms` for `attackTimeMs`) binds when its words are, in order, a unique subset
   of the control's; the generated binding then lists it as a rename owed by omx-dsp's name
-  conformance (spec §2), and `OMX_BINDING_STRICT=1` refuses it.
+  conformance, and `OMX_BINDING_STRICT=1` refuses it.
 
 ## What is drafted, what a person writes
 
@@ -58,7 +56,7 @@ Step 1 checks before it writes:
 | `lv2.class`, `clap.features` | `REVIEW`, and `audio-effect`, `stereo` | the LV2 class and the CLAP kind |
 | `summary`, `manual` | left out: the README row reads `description`, the section is the parameter table | optional prose |
 | `panel` | one section of every parameter | groups the controls into sections: the one panel the MOD GUI and the console draw |
-| `console` | its `placement`'s strip kinds and group as `REVIEW` | the placement, and the card and chip the console draws (spec §8) |
+| `console` | its `placement`'s strip kinds and group as `REVIEW` | the placement, and the card and chip the console draws |
 | `portHints` | written after the first generation: the pin of the hints the generated TTL carries (`make hints` holds every later TTL to it) | — |
 
 Step 3 refuses while any `REVIEW` mark is left, naming each by its JSON pointer. When the draft is
@@ -97,10 +95,22 @@ would test the re-arm, not the identity. The flag is read from omx-contract's JS
 `kernels.<kernel>.controls` lists each kernel's controls in declared order. The oracle's header comment names each held parameter, and the sabotage arm still moves it
 by one step. The other parameters move as before.
 
+## Oracles beside the identity test
+
+The identity test proves the faces run omx-dsp's kernel; it does not say what the kernel does. When
+an effect moves out of the console engine, the engine's own oracle comes with it: the declaration
+names it in `oracles`, a list of names, and each `test/<name>.c` is written by hand (it is not
+generated, and `tools/gen.mjs` refuses a name whose file is missing). The generated Makefile builds
+each one as it builds the identity test and runs it in `make test` on both faces, as
+`<name> clap <stem>.clap` and `<name> lv2 <bundle> <uri>`. Such an oracle opens the built faces as a
+host does and reads only their audio, so an arm that read the kernel's state in the engine says what
+of it a host can see. It runs at the nine rates an RME interface clocks at (`OMX_RME_RATES`, 32 to
+192 kHz), the rates omx-dsp's own kernel oracles run at.
+
 ## A plugin made of several kernels: a chain
 
 `node tools/omx-new-plugin.mjs --from-contract <k1>,<k2>,... --stem omx-<x>` drafts a composite
-(`"binding": "chain"`, spec 2026-10-09-plugin-from-contract §15.2): one element per kernel, in the
+(`"binding": "chain"`): one element per kernel, in the
 order given, each element's parameters drafted as a single plugin's are and refused, naming the
 omx-dsp work, for a kernel with no instance face of the generated shape. The declaration has no
 `params`: the list is generated from `chain`, element by element, each element's switch `<id>On`
