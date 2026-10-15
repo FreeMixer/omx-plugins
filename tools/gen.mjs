@@ -720,23 +720,66 @@ export function latencyRows(d) {
   });
 }
 
+/** clap.meters/1's kind of each meter kind a declaration may name. */
+const METER_KINDS = { gain_reduction: 'CLAP_METER_KIND_GAIN_REDUCTION', level: 'CLAP_METER_KIND_LEVEL' };
+/** The most values a plugin's meters carry together: include/omx_meter_ring.h's OMX_METER_RING_MAX. */
+const METER_VALUES_MAX = 16;
+/** A C double literal: always with a point. */
+const cdouble = (n) => (/[.e]/.test(`${n}`) ? `${n}` : `${n}.0`);
+
 /** The declaration's meters in the faces' shape (`meters` in the schema, docs/meters.md): each its CLAP
- * id (its index), its name, the instance field it reads and its display floor, the low end of the
- * `floor` parameter's travel. */
+ * id (its index), its name, its kind, its channels and where they start among the plugin's meter
+ * values (the order the face publishes them in, one block at a time), and its display range. A
+ * gain reduction reads the instance field it names, one channel, from the low end of its `floor`
+ * parameter's travel to 0 dB; a level is the stereo pair's peak in dBFS at the plugin's `input` or
+ * `output`, its range as declared. */
 export function meterRows(d) {
   const taken = new Set([...d.params.map((p) => p.symbol), ...FIXED_PORTS]);
-  return (d.meters ?? []).map((m, k) => {
+  let offset = 0;
+  const rows = (d.meters ?? []).map((m, k) => {
     const where = `plugins/${d.stem}: meters[${k}]`;
-    if (m.kind !== 'gain_reduction') throw new Error(`${where}: kind '${m.kind}' is not gain_reduction`);
+    if (!(m.kind in METER_KINDS)) throw new Error(`${where}: kind '${m.kind}' is none of ${Object.keys(METER_KINDS).join(', ')}`);
     if (!/^[A-Za-z][A-Za-z0-9_]*$/.test(m.id ?? '')) throw new Error(`${where}: id '${m.id}' is not a symbol`);
     if (taken.has(m.id)) throw new Error(`${where}: id '${m.id}' is taken`);
     taken.add(m.id);
-    if (!/^[a-z_][a-z0-9_]*(\.[a-z_][a-z0-9_]*)*$/.test(m.field ?? '')) throw new Error(`${where}: field '${m.field}' is not a member path`);
-    const p = d.params.find((q) => q.symbol === m.floor);
-    if (!p) throw new Error(`${where}: floor '${m.floor}' is no parameter`);
-    if (!(p.min < 0)) throw new Error(`${where}: floor '${m.floor}' starts at ${p.min}, not below 0 dB`);
-    return { meterIndex: k, meterName: m.id, meterField: m.field, meterFloor: `${p.min}` };
+    const own = m.kind === 'gain_reduction' ? ['field', 'floor'] : ['source', 'min', 'max'];
+    for (const key of ['field', 'floor', 'source', 'min', 'max']) {
+      if (own.includes(key) && !(key in m)) throw new Error(`${where}: a ${m.kind} meter names its '${key}'`);
+      if (!own.includes(key) && key in m) throw new Error(`${where}: a ${m.kind} meter takes no '${key}'`);
+    }
+    let row;
+    if (m.kind === 'gain_reduction') {
+      if (!/^[a-z_][a-z0-9_]*(\.[a-z_][a-z0-9_]*)*$/.test(m.field)) throw new Error(`${where}: field '${m.field}' is not a member path`);
+      const p = d.params.find((q) => q.symbol === m.floor);
+      if (!p) throw new Error(`${where}: floor '${m.floor}' is no parameter`);
+      if (!(p.min < 0)) throw new Error(`${where}: floor '${m.floor}' starts at ${p.min}, not below 0 dB`);
+      row = { channels: 1, min: p.min, max: 0, meterField: m.field };
+    } else {
+      if (m.source !== 'input' && m.source !== 'output') throw new Error(`${where}: source '${m.source}' is not input or output`);
+      if (!(Number.isFinite(m.min) && Number.isFinite(m.max) && m.min < m.max)) throw new Error(`${where}: the range ${m.min}..${m.max} is not a range`);
+      row = { channels: 2, min: m.min, max: m.max, meterField: '' };
+    }
+    const out = {
+      meterIndex: k, meterName: m.id, meterKind: METER_KINDS[m.kind], meterField: row.meterField,
+      meterChannels: row.channels, meterOffset: offset, meterRight: offset + 1, meterMin: cdouble(row.min), meterMax: cdouble(row.max),
+      isGr: m.kind === 'gain_reduction', isIn: m.source === 'input', isOut: m.source === 'output',
+    };
+    offset += row.channels;
+    return out;
   });
+  if (offset > METER_VALUES_MAX) throw new Error(`plugins/${d.stem}: its meters carry ${offset} values, more than the ${METER_VALUES_MAX} one read holds`);
+  return rows;
+}
+
+/** The template's view of the meters: the rows, how many, how many values, which levels are read. */
+function meterView(d) {
+  const meters = meterRows(d);
+  return {
+    meters, metered: meters.length > 0, meterCount: meters.length,
+    meterValues: meters.reduce((n, m) => n + m.meterChannels, 0),
+    meterGr: meters.some((m) => m.isGr), meterIn: meters.some((m) => m.isIn), meterOut: meters.some((m) => m.isOut),
+    meterLevel: meters.some((m) => m.isIn || m.isOut),
+  };
 }
 
 /** The parameters the plan holds at their default, for the oracle's comment: `[{ symbol }]`. */
@@ -779,7 +822,7 @@ export function generateInstance(d) {
     plan: oraclePlan(d.params, d.controls ?? []), held: heldOf(d), stretch: oracleStretch(face), steps: d.params.map((p) => cfloat(stepOf(p))).join(', '),
     chain: false,
     latencyChecks: latencyRows(d), measuresLatency: Boolean(d.latencyChecks),
-    meters: meterRows(d), metered: Boolean(d.meters), meterCount: (d.meters ?? []).length,
+    ...meterView(d),
   };
   return {
     Makefile: withBanner(render(template('Makefile.tmpl'), view), d, '#'),

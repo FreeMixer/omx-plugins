@@ -125,6 +125,20 @@
       "kind": "gain_reduction",
       "field": "state.band.gr_min_db",
       "floor": "deessRange"
+    },
+    {
+      "id": "deessIn",
+      "kind": "level",
+      "source": "input",
+      "min": -60,
+      "max": 6
+    },
+    {
+      "id": "deessOut",
+      "kind": "level",
+      "source": "output",
+      "min": -60,
+      "max": 6
     }
   ],
   "panel": {
