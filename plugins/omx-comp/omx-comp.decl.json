@@ -158,6 +158,28 @@
       "unit": "units:frame"
     }
   },
+  "meters": [
+    {
+      "id": "compGr",
+      "kind": "gain_reduction",
+      "field": "st.gr_min_db",
+      "readout": "GAIN_REDUCTION_DB"
+    },
+    {
+      "id": "compIn",
+      "kind": "level",
+      "source": "input",
+      "min": -60,
+      "max": 6
+    },
+    {
+      "id": "compOut",
+      "kind": "level",
+      "source": "output",
+      "min": -60,
+      "max": 6
+    }
+  ],
   "panel": {
     "family": "dynamics",
     "roles": {

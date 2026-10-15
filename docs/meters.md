@@ -32,7 +32,10 @@ A `gain_reduction` (one channel: one detector drives both legs) names:
   (`state.band.gr_min_db` for the de-esser). The face reads it and nothing else: no meter is
   computed twice.
 - `floor`: the parameter whose travel's low end is the deepest reduction the kernel can apply; it
-  is the display range's minimum, and 0 dB its maximum.
+  is the display range's minimum, and 0 dB its maximum. Or, for a kernel with no such parameter,
+- `readout`: the kernel's readout in omx-contract (`GAIN_REDUCTION_DB`), whose declared range is
+  the display range: the face reads `OMX_<KERNEL>_READOUT_<readout>_MIN` and `_MAX`, so the
+  number is never typed here.
 
 A `level` (two channels, left and right, in dBFS) names:
 
@@ -46,7 +49,9 @@ buffers) and at the outputs after it ran, as `20 log10(peak)`. That is one pass 
 per block, and only a plugin that declares a level pays it.
 
 The de-esser declares its gain reduction (`deessGr`, id 0), its input level (`deessIn`, id 1) and
-its output level (`deessOut`, id 2), each level from -60 to +6 dBFS.
+its output level (`deessOut`, id 2); the compressor its gain reduction (`compGr`, over the comp
+kernel's `GAIN_REDUCTION_DB` readout), `compIn` and `compOut`. Every level runs from -60 to +6
+dBFS.
 
 ## What the face reports
 

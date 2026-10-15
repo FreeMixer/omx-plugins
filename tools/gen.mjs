@@ -725,13 +725,14 @@ const METER_KINDS = { gain_reduction: 'CLAP_METER_KIND_GAIN_REDUCTION', level: '
 /** The most values a plugin's meters carry together: include/omx_meter_ring.h's OMX_METER_RING_MAX. */
 const METER_VALUES_MAX = 16;
 /** A C double literal: always with a point. */
-const cdouble = (n) => (/[.e]/.test(`${n}`) ? `${n}` : `${n}.0`);
+const cdouble = (n) => (typeof n === 'string' || /[.e]/.test(`${n}`) ? `${n}` : `${n}.0`);
 
 /** The declaration's meters in the faces' shape (`meters` in the schema, docs/meters.md): each its CLAP
  * id (its index), its name, its kind, its channels and where they start among the plugin's meter
  * values (the order the face publishes them in, one block at a time), and its display range. A
  * gain reduction reads the instance field it names, one channel, from the low end of its `floor`
- * parameter's travel to 0 dB; a level is the stereo pair's peak in dBFS at the plugin's `input` or
+ * parameter's travel to 0 dB, or over the range omx-contract declares for the kernel's `readout`
+ * of that name (OMX_<KERNEL>_READOUT_<readout>_MIN/_MAX, read by the compiler); a level is the stereo pair's peak in dBFS at the plugin's `input` or
  * `output`, its range as declared. */
 export function meterRows(d) {
   const taken = new Set([...d.params.map((p) => p.symbol), ...FIXED_PORTS]);
@@ -742,18 +743,24 @@ export function meterRows(d) {
     if (!/^[A-Za-z][A-Za-z0-9_]*$/.test(m.id ?? '')) throw new Error(`${where}: id '${m.id}' is not a symbol`);
     if (taken.has(m.id)) throw new Error(`${where}: id '${m.id}' is taken`);
     taken.add(m.id);
-    const own = m.kind === 'gain_reduction' ? ['field', 'floor'] : ['source', 'min', 'max'];
-    for (const key of ['field', 'floor', 'source', 'min', 'max']) {
+    const own = m.kind === 'gain_reduction' ? ['field', 'readout' in m ? 'readout' : 'floor'] : ['source', 'min', 'max'];
+    for (const key of ['field', 'floor', 'readout', 'source', 'min', 'max']) {
       if (own.includes(key) && !(key in m)) throw new Error(`${where}: a ${m.kind} meter names its '${key}'`);
       if (!own.includes(key) && key in m) throw new Error(`${where}: a ${m.kind} meter takes no '${key}'`);
     }
     let row;
     if (m.kind === 'gain_reduction') {
       if (!/^[a-z_][a-z0-9_]*(\.[a-z_][a-z0-9_]*)*$/.test(m.field)) throw new Error(`${where}: field '${m.field}' is not a member path`);
-      const p = d.params.find((q) => q.symbol === m.floor);
-      if (!p) throw new Error(`${where}: floor '${m.floor}' is no parameter`);
-      if (!(p.min < 0)) throw new Error(`${where}: floor '${m.floor}' starts at ${p.min}, not below 0 dB`);
-      row = { channels: 1, min: p.min, max: 0, meterField: m.field };
+      if ('readout' in m) {
+        if (!/^[A-Z][A-Z0-9_]*$/.test(m.readout)) throw new Error(`${where}: readout '${m.readout}' is not a readout name`);
+        const r = `OMX_${d.kernel.toUpperCase()}_READOUT_${m.readout}`;
+        row = { channels: 1, min: `(double)${r}_MIN`, max: `(double)${r}_MAX`, meterField: m.field };
+      } else {
+        const p = d.params.find((q) => q.symbol === m.floor);
+        if (!p) throw new Error(`${where}: floor '${m.floor}' is no parameter`);
+        if (!(p.min < 0)) throw new Error(`${where}: floor '${m.floor}' starts at ${p.min}, not below 0 dB`);
+        row = { channels: 1, min: p.min, max: 0, meterField: m.field };
+      }
     } else {
       if (m.source !== 'input' && m.source !== 'output') throw new Error(`${where}: source '${m.source}' is not input or output`);
       if (!(Number.isFinite(m.min) && Number.isFinite(m.max) && m.min < m.max)) throw new Error(`${where}: the range ${m.min}..${m.max} is not a range`);

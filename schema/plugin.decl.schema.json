@@ -912,6 +912,11 @@
           "pattern": "^[A-Za-z][A-Za-z0-9_]*$",
           "description": "The parameter whose travel's low end is the deepest reduction the kernel applies: the meter's display minimum (its maximum is 0 dB)."
         },
+        "readout": {
+          "type": "string",
+          "pattern": "^[A-Z][A-Z0-9_]*$",
+          "description": "A gain reduction's, instead of `floor`: the kernel's readout in omx-contract (`GAIN_REDUCTION_DB`), whose declared range is the meter's display range."
+        },
         "source": {
           "enum": [
             "input",
@@ -939,8 +944,19 @@
           },
           "then": {
             "required": [
-              "field",
-              "floor"
+              "field"
+            ],
+            "oneOf": [
+              {
+                "required": [
+                  "floor"
+                ]
+              },
+              {
+                "required": [
+                  "readout"
+                ]
+              }
             ],
             "not": {
               "anyOf": [
@@ -987,6 +1003,11 @@
                 {
                   "required": [
                     "floor"
+                  ]
+                },
+                {
+                  "required": [
+                    "readout"
                   ]
                 }
               ]
