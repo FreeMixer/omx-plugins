@@ -16,7 +16,7 @@ BuildRequires: pkgconf-pkg-config
 # the same in debian/control (tools/deps-check.sh). The Makefile and tools/gen.mjs read them from here.
 BuildRequires: omx-dsp-devel >= 0.18.0
 BuildRequires: omx-contract-devel >= 2.11.0
-BuildRequires: omx-clap-core-devel
+BuildRequires: omx-clap-core-devel >= 0.6.0
 BuildRequires: clap-devel
 BuildRequires: lv2-devel
 # %%check: the generators and checks are Node scripts; the hosts that load the built plugins

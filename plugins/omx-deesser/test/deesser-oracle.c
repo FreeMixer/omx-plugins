@@ -39,7 +39,7 @@
 
 #include <omxdsp/fx/omx_deesser_instance.h>
 #include <omxdsp/omx_denormal.h>
-#include "omx_clap_meters.h"
+#include <omx-clap-host/clap_meters.h>
 
 #define NP OMX_DEESSER_PARAM_COUNT
 /* 1 when the face takes a sidechain key. */

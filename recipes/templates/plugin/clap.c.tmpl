@@ -42,7 +42,7 @@
 #include "omx_{{kernel}}_params.h"
 #include "omx_{{kernel}}_core.h"
 #include <omx-clap-host/omx_clap_ext.h>
-{{#metered}}#include "omx_clap_meters.h"
+{{#metered}}#include <omx-clap-host/clap_meters.h>
 {{/metered}}#include <omxdsp/omx_denormal.h> /* omx_denormals_off, per callback */
 
 #define G_DECLARED OMX_{{K}}_PARAM_COUNT

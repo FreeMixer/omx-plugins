@@ -12,10 +12,10 @@ omx-clap-core reads for meters since it removed `org.openmixer.meters/1` (omx-cl
 `docs/meters.md`): every channel of every meter becomes an output symbol, read at
 the host's idle rate through `get_values()`.
 
-No released CLAP SDK ships `clap/ext/draft/meters.h` yet, and omx-clap-core does not install its
-copy. `include/omx_clap_meters.h` declares the draft's id and structures exactly as the draft and
-omx-clap-core's `src/clap_meters.h` do (the same include guard, so the two are one header), and
-includes the SDK's header instead once the SDK has it.
+No released CLAP SDK ships `clap/ext/draft/meters.h` yet. omx-clap-core installs its declaration as
+`<omx-clap-host/clap_meters.h>` (it includes the SDK's header instead once the SDK has it), and the
+plugins include that one. `tools/test/meters-abi-test.c`, run by `make test`, holds its id, enums,
+sizes and offsets.
 
 ## The declaration
 
