@@ -6,8 +6,8 @@
 
 | What | Fedora | Debian | Used for |
 |---|---|---|---|
-| omx-dsp ≥ 0.18.0, < 0.19 (`pkg-config omxdsp`) | `omx-dsp-devel` (channel) | `libomxdsp-dev` (channel) | the DSP: every kernel lives there, none here |
-| omx-contract ≥ 2.11.0, < 2.12 (`pkg-config omx-contract`) | `omx-contract-devel` (channel) | `libomx-contract-dev` (channel) | the declarations: every parameter's travel, read from its installed `omx-contract.json`, and the EQ default rule (its C render; the generators build a small probe, so they need the C compiler too) |
+| omx-dsp ≥ 0.18.0 (`pkg-config omxdsp`) | `omx-dsp-devel` (channel) | `libomxdsp-dev` (channel) | the DSP: every kernel lives there, none here |
+| omx-contract ≥ 2.11.0 (`pkg-config omx-contract`) | `omx-contract-devel` (channel) | `libomx-contract-dev` (channel) | the declarations: every parameter's travel, read from its installed `omx-contract.json`, and the EQ default rule (its C render; the generators build a small probe, so they need the C compiler too) |
 | openmixer CLAP extensions | `omx-clap-core-devel` (channel) | `libomx-clap-core-dev` (channel) | `<omx-clap-host/omx_clap_ext.h>` |
 | CLAP 1.2 headers | `clap-devel` | `clap-headers` (built from the pinned CLAP, see FreeMixer/.github) | the CLAP face |
 | LV2 headers | `lv2-devel` | `lv2-dev` | the LV2 face |
@@ -23,10 +23,10 @@ for apt. With it configured, `dnf builddep packaging/omx-plugins.spec` or `apt-g
 everything above.
 
 The ranges are written once, in the packaging: `packaging/omx-plugins.spec` (`BuildRequires`, a floor
-`>=` and the next minor as the ceiling `<`) and `debian/control` (the same, `>=` and `<<`);
+a floor `>=`, never a ceiling) and `debian/control` (the same, `>=` only);
 `tools/deps-check.sh` holds the two equal. Nothing else names a version: the Makefile reads the
-floors and ceilings from the spec, and building the archive stops, naming the dependency, the range
-and what `pkg-config` finds installed, when an installed release is outside it.
+floors from the spec, and building the archive stops, naming the dependency, the floor
+and what `pkg-config` finds installed, when an installed release is below it.
 
 ## Build, test, install
 
