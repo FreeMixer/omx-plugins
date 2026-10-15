@@ -45,6 +45,7 @@ enum omx_clap_param_unit {
   OMX_CLAP_UNIT_CENT = 21, OMX_CLAP_UNIT_SEMITONE_12TET = 22, OMX_CLAP_UNIT_DEGREE = 23,
   OMX_CLAP_UNIT_MIDI_NOTE = 24,
   OMX_CLAP_UNIT_DBFS = 0x100, OMX_CLAP_UNIT_DBU = 0x101, OMX_CLAP_UNIT_RATIO = 0x102,
+  OMX_CLAP_UNIT_LUFS = 0x103,
 };
 
 /** How the plain value maps to a control's travel. */

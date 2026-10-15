@@ -19,6 +19,7 @@ export const CONTRACT_VERSION = 1;
 export const UNITS = {
   '': ['none', 0], s: ['s', 1], ms: ['ms', 2], min: ['min', 3], dB: ['db', 13], '%': ['pc', 14], x: ['coef', 15],
   Hz: ['hz', 16], oct: ['oct', 20], cents: ['cent', 21], dBFS: ['dbfs', 0x100], dBu: ['dbu', 0x101],
+  LUFS: ['lufs', 0x103],
 };
 export const SCALES = ['linear', 'log', 'stepped'];
 const STEPPED = 0x1, BYPASS = 0x10;
