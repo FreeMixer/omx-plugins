@@ -80,6 +80,13 @@ jobs:
         id: handback-completeness
         run: make completeness
 
+      - name: include/omx_meter_ring.h never hands a reader two blocks at once, and each sabotage goes red
+        id: handback-meter-ring
+        run: |
+          set -euo pipefail
+          dnf install -y --setopt=install_weak_deps=False gcc
+          make meter-ring
+
   selftest:
     # Its own job, beside make test: the two together outgrew one job's 30 minutes once the chain and the
     # compressor landed. Same container and dependencies; nothing is dropped.
