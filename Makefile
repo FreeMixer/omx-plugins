@@ -6,6 +6,8 @@
 #
 #   make            build every plugin
 #   make test       every plugin's tests (what the package builds run), then `make hints`, `make look` and `make manual`
+#   make units      the declared units' contract codes (tools/param-contract.mjs) are the header's enum, and its vendor
+#                   block is dbfs, dbu, ratio, lufs (tools/test/param-units-check.mjs)
 #   make hints      no LV2 face lost a port hint: tools/port-hints.mjs against each declaration's `portHints` pin
 #   make look       tools/look.json, the MOD GUI's colours and font, is what tools/look/tokens.css resolves to
 #   make manual     each declaration's manual follows omx-contract: a travel moved in a copy of the release moves
@@ -68,17 +70,19 @@ LIB_FLAGS  := -fPIC -fvisibility=hidden -DOMX_CLAP_STATIC -Iinclude
 # read only by the targets that build the archive, so `make version` and the rest need no omx-dsp
 lib_cflags = $(call dep_check,omxdsp,$(OMXDSP_MIN))$(call dep_check,omx-contract,$(CONTRACT_MIN))$(shell $(PKG_CONFIG) --cflags omxdsp omx-clap-core clap)
 
-.PHONY: all lib lib-test test hints look manual install install-devel clean version recipe-test completeness selftest private-refs strip-crosscheck meters-abi
+.PHONY: all lib lib-test test units hints look manual install install-devel clean version recipe-test completeness selftest private-refs strip-crosscheck meters-abi
 all: lib
 	@for p in $(PLUGINS); do $(MAKE) -C $$p all || exit 1; done
 lib: $(LIB) $(LIB_PC)
-test: lib
+test: lib units
 	@if [ -z "$(PLUGINS)" ]; then echo "no plugins yet"; fi
 	@for p in $(PLUGINS); do $(MAKE) -C $$p test || exit 1; done
 	@$(MAKE) -s lib-test
 	@$(MAKE) -s hints
 	@$(MAKE) -s look
 	@$(MAKE) -s manual
+units:
+	node tools/test/param-units-check.mjs
 hints:
 	node tools/gen.mjs --check
 	node tools/gen.mjs
