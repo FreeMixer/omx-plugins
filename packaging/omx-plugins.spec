@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # Copyright (C) 2026 Pau Aliagas <linuxnow@gmail.com>
 Name: omx-plugins
-Version: 0.7.0
+Version: 0.8.0
 Release: 1%{?dist}
 License: GPL-3.0-or-later
 Summary: The OpenMixer console's delay, drive, EQ, channel strip, keyed gate and effects, as plugins for your DAW
@@ -158,6 +158,14 @@ host that runs the plugins in its own process without loading .clap files.
 # END GENERATED lv2-files
 
 %changelog
+* Thu Oct 15 2026 Pau Aliagas <linuxnow@gmail.com> - 0.8.0-1
+- Library dependencies are a floor only, no ceiling: omx-dsp >= 0.18.0
+  (the first release the plugins build and pass make test against; 0.17.0
+  does not link) and omx-contract >= 2.11.0. tools/deps-check.sh fails on
+  any upper bound.
+- The parameter-contract header names the LUFS unit (OMX_CLAP_UNIT_LUFS,
+  0x103), which openmixer's MAIN loudness target travels in.
+
 * Wed Oct 14 2026 Pau Aliagas <linuxnow@gmail.com> - 0.7.0-1
 - Built against omx-dsp 0.18.0 (at least 0.18.0, below 0.19) and omx-
   contract 2.11.0 (at least 2.11.0, below 2.12). No pins file: the

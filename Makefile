@@ -31,7 +31,7 @@
 #   make install-devel   the public headers other projects include: $(INCLUDEDIR)/omx-plugins/*.h,
 #                   and $(LIBDIR)/libomxplugins.a with $(LIBDIR)/pkgconfig/omxplugins.pc
 #   make version    the release version, the one packaging/omx-plugins.spec and debian/changelog carry
-VERSION := 0.7.0
+VERSION := 0.8.0
 PLUGINS := $(sort $(dir $(wildcard plugins/*/Makefile)))
 PREFIX     ?= /usr
 INCLUDEDIR ?= $(PREFIX)/include
