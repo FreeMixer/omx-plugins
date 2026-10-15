@@ -8,6 +8,7 @@ name: release
 # repacked as a Zynthian tarball beside them. Anything else builds unsigned trees and publishes nothing. Everything is in FreeMixer/.github; the secrets are the organisation's.
 # The build dependencies the distributions do not carry (omx-dsp-devel, omx-clap-core-devel,
 # omx-clap-host) come from the FreeMixer channel, inside the build containers only.
+# Nothing is built for release before every plugin has a suitable real-time-safety verdict (the qualify job).
 
 on:
   push:
@@ -38,7 +39,45 @@ permissions:
   actions: read
 
 jobs:
+  # The ruling of 2026-10-10: plugin-qualify's real-time-safety verdict runs over every plugin, THEN omx-plugins
+  # is released. The rpm job below publishes the moment it builds, so this job comes first and the release waits
+  # on it: tools/qualify-release.sh builds the tree, qualifies every installed .clap and refuses unless each one's
+  # verdict document says suitable. The documents are attached to the run.
+  qualify:
+    name: RT-safety verdict (every plugin)
+    runs-on: ${{ inputs.runner || 'ubuntu-latest' }}
+    timeout-minutes: 60
+    permissions:
+      contents: read
+    container:
+      image: fedora:44
+    steps:
+      - name: Install git and dnf plugins
+        run: dnf install -y --setopt=install_weak_deps=False git dnf5-plugins nodejs
+
+      - name: Add the FreeMixer channel
+        run: dnf config-manager addrepo --from-repofile=https://freemixer.github.io/rpm/freemixer.repo
+
+      - uses: actions/checkout@v4
+
+      - name: Install the build dependencies and the prober
+        run: |
+          dnf builddep -y --setopt=install_weak_deps=False packaging/omx-plugins.spec
+          dnf install -y --setopt=install_weak_deps=False plugin-qualify omx-clap-host
+
+      - name: Qualify every plugin; refuse the release unless each is suitable
+        run: tools/qualify-release.sh rt-safety
+
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: omx-plugins-rt-safety
+          path: rt-safety/*.rt-safety.json
+          if-no-files-found: warn
+          retention-days: 90
+
   rpm:
+    needs: qualify
     uses: FreeMixer/.github/.github/workflows/build-rpm.yml@v1
     with:
       package-name: omx-plugins
