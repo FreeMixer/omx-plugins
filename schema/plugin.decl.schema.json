@@ -259,7 +259,7 @@
           "type": "array",
           "minItems": 1,
           "title": "Meters",
-          "description": "The meters the CLAP face reports through clap.meters/1 (docs/meters.md), in order: the CLAP meter id is the index, append-only once released. Each is the kernel's own reading, published after every block; the identity test holds it to the instance face's, block for block, at every declared rate. Left out, the face has no meters.",
+          "description": "The meters the CLAP face reports through clap.meters/1 (docs/meters.md), in order: the CLAP meter id is the index, append-only once released. Every one is coherent: the face publishes all their values after each block at once (include/omx_meter_ring.h), and a read never mixes two blocks; the identity test holds every channel to a reference computed from the same block, at every declared rate. Left out, the face has no meters.",
           "items": {
             "$ref": "#/$defs/meter"
           }
@@ -887,9 +887,7 @@
       "additionalProperties": false,
       "required": [
         "id",
-        "kind",
-        "field",
-        "floor"
+        "kind"
       ],
       "properties": {
         "id": {
@@ -899,9 +897,10 @@
         },
         "kind": {
           "enum": [
-            "gain_reduction"
+            "gain_reduction",
+            "level"
           ],
-          "description": "`gain_reduction`: dB with CLAP's sign, 0 none, negative a reduction; one channel (one detector drives every leg); 0 while bypassed."
+          "description": "`gain_reduction`: dB with CLAP's sign, 0 none, negative a reduction; one channel (one detector drives every leg), the kernel's reading at `field`; 0 while bypassed. `level`: the stereo pair's peak over the block in dBFS at the plugin's `source`, two channels (left, right), measured by the face because the kernel keeps no level; floored at `min`."
         },
         "field": {
           "type": "string",
@@ -912,8 +911,110 @@
           "type": "string",
           "pattern": "^[A-Za-z][A-Za-z0-9_]*$",
           "description": "The parameter whose travel's low end is the deepest reduction the kernel applies: the meter's display minimum (its maximum is 0 dB)."
+        },
+        "readout": {
+          "type": "string",
+          "pattern": "^[A-Z][A-Z0-9_]*$",
+          "description": "A gain reduction's, instead of `floor`: the kernel's readout in omx-contract (`GAIN_REDUCTION_DB`), whose declared range is the meter's display range."
+        },
+        "source": {
+          "enum": [
+            "input",
+            "output"
+          ],
+          "description": "A level's: where it is measured, the plugin's inputs before the kernel runs or its outputs after."
+        },
+        "min": {
+          "type": "number",
+          "description": "A level's display minimum in dBFS; a quieter block, silence included, reads it."
+        },
+        "max": {
+          "type": "number",
+          "description": "A level's display maximum in dBFS, above `min`."
         }
-      }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "gain_reduction"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "field"
+            ],
+            "oneOf": [
+              {
+                "required": [
+                  "floor"
+                ]
+              },
+              {
+                "required": [
+                  "readout"
+                ]
+              }
+            ],
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "source"
+                  ]
+                },
+                {
+                  "required": [
+                    "min"
+                  ]
+                },
+                {
+                  "required": [
+                    "max"
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "level"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "source",
+              "min",
+              "max"
+            ],
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "field"
+                  ]
+                },
+                {
+                  "required": [
+                    "floor"
+                  ]
+                },
+                {
+                  "required": [
+                    "readout"
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      ]
     },
     "console": {
       "type": "object",

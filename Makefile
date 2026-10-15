@@ -69,7 +69,7 @@ LIB_FLAGS  := -fPIC -fvisibility=hidden -DOMX_CLAP_STATIC -Iinclude
 # read only by the targets that build the archive, so `make version` and the rest need no omx-dsp
 lib_cflags = $(call dep_check,omxdsp,$(OMXDSP_MIN))$(call dep_check,omx-contract,$(CONTRACT_MIN))$(shell $(PKG_CONFIG) --cflags omxdsp omx-clap-core clap)
 
-.PHONY: all lib lib-test test units hints look manual install install-devel clean version recipe-test completeness selftest private-refs strip-crosscheck meters-abi
+.PHONY: all lib lib-test test units hints look manual install install-devel clean version recipe-test completeness selftest private-refs strip-crosscheck meters-abi meter-ring
 all: lib
 	@for p in $(PLUGINS); do $(MAKE) -C $$p all || exit 1; done
 lib: $(LIB) $(LIB_PC)
@@ -106,6 +106,9 @@ meters-abi:
 	$(CC) -std=gnu11 -Wall -Wextra -Werror $(shell $(PKG_CONFIG) --cflags omx-clap-core clap) -o build/meters-abi-test tools/test/meters-abi-test.c
 	build/meters-abi-test
 	@echo "ok   clap.meters/1 as omx-clap-core installs it: id, enums, sizeof and offsetof"
+meter-ring:
+	tools/meter-ring-check.sh
+	tools/meter-ring-check.sh --self-test
 strip-crosscheck:
 	sh tools/test/strip-crosscheck.sh
 install:

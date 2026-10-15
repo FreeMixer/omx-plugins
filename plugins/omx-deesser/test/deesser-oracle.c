@@ -20,9 +20,14 @@
  * reported latency holds while it is active and moves only at the activation after the restart it
  * asks for, as the CLAP latency extension says.
  * The declaration's meters: after every block of the plan, through the CLAP face's clap.meters/1 at
- * every declared rate, each reads what the reference's instance holds at its declared field (0 while
- * bypassed), bit for bit; the plan must make the kernel reduce gain, and nothing is read before the
- * first block (docs/meters.md).
+ * every declared rate, every channel of every meter is held bit for bit to a reference computed here
+ * from the same block: a gain reduction to what the reference's instance holds at its declared field
+ * (0 while bypassed), a level to the peak of the block's input or of the reference's output, in dBFS,
+ * floored at the meter's display minimum. The meters are listed as declared, every one coherent;
+ * nothing is read before the first block (docs/meters.md).
+ * The plan must make the kernel reduce gain.
+ * The plan must move the levels: the two legs differ in some block, and the input and the
+ * output differ in some block.
  */
 #include <dlfcn.h>
 #include <math.h>
@@ -87,14 +92,33 @@ static const float STEP[NP] = { 1.0f, 0.0375f, 0.6f, 0.19f, 0.24f, 0.499f, 1.0f,
 
 static int failures;
 
-/* The meters, the declaration's `meters` in order: each one's name and display floor; what the
- * reference's instance holds at its field after every block of the plan (0 bypassed), and what the
- * CLAP face's clap.meters/1 reported then (NaN: nothing). Set for the CLAP run of the plan only. */
-#define NM 1u
-static const char *const METER_NAMES[NM] = { "deessGr", };
-static const double METER_FLOORS[NM] = { -24, };
-static float *meters_want, *meters_got;
+/* The meters, the declaration's `meters` in order: each one's name, kind, channels, where they start
+ * among the NV values of a block, and display range; the reference's values after every block of the
+ * plan, and what the CLAP face's clap.meters/1 reported then (NaN: nothing). Set for the CLAP run of
+ * the plan only. */
+#define NM 3u
+#define NV 5u
+static const struct {
+  const char *name;
+  uint32_t kind, channels, at;
+  double min, max;
+} METERS[NM] = {
+    {"deessGr", CLAP_METER_KIND_GAIN_REDUCTION, 1u, 0u, -24.0, 0.0},
+    {"deessIn", CLAP_METER_KIND_LEVEL, 2u, 1u, -60.0, 6.0},
+    {"deessOut", CLAP_METER_KIND_LEVEL, 2u, 3u, -60.0, 6.0},
+};
+static double *meters_want, *meters_got;
 static bool meters_early, meters_listed;
+
+/* The reference's level: the largest magnitude of the block's samples of one leg, in dBFS, the meter's
+ * display minimum when below it or silent. */
+static double ref_level(const float *x, uint32_t n, double min) {
+  double peak = 0.0;
+  for (uint32_t i = 0; i < n; i++) peak = fabs((double)x[i]) > peak ? fabs((double)x[i]) : peak;
+  if (!(peak > 0.0)) return min;
+  const double db = 20.0 * log10(peak);
+  return db < min ? min : db;
+}
 
 static void check(bool ok, const char *face, double sr, const char *what) {
   if (!ok) failures++;
@@ -189,7 +213,12 @@ static void reference(double sr, int off, const float *key, const float *il, con
       omx_deesser_instance_run(&inst, il + at, ir + at, ol + at, orr + at, frames);
 #endif
       if (meters_want) {
-        meters_want[(b * STRETCH + r) * NM + 0u] = k->bypass ? 0.0f : inst.state.band.gr_min_db;
+        double *mw = meters_want + (b * STRETCH + r) * NV;
+        mw[0] = k->bypass ? 0.0 : (double)inst.state.band.gr_min_db;
+        mw[1] = ref_level(il + at, frames, METERS[1].min);
+        mw[2] = ref_level(ir + at, frames, METERS[1].min);
+        mw[3] = ref_level(ol + at, frames, METERS[2].min);
+        mw[4] = ref_level(orr + at, frames, METERS[2].min);
       }
       at += frames;
     }
@@ -227,8 +256,8 @@ static void run_checks(const char *face, Driver *d, double sr, bool keyed, bool 
   char what[200];
   omx_denormals_off(); /* the faces run with flush-to-zero; so does the reference */
   const bool metering = strcmp(face, "clap") == 0;
-  const uint32_t nm = (uint32_t)NBLOCKS * STRETCH * NM;
-  float *mwant = calloc(nm, sizeof(float)), *mgot = calloc(nm, sizeof(float));
+  const uint32_t nm = (uint32_t)NBLOCKS * STRETCH * NV;
+  double *mwant = calloc(nm, sizeof(double)), *mgot = calloc(nm, sizeof(double));
   if (!mwant || !mgot) abort();
   meters_want = mwant;
   uint32_t want = 0;
@@ -257,21 +286,35 @@ static void run_checks(const char *face, Driver *d, double sr, bool keyed, bool 
   snprintf(what, sizeof what, "the reported latency moves only at activation, after a restart asked for%s", pass);
   check(ran && !latency_broke, face, sr, what);
   if (metering) {
-    bool reduces = false, agrees = ran;
-    for (uint32_t i = 0; i < nm; i++) {
-      reduces = reduces || mwant[i] < 0.0f;
-      if (agrees && memcmp(&mwant[i], &mgot[i], sizeof(float)) != 0) {
-        fprintf(stderr, "  meter %s differs after block %u: got %.9g, kernel %.9g\n", METER_NAMES[i % NM], i / NM,
-                (double)mgot[i], (double)mwant[i]);
+    bool agrees = ran, reduces = false, legs = false, shaped = false;
+    for (uint32_t i = 0; i < nm; i++)
+      if (agrees && memcmp(&mwant[i], &mgot[i], sizeof(double)) != 0) {
+        uint32_t m = 0;
+        while (m + 1 < NM && METERS[m + 1].at <= i % NV) m++;
+        fprintf(stderr, "  meter %s channel %u differs after block %u: got %.17g, reference %.17g\n", METERS[m].name,
+                i % NV - METERS[m].at, i / NV, mgot[i], mwant[i]);
         agrees = false;
       }
-    }
-    snprintf(what, sizeof what, "clap.meters/1 lists the declaration's meters%s", pass);
+    for (uint32_t b = 0; b < nm / NV; b++)
+      for (uint32_t m = 0; m < NM; m++) {
+        const double *v = mwant + b * NV + METERS[m].at;
+        if (METERS[m].kind == CLAP_METER_KIND_GAIN_REDUCTION) reduces = reduces || v[0] < 0.0;
+        if (METERS[m].kind == CLAP_METER_KIND_LEVEL) legs = legs || v[0] != v[1];
+        for (uint32_t o = 0; o < NM; o++)
+          if (o != m && METERS[o].kind == CLAP_METER_KIND_LEVEL && METERS[m].kind == CLAP_METER_KIND_LEVEL)
+            shaped = shaped || memcmp(v, mwant + b * NV + METERS[o].at, 2 * sizeof(double)) != 0;
+      }
+    (void)reduces, (void)legs, (void)shaped;
+    snprintf(what, sizeof what, "clap.meters/1 lists the declaration's meters, every one coherent%s", pass);
     check(ran && meters_listed, face, sr, what);
-    snprintf(what, sizeof what, "each meter is the kernel's reading after every block, 0 bypassed%s", pass);
+    snprintf(what, sizeof what, "every channel of every meter is the reference's after every block%s", pass);
     check(agrees, face, sr, what);
     snprintf(what, sizeof what, "the kernel reduces gain in the plan%s", pass);
     check(reduces, face, sr, what);
+    snprintf(what, sizeof what, "the levels of the two legs differ in the plan%s", pass);
+    check(legs, face, sr, what);
+    snprintf(what, sizeof what, "the input and output levels differ in the plan%s", pass);
+    check(shaped, face, sr, what);
     snprintf(what, sizeof what, "no meter value before the first block%s", pass);
     check(ran && !meters_early, face, sr, what);
   }
@@ -350,14 +393,14 @@ static bool clap_param(const clap_plugin_params_t *pp, const clap_plugin_t *p, c
   return false;
 }
 
-/* The face's meter list is the declaration's: the names, ids and floors, gain reductions of one channel. */
+/* The face's meter list is the declaration's: the ids, names, kinds, channels and ranges, every one coherent. */
 static bool meters_listed_ok(const clap_plugin_meters_t *mx, const clap_plugin_t *p) {
   if (mx->count(p) != NM) return false;
   for (uint32_t m = 0; m < NM; m++) {
     clap_meter_info_t info;
-    if (!mx->get_info(p, m, &info) || info.id != m || strcmp(info.name, METER_NAMES[m]) != 0 ||
-        info.kind != CLAP_METER_KIND_GAIN_REDUCTION || info.channel_count != 1 || info.min_value != METER_FLOORS[m] ||
-        info.max_value != 0.0)
+    if (!mx->get_info(p, m, &info) || info.id != m || strcmp(info.name, METERS[m].name) != 0 ||
+        info.kind != METERS[m].kind || info.flags != CLAP_METER_IS_COHERENT || info.channel_count != METERS[m].channels ||
+        info.min_value != METERS[m].min || info.max_value != METERS[m].max)
       return false;
   }
   return true;
@@ -404,8 +447,9 @@ static bool clap_run(void *face, const Block *plan, size_t nblocks, double sr, c
                          .out_events = &out};
     ok = p->process(p, &pr) != CLAP_PROCESS_ERROR;
     for (uint32_t m = 0; meters_got && m < NM; m++) {
-      double v;
-      meters_got[b * NM + m] = mx && mx->get_values(p, m, &v, 1) == 1 ? (float)v : NAN;
+      double *v = meters_got + b * NV + METERS[m].at;
+      if (!mx || mx->get_values(p, m, v, METERS[m].channels) != METERS[m].channels)
+        for (uint32_t c = 0; c < METERS[m].channels; c++) v[c] = NAN;
     }
     at += frames;
   }

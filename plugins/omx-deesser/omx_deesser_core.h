@@ -54,7 +54,8 @@ static inline uint32_t omx_deesser_core_latency(const OmxDeesserCore *c) {
   return (uint32_t)lrintf((float)(omx_deesser_instance_latency(&c->inst)));
 }
 
-/** Meter `i`'s reading (the declaration's `meters`, in order): the kernel's own, after the last block. */
+/** Gain-reduction meter `i`'s reading (the declaration's `meters`, in order): the kernel's own, after the
+ * last block. */
 static inline float omx_deesser_core_meter(const OmxDeesserCore *c, uint32_t i) {
   switch (i) {
   case 0:
