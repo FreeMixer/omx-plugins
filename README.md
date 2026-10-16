@@ -250,9 +250,9 @@ Plus the host's bypass.
 
 | Parameter | Range | Default |
 |---|---|---|
-| Semitones | -12 to 12 | 0 |
-| Cents | -50 to 50 | 0 |
-| Mix | 0 to 100 | 100 |
+| Semitones | -12 to 12 st, whole steps | 0 st |
+| Cents | -50 to 50 cents, whole steps | 0 cents |
+| Mix | 0 to 100 % | 100 % |
 
 Plus the host's bypass.
 
