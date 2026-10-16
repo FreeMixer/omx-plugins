@@ -21,7 +21,8 @@
 #
 #   tools/qualify-release.sh --self-test   a stand-in prober over a two-plugin stage: a pass passes, and
 #                                          an unsuitable verdict, a missing document, a `suitable` rating
-#                                          whose rtSafe is false and a non-zero prober exit each refuse
+#                                          whose rtSafe is false, an unknown schema and a non-zero prober exit
+#                                          each refuse; a /1 and a /2 document both pass
 set -euo pipefail
 HERE=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 
@@ -42,13 +43,15 @@ n=0
 for clap in "$@"; do
   n=$((n + 1))
   sha=$(sha256sum "$clap" | cut -c1-64)
-  rating=suitable; rt=true
+  rating=suitable; rt=true; schema=2
   case "$STUB_MODE:$n" in
+    v1:*) schema=1 ;;
+    v9:2) schema=9 ;;
     unsuitable:2) rating=unsuitable; rt=false ;;
     rtsafe-false:2) rt=false ;;
     missing:2) continue ;;
   esac
-  printf '{"schema":"plugin-qualify.rt-safety/1","verdict":{"rating":"%s","rtSafe":%s}}\n' "$rating" "$rt" > "$out/$sha.openmixer-console.rt-safety.json"
+  printf '{"schema":"plugin-qualify.rt-safety/%s","verdict":{"rating":"%s","rtSafe":%s}}\n' "$schema" "$rating" "$rt" > "$out/$sha.openmixer-console.rt-safety.json"
 done
 [ "$STUB_MODE" != exit2 ] || exit 2
 exit 0
@@ -65,6 +68,8 @@ STUB
   run unsuitable 1 "one unsuitable verdict refuses, naming the plugin" 'REFUSED b.clap'
   run missing 1 "one .clap without a document refuses" 'REFUSED b.clap: no verdict document'
   run rtsafe-false 1 "a suitable rating whose rtSafe is false refuses" 'REFUSED b.clap'
+  run v1 0 "a /1 document from an older plugin-qualify still passes" "every plugin is suitable (2 binaries)"
+  run v9 1 "a document of a schema this gate does not know refuses" 'REFUSED b.clap'
   run exit2 1 "a non-zero prober exit refuses even with every document suitable" 'plugin-qualify exit 2'
   [ "$fail" = 0 ] && echo "qualify-release self-test ok"
   exit "$fail"
@@ -100,8 +105,11 @@ const { createHash } = require('node:crypto');
 const { join, basename } = require('node:path');
 const [out, ...claps] = process.argv.slice(2);
 const docs = readdirSync(out).filter((f) => f.endsWith('.rt-safety.json')).map((f) => ({ f, d: JSON.parse(readFileSync(join(out, f), 'utf8')) }));
-// plugin-qualify.rt-safety/1: verdict.rating is suitable | unsuitable | unknown, verdict.rtSafe its boolean
+// plugin-qualify.rt-safety/1 and /2 (/2 is /1 plus measured.noteSweep and note reasons): verdict.rating is
+// suitable | unsuitable | unknown, verdict.rtSafe its boolean; nothing else of either document is read here
+const SCHEMAS = ['plugin-qualify.rt-safety/1', 'plugin-qualify.rt-safety/2'];
 const verdictOf = (d) => {
+  if (!SCHEMAS.includes(d.schema)) return `unknown schema ${JSON.stringify(d.schema ?? null)}`;
   const rating = d.verdict?.rating ?? 'absent';
   if (rating !== 'suitable') return rating;
   return d.verdict?.rtSafe === true ? 'suitable' : 'suitable, but rtSafe is not true';
