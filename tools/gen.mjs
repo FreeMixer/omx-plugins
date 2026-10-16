@@ -45,6 +45,7 @@ import { CONTRACT_VERSION, contractFingerprint, contractOf } from './param-contr
 import { SPEC_FILE, controlOf, eqDefaultBands, findName, kernelControls, locateContract, packagingRange, paramKernel, resolveParam } from './omx-contract.mjs';
 import { bandsMacro, baseOf, expandVariant, variantStems } from './variants.mjs';
 import { omxdspInclude, render } from './template.mjs';
+import { generateTest, isTestDir, loadTestDecl, testPluginDirs } from './test-plugins.mjs';
 
 export const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -1001,11 +1002,12 @@ export function generate(d) {
 }
 
 /** Every plugin's folder: each plugins/<stem>/ holding <stem>.decl.json, a base of variants standing
- * for its variants' folders (tools/variants.mjs). */
+ * for its variants' folders (tools/variants.mjs). A test plugin's folder (`"role": "test"`,
+ * tools/test-plugins.mjs) is none of them: testPluginDirs() lists those. */
 export const pluginDirs = (root = ROOT) =>
   readdirSync(join(root, 'plugins'))
     .map((n) => join(root, 'plugins', n))
-    .filter((p) => existsSync(join(p, `${basename(p)}.decl.json`)))
+    .filter((p) => existsSync(join(p, `${basename(p)}.decl.json`)) && !isTestDir(p))
     .flatMap((p) => {
       const raw = JSON.parse(readFileSync(join(p, `${basename(p)}.decl.json`), 'utf8'));
       return raw.variants ? variantStems(raw).map((s) => join(root, 'plugins', s)) : [p];
@@ -1042,19 +1044,28 @@ export const SHARED = {
     'lv2-files': (ds) => ds.map((d) => `%{_libdir}/lv2/${d.stem}.lv2/`),
   },
   '.github/workflows/ci.yml': {
-    plugins: (ds) => [`shorts="${ds.map((d) => d.stem.replace(/^omx-/, '')).join(' ')}"`, `kernels="${ds.map((d) => d.kernel).join(' ')}"`],
+    // the test plugins' ids too: static-table-host expects them after `--test`, and a hand-written
+    // list in CI hides a new test plugin
+    plugins: (ds, ts = []) => [
+      `shorts="${ds.map((d) => d.stem.replace(/^omx-/, '')).join(' ')}"`,
+      `kernels="${ds.map((d) => d.kernel).join(' ')}"`,
+      `tests="${ts.map((d) => d.clap.id).join(' ')}"`,
+    ],
   },  // libomxplugins: each face's entry, defined by omx_<kernel>_clap.c, listed by its CLAP id
   'include/omx_clap_static.h': {
     'clap-entries': (ds) => ds.map((d) => `extern const clap_plugin_entry_t omx_clap_entry_${d.kernel};`),
+    'clap-test-entries': (ds, ts = []) => ts.map((d) => `extern const clap_plugin_entry_t omx_clap_entry_${d.kernel};`),
   },
   'lib/omx_clap_static.c': {
     'clap-table': (ds) => ds.map((d) => `{"${d.clap.id}", &omx_clap_entry_${d.kernel}},`),
+    // the test plugins (`"role": "test"`): linked and found by id, never listed with the shipped ones
+    'clap-test-table': (ds, ts = []) => ts.map((d) => `{"${d.clap.id}", &omx_clap_entry_${d.kernel}},`),
   },
 };
 
 /** `text` with each `BEGIN GENERATED <name>` .. `END GENERATED <name>` region refilled; the inner
  * lines take the BEGIN line's indentation. A region missing, unclosed or unknown throws. */
-export function fillRegions(file, text, producers, ds) {
+export function fillRegions(file, text, producers, ds, ts = []) {
   const lines = text.split('\n');
   const out = [];
   const seen = new Set();
@@ -1066,7 +1077,7 @@ export function fillRegions(file, text, producers, ds) {
     if (!producers[name]) throw new Error(`${file}: line ${i + 1} opens a region '${name}' tools/gen.mjs does not fill`);
     const end = lines.findIndex((l, j) => j > i && new RegExp(`\\bEND GENERATED ${name}\\b`).test(l));
     if (end < 0) throw new Error(`${file}: region '${name}' (line ${i + 1}) is never closed`);
-    out.push(...producers[name](ds).map((l) => (l ? `${indent}${l}` : l)));
+    out.push(...producers[name](ds, ts).map((l) => (l ? `${indent}${l}` : l)));
     out.push(lines[end]);
     seen.add(name);
     i = end;
@@ -1077,9 +1088,10 @@ export function fillRegions(file, text, producers, ds) {
 }
 
 /** Every shared file: path relative to the tree -> text. */
-export function generateShared(root = ROOT, decls = pluginDirs(root).map((p) => loadDecl(p))) {
+export function generateShared(root = ROOT, decls = pluginDirs(root).map((p) => loadDecl(p)), tests = testPluginDirs(root).map((p) => loadTestDecl(root, p))) {
   const ds = decls.filter(ships).sort(byStem);
-  return Object.fromEntries(Object.entries(SHARED).map(([file, producers]) => [file, fillRegions(file, readFileSync(join(root, file), 'utf8'), producers, ds)]));
+  const ts = [...tests].sort(byStem);
+  return Object.fromEntries(Object.entries(SHARED).map(([file, producers]) => [file, fillRegions(file, readFileSync(join(root, file), 'utf8'), producers, ds, ts)]));
 }
 
 /** A declaration's pinned port hints (its `portHints`, tools/port-hints.mjs) in the view's shape,
@@ -1124,11 +1136,15 @@ function main(argv) {
       console.log(`gen: wrote ${shown}`);
     }
   };
-  const decls = (dirs.length ? dirs : pluginDirs()).map((dir) => loadDecl(dir));
+  const decls = (dirs.length ? dirs.filter((dir) => !isTestDir(dir)) : pluginDirs()).map((dir) => loadDecl(dir));
+  const tests = (dirs.length ? dirs.filter((dir) => isTestDir(dir)) : testPluginDirs(ROOT)).map((dir) => loadTestDecl(ROOT, dir));
   for (const d of decls) {
     for (const [rel, text] of Object.entries(generate(d))) put(join(d.dir, rel), join('plugins', d.stem, rel), text, `make -C plugins/${d.stem} gen`);
   }
-  if (!dirs.length) for (const [rel, text] of Object.entries(generateShared(ROOT, decls))) put(join(ROOT, rel), rel, text, 'node tools/gen.mjs');
+  for (const d of tests) {
+    for (const [rel, text] of Object.entries(generateTest(d))) put(join(d.dir, rel), join('plugins', d.stem, rel), text, 'node tools/gen.mjs');
+  }
+  if (!dirs.length) for (const [rel, text] of Object.entries(generateShared(ROOT, decls, tests))) put(join(ROOT, rel), rel, text, 'node tools/gen.mjs');
   if (!dirs.length) {
     // the pin is the declaration's `portHints`: a pin file beside it would be a second home
     for (const n of readdirSync(join(ROOT, 'plugins')).sort()) {

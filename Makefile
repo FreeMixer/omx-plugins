@@ -30,15 +30,24 @@
 #   make install-devel   the public headers other projects include: $(INCLUDEDIR)/omx-plugins/*.h,
 #                   and $(LIBDIR)/libomxplugins.a with $(LIBDIR)/pkgconfig/omxplugins.pc
 #   make version    the release version, the one packaging/omx-plugins.spec and debian/changelog carry
+#   make test-role  a test plugin (`"role": "test"`) is linked into the archive and installed by no
+#                   target: tools/test-role-check.sh over a staged install, with its --self-test
+#                   (part of `make test`)
 VERSION := 0.9.0
 PLUGINS := $(sort $(dir $(wildcard plugins/*/Makefile)))
+# A test plugin is built, tested and linked into libomxplugins.a like the others, and installed by no
+# target: its declaration says `"role": "test"` (tools/test-plugins.mjs).
+TEST_PLUGINS := $(sort $(dir $(shell grep -l '"role": *"test"' plugins/*/*.decl.json 2>/dev/null)))
+SHIP_PLUGINS := $(filter-out $(TEST_PLUGINS),$(PLUGINS))
 PREFIX     ?= /usr
 INCLUDEDIR ?= $(PREFIX)/include
 LIBDIR     ?= $(PREFIX)/lib
 # Every header a consumer includes: the shared parameter type, the panel description and parameter contract rows, then each shipped plugin's generated
 # parameter header and its instance header (the DSP shell around the omx-dsp kernel). A plugin's
 # headers are the .h files beside its Makefile and in its generated/ directory.
-HEADERS := include/omx_plugin_param.h include/omx_panel_description.h include/omx_param_contract.h include/omx_clap_static.h $(foreach p,$(PLUGINS),$(wildcard $(p)*.h) $(wildcard $(p)generated/*.h))
+# A test plugin's own hand-written header (an extension a host's test reads, omx_test_transport_probe.h)
+# is installed with them: the archive links its face.
+HEADERS := include/omx_plugin_param.h include/omx_panel_description.h include/omx_param_contract.h include/omx_clap_static.h $(foreach p,$(SHIP_PLUGINS),$(wildcard $(p)*.h) $(wildcard $(p)generated/*.h)) $(foreach p,$(TEST_PLUGINS),$(wildcard $(p)*.h))
 
 # libomxplugins.a: each shipped plugin's CLAP face built with -DOMX_CLAP_STATIC (no `clap_entry`;
 # its `omx_clap_entry_<kernel>` stays) and lib/omx_clap_static.c, the table of those entries by CLAP
@@ -69,7 +78,7 @@ LIB_FLAGS  := -fPIC -fvisibility=hidden -DOMX_CLAP_STATIC -Iinclude
 # read only by the targets that build the archive, so `make version` and the rest need no omx-dsp
 lib_cflags = $(call dep_check,omxdsp,$(OMXDSP_MIN))$(call dep_check,omx-contract,$(CONTRACT_MIN))$(shell $(PKG_CONFIG) --cflags omxdsp omx-clap-core clap)
 
-.PHONY: all lib lib-test test units hints look manual install install-devel clean version recipe-test completeness selftest private-refs strip-crosscheck meters-abi meter-ring
+.PHONY: test-role all lib lib-test test units hints look manual install install-devel clean version recipe-test completeness selftest private-refs strip-crosscheck meters-abi meter-ring
 all: lib
 	@for p in $(PLUGINS); do $(MAKE) -C $$p all || exit 1; done
 lib: $(LIB) $(LIB_PC)
@@ -81,6 +90,7 @@ test: lib units
 	@$(MAKE) -s look
 	@$(MAKE) -s manual
 	@$(MAKE) -s meters-abi
+	@$(MAKE) -s test-role
 units:
 	node tools/test/param-units-check.mjs
 hints:
@@ -113,7 +123,10 @@ meter-ring:
 strip-crosscheck:
 	sh tools/test/strip-crosscheck.sh
 install:
-	@for p in $(PLUGINS); do $(MAKE) -C $$p install || exit 1; done
+	@for p in $(SHIP_PLUGINS); do $(MAKE) -C $$p install || exit 1; done
+test-role:
+	tools/test-role-check.sh
+	tools/test-role-check.sh --self-test
 install-devel: lib
 	install -d $(DESTDIR)$(INCLUDEDIR)/omx-plugins $(DESTDIR)$(LIBDIR)/pkgconfig
 	install -m644 $(HEADERS) $(DESTDIR)$(INCLUDEDIR)/omx-plugins/
@@ -148,9 +161,11 @@ $(LIB_B):
 
 # The consumer's proof: install-devel into a stage, then a C host built only from the staged
 # omxplugins.pc (no -ldl, and dlopen must not be among its symbols) opens every face through the
-# table. The ids it expects are each plugin folder's CLAP_ID, in folder order: the plugins' own.
+# table. The ids it expects are each plugin folder's CLAP_ID, in folder order: the plugins' own; the
+# test plugins' after `--test`, in their own table.
 LIB_STAGE := $(abspath $(LIB_B)/stage)
-CLAP_IDS   = $(foreach p,$(PLUGINS),$(shell sed -n 's/^CLAP_ID *:= *//p' $(p)Makefile))
+CLAP_IDS   = $(foreach p,$(SHIP_PLUGINS),$(shell sed -n 's/^CLAP_ID *:= *//p' $(p)Makefile))
+TEST_IDS   = $(foreach p,$(TEST_PLUGINS),$(shell sed -n 's/^CLAP_ID *:= *//p' $(p)Makefile))
 lib-test: lib
 	rm -rf $(LIB_STAGE)
 	$(MAKE) -s install-devel DESTDIR= PREFIX=$(LIB_STAGE) LIBDIR=$(LIB_STAGE)/lib
@@ -159,6 +174,6 @@ lib-test: lib
 	    tools/test/static-table-host.c $(LDFLAGS) $$($(PKG_CONFIG) --libs omxplugins)
 	@if nm -u $(LIB_B)/static-table-host | grep -qw dlopen; then echo "FAIL static-table-host calls dlopen"; exit 1; fi
 	@echo "PASS static-table-host links libomxplugins through omxplugins.pc, without dlopen"
-	$(LIB_B)/static-table-host $(CLAP_IDS)
+	$(LIB_B)/static-table-host $(CLAP_IDS) --test $(TEST_IDS)
 version:
 	@echo $(VERSION)

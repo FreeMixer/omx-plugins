@@ -4,14 +4,17 @@
  * static-table-host.c — a CLAP host that links libomxplugins.a through omxplugins.pc and opens
  * every plugin in-process, the way the console's engine does: no .clap path, no dlopen.
  *
- *   static-table-host <clap-id> ...
+ *   static-table-host <clap-id> ... --test <test-clap-id> ...
  *       the ids are the plugins' own (each plugins/<stem>/Makefile's CLAP_ID, from its
  *       declaration). The table must list exactly those, each once, in any order;
  *       omx_clap_static_find() returns each one's row entry and refuses an unknown id and NULL;
  *       each entry's factory holds one plugin whose descriptor id is the row's, created, activated
  *       at 48 kHz, run over a block on every audio port it declares, and destroyed; and the one
  *       entry over all of them (omx_clap_static_entry) lists the same descriptors and creates each
- *       by id. `PASS ...` / `FAIL ...` per check; the exit status is the number of failures (capped).
+ *       by id. The ids after `--test` are the test plugins' (a declaration's `"role": "test"`): the test
+ *       table lists exactly those; neither the shipped table nor the one entry's factory lists them;
+ *       find() and the one entry's create_plugin() open and run each by id.
+ *       `PASS ...` / `FAIL ...` per check; the exit status is the number of failures (capped).
  */
 #include <math.h>
 #include <stdbool.h>
@@ -119,7 +122,13 @@ static bool run_one(const clap_plugin_factory_t *fac, const char *id) {
 }
 
 int main(int argc, char **argv) {
-  const uint32_t want = (uint32_t)(argc - 1);
+  /* argv: the shipped plugins' ids, then `--test` and the test plugins' ids */
+  int sep = argc;
+  for (int a = 1; a < argc; a++)
+    if (strcmp(argv[a], "--test") == 0) sep = a;
+  const uint32_t want = (uint32_t)(sep - 1);
+  char **tests = argv + (sep < argc ? sep + 1 : argc);
+  const uint32_t ntest = (uint32_t)(sep < argc ? argc - sep - 1 : 0);
   CHECK(want > 0, "the expected ids are given (%u)", want);
   CHECK(OMX_CLAP_STATIC_COUNT == want, "the table lists %u plugins, the plugin folders declare %u", OMX_CLAP_STATIC_COUNT,
         want);
@@ -160,8 +169,30 @@ int main(int argc, char **argv) {
   }
   CHECK(fac && fac->get_plugin_descriptor(fac, OMX_CLAP_STATIC_COUNT) == NULL, "no descriptor past the last");
   CHECK(fac && fac->create_plugin(fac, &HOST, "org.example.not-ours") == NULL, "its factory refuses an id no plugin has");
+
+  /* the test plugins: linked, found by id, created by the one entry, listed by neither table nor factory */
+  CHECK(OMX_CLAP_STATIC_TEST_COUNT == ntest, "the test table lists %u plugins, the test folders declare %u",
+        OMX_CLAP_STATIC_TEST_COUNT, ntest);
+  for (uint32_t i = 0; i < ntest; i++) {
+    const char *id = tests[i];
+    uint32_t rows = 0, shipped = 0, listed = 0;
+    const struct omx_clap_static_plugin *row = NULL;
+    for (uint32_t r = 0; r < OMX_CLAP_STATIC_TEST_COUNT; r++)
+      if (strcmp(OMX_CLAP_STATIC_TEST_PLUGINS[r].id, id) == 0) row = &OMX_CLAP_STATIC_TEST_PLUGINS[r], rows++;
+    for (uint32_t r = 0; r < OMX_CLAP_STATIC_COUNT; r++) shipped += strcmp(OMX_CLAP_STATIC_PLUGINS[r].id, id) == 0;
+    for (uint32_t r = 0; fac && r < fac->get_plugin_count(fac); r++) {
+      const clap_plugin_descriptor_t *d = fac->get_plugin_descriptor(fac, r);
+      listed += d && strcmp(d->id, id) == 0;
+    }
+    CHECK(rows == 1 && shipped == 0, "test plugin %s: once in the test table, never in the shipped one", id);
+    CHECK(listed == 0, "test plugin %s: the one entry's factory does not list it", id);
+    CHECK(row && omx_clap_static_find(id) == row->entry, "test plugin %s: find() returns its entry", id);
+    CHECK(fac && run_one(fac, id), "test plugin %s: the one entry's factory creates and runs it by id", id);
+  }
+  CHECK(OMX_CLAP_STATIC_TEST_PLUGINS[OMX_CLAP_STATIC_TEST_COUNT].id == NULL, "the test table ends in its sentinel");
   all->deinit();
 
-  printf("static-table-host: %u plugins, %d failures\n", OMX_CLAP_STATIC_COUNT, failures);
+  printf("static-table-host: %u plugins, %u test plugins, %d failures\n", OMX_CLAP_STATIC_COUNT, OMX_CLAP_STATIC_TEST_COUNT,
+         failures);
   return failures > 100 ? 100 : failures;
 }
