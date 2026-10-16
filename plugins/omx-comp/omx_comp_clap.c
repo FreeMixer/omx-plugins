@@ -47,6 +47,8 @@
 #include <omx-clap-host/clap_meters.h>
 #include "omx_meter_ring.h"
 #include <omxdsp/omx_denormal.h> /* omx_denormals_off, per callback */
+#include <omxdsp/mix/omx_meter.h> /* omx_meter_block_peak, a level meter's peak */
+#include <omxdsp/omx_units.h> /* omx_lin_to_db_d, a level meter's dBFS */
 
 #define G_DECLARED OMX_COMP_PARAM_COUNT
 /* The host's bypass, appended after the declared ids. */
@@ -74,12 +76,8 @@ static const struct {
 /** A level meter's reading: one leg's peak over the block, in dBFS, never below the meter's display
  * minimum (silence reads the minimum). */
 static double g_level_db(const float *x, uint32_t n, double min) {
-  float peak = 0.0f;
-  for (uint32_t i = 0; i < n; ++i) {
-    const float a = fabsf(x[i]);
-    if (a > peak) peak = a;
-  }
-  const double db = peak > 0.0f ? 20.0 * log10((double)peak) : min;
+  const float peak = omx_meter_block_peak(x, NULL, n);
+  const double db = peak > 0.0f ? omx_lin_to_db_d((double)peak, 0.0) : min;
   return db > min ? db : min;
 }
 
