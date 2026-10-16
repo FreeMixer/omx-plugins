@@ -1,0 +1,21 @@
+{
+  "$comment": "THE declaration of omx-test-note-echo, a test plugin: one note out per note in, the same event at the same frame (key, velocity, channel, note id), and silent audio.",
+  "stem": "omx-test-note-echo",
+  "kernel": "test_note_echo",
+  "role": "test",
+  "name": "omx test-note-echo",
+  "vendor": "openmixer",
+  "url": "https://github.com/FreeMixer/omx-plugins",
+  "version": "0.9.0",
+  "description": "A test instrument: every note event it is handed comes out of its note output unchanged at the same frame, and its audio is silence.",
+  "clap": {
+    "id": "org.openmixer.test-note-echo",
+    "features": [
+      "note-effect",
+      "utility"
+    ]
+  },
+  "constants": {
+    "outputChannels": 2
+  }
+}
