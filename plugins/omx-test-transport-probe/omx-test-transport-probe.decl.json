@@ -1,0 +1,22 @@
+{
+  "$comment": "THE declaration of omx-test-transport-probe, a test plugin: an effect whose audio passes unchanged, that records the CLAP transport it is handed each block where a test reads it (the org.openmixer.test-transport-probe/1 extension, omx_test_transport_probe.h).",
+  "stem": "omx-test-transport-probe",
+  "kernel": "test_transport_probe",
+  "role": "test",
+  "name": "omx test-transport-probe",
+  "vendor": "openmixer",
+  "url": "https://github.com/FreeMixer/omx-plugins",
+  "version": "0.9.0",
+  "description": "A test probe: audio passes unchanged, and the transport handed to each block is recorded whole for a test to read back.",
+  "clap": {
+    "id": "org.openmixer.test-transport-probe",
+    "features": [
+      "audio-effect",
+      "utility",
+      "stereo"
+    ]
+  },
+  "constants": {
+    "readRetries": 64
+  }
+}
