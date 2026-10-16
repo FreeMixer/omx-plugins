@@ -163,6 +163,8 @@ host that runs the plugins in its own process without loading .clap files.
   of three copies, so a host never reads values from two different blocks.
 - omx comp reports its gain reduction and its input and output levels, and
   the de-esser its input and output levels.
+- omx pitch declares its units: semitones and cents are whole steps that a
+  host shows as semitones and cents, and the mix as a percent.
 - The plugins use the meters header omx-clap-core installs instead of a
   copy of their own.
 - The first release that waits for plugin-qualify: every plugin is measured
