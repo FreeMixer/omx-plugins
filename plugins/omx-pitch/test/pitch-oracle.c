@@ -64,10 +64,10 @@ static const Block PLAN[] = {
     { 17, 0.0f, 0, {6.0f, 0.0f, 10.0f}, 1 },
     { 480, 0.0f, 0, {0.0f, 40.0f, 60.0f}, 1 },
     { 129, 0.0f, 0, {0.0f, -40.0f, 35.0f}, 0 },
-    { 1024, 0.0f, 0, {9.6f, 10.0f, 100.0f}, 0 },
-    { 7, 0.0f, 0, {-9.6f, -15.0f, 100.0f}, 0 },
-    { 2500, 0.0f, 0, {2.4f, 0.0f, 25.0f}, 0 },
-    { 600, 0.0f, 0, {-3.6f, 0.0f, 100.0f}, 0 },
+    { 1024, 0.0f, 0, {10.0f, 10.0f, 100.0f}, 0 },
+    { 7, 0.0f, 0, {-10.0f, -15.0f, 100.0f}, 0 },
+    { 2500, 0.0f, 0, {2.0f, 0.0f, 25.0f}, 0 },
+    { 600, 0.0f, 0, {-4.0f, 0.0f, 100.0f}, 0 },
     { 3000, 0.0f, 0, {0.0f, -25.0f, 0.0f}, 0 },
     { 0, 10.0f, 1, {0.0f, 0.0f, 100.0f}, 0 },
     { 0, 100.0f, 2, {0.0f, 0.0f, 100.0f}, 0 },
@@ -75,7 +75,7 @@ static const Block PLAN[] = {
 #define NBLOCKS (sizeof PLAN / sizeof PLAN[0])
 
 /* One step of each parameter: what the sabotage arm moves it by. */
-static const float STEP[NP] = { 0.24f, 1.0f, 1.0f };
+static const float STEP[NP] = { 1.0f, 1.0f, 1.0f };
 
 static int failures;
 

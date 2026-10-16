@@ -551,8 +551,8 @@
         },
         "unit": {
           "type": "string",
-          "pattern": "^units:[a-z]+$",
-          "description": "The LV2 unit (units:hz, units:db, ...)."
+          "pattern": "^units:[a-z][A-Za-z0-9]*$",
+          "description": "The LV2 unit (units:hz, units:db, units:semitone12TET, ...)."
         },
         "points": {
           "type": "array",
