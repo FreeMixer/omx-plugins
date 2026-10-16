@@ -142,3 +142,21 @@ plugin declares `panel` and `console`) and checked against the vocabulary in
 `schema/plugin.decl.schema.json`; the console's placement rules are
 openmixer's and are applied there. The package descriptions are prose a person writes; the
 completeness test checks that they name every shipped plugin.
+
+## A test plugin
+
+An instrument or probe that only a host's own tests create (the console's job proofs play a sine
+voice, echo notes and read the transport a block was handed) is declared with `"role": "test"`
+(schema `$defs.testPlugin`): its identity and the `constants` its face runs with and its oracle
+predicts from. There is no wizard and no kernel: the CLAP face, the Makefile and the oracle with its
+sabotage arms are written by hand, and `tools/gen.mjs` writes `generated/omx_<kernel>_decl.h` from
+the declaration (`tools/test-plugins.mjs`).
+
+A test plugin is linked into libomxplugins.a in a table of its own, `OMX_CLAP_STATIC_TEST_PLUGINS`:
+`omx_clap_static_find()` and the one entry's `create_plugin()` open it by id, while
+`OMX_CLAP_STATIC_PLUGINS`, the one entry's factory listing, the README, the packages' plugin lists,
+the completeness recipe and `make install` never carry it, so no picker lists it and the release
+gate, which probes every installed `.clap`, never sees it. `make test-role` holds that over a staged
+install (`tools/test-role-check.sh`, with its self-test).
+
+Each test plugin's face says, in its header comment, what a test reads from it.

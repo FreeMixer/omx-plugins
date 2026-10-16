@@ -349,6 +349,11 @@
               "minimum": 1
             }
           }
+        },
+        "role": {
+          "const": "ship",
+          "title": "Role",
+          "description": "What the plugin is for: `ship`, the default, a plugin the packages install and every picker lists. A test plugin says `test` and is declared by `$defs.testPlugin` instead."
         }
       },
       "anyOf": [
@@ -1204,6 +1209,69 @@
           },
           "title": "Fixed",
           "description": "Controls of the element's kernel that are no parameter, each passed at one value: a set's id, a travel's number, \"default\" (its declared default), or {\"defaultRef\": \"<SHEET>.<field>\"} (a default an omx-contract sheet holds). A per-band control is passed so for every band the element does not expose. For a control a chain cannot use, such as the key source of a keyed face that is not the chain's `key` (it runs self-keyed)."
+        }
+      }
+    },
+    "testPlugin": {
+      "type": "object",
+      "title": "A test plugin",
+      "description": "An instrument or probe a host's own tests create by CLAP id (tools/test-plugins.mjs). It is linked into libomxplugins.a and found by omx_clap_static_find(), but no picker lists it, no package installs it and the release gate never sees it. Its face, Makefile and oracles are written by hand; tools/gen.mjs writes generated/omx_<kernel>_decl.h from this declaration and lists the face in the archive's test table.",
+      "required": [
+        "stem",
+        "kernel",
+        "role",
+        "name",
+        "vendor",
+        "url",
+        "version",
+        "description",
+        "clap",
+        "constants"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "$comment": {
+          "type": "string"
+        },
+        "stem": {
+          "$ref": "#/$defs/plugin/properties/stem"
+        },
+        "kernel": {
+          "$ref": "#/$defs/plugin/properties/kernel"
+        },
+        "role": {
+          "const": "test",
+          "title": "Role",
+          "description": "`test`: hidden from every picker, never installed, created by id."
+        },
+        "name": {
+          "$ref": "#/$defs/plugin/properties/name"
+        },
+        "vendor": {
+          "$ref": "#/$defs/plugin/properties/vendor"
+        },
+        "url": {
+          "$ref": "#/$defs/plugin/properties/url"
+        },
+        "version": {
+          "$ref": "#/$defs/plugin/properties/version"
+        },
+        "description": {
+          "type": "string",
+          "minLength": 20,
+          "title": "Description",
+          "description": "One plain sentence: what the test plugin does and what a test reads from it."
+        },
+        "clap": {
+          "$ref": "#/$defs/plugin/properties/clap"
+        },
+        "constants": {
+          "type": "object",
+          "title": "Constants",
+          "description": "The numbers the face runs with and its oracle predicts from, by name in camel case (`attackMs`); each becomes OMX_<KERNEL>_<NAME> in generated/omx_<kernel>_decl.h.",
+          "additionalProperties": {
+            "type": "number"
+          }
         }
       }
     }

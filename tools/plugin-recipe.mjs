@@ -44,7 +44,7 @@ export { validate };
 
 // ---- facts of one plugin ------------------------------------------------------------------------
 
-/** The plugin directories: every plugins/<stem>/ holding <stem>.decl.json. */
+/** The plugin directories: every plugins/<stem>/ holding <stem>.decl.json, a test plugin's excepted. */
 export function pluginStems(root = ROOT) {
   const dir = join(root, 'plugins');
   // a base of variants is no plugin: its variants are (tools/variants.mjs)
@@ -57,6 +57,8 @@ export function pluginStems(root = ROOT) {
       } catch {
         return [n];
       }
+      // a test plugin ("role": "test", tools/test-plugins.mjs) ships nothing the recipe asks for
+      if (raw.role === 'test') return [];
       return raw.variants ? variantStems(raw) : [n];
     })
     .sort();
