@@ -38,7 +38,7 @@ const DISPLAY_OF_GRAPH = { 'eq-curve': 'eq_response', 'dynamics-curve': 'transfe
 const CLOSED_FORMS = { gate: ['transfer_curve'], dynamics: ['transfer_curve'], eq: ['eq_response'], drive: ['transfer_curve'] };
 
 /** A declared unit -> the unit a role is checked against. */
-const UNIT_OF = { '': 'none', dB: 'db', dBFS: 'dbfs', Hz: 'hz', ms: 'ms', s: 's', '%': 'pc', x: 'coef', oct: 'oct', cents: 'cent' };
+const UNIT_OF = { '': 'none', dB: 'db', dBFS: 'dbfs', Hz: 'hz', ms: 'ms', s: 's', '%': 'pc', x: 'coef', oct: 'oct', cents: 'cent', st: 'semitone12TET' };
 
 const T = ['ms', 's'], LVL = ['db', 'dbfs'], DB = ['db'], FREQ = ['hz', 'khz'], PLAIN = ['none', 'pc', 'coef'], RATIO = ['ratio', 'coef'], CHOICE = ['none'];
 const WET = { mix: ['pc', 'coef', 'none'], output: DB };
