@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # Copyright (C) 2026 Pau Aliagas <linuxnow@gmail.com>
 Name: omx-plugins
-Version: 0.8.0
+Version: 0.9.0
 Release: 1%{?dist}
 License: GPL-3.0-or-later
 Summary: The OpenMixer console's delay, drive, EQ, channel strip, keyed gate and effects, as plugins for your DAW
@@ -158,6 +158,17 @@ host that runs the plugins in its own process without loading .clap files.
 # END GENERATED lv2-files
 
 %changelog
+* Fri Oct 16 2026 Pau Aliagas <linuxnow@gmail.com> - 0.9.0-1
+- Every meter is coherent: the plugins publish their meters through a ring
+  of three copies, so a host never reads values from two different blocks.
+- omx comp reports its gain reduction and its input and output levels, and
+  the de-esser its input and output levels.
+- The plugins use the meters header omx-clap-core installs instead of a
+  copy of their own.
+- The first release that waits for plugin-qualify: every plugin is measured
+  for real-time safety and must be rated suitable before any package is
+  built, and the verdicts are kept with the release run.
+
 * Thu Oct 15 2026 Pau Aliagas <linuxnow@gmail.com> - 0.8.0-1
 - Library dependencies are a floor only, no ceiling: omx-dsp >= 0.18.0
   (the first release the plugins build and pass make test against; 0.17.0
