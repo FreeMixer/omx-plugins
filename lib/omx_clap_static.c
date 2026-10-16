@@ -44,6 +44,7 @@ const uint32_t OMX_CLAP_STATIC_COUNT = (uint32_t)(sizeof OMX_CLAP_STATIC_PLUGINS
  * count leaves it out. */
 const struct omx_clap_static_plugin OMX_CLAP_STATIC_TEST_PLUGINS[] = {
     /* BEGIN GENERATED clap-test-table: tools/gen.mjs, one row per test plugin */
+    {"org.openmixer.test-sine-voice", &omx_clap_entry_test_sine_voice},
     /* END GENERATED clap-test-table */
     {NULL, NULL},
 };

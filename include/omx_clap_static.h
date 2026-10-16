@@ -77,6 +77,7 @@ extern const clap_plugin_entry_t omx_clap_entry_transient;
 extern const clap_plugin_entry_t omx_clap_entry_tremolo;
 /* END GENERATED clap-entries */
 /* BEGIN GENERATED clap-test-entries: tools/gen.mjs, one line per test plugin */
+extern const clap_plugin_entry_t omx_clap_entry_test_sine_voice;
 /* END GENERATED clap-test-entries */
 
 #ifdef __cplusplus

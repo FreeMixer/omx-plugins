@@ -1,0 +1,26 @@
+{
+  "$comment": "THE declaration of omx-test-sine-voice, a test plugin: its identity and the constants its face runs with and its oracle predicts from. A voice per held note: sin(2 pi f k / rate) at the key's equal-tempered frequency (A4 = 440 Hz), times gain * velocity, times a linear attack of attackMs and a linear release of releaseMs; at most `voices` sound at once.",
+  "stem": "omx-test-sine-voice",
+  "kernel": "test_sine_voice",
+  "role": "test",
+  "name": "omx test-sine-voice",
+  "vendor": "openmixer",
+  "url": "https://github.com/FreeMixer/omx-plugins",
+  "version": "0.9.0",
+  "description": "A test instrument: one sine per held note at its equal-tempered frequency, at a level the velocity predicts, with a linear attack and release.",
+  "clap": {
+    "id": "org.openmixer.test-sine-voice",
+    "features": [
+      "instrument",
+      "synthesizer",
+      "stereo"
+    ]
+  },
+  "constants": {
+    "gain": 0.5,
+    "attackMs": 5,
+    "releaseMs": 50,
+    "voices": 16,
+    "a4Hz": 440
+  }
+}
