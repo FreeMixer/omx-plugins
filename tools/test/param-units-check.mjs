@@ -3,8 +3,9 @@
 /*
  * param-units-check.mjs — the units tools/param-contract.mjs writes are the ones
  * include/omx_param_contract.h serves: every declared unit's token names an OMX_CLAP_UNIT_<TOKEN> with
- * the same value, and the vendor block is the one openmixer's CONTRACT_UNITS ends with (dbfs, dbu,
- * ratio, lufs from 0x100, append-only). `make units`, part of `make test`.
+ * the same value (the token upper-cased is the enum name without its underscores: semitone12TET is
+ * OMX_CLAP_UNIT_SEMITONE_12TET), and the vendor block is the one openmixer's CONTRACT_UNITS ends with
+ * (dbfs, dbu, ratio, lufs from 0x100, append-only). `make units`, part of `make test`.
  */
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
@@ -14,7 +15,7 @@ import { UNITS } from '../param-contract.mjs';
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const header = readFileSync(process.env.OMX_PARAM_CONTRACT_H ?? join(root, 'include/omx_param_contract.h'), 'utf8');
 const body = header.match(/enum omx_clap_param_unit \{([\s\S]*?)\};/)?.[1] ?? '';
-const enumOf = new Map([...body.matchAll(/OMX_CLAP_UNIT_(\w+)\s*=\s*(0x[0-9a-fA-F]+|\d+)/g)].map((m) => [m[1], Number(m[2])]));
+const enumOf = new Map([...body.matchAll(/OMX_CLAP_UNIT_(\w+)\s*=\s*(0x[0-9a-fA-F]+|\d+)/g)].map((m) => [m[1].replaceAll('_', ''), Number(m[2])]));
 const VENDOR = ['dbfs', 'dbu', 'ratio', 'lufs'];
 
 const errors = [];

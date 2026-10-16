@@ -25,7 +25,7 @@ import { fileURLToPath } from 'node:url';
 import { choicesOf, hintsView, loadDecl, pluginDirs, scaleOf } from './gen.mjs';
 
 const ROOT = resolve(fileURLToPath(import.meta.url), '..', '..');
-const UNITS = { Hz: 'hz', dB: 'db', ms: 'ms', s: 's', '%': 'pc', oct: 'oct' };
+const UNITS = { Hz: 'hz', dB: 'db', ms: 'ms', s: 's', '%': 'pc', oct: 'oct', cents: 'cent', st: 'semitone12TET' };
 
 /** The hints of each port of a generated TTL, by symbol: `props`, `unit`, `points` ["v label"]. */
 export function ttlHints(text) {

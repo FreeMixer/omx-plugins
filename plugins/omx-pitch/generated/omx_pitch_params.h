@@ -23,9 +23,9 @@ enum {
 };
 
 static const omx_plugin_param OMX_PITCH_PARAMS[OMX_PITCH_PARAM_COUNT] = {
-  { "semitones", "Semitones", "", -12.0f, 12.0f, 0.0f, 0u },
-  { "cents", "Cents", "", -50.0f, 50.0f, 0.0f, 0u },
-  { "mix", "Mix", "", 0.0f, 100.0f, 100.0f, 0u },
+  { "semitones", "Semitones", "st", -12.0f, 12.0f, 0.0f, OMX_PLUGIN_PARAM_INTEGER },
+  { "cents", "Cents", "cents", -50.0f, 50.0f, 0.0f, OMX_PLUGIN_PARAM_INTEGER },
+  { "mix", "Mix", "%", 0.0f, 100.0f, 100.0f, 0u },
 };
 
 /* One macro per declared bound: what a C face reads where a constant is needed. */
@@ -49,25 +49,22 @@ static const omx_plugin_param OMX_PITCH_PARAMS[OMX_PITCH_PARAM_COUNT] = {
 #define OMX_PITCH_CLAP_FEATURES "audio-effect", "pitch-shifter", "stereo"
 #define OMX_PITCH_LV2_URI "urn:openmixer:pitch"
 /* org.openmixer.declaration/1: the declaration's plain description and the digest of its parameters. */
-#define OMX_PITCH_DECL_SOURCE "omx pitch: Semitones -12 to 12, Cents -50 to 50, Mix 0 to 100"
-#define OMX_PITCH_DECL_DIGEST "be51e9f044d94539dbfc82ff4669e9327b5e9199863a6e0b37c64ca700988836"
+#define OMX_PITCH_DECL_SOURCE "omx pitch: Semitones -12 to 12 st, Cents -50 to 50 cents, Mix 0 to 100 %"
+#define OMX_PITCH_DECL_DIGEST "1147fee9b0992b434223331f065cdfacf96577f00fb64751d0c42aca706448b6"
 
 /* org.openmixer.param-contract/1 (tools/param-contract.mjs): each parameter's unit, scale and step, in
  * id order; the host's bypass, the last id, is the face's. */
 #define OMX_PITCH_PARAM_CONTRACT_VERSION 1u
-#define OMX_PITCH_PARAM_CONTRACT_FINGERPRINT "ed5daf3af04017ecb41d0c0768b37ff624e5e60510bf46c5ace19aa3c68c62ea"
+#define OMX_PITCH_PARAM_CONTRACT_FINGERPRINT "5e31598957873137f074ab60e22da1d9b4b7ff26f2bb238e6eb450aca61311b3"
 static const struct omx_param_contract_row OMX_PITCH_PARAM_CONTRACT[OMX_PITCH_PARAM_COUNT] = {
-  { 0u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* semitones none */
-  { 0u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* cents none */
-  { 0u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* mix none */
+  { 22u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* semitones semitone12TET */
+  { 21u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* cents cent */
+  { 14u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* mix pc */
 };
 
 /* org.openmixer.panel-description/1 (tools/panel-description.mjs): the declaration's panel as the rows
- * include/omx_panel_description.h serves, parameter ids the declaration's. Family pitch.
- * Declared roles not published:
- *   shift (semitones): the shift role takes semitone12TET, cent, not no unit
- *   fine (cents): the fine role takes cent, not no unit */
-#define OMX_PITCH_PANEL_FINGERPRINT "306ffa35aed518cd21ab460772a0a8b69e4860f2ccf61f9594c067e324e8817f"
+ * include/omx_panel_description.h serves, parameter ids the declaration's. Family pitch. */
+#define OMX_PITCH_PANEL_FINGERPRINT "346afbde3998f87326a46a344219d7df8ad9f356771ec81454a5f88ac31093ce"
 static const struct omx_panel_section_row OMX_PITCH_PANEL_SECTIONS[] = {
   { "pitch", "fx.pitch.section.pitch", "Pitch" },
 };
@@ -77,6 +74,8 @@ static const struct omx_panel_control_row OMX_PITCH_PANEL_CONTROLS[] = {
   { 2u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.pitch.mix", "Mix", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
 };
 static const struct omx_panel_role_row OMX_PITCH_PANEL_ROLES[] = {
+  { "shift", 0u, 0u },
+  { "fine", 0u, 1u },
   { "mix", 0u, 2u },
 };
 /* clap.remote-controls/2: the pages of the page rule over the sections. */
@@ -88,7 +87,7 @@ static const struct omx_panel_rows OMX_PITCH_PANEL = {
   OMX_PITCH_PANEL_FINGERPRINT, OMX_CLAP_FAMILY_PITCH,
   OMX_PITCH_PANEL_SECTIONS, 1u,
   OMX_PITCH_PANEL_CONTROLS, 3u,
-  OMX_PITCH_PANEL_ROLES, 1u,
+  OMX_PITCH_PANEL_ROLES, 3u,
   NULL, 0u,
   NULL, 0u,
 };

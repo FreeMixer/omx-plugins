@@ -55,6 +55,8 @@
         lv2:default 0 ;
         lv2:minimum -12 ;
         lv2:maximum 12 ;
+        lv2:portProperty lv2:integer ;
+        units:unit units:semitone12TET ;
         pg:group <urn:openmixer:pitch#pitch>
     ] ,
     [
@@ -65,6 +67,8 @@
         lv2:default 0 ;
         lv2:minimum -50 ;
         lv2:maximum 50 ;
+        lv2:portProperty lv2:integer ;
+        units:unit units:cent ;
         pg:group <urn:openmixer:pitch#pitch>
     ] ,
     [
@@ -75,6 +79,7 @@
         lv2:default 100 ;
         lv2:minimum 0 ;
         lv2:maximum 100 ;
+        units:unit units:pc ;
         pg:group <urn:openmixer:pitch#pitch>
     ] ,
     [
