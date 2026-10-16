@@ -1044,7 +1044,13 @@ export const SHARED = {
     'lv2-files': (ds) => ds.map((d) => `%{_libdir}/lv2/${d.stem}.lv2/`),
   },
   '.github/workflows/ci.yml': {
-    plugins: (ds) => [`shorts="${ds.map((d) => d.stem.replace(/^omx-/, '')).join(' ')}"`, `kernels="${ds.map((d) => d.kernel).join(' ')}"`],
+    // the test plugins' ids too: static-table-host expects them after `--test`, and a hand-written
+    // list in CI hides a new test plugin
+    plugins: (ds, ts = []) => [
+      `shorts="${ds.map((d) => d.stem.replace(/^omx-/, '')).join(' ')}"`,
+      `kernels="${ds.map((d) => d.kernel).join(' ')}"`,
+      `tests="${ts.map((d) => d.clap.id).join(' ')}"`,
+    ],
   },  // libomxplugins: each face's entry, defined by omx_<kernel>_clap.c, listed by its CLAP id
   'include/omx_clap_static.h': {
     'clap-entries': (ds) => ds.map((d) => `extern const clap_plugin_entry_t omx_clap_entry_${d.kernel};`),
