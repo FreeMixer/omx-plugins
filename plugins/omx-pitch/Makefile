@@ -20,7 +20,7 @@
 NAME       := omx-pitch
 URI        := urn:openmixer:pitch
 CLAP_ID    := org.openmixer.pitch
-OMXDSP_MIN ?= 0.18.0
+OMXDSP_MIN ?= 0.22.0
 ROOT       := $(abspath ../..)
 GEN        := generated
 B          := build

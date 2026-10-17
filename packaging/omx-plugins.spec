@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # Copyright (C) 2026 Pau Aliagas <linuxnow@gmail.com>
 Name: omx-plugins
-Version: 0.9.0
+Version: 0.10.0
 Release: 1%{?dist}
 License: GPL-3.0-or-later
 Summary: The OpenMixer console's delay, drive, EQ, channel strip, keyed gate and effects, as plugins for your DAW
@@ -14,8 +14,8 @@ BuildRequires: make
 BuildRequires: pkgconf-pkg-config
 # The releases this tree builds against: a floor each (no ceiling), once here and
 # the same in debian/control (tools/deps-check.sh). The Makefile and tools/gen.mjs read them from here.
-BuildRequires: omx-dsp-devel >= 0.18.0
-BuildRequires: omx-contract-devel >= 2.12.0
+BuildRequires: omx-dsp-devel >= 0.22.0
+BuildRequires: omx-contract-devel >= 2.15.0
 BuildRequires: omx-clap-core-devel >= 0.6.0
 # the omx-contract command, first packaged in 2.15.0: the generators read the contract directory through it
 BuildRequires: omx-contract >= 2.15.0
@@ -73,7 +73,7 @@ console's own DSP, so they sound like the desk.
 
 %package devel
 Summary: Headers and static library of the OpenMixer plugins, for projects that build on them
-Requires: omx-dsp-devel >= 0.18.0
+Requires: omx-dsp-devel >= 0.22.0
 Requires: clap-devel
 
 %description devel
@@ -160,6 +160,23 @@ host that runs the plugins in its own process without loading .clap files.
 # END GENERATED lv2-files
 
 %changelog
+* Sat Oct 17 2026 Pau Aliagas <linuxnow@gmail.com> - 0.10.0-1
+- Every plugin over one kernel is described in omx-contract's own words: a
+  descriptor file per plugin carries its identity, its controls with their
+  symbols, names, groups, meanings and the definitions their travels are
+  read from, its ports and its latency, and the declaration keeps only what
+  the descriptor has no word for.
+- The built CLAP and LV2 faces are scanned as a host scans any plugin, and
+  must state exactly what the descriptor says.
+- The panel description is laid out from a descriptor, so any plugin, ours
+  or a scanned one, gets a panel; a LUFS or dBu level takes the threshold
+  and ceiling roles.
+- omx transient is no longer drawn under the compressor's family: a declared
+  family needs the meanings it stands on.
+- Builds against omx-contract >= 2.15.0 and omx-dsp >= 0.22.0, which ships
+  the kernels' definitions; the build reads them from the contract directory
+  through the omx-contract command.
+
 * Fri Oct 16 2026 Pau Aliagas <linuxnow@gmail.com> - 0.9.0-1
 - Every meter is coherent: the plugins publish their meters through a ring
   of three copies, so a host never reads values from two different blocks.

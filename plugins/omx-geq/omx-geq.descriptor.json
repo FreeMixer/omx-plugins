@@ -10,7 +10,7 @@
     "uri": "urn:openmixer:geq",
     "name": "omx geq",
     "vendor": "openmixer",
-    "version": "0.9.0",
+    "version": "0.10.0",
     "features": [
       "audio-effect"
     ]
@@ -37,7 +37,7 @@
       "source": {
         "from": {
           "link": "data/kernels/geq.json#GEQ_BAND_RANGE",
-          "at": "omx-contract@2.12.0"
+          "at": "omx-dsp@0.22.0"
         }
       }
     },
@@ -62,7 +62,7 @@
       "source": {
         "from": {
           "link": "data/kernels/geq.json#GEQ_BAND_RANGE",
-          "at": "omx-contract@2.12.0"
+          "at": "omx-dsp@0.22.0"
         }
       }
     },
@@ -87,7 +87,7 @@
       "source": {
         "from": {
           "link": "data/kernels/geq.json#GEQ_BAND_RANGE",
-          "at": "omx-contract@2.12.0"
+          "at": "omx-dsp@0.22.0"
         }
       }
     },
@@ -112,7 +112,7 @@
       "source": {
         "from": {
           "link": "data/kernels/geq.json#GEQ_BAND_RANGE",
-          "at": "omx-contract@2.12.0"
+          "at": "omx-dsp@0.22.0"
         }
       }
     },
@@ -137,7 +137,7 @@
       "source": {
         "from": {
           "link": "data/kernels/geq.json#GEQ_BAND_RANGE",
-          "at": "omx-contract@2.12.0"
+          "at": "omx-dsp@0.22.0"
         }
       }
     },
@@ -162,7 +162,7 @@
       "source": {
         "from": {
           "link": "data/kernels/geq.json#GEQ_BAND_RANGE",
-          "at": "omx-contract@2.12.0"
+          "at": "omx-dsp@0.22.0"
         }
       }
     },
@@ -187,7 +187,7 @@
       "source": {
         "from": {
           "link": "data/kernels/geq.json#GEQ_BAND_RANGE",
-          "at": "omx-contract@2.12.0"
+          "at": "omx-dsp@0.22.0"
         }
       }
     },
@@ -212,7 +212,7 @@
       "source": {
         "from": {
           "link": "data/kernels/geq.json#GEQ_BAND_RANGE",
-          "at": "omx-contract@2.12.0"
+          "at": "omx-dsp@0.22.0"
         }
       }
     },
@@ -237,7 +237,7 @@
       "source": {
         "from": {
           "link": "data/kernels/geq.json#GEQ_BAND_RANGE",
-          "at": "omx-contract@2.12.0"
+          "at": "omx-dsp@0.22.0"
         }
       }
     },
@@ -262,7 +262,7 @@
       "source": {
         "from": {
           "link": "data/kernels/geq.json#GEQ_BAND_RANGE",
-          "at": "omx-contract@2.12.0"
+          "at": "omx-dsp@0.22.0"
         }
       }
     },
@@ -287,7 +287,7 @@
       "source": {
         "from": {
           "link": "data/kernels/geq.json#GEQ_BAND_RANGE",
-          "at": "omx-contract@2.12.0"
+          "at": "omx-dsp@0.22.0"
         }
       }
     },
@@ -312,7 +312,7 @@
       "source": {
         "from": {
           "link": "data/kernels/geq.json#GEQ_BAND_RANGE",
-          "at": "omx-contract@2.12.0"
+          "at": "omx-dsp@0.22.0"
         }
       }
     },
@@ -337,7 +337,7 @@
       "source": {
         "from": {
           "link": "data/kernels/geq.json#GEQ_BAND_RANGE",
-          "at": "omx-contract@2.12.0"
+          "at": "omx-dsp@0.22.0"
         }
       }
     },
@@ -362,7 +362,7 @@
       "source": {
         "from": {
           "link": "data/kernels/geq.json#GEQ_BAND_RANGE",
-          "at": "omx-contract@2.12.0"
+          "at": "omx-dsp@0.22.0"
         }
       }
     },
@@ -387,7 +387,7 @@
       "source": {
         "from": {
           "link": "data/kernels/geq.json#GEQ_BAND_RANGE",
-          "at": "omx-contract@2.12.0"
+          "at": "omx-dsp@0.22.0"
         }
       }
     },
@@ -412,7 +412,7 @@
       "source": {
         "from": {
           "link": "data/kernels/geq.json#GEQ_BAND_RANGE",
-          "at": "omx-contract@2.12.0"
+          "at": "omx-dsp@0.22.0"
         }
       }
     },
@@ -437,7 +437,7 @@
       "source": {
         "from": {
           "link": "data/kernels/geq.json#GEQ_BAND_RANGE",
-          "at": "omx-contract@2.12.0"
+          "at": "omx-dsp@0.22.0"
         }
       }
     },
@@ -462,7 +462,7 @@
       "source": {
         "from": {
           "link": "data/kernels/geq.json#GEQ_BAND_RANGE",
-          "at": "omx-contract@2.12.0"
+          "at": "omx-dsp@0.22.0"
         }
       }
     },
@@ -487,7 +487,7 @@
       "source": {
         "from": {
           "link": "data/kernels/geq.json#GEQ_BAND_RANGE",
-          "at": "omx-contract@2.12.0"
+          "at": "omx-dsp@0.22.0"
         }
       }
     },
@@ -512,7 +512,7 @@
       "source": {
         "from": {
           "link": "data/kernels/geq.json#GEQ_BAND_RANGE",
-          "at": "omx-contract@2.12.0"
+          "at": "omx-dsp@0.22.0"
         }
       }
     },
@@ -537,7 +537,7 @@
       "source": {
         "from": {
           "link": "data/kernels/geq.json#GEQ_BAND_RANGE",
-          "at": "omx-contract@2.12.0"
+          "at": "omx-dsp@0.22.0"
         }
       }
     },
@@ -562,7 +562,7 @@
       "source": {
         "from": {
           "link": "data/kernels/geq.json#GEQ_BAND_RANGE",
-          "at": "omx-contract@2.12.0"
+          "at": "omx-dsp@0.22.0"
         }
       }
     },
@@ -587,7 +587,7 @@
       "source": {
         "from": {
           "link": "data/kernels/geq.json#GEQ_BAND_RANGE",
-          "at": "omx-contract@2.12.0"
+          "at": "omx-dsp@0.22.0"
         }
       }
     },
@@ -612,7 +612,7 @@
       "source": {
         "from": {
           "link": "data/kernels/geq.json#GEQ_BAND_RANGE",
-          "at": "omx-contract@2.12.0"
+          "at": "omx-dsp@0.22.0"
         }
       }
     },
@@ -637,7 +637,7 @@
       "source": {
         "from": {
           "link": "data/kernels/geq.json#GEQ_BAND_RANGE",
-          "at": "omx-contract@2.12.0"
+          "at": "omx-dsp@0.22.0"
         }
       }
     },
@@ -662,7 +662,7 @@
       "source": {
         "from": {
           "link": "data/kernels/geq.json#GEQ_BAND_RANGE",
-          "at": "omx-contract@2.12.0"
+          "at": "omx-dsp@0.22.0"
         }
       }
     },
@@ -687,7 +687,7 @@
       "source": {
         "from": {
           "link": "data/kernels/geq.json#GEQ_BAND_RANGE",
-          "at": "omx-contract@2.12.0"
+          "at": "omx-dsp@0.22.0"
         }
       }
     },
@@ -712,7 +712,7 @@
       "source": {
         "from": {
           "link": "data/kernels/geq.json#GEQ_BAND_RANGE",
-          "at": "omx-contract@2.12.0"
+          "at": "omx-dsp@0.22.0"
         }
       }
     },
@@ -737,7 +737,7 @@
       "source": {
         "from": {
           "link": "data/kernels/geq.json#GEQ_BAND_RANGE",
-          "at": "omx-contract@2.12.0"
+          "at": "omx-dsp@0.22.0"
         }
       }
     },
@@ -762,7 +762,7 @@
       "source": {
         "from": {
           "link": "data/kernels/geq.json#GEQ_BAND_RANGE",
-          "at": "omx-contract@2.12.0"
+          "at": "omx-dsp@0.22.0"
         }
       }
     },
@@ -787,7 +787,7 @@
       "source": {
         "from": {
           "link": "data/kernels/geq.json#GEQ_BAND_RANGE",
-          "at": "omx-contract@2.12.0"
+          "at": "omx-dsp@0.22.0"
         }
       }
     }
