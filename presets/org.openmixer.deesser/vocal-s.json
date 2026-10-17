@@ -1,0 +1,53 @@
+{
+  "format": "org.openmixer.preset/1",
+  "plugin": "org.openmixer.deesser",
+  "id": "vocal-s",
+  "name": "Vocal S",
+  "carries": "params",
+  "params": [
+    {
+      "symbol": "deessFreq",
+      "unit": "Hz",
+      "value": 6000
+    },
+    {
+      "symbol": "deessWidth",
+      "unit": "oct",
+      "value": 1
+    },
+    {
+      "symbol": "deessThreshold",
+      "unit": "dB",
+      "value": -30
+    },
+    {
+      "symbol": "deessRatio",
+      "unit": "",
+      "value": 4
+    },
+    {
+      "symbol": "deessRange",
+      "unit": "dB",
+      "value": -12
+    },
+    {
+      "symbol": "deessAttack",
+      "unit": "ms",
+      "value": 1
+    },
+    {
+      "symbol": "deessRelease",
+      "unit": "ms",
+      "value": 60
+    },
+    {
+      "symbol": "deessMode",
+      "unit": "",
+      "value": 0,
+      "label": "Split"
+    }
+  ],
+  "created": "2026-10-17T00:00:00Z",
+  "modified": "2026-10-17T00:00:00Z",
+  "copyOf": null
+}

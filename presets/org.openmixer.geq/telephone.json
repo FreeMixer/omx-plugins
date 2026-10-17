@@ -1,0 +1,167 @@
+{
+  "format": "org.openmixer.preset/1",
+  "plugin": "org.openmixer.geq",
+  "id": "telephone",
+  "name": "Telephone",
+  "carries": "params",
+  "params": [
+    {
+      "symbol": "band01",
+      "unit": "dB",
+      "value": -15
+    },
+    {
+      "symbol": "band02",
+      "unit": "dB",
+      "value": -15
+    },
+    {
+      "symbol": "band03",
+      "unit": "dB",
+      "value": -15
+    },
+    {
+      "symbol": "band04",
+      "unit": "dB",
+      "value": -15
+    },
+    {
+      "symbol": "band05",
+      "unit": "dB",
+      "value": -15
+    },
+    {
+      "symbol": "band06",
+      "unit": "dB",
+      "value": -15
+    },
+    {
+      "symbol": "band07",
+      "unit": "dB",
+      "value": -15
+    },
+    {
+      "symbol": "band08",
+      "unit": "dB",
+      "value": -15
+    },
+    {
+      "symbol": "band09",
+      "unit": "dB",
+      "value": -12
+    },
+    {
+      "symbol": "band10",
+      "unit": "dB",
+      "value": -9
+    },
+    {
+      "symbol": "band11",
+      "unit": "dB",
+      "value": -6
+    },
+    {
+      "symbol": "band12",
+      "unit": "dB",
+      "value": -3
+    },
+    {
+      "symbol": "band13",
+      "unit": "dB",
+      "value": 0
+    },
+    {
+      "symbol": "band14",
+      "unit": "dB",
+      "value": 0
+    },
+    {
+      "symbol": "band15",
+      "unit": "dB",
+      "value": 0
+    },
+    {
+      "symbol": "band16",
+      "unit": "dB",
+      "value": 0
+    },
+    {
+      "symbol": "band17",
+      "unit": "dB",
+      "value": 0
+    },
+    {
+      "symbol": "band18",
+      "unit": "dB",
+      "value": 3
+    },
+    {
+      "symbol": "band19",
+      "unit": "dB",
+      "value": 4
+    },
+    {
+      "symbol": "band20",
+      "unit": "dB",
+      "value": 4
+    },
+    {
+      "symbol": "band21",
+      "unit": "dB",
+      "value": 3
+    },
+    {
+      "symbol": "band22",
+      "unit": "dB",
+      "value": 0
+    },
+    {
+      "symbol": "band23",
+      "unit": "dB",
+      "value": 0
+    },
+    {
+      "symbol": "band24",
+      "unit": "dB",
+      "value": -6
+    },
+    {
+      "symbol": "band25",
+      "unit": "dB",
+      "value": -9
+    },
+    {
+      "symbol": "band26",
+      "unit": "dB",
+      "value": -12
+    },
+    {
+      "symbol": "band27",
+      "unit": "dB",
+      "value": -15
+    },
+    {
+      "symbol": "band28",
+      "unit": "dB",
+      "value": -15
+    },
+    {
+      "symbol": "band29",
+      "unit": "dB",
+      "value": -15
+    },
+    {
+      "symbol": "band30",
+      "unit": "dB",
+      "value": -15
+    },
+    {
+      "symbol": "band31",
+      "unit": "dB",
+      "value": -15
+    }
+  ],
+  "created": "2026-10-17T00:00:00Z",
+  "modified": "2026-10-17T00:00:00Z",
+  "copyOf": null
+}

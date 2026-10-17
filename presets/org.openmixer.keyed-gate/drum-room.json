@@ -1,0 +1,67 @@
+{
+  "format": "org.openmixer.preset/1",
+  "plugin": "org.openmixer.keyed-gate",
+  "id": "drum-room",
+  "name": "Drum Room",
+  "carries": "params",
+  "params": [
+    {
+      "symbol": "threshold",
+      "unit": "dB",
+      "value": -42
+    },
+    {
+      "symbol": "ratio",
+      "unit": "",
+      "value": 2
+    },
+    {
+      "symbol": "range",
+      "unit": "dB",
+      "value": -12
+    },
+    {
+      "symbol": "attack",
+      "unit": "ms",
+      "value": 10
+    },
+    {
+      "symbol": "release",
+      "unit": "ms",
+      "value": 600
+    },
+    {
+      "symbol": "knee_start",
+      "unit": "dB",
+      "value": -46
+    },
+    {
+      "symbol": "knee_end",
+      "unit": "dB",
+      "value": -36
+    },
+    {
+      "symbol": "hold",
+      "unit": "ms",
+      "value": 300
+    },
+    {
+      "symbol": "hysteresis",
+      "unit": "dB",
+      "value": 4
+    },
+    {
+      "symbol": "key_hp",
+      "unit": "Hz",
+      "value": 0
+    },
+    {
+      "symbol": "key_lp",
+      "unit": "Hz",
+      "value": 0
+    }
+  ],
+  "created": "2026-10-17T00:00:00Z",
+  "modified": "2026-10-17T00:00:00Z",
+  "copyOf": null
+}

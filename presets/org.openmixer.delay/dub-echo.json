@@ -1,0 +1,32 @@
+{
+  "format": "org.openmixer.preset/1",
+  "plugin": "org.openmixer.delay",
+  "id": "dub-echo",
+  "name": "Dub Echo",
+  "carries": "params",
+  "params": [
+    {
+      "symbol": "fxDelayTime",
+      "unit": "ms",
+      "value": 500
+    },
+    {
+      "symbol": "fxDelayFeedback",
+      "unit": "",
+      "value": 0.7
+    },
+    {
+      "symbol": "tone",
+      "unit": "",
+      "value": 0.15
+    },
+    {
+      "symbol": "pingpong",
+      "unit": "",
+      "value": 1
+    }
+  ],
+  "created": "2026-10-17T00:00:00Z",
+  "modified": "2026-10-17T00:00:00Z",
+  "copyOf": null
+}

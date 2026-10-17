@@ -1,0 +1,65 @@
+{
+  "format": "org.openmixer.preset/1",
+  "plugin": "org.openmixer.comp",
+  "id": "limiter-ish",
+  "name": "Limiter",
+  "carries": "params",
+  "params": [
+    {
+      "symbol": "thresholdDb",
+      "unit": "dB",
+      "value": -3
+    },
+    {
+      "symbol": "ratio",
+      "unit": "",
+      "value": 20
+    },
+    {
+      "symbol": "kneeDb",
+      "unit": "dB",
+      "value": 6
+    },
+    {
+      "symbol": "attackMs",
+      "unit": "ms",
+      "value": 0.1
+    },
+    {
+      "symbol": "releaseMs",
+      "unit": "ms",
+      "value": 60
+    },
+    {
+      "symbol": "makeupDb",
+      "unit": "dB",
+      "value": 0
+    },
+    {
+      "symbol": "mixPct",
+      "unit": "%",
+      "value": 100
+    },
+    {
+      "symbol": "kind",
+      "unit": "",
+      "value": 1,
+      "label": "Limiter"
+    },
+    {
+      "symbol": "detectorOversampling",
+      "unit": "",
+      "value": 0,
+      "label": "Auto"
+    },
+    {
+      "symbol": "detectorTopology",
+      "unit": "",
+      "value": 0,
+      "label": "Feedforward"
+    }
+  ],
+  "created": "2026-10-17T00:00:00Z",
+  "modified": "2026-10-17T00:00:00Z",
+  "copyOf": null
+}

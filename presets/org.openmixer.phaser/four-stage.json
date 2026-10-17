@@ -1,0 +1,42 @@
+{
+  "format": "org.openmixer.preset/1",
+  "plugin": "org.openmixer.phaser",
+  "id": "four-stage",
+  "name": "Four Stage",
+  "carries": "params",
+  "params": [
+    {
+      "symbol": "rateHz",
+      "unit": "Hz",
+      "value": 0.5
+    },
+    {
+      "symbol": "baseHz",
+      "unit": "Hz",
+      "value": 200
+    },
+    {
+      "symbol": "depthOct",
+      "unit": "oct",
+      "value": 4
+    },
+    {
+      "symbol": "stages",
+      "unit": "",
+      "value": 4
+    },
+    {
+      "symbol": "feedback",
+      "unit": "",
+      "value": 0.2
+    },
+    {
+      "symbol": "mix",
+      "unit": "%",
+      "value": 50
+    }
+  ],
+  "created": "2026-10-17T00:00:00Z",
+  "modified": "2026-10-17T00:00:00Z",
+  "copyOf": null
+}

@@ -1,0 +1,32 @@
+{
+  "format": "org.openmixer.preset/1",
+  "plugin": "org.openmixer.delay",
+  "id": "ping-pong",
+  "name": "Ping-pong",
+  "carries": "params",
+  "params": [
+    {
+      "symbol": "fxDelayTime",
+      "unit": "ms",
+      "value": 375
+    },
+    {
+      "symbol": "fxDelayFeedback",
+      "unit": "",
+      "value": 0.35
+    },
+    {
+      "symbol": "tone",
+      "unit": "",
+      "value": 0.5
+    },
+    {
+      "symbol": "pingpong",
+      "unit": "",
+      "value": 1
+    }
+  ],
+  "created": "2026-10-17T00:00:00Z",
+  "modified": "2026-10-17T00:00:00Z",
+  "copyOf": null
+}
