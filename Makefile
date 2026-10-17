@@ -78,7 +78,7 @@ LIB_FLAGS  := -fPIC -fvisibility=hidden -DOMX_CLAP_STATIC -Iinclude
 # read only by the targets that build the archive, so `make version` and the rest need no omx-dsp
 lib_cflags = $(call dep_check,omxdsp,$(OMXDSP_MIN))$(call dep_check,omx-contract,$(CONTRACT_MIN))$(shell $(PKG_CONFIG) --cflags omxdsp omx-clap-core clap)
 
-.PHONY: test-role all lib lib-test test units panel-layout descriptor-view face-descriptor hints look manual install install-devel clean version recipe-test completeness selftest private-refs strip-crosscheck meters-abi meter-ring
+.PHONY: test-role all lib lib-test test test-faces units panel-layout descriptor-view face-descriptor hints look manual install install-devel clean version recipe-test completeness selftest private-refs strip-crosscheck meters-abi meter-ring
 all: lib
 	@for p in $(PLUGINS); do $(MAKE) -C $$p all || exit 1; done
 lib: $(LIB) $(LIB_PC)
@@ -90,6 +90,13 @@ test: lib units panel-layout descriptor-view
 	@$(MAKE) -s hints
 	@$(MAKE) -s look
 	@$(MAKE) -s manual
+	@$(MAKE) -s meters-abi
+	@$(MAKE) -s test-role
+# what runs with no omx-contract command (debian/rules: no .deb ships the command yet): the built faces against their
+# committed descriptors, the static table and the ABI checks; nothing here reads the contract directory
+test-faces: all lib
+	@$(MAKE) -s face-descriptor
+	@$(MAKE) -s lib-test
 	@$(MAKE) -s meters-abi
 	@$(MAKE) -s test-role
 units:
