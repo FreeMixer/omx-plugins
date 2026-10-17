@@ -113,12 +113,12 @@ check('a modulation family needs no meaning yet (a rotor has no word for its spe
 const lv2 = panelLayout(fixture('scanned-lv2-compressor'));
 check('scanned LV2 compressor: family dynamics from its meanings', lv2.family, 'dynamics');
 check('scanned LV2 compressor: sections from its groups, the ungrouped under controls', lv2.sections.map((s) => [s.key, s.label, s.labelKey]), [['detector', 'Detector', null], ['controls', 'Controls', null]]);
-check('scanned LV2 compressor: the widgets, each control by its name', lv2.controls.map((c) => [c.symbol, c.standard.widget, c.widget]), [
-  ['Threshold', 'knob', 'knob'], ['Ratio', 'knob', 'knob'], ['Release (beats)', 'knob', 'knob'], ['Makeup', 'knob', 'knob'], ['Enable', 'switch', 'switch'], ['Gain reduction', 'meter', 'auto'],
+check('scanned LV2 compressor: the widgets, each control by its port symbol', lv2.controls.map((c) => [c.symbol, c.standard.widget, c.widget]), [
+  ['threshold', 'knob', 'knob'], ['ratio', 'knob', 'knob'], ['release_beats', 'knob', 'knob'], ['makeup', 'knob', 'knob'], ['enable', 'switch', 'switch'], ['gr', 'meter', 'auto'],
 ]);
-check('scanned LV2 compressor: the threshold role, by meaning', rolesOf(lv2), [['threshold', 0, 'Threshold', 'dB']]);
-check('scanned LV2 compressor: its ratio states no unit (LV2 has none for a ratio), so the role is named, not published', lv2.unpublished, [{ role: 'ratio', symbol: 'Ratio', why: 'the ratio role takes ratio, coef, not no unit' }]);
-check('scanned LV2 compressor: the gain-reduction meter states no measurement', lv2.controls.find((c) => c.symbol === 'Gain reduction').standard, { widget: 'meter', measurement: null });
+check('scanned LV2 compressor: the threshold role, by meaning', rolesOf(lv2), [['threshold', 0, 'threshold', 'dB']]);
+check('scanned LV2 compressor: its ratio states no unit (LV2 has none for a ratio), so the role is named, not published', lv2.unpublished, [{ role: 'ratio', symbol: 'ratio', why: 'the ratio role takes ratio, coef, not no unit' }]);
+check('scanned LV2 compressor: the gain-reduction meter states no measurement', lv2.controls.find((c) => c.symbol === 'gr').standard, { widget: 'meter', measurement: null });
 check('scanned LV2 compressor: the ports, side-chain among them', lv2.ports, {
   inputs: [{ id: 'main_in', name: 'Input', role: 'main', channels: 2 }, { id: 'sidechain_in', name: 'Side-chain', role: 'sidechain', channels: 1 }],
   outputs: [{ id: 'main_out', name: 'Output', role: 'main', channels: 2 }], sidechain: true, notes: false,

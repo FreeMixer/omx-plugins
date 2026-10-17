@@ -40,6 +40,7 @@ import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 
 import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { faceBinding } from './instance-face.mjs';
+import { descriptorFile, descriptorText, viewOf } from './descriptor.mjs';
 import { DISPLAY_KINDS, DISPLAY_SOURCES, FAMILIES, PLACEMENTS, WIDGETS, pagesOf, panelDescription, panelFingerprint } from './panel-description.mjs';
 import { CONTRACT_VERSION, contractFingerprint, contractOf } from './param-contract.mjs';
 import { SPEC_FILE, controlOf, eqDefaultBands, findName, kernelControls, locateContract, packagingRange, paramKernel, resolveParam } from './omx-contract.mjs';
@@ -57,8 +58,13 @@ export function loadDecl(dir) {
   const stem = basename(resolve(dir));
   let file = join(dir, `${stem}.decl.json`);
   let d;
-  if (existsSync(file) || !baseOf(dir)) d = JSON.parse(readFileSync(file, 'utf8'));
-  else {
+  if (existsSync(file) || !baseOf(dir)) {
+    d = JSON.parse(readFileSync(file, 'utf8'));
+    // a plugin described in omx-contract's words: its declaration is the descriptor's view, the
+    // extras of <stem>.decl.json folded in (tools/descriptor.mjs)
+    const described = join(dir, descriptorFile(stem));
+    if (existsSync(described)) d = { ...viewOf(JSON.parse(readFileSync(described, 'utf8')), d, file), described: true };
+  } else {
     // a variant's folder holds generated files only: its declaration is its base's, expanded
     const base = baseOf(dir);
     file = base.file;
@@ -304,7 +310,7 @@ function resolveParams(file, d) {
     const typed = TRAVEL_FIELDS.filter((k) => k in p && !(isSet && k === 'unit'));
     if (typed.length) throw new Error(`${file}: '${p.symbol}' is by reference and retypes ${typed.join(', ')}; omx-contract holds them`);
     const t = resolveParam(dir, kernel, p);
-    const out = { ...p, min: t.min, max: t.max, def: t.def, unit: t.unit };
+    const out = { ...p, min: t.min, max: t.max, def: t.def, unit: t.unit, from: t.from };
     // a control whose travel another choice widens (eq's q, notchQ while the band is a notch): the
     // port spans every travel it may take, and the face clamps by the choice
     const c = generatedBinding(d) ? controlOf(dir, kernel, localParam(p)) : undefined;
@@ -998,6 +1004,7 @@ export function generate(d) {
     [`${lv2}/${d.stem}.ttl`]: emitPluginTtl(d),
     ...(d.binding === 'instance' ? generateInstance(d) : {}),
     ...(d.binding === 'chain' ? generateChain(d) : {}),
+    ...(d.described ? { [descriptorFile(d.stem)]: descriptorText(d) } : {}),
   };
 }
 

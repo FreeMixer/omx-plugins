@@ -155,6 +155,9 @@ const keyOfText = (s) => {
   return /^[a-z]/.test(k) ? k : `s_${k}`;
 };
 
+/** The key a layout names a control by: its symbol, else an LV2 control's id (its port symbol), else its name. */
+export const keyOf = (c) => c.symbol ?? (typeof c.id === 'string' ? c.id : c.name);
+
 /** The ports a layout carries: the audio inputs and outputs with their channels, the side-chain, the notes in. */
 function portsOf(ports = []) {
   const audio = (direction) => ports.filter((p) => p.kind === 'audio' && p.direction === direction).map((p) => ({ id: p.id, name: p.name, role: p.role ?? 'main', channels: p.channels ?? null }));
@@ -179,9 +182,9 @@ export function panelDescription(d) {
  */
 export function panelLayout(descriptor, { panel, ns, where = `descriptor ${descriptor.plugin?.id}`, choiceUnits = {}, byKind = {} } = {}) {
   const all = descriptor.controls;
-  const byName = new Map(all.map((c, i) => [c.name, i]));
-  const control = (sym) => all[byName.get(sym)];
-  const unitOf = (c) => c.travel?.unit ?? choiceUnits[c.name] ?? '';
+  const byKey = new Map(all.map((c, i) => [keyOf(c), i]));
+  const control = (sym) => all[byKey.get(sym)];
+  const unitOf = (c) => c.travel?.unit ?? choiceUnits[keyOf(c)] ?? '';
   const key = (k, what) => {
     if (!KEY.test(k) || k.length > KEY_MAX) throw new Error(`${where}: ${what} '${k}' is not a key of ${PANEL_ID} ([a-z][a-z0-9_]*, dotted, at most ${KEY_MAX} bytes)`);
     return k;
@@ -209,7 +212,7 @@ export function panelLayout(descriptor, { panel, ns, where = `descriptor ${descr
       const path = c.group?.length ? c.group : ['Controls'];
       const k = path.map(keyOfText).join('.');
       if (!groups.has(k)) groups.set(k, { key: k, label: path.join(' / '), controls: [] });
-      groups.get(k).controls.push(c.name);
+      groups.get(k).controls.push(keyOf(c));
     }
     listed = [...groups.values()];
   }
@@ -259,8 +262,8 @@ export function panelLayout(descriptor, { panel, ns, where = `descriptor ${descr
       if (named.length !== 1) continue;
       const [role] = named;
       const n = played.get(role) ?? 0;
-      if (n && !INDEXED_ROLES.includes(role)) unpublished.push({ role, symbol: c.name, why: `the ${role} role is played by ${roles.find((r) => r.role === role)?.symbol ?? 'another control'}` });
-      else bind(role, n, c.name);
+      if (n && !INDEXED_ROLES.includes(role)) unpublished.push({ role, symbol: keyOf(c), why: `the ${role} role is played by ${roles.find((r) => r.role === role)?.symbol ?? 'another control'}` });
+      else bind(role, n, keyOf(c));
       played.set(role, n + 1);
     }
   }
@@ -274,13 +277,13 @@ export function panelLayout(descriptor, { panel, ns, where = `descriptor ${descr
 
   // the contract's per-kind defaults: each channel kind the placement it is, the value inside the travel
   const defaults = all.flatMap((c, i) =>
-    Object.entries(byKind[c.name] ?? {}).map(([kind, value]) => {
+    Object.entries(byKind[keyOf(c)] ?? {}).map(([kind, value]) => {
       const placement = PLACEMENT_OF_KIND[kind];
-      if (!placement) throw new Error(`${where}: '${c.name}' comes up differently on a ${kind} channel, which has no placement of ${PANEL_ID}; add it to PLACEMENT_OF_KIND`);
+      if (!placement) throw new Error(`${where}: '${keyOf(c)}' comes up differently on a ${kind} channel, which has no placement of ${PANEL_ID}; add it to PLACEMENT_OF_KIND`);
       const [min, max] = c.travel ? [c.travel.min, c.travel.max] : c.values ? [Math.min(...c.values), Math.max(...c.values)] : [0, 1];
       const integer = c.kind !== 'travel' || c.travel.step === 1;
-      if (!(value >= min && value <= max) || (integer && !Number.isInteger(value))) throw new Error(`${where}: '${c.name}' on ${kind} comes up at ${value}, outside its travel`);
-      return { placement, symbol: c.name, param: i, value };
+      if (!(value >= min && value <= max) || (integer && !Number.isInteger(value))) throw new Error(`${where}: '${keyOf(c)}' on ${kind} comes up at ${value}, outside its travel`);
+      return { placement, symbol: keyOf(c), param: i, value };
     }),
   );
 
