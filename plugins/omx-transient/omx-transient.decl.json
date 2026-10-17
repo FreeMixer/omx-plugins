@@ -91,11 +91,8 @@
     }
   },
   "panel": {
-    "family": "dynamics",
-    "roles": {
-      "attack": "attackTimeMs",
-      "output": "outputDb"
-    },
+    "family": "none",
+    "roles": {},
     "sections": [
       {
         "key": "transient",

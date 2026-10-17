@@ -192,7 +192,12 @@ export function panelLayout(descriptor, { panel, ns, where = `descriptor ${descr
     return s;
   };
 
-  const { family } = familyOf(all, panel ? panel.family : undefined, descriptor.plugin?.features);
+  const { family, needs } = familyOf(all, panel ? panel.family : undefined, descriptor.plugin?.features);
+  // a declared family stands on its controls' meanings: a transient designer is no compressor
+  if (needs) {
+    const have = [...new Set(all.map((c) => c.meaning).filter(Boolean))];
+    throw new Error(`${where}: the ${family} family needs a control meaning ${needs.join(' or ')}, and its meanings are ${have.join(', ') || 'none'}: its family is none`);
+  }
 
   // the sections, each with the controls it lists: the declared panel's, else one per group path
   let listed;

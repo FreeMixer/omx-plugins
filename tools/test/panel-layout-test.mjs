@@ -12,7 +12,8 @@
  *      published with their unit, an `unknown` unit is a plain number and takes no role (#145);
  *   3. roles from meanings: each meaning plays its family's role, an indexed role takes every band, a
  *      second control of a plain role is named, not published;
- *   4. the family from meanings: inference in order, an instrument none;
+ *   4. the family from meanings: inference in order, an instrument none, a declared family its
+ *      meanings do not back refused (a transient designer is no compressor, #138);
  *   5. sections from groups, hidden controls left out, the ports carried;
  *   6. omx-contract's example descriptors (tools/test/fixtures/descriptors/, copied from omx-contract's
  *      test/fixtures/descriptors/ at the descriptor words' commit) each give a sensible panel;
@@ -97,6 +98,16 @@ check('arm: a range beside them makes a gate (tried first)', panelLayout(gate).f
 const plain = clone(comp);
 delete plain.controls[1].meaning;
 check('arm: no ratio, no family', [panelLayout(plain).family, panelLayout(plain).roles], ['none', []]);
+
+const declared = (family, roles) => ({ family, roles, sections: [{ key: 'main', label: 'Main', controls: ['c0', 'c1', 'c2'] }] });
+const shaper = descriptor([travel('dB'), travel('dB'), { kind: 'travel', meaning: 'attack', travel: { min: 1, max: 100, unit: 'ms', default: 10, scale: 'log' } }]);
+check('a declared family its meanings do not back is refused, naming what it needs (#138)', (() => {
+  try { panelLayout(shaper, { panel: declared('dynamics', { attack: 'c2' }), where: 'shaper' }); return 'laid out'; } catch (e) { return e.message; }
+})(), 'shaper: the dynamics family needs a control meaning threshold or ratio, and its meanings are attack: its family is none');
+const backed = clone(shaper);
+backed.controls[0].meaning = 'threshold';
+check('arm: a threshold backs it', panelLayout(backed, { panel: declared('dynamics', { threshold: 'c0', attack: 'c2' }) }).family, 'dynamics');
+check('a modulation family needs no meaning yet (a rotor has no word for its speeds)', panelLayout(shaper, { panel: declared('modulation', {}) }).family, 'modulation');
 
 // 5 and 6. omx-contract's example descriptors
 const lv2 = panelLayout(fixture('scanned-lv2-compressor'));
