@@ -5,7 +5,8 @@
  * presets-check.mjs — every factory preset file parses, belongs to a shipped plugin, names only that
  * plugin's parameters, and keeps each value inside the travel its generated header declares (whole
  * steps where the parameter is stepped, a choice's label where it has one). Every shipped plugin has
- * at least one preset. The two presets measured on the console are pinned to their figures.
+ * at least one preset. The two presets measured on the console are pinned to their values here, and to their
+ * measured figures through the DSP by tools/test/preset-figures.mjs (`make presets-figures`).
  * `make presets`, part of `make test`; `--self-test` breaks a copy of a preset five ways and wants five reds.
  */
 import { readFileSync } from 'node:fs';
