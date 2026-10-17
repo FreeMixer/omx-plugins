@@ -342,7 +342,7 @@ export function digestOf(params) {
 }
 
 /** The LV2 unit of a declared unit, where the units extension names one. */
-const LV2_UNITS = { Hz: 'hz', dB: 'db', ms: 'ms', s: 's', '%': 'pc', oct: 'oct', cents: 'cent', st: 'semitone12TET' };
+export const LV2_UNITS = { Hz: 'hz', dB: 'db', ms: 'ms', s: 's', '%': 'pc', oct: 'oct', cents: 'cent', st: 'semitone12TET' };
 
 /** How a host draws a travel: as declared, else a frequency logarithmic (the console's every
  * frequency control is), else linear. */
