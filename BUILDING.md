@@ -47,6 +47,11 @@ entries by CLAP id that `include/omx_clap_static.h` declares. A host links it th
 `tools/test/static-table-host.c` from the staged `omxplugins.pc` alone and runs it: every plugin's
 CLAP id is in the table once, and each one is created through its factory, activated and run.
 
+Before the plugins, `make test` runs `make units` (the param-contract units are the header's) and
+`make panel-layout` (`tools/test/panel-layout-test.mjs`: the panel rules of
+[docs/panel-layout.md](docs/panel-layout.md) by value, each with an arm that breaks it, over
+omx-contract's example descriptors and our own plugins).
+
 `make test` for a plugin runs, in order:
 
 1. **freshness**: every generated file matches what its declaration generates today;
@@ -97,8 +102,10 @@ plugins/<name>/
 include/                  shared C shapes (no DSP): omx_panel_description.h and omx_param_contract.h,
                           the openmixer extensions and their rows; omx_clap_static.h, libomxplugins' table
 lib/                      omx_clap_static.c (the table's rows are generated) and omxplugins.pc.in
-tools/                    gen.mjs (header + TTL), panel-description.mjs and param-contract.mjs (the
-                          extensions' rows), modgui-gen.mjs (MOD GUI), look.mjs (its look.json, from
+tools/                    gen.mjs (header + TTL), descriptor.mjs (a declaration as its plugin
+                          descriptor), panel-description.mjs (a panel laid out from any descriptor,
+                          docs/panel-layout.md) and param-contract.mjs (the extensions' rows),
+                          modgui-gen.mjs (MOD GUI), look.mjs (its look.json, from
                           look/tokens.css, the omx look's tokens), the test helpers,
                           omx-new-plugin.mjs (the wizard), plugin-recipe.mjs (completeness)
 recipes/                  plugin.recipe.json, the templates tools/gen.mjs writes from
