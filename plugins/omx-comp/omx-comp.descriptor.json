@@ -10,7 +10,7 @@
     "uri": "urn:openmixer:comp",
     "name": "omx comp",
     "vendor": "openmixer",
-    "version": "0.9.0",
+    "version": "0.10.0",
     "features": [
       "audio-effect"
     ]
@@ -37,7 +37,7 @@
       "source": {
         "from": {
           "link": "data/kernels/comp.json#COMP_LIMITS.thresholdDb",
-          "at": "omx-contract@2.12.0"
+          "at": "omx-dsp@0.22.0"
         }
       }
     },
@@ -62,7 +62,7 @@
       "source": {
         "from": {
           "link": "data/kernels/comp.json#COMP_LIMITS.ratio",
-          "at": "omx-contract@2.12.0"
+          "at": "omx-dsp@0.22.0"
         }
       }
     },
@@ -87,7 +87,7 @@
       "source": {
         "from": {
           "link": "data/kernels/comp.json#COMP_LIMITS.kneeDb",
-          "at": "omx-contract@2.12.0"
+          "at": "omx-dsp@0.22.0"
         }
       }
     },
@@ -112,7 +112,7 @@
       "source": {
         "from": {
           "link": "data/kernels/comp.json#COMP_LIMITS.attackMs",
-          "at": "omx-contract@2.12.0"
+          "at": "omx-dsp@0.22.0"
         }
       }
     },
@@ -137,7 +137,7 @@
       "source": {
         "from": {
           "link": "data/kernels/comp.json#COMP_LIMITS.releaseMs",
-          "at": "omx-contract@2.12.0"
+          "at": "omx-dsp@0.22.0"
         }
       }
     },
@@ -162,7 +162,7 @@
       "source": {
         "from": {
           "link": "data/kernels/comp.json#COMP_LIMITS.makeupDb",
-          "at": "omx-contract@2.12.0"
+          "at": "omx-dsp@0.22.0"
         }
       }
     },
@@ -187,7 +187,7 @@
       "source": {
         "from": {
           "link": "data/kernels/comp.json#COMP_LIMITS.mixPct",
-          "at": "omx-contract@2.12.0"
+          "at": "omx-dsp@0.22.0"
         }
       }
     },
@@ -216,7 +216,7 @@
       "source": {
         "from": {
           "link": "data/kernels/comp.json#COMP_KINDS",
-          "at": "omx-contract@2.12.0"
+          "at": "omx-dsp@0.22.0"
         }
       }
     },
@@ -248,7 +248,7 @@
       "source": {
         "from": {
           "link": "data/kernels/comp.json#DETECTOR_OVERSAMPLINGS",
-          "at": "omx-contract@2.12.0"
+          "at": "omx-dsp@0.22.0"
         }
       }
     },
@@ -277,7 +277,7 @@
       "source": {
         "from": {
           "link": "data/kernels/comp.json#DETECTOR_TOPOLOGY",
-          "at": "omx-contract@2.12.0"
+          "at": "omx-dsp@0.22.0"
         }
       }
     }

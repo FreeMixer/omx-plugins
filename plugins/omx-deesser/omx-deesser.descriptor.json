@@ -10,7 +10,7 @@
     "uri": "urn:openmixer:deesser",
     "name": "omx deesser",
     "vendor": "openmixer",
-    "version": "0.9.0",
+    "version": "0.10.0",
     "features": [
       "audio-effect"
     ]
@@ -37,7 +37,7 @@
       "source": {
         "from": {
           "link": "data/kernels/deesser.json#DEESS_FREQ_RANGE",
-          "at": "omx-contract@2.12.0"
+          "at": "omx-dsp@0.22.0"
         }
       }
     },
@@ -62,7 +62,7 @@
       "source": {
         "from": {
           "link": "data/kernels/deesser.json#DEESS_WIDTH_RANGE",
-          "at": "omx-contract@2.12.0"
+          "at": "omx-dsp@0.22.0"
         }
       }
     },
@@ -87,7 +87,7 @@
       "source": {
         "from": {
           "link": "data/kernels/deesser.json#DEESS_THRESHOLD_RANGE",
-          "at": "omx-contract@2.12.0"
+          "at": "omx-dsp@0.22.0"
         }
       }
     },
@@ -112,7 +112,7 @@
       "source": {
         "from": {
           "link": "data/kernels/deesser.json#DEESS_RATIO_RANGE",
-          "at": "omx-contract@2.12.0"
+          "at": "omx-dsp@0.22.0"
         }
       }
     },
@@ -137,7 +137,7 @@
       "source": {
         "from": {
           "link": "data/kernels/deesser.json#DEESS_RANGE_RANGE",
-          "at": "omx-contract@2.12.0"
+          "at": "omx-dsp@0.22.0"
         }
       }
     },
@@ -162,7 +162,7 @@
       "source": {
         "from": {
           "link": "data/kernels/deesser.json#DEESS_ATTACK_RANGE",
-          "at": "omx-contract@2.12.0"
+          "at": "omx-dsp@0.22.0"
         }
       }
     },
@@ -187,7 +187,7 @@
       "source": {
         "from": {
           "link": "data/kernels/deesser.json#DEESS_RELEASE_RANGE",
-          "at": "omx-contract@2.12.0"
+          "at": "omx-dsp@0.22.0"
         }
       }
     },
@@ -216,7 +216,7 @@
       "source": {
         "from": {
           "link": "data/kernels/deesser.json#DEESS_MODES",
-          "at": "omx-contract@2.12.0"
+          "at": "omx-dsp@0.22.0"
         }
       }
     }

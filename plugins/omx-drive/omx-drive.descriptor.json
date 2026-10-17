@@ -10,7 +10,7 @@
     "uri": "urn:openmixer:drive",
     "name": "omx drive",
     "vendor": "openmixer",
-    "version": "0.9.0",
+    "version": "0.10.0",
     "features": [
       "audio-effect"
     ]
@@ -37,7 +37,7 @@
       "source": {
         "from": {
           "link": "data/kernels/drive.json#DRIVE_AMOUNT_RANGE",
-          "at": "omx-contract@2.12.0"
+          "at": "omx-dsp@0.22.0"
         }
       }
     },
@@ -62,7 +62,7 @@
       "source": {
         "from": {
           "link": "data/kernels/drive.json#DRIVE_CHARACTER_RANGE",
-          "at": "omx-contract@2.12.0"
+          "at": "omx-dsp@0.22.0"
         }
       }
     },
@@ -86,7 +86,7 @@
       "source": {
         "from": {
           "link": "data/kernels/drive.json#DRIVE_BAND_FREQ_RANGE",
-          "at": "omx-contract@2.12.0"
+          "at": "omx-dsp@0.22.0"
         }
       }
     },
@@ -111,7 +111,7 @@
       "source": {
         "from": {
           "link": "data/kernels/drive.json#DRIVE_MIX_RANGE",
-          "at": "omx-contract@2.12.0"
+          "at": "omx-dsp@0.22.0"
         }
       }
     },
@@ -136,7 +136,7 @@
       "source": {
         "from": {
           "link": "data/kernels/drive.json#DRIVE_TRIM_RANGE",
-          "at": "omx-contract@2.12.0"
+          "at": "omx-dsp@0.22.0"
         }
       }
     },
@@ -171,7 +171,7 @@
       "source": {
         "from": {
           "link": "data/kernels/drive.json#DRIVE_CURVES",
-          "at": "omx-contract@2.12.0"
+          "at": "omx-dsp@0.22.0"
         }
       }
     },
@@ -206,7 +206,7 @@
       "source": {
         "from": {
           "link": "data/kernels/drive.json#DRIVE_BANDS",
-          "at": "omx-contract@2.12.0"
+          "at": "omx-dsp@0.22.0"
         }
       }
     },
@@ -223,7 +223,7 @@
       "source": {
         "from": {
           "link": "data/kernels/drive.json#DRIVE_AUTO_GAINS",
-          "at": "omx-contract@2.12.0"
+          "at": "omx-dsp@0.22.0"
         }
       }
     },
@@ -240,7 +240,7 @@
       "source": {
         "from": {
           "link": "data/kernels/drive.json#DRIVE_STEREO_LINKS",
-          "at": "omx-contract@2.12.0"
+          "at": "omx-dsp@0.22.0"
         }
       }
     },
@@ -272,7 +272,7 @@
       "source": {
         "from": {
           "link": "data/kernels/drive.json#DRIVE_HF_ROLLOFFS",
-          "at": "omx-contract@2.12.0"
+          "at": "omx-dsp@0.22.0"
         }
       }
     },
@@ -304,7 +304,7 @@
       "source": {
         "from": {
           "link": "data/kernels/drive.json#DRIVE_OVERSAMPLES",
-          "at": "omx-contract@2.12.0"
+          "at": "omx-dsp@0.22.0"
         }
       }
     }

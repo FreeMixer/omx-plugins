@@ -10,7 +10,7 @@
     "uri": "urn:openmixer:chorus",
     "name": "omx chorus",
     "vendor": "openmixer",
-    "version": "0.9.0",
+    "version": "0.10.0",
     "features": [
       "audio-effect"
     ]
@@ -37,7 +37,7 @@
       "source": {
         "from": {
           "link": "data/kernels/chorus.json#CHORUS_SPREAD_RANGE",
-          "at": "omx-contract@2.12.0"
+          "at": "omx-dsp@0.22.0"
         }
       }
     },
@@ -62,7 +62,7 @@
       "source": {
         "from": {
           "link": "data/kernels/chorus.json#CHORUS_RATE_RANGE",
-          "at": "omx-contract@2.12.0"
+          "at": "omx-dsp@0.22.0"
         }
       }
     },
@@ -87,7 +87,7 @@
       "source": {
         "from": {
           "link": "data/kernels/chorus.json#CHORUS_DEPTH_RANGE",
-          "at": "omx-contract@2.12.0"
+          "at": "omx-dsp@0.22.0"
         }
       }
     },
@@ -111,7 +111,7 @@
       "source": {
         "from": {
           "link": "data/kernels/chorus.json#CHORUS_VOICES_RANGE",
-          "at": "omx-contract@2.12.0"
+          "at": "omx-dsp@0.22.0"
         }
       }
     },
@@ -136,7 +136,7 @@
       "source": {
         "from": {
           "link": "data/kernels/chorus.json#CHORUS_MIX_RANGE",
-          "at": "omx-contract@2.12.0"
+          "at": "omx-dsp@0.22.0"
         }
       }
     }
