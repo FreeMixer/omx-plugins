@@ -6,7 +6,8 @@
  * its <stem>.descriptor.json and the extras of its <stem>.decl.json make the declaration tools/gen.mjs
  * resolves. Held by value over every described plugin, each rule with an arm that breaks it on a copy:
  *
- *   1. the descriptor is fresh: it is what its declaration renders;
+ *   1. the descriptor is fresh: it is what its declaration renders, and it holds to the descriptor words of
+ *      the installed omx-contract's schema (`$defs.descriptor`; a release before them is named);
  *   2. its links are the references: a travel is read from the link, never from the number it states (a
  *      number edited by hand is stale), and a link moved reads the other travel;
  *   3. the descriptor and the extras never both say one thing: an extras file naming the plugin is
@@ -17,8 +18,10 @@
  */
 import { cpSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { descriptorFile, descriptorText } from '../descriptor.mjs';
+import { DESCRIPTOR_SCHEMA_FLOOR, descriptorFile, descriptorText } from '../descriptor.mjs';
 import { ROOT, loadDecl, pluginDirs } from '../gen.mjs';
+import { locateContract } from '../omx-contract.mjs';
+import { validate } from '../schema-validate.mjs';
 
 let bad = 0, n = 0;
 function check(what, got, want) {
@@ -42,6 +45,20 @@ for (const dir of described) {
   const stem = dir.split('/').pop();
   check(`${stem}: the descriptor is what its declaration renders`, descriptorText(loadDecl(dir)) === readFileSync(join(dir, descriptorFile(stem)), 'utf8'), true);
 }
+
+// the descriptor words: the installed omx-contract's schema
+const where = locateContract();
+const schemaFile = where.dir && join(where.dir, 'omx-contract.schema.json');
+const schema = schemaFile && existsSync(schemaFile) ? JSON.parse(readFileSync(schemaFile, 'utf8')) : undefined;
+if (schema?.$defs?.descriptor) {
+  for (const dir of described) {
+    const stem = dir.split('/').pop();
+    check(`${stem}: the descriptor holds to omx-contract's descriptor words`, validate(schema, schema.$defs.descriptor, JSON.parse(readFileSync(join(dir, descriptorFile(stem)), 'utf8'))), []);
+  }
+  const broken = JSON.parse(readFileSync(join(described[0], descriptorFile(described[0].split('/').pop())), 'utf8'));
+  broken.controls[0].ids = ['a'];
+  check('arm: a travel carrying choice ids breaks the descriptor words', validate(schema, schema.$defs.descriptor, broken).length > 0, true);
+} else console.log(`NOTE descriptor-view: ${where.at ?? 'omx-contract'} predates the descriptor words (${DESCRIPTOR_SCHEMA_FLOOR}); its schema holds no descriptor`);
 
 // the arms, on a copy of the first described plugin
 const dir = described[0], stem = dir.split('/').pop();
