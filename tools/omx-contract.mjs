@@ -222,8 +222,8 @@ function sheetValue(dir, kernel, path, symbol) {
 const eqCache = new Map();
 /**
  * The default bands of an EQ with `count` bands, by omx-contract's own rule: its C render,
- * omx_eq_default_centres() and omx_eq_default_type() of the installed <omxcontract/omx_contract_limits.h>
- * (from 2.15.0 on, of omx-dsp's <omxdsp/omxdsp_definitions.h>)
+ * omx_eq_default_centres() and omx_eq_default_type() of omx-dsp's <omxdsp/omxdsp_definitions.h> (omx-contract's
+ * own until 2.15.0)
  * (the package installs no JavaScript), run through a small probe built once into build/; gain and Q
  * are EQ_BAND_DEFAULTS of the render at `dir`. `[{ type, freqHz, gainDb, q }]`.
  */
@@ -251,10 +251,7 @@ function eqProbe(root) {
   const src = `${out}.c`;
   writeFileSync(src, `#include <stdio.h>
 #include <stdlib.h>
-#include <omxcontract/omx_contract_limits.h>
-#if __has_include(<omxdsp/omxdsp_definitions.h>)
 #include <omxdsp/omxdsp_definitions.h>
-#endif
 int main(int argc, char **argv) {
   static float hz[1024];
   unsigned n = argc > 1 ? (unsigned)strtoul(argv[1], NULL, 10) : 0;
@@ -265,15 +262,10 @@ int main(int argc, char **argv) {
 `);
   let cflags;
   try {
-    cflags = execFileSync(PKG_CONFIG(), ['--cflags', 'omx-contract'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim().split(/\s+/).filter(Boolean);
-    // from omx-contract 2.15.0 on, the EQ rule is omx-dsp's (<omxdsp/omxdsp_definitions.h>)
-    try {
-      cflags.push(...execFileSync(PKG_CONFIG(), ['--cflags', 'omxdsp'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim().split(/\s+/).filter(Boolean));
-    } catch {
-      // an omx-dsp before its definitions: the rule is omx-contract's own
-    }
+    // the rule is omx-dsp's definitions header, which reads omx-contract's own
+    cflags = execFileSync(PKG_CONFIG(), ['--cflags', 'omxdsp', 'omx-contract'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim().split(/\s+/).filter(Boolean);
   } catch (e) {
-    throw new Error(`the EQ default rule is omx-contract's C render, and \`${PKG_CONFIG()} --cflags omx-contract\` failed: ${String(e.stderr ?? e.message).trim()}`);
+    throw new Error(`the EQ default rule is omx-dsp's C render, and \`${PKG_CONFIG()} --cflags omxdsp omx-contract\` failed: ${String(e.stderr ?? e.message).trim()}`);
   }
   execFileSync(process.env.CC || 'cc', ['-O1', '-o', out, src, ...cflags, '-lm'], { stdio: ['ignore', 'ignore', 'inherit'] });
   probe = out;
