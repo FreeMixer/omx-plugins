@@ -9,6 +9,7 @@
 | omx-dsp ≥ 0.18.0 (`pkg-config omxdsp`) | `omx-dsp-devel` (channel) | `libomxdsp-dev` (channel) | the DSP: every kernel lives there, none here |
 | omx-contract ≥ 2.12.0 (`pkg-config omx-contract`) | `omx-contract-devel` (channel) | `libomx-contract-dev` (channel) | the declarations: every parameter's travel, read from its installed `omx-contract.json`, and the EQ default rule (its C render; the generators build a small probe, so they need the C compiler too) |
 | openmixer CLAP extensions | `omx-clap-core-devel` (channel) | `libomx-clap-core-dev` (channel) | `<omx-clap-host/omx_clap_ext.h>` |
+| the omx-contract command ≥ 2.15.0 | `omx-contract` (channel) | not packaged yet | the generators: the union of the contract directory, read through `omx-contract render --installed` |
 | CLAP 1.2 headers | `clap-devel` | `clap-headers` (built from the pinned CLAP, see FreeMixer/.github) | the CLAP face |
 | LV2 headers | `lv2-devel` | `lv2-dev` | the LV2 face |
 | C compiler, make, pkg-config | `gcc make pkgconf-pkg-config` | `build-essential pkgconf` | |
@@ -21,7 +22,8 @@ From omx-contract 2.15.0 on, the kernels' definitions ship with omx-dsp into omx
 directory (`pkg-config --variable=contractdir omx-contract`), and the installed `omx-contract.json` holds
 only the shared facts. The generators then read the union of that directory through the omx-contract CLI,
 `omx-contract render --target json --installed`, rendered once into `build/contract-union/`: the CLI is
-`$OMX_CONTRACT_CLI` (its `bin/omx-contract.mjs`) or `omx-contract` on `PATH`. A descriptor's links name the
+`$OMX_CONTRACT_CLI` (its `bin/omx-contract.mjs`) or `omx-contract` on `PATH`, which the omx-contract
+RPM installs. A descriptor's links name the
 package that owns each definition, from the directory's manifests.
 
 The channel is FreeMixer's package repository: `https://freemixer.github.io/rpm/freemixer.repo` for
