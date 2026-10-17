@@ -1,0 +1,27 @@
+{
+  "format": "org.openmixer.preset/1",
+  "plugin": "org.openmixer.pitch",
+  "id": "octave-up",
+  "name": "Octave Up",
+  "carries": "params",
+  "params": [
+    {
+      "symbol": "semitones",
+      "unit": "st",
+      "value": 12
+    },
+    {
+      "symbol": "cents",
+      "unit": "cents",
+      "value": 0
+    },
+    {
+      "symbol": "mix",
+      "unit": "%",
+      "value": 50
+    }
+  ],
+  "created": "2026-10-17T00:00:00Z",
+  "modified": "2026-10-17T00:00:00Z",
+  "copyOf": null
+}

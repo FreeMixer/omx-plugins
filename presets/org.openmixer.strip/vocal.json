@@ -1,0 +1,275 @@
+{
+  "format": "org.openmixer.preset/1",
+  "plugin": "org.openmixer.strip",
+  "id": "vocal",
+  "name": "Vocal",
+  "carries": "params",
+  "params": [
+    {
+      "symbol": "trimOn",
+      "unit": "",
+      "value": 1
+    },
+    {
+      "symbol": "trimDb",
+      "unit": "dB",
+      "value": 0
+    },
+    {
+      "symbol": "filterOn",
+      "unit": "",
+      "value": 1
+    },
+    {
+      "symbol": "hpfOn",
+      "unit": "",
+      "value": 1
+    },
+    {
+      "symbol": "hpfFreq",
+      "unit": "Hz",
+      "value": 90
+    },
+    {
+      "symbol": "hpfSlope",
+      "unit": "dB/oct",
+      "value": 12,
+      "label": "12 dB/oct"
+    },
+    {
+      "symbol": "lpfOn",
+      "unit": "",
+      "value": 0
+    },
+    {
+      "symbol": "lpfFreq",
+      "unit": "Hz",
+      "value": 18000
+    },
+    {
+      "symbol": "lpfSlope",
+      "unit": "dB/oct",
+      "value": 12,
+      "label": "12 dB/oct"
+    },
+    {
+      "symbol": "gateOn",
+      "unit": "",
+      "value": 0
+    },
+    {
+      "symbol": "gateThreshold",
+      "unit": "dB",
+      "value": -40
+    },
+    {
+      "symbol": "gateRatio",
+      "unit": "",
+      "value": 16
+    },
+    {
+      "symbol": "gateRange",
+      "unit": "dB",
+      "value": -90
+    },
+    {
+      "symbol": "gateAttack",
+      "unit": "ms",
+      "value": 1
+    },
+    {
+      "symbol": "gateRelease",
+      "unit": "ms",
+      "value": 100
+    },
+    {
+      "symbol": "gateKneeStart",
+      "unit": "dB",
+      "value": -43
+    },
+    {
+      "symbol": "gateKneeEnd",
+      "unit": "dB",
+      "value": -37
+    },
+    {
+      "symbol": "gateHold",
+      "unit": "ms",
+      "value": 10
+    },
+    {
+      "symbol": "gateHysteresis",
+      "unit": "dB",
+      "value": 3
+    },
+    {
+      "symbol": "eqOn",
+      "unit": "",
+      "value": 1
+    },
+    {
+      "symbol": "eq1Type",
+      "unit": "",
+      "value": 0,
+      "label": "Bell"
+    },
+    {
+      "symbol": "eq1Freq",
+      "unit": "Hz",
+      "value": 300
+    },
+    {
+      "symbol": "eq1Gain",
+      "unit": "dB",
+      "value": -2.5
+    },
+    {
+      "symbol": "eq1Q",
+      "unit": "",
+      "value": 1.2
+    },
+    {
+      "symbol": "eq1On",
+      "unit": "",
+      "value": 1
+    },
+    {
+      "symbol": "eq2Type",
+      "unit": "",
+      "value": 0,
+      "label": "Bell"
+    },
+    {
+      "symbol": "eq2Freq",
+      "unit": "Hz",
+      "value": 3500
+    },
+    {
+      "symbol": "eq2Gain",
+      "unit": "dB",
+      "value": 2
+    },
+    {
+      "symbol": "eq2Q",
+      "unit": "",
+      "value": 1
+    },
+    {
+      "symbol": "eq2On",
+      "unit": "",
+      "value": 1
+    },
+    {
+      "symbol": "eq3Type",
+      "unit": "",
+      "value": 2,
+      "label": "High Shelf"
+    },
+    {
+      "symbol": "eq3Freq",
+      "unit": "Hz",
+      "value": 10000
+    },
+    {
+      "symbol": "eq3Gain",
+      "unit": "dB",
+      "value": 2
+    },
+    {
+      "symbol": "eq3Q",
+      "unit": "",
+      "value": 0.7
+    },
+    {
+      "symbol": "eq3On",
+      "unit": "",
+      "value": 1
+    },
+    {
+      "symbol": "eq4Type",
+      "unit": "",
+      "value": 2,
+      "label": "High Shelf"
+    },
+    {
+      "symbol": "eq4Freq",
+      "unit": "Hz",
+      "value": 8000
+    },
+    {
+      "symbol": "eq4Gain",
+      "unit": "dB",
+      "value": 0
+    },
+    {
+      "symbol": "eq4Q",
+      "unit": "",
+      "value": 1
+    },
+    {
+      "symbol": "eq4On",
+      "unit": "",
+      "value": 0
+    },
+    {
+      "symbol": "compOn",
+      "unit": "",
+      "value": 1
+    },
+    {
+      "symbol": "compThreshold",
+      "unit": "dB",
+      "value": -18
+    },
+    {
+      "symbol": "compRatio",
+      "unit": "",
+      "value": 3
+    },
+    {
+      "symbol": "compKnee",
+      "unit": "dB",
+      "value": 6
+    },
+    {
+      "symbol": "compAttack",
+      "unit": "ms",
+      "value": 5
+    },
+    {
+      "symbol": "compRelease",
+      "unit": "ms",
+      "value": 120
+    },
+    {
+      "symbol": "compMakeup",
+      "unit": "dB",
+      "value": 4
+    },
+    {
+      "symbol": "compKind",
+      "unit": "",
+      "value": 0,
+      "label": "Compressor"
+    },
+    {
+      "symbol": "compMix",
+      "unit": "%",
+      "value": 100
+    },
+    {
+      "symbol": "compDetectorOversampling",
+      "unit": "",
+      "value": 0,
+      "label": "Auto"
+    },
+    {
+      "symbol": "order",
+      "unit": "",
+      "value": 0
+    }
+  ],
+  "created": "2026-10-17T00:00:00Z",
+  "modified": "2026-10-17T00:00:00Z",
+  "copyOf": null
+}

@@ -1,0 +1,67 @@
+{
+  "format": "org.openmixer.preset/1",
+  "plugin": "org.openmixer.keyed-gate",
+  "id": "hi-hat-spill",
+  "name": "Hi-hat Spill",
+  "carries": "params",
+  "params": [
+    {
+      "symbol": "threshold",
+      "unit": "dB",
+      "value": -45
+    },
+    {
+      "symbol": "ratio",
+      "unit": "",
+      "value": 3
+    },
+    {
+      "symbol": "range",
+      "unit": "dB",
+      "value": -20
+    },
+    {
+      "symbol": "attack",
+      "unit": "ms",
+      "value": 2
+    },
+    {
+      "symbol": "release",
+      "unit": "ms",
+      "value": 150
+    },
+    {
+      "symbol": "knee_start",
+      "unit": "dB",
+      "value": -48
+    },
+    {
+      "symbol": "knee_end",
+      "unit": "dB",
+      "value": -40
+    },
+    {
+      "symbol": "hold",
+      "unit": "ms",
+      "value": 5
+    },
+    {
+      "symbol": "hysteresis",
+      "unit": "dB",
+      "value": 3
+    },
+    {
+      "symbol": "key_hp",
+      "unit": "Hz",
+      "value": 0
+    },
+    {
+      "symbol": "key_lp",
+      "unit": "Hz",
+      "value": 0
+    }
+  ],
+  "created": "2026-10-17T00:00:00Z",
+  "modified": "2026-10-17T00:00:00Z",
+  "copyOf": null
+}

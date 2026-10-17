@@ -1,0 +1,42 @@
+{
+  "format": "org.openmixer.preset/1",
+  "plugin": "org.openmixer.phaser",
+  "id": "gentle-shimmer",
+  "name": "Gentle Shimmer",
+  "carries": "params",
+  "params": [
+    {
+      "symbol": "rateHz",
+      "unit": "Hz",
+      "value": 1.2
+    },
+    {
+      "symbol": "baseHz",
+      "unit": "Hz",
+      "value": 400
+    },
+    {
+      "symbol": "depthOct",
+      "unit": "oct",
+      "value": 2
+    },
+    {
+      "symbol": "stages",
+      "unit": "",
+      "value": 4
+    },
+    {
+      "symbol": "feedback",
+      "unit": "",
+      "value": 0
+    },
+    {
+      "symbol": "mix",
+      "unit": "%",
+      "value": 35
+    }
+  ],
+  "created": "2026-10-17T00:00:00Z",
+  "modified": "2026-10-17T00:00:00Z",
+  "copyOf": null
+}
