@@ -50,7 +50,15 @@ CLAP id is in the table once, and each one is created through its factory, activ
 Before the plugins, `make test` runs `make units` (the param-contract units are the header's) and
 `make panel-layout` (`tools/test/panel-layout-test.mjs`: the panel rules of
 [docs/panel-layout.md](docs/panel-layout.md) by value, each with an arm that breaks it, over
-omx-contract's example descriptors and our own plugins).
+omx-contract's example descriptors and our own plugins) and `make descriptor-view`
+(`tools/test/descriptor-view-test.mjs`: each described plugin's descriptor fresh and in omx-contract's
+words, and the declaration its view).
+
+After the plugins, `make face-descriptor` scans every described plugin's built CLAP and LV2 faces as a
+host scans anyone's plugin (`tools/face-scan.c`) and holds what they state to the plugin's authored
+descriptor (`tools/face-descriptor-check.mjs`); a difference is `contract.descriptor.face-differs`, and
+its self-test breaks a copy of a descriptor and of a built `.ttl` and wants both red
+([docs/declaration-as-descriptor.md](docs/declaration-as-descriptor.md)).
 
 `make test` for a plugin runs, in order:
 
