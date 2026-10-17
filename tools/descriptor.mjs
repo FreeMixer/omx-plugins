@@ -14,7 +14,7 @@
  * tools/panel-description.mjs lays a panel out from a descriptor of any origin; for ours it reads this one.
  */
 import { choicesOf, scaleOf } from './gen.mjs';
-import { packagingRange } from './omx-contract.mjs';
+import { installedContractDir, locateContract, ownersOf, packagingRange } from './omx-contract.mjs';
 
 /** The descriptor file of a plugin folder. */
 export const descriptorFile = (stem) => `${stem}.descriptor.json`;
@@ -77,16 +77,21 @@ export function descriptorOf(d) {
     const m = meaningOfRole(role);
     if (m) for (const sym of [syms].flat()) if (!meaningOf.has(sym)) meaningOf.set(sym, m);
   }
-  let at;
-  const atOf = () => {
-    if (at === undefined) {
-      try {
-        at = `omx-contract@${packagingRange('omx-contract-devel', d.tree).floor}`;
-      } catch {
-        at = null;
-      }
+  // the release a link is read from: its owner (the contract directory's manifests, from omx-contract 2.15.0
+  // on; omx-contract itself before) at the floor the packaging builds against, else the installed version
+  let owners;
+  const atOf = (rel) => {
+    if (owners === undefined) {
+      // the installed directory's manifests, also when OMX_CONTRACT_DIR stands in for its render (a
+      // perturbation's moved copy names the same files)
+      owners = ownersOf(locateContract(d.tree).contractdir ?? installedContractDir());
     }
-    return at;
+    const owner = owners.get(rel.split('#')[0]) ?? { package: 'omx-contract' };
+    try {
+      return `${owner.package}@${packagingRange(`${owner.package}-devel`, d.tree).floor}`;
+    } catch {
+      return owner.version ? `${owner.package}@${owner.version}` : null;
+    }
   };
   const face = `plugins/${d.stem}/omx_${d.kernel}_clap.c#clap_entry`;
   const choiceUnits = {}, byKind = {};
@@ -104,7 +109,7 @@ export function descriptorOf(d) {
     if (groupOf.has(p.symbol)) c.group = groupOf.get(p.symbol);
     if (meaningOf.has(p.symbol)) c.meaning = meaningOf.get(p.symbol);
     c.automatable = true;
-    c.source = p.from ? { from: atOf() ? { link: p.from, at: atOf() } : p.from } : { impl: face };
+    c.source = p.from ? { from: atOf(p.from) ? { link: p.from, at: atOf(p.from) } : p.from } : { impl: face };
     if (p.byKind) byKind[p.symbol] = p.byKind;
     return c;
   });

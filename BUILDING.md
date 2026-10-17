@@ -17,6 +17,13 @@
 | sord | `sord` | `sordi` | tests: `sord_validate` on the LV2 bundle |
 | omx-clap-host | `omx-clap-host` (channel) | `omx-clap-host` (channel) | tests: `omx-clap-scan` (the check says SKIP when it is absent; CI and the package builds install it) |
 
+From omx-contract 2.15.0 on, the kernels' definitions ship with omx-dsp into omx-contract's contract
+directory (`pkg-config --variable=contractdir omx-contract`), and the installed `omx-contract.json` holds
+only the shared facts. The generators then read the union of that directory through the omx-contract CLI,
+`omx-contract render --target json --installed`, rendered once into `build/contract-union/`: the CLI is
+`$OMX_CONTRACT_CLI` (its `bin/omx-contract.mjs`) or `omx-contract` on `PATH`. A descriptor's links name the
+package that owns each definition, from the directory's manifests.
+
 The channel is FreeMixer's package repository: `https://freemixer.github.io/rpm/freemixer.repo` for
 dnf, `https://freemixer.github.io/deb/debian/<release> ./` (key `https://freemixer.github.io/deb/freemixer.asc`)
 for apt. With it configured, `dnf builddep packaging/omx-plugins.spec` or `apt-get build-dep ./` installs
