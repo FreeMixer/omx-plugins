@@ -78,11 +78,11 @@ LIB_FLAGS  := -fPIC -fvisibility=hidden -DOMX_CLAP_STATIC -Iinclude
 # read only by the targets that build the archive, so `make version` and the rest need no omx-dsp
 lib_cflags = $(call dep_check,omxdsp,$(OMXDSP_MIN))$(call dep_check,omx-contract,$(CONTRACT_MIN))$(shell $(PKG_CONFIG) --cflags omxdsp omx-clap-core clap)
 
-.PHONY: test-role all lib lib-test test units hints look manual install install-devel clean version recipe-test completeness selftest private-refs strip-crosscheck meters-abi meter-ring
+.PHONY: test-role all lib lib-test test units panel-layout hints look manual install install-devel clean version recipe-test completeness selftest private-refs strip-crosscheck meters-abi meter-ring
 all: lib
 	@for p in $(PLUGINS); do $(MAKE) -C $$p all || exit 1; done
 lib: $(LIB) $(LIB_PC)
-test: lib units
+test: lib units panel-layout
 	@if [ -z "$(PLUGINS)" ]; then echo "no plugins yet"; fi
 	@for p in $(PLUGINS); do $(MAKE) -C $$p test || exit 1; done
 	@$(MAKE) -s lib-test
@@ -93,6 +93,8 @@ test: lib units
 	@$(MAKE) -s test-role
 units:
 	node tools/test/param-units-check.mjs
+panel-layout:
+	node tools/test/panel-layout-test.mjs
 hints:
 	node tools/gen.mjs --check
 	node tools/gen.mjs
