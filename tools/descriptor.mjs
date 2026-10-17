@@ -82,9 +82,11 @@ export function descriptorOf(d) {
   let owners;
   const atOf = (rel) => {
     if (owners === undefined) {
-      // the installed directory's manifests, also when OMX_CONTRACT_DIR stands in for its render (a
-      // perturbation's moved copy names the same files)
-      owners = ownersOf(locateContract(d.tree).contractdir ?? installedContractDir());
+      // the owners beside the render read (owners.json: a union render and every copy of it carry
+      // one, OMX_CONTRACT_DIR's included), else the installed contract directory's manifests
+      const where = locateContract(d.tree);
+      owners = ownersOf(where.contractdir ?? where.dir);
+      if (!owners.size) owners = ownersOf(installedContractDir());
     }
     const owner = owners.get(rel.split('#')[0]) ?? { package: 'omx-contract' };
     try {

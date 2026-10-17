@@ -7,7 +7,8 @@
  * resolves. Held by value over every described plugin, each rule with an arm that breaks it on a copy:
  *
  *   1. the descriptor is fresh: it is what its declaration renders, and it holds to the descriptor words of
- *      the installed omx-contract's schema (`$defs.descriptor`; a release before them is named);
+ *      the installed omx-contract's schema (`$defs.descriptor`; a release before them is named); the links' owners travel with the render (owners.json), so
+ *      OMX_CONTRACT_DIR alone gives the same descriptors, and a render without them does not;
  *   2. its links are the references: a travel is read from the link, never from the number it states (a
  *      number edited by hand is stale), and a link moved reads the other travel;
  *   3. the descriptor and the extras never both say one thing: an extras file naming the plugin is
@@ -16,11 +17,12 @@
  * The generated files the view gives are the ones committed: `node tools/gen.mjs --check` holds that.
  * `make descriptor-view`, part of `make test`; it reads omx-contract as `make test` does.
  */
+import { spawnSync } from 'node:child_process';
 import { cpSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { DESCRIPTOR_SCHEMA_FLOOR, descriptorFile, descriptorText } from '../descriptor.mjs';
 import { ROOT, loadDecl, pluginDirs } from '../gen.mjs';
-import { installedDataDir, locateContract } from '../omx-contract.mjs';
+import { OWNERS, compareVersions, installedDataDir, locateContract } from '../omx-contract.mjs';
 import { validate } from '../schema-validate.mjs';
 
 let bad = 0, n = 0;
@@ -51,6 +53,8 @@ const where = locateContract();
 // beside the render read, else in the installed data directory (a union render carries no schema)
 const schemaFile = [where.dir, installedDataDir()].filter(Boolean).map((d) => join(d, 'omx-contract.schema.json')).find((f) => existsSync(f));
 const schema = schemaFile && existsSync(schemaFile) ? JSON.parse(readFileSync(schemaFile, 'utf8')) : undefined;
+// from the release that added them on, the descriptor words name their owners beside the render
+const carriesWords = Boolean(where.version) && compareVersions(where.version, DESCRIPTOR_SCHEMA_FLOOR) >= 0;
 if (schema?.$defs?.descriptor) {
   for (const dir of described) {
     const stem = dir.split('/').pop();
@@ -60,6 +64,32 @@ if (schema?.$defs?.descriptor) {
   broken.controls[0].ids = ['a'];
   check('arm: a travel carrying choice ids breaks the descriptor words', validate(schema, schema.$defs.descriptor, broken).length > 0, true);
 } else console.log(`NOTE descriptor-view: ${where.at ?? 'omx-contract'} predates the descriptor words (${DESCRIPTOR_SCHEMA_FLOOR}); its schema holds no descriptor`);
+
+// the owners a descriptor's links name come with the render: read through OMX_CONTRACT_DIR alone, with no
+// installed omx-contract, a copy of the render with its owners.json gives the same descriptors, and one
+// without gives others
+if (carriesWords) {
+  const first = described[0], firstStem = first.split('/').pop();
+  const lone = (dir) => {
+    const r = spawnSync(process.execPath, ['--input-type=module', '-e', `
+      const { loadDecl } = await import(${JSON.stringify(join(ROOT, 'tools', 'gen.mjs'))});
+      const { descriptorText } = await import(${JSON.stringify(join(ROOT, 'tools', 'descriptor.mjs'))});
+      process.stdout.write(descriptorText(loadDecl(${JSON.stringify(first)})));`],
+    { encoding: 'utf8', env: { ...process.env, OMX_CONTRACT_DIR: dir, PKG_CONFIG_PATH: '/nonexistent', PKG_CONFIG_LIBDIR: '/nonexistent' } });
+    return r.status === 0 ? r.stdout : `refused: ${r.stderr.trim().split('\n').find((l) => l.startsWith('Error')) ?? r.stderr.trim()}`;
+  };
+  const render = join(ROOT, 'build', 'tmp', 'descriptor-view-render');
+  rmSync(render, { recursive: true, force: true });
+  mkdirSync(render, { recursive: true });
+  cpSync(join(where.dir, 'omx-contract.json'), join(render, 'omx-contract.json'));
+  check(`the render read carries ${OWNERS}`, existsSync(join(where.dir, OWNERS)), true);
+  if (existsSync(join(where.dir, OWNERS))) cpSync(join(where.dir, OWNERS), join(render, OWNERS));
+  const want = readFileSync(join(first, descriptorFile(firstStem)), 'utf8');
+  check(`${firstStem}: OMX_CONTRACT_DIR alone gives the committed descriptor, its links' owners included`, lone(render) === want, true);
+  rmSync(join(render, OWNERS), { force: true });
+  check(`arm: the same render without ${OWNERS} names other owners`, lone(render) === want, false);
+  rmSync(render, { recursive: true, force: true });
+}
 
 // the arms, on a copy of the first described plugin
 const dir = described[0], stem = dir.split('/').pop();

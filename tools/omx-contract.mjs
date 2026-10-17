@@ -115,6 +115,9 @@ function unionRender(root, contractdir) {
     try {
       mkdirSync(dir, { recursive: true });
       execFileSync(cli[0], [...cli.slice(1), 'render', '--target', 'json', '--out', dir, '--installed'], { stdio: ['ignore', 'ignore', 'pipe'] });
+      // the render cites each definition by its path only: who owns it goes beside it, so a reader
+      // pointed at this directory (OMX_CONTRACT_DIR) still knows
+      writeFileSync(join(dir, OWNERS), `${JSON.stringify(Object.fromEntries(ownersOf(contractdir)), null, 2)}\n`);
       out = { dir };
     } catch (e) {
       out = { why: `the omx-contract CLI refused the contract directory ${contractdir}: ${String(e.stderr ?? e.message).trim().split('\n')[0]}` };
@@ -124,10 +127,18 @@ function unionRender(root, contractdir) {
   return out;
 }
 
+/** Beside a union render: each definition file's owner, as ownersOf read it from the manifests. */
+export const OWNERS = 'owners.json';
+
 /** Each installed definition file's package and version, by its path in its owner's tree
- * (`<tree>/<file>`, the `rel` a render cites), read from the contract directory's manifests. */
+ * (`<tree>/<file>`, the `rel` a render cites): read from the manifests of a contract directory, or from
+ * the owners.json a union render carries beside it (the directory OMX_CONTRACT_DIR stands in for). */
 export function ownersOf(contractdir = installedContractDir()) {
   const out = new Map();
+  if (contractdir && existsSync(join(contractdir, OWNERS))) {
+    for (const [rel, o] of Object.entries(JSON.parse(readFileSync(join(contractdir, OWNERS), 'utf8')))) out.set(rel, o);
+    return out;
+  }
   const base = contractdir && join(contractdir, '2');
   if (!base || !existsSync(base)) return out;
   for (const pkg of readdirSync(base)) {
@@ -362,6 +373,7 @@ export function resolveParam(dir, kernel, p) {
 export function perturbCopy(src, dst, kernel, p, { move = 'default' } = {}) {
   mkdirSync(dst, { recursive: true });
   execFileSync('cp', [join(src, RESOLVED), dst]);
+  if (existsSync(join(src, OWNERS))) execFileSync('cp', [join(src, OWNERS), dst]);
   const file = join(dst, RESOLVED);
   const data = JSON.parse(readFileSync(file, 'utf8'));
   const where = findNameIn(data.items, kernel, p.ref);
