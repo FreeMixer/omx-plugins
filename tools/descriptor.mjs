@@ -1,15 +1,27 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Pau Aliagas <linuxnow@gmail.com>
 /*
- * descriptor.mjs — a declaration (as tools/gen.mjs loads it) rendered as its `authored` plugin
- * descriptor, in omx-contract's descriptor words (omx-contract docs/descriptors.md): the plugin's
- * identity, one control per parameter, its ports. tools/panel-description.mjs lays a panel out from a
- * descriptor of any origin; for our plugins it reads this one (docs/panel-layout.md).
+ * descriptor.mjs — a plugin of ours in omx-contract's descriptor words (omx-contract docs/descriptors.md;
+ * docs/declaration-as-descriptor.md):
  *
- * What a declaration states that the descriptor has no word for goes in `extras`, beside it, never
- * into the descriptor: a choice's unit (a slope's dB/oct) and the per-placement come-up values.
+ *   - descriptorOf(d): the `authored` descriptor of a declaration as tools/gen.mjs loads it: the plugin's
+ *     identity, one control per parameter, its ports, its latency. A plugin folder holding
+ *     <stem>.descriptor.json keeps it equal to this render (gen.mjs writes it, --check refuses it stale),
+ *     so the travels it states are always what its links resolve to.
+ *   - viewOf(descriptor, extras): the declaration tools/gen.mjs resolves, from the descriptor and the
+ *     extras its <stem>.decl.json keeps: what the descriptor has no word for.
+ *
+ * tools/panel-description.mjs lays a panel out from a descriptor of any origin; for ours it reads this one.
  */
 import { choicesOf, scaleOf } from './gen.mjs';
+import { packagingRange } from './omx-contract.mjs';
+
+/** The descriptor file of a plugin folder. */
+export const descriptorFile = (stem) => `${stem}.descriptor.json`;
+
+/** The schema the descriptor words are in, and the release that added them. */
+export const DESCRIPTOR_SCHEMA = 'https://github.com/FreeMixer/omx-contract/raw/v2/schema/omx-contract.schema.json';
+export const DESCRIPTOR_SCHEMA_FLOOR = '2.15.0';
 
 /** The plugin features the descriptor names; a declaration's other CLAP features have no word there. */
 export const FEATURES = ['audio-effect', 'instrument', 'note-effect', 'analyzer'];
@@ -37,11 +49,25 @@ export function meaningOfRole(role) {
   return MEANINGS.includes(m) ? m : undefined;
 }
 
+/** A reference link, `<file>#<NAME>[.<field>]`, as its parts. */
+const LINK = /^(data\/[A-Za-z0-9_./-]+\.json)#([A-Za-z0-9_]+)(?:\.([A-Za-z0-9_]+))?$/;
+export function parseLink(link) {
+  const m = LINK.exec(link ?? '');
+  if (!m) return undefined;
+  const kernel = /^data\/kernels\/([a-z0-9_]+)\.json$/.exec(m[1])?.[1];
+  return { file: m[1], ref: m[2], field: m[3], kernel };
+}
+
+/** The per-control extras a declaration keeps: how a value is read, not the value. */
+export const CONTROL_EXTRAS = ['forKind', 'defaultRef', 'defaultId', 'defaultBand', 'perBand', 'unit', 'values', 'own'];
+
 /**
- * `{ descriptor, extras }` of declaration `d`. Each control's id is the parameter's index, its name the
- * symbol, its label the parameter's name; a toggle is a toggle, an integer with labelled values a
- * choice (ids the values, as text), any other parameter a travel with the declared unit and scale;
- * its group the label of the panel section listing it, its meaning the one its declared role plays.
+ * `{ descriptor, extras }` of declaration `d`, every parameter resolved. Each control's id is the
+ * parameter's index; its symbol and name the parameter's; a toggle is a toggle, an integer with labelled
+ * values a choice (ids the values, as text), any other parameter a travel with the declared unit and
+ * scale; its group the label of the panel section listing it, its meaning the one its declared role
+ * plays; its source the link its travel is read from, or the face for a parameter of the face's own.
+ * `extras` carries what the descriptor has no word for: a choice's unit and the per-kind come-up values.
  */
 export function descriptorOf(d) {
   const groupOf = new Map();
@@ -51,9 +77,21 @@ export function descriptorOf(d) {
     const m = meaningOfRole(role);
     if (m) for (const sym of [syms].flat()) if (!meaningOf.has(sym)) meaningOf.set(sym, m);
   }
+  let at;
+  const atOf = () => {
+    if (at === undefined) {
+      try {
+        at = `omx-contract@${packagingRange('omx-contract-devel', d.tree).floor}`;
+      } catch {
+        at = null;
+      }
+    }
+    return at;
+  };
+  const face = `plugins/${d.stem}/omx_${d.kernel}_clap.c#clap_entry`;
   const choiceUnits = {}, byKind = {};
   const controls = d.params.map((p, i) => {
-    const c = { id: i, name: p.symbol, label: p.name };
+    const c = { id: i, symbol: p.symbol, name: p.name };
     const choices = choicesOf(p);
     if (p.kind === 'toggle') Object.assign(c, { kind: 'toggle', default: p.def !== 0 });
     else if (choices) {
@@ -66,21 +104,70 @@ export function descriptorOf(d) {
     if (groupOf.has(p.symbol)) c.group = groupOf.get(p.symbol);
     if (meaningOf.has(p.symbol)) c.meaning = meaningOf.get(p.symbol);
     c.automatable = true;
+    c.source = p.from ? { from: atOf() ? { link: p.from, at: atOf() } : p.from } : { impl: face };
     if (p.byKind) byKind[p.symbol] = p.byKind;
     return c;
   });
-  const stereo = (id, name, direction) => ({ id, name, kind: 'audio', direction, role: 'main', channels: 2, layout: 'stereo' });
   const ports = [
-    stereo(0, 'Input', 'in'),
-    ...(d.sidechain ? [{ id: 1, name: d.sidechain.name, kind: 'audio', direction: 'in', role: 'sidechain', channels: 1, layout: 'mono' }] : []),
-    stereo(0, 'Output', 'out'),
+    { id: 0, name: 'in', kind: 'audio', direction: 'in', role: 'main', channels: 2, layout: 'stereo' },
+    ...(d.sidechain ? [{ id: 1, name: d.sidechain.symbol, kind: 'audio', direction: 'in', role: 'sidechain', channels: 1, layout: 'mono' }] : []),
+    { id: 0, name: 'out', kind: 'audio', direction: 'out', role: 'main', channels: 2, layout: 'stereo' },
   ];
   const descriptor = {
+    $schema: DESCRIPTOR_SCHEMA,
+    requires: { 'omx-contract-schema': `>= ${DESCRIPTOR_SCHEMA_FLOOR}` },
     origin: 'authored',
     plugin: { id: d.clap.id, format: 'clap', uri: d.lv2.uri, name: d.name, vendor: d.vendor, version: d.version, features: d.clap.features.filter((f) => FEATURES.includes(f)) },
     controls,
     ports,
-    source: { impl: `plugins/${d.stem}/${d.stem}.decl.json` },
+    latency: { reports: true },
+    source: { impl: face },
   };
   return { descriptor, extras: { choiceUnits, byKind } };
+}
+
+/** The descriptor file's text: what `node tools/gen.mjs` writes and `--check` holds equal. */
+export const descriptorText = (d) => `${JSON.stringify(descriptorOf(d).descriptor, null, 2)}\n`;
+
+/** The declaration fields the descriptor says: an extras file beside a descriptor carries none of them. */
+const SAID = ['name', 'vendor', 'version', 'params'];
+
+/**
+ * The declaration `extras` (a <stem>.decl.json beside a descriptor) and `descriptor` make together, as
+ * tools/gen.mjs resolves it: identity from the descriptor's plugin block, one parameter per control (its
+ * reference read from the control's source link, or its travel typed for a control of the face's own),
+ * and each control's extras (`controls`, by symbol) folded in. Throws, naming `file`, on what the two
+ * would both say or what neither does.
+ */
+export function viewOf(descriptor, extras, file) {
+  for (const k of SAID) if (k in extras) throw new Error(`${file}: "${k}" is the descriptor's to say (${descriptorFile(extras.stem)})`);
+  if (extras.clap?.id !== undefined || extras.lv2?.uri !== undefined) throw new Error(`${file}: the plugin's CLAP id and LV2 URI are the descriptor's to say (${descriptorFile(extras.stem)})`);
+  if (descriptor.origin !== 'authored') throw new Error(`${file}: ${descriptorFile(extras.stem)} is ${descriptor.origin}; ours is authored`);
+  const known = new Set(descriptor.controls.map((c) => c.symbol));
+  for (const sym of Object.keys(extras.controls ?? {})) if (!known.has(sym)) throw new Error(`${file}: "controls" names '${sym}', no control of the descriptor`);
+  const { controls: perControl = {}, ...rest } = extras;
+  const pl = descriptor.plugin;
+  const params = descriptor.controls.map((c, i) => {
+    if (c.id !== i) throw new Error(`${file}: the descriptor's control ${i} has id ${JSON.stringify(c.id)}; our ids are the parameter order`);
+    const x = perControl[c.symbol] ?? {};
+    for (const k of Object.keys(x)) if (!CONTROL_EXTRAS.includes(k)) throw new Error(`${file}: '${c.symbol}' keeps "${k}", which is not an extra (${CONTROL_EXTRAS.join(', ')})`);
+    const p = { symbol: c.symbol, name: c.name };
+    const from = c.source?.from;
+    if (from !== undefined) {
+      const link = parseLink(typeof from === 'string' ? from : from.link);
+      if (!link) throw new Error(`${file}: '${c.symbol}' reads its travel from ${JSON.stringify(from)}, not a link <file>#<NAME>[.<field>]`);
+      p.ref = link.ref;
+      if (link.field) p.field = link.field;
+      if (link.kernel && (rest.kernels ?? [rest.kernel]).length > 1) p.kernel = link.kernel;
+      if (c.travel && c.travel.scale !== scaleOf({ unit: c.travel.unit })) p.scale = c.travel.scale;
+    } else {
+      // a control of the face's own: its travel is typed, the reason kept with it
+      if (!x.own) throw new Error(`${file}: '${c.symbol}' has no source link and no "own" reason`);
+      if (c.kind === 'toggle') Object.assign(p, { unit: '', min: 0, max: 1, def: c.default ? 1 : 0, kind: 'toggle' });
+      else if (c.kind === 'travel') Object.assign(p, { unit: c.travel.unit, min: c.travel.min, max: c.travel.max, def: c.travel.default, ...(c.travel.step === 1 ? { kind: 'integer' } : {}) });
+      else throw new Error(`${file}: '${c.symbol}', a ${c.kind} of the face's own, is not a toggle or a travel`);
+    }
+    return { ...p, ...x };
+  });
+  return { ...rest, name: pl.name, vendor: pl.vendor, version: pl.version, clap: { id: pl.id, ...rest.clap }, lv2: { uri: pl.uri, ...rest.lv2 }, params };
 }

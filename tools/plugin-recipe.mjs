@@ -25,6 +25,7 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { descriptorFile, viewOf } from './descriptor.mjs';
 import { compareVersions, declKernels, declParams, findName, kernelExists, locateContract, packagingRange, paramKernel } from './omx-contract.mjs';
 import { validate } from './schema-validate.mjs';
 import { omxdspInclude, render } from './template.mjs';
@@ -77,7 +78,12 @@ export function pluginFacts(root, stem) {
       const where = locateContract(root);
       if (!where.dir) throw new Error(`its variant ${stem} is expanded from omx-contract and ${where.why}`);
       decl = expandVariant(where.dir, base.decl, base.decl.variants.of.find((v) => v.stem === stem));
-    } else decl = JSON.parse(readFileSync(file, 'utf8'));
+    } else {
+      decl = JSON.parse(readFileSync(file, 'utf8'));
+      // a plugin described in omx-contract's words: the declaration is its descriptor's view
+      const described = join(root, 'plugins', stem, descriptorFile(stem));
+      if (existsSync(described)) decl = viewOf(JSON.parse(readFileSync(described, 'utf8')), decl, file);
+    }
   } catch (e) {
     return { stem, short: stem.replace(/^omx-/, ''), decl: undefined, error: `${relative(root, file)}: ${e.message}` };
   }
