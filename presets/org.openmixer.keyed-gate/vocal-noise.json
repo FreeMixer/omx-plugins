@@ -1,0 +1,67 @@
+{
+  "format": "org.openmixer.preset/1",
+  "plugin": "org.openmixer.keyed-gate",
+  "id": "vocal-noise",
+  "name": "Vocal Noise",
+  "carries": "params",
+  "params": [
+    {
+      "symbol": "threshold",
+      "unit": "dB",
+      "value": -50
+    },
+    {
+      "symbol": "ratio",
+      "unit": "",
+      "value": 4
+    },
+    {
+      "symbol": "range",
+      "unit": "dB",
+      "value": -18
+    },
+    {
+      "symbol": "attack",
+      "unit": "ms",
+      "value": 5
+    },
+    {
+      "symbol": "release",
+      "unit": "ms",
+      "value": 300
+    },
+    {
+      "symbol": "knee_start",
+      "unit": "dB",
+      "value": -55
+    },
+    {
+      "symbol": "knee_end",
+      "unit": "dB",
+      "value": -45
+    },
+    {
+      "symbol": "hold",
+      "unit": "ms",
+      "value": 200
+    },
+    {
+      "symbol": "hysteresis",
+      "unit": "dB",
+      "value": 2
+    },
+    {
+      "symbol": "key_hp",
+      "unit": "Hz",
+      "value": 0
+    },
+    {
+      "symbol": "key_lp",
+      "unit": "Hz",
+      "value": 0
+    }
+  ],
+  "created": "2026-10-17T00:00:00Z",
+  "modified": "2026-10-17T00:00:00Z",
+  "copyOf": null
+}

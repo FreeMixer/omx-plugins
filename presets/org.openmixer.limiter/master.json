@@ -1,0 +1,27 @@
+{
+  "format": "org.openmixer.preset/1",
+  "plugin": "org.openmixer.limiter",
+  "id": "master",
+  "name": "Master",
+  "carries": "params",
+  "params": [
+    {
+      "symbol": "ceilingDb",
+      "unit": "dBFS",
+      "value": -1
+    },
+    {
+      "symbol": "lookaheadMs",
+      "unit": "ms",
+      "value": 1.5
+    },
+    {
+      "symbol": "releaseMs",
+      "unit": "ms",
+      "value": 50
+    }
+  ],
+  "created": "2026-10-17T00:00:00Z",
+  "modified": "2026-10-17T00:00:00Z",
+  "copyOf": null
+}

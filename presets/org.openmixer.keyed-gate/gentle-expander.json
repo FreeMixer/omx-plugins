@@ -1,0 +1,67 @@
+{
+  "format": "org.openmixer.preset/1",
+  "plugin": "org.openmixer.keyed-gate",
+  "id": "gentle-expander",
+  "name": "Gentle Expander",
+  "carries": "params",
+  "params": [
+    {
+      "symbol": "threshold",
+      "unit": "dB",
+      "value": -50
+    },
+    {
+      "symbol": "ratio",
+      "unit": "",
+      "value": 2
+    },
+    {
+      "symbol": "range",
+      "unit": "dB",
+      "value": -10
+    },
+    {
+      "symbol": "attack",
+      "unit": "ms",
+      "value": 5
+    },
+    {
+      "symbol": "release",
+      "unit": "ms",
+      "value": 250
+    },
+    {
+      "symbol": "knee_start",
+      "unit": "dB",
+      "value": -56
+    },
+    {
+      "symbol": "knee_end",
+      "unit": "dB",
+      "value": -44
+    },
+    {
+      "symbol": "hold",
+      "unit": "ms",
+      "value": 20
+    },
+    {
+      "symbol": "hysteresis",
+      "unit": "dB",
+      "value": 3
+    },
+    {
+      "symbol": "key_hp",
+      "unit": "Hz",
+      "value": 0
+    },
+    {
+      "symbol": "key_lp",
+      "unit": "Hz",
+      "value": 0
+    }
+  ],
+  "created": "2026-10-17T00:00:00Z",
+  "modified": "2026-10-17T00:00:00Z",
+  "copyOf": null
+}

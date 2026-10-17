@@ -1,0 +1,73 @@
+{
+  "format": "org.openmixer.preset/1",
+  "plugin": "org.openmixer.reverb",
+  "id": "vocal-plate",
+  "name": "Vocal Plate",
+  "carries": "params",
+  "params": [
+    {
+      "symbol": "plateModDepth",
+      "unit": "%",
+      "value": 100
+    },
+    {
+      "symbol": "size",
+      "unit": "",
+      "value": 0.6
+    },
+    {
+      "symbol": "damping",
+      "unit": "",
+      "value": 0.35
+    },
+    {
+      "symbol": "width",
+      "unit": "",
+      "value": 1
+    },
+    {
+      "symbol": "predelay",
+      "unit": "ms",
+      "value": 20
+    },
+    {
+      "symbol": "lowcut",
+      "unit": "Hz",
+      "value": 200
+    },
+    {
+      "symbol": "highcut",
+      "unit": "Hz",
+      "value": 12000
+    },
+    {
+      "symbol": "reverse",
+      "unit": "ms",
+      "value": 300
+    },
+    {
+      "symbol": "hold",
+      "unit": "ms",
+      "value": 120
+    },
+    {
+      "symbol": "release",
+      "unit": "ms",
+      "value": 20
+    },
+    {
+      "symbol": "gateThreshold",
+      "unit": "dBFS",
+      "value": -40
+    },
+    {
+      "symbol": "algorithm",
+      "unit": "",
+      "value": 1,
+      "label": "Plate"
+    }
+  ],
+  "created": "2026-10-17T00:00:00Z",
+  "modified": "2026-10-17T00:00:00Z",
+  "copyOf": null
+}

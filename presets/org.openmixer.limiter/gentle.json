@@ -1,0 +1,27 @@
+{
+  "format": "org.openmixer.preset/1",
+  "plugin": "org.openmixer.limiter",
+  "id": "gentle",
+  "name": "Gentle",
+  "carries": "params",
+  "params": [
+    {
+      "symbol": "ceilingDb",
+      "unit": "dBFS",
+      "value": -2
+    },
+    {
+      "symbol": "lookaheadMs",
+      "unit": "ms",
+      "value": 3
+    },
+    {
+      "symbol": "releaseMs",
+      "unit": "ms",
+      "value": 200
+    }
+  ],
+  "created": "2026-10-17T00:00:00Z",
+  "modified": "2026-10-17T00:00:00Z",
+  "copyOf": null
+}

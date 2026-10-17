@@ -1,0 +1,32 @@
+{
+  "format": "org.openmixer.preset/1",
+  "plugin": "org.openmixer.delay",
+  "id": "slapback",
+  "name": "Slapback",
+  "carries": "params",
+  "params": [
+    {
+      "symbol": "fxDelayTime",
+      "unit": "ms",
+      "value": 90
+    },
+    {
+      "symbol": "fxDelayFeedback",
+      "unit": "",
+      "value": 0.1
+    },
+    {
+      "symbol": "tone",
+      "unit": "",
+      "value": 0.6
+    },
+    {
+      "symbol": "pingpong",
+      "unit": "",
+      "value": 0
+    }
+  ],
+  "created": "2026-10-17T00:00:00Z",
+  "modified": "2026-10-17T00:00:00Z",
+  "copyOf": null
+}
