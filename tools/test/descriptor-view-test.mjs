@@ -20,7 +20,7 @@ import { cpSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } fr
 import { join } from 'node:path';
 import { DESCRIPTOR_SCHEMA_FLOOR, descriptorFile, descriptorText } from '../descriptor.mjs';
 import { ROOT, loadDecl, pluginDirs } from '../gen.mjs';
-import { locateContract } from '../omx-contract.mjs';
+import { installedDataDir, locateContract } from '../omx-contract.mjs';
 import { validate } from '../schema-validate.mjs';
 
 let bad = 0, n = 0;
@@ -48,7 +48,8 @@ for (const dir of described) {
 
 // the descriptor words: the installed omx-contract's schema
 const where = locateContract();
-const schemaFile = where.dir && join(where.dir, 'omx-contract.schema.json');
+// beside the render read, else in the installed data directory (a union render carries no schema)
+const schemaFile = [where.dir, installedDataDir()].filter(Boolean).map((d) => join(d, 'omx-contract.schema.json')).find((f) => existsSync(f));
 const schema = schemaFile && existsSync(schemaFile) ? JSON.parse(readFileSync(schemaFile, 'utf8')) : undefined;
 if (schema?.$defs?.descriptor) {
   for (const dir of described) {

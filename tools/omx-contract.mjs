@@ -22,7 +22,7 @@
  * render's own `version`) must lie in the packaging's range, or nothing is read.
  */
 import { execFileSync } from 'node:child_process';
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -68,7 +68,7 @@ const versionOf = (dir) => {
 };
 
 /** The installed omx-contract's data directory (pkg-config), or undefined. */
-function installedDataDir() {
+export function installedDataDir() {
   try {
     return execFileSync(PKG_CONFIG(), ['--variable=datadir', 'omx-contract'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim() || undefined;
   } catch {
@@ -76,10 +76,73 @@ function installedDataDir() {
   }
 }
 
+/** The installed omx-contract's contract directory (pkg-config's contractdir, from 2.15.0 on), or undefined. */
+export function installedContractDir() {
+  try {
+    return execFileSync(PKG_CONFIG(), ['--variable=contractdir', 'omx-contract'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim() || undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+/** The omx-contract CLI: $OMX_CONTRACT_CLI (its bin/omx-contract.mjs, or an executable), else `omx-contract`
+ * on PATH; `[command, ...leading args]`, or undefined when there is none. */
+function contractCli() {
+  const env = process.env.OMX_CONTRACT_CLI;
+  if (env) return env.endsWith('.mjs') ? [process.execPath, env] : [env];
+  try {
+    execFileSync('omx-contract', ['--help'], { stdio: 'ignore' });
+    return ['omx-contract'];
+  } catch (e) {
+    return e.code === 'ENOENT' ? undefined : ['omx-contract'];
+  }
+}
+
+const unionCache = new Map();
 /**
- * The directory omx-contract's resolved render is read from: `{ dir, version, range, at }`, or `{ dir:
- * undefined, range, why }` when no omx-contract in the packaging's range is installed (nor given by
- * OMX_CONTRACT_DIR).
+ * From omx-contract 2.15.0 on, the kernels ship with their owners (omx-dsp) into omx-contract's contract
+ * directory, and the installed omx-contract.json holds only the shared facts. The union is read through the
+ * omx-contract CLI, `render --target json --installed`, rendered once into build/contract-union:
+ * `{ dir }`, or `{ why }` when the CLI is missing or refuses the directory.
+ */
+function unionRender(root, contractdir) {
+  if (unionCache.has(contractdir)) return unionCache.get(contractdir);
+  const cli = contractCli();
+  let out;
+  if (!cli) out = { why: `omx-contract keeps its kernels in the contract directory ${contractdir}, read through the omx-contract CLI (\`omx-contract render --target json --installed\`), and none is installed: set OMX_CONTRACT_CLI to its bin/omx-contract.mjs or put omx-contract on PATH (BUILDING.md)` };
+  else {
+    const dir = join(root, 'build', 'contract-union');
+    try {
+      mkdirSync(dir, { recursive: true });
+      execFileSync(cli[0], [...cli.slice(1), 'render', '--target', 'json', '--out', dir, '--installed'], { stdio: ['ignore', 'ignore', 'pipe'] });
+      out = { dir };
+    } catch (e) {
+      out = { why: `the omx-contract CLI refused the contract directory ${contractdir}: ${String(e.stderr ?? e.message).trim().split('\n')[0]}` };
+    }
+  }
+  unionCache.set(contractdir, out);
+  return out;
+}
+
+/** Each installed definition file's package and version, by its path in its owner's tree
+ * (`<tree>/<file>`, the `rel` a render cites), read from the contract directory's manifests. */
+export function ownersOf(contractdir = installedContractDir()) {
+  const out = new Map();
+  const base = contractdir && join(contractdir, '2');
+  if (!base || !existsSync(base)) return out;
+  for (const pkg of readdirSync(base)) {
+    const file = join(base, pkg, 'MANIFEST.json');
+    if (!existsSync(file)) continue;
+    const m = JSON.parse(readFileSync(file, 'utf8'));
+    for (const f of Object.keys(m.files ?? {})) out.set(m.tree ? `${m.tree}/${f}` : f, { package: m.package, version: m.version });
+  }
+  return out;
+}
+
+/**
+ * The directory omx-contract's resolved render is read from: `{ dir, version, range, at, contractdir? }`, or
+ * `{ dir: undefined, range, why }` when no omx-contract in the packaging's range is installed (nor given by
+ * OMX_CONTRACT_DIR). From 2.15.0 on, the render is the union of the contract directory (unionRender).
  */
 export function locateContract(root = ROOT) {
   let range;
@@ -96,6 +159,12 @@ export function locateContract(root = ROOT) {
   const version = versionOf(dir);
   if (!version) return { dir: undefined, range, why: `${at} holds no readable ${RESOLVED}` };
   if (!inRange(version, range)) return { dir: undefined, range, why: `${at} is omx-contract ${version}; this tree needs ${want}` };
+  const contractdir = env ? undefined : installedContractDir();
+  if (contractdir && !Object.keys(JSON.parse(readFileSync(join(dir, RESOLVED), 'utf8')).kernels ?? {}).length) {
+    const union = unionRender(root, contractdir);
+    if (!union.dir) return { dir: undefined, range, why: union.why };
+    return { dir: union.dir, version, range, at: `${contractdir} (omx-contract ${version} and its owners)`, contractdir };
+  }
   return { dir, version, range, at: `${at} (omx-contract ${version})` };
 }
 
@@ -107,7 +176,10 @@ export function items(dir) {
 }
 
 const kernelFile = (k) => `data/kernels/${k}.json`;
-const SHARED = ['data/primitives.json', 'data/rates.json'];
+const SHARED_FILES = ['data/primitives.json', 'data/rates.json'];
+/** omx-contract's shared files: the two of a release before 2.15, and one file per item since (an owner's
+ * data/primitives/<item>.json, omx-contract's data/rates/<item>.json). A shared name belongs to no kernel. */
+const SHARED = { includes: (rel) => SHARED_FILES.includes(rel) || /^data\/(primitives|rates)\/[a-z0-9-]+\.json$/.test(rel ?? '') };
 
 /** Does the kernel have its file in omx-contract at `dir`? */
 export const kernelExists = (dir, kernel) => Object.values(items(dir)).some((e) => e.rel === kernelFile(kernel));
@@ -140,6 +212,7 @@ const eqCache = new Map();
 /**
  * The default bands of an EQ with `count` bands, by omx-contract's own rule: its C render,
  * omx_eq_default_centres() and omx_eq_default_type() of the installed <omxcontract/omx_contract_limits.h>
+ * (from 2.15.0 on, of omx-dsp's <omxdsp/omxdsp_definitions.h>)
  * (the package installs no JavaScript), run through a small probe built once into build/; gain and Q
  * are EQ_BAND_DEFAULTS of the render at `dir`. `[{ type, freqHz, gainDb, q }]`.
  */
@@ -168,6 +241,9 @@ function eqProbe(root) {
   writeFileSync(src, `#include <stdio.h>
 #include <stdlib.h>
 #include <omxcontract/omx_contract_limits.h>
+#if __has_include(<omxdsp/omxdsp_definitions.h>)
+#include <omxdsp/omxdsp_definitions.h>
+#endif
 int main(int argc, char **argv) {
   static float hz[1024];
   unsigned n = argc > 1 ? (unsigned)strtoul(argv[1], NULL, 10) : 0;
@@ -179,6 +255,12 @@ int main(int argc, char **argv) {
   let cflags;
   try {
     cflags = execFileSync(PKG_CONFIG(), ['--cflags', 'omx-contract'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim().split(/\s+/).filter(Boolean);
+    // from omx-contract 2.15.0 on, the EQ rule is omx-dsp's (<omxdsp/omxdsp_definitions.h>)
+    try {
+      cflags.push(...execFileSync(PKG_CONFIG(), ['--cflags', 'omxdsp'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim().split(/\s+/).filter(Boolean));
+    } catch {
+      // an omx-dsp before its definitions: the rule is omx-contract's own
+    }
   } catch (e) {
     throw new Error(`the EQ default rule is omx-contract's C render, and \`${PKG_CONFIG()} --cflags omx-contract\` failed: ${String(e.stderr ?? e.message).trim()}`);
   }

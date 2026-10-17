@@ -53,6 +53,9 @@
 #include <omxdsp/omx_biquad.h>
 #include <omxdsp/omx_denormal.h>
 #include <omxcontract/omx_contract_limits.h>
+#if __has_include(<omxdsp/omxdsp_definitions.h>)
+#include <omxdsp/omxdsp_definitions.h> /* from omx-contract 2.15.0 on, the EQ's limits are omx-dsp's */
+#endif
 #include <omxdsp/omx_eq_design.h>
 
 #define BANDS ((uint32_t)OMX_EQ_LV2_BANDS)
