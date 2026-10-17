@@ -1,0 +1,250 @@
+{
+  "$schema": "https://github.com/FreeMixer/omx-contract/raw/v2/schema/omx-contract.schema.json",
+  "requires": {
+    "omx-contract-schema": ">= 2.15.0"
+  },
+  "origin": "authored",
+  "plugin": {
+    "id": "org.openmixer.deesser",
+    "format": "clap",
+    "uri": "urn:openmixer:deesser",
+    "name": "omx deesser",
+    "vendor": "openmixer",
+    "version": "0.9.0",
+    "features": [
+      "audio-effect"
+    ]
+  },
+  "controls": [
+    {
+      "id": 0,
+      "symbol": "deessFreq",
+      "name": "Freq",
+      "kind": "travel",
+      "travel": {
+        "min": 2000,
+        "max": 16000,
+        "step": 1,
+        "unit": "Hz",
+        "default": 7000,
+        "scale": "log"
+      },
+      "group": [
+        "De-esser"
+      ],
+      "meaning": "frequency",
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/deesser.json#DEESS_FREQ_RANGE",
+          "at": "omx-contract@2.12.0"
+        }
+      }
+    },
+    {
+      "id": 1,
+      "symbol": "deessWidth",
+      "name": "Width",
+      "kind": "travel",
+      "travel": {
+        "min": 0.25,
+        "max": 4,
+        "step": 0,
+        "unit": "oct",
+        "default": 1,
+        "scale": "linear"
+      },
+      "group": [
+        "De-esser"
+      ],
+      "meaning": "width",
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/deesser.json#DEESS_WIDTH_RANGE",
+          "at": "omx-contract@2.12.0"
+        }
+      }
+    },
+    {
+      "id": 2,
+      "symbol": "deessThreshold",
+      "name": "Threshold",
+      "kind": "travel",
+      "travel": {
+        "min": -60,
+        "max": 0,
+        "step": 0,
+        "unit": "dB",
+        "default": -30,
+        "scale": "linear"
+      },
+      "group": [
+        "De-esser"
+      ],
+      "meaning": "threshold",
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/deesser.json#DEESS_THRESHOLD_RANGE",
+          "at": "omx-contract@2.12.0"
+        }
+      }
+    },
+    {
+      "id": 3,
+      "symbol": "deessRatio",
+      "name": "Ratio",
+      "kind": "travel",
+      "travel": {
+        "min": 1,
+        "max": 20,
+        "step": 0,
+        "unit": "",
+        "default": 4,
+        "scale": "linear"
+      },
+      "group": [
+        "De-esser"
+      ],
+      "meaning": "ratio",
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/deesser.json#DEESS_RATIO_RANGE",
+          "at": "omx-contract@2.12.0"
+        }
+      }
+    },
+    {
+      "id": 4,
+      "symbol": "deessRange",
+      "name": "Range",
+      "kind": "travel",
+      "travel": {
+        "min": -24,
+        "max": 0,
+        "step": 0,
+        "unit": "dB",
+        "default": -12,
+        "scale": "linear"
+      },
+      "group": [
+        "De-esser"
+      ],
+      "meaning": "range",
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/deesser.json#DEESS_RANGE_RANGE",
+          "at": "omx-contract@2.12.0"
+        }
+      }
+    },
+    {
+      "id": 5,
+      "symbol": "deessAttack",
+      "name": "Attack",
+      "kind": "travel",
+      "travel": {
+        "min": 0.1,
+        "max": 50,
+        "step": 0,
+        "unit": "ms",
+        "default": 1,
+        "scale": "linear"
+      },
+      "group": [
+        "De-esser"
+      ],
+      "meaning": "attack",
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/deesser.json#DEESS_ATTACK_RANGE",
+          "at": "omx-contract@2.12.0"
+        }
+      }
+    },
+    {
+      "id": 6,
+      "symbol": "deessRelease",
+      "name": "Release",
+      "kind": "travel",
+      "travel": {
+        "min": 5,
+        "max": 500,
+        "step": 1,
+        "unit": "ms",
+        "default": 60,
+        "scale": "linear"
+      },
+      "group": [
+        "De-esser"
+      ],
+      "meaning": "release",
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/deesser.json#DEESS_RELEASE_RANGE",
+          "at": "omx-contract@2.12.0"
+        }
+      }
+    },
+    {
+      "id": 7,
+      "symbol": "deessMode",
+      "name": "Mode",
+      "kind": "choice",
+      "ids": [
+        "0",
+        "1"
+      ],
+      "labels": [
+        "Split",
+        "Wideband"
+      ],
+      "values": [
+        0,
+        1
+      ],
+      "default": "0",
+      "group": [
+        "De-esser"
+      ],
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/deesser.json#DEESS_MODES",
+          "at": "omx-contract@2.12.0"
+        }
+      }
+    }
+  ],
+  "ports": [
+    {
+      "id": 0,
+      "name": "in",
+      "kind": "audio",
+      "direction": "in",
+      "role": "main",
+      "channels": 2,
+      "layout": "stereo"
+    },
+    {
+      "id": 0,
+      "name": "out",
+      "kind": "audio",
+      "direction": "out",
+      "role": "main",
+      "channels": 2,
+      "layout": "stereo"
+    }
+  ],
+  "latency": {
+    "reports": true
+  },
+  "source": {
+    "impl": "plugins/omx-deesser/omx_deesser_clap.c#clap_entry"
+  }
+}
