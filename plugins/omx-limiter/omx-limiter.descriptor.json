@@ -1,0 +1,121 @@
+{
+  "$schema": "https://github.com/FreeMixer/omx-contract/raw/v2/schema/omx-contract.schema.json",
+  "requires": {
+    "omx-contract-schema": ">= 2.15.0"
+  },
+  "origin": "authored",
+  "plugin": {
+    "id": "org.openmixer.limiter",
+    "format": "clap",
+    "uri": "urn:openmixer:limiter",
+    "name": "omx limiter",
+    "vendor": "openmixer",
+    "version": "0.9.0",
+    "features": [
+      "audio-effect"
+    ]
+  },
+  "controls": [
+    {
+      "id": 0,
+      "symbol": "ceilingDb",
+      "name": "Ceiling",
+      "kind": "travel",
+      "travel": {
+        "min": -12,
+        "max": 0,
+        "step": 0,
+        "unit": "dBFS",
+        "default": -1,
+        "scale": "linear"
+      },
+      "group": [
+        "Limiter"
+      ],
+      "meaning": "ceiling",
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/limiter.json#LIMITER_LIMITS.ceilingDb",
+          "at": "omx-contract@2.12.0"
+        }
+      }
+    },
+    {
+      "id": 1,
+      "symbol": "lookaheadMs",
+      "name": "Lookahead",
+      "kind": "travel",
+      "travel": {
+        "min": 0.5,
+        "max": 5,
+        "step": 0,
+        "unit": "ms",
+        "default": 1.5,
+        "scale": "linear"
+      },
+      "group": [
+        "Limiter"
+      ],
+      "meaning": "lookahead",
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/limiter.json#LIMITER_LIMITS.lookaheadMs",
+          "at": "omx-contract@2.12.0"
+        }
+      }
+    },
+    {
+      "id": 2,
+      "symbol": "releaseMs",
+      "name": "Release",
+      "kind": "travel",
+      "travel": {
+        "min": 1,
+        "max": 1000,
+        "step": 1,
+        "unit": "ms",
+        "default": 50,
+        "scale": "linear"
+      },
+      "group": [
+        "Limiter"
+      ],
+      "meaning": "release",
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/limiter.json#LIMITER_LIMITS.releaseMs",
+          "at": "omx-contract@2.12.0"
+        }
+      }
+    }
+  ],
+  "ports": [
+    {
+      "id": 0,
+      "name": "in",
+      "kind": "audio",
+      "direction": "in",
+      "role": "main",
+      "channels": 2,
+      "layout": "stereo"
+    },
+    {
+      "id": 0,
+      "name": "out",
+      "kind": "audio",
+      "direction": "out",
+      "role": "main",
+      "channels": 2,
+      "layout": "stereo"
+    }
+  ],
+  "latency": {
+    "reports": true
+  },
+  "source": {
+    "impl": "plugins/omx-limiter/omx_limiter_clap.c#clap_entry"
+  }
+}
