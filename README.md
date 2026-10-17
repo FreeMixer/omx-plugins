@@ -335,6 +335,15 @@ Plus the host's bypass.
 
 <!-- END GENERATED sections -->
 
+## Factory presets
+
+Every plugin ships a set of factory presets, one JSON file each, in `presets/<plugin id>/<preset id>.json`
+(for example `presets/org.openmixer.drive/amp-tube.json`). The `omx-plugins` package installs them
+read only under `/usr/share/omx/presets/`, where the console's preset library lists them as the
+factory group. A file names the plugin, the preset's id and name, and every parameter by symbol,
+unit and plain value (a choice also by its label); no value leaves its declared range.
+`tools/gen-presets.mjs` writes the files and `make presets` checks them.
+
 ## Install
 
 On **Fedora**, from the FreeMixer package channel:
