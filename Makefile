@@ -22,7 +22,9 @@
 #                    plugins are built for (tools/test/meters-abi-test.c, compile and run; part of `make test`)
 #   make strip-crosscheck   omx-strip, a chain, against the hand-ported strip it replaced, bit for bit at
 #                    the old plugin's settings (tools/test/strip-crosscheck.sh; needs the git history)
-#   make install    DESTDIR, PREFIX, LIBDIR, CLAPDIR: $(CLAPDIR)/<name>.clap and $(LIBDIR)/lv2/<name>.lv2/
+#   make presets    the factory presets: fresh against tools/gen-presets.mjs, each value inside its declared travel (part of `make test`)
+#   make install    DESTDIR, PREFIX, LIBDIR, CLAPDIR, DATADIR: $(CLAPDIR)/<name>.clap, $(LIBDIR)/lv2/<name>.lv2/ and the
+#                   factory presets in $(DATADIR)/omx/presets/<plugin id>/<preset id>.json
 #   make lib        build/lib/libomxplugins.a: every shipped plugin's CLAP face and the table of their
 #                   entries (include/omx_clap_static.h), for a host that runs them in-process
 #   make lib-test   a C host linked against the archive opens every face through the table, then
@@ -42,6 +44,7 @@ SHIP_PLUGINS := $(filter-out $(TEST_PLUGINS),$(PLUGINS))
 PREFIX     ?= /usr
 INCLUDEDIR ?= $(PREFIX)/include
 LIBDIR     ?= $(PREFIX)/lib
+DATADIR    ?= $(PREFIX)/share
 # Every header a consumer includes: the shared parameter type, the panel description and parameter contract rows, then each shipped plugin's generated
 # parameter header and its instance header (the DSP shell around the omx-dsp kernel). A plugin's
 # headers are the .h files beside its Makefile and in its generated/ directory.
@@ -78,7 +81,7 @@ LIB_FLAGS  := -fPIC -fvisibility=hidden -DOMX_CLAP_STATIC -Iinclude
 # read only by the targets that build the archive, so `make version` and the rest need no omx-dsp
 lib_cflags = $(call dep_check,omxdsp,$(OMXDSP_MIN))$(call dep_check,omx-contract,$(CONTRACT_MIN))$(shell $(PKG_CONFIG) --cflags omxdsp omx-clap-core clap)
 
-.PHONY: test-role all lib lib-test test test-faces units panel-layout descriptor-view face-descriptor hints look manual install install-devel clean version recipe-test completeness selftest private-refs strip-crosscheck meters-abi meter-ring
+.PHONY: presets test-role all lib lib-test test test-faces units panel-layout descriptor-view face-descriptor hints look manual install install-devel clean version recipe-test completeness selftest private-refs strip-crosscheck meters-abi meter-ring
 all: lib
 	@for p in $(PLUGINS); do $(MAKE) -C $$p all || exit 1; done
 lib: $(LIB) $(LIB_PC)
@@ -90,6 +93,7 @@ test: lib units panel-layout descriptor-view
 	@$(MAKE) -s hints
 	@$(MAKE) -s look
 	@$(MAKE) -s manual
+	@$(MAKE) -s presets
 	@$(MAKE) -s meters-abi
 	@$(MAKE) -s test-role
 # what runs with no omx-contract command (debian/rules: no .deb ships the command yet): the built faces against their
@@ -117,6 +121,10 @@ look:
 	node tools/look.mjs --check
 manual:
 	node tools/test/manual-perturb.mjs
+# the factory presets: fresh against tools/gen-presets.mjs, every value inside its declared travel
+presets:
+	node tools/gen-presets.mjs --check
+	node tools/test/presets-check.mjs --self-test
 # A plugin is complete when it has every artifact the recipe lists and keeps every law; a new plugin
 # starts with `node tools/omx-new-plugin.mjs --from-contract <kernel>` (docs/new-plugin-from-contract.md).
 recipe-test: selftest completeness
@@ -140,6 +148,7 @@ strip-crosscheck:
 	sh tools/test/strip-crosscheck.sh
 install:
 	@for p in $(SHIP_PLUGINS); do $(MAKE) -C $$p install || exit 1; done
+	find presets -type f -name '*.json' | while read -r f; do install -D -m644 "$$f" "$(DESTDIR)$(DATADIR)/omx/$$f"; done
 test-role:
 	tools/test-role-check.sh
 	tools/test-role-check.sh --self-test
