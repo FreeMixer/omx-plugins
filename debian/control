@@ -35,7 +35,8 @@ Description: OpenMixer delay, drive, EQ, strip, gate and effects (CLAP, LV2)
  does on the desk, sample for sample.
  .
  This package installs both formats; omx-plugins-clap and omx-plugins-lv2
- install one each.
+ install one each. It also carries the factory presets of every plugin, as
+ files in /usr/share/omx/presets.
 
 Package: omx-plugins-clap
 Architecture: any
