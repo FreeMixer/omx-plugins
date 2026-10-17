@@ -1,0 +1,876 @@
+{
+  "format": "org.openmixer.preset/1",
+  "plugin": "org.openmixer.eq32",
+  "id": "portico-5033",
+  "name": "Five Band Polish",
+  "carries": "params",
+  "params": [
+    {
+      "symbol": "hpf_on",
+      "unit": "",
+      "value": 0
+    },
+    {
+      "symbol": "hpf_freq",
+      "unit": "Hz",
+      "value": 80
+    },
+    {
+      "symbol": "hpf_slope",
+      "unit": "dB/oct",
+      "value": 12,
+      "label": "12 dB/oct"
+    },
+    {
+      "symbol": "lpf_on",
+      "unit": "",
+      "value": 0
+    },
+    {
+      "symbol": "lpf_freq",
+      "unit": "Hz",
+      "value": 18000
+    },
+    {
+      "symbol": "lpf_slope",
+      "unit": "dB/oct",
+      "value": 12,
+      "label": "12 dB/oct"
+    },
+    {
+      "symbol": "b1_type",
+      "unit": "",
+      "value": 1,
+      "label": "Low Shelf"
+    },
+    {
+      "symbol": "b1_freq",
+      "unit": "Hz",
+      "value": 100
+    },
+    {
+      "symbol": "b1_gain",
+      "unit": "dB",
+      "value": 2
+    },
+    {
+      "symbol": "b1_q",
+      "unit": "",
+      "value": 0.7
+    },
+    {
+      "symbol": "b1_on",
+      "unit": "",
+      "value": 1
+    },
+    {
+      "symbol": "b2_type",
+      "unit": "",
+      "value": 0,
+      "label": "Bell"
+    },
+    {
+      "symbol": "b2_freq",
+      "unit": "Hz",
+      "value": 300
+    },
+    {
+      "symbol": "b2_gain",
+      "unit": "dB",
+      "value": -2
+    },
+    {
+      "symbol": "b2_q",
+      "unit": "",
+      "value": 1.4
+    },
+    {
+      "symbol": "b2_on",
+      "unit": "",
+      "value": 1
+    },
+    {
+      "symbol": "b3_type",
+      "unit": "",
+      "value": 0,
+      "label": "Bell"
+    },
+    {
+      "symbol": "b3_freq",
+      "unit": "Hz",
+      "value": 1500
+    },
+    {
+      "symbol": "b3_gain",
+      "unit": "dB",
+      "value": 1.5
+    },
+    {
+      "symbol": "b3_q",
+      "unit": "",
+      "value": 1
+    },
+    {
+      "symbol": "b3_on",
+      "unit": "",
+      "value": 1
+    },
+    {
+      "symbol": "b4_type",
+      "unit": "",
+      "value": 0,
+      "label": "Bell"
+    },
+    {
+      "symbol": "b4_freq",
+      "unit": "Hz",
+      "value": 4000
+    },
+    {
+      "symbol": "b4_gain",
+      "unit": "dB",
+      "value": 2
+    },
+    {
+      "symbol": "b4_q",
+      "unit": "",
+      "value": 1
+    },
+    {
+      "symbol": "b4_on",
+      "unit": "",
+      "value": 1
+    },
+    {
+      "symbol": "b5_type",
+      "unit": "",
+      "value": 2,
+      "label": "High Shelf"
+    },
+    {
+      "symbol": "b5_freq",
+      "unit": "Hz",
+      "value": 12000
+    },
+    {
+      "symbol": "b5_gain",
+      "unit": "dB",
+      "value": 2
+    },
+    {
+      "symbol": "b5_q",
+      "unit": "",
+      "value": 0.7
+    },
+    {
+      "symbol": "b5_on",
+      "unit": "",
+      "value": 1
+    },
+    {
+      "symbol": "b6_type",
+      "unit": "",
+      "value": 0,
+      "label": "Bell"
+    },
+    {
+      "symbol": "b6_freq",
+      "unit": "Hz",
+      "value": 63
+    },
+    {
+      "symbol": "b6_gain",
+      "unit": "dB",
+      "value": 0
+    },
+    {
+      "symbol": "b6_q",
+      "unit": "",
+      "value": 1
+    },
+    {
+      "symbol": "b6_on",
+      "unit": "",
+      "value": 0
+    },
+    {
+      "symbol": "b7_type",
+      "unit": "",
+      "value": 0,
+      "label": "Bell"
+    },
+    {
+      "symbol": "b7_freq",
+      "unit": "Hz",
+      "value": 80
+    },
+    {
+      "symbol": "b7_gain",
+      "unit": "dB",
+      "value": 0
+    },
+    {
+      "symbol": "b7_q",
+      "unit": "",
+      "value": 1
+    },
+    {
+      "symbol": "b7_on",
+      "unit": "",
+      "value": 0
+    },
+    {
+      "symbol": "b8_type",
+      "unit": "",
+      "value": 0,
+      "label": "Bell"
+    },
+    {
+      "symbol": "b8_freq",
+      "unit": "Hz",
+      "value": 100
+    },
+    {
+      "symbol": "b8_gain",
+      "unit": "dB",
+      "value": 0
+    },
+    {
+      "symbol": "b8_q",
+      "unit": "",
+      "value": 1
+    },
+    {
+      "symbol": "b8_on",
+      "unit": "",
+      "value": 0
+    },
+    {
+      "symbol": "b9_type",
+      "unit": "",
+      "value": 0,
+      "label": "Bell"
+    },
+    {
+      "symbol": "b9_freq",
+      "unit": "Hz",
+      "value": 125
+    },
+    {
+      "symbol": "b9_gain",
+      "unit": "dB",
+      "value": 0
+    },
+    {
+      "symbol": "b9_q",
+      "unit": "",
+      "value": 1
+    },
+    {
+      "symbol": "b9_on",
+      "unit": "",
+      "value": 0
+    },
+    {
+      "symbol": "b10_type",
+      "unit": "",
+      "value": 0,
+      "label": "Bell"
+    },
+    {
+      "symbol": "b10_freq",
+      "unit": "Hz",
+      "value": 160
+    },
+    {
+      "symbol": "b10_gain",
+      "unit": "dB",
+      "value": 0
+    },
+    {
+      "symbol": "b10_q",
+      "unit": "",
+      "value": 1
+    },
+    {
+      "symbol": "b10_on",
+      "unit": "",
+      "value": 0
+    },
+    {
+      "symbol": "b11_type",
+      "unit": "",
+      "value": 0,
+      "label": "Bell"
+    },
+    {
+      "symbol": "b11_freq",
+      "unit": "Hz",
+      "value": 200
+    },
+    {
+      "symbol": "b11_gain",
+      "unit": "dB",
+      "value": 0
+    },
+    {
+      "symbol": "b11_q",
+      "unit": "",
+      "value": 1
+    },
+    {
+      "symbol": "b11_on",
+      "unit": "",
+      "value": 0
+    },
+    {
+      "symbol": "b12_type",
+      "unit": "",
+      "value": 0,
+      "label": "Bell"
+    },
+    {
+      "symbol": "b12_freq",
+      "unit": "Hz",
+      "value": 250
+    },
+    {
+      "symbol": "b12_gain",
+      "unit": "dB",
+      "value": 0
+    },
+    {
+      "symbol": "b12_q",
+      "unit": "",
+      "value": 1
+    },
+    {
+      "symbol": "b12_on",
+      "unit": "",
+      "value": 0
+    },
+    {
+      "symbol": "b13_type",
+      "unit": "",
+      "value": 0,
+      "label": "Bell"
+    },
+    {
+      "symbol": "b13_freq",
+      "unit": "Hz",
+      "value": 315
+    },
+    {
+      "symbol": "b13_gain",
+      "unit": "dB",
+      "value": 0
+    },
+    {
+      "symbol": "b13_q",
+      "unit": "",
+      "value": 1
+    },
+    {
+      "symbol": "b13_on",
+      "unit": "",
+      "value": 0
+    },
+    {
+      "symbol": "b14_type",
+      "unit": "",
+      "value": 0,
+      "label": "Bell"
+    },
+    {
+      "symbol": "b14_freq",
+      "unit": "Hz",
+      "value": 355
+    },
+    {
+      "symbol": "b14_gain",
+      "unit": "dB",
+      "value": 0
+    },
+    {
+      "symbol": "b14_q",
+      "unit": "",
+      "value": 1
+    },
+    {
+      "symbol": "b14_on",
+      "unit": "",
+      "value": 0
+    },
+    {
+      "symbol": "b15_type",
+      "unit": "",
+      "value": 0,
+      "label": "Bell"
+    },
+    {
+      "symbol": "b15_freq",
+      "unit": "Hz",
+      "value": 450
+    },
+    {
+      "symbol": "b15_gain",
+      "unit": "dB",
+      "value": 0
+    },
+    {
+      "symbol": "b15_q",
+      "unit": "",
+      "value": 1
+    },
+    {
+      "symbol": "b15_on",
+      "unit": "",
+      "value": 0
+    },
+    {
+      "symbol": "b16_type",
+      "unit": "",
+      "value": 0,
+      "label": "Bell"
+    },
+    {
+      "symbol": "b16_freq",
+      "unit": "Hz",
+      "value": 560
+    },
+    {
+      "symbol": "b16_gain",
+      "unit": "dB",
+      "value": 0
+    },
+    {
+      "symbol": "b16_q",
+      "unit": "",
+      "value": 1
+    },
+    {
+      "symbol": "b16_on",
+      "unit": "",
+      "value": 0
+    },
+    {
+      "symbol": "b17_type",
+      "unit": "",
+      "value": 0,
+      "label": "Bell"
+    },
+    {
+      "symbol": "b17_freq",
+      "unit": "Hz",
+      "value": 710
+    },
+    {
+      "symbol": "b17_gain",
+      "unit": "dB",
+      "value": 0
+    },
+    {
+      "symbol": "b17_q",
+      "unit": "",
+      "value": 1
+    },
+    {
+      "symbol": "b17_on",
+      "unit": "",
+      "value": 0
+    },
+    {
+      "symbol": "b18_type",
+      "unit": "",
+      "value": 0,
+      "label": "Bell"
+    },
+    {
+      "symbol": "b18_freq",
+      "unit": "Hz",
+      "value": 900
+    },
+    {
+      "symbol": "b18_gain",
+      "unit": "dB",
+      "value": 0
+    },
+    {
+      "symbol": "b18_q",
+      "unit": "",
+      "value": 1
+    },
+    {
+      "symbol": "b18_on",
+      "unit": "",
+      "value": 0
+    },
+    {
+      "symbol": "b19_type",
+      "unit": "",
+      "value": 0,
+      "label": "Bell"
+    },
+    {
+      "symbol": "b19_freq",
+      "unit": "Hz",
+      "value": 1120
+    },
+    {
+      "symbol": "b19_gain",
+      "unit": "dB",
+      "value": 0
+    },
+    {
+      "symbol": "b19_q",
+      "unit": "",
+      "value": 1
+    },
+    {
+      "symbol": "b19_on",
+      "unit": "",
+      "value": 0
+    },
+    {
+      "symbol": "b20_type",
+      "unit": "",
+      "value": 0,
+      "label": "Bell"
+    },
+    {
+      "symbol": "b20_freq",
+      "unit": "Hz",
+      "value": 1400
+    },
+    {
+      "symbol": "b20_gain",
+      "unit": "dB",
+      "value": 0
+    },
+    {
+      "symbol": "b20_q",
+      "unit": "",
+      "value": 1
+    },
+    {
+      "symbol": "b20_on",
+      "unit": "",
+      "value": 0
+    },
+    {
+      "symbol": "b21_type",
+      "unit": "",
+      "value": 0,
+      "label": "Bell"
+    },
+    {
+      "symbol": "b21_freq",
+      "unit": "Hz",
+      "value": 1600
+    },
+    {
+      "symbol": "b21_gain",
+      "unit": "dB",
+      "value": 0
+    },
+    {
+      "symbol": "b21_q",
+      "unit": "",
+      "value": 1
+    },
+    {
+      "symbol": "b21_on",
+      "unit": "",
+      "value": 0
+    },
+    {
+      "symbol": "b22_type",
+      "unit": "",
+      "value": 0,
+      "label": "Bell"
+    },
+    {
+      "symbol": "b22_freq",
+      "unit": "Hz",
+      "value": 2000
+    },
+    {
+      "symbol": "b22_gain",
+      "unit": "dB",
+      "value": 0
+    },
+    {
+      "symbol": "b22_q",
+      "unit": "",
+      "value": 1
+    },
+    {
+      "symbol": "b22_on",
+      "unit": "",
+      "value": 0
+    },
+    {
+      "symbol": "b23_type",
+      "unit": "",
+      "value": 0,
+      "label": "Bell"
+    },
+    {
+      "symbol": "b23_freq",
+      "unit": "Hz",
+      "value": 2500
+    },
+    {
+      "symbol": "b23_gain",
+      "unit": "dB",
+      "value": 0
+    },
+    {
+      "symbol": "b23_q",
+      "unit": "",
+      "value": 1
+    },
+    {
+      "symbol": "b23_on",
+      "unit": "",
+      "value": 0
+    },
+    {
+      "symbol": "b24_type",
+      "unit": "",
+      "value": 0,
+      "label": "Bell"
+    },
+    {
+      "symbol": "b24_freq",
+      "unit": "Hz",
+      "value": 3150
+    },
+    {
+      "symbol": "b24_gain",
+      "unit": "dB",
+      "value": 0
+    },
+    {
+      "symbol": "b24_q",
+      "unit": "",
+      "value": 1
+    },
+    {
+      "symbol": "b24_on",
+      "unit": "",
+      "value": 0
+    },
+    {
+      "symbol": "b25_type",
+      "unit": "",
+      "value": 0,
+      "label": "Bell"
+    },
+    {
+      "symbol": "b25_freq",
+      "unit": "Hz",
+      "value": 4000
+    },
+    {
+      "symbol": "b25_gain",
+      "unit": "dB",
+      "value": 0
+    },
+    {
+      "symbol": "b25_q",
+      "unit": "",
+      "value": 1
+    },
+    {
+      "symbol": "b25_on",
+      "unit": "",
+      "value": 0
+    },
+    {
+      "symbol": "b26_type",
+      "unit": "",
+      "value": 0,
+      "label": "Bell"
+    },
+    {
+      "symbol": "b26_freq",
+      "unit": "Hz",
+      "value": 5000
+    },
+    {
+      "symbol": "b26_gain",
+      "unit": "dB",
+      "value": 0
+    },
+    {
+      "symbol": "b26_q",
+      "unit": "",
+      "value": 1
+    },
+    {
+      "symbol": "b26_on",
+      "unit": "",
+      "value": 0
+    },
+    {
+      "symbol": "b27_type",
+      "unit": "",
+      "value": 0,
+      "label": "Bell"
+    },
+    {
+      "symbol": "b27_freq",
+      "unit": "Hz",
+      "value": 6300
+    },
+    {
+      "symbol": "b27_gain",
+      "unit": "dB",
+      "value": 0
+    },
+    {
+      "symbol": "b27_q",
+      "unit": "",
+      "value": 1
+    },
+    {
+      "symbol": "b27_on",
+      "unit": "",
+      "value": 0
+    },
+    {
+      "symbol": "b28_type",
+      "unit": "",
+      "value": 0,
+      "label": "Bell"
+    },
+    {
+      "symbol": "b28_freq",
+      "unit": "Hz",
+      "value": 8000
+    },
+    {
+      "symbol": "b28_gain",
+      "unit": "dB",
+      "value": 0
+    },
+    {
+      "symbol": "b28_q",
+      "unit": "",
+      "value": 1
+    },
+    {
+      "symbol": "b28_on",
+      "unit": "",
+      "value": 0
+    },
+    {
+      "symbol": "b29_type",
+      "unit": "",
+      "value": 0,
+      "label": "Bell"
+    },
+    {
+      "symbol": "b29_freq",
+      "unit": "Hz",
+      "value": 9000
+    },
+    {
+      "symbol": "b29_gain",
+      "unit": "dB",
+      "value": 0
+    },
+    {
+      "symbol": "b29_q",
+      "unit": "",
+      "value": 1
+    },
+    {
+      "symbol": "b29_on",
+      "unit": "",
+      "value": 0
+    },
+    {
+      "symbol": "b30_type",
+      "unit": "",
+      "value": 0,
+      "label": "Bell"
+    },
+    {
+      "symbol": "b30_freq",
+      "unit": "Hz",
+      "value": 11200
+    },
+    {
+      "symbol": "b30_gain",
+      "unit": "dB",
+      "value": 0
+    },
+    {
+      "symbol": "b30_q",
+      "unit": "",
+      "value": 1
+    },
+    {
+      "symbol": "b30_on",
+      "unit": "",
+      "value": 0
+    },
+    {
+      "symbol": "b31_type",
+      "unit": "",
+      "value": 0,
+      "label": "Bell"
+    },
+    {
+      "symbol": "b31_freq",
+      "unit": "Hz",
+      "value": 14000
+    },
+    {
+      "symbol": "b31_gain",
+      "unit": "dB",
+      "value": 0
+    },
+    {
+      "symbol": "b31_q",
+      "unit": "",
+      "value": 1
+    },
+    {
+      "symbol": "b31_on",
+      "unit": "",
+      "value": 0
+    },
+    {
+      "symbol": "b32_type",
+      "unit": "",
+      "value": 2,
+      "label": "High Shelf"
+    },
+    {
+      "symbol": "b32_freq",
+      "unit": "Hz",
+      "value": 18000
+    },
+    {
+      "symbol": "b32_gain",
+      "unit": "dB",
+      "value": 0
+    },
+    {
+      "symbol": "b32_q",
+      "unit": "",
+      "value": 1
+    },
+    {
+      "symbol": "b32_on",
+      "unit": "",
+      "value": 0
+    }
+  ],
+  "created": "2026-10-17T00:00:00Z",
+  "modified": "2026-10-17T00:00:00Z",
+  "copyOf": null
+}

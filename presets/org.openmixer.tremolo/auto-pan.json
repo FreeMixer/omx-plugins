@@ -1,0 +1,33 @@
+{
+  "format": "org.openmixer.preset/1",
+  "plugin": "org.openmixer.tremolo",
+  "id": "auto-pan",
+  "name": "Auto-pan",
+  "carries": "params",
+  "params": [
+    {
+      "symbol": "rateHz",
+      "unit": "Hz",
+      "value": 1
+    },
+    {
+      "symbol": "depth",
+      "unit": "%",
+      "value": 80
+    },
+    {
+      "symbol": "mix",
+      "unit": "%",
+      "value": 100
+    },
+    {
+      "symbol": "mode",
+      "unit": "",
+      "value": 1,
+      "label": "Pan"
+    }
+  ],
+  "created": "2026-10-17T00:00:00Z",
+  "modified": "2026-10-17T00:00:00Z",
+  "copyOf": null
+}
