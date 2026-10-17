@@ -321,7 +321,7 @@ async function main() {
     return h.match(/static inline \w+ (omx_lfo_[a-z_]+)\s*\(/)[1];
   })();
   const SABOTAGE = [
-    ['declValid', 'declaration', () => edit(`${P}/omx-drive.decl.json`, (s) => s.replace('"org.openmixer.drive"', '"org.openmixer.delay"'))],
+    ['declValid', 'declaration', () => edit(`${P}/omx-drive.descriptor.json`, (s) => s.replace('"org.openmixer.drive"', '"org.openmixer.delay"'))],
     ['generatedFresh', 'params-header', () => edit(`${P}/generated/omx_drive_params.h`, (s) => `${s}\n`)],
     ['generatedFresh', 'lv2-description', () => edit(`${P}/generated/omx-drive.lv2/omx-drive.ttl`, (s) => s.replace('lv2:default 0 ;', 'lv2:default 1 ;'))],
     ['modguiFresh', 'modgui', () => add(`${P}/generated/omx-drive.lv2/modgui/stray.css`, '')],
@@ -358,7 +358,8 @@ async function main() {
     ['declValid', 'declaration', () => edit(`${P}/omx-drive.decl.json`, (s) => JSON.stringify((({ console: c, panel: p, ...d }) => ({ ...d, panel: p, console: { ...c, panel: { sections: p.sections } } }))(JSON.parse(s)), null, 2))],
     ['declValid', 'declaration', () => edit(`${P}/omx-drive.decl.json`, (s) => s.replace('"family": "drive"', '"family": "saturation"'))],
     ['declValid', 'declaration', () => edit(`${P}/omx-drive.decl.json`, (s) => s.replace('"tone": "character"', '"character": "character"'))],
-    ['paramsByReference', 'params-by-reference', () => edit(`${P}/omx-drive.decl.json`, (s) => s.replace('"ref": "DRIVE_AMOUNT_RANGE"', '"ref": "DRIVE_AMOUNT_RANGE", "min": 0'))],
+    // a control both read by reference (its descriptor link) and the face's own (its extras' reason)
+    ['paramsByReference', 'params-by-reference', () => edit(`${P}/omx-drive.decl.json`, (s) => s.replace('"controls": {\n', '"controls": {\n    "amount": { "own": "switch" },\n'))],
   ];
   for (const [family, id, breakIt] of SABOTAGE) {
     const restore = breakIt();
@@ -609,7 +610,7 @@ static inline void omx_wobble_instance_run(OmxWobbleInstance *s, const float *${
     regen(() => {});
     expect(hintErrors(hints).length === 0, 'port hints: restored, green again');
     cpSync(join(hints, 'plugins/omx-delay'), join(hints, 'plugins/omx-delay9'), { recursive: true });
-    for (const [from, to] of [['omx-delay.decl.json', 'omx-delay9.decl.json'], ['generated/omx-delay.lv2', 'generated/omx-delay9.lv2'], ['generated/omx-delay9.lv2/omx-delay.ttl', 'generated/omx-delay9.lv2/omx-delay9.ttl']])
+    for (const [from, to] of [['omx-delay.decl.json', 'omx-delay9.decl.json'], ['omx-delay.descriptor.json', 'omx-delay9.descriptor.json'], ['generated/omx-delay.lv2', 'generated/omx-delay9.lv2'], ['generated/omx-delay9.lv2/omx-delay.ttl', 'generated/omx-delay9.lv2/omx-delay9.ttl']])
       execFileSync('mv', [join(hints, 'plugins/omx-delay9', from), join(hints, 'plugins/omx-delay9', to)]);
     const d9 = JSON.parse(readFileSync(join(hints, 'plugins/omx-delay9/omx-delay9.decl.json'), 'utf8'));
     d9.stem = 'omx-delay9';

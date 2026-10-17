@@ -1,0 +1,355 @@
+{
+  "$schema": "https://github.com/FreeMixer/omx-contract/raw/v2/schema/omx-contract.schema.json",
+  "requires": {
+    "omx-contract-schema": ">= 2.15.0"
+  },
+  "origin": "authored",
+  "plugin": {
+    "id": "org.openmixer.keyed-gate",
+    "format": "clap",
+    "uri": "urn:openmixer:keyed-gate",
+    "name": "omx keyed-gate",
+    "vendor": "openmixer",
+    "version": "0.10.0",
+    "features": [
+      "audio-effect"
+    ]
+  },
+  "controls": [
+    {
+      "id": 0,
+      "symbol": "key_external",
+      "name": "Key",
+      "kind": "choice",
+      "ids": [
+        "0",
+        "1"
+      ],
+      "labels": [
+        "Self",
+        "Sidechain"
+      ],
+      "values": [
+        0,
+        1
+      ],
+      "default": "1",
+      "group": [
+        "Key"
+      ],
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/gate.json#GATE_KEY_SOURCES",
+          "at": "omx-dsp@0.22.0"
+        }
+      }
+    },
+    {
+      "id": 1,
+      "symbol": "threshold",
+      "name": "Threshold",
+      "kind": "travel",
+      "travel": {
+        "min": -80,
+        "max": 0,
+        "step": 0,
+        "unit": "dB",
+        "default": -40,
+        "scale": "linear"
+      },
+      "group": [
+        "Gate"
+      ],
+      "meaning": "threshold",
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/primitives/gate-continuous-travels.json#GATE_CONTINUOUS_TRAVELS.thresholdDb",
+          "at": "omx-dsp@0.22.0"
+        }
+      }
+    },
+    {
+      "id": 2,
+      "symbol": "ratio",
+      "name": "Ratio",
+      "kind": "travel",
+      "travel": {
+        "min": 1,
+        "max": 100,
+        "step": 0,
+        "unit": "",
+        "default": 16,
+        "scale": "log"
+      },
+      "group": [
+        "Gate"
+      ],
+      "meaning": "ratio",
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/primitives/gate-continuous-travels.json#GATE_CONTINUOUS_TRAVELS.ratio",
+          "at": "omx-dsp@0.22.0"
+        }
+      }
+    },
+    {
+      "id": 3,
+      "symbol": "range",
+      "name": "Range",
+      "kind": "travel",
+      "travel": {
+        "min": -90,
+        "max": 0,
+        "step": 0,
+        "unit": "dB",
+        "default": -90,
+        "scale": "linear"
+      },
+      "group": [
+        "Gate"
+      ],
+      "meaning": "range",
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/primitives/gate-continuous-travels.json#GATE_CONTINUOUS_TRAVELS.rangeDb",
+          "at": "omx-dsp@0.22.0"
+        }
+      }
+    },
+    {
+      "id": 4,
+      "symbol": "attack",
+      "name": "Attack",
+      "kind": "travel",
+      "travel": {
+        "min": 0,
+        "max": 500,
+        "step": 0,
+        "unit": "ms",
+        "default": 1,
+        "scale": "linear"
+      },
+      "group": [
+        "Gate"
+      ],
+      "meaning": "attack",
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/gate.json#GATE_LIMITS.attackMs",
+          "at": "omx-dsp@0.22.0"
+        }
+      }
+    },
+    {
+      "id": 5,
+      "symbol": "release",
+      "name": "Release",
+      "kind": "travel",
+      "travel": {
+        "min": 0,
+        "max": 5000,
+        "step": 0,
+        "unit": "ms",
+        "default": 100,
+        "scale": "linear"
+      },
+      "group": [
+        "Gate"
+      ],
+      "meaning": "release",
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/primitives/gate-continuous-travels.json#GATE_CONTINUOUS_TRAVELS.releaseMs",
+          "at": "omx-dsp@0.22.0"
+        }
+      }
+    },
+    {
+      "id": 6,
+      "symbol": "knee_start",
+      "name": "Knee Start",
+      "kind": "travel",
+      "travel": {
+        "min": -80,
+        "max": 0,
+        "step": 1,
+        "unit": "dB",
+        "default": -43,
+        "scale": "linear"
+      },
+      "group": [
+        "Gate"
+      ],
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/gate.json#GATE_LIMITS.kneeStartDb",
+          "at": "omx-dsp@0.22.0"
+        }
+      }
+    },
+    {
+      "id": 7,
+      "symbol": "knee_end",
+      "name": "Knee End",
+      "kind": "travel",
+      "travel": {
+        "min": -80,
+        "max": 0,
+        "step": 1,
+        "unit": "dB",
+        "default": -37,
+        "scale": "linear"
+      },
+      "group": [
+        "Gate"
+      ],
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/gate.json#GATE_LIMITS.kneeEndDb",
+          "at": "omx-dsp@0.22.0"
+        }
+      }
+    },
+    {
+      "id": 8,
+      "symbol": "hold",
+      "name": "Hold",
+      "kind": "travel",
+      "travel": {
+        "min": 0,
+        "max": 2000,
+        "step": 1,
+        "unit": "ms",
+        "default": 10,
+        "scale": "linear"
+      },
+      "group": [
+        "Gate"
+      ],
+      "meaning": "hold",
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/gate.json#GATE_LIMITS.holdMs",
+          "at": "omx-dsp@0.22.0"
+        }
+      }
+    },
+    {
+      "id": 9,
+      "symbol": "hysteresis",
+      "name": "Hysteresis",
+      "kind": "travel",
+      "travel": {
+        "min": 0,
+        "max": 24,
+        "step": 0,
+        "unit": "dB",
+        "default": 3,
+        "scale": "linear"
+      },
+      "group": [
+        "Gate"
+      ],
+      "meaning": "hysteresis",
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/gate.json#GATE_LIMITS.hysteresisDb",
+          "at": "omx-dsp@0.22.0"
+        }
+      }
+    },
+    {
+      "id": 10,
+      "symbol": "key_hp",
+      "name": "Key High-pass",
+      "kind": "travel",
+      "travel": {
+        "min": 0,
+        "max": 20000,
+        "step": 1,
+        "unit": "Hz",
+        "default": 0,
+        "scale": "log"
+      },
+      "group": [
+        "Key"
+      ],
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/gate.json#GATE_KEY_LIMITS.hpHz",
+          "at": "omx-dsp@0.22.0"
+        }
+      }
+    },
+    {
+      "id": 11,
+      "symbol": "key_lp",
+      "name": "Key Low-pass",
+      "kind": "travel",
+      "travel": {
+        "min": 0,
+        "max": 20000,
+        "step": 1,
+        "unit": "Hz",
+        "default": 0,
+        "scale": "log"
+      },
+      "group": [
+        "Key"
+      ],
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/gate.json#GATE_KEY_LIMITS.lpHz",
+          "at": "omx-dsp@0.22.0"
+        }
+      }
+    }
+  ],
+  "ports": [
+    {
+      "id": 0,
+      "name": "in",
+      "kind": "audio",
+      "direction": "in",
+      "role": "main",
+      "channels": 2,
+      "layout": "stereo"
+    },
+    {
+      "id": 1,
+      "name": "key",
+      "kind": "audio",
+      "direction": "in",
+      "role": "sidechain",
+      "channels": 1,
+      "layout": "mono"
+    },
+    {
+      "id": 0,
+      "name": "out",
+      "kind": "audio",
+      "direction": "out",
+      "role": "main",
+      "channels": 2,
+      "layout": "stereo"
+    }
+  ],
+  "latency": {
+    "reports": true
+  },
+  "source": {
+    "impl": "plugins/omx-keyed-gate/omx_gate_clap.c#clap_entry"
+  }
+}

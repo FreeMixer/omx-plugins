@@ -1,17 +1,13 @@
 {
-  "$comment": "THE declaration of omx-transient, the folder's one hand-written file. Every other file of the folder is generated from it by tools/gen.mjs. Its parameters are by reference to omx-contract's transient kernel and bind by name to omx-dsp's instance face. Parameter order is append-only.",
+  "$comment": "The extras of omx-transient's declaration: what its descriptor, omx-transient.descriptor.json, has no word for (docs/declaration-as-descriptor.md). The two are the folder's hand-written files; tools/gen.mjs generates the rest and writes the travels the descriptor's links resolve to. Its parameters are by reference to omx-contract's transient kernel and bind by name to omx-dsp's instance face. Control order, the descriptor's, is append-only.",
   "stem": "omx-transient",
   "kernel": "transient",
   "kernels": [
     "transient"
   ],
-  "name": "omx transient",
-  "vendor": "openmixer",
   "url": "https://github.com/FreeMixer/omx-plugins",
-  "version": "0.9.0",
   "description": "The console's transient designer: more or less attack and sustain, from two envelope contrasts, with no threshold to set.",
   "clap": {
-    "id": "org.openmixer.transient",
     "features": [
       "audio-effect",
       "transient-shaper",
@@ -19,44 +15,11 @@
     ]
   },
   "lv2": {
-    "uri": "urn:openmixer:transient",
     "class": "lv2:DynamicsPlugin"
   },
   "binding": "instance",
   "oracles": [
     "transient-arms"
-  ],
-  "params": [
-    {
-      "symbol": "attackDb",
-      "name": "Attack",
-      "ref": "TRANSIENT_LIMITS",
-      "field": "attackDb"
-    },
-    {
-      "symbol": "sustainDb",
-      "name": "Sustain",
-      "ref": "TRANSIENT_LIMITS",
-      "field": "sustainDb"
-    },
-    {
-      "symbol": "attackTimeMs",
-      "name": "Attack Time",
-      "ref": "TRANSIENT_LIMITS",
-      "field": "attackTimeMs"
-    },
-    {
-      "symbol": "sustainTimeMs",
-      "name": "Sustain Time",
-      "ref": "TRANSIENT_LIMITS",
-      "field": "sustainTimeMs"
-    },
-    {
-      "symbol": "outputDb",
-      "name": "Output",
-      "ref": "TRANSIENT_LIMITS",
-      "field": "outputDb"
-    }
   ],
   "portHints": {
     "attackDb": {
@@ -91,11 +54,8 @@
     }
   },
   "panel": {
-    "family": "dynamics",
-    "roles": {
-      "attack": "attackTimeMs",
-      "output": "outputDb"
-    },
+    "family": "none",
+    "roles": {},
     "sections": [
       {
         "key": "transient",

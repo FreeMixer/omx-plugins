@@ -6,7 +6,7 @@
   "name": "omx test-sine-voice",
   "vendor": "openmixer",
   "url": "https://github.com/FreeMixer/omx-plugins",
-  "version": "0.9.0",
+  "version": "0.10.0",
   "description": "A test instrument: one sine per held note at its equal-tempered frequency, at a level the velocity predicts, with a linear attack and release.",
   "clap": {
     "id": "org.openmixer.test-sine-voice",

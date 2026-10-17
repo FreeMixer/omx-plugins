@@ -1,0 +1,146 @@
+{
+  "$schema": "https://github.com/FreeMixer/omx-contract/raw/v2/schema/omx-contract.schema.json",
+  "requires": {
+    "omx-contract-schema": ">= 2.15.0"
+  },
+  "origin": "authored",
+  "plugin": {
+    "id": "org.openmixer.flanger",
+    "format": "clap",
+    "uri": "urn:openmixer:flanger",
+    "name": "omx flanger",
+    "vendor": "openmixer",
+    "version": "0.10.0",
+    "features": [
+      "audio-effect"
+    ]
+  },
+  "controls": [
+    {
+      "id": 0,
+      "symbol": "rate",
+      "name": "Rate",
+      "kind": "travel",
+      "travel": {
+        "min": 0.05,
+        "max": 5,
+        "step": 0,
+        "unit": "Hz",
+        "default": 0.25,
+        "scale": "log"
+      },
+      "group": [
+        "Flanger"
+      ],
+      "meaning": "rate",
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/flanger.json#FLANGER_RATE_RANGE",
+          "at": "omx-dsp@0.22.0"
+        }
+      }
+    },
+    {
+      "id": 1,
+      "symbol": "depth",
+      "name": "Depth",
+      "kind": "travel",
+      "travel": {
+        "min": 0,
+        "max": 5,
+        "step": 0,
+        "unit": "ms",
+        "default": 2,
+        "scale": "linear"
+      },
+      "group": [
+        "Flanger"
+      ],
+      "meaning": "depth",
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/flanger.json#FLANGER_DEPTH_RANGE",
+          "at": "omx-dsp@0.22.0"
+        }
+      }
+    },
+    {
+      "id": 2,
+      "symbol": "feedback",
+      "name": "Feedback",
+      "kind": "travel",
+      "travel": {
+        "min": -0.95,
+        "max": 0.95,
+        "step": 0,
+        "unit": "",
+        "default": 0.6,
+        "scale": "linear"
+      },
+      "group": [
+        "Flanger"
+      ],
+      "meaning": "feedback",
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/flanger.json#FLANGER_FEEDBACK_RANGE",
+          "at": "omx-dsp@0.22.0"
+        }
+      }
+    },
+    {
+      "id": 3,
+      "symbol": "mix",
+      "name": "Mix",
+      "kind": "travel",
+      "travel": {
+        "min": 0,
+        "max": 100,
+        "step": 0,
+        "unit": "%",
+        "default": 50,
+        "scale": "linear"
+      },
+      "group": [
+        "Flanger"
+      ],
+      "meaning": "wetDryRatio",
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/flanger.json#FLANGER_MIX_RANGE",
+          "at": "omx-dsp@0.22.0"
+        }
+      }
+    }
+  ],
+  "ports": [
+    {
+      "id": 0,
+      "name": "in",
+      "kind": "audio",
+      "direction": "in",
+      "role": "main",
+      "channels": 2,
+      "layout": "stereo"
+    },
+    {
+      "id": 0,
+      "name": "out",
+      "kind": "audio",
+      "direction": "out",
+      "role": "main",
+      "channels": 2,
+      "layout": "stereo"
+    }
+  ],
+  "latency": {
+    "reports": true
+  },
+  "source": {
+    "impl": "plugins/omx-flanger/omx_flanger_clap.c#clap_entry"
+  }
+}
