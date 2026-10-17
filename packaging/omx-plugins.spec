@@ -17,6 +17,8 @@ BuildRequires: pkgconf-pkg-config
 BuildRequires: omx-dsp-devel >= 0.18.0
 BuildRequires: omx-contract-devel >= 2.12.0
 BuildRequires: omx-clap-core-devel >= 0.6.0
+# the omx-contract command, first packaged in 2.15.0: the generators read the contract directory through it
+BuildRequires: omx-contract >= 2.15.0
 BuildRequires: clap-devel
 BuildRequires: lv2-devel
 # %%check: the generators and checks are Node scripts; the hosts that load the built plugins
