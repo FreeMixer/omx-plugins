@@ -1,0 +1,42 @@
+{
+  "format": "org.openmixer.preset/1",
+  "plugin": "org.openmixer.phaser",
+  "id": "deep-jet",
+  "name": "Deep Jet",
+  "carries": "params",
+  "params": [
+    {
+      "symbol": "rateHz",
+      "unit": "Hz",
+      "value": 0.3
+    },
+    {
+      "symbol": "baseHz",
+      "unit": "Hz",
+      "value": 200
+    },
+    {
+      "symbol": "depthOct",
+      "unit": "oct",
+      "value": 5
+    },
+    {
+      "symbol": "stages",
+      "unit": "",
+      "value": 10
+    },
+    {
+      "symbol": "feedback",
+      "unit": "",
+      "value": 0.8
+    },
+    {
+      "symbol": "mix",
+      "unit": "%",
+      "value": 50
+    }
+  ],
+  "created": "2026-10-17T00:00:00Z",
+  "modified": "2026-10-17T00:00:00Z",
+  "copyOf": null
+}

@@ -1,0 +1,32 @@
+{
+  "format": "org.openmixer.preset/1",
+  "plugin": "org.openmixer.flanger",
+  "id": "negative-sweep",
+  "name": "Negative Sweep",
+  "carries": "params",
+  "params": [
+    {
+      "symbol": "rate",
+      "unit": "Hz",
+      "value": 0.1
+    },
+    {
+      "symbol": "depth",
+      "unit": "ms",
+      "value": 4
+    },
+    {
+      "symbol": "feedback",
+      "unit": "",
+      "value": -0.6
+    },
+    {
+      "symbol": "mix",
+      "unit": "%",
+      "value": 50
+    }
+  ],
+  "created": "2026-10-17T00:00:00Z",
+  "modified": "2026-10-17T00:00:00Z",
+  "copyOf": null
+}

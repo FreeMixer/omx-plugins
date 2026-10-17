@@ -1,0 +1,37 @@
+{
+  "format": "org.openmixer.preset/1",
+  "plugin": "org.openmixer.chorus",
+  "id": "lush-chorus",
+  "name": "Lush Chorus",
+  "carries": "params",
+  "params": [
+    {
+      "symbol": "spread",
+      "unit": "",
+      "value": 0
+    },
+    {
+      "symbol": "rate",
+      "unit": "Hz",
+      "value": 0.6
+    },
+    {
+      "symbol": "depth",
+      "unit": "ms",
+      "value": 4
+    },
+    {
+      "symbol": "voices",
+      "unit": "",
+      "value": 4
+    },
+    {
+      "symbol": "mix",
+      "unit": "%",
+      "value": 35
+    }
+  ],
+  "created": "2026-10-17T00:00:00Z",
+  "modified": "2026-10-17T00:00:00Z",
+  "copyOf": null
+}

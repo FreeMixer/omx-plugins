@@ -1,0 +1,27 @@
+{
+  "format": "org.openmixer.preset/1",
+  "plugin": "org.openmixer.pitch",
+  "id": "detune-thicken",
+  "name": "Detune Thicken",
+  "carries": "params",
+  "params": [
+    {
+      "symbol": "semitones",
+      "unit": "st",
+      "value": 0
+    },
+    {
+      "symbol": "cents",
+      "unit": "cents",
+      "value": 12
+    },
+    {
+      "symbol": "mix",
+      "unit": "%",
+      "value": 50
+    }
+  ],
+  "created": "2026-10-17T00:00:00Z",
+  "modified": "2026-10-17T00:00:00Z",
+  "copyOf": null
+}

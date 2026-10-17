@@ -1,0 +1,37 @@
+{
+  "format": "org.openmixer.preset/1",
+  "plugin": "org.openmixer.chorus",
+  "id": "slow-wide",
+  "name": "Slow and Wide",
+  "carries": "params",
+  "params": [
+    {
+      "symbol": "spread",
+      "unit": "",
+      "value": 0.25
+    },
+    {
+      "symbol": "rate",
+      "unit": "Hz",
+      "value": 0.2
+    },
+    {
+      "symbol": "depth",
+      "unit": "ms",
+      "value": 8
+    },
+    {
+      "symbol": "voices",
+      "unit": "",
+      "value": 3
+    },
+    {
+      "symbol": "mix",
+      "unit": "%",
+      "value": 50
+    }
+  ],
+  "created": "2026-10-17T00:00:00Z",
+  "modified": "2026-10-17T00:00:00Z",
+  "copyOf": null
+}

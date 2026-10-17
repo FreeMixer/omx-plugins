@@ -1,0 +1,73 @@
+{
+  "format": "org.openmixer.preset/1",
+  "plugin": "org.openmixer.reverb",
+  "id": "bright-plate",
+  "name": "Bright Plate",
+  "carries": "params",
+  "params": [
+    {
+      "symbol": "plateModDepth",
+      "unit": "%",
+      "value": 100
+    },
+    {
+      "symbol": "size",
+      "unit": "",
+      "value": 0.5
+    },
+    {
+      "symbol": "damping",
+      "unit": "",
+      "value": 0.3
+    },
+    {
+      "symbol": "width",
+      "unit": "",
+      "value": 1
+    },
+    {
+      "symbol": "predelay",
+      "unit": "ms",
+      "value": 15
+    },
+    {
+      "symbol": "lowcut",
+      "unit": "Hz",
+      "value": 150
+    },
+    {
+      "symbol": "highcut",
+      "unit": "Hz",
+      "value": 11000
+    },
+    {
+      "symbol": "reverse",
+      "unit": "ms",
+      "value": 300
+    },
+    {
+      "symbol": "hold",
+      "unit": "ms",
+      "value": 120
+    },
+    {
+      "symbol": "release",
+      "unit": "ms",
+      "value": 20
+    },
+    {
+      "symbol": "gateThreshold",
+      "unit": "dBFS",
+      "value": -40
+    },
+    {
+      "symbol": "algorithm",
+      "unit": "",
+      "value": 1,
+      "label": "Plate"
+    }
+  ],
+  "created": "2026-10-17T00:00:00Z",
+  "modified": "2026-10-17T00:00:00Z",
+  "copyOf": null
+}

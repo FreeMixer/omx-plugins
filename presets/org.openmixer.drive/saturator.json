@@ -1,0 +1,71 @@
+{
+  "format": "org.openmixer.preset/1",
+  "plugin": "org.openmixer.drive",
+  "id": "saturator",
+  "name": "Saturator",
+  "carries": "params",
+  "params": [
+    {
+      "symbol": "amount",
+      "unit": "dB",
+      "value": 6
+    },
+    {
+      "symbol": "character",
+      "unit": "",
+      "value": 0
+    },
+    {
+      "symbol": "bandFreq",
+      "unit": "Hz",
+      "value": 2000
+    },
+    {
+      "symbol": "mix",
+      "unit": "%",
+      "value": 100
+    },
+    {
+      "symbol": "trim",
+      "unit": "dB",
+      "value": 0
+    },
+    {
+      "symbol": "curve",
+      "unit": "",
+      "value": 0,
+      "label": "Soft"
+    },
+    {
+      "symbol": "band",
+      "unit": "",
+      "value": 0,
+      "label": "Full"
+    },
+    {
+      "symbol": "autoGain",
+      "unit": "",
+      "value": 1
+    },
+    {
+      "symbol": "stereoLink",
+      "unit": "",
+      "value": 1
+    },
+    {
+      "symbol": "hfRolloff",
+      "unit": "",
+      "value": 0,
+      "label": "Off"
+    },
+    {
+      "symbol": "oversample",
+      "unit": "",
+      "value": 4,
+      "label": "4"
+    }
+  ],
+  "created": "2026-10-17T00:00:00Z",
+  "modified": "2026-10-17T00:00:00Z",
+  "copyOf": null
+}

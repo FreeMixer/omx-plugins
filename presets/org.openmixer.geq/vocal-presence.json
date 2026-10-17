@@ -1,0 +1,167 @@
+{
+  "format": "org.openmixer.preset/1",
+  "plugin": "org.openmixer.geq",
+  "id": "vocal-presence",
+  "name": "Vocal Presence",
+  "carries": "params",
+  "params": [
+    {
+      "symbol": "band01",
+      "unit": "dB",
+      "value": 0
+    },
+    {
+      "symbol": "band02",
+      "unit": "dB",
+      "value": 0
+    },
+    {
+      "symbol": "band03",
+      "unit": "dB",
+      "value": 0
+    },
+    {
+      "symbol": "band04",
+      "unit": "dB",
+      "value": 0
+    },
+    {
+      "symbol": "band05",
+      "unit": "dB",
+      "value": 0
+    },
+    {
+      "symbol": "band06",
+      "unit": "dB",
+      "value": 0
+    },
+    {
+      "symbol": "band07",
+      "unit": "dB",
+      "value": 0
+    },
+    {
+      "symbol": "band08",
+      "unit": "dB",
+      "value": 0
+    },
+    {
+      "symbol": "band09",
+      "unit": "dB",
+      "value": 0
+    },
+    {
+      "symbol": "band10",
+      "unit": "dB",
+      "value": -2
+    },
+    {
+      "symbol": "band11",
+      "unit": "dB",
+      "value": -2
+    },
+    {
+      "symbol": "band12",
+      "unit": "dB",
+      "value": -2
+    },
+    {
+      "symbol": "band13",
+      "unit": "dB",
+      "value": -1.5
+    },
+    {
+      "symbol": "band14",
+      "unit": "dB",
+      "value": -1
+    },
+    {
+      "symbol": "band15",
+      "unit": "dB",
+      "value": 0
+    },
+    {
+      "symbol": "band16",
+      "unit": "dB",
+      "value": 0
+    },
+    {
+      "symbol": "band17",
+      "unit": "dB",
+      "value": 0
+    },
+    {
+      "symbol": "band18",
+      "unit": "dB",
+      "value": 0
+    },
+    {
+      "symbol": "band19",
+      "unit": "dB",
+      "value": 0
+    },
+    {
+      "symbol": "band20",
+      "unit": "dB",
+      "value": 0
+    },
+    {
+      "symbol": "band21",
+      "unit": "dB",
+      "value": 1
+    },
+    {
+      "symbol": "band22",
+      "unit": "dB",
+      "value": 2.5
+    },
+    {
+      "symbol": "band23",
+      "unit": "dB",
+      "value": 3.5
+    },
+    {
+      "symbol": "band24",
+      "unit": "dB",
+      "value": 3.5
+    },
+    {
+      "symbol": "band25",
+      "unit": "dB",
+      "value": 2.5
+    },
+    {
+      "symbol": "band26",
+      "unit": "dB",
+      "value": 1.5
+    },
+    {
+      "symbol": "band27",
+      "unit": "dB",
+      "value": 0
+    },
+    {
+      "symbol": "band28",
+      "unit": "dB",
+      "value": 0
+    },
+    {
+      "symbol": "band29",
+      "unit": "dB",
+      "value": 0
+    },
+    {
+      "symbol": "band30",
+      "unit": "dB",
+      "value": 0
+    },
+    {
+      "symbol": "band31",
+      "unit": "dB",
+      "value": 0
+    }
+  ],
+  "created": "2026-10-17T00:00:00Z",
+  "modified": "2026-10-17T00:00:00Z",
+  "copyOf": null
+}
