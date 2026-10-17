@@ -1,3 +1,23 @@
+omx-plugins (0.10.0) unstable; urgency=medium
+
+  * Every plugin over one kernel is described in omx-contract's own words: a
+    descriptor file per plugin carries its identity, its controls with their
+    symbols, names, groups, meanings and the definitions their travels are
+    read from, its ports and its latency, and the declaration keeps only
+    what the descriptor has no word for.
+  * The built CLAP and LV2 faces are scanned as a host scans any plugin, and
+    must state exactly what the descriptor says.
+  * The panel description is laid out from a descriptor, so any plugin, ours
+    or a scanned one, gets a panel; a LUFS or dBu level takes the threshold
+    and ceiling roles.
+  * omx transient is no longer drawn under the compressor's family: a
+    declared family needs the meanings it stands on.
+  * Builds against omx-contract >= 2.15.0 and omx-dsp >= 0.22.0, which ships
+    the kernels' definitions; the build reads them from the contract
+    directory through the omx-contract command.
+
+ -- Pau Aliagas <linuxnow@gmail.com>  Sat, 17 Oct 2026 00:00:00 +0000
+
 omx-plugins (0.9.0) unstable; urgency=medium
 
   * Every meter is coherent: the plugins publish their meters through a

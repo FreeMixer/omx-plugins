@@ -33,7 +33,7 @@
 #   make test-role  a test plugin (`"role": "test"`) is linked into the archive and installed by no
 #                   target: tools/test-role-check.sh over a staged install, with its --self-test
 #                   (part of `make test`)
-VERSION := 0.9.0
+VERSION := 0.10.0
 PLUGINS := $(sort $(dir $(wildcard plugins/*/Makefile)))
 # A test plugin is built, tested and linked into libomxplugins.a like the others, and installed by no
 # target: its declaration says `"role": "test"` (tools/test-plugins.mjs).
@@ -78,21 +78,37 @@ LIB_FLAGS  := -fPIC -fvisibility=hidden -DOMX_CLAP_STATIC -Iinclude
 # read only by the targets that build the archive, so `make version` and the rest need no omx-dsp
 lib_cflags = $(call dep_check,omxdsp,$(OMXDSP_MIN))$(call dep_check,omx-contract,$(CONTRACT_MIN))$(shell $(PKG_CONFIG) --cflags omxdsp omx-clap-core clap)
 
-.PHONY: test-role all lib lib-test test units hints look manual install install-devel clean version recipe-test completeness selftest private-refs strip-crosscheck meters-abi meter-ring
+.PHONY: test-role all lib lib-test test test-faces units panel-layout descriptor-view face-descriptor hints look manual install install-devel clean version recipe-test completeness selftest private-refs strip-crosscheck meters-abi meter-ring
 all: lib
 	@for p in $(PLUGINS); do $(MAKE) -C $$p all || exit 1; done
 lib: $(LIB) $(LIB_PC)
-test: lib units
+test: lib units panel-layout descriptor-view
 	@if [ -z "$(PLUGINS)" ]; then echo "no plugins yet"; fi
 	@for p in $(PLUGINS); do $(MAKE) -C $$p test || exit 1; done
+	@$(MAKE) -s face-descriptor
 	@$(MAKE) -s lib-test
 	@$(MAKE) -s hints
 	@$(MAKE) -s look
 	@$(MAKE) -s manual
 	@$(MAKE) -s meters-abi
 	@$(MAKE) -s test-role
+# what runs with no omx-contract command (debian/rules: no .deb ships the command yet): the built faces against their
+# committed descriptors, the static table and the ABI checks; nothing here reads the contract directory
+test-faces: all lib
+	@$(MAKE) -s face-descriptor
+	@$(MAKE) -s lib-test
+	@$(MAKE) -s meters-abi
+	@$(MAKE) -s test-role
 units:
 	node tools/test/param-units-check.mjs
+panel-layout:
+	node tools/test/panel-layout-test.mjs
+descriptor-view:
+	node tools/test/descriptor-view-test.mjs
+# the described plugins' built faces, scanned, against their authored descriptors; after the plugins build
+face-descriptor:
+	tools/face-descriptor-check.sh
+	tools/face-descriptor-check.sh --self-test
 hints:
 	node tools/gen.mjs --check
 	node tools/gen.mjs

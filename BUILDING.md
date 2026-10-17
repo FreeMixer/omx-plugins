@@ -6,9 +6,10 @@
 
 | What | Fedora | Debian | Used for |
 |---|---|---|---|
-| omx-dsp ≥ 0.18.0 (`pkg-config omxdsp`) | `omx-dsp-devel` (channel) | `libomxdsp-dev` (channel) | the DSP: every kernel lives there, none here |
-| omx-contract ≥ 2.12.0 (`pkg-config omx-contract`) | `omx-contract-devel` (channel) | `libomx-contract-dev` (channel) | the declarations: every parameter's travel, read from its installed `omx-contract.json`, and the EQ default rule (its C render; the generators build a small probe, so they need the C compiler too) |
+| omx-dsp ≥ 0.22.0 (`pkg-config omxdsp`) | `omx-dsp-devel` (channel) | `libomxdsp-dev` (channel) | the DSP: every kernel lives there, none here |
+| omx-contract ≥ 2.15.0 (`pkg-config omx-contract`) | `omx-contract-devel` (channel) | `libomx-contract-dev` (channel) | the declarations: every parameter's travel, read from its installed `omx-contract.json`, and the EQ default rule (its C render; the generators build a small probe, so they need the C compiler too) |
 | openmixer CLAP extensions | `omx-clap-core-devel` (channel) | `libomx-clap-core-dev` (channel) | `<omx-clap-host/omx_clap_ext.h>` |
+| the omx-contract command ≥ 2.15.0 | `omx-contract` (channel) | not packaged yet | the generators: the union of the contract directory, read through `omx-contract render --installed` |
 | CLAP 1.2 headers | `clap-devel` | `clap-headers` (built from the pinned CLAP, see FreeMixer/.github) | the CLAP face |
 | LV2 headers | `lv2-devel` | `lv2-dev` | the LV2 face |
 | C compiler, make, pkg-config | `gcc make pkgconf-pkg-config` | `build-essential pkgconf` | |
@@ -16,6 +17,20 @@
 | Node.js ≥ 18 | `nodejs` | `nodejs` | tests and `make gen`: the generators |
 | sord | `sord` | `sordi` | tests: `sord_validate` on the LV2 bundle |
 | omx-clap-host | `omx-clap-host` (channel) | `omx-clap-host` (channel) | tests: `omx-clap-scan` (the check says SKIP when it is absent; CI and the package builds install it) |
+
+From omx-contract 2.15.0 on, the kernels' definitions ship with omx-dsp into omx-contract's contract
+directory (`pkg-config --variable=contractdir omx-contract`), and the installed `omx-contract.json` holds
+only the shared facts. The generators then read the union of that directory through the omx-contract CLI,
+`omx-contract render --target json --installed`, rendered once into `build/contract-union/`: the CLI is
+`$OMX_CONTRACT_CLI` (its `bin/omx-contract.mjs`) or `omx-contract` on `PATH`, which the omx-contract
+RPM installs. A descriptor's links name the
+package that owns each definition, from the directory's manifests.
+
+A Debian build host has no omx-contract command yet (no .deb ships it yet). There
+`debian/rules` prints one line, `NO-CONTRACT-COMMAND omx-plugins: no omx-contract command on this build host
+...: the generator checks ... are skipped; make test-faces runs`, and runs `make test-faces`: the built faces
+against their committed descriptors (`make face-descriptor`), the static table, the meters ABI and the test
+roles. Where the command is present, `make test` runs whole.
 
 The channel is FreeMixer's package repository: `https://freemixer.github.io/rpm/freemixer.repo` for
 dnf, `https://freemixer.github.io/deb/debian/<release> ./` (key `https://freemixer.github.io/deb/freemixer.asc`)
@@ -46,6 +61,19 @@ entries by CLAP id that `include/omx_clap_static.h` declares. A host links it th
 `make lib-test` installs the devel files into `build/lib/stage`, builds
 `tools/test/static-table-host.c` from the staged `omxplugins.pc` alone and runs it: every plugin's
 CLAP id is in the table once, and each one is created through its factory, activated and run.
+
+Before the plugins, `make test` runs `make units` (the param-contract units are the header's) and
+`make panel-layout` (`tools/test/panel-layout-test.mjs`: the panel rules of
+[docs/panel-layout.md](docs/panel-layout.md) by value, each with an arm that breaks it, over
+omx-contract's example descriptors and our own plugins) and `make descriptor-view`
+(`tools/test/descriptor-view-test.mjs`: each described plugin's descriptor fresh and in omx-contract's
+words, and the declaration its view).
+
+After the plugins, `make face-descriptor` scans every described plugin's built CLAP and LV2 faces as a
+host scans anyone's plugin (`tools/face-scan.c`) and holds what they state to the plugin's authored
+descriptor (`tools/face-descriptor-check.mjs`); a difference is `contract.descriptor.face-differs`, and
+its self-test breaks a copy of a descriptor and of a built `.ttl` and wants both red
+([docs/declaration-as-descriptor.md](docs/declaration-as-descriptor.md)).
 
 `make test` for a plugin runs, in order:
 
@@ -97,8 +125,10 @@ plugins/<name>/
 include/                  shared C shapes (no DSP): omx_panel_description.h and omx_param_contract.h,
                           the openmixer extensions and their rows; omx_clap_static.h, libomxplugins' table
 lib/                      omx_clap_static.c (the table's rows are generated) and omxplugins.pc.in
-tools/                    gen.mjs (header + TTL), panel-description.mjs and param-contract.mjs (the
-                          extensions' rows), modgui-gen.mjs (MOD GUI), look.mjs (its look.json, from
+tools/                    gen.mjs (header + TTL), descriptor.mjs (a declaration as its plugin
+                          descriptor), panel-description.mjs (a panel laid out from any descriptor,
+                          docs/panel-layout.md) and param-contract.mjs (the extensions' rows),
+                          modgui-gen.mjs (MOD GUI), look.mjs (its look.json, from
                           look/tokens.css, the omx look's tokens), the test helpers,
                           omx-new-plugin.mjs (the wizard), plugin-recipe.mjs (completeness)
 recipes/                  plugin.recipe.json, the templates tools/gen.mjs writes from

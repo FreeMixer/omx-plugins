@@ -1,0 +1,338 @@
+{
+  "$schema": "https://github.com/FreeMixer/omx-contract/raw/v2/schema/omx-contract.schema.json",
+  "requires": {
+    "omx-contract-schema": ">= 2.15.0"
+  },
+  "origin": "authored",
+  "plugin": {
+    "id": "org.openmixer.drive",
+    "format": "clap",
+    "uri": "urn:openmixer:drive",
+    "name": "omx drive",
+    "vendor": "openmixer",
+    "version": "0.10.0",
+    "features": [
+      "audio-effect"
+    ]
+  },
+  "controls": [
+    {
+      "id": 0,
+      "symbol": "amount",
+      "name": "Drive",
+      "kind": "travel",
+      "travel": {
+        "min": 0,
+        "max": 36,
+        "step": 0,
+        "unit": "dB",
+        "default": 0,
+        "scale": "linear"
+      },
+      "group": [
+        "Drive"
+      ],
+      "meaning": "drive",
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/drive.json#DRIVE_AMOUNT_RANGE",
+          "at": "omx-dsp@0.22.0"
+        }
+      }
+    },
+    {
+      "id": 1,
+      "symbol": "character",
+      "name": "Character",
+      "kind": "travel",
+      "travel": {
+        "min": -1,
+        "max": 1,
+        "step": 0,
+        "unit": "",
+        "default": 0,
+        "scale": "linear"
+      },
+      "group": [
+        "Drive"
+      ],
+      "meaning": "tone",
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/drive.json#DRIVE_CHARACTER_RANGE",
+          "at": "omx-dsp@0.22.0"
+        }
+      }
+    },
+    {
+      "id": 2,
+      "symbol": "bandFreq",
+      "name": "Band Frequency",
+      "kind": "travel",
+      "travel": {
+        "min": 20,
+        "max": 20000,
+        "step": 1,
+        "unit": "Hz",
+        "default": 2000,
+        "scale": "log"
+      },
+      "group": [
+        "Drive"
+      ],
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/drive.json#DRIVE_BAND_FREQ_RANGE",
+          "at": "omx-dsp@0.22.0"
+        }
+      }
+    },
+    {
+      "id": 3,
+      "symbol": "mix",
+      "name": "Mix",
+      "kind": "travel",
+      "travel": {
+        "min": 0,
+        "max": 100,
+        "step": 0,
+        "unit": "%",
+        "default": 100,
+        "scale": "linear"
+      },
+      "group": [
+        "Drive"
+      ],
+      "meaning": "wetDryRatio",
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/drive.json#DRIVE_MIX_RANGE",
+          "at": "omx-dsp@0.22.0"
+        }
+      }
+    },
+    {
+      "id": 4,
+      "symbol": "trim",
+      "name": "Trim",
+      "kind": "travel",
+      "travel": {
+        "min": -24,
+        "max": 12,
+        "step": 0,
+        "unit": "dB",
+        "default": 0,
+        "scale": "linear"
+      },
+      "group": [
+        "Drive"
+      ],
+      "meaning": "output",
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/drive.json#DRIVE_TRIM_RANGE",
+          "at": "omx-dsp@0.22.0"
+        }
+      }
+    },
+    {
+      "id": 5,
+      "symbol": "curve",
+      "name": "Curve",
+      "kind": "choice",
+      "ids": [
+        "0",
+        "1",
+        "2",
+        "3"
+      ],
+      "labels": [
+        "Soft",
+        "Tape",
+        "Tube",
+        "Exciter"
+      ],
+      "values": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "default": "0",
+      "group": [
+        "Drive"
+      ],
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/drive.json#DRIVE_CURVES",
+          "at": "omx-dsp@0.22.0"
+        }
+      }
+    },
+    {
+      "id": 6,
+      "symbol": "band",
+      "name": "Band",
+      "kind": "choice",
+      "ids": [
+        "0",
+        "1",
+        "2",
+        "3"
+      ],
+      "labels": [
+        "Full",
+        "Low",
+        "High",
+        "Tilt"
+      ],
+      "values": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "default": "0",
+      "group": [
+        "Drive"
+      ],
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/drive.json#DRIVE_BANDS",
+          "at": "omx-dsp@0.22.0"
+        }
+      }
+    },
+    {
+      "id": 7,
+      "symbol": "autoGain",
+      "name": "Auto Gain",
+      "kind": "toggle",
+      "default": true,
+      "group": [
+        "Drive"
+      ],
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/drive.json#DRIVE_AUTO_GAINS",
+          "at": "omx-dsp@0.22.0"
+        }
+      }
+    },
+    {
+      "id": 8,
+      "symbol": "stereoLink",
+      "name": "Stereo Link",
+      "kind": "toggle",
+      "default": true,
+      "group": [
+        "Drive"
+      ],
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/drive.json#DRIVE_STEREO_LINKS",
+          "at": "omx-dsp@0.22.0"
+        }
+      }
+    },
+    {
+      "id": 9,
+      "symbol": "hfRolloff",
+      "name": "HF Roll-off",
+      "kind": "choice",
+      "ids": [
+        "0",
+        "1",
+        "2"
+      ],
+      "labels": [
+        "Off",
+        "12 kHz",
+        "16 kHz"
+      ],
+      "values": [
+        0,
+        1,
+        2
+      ],
+      "default": "0",
+      "group": [
+        "Drive"
+      ],
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/drive.json#DRIVE_HF_ROLLOFFS",
+          "at": "omx-dsp@0.22.0"
+        }
+      }
+    },
+    {
+      "id": 10,
+      "symbol": "oversample",
+      "name": "Oversampling",
+      "kind": "choice",
+      "ids": [
+        "1",
+        "2",
+        "4"
+      ],
+      "labels": [
+        "1",
+        "2",
+        "4"
+      ],
+      "values": [
+        1,
+        2,
+        4
+      ],
+      "default": "4",
+      "group": [
+        "Drive"
+      ],
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/drive.json#DRIVE_OVERSAMPLES",
+          "at": "omx-dsp@0.22.0"
+        }
+      }
+    }
+  ],
+  "ports": [
+    {
+      "id": 0,
+      "name": "in",
+      "kind": "audio",
+      "direction": "in",
+      "role": "main",
+      "channels": 2,
+      "layout": "stereo"
+    },
+    {
+      "id": 0,
+      "name": "out",
+      "kind": "audio",
+      "direction": "out",
+      "role": "main",
+      "channels": 2,
+      "layout": "stereo"
+    }
+  ],
+  "latency": {
+    "reports": true
+  },
+  "source": {
+    "impl": "plugins/omx-drive/omx_drive_clap.c#clap_entry"
+  }
+}

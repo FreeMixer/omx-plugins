@@ -1,0 +1,194 @@
+{
+  "$schema": "https://github.com/FreeMixer/omx-contract/raw/v2/schema/omx-contract.schema.json",
+  "requires": {
+    "omx-contract-schema": ">= 2.15.0"
+  },
+  "origin": "authored",
+  "plugin": {
+    "id": "org.openmixer.phaser",
+    "format": "clap",
+    "uri": "urn:openmixer:phaser",
+    "name": "omx phaser",
+    "vendor": "openmixer",
+    "version": "0.10.0",
+    "features": [
+      "audio-effect"
+    ]
+  },
+  "controls": [
+    {
+      "id": 0,
+      "symbol": "rateHz",
+      "name": "Rate",
+      "kind": "travel",
+      "travel": {
+        "min": 0.05,
+        "max": 5,
+        "step": 0,
+        "unit": "Hz",
+        "default": 0.5,
+        "scale": "log"
+      },
+      "group": [
+        "Phaser"
+      ],
+      "meaning": "rate",
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/phaser.json#PHASER_RATE_RANGE",
+          "at": "omx-dsp@0.22.0"
+        }
+      }
+    },
+    {
+      "id": 1,
+      "symbol": "baseHz",
+      "name": "Base",
+      "kind": "travel",
+      "travel": {
+        "min": 50,
+        "max": 2000,
+        "step": 1,
+        "unit": "Hz",
+        "default": 200,
+        "scale": "log"
+      },
+      "group": [
+        "Phaser"
+      ],
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/phaser.json#PHASER_BASE_RANGE",
+          "at": "omx-dsp@0.22.0"
+        }
+      }
+    },
+    {
+      "id": 2,
+      "symbol": "depthOct",
+      "name": "Depth",
+      "kind": "travel",
+      "travel": {
+        "min": 0,
+        "max": 6,
+        "step": 0,
+        "unit": "oct",
+        "default": 4,
+        "scale": "linear"
+      },
+      "group": [
+        "Phaser"
+      ],
+      "meaning": "depth",
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/phaser.json#PHASER_DEPTH_RANGE",
+          "at": "omx-dsp@0.22.0"
+        }
+      }
+    },
+    {
+      "id": 3,
+      "symbol": "stages",
+      "name": "Stages",
+      "kind": "travel",
+      "travel": {
+        "min": 2,
+        "max": 12,
+        "step": 1,
+        "unit": "",
+        "default": 6,
+        "scale": "linear"
+      },
+      "group": [
+        "Phaser"
+      ],
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/phaser.json#PHASER_STAGES_RANGE",
+          "at": "omx-dsp@0.22.0"
+        }
+      }
+    },
+    {
+      "id": 4,
+      "symbol": "feedback",
+      "name": "Feedback",
+      "kind": "travel",
+      "travel": {
+        "min": -0.9,
+        "max": 0.9,
+        "step": 0,
+        "unit": "",
+        "default": 0.4,
+        "scale": "linear"
+      },
+      "group": [
+        "Phaser"
+      ],
+      "meaning": "feedback",
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/phaser.json#PHASER_FEEDBACK_RANGE",
+          "at": "omx-dsp@0.22.0"
+        }
+      }
+    },
+    {
+      "id": 5,
+      "symbol": "mix",
+      "name": "Mix",
+      "kind": "travel",
+      "travel": {
+        "min": 0,
+        "max": 100,
+        "step": 0,
+        "unit": "%",
+        "default": 50,
+        "scale": "linear"
+      },
+      "group": [
+        "Phaser"
+      ],
+      "meaning": "wetDryRatio",
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/phaser.json#PHASER_MIX_RANGE",
+          "at": "omx-dsp@0.22.0"
+        }
+      }
+    }
+  ],
+  "ports": [
+    {
+      "id": 0,
+      "name": "in",
+      "kind": "audio",
+      "direction": "in",
+      "role": "main",
+      "channels": 2,
+      "layout": "stereo"
+    },
+    {
+      "id": 0,
+      "name": "out",
+      "kind": "audio",
+      "direction": "out",
+      "role": "main",
+      "channels": 2,
+      "layout": "stereo"
+    }
+  ],
+  "latency": {
+    "reports": true
+  },
+  "source": {
+    "impl": "plugins/omx-phaser/omx_phaser_clap.c#clap_entry"
+  }
+}
