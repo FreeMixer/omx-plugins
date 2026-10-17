@@ -14,7 +14,16 @@ override_dh_auto_install:
 	# libomxplugins.a and omxplugins.pc are the -dev package's, in the multiarch directory
 	$(MAKE) install-devel DESTDIR=$(CURDIR)/debian/tmp PREFIX=/usr LIBDIR=/usr/lib/$(DEB_HOST_MULTIARCH)
 
+# The generators read omx-contract's contract directory through the omx-contract command, which no .deb
+# installs yet: where it is absent, the checks that read it are skipped, saying so in one
+# line, and the faces are still held to their committed descriptors (make test-faces). Where it is present,
+# make test runs whole.
 override_dh_auto_test:
 ifeq (,$(filter nocheck,$(DEB_BUILD_OPTIONS)))
-	$(MAKE) test OMX_LV2_SPEC_DIR=/usr/lib/lv2
+	@if [ -n "$$OMX_CONTRACT_CLI" ] || command -v omx-contract >/dev/null 2>&1; then \
+	  $(MAKE) test OMX_LV2_SPEC_DIR=/usr/lib/lv2; \
+	else \
+	  echo "NO-CONTRACT-COMMAND omx-plugins: no omx-contract command on this build host (no .deb ships it yet): the generator checks, which read the contract directory through it, are skipped; make test-faces runs"; \
+	  $(MAKE) test-faces OMX_LV2_SPEC_DIR=/usr/lib/lv2; \
+	fi
 endif
