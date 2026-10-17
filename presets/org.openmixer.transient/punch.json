@@ -1,0 +1,37 @@
+{
+  "format": "org.openmixer.preset/1",
+  "plugin": "org.openmixer.transient",
+  "id": "punch",
+  "name": "Punch",
+  "carries": "params",
+  "params": [
+    {
+      "symbol": "attackDb",
+      "unit": "dB",
+      "value": 8
+    },
+    {
+      "symbol": "sustainDb",
+      "unit": "dB",
+      "value": -4
+    },
+    {
+      "symbol": "attackTimeMs",
+      "unit": "ms",
+      "value": 10
+    },
+    {
+      "symbol": "sustainTimeMs",
+      "unit": "ms",
+      "value": 250
+    },
+    {
+      "symbol": "outputDb",
+      "unit": "dB",
+      "value": 0
+    }
+  ],
+  "created": "2026-10-17T00:00:00Z",
+  "modified": "2026-10-17T00:00:00Z",
+  "copyOf": null
+}

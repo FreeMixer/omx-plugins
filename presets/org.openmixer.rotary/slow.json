@@ -1,0 +1,53 @@
+{
+  "format": "org.openmixer.preset/1",
+  "plugin": "org.openmixer.rotary",
+  "id": "slow",
+  "name": "Slow",
+  "carries": "params",
+  "params": [
+    {
+      "symbol": "hornSlowHz",
+      "unit": "Hz",
+      "value": 0.8
+    },
+    {
+      "symbol": "hornFastHz",
+      "unit": "Hz",
+      "value": 6.8
+    },
+    {
+      "symbol": "drumSlowHz",
+      "unit": "Hz",
+      "value": 0.7
+    },
+    {
+      "symbol": "drumFastHz",
+      "unit": "Hz",
+      "value": 5.9
+    },
+    {
+      "symbol": "accel",
+      "unit": "x",
+      "value": 1
+    },
+    {
+      "symbol": "balance",
+      "unit": "%",
+      "value": 0
+    },
+    {
+      "symbol": "mix",
+      "unit": "%",
+      "value": 100
+    },
+    {
+      "symbol": "speed",
+      "unit": "",
+      "value": 1,
+      "label": "Slow"
+    }
+  ],
+  "created": "2026-10-17T00:00:00Z",
+  "modified": "2026-10-17T00:00:00Z",
+  "copyOf": null
+}

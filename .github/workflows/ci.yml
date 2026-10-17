@@ -68,6 +68,7 @@ jobs:
           set -euo pipefail
           node tools/gen.mjs --check
           node tools/look.mjs --check
+          node tools/gen-presets.mjs --check
 
       - name: make test, and nothing skipped
         id: handback-test
@@ -174,6 +175,9 @@ jobs:
           req=$(rpm -q --requires omx-plugins)
           grep -qE '^omx-plugins-clap\([a-z0-9-]+\) = ' <<<"$req"
           grep -qE '^omx-plugins-lv2\([a-z0-9-]+\) = ' <<<"$req"
+          # the metapackage carries the factory presets, one file per preset
+          out=$(rpm -ql omx-plugins); grep -qx /usr/share/omx/presets/org.openmixer.drive/amp-tube.json <<<"$out"
+          test "$(grep -c '^/usr/share/omx/presets/.*\.json$' <<<"$out")" = "$(find presets -name '*.json' | wc -l)"
           # BEGIN GENERATED plugins: tools/gen.mjs, the shipped plugins' short names and kernels, the test plugins' ids
           shorts="chorus comp deesser delay drive eq8 eq16 eq32 flanger geq keyed-gate limiter phaser pitch reverb rotary strip transient tremolo"
           kernels="chorus comp deesser delay drive eq8 eq16 eq32 flanger geq gate limiter phaser pitch reverb rotary strip transient tremolo"
@@ -258,6 +262,9 @@ jobs:
           grep -qE '\./usr/lib/[^/]+/libomxplugins\.a$' <<<"$dev"
           grep -qE '\./usr/lib/[^/]+/pkgconfig/omxplugins\.pc$' <<<"$dev"
           dep=$(dpkg -s omx-plugins); grep -q '^Depends: omx-plugins-clap (= .*), omx-plugins-lv2 (= .*)' <<<"$dep"
+          # the metapackage carries the factory presets, one file per preset
+          out=$(dpkg -L omx-plugins); grep -qx /usr/share/omx/presets/org.openmixer.drive/amp-tube.json <<<"$out"
+          test "$(grep -c '^/usr/share/omx/presets/.*\.json$' <<<"$out")" = "$(find presets -name '*.json' | wc -l)"
           # BEGIN GENERATED plugins: tools/gen.mjs, the shipped plugins' short names and kernels, the test plugins' ids
           shorts="chorus comp deesser delay drive eq8 eq16 eq32 flanger geq keyed-gate limiter phaser pitch reverb rotary strip transient tremolo"
           kernels="chorus comp deesser delay drive eq8 eq16 eq32 flanger geq gate limiter phaser pitch reverb rotary strip transient tremolo"

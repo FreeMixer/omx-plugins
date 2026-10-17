@@ -1,0 +1,252 @@
+{
+  "format": "org.openmixer.preset/1",
+  "plugin": "org.openmixer.eq8",
+  "id": "amp-input",
+  "name": "Amp Input",
+  "carries": "params",
+  "params": [
+    {
+      "symbol": "hpf_on",
+      "unit": "",
+      "value": 0
+    },
+    {
+      "symbol": "hpf_freq",
+      "unit": "Hz",
+      "value": 80
+    },
+    {
+      "symbol": "hpf_slope",
+      "unit": "dB/oct",
+      "value": 12,
+      "label": "12 dB/oct"
+    },
+    {
+      "symbol": "lpf_on",
+      "unit": "",
+      "value": 0
+    },
+    {
+      "symbol": "lpf_freq",
+      "unit": "Hz",
+      "value": 18000
+    },
+    {
+      "symbol": "lpf_slope",
+      "unit": "dB/oct",
+      "value": 12,
+      "label": "12 dB/oct"
+    },
+    {
+      "symbol": "b1_type",
+      "unit": "",
+      "value": 0,
+      "label": "Bell"
+    },
+    {
+      "symbol": "b1_freq",
+      "unit": "Hz",
+      "value": 2500
+    },
+    {
+      "symbol": "b1_gain",
+      "unit": "dB",
+      "value": 4
+    },
+    {
+      "symbol": "b1_q",
+      "unit": "",
+      "value": 1
+    },
+    {
+      "symbol": "b1_on",
+      "unit": "",
+      "value": 1
+    },
+    {
+      "symbol": "b2_type",
+      "unit": "",
+      "value": 0,
+      "label": "Bell"
+    },
+    {
+      "symbol": "b2_freq",
+      "unit": "Hz",
+      "value": 80
+    },
+    {
+      "symbol": "b2_gain",
+      "unit": "dB",
+      "value": 0
+    },
+    {
+      "symbol": "b2_q",
+      "unit": "",
+      "value": 1
+    },
+    {
+      "symbol": "b2_on",
+      "unit": "",
+      "value": 0
+    },
+    {
+      "symbol": "b3_type",
+      "unit": "",
+      "value": 0,
+      "label": "Bell"
+    },
+    {
+      "symbol": "b3_freq",
+      "unit": "Hz",
+      "value": 160
+    },
+    {
+      "symbol": "b3_gain",
+      "unit": "dB",
+      "value": 0
+    },
+    {
+      "symbol": "b3_q",
+      "unit": "",
+      "value": 1
+    },
+    {
+      "symbol": "b3_on",
+      "unit": "",
+      "value": 0
+    },
+    {
+      "symbol": "b4_type",
+      "unit": "",
+      "value": 0,
+      "label": "Bell"
+    },
+    {
+      "symbol": "b4_freq",
+      "unit": "Hz",
+      "value": 400
+    },
+    {
+      "symbol": "b4_gain",
+      "unit": "dB",
+      "value": 0
+    },
+    {
+      "symbol": "b4_q",
+      "unit": "",
+      "value": 1
+    },
+    {
+      "symbol": "b4_on",
+      "unit": "",
+      "value": 0
+    },
+    {
+      "symbol": "b5_type",
+      "unit": "",
+      "value": 0,
+      "label": "Bell"
+    },
+    {
+      "symbol": "b5_freq",
+      "unit": "Hz",
+      "value": 1000
+    },
+    {
+      "symbol": "b5_gain",
+      "unit": "dB",
+      "value": 0
+    },
+    {
+      "symbol": "b5_q",
+      "unit": "",
+      "value": 1
+    },
+    {
+      "symbol": "b5_on",
+      "unit": "",
+      "value": 0
+    },
+    {
+      "symbol": "b6_type",
+      "unit": "",
+      "value": 0,
+      "label": "Bell"
+    },
+    {
+      "symbol": "b6_freq",
+      "unit": "Hz",
+      "value": 2500
+    },
+    {
+      "symbol": "b6_gain",
+      "unit": "dB",
+      "value": 0
+    },
+    {
+      "symbol": "b6_q",
+      "unit": "",
+      "value": 1
+    },
+    {
+      "symbol": "b6_on",
+      "unit": "",
+      "value": 0
+    },
+    {
+      "symbol": "b7_type",
+      "unit": "",
+      "value": 0,
+      "label": "Bell"
+    },
+    {
+      "symbol": "b7_freq",
+      "unit": "Hz",
+      "value": 5000
+    },
+    {
+      "symbol": "b7_gain",
+      "unit": "dB",
+      "value": 0
+    },
+    {
+      "symbol": "b7_q",
+      "unit": "",
+      "value": 1
+    },
+    {
+      "symbol": "b7_on",
+      "unit": "",
+      "value": 0
+    },
+    {
+      "symbol": "b8_type",
+      "unit": "",
+      "value": 2,
+      "label": "High Shelf"
+    },
+    {
+      "symbol": "b8_freq",
+      "unit": "Hz",
+      "value": 12500
+    },
+    {
+      "symbol": "b8_gain",
+      "unit": "dB",
+      "value": 0
+    },
+    {
+      "symbol": "b8_q",
+      "unit": "",
+      "value": 1
+    },
+    {
+      "symbol": "b8_on",
+      "unit": "",
+      "value": 0
+    }
+  ],
+  "created": "2026-10-17T00:00:00Z",
+  "modified": "2026-10-17T00:00:00Z",
+  "copyOf": null
+}

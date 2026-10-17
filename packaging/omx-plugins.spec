@@ -46,7 +46,8 @@ in a session as it does on the desk, sample for sample. Every plugin comes in
 both formats with the same controls, MOD GUI included.
 
 This package installs both formats; omx-plugins-clap and omx-plugins-lv2
-install one each.
+install one each. It also carries the factory presets of every plugin, as
+files in %{_datadir}/omx/presets.
 
 %package clap
 Summary: OpenMixer delay, drive, EQ, strip, gate and effects as CLAP plugins
@@ -101,6 +102,8 @@ host that runs the plugins in its own process without loading .clap files.
 %files
 %license LICENSE
 %doc README.md
+# the factory presets of every plugin, read only data the console's preset library lists (presets/)
+%{_datadir}/omx/presets/
 
 %files clap
 %license LICENSE
