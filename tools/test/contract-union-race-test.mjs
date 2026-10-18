@@ -39,7 +39,7 @@ function scratch() {
   const pkg = join(root, 'pkg-config');
   writeFileSync(pkg, `#!/bin/sh\ncase "$*" in\n  *datadir*) echo ${data};;\n  *contractdir*) echo ${contractdir};;\nesac\n`);
   chmodSync(pkg, 0o755);
-  const cli = join(root, 'fake-omx-contract');
+  const cli = join(root, 'fake-omx-contract.mjs');
   writeFileSync(cli, `#!/usr/bin/env node
 import { closeSync, openSync, writeSync } from 'node:fs';
 import { join } from 'node:path';
