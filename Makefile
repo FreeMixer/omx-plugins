@@ -10,6 +10,8 @@
 #                   block is dbfs, dbu, ratio, lufs (tools/test/param-units-check.mjs)
 #   make lv2-units  every unit a declaration uses has an LV2 unit, and every port states the unit it declares
 #                   (tools/test/lv2-units-check.mjs, with its sabotage arms; part of `make test`)
+#   make contract-union  parallel make targets render omx-contract's union into private directories and read it whole
+#                   (tools/test/contract-union-race-test.mjs; part of `make test` and `make test-faces`)
 #   make hints      no LV2 face lost a port hint: tools/port-hints.mjs against each declaration's `portHints` pin
 #   make look       tools/look.json, the MOD GUI's colours and font, is what tools/look/tokens.css resolves to
 #   make manual     each declaration's manual follows omx-contract: a travel moved in a copy of the release moves
@@ -89,11 +91,11 @@ LIB_FLAGS  := -fPIC -fvisibility=hidden -DOMX_CLAP_STATIC -Iinclude
 # read only by the targets that build the archive, so `make version` and the rest need no omx-dsp
 lib_cflags = $(call dep_check,omxdsp,$(OMXDSP_MIN))$(call dep_check,omx-contract,$(CONTRACT_MIN))$(shell $(PKG_CONFIG) --cflags omxdsp omx-clap-core clap)
 
-.PHONY: presets presets-figures test-role all lib lib-test test test-faces units panel-layout descriptor-view lv2-units face-descriptor hints look manual install install-devel clean version recipe-test completeness selftest private-refs strip-crosscheck meters-abi meter-ring
+.PHONY: presets presets-figures test-role all lib lib-test test test-faces units panel-layout descriptor-view lv2-units contract-union face-descriptor hints look manual install install-devel clean version recipe-test completeness selftest private-refs strip-crosscheck meters-abi meter-ring
 all: lib
 	@for p in $(PLUGINS); do $(MAKE) -C $$p all || exit 1; done
 lib: $(LIB) $(LIB_PC)
-test: lib units panel-layout descriptor-view lv2-units
+test: lib units panel-layout descriptor-view lv2-units contract-union
 	@if [ -z "$(PLUGINS)" ]; then echo "no plugins yet"; fi
 	@for p in $(PLUGINS); do $(MAKE) -C $$p test || exit 1; done
 	@$(MAKE) -s face-descriptor
@@ -108,7 +110,7 @@ test: lib units panel-layout descriptor-view lv2-units
 	@$(MAKE) -s test-role
 # what runs with no omx-contract command (debian/rules: no .deb ships the command yet): the built faces against their
 # committed descriptors, the static table and the ABI checks; nothing here reads the contract directory
-test-faces: all lib
+test-faces: all lib contract-union
 	@$(MAKE) -s face-descriptor
 	@$(MAKE) -s lib-test
 	@$(MAKE) -s meters-abi
@@ -122,6 +124,9 @@ descriptor-view:
 # every declared unit is stated by its port in the generated TTL, with its sabotage arms
 lv2-units:
 	node tools/test/lv2-units-check.mjs --self-test
+# the union render is read whole while other processes render it (make -j): a fake CLI, readers a little apart
+contract-union:
+	node tools/test/contract-union-race-test.mjs
 # the described plugins' built faces, scanned, against their authored descriptors; after the plugins build
 face-descriptor:
 	tools/face-descriptor-check.sh
