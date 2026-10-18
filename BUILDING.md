@@ -21,7 +21,7 @@
 From omx-contract 2.15.0 on, the kernels' definitions ship with omx-dsp into omx-contract's contract
 directory (`pkg-config --variable=contractdir omx-contract`), and the installed `omx-contract.json` holds
 only the shared facts. The generators then read the union of that directory through the omx-contract CLI,
-`omx-contract render --target json --installed`, rendered once into `build/contract-union/`: the CLI is
+`omx-contract render --target json --installed`, rendered into `build/contract-union-<digest>/` (a name only that content has, so parallel make targets never share a half-written render): the CLI is
 `$OMX_CONTRACT_CLI` (its `bin/omx-contract.mjs`) or `omx-contract` on `PATH`, which the omx-contract
 RPM installs. A descriptor's links name the
 package that owns each definition, from the directory's manifests.

@@ -22,7 +22,8 @@
  * render's own `version`) must lie in the packaging's range, or nothing is read.
  */
 import { execFileSync } from 'node:child_process';
-import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -102,7 +103,11 @@ const unionCache = new Map();
 /**
  * From omx-contract 2.15.0 on, the kernels ship with their owners (omx-dsp) into omx-contract's contract
  * directory, and the installed omx-contract.json holds only the shared facts. The union is read through the
- * omx-contract CLI, `render --target json --installed`, rendered once into build/contract-union:
+ * omx-contract CLI, `render --target json --installed`. Every node process renders for itself, and the
+ * make targets run side by side (`make -j`), so no render is ever written where another process reads:
+ * it goes into a private temporary directory, which is renamed to build/contract-union-<digest of its
+ * files>, a name only that content has. A directory under that name is whole by construction and is never
+ * rewritten; a second process with the same content finds it in place and drops its own.
  * `{ dir }`, or `{ why }` when the CLI is missing or refuses the directory.
  */
 function unionRender(root, contractdir) {
@@ -111,16 +116,30 @@ function unionRender(root, contractdir) {
   let out;
   if (!cli) out = { why: `omx-contract keeps its kernels in the contract directory ${contractdir}, read through the omx-contract CLI (\`omx-contract render --target json --installed\`), and none is installed: set OMX_CONTRACT_CLI to its bin/omx-contract.mjs or put omx-contract on PATH (BUILDING.md)` };
   else {
-    const dir = join(root, 'build', 'contract-union');
+    const build = join(root, 'build');
+    let tmp;
     try {
-      mkdirSync(dir, { recursive: true });
-      execFileSync(cli[0], [...cli.slice(1), 'render', '--target', 'json', '--out', dir, '--installed'], { stdio: ['ignore', 'ignore', 'pipe'] });
+      mkdirSync(build, { recursive: true });
+      tmp = mkdtempSync(join(build, 'contract-union.tmp-'));
+      execFileSync(cli[0], [...cli.slice(1), 'render', '--target', 'json', '--out', tmp, '--installed'], { stdio: ['ignore', 'ignore', 'pipe'] });
       // the render cites each definition by its path only: who owns it goes beside it, so a reader
       // pointed at this directory (OMX_CONTRACT_DIR) still knows
-      writeFileSync(join(dir, OWNERS), `${JSON.stringify(Object.fromEntries(ownersOf(contractdir)), null, 2)}\n`);
+      writeFileSync(join(tmp, OWNERS), `${JSON.stringify(Object.fromEntries(ownersOf(contractdir)), null, 2)}\n`);
+      const digest = createHash('sha256');
+      for (const f of readdirSync(tmp).sort()) digest.update(f).update('\0').update(readFileSync(join(tmp, f))).update('\0');
+      const dir = join(build, `contract-union-${digest.digest('hex').slice(0, 16)}`);
+      try {
+        renameSync(tmp, dir);
+        tmp = undefined;
+      } catch (e) {
+        // the same content already stands there (another process landed it first): it is whole, use it
+        if (!existsSync(join(dir, RESOLVED))) throw e;
+      }
       out = { dir };
     } catch (e) {
       out = { why: `the omx-contract CLI refused the contract directory ${contractdir}: ${String(e.stderr ?? e.message).trim().split('\n')[0]}` };
+    } finally {
+      if (tmp) rmSync(tmp, { recursive: true, force: true });
     }
   }
   unionCache.set(contractdir, out);
