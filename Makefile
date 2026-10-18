@@ -97,7 +97,7 @@ LIB_FLAGS  := -fPIC -fvisibility=hidden -DOMX_CLAP_STATIC -Iinclude
 # read only by the targets that build the archive, so `make version` and the rest need no omx-dsp
 lib_cflags = $(call dep_check,omxdsp,$(OMXDSP_MIN))$(call dep_check,omx-contract,$(CONTRACT_MIN))$(shell $(PKG_CONFIG) --cflags omxdsp omx-clap-core clap)
 
-.PHONY: presets presets-figures test-role all lib lib-test test test-faces units panel-layout descriptor-view lv2-units contract-union probe-checks eq-probe-race face-descriptor hints look manual install install-devel clean version recipe-test completeness selftest private-refs strip-crosscheck meters-abi meter-ring
+.PHONY: presets presets-figures test-role all lib lib-test test test-faces units panel-layout descriptor-view lv2-units contract-union probe-checks eq-probe-race face-descriptor hints look manual install install-devel clean version recipe-test completeness selftest private-refs strip-crosscheck meters-abi meter-level dsp-copies meter-ring
 all: lib
 	@for p in $(PLUGINS); do $(MAKE) -C $$p all || exit 1; done
 lib: $(LIB) $(LIB_PC)
@@ -113,6 +113,7 @@ test: lib units panel-layout descriptor-view lv2-units contract-union probe-chec
 	@$(MAKE) -s presets
 	@$(MAKE) -s presets-figures
 	@$(MAKE) -s meters-abi
+	@$(MAKE) -s meter-level
 	@$(MAKE) -s test-role
 # what runs with no omx-contract command (debian/rules: no .deb ships the command yet): the built faces against their
 # committed descriptors, the static table and the ABI checks; nothing here reads the contract directory
@@ -120,6 +121,7 @@ test-faces: all lib contract-union eq-probe-race
 	@$(MAKE) -s face-descriptor
 	@$(MAKE) -s lib-test
 	@$(MAKE) -s meters-abi
+	@$(MAKE) -s meter-level
 	@$(MAKE) -s test-role
 units:
 	node tools/test/param-units-check.mjs
@@ -174,6 +176,22 @@ meters-abi:
 	$(CC) -std=gnu11 -Wall -Wextra -Werror $(shell $(PKG_CONFIG) --cflags omx-clap-core clap) -o build/meters-abi-test tools/test/meters-abi-test.c
 	build/meters-abi-test
 	@echo "ok   clap.meters/1 as omx-clap-core installs it: id, enums, sizeof and offsetof"
+# every level meter of the metered faces reads bit for bit what tools/test/meter-level.sha256 holds
+METER_LEVEL_FACES := omx-comp omx-deesser
+meter-level:
+	@mkdir -p build
+	@for f in $(METER_LEVEL_FACES); do $(MAKE) -s -C plugins/$$f all || exit 1; done
+	$(CC) -std=gnu11 -Wall -Wextra -Werror $(shell $(PKG_CONFIG) --cflags omx-clap-core clap) -o build/meter-level-digest tools/test/meter-level-digest.c -ldl -lm
+	@for f in $(METER_LEVEL_FACES); do \
+	  got=$$(build/meter-level-digest plugins/$$f/build/$$f.clap | sha256sum | cut -d' ' -f1); \
+	  want=$$(sed -n "s/^\([0-9a-f]*\)  $$f\$$/\1/p" tools/test/meter-level.sha256); \
+	  if [ "$$got" != "$$want" ] || [ -z "$$want" ]; then echo "FAIL meter-level $$f: $$got, expected $$want" >&2; exit 1; fi; \
+	  echo "ok   meter-level $$f: the level meters read $$got"; \
+	done
+# no source, hand-written or generated, carries a copy of a function omx-dsp exports (omx-dsp-copy-check --enforce)
+dsp-copies:
+	tools/dsp-copies-check.sh
+	tools/dsp-copies-check.sh --self-test
 meter-ring:
 	tools/meter-ring-check.sh
 	tools/meter-ring-check.sh --self-test
