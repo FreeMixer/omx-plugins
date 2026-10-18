@@ -21,7 +21,8 @@
 #   make meters-abi  the clap.meters/1 header omx-clap-core installs has the id, enums, sizeof and offsetof the
 #                    plugins are built for (tools/test/meters-abi-test.c, compile and run; part of `make test`)
 #   make strip-crosscheck   omx-strip, a chain, against the hand-ported strip it replaced, bit for bit at
-#                    the old plugin's settings (tools/test/strip-crosscheck.sh; needs the git history)
+#                    the old plugin's settings (tools/test/strip-crosscheck.sh; needs the git history, and builds the
+#                    omx-contract and omx-dsp releases the old commit pinned, from sibling checkouts' tags or GitHub)
 #   make presets    the factory presets: fresh against tools/gen-presets.mjs, each value inside its declared travel (part of `make test`)
 #   make presets-figures  the measured figures of the console's two catalogue presets, through omx-dsp's instance faces: the
 #                   amp-input bell (+4.00 dB at 2.5 kHz), the amp-tube harmonics (H2/H3 on the closed form), the dimension's
