@@ -52,8 +52,10 @@ DATADIR    ?= $(PREFIX)/share
 # parameter header and its instance header (the DSP shell around the omx-dsp kernel). A plugin's
 # headers are the .h files beside its Makefile and in its generated/ directory.
 # A test plugin's own hand-written header (an extension a host's test reads, omx_test_transport_probe.h)
-# is installed with them: the archive links its face.
-HEADERS := include/omx_plugin_param.h include/omx_panel_description.h include/omx_param_contract.h include/omx_clap_static.h $(foreach p,$(SHIP_PLUGINS),$(wildcard $(p)*.h) $(wildcard $(p)generated/*.h)) $(foreach p,$(TEST_PLUGINS),$(wildcard $(p)*.h))
+# is installed with them, and so is its generated generated/omx_<kernel>_decl.h: the constants a
+# proof predicts from (and the CLAP id) have one home, the declaration, not a hardcoded second copy
+# in the host that reads it. Neither declares anything a picker lists: macros only.
+HEADERS := include/omx_plugin_param.h include/omx_panel_description.h include/omx_param_contract.h include/omx_clap_static.h $(foreach p,$(SHIP_PLUGINS),$(wildcard $(p)*.h) $(wildcard $(p)generated/*.h)) $(foreach p,$(TEST_PLUGINS),$(wildcard $(p)*.h) $(wildcard $(p)generated/*.h))
 
 # libomxplugins.a: each shipped plugin's CLAP face built with -DOMX_CLAP_STATIC (no `clap_entry`;
 # its `omx_clap_entry_<kernel>` stays) and lib/omx_clap_static.c, the table of those entries by CLAP
