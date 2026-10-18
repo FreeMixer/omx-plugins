@@ -342,7 +342,26 @@ export function digestOf(params) {
 }
 
 /** The LV2 unit of a declared unit, where the units extension names one. */
-export const LV2_UNITS = { Hz: 'hz', dB: 'db', ms: 'ms', s: 's', '%': 'pc', oct: 'oct', cents: 'cent', st: 'semitone12TET' };
+export const LV2_UNITS = {
+  Hz: 'hz', dB: 'db', ms: 'ms', s: 's', min: 'min', '%': 'pc', x: 'coef', oct: 'oct', cents: 'cent', st: 'semitone12TET',
+  dBFS: 'dBFS', dBu: 'dBu', LUFS: 'LUFS', 'dB/oct': 'dBoct',
+};
+
+/** The declared units the LV2 units extension has no name for: defined (units:Unit) in the plugin's own
+ * TTL under urn:openmixer:unit#<name>, so a host that reads units:unit finds the unit and how to write it. */
+export const LV2_CUSTOM_UNITS = {
+  dBFS: { label: 'decibels (full scale)', render: '%f dBFS', symbol: 'dBFS' },
+  dBu: { label: 'decibels (unloaded)', render: '%f dBu', symbol: 'dBu' },
+  LUFS: { label: 'loudness units (full scale)', render: '%f LUFS', symbol: 'LUFS' },
+  dBoct: { label: 'decibels per octave', render: '%f dB/oct', symbol: 'dB/oct' },
+};
+
+/** The `units:unit` value of a declared unit: the extension's own name, or the plugin-defined unit. */
+export const lv2UnitRef = (unit) => {
+  const name = LV2_UNITS[unit];
+  if (!name) return undefined;
+  return name in LV2_CUSTOM_UNITS ? `<urn:openmixer:unit#${name}>` : `units:${name}`;
+};
 
 /** How a host draws a travel: as declared, else a frequency logarithmic (the console's every
  * frequency control is), else linear. */
@@ -511,7 +530,7 @@ export function emitPluginTtl(d) {
       if (q.kind === 'integer') lines.push(`        lv2:portProperty lv2:integer${choices ? ' , lv2:enumeration' : ''} ;`);
       if (scaleOf(q) === 'log') lines.push('        lv2:portProperty pprops:logarithmic ;');
       if (q.kind === 'toggle') lines.push('        lv2:portProperty lv2:toggled ;');
-      if (LV2_UNITS[q.unit]) lines.push(`        units:unit units:${LV2_UNITS[q.unit]} ;`);
+      if (lv2UnitRef(q.unit)) lines.push(`        units:unit ${lv2UnitRef(q.unit)} ;`);
       if (choices) {
         const points = choices.map((c) => `            [ rdfs:label ${ttlStr(c.label)} ; rdf:value ${c.value} ]`);
         lines.push(`        lv2:scalePoint\n${points.join(' ,\n')} ;`);
@@ -556,8 +575,17 @@ ${(d.panel?.sections ?? []).map((g) => `
     a pg:Group ;
     lv2:symbol "${g.key}" ;
     rdfs:label ${ttlStr(g.label)} .
+`).join('')}${customUnitsOf(d).map((name) => `
+<urn:openmixer:unit#${name}>
+    a units:Unit ;
+    rdfs:label ${ttlStr(LV2_CUSTOM_UNITS[name].label)} ;
+    units:render ${ttlStr(LV2_CUSTOM_UNITS[name].render)} ;
+    units:symbol ${ttlStr(LV2_CUSTOM_UNITS[name].symbol)} .
 `).join('')}`;
 }
+
+/** The plugin-defined units this plugin's ports use, in a fixed order. */
+const customUnitsOf = (d) => Object.keys(LV2_CUSTOM_UNITS).filter((name) => d.params.some((q) => LV2_UNITS[q.unit] === name));
 
 /** The panel section a parameter is drawn in: its LV2 port group (pg:Group), one per section. */
 const groupOf = (d, symbol) => d.panel?.sections.find((s) => s.controls.includes(symbol));
