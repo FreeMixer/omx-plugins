@@ -20,7 +20,6 @@
  * kernel keeps no level of its own).
  * An output level is the block's peak at the outputs, in dBFS, measured here after the kernel ran.
  */
-#include <math.h>
 #include <stdatomic.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -47,6 +46,7 @@
 #include <omx-clap-host/clap_meters.h>
 #include "omx_meter_ring.h"
 #include <omxdsp/omx_denormal.h> /* omx_denormals_off, per callback */
+#include <omxdsp/mix/omx_meter.h> /* omx_meter_level_db: a level meter's reading */
 
 #define G_DECLARED OMX_DEESSER_PARAM_COUNT
 /* The host's bypass, appended after the declared ids. */
@@ -70,18 +70,6 @@ static const struct {
     {"deessIn", CLAP_METER_KIND_LEVEL, 2u, 1u, -60.0, 6.0},
     {"deessOut", CLAP_METER_KIND_LEVEL, 2u, 3u, -60.0, 6.0},
 };
-
-/** A level meter's reading: one leg's peak over the block, in dBFS, never below the meter's display
- * minimum (silence reads the minimum). */
-static double g_level_db(const float *x, uint32_t n, double min) {
-  float peak = 0.0f;
-  for (uint32_t i = 0; i < n; ++i) {
-    const float a = fabsf(x[i]);
-    if (a > peak) peak = a;
-  }
-  const double db = peak > 0.0f ? 20.0 * log10((double)peak) : min;
-  return db > min ? db : min;
-}
 
 typedef struct {
   clap_plugin_t plugin;
@@ -225,15 +213,15 @@ static clap_process_status g_process(const clap_plugin_t *p, const clap_process_
   omx_deesser_core_resolve(&g->core, g->values, g->values[G_BYPASS] > 0.5f);
   double mv[G_METER_VALUES];
   /* meter 1: the inputs' peak, before the kernel runs (the outputs may be the inputs) */
-  mv[1] = g_level_db(ai->data32[0], pr->frames_count, G_METER_INFO[1].min);
-  mv[2] = g_level_db(ai->data32[1], pr->frames_count, G_METER_INFO[1].min);
+  mv[1] = omx_meter_level_db(ai->data32[0], pr->frames_count, G_METER_INFO[1].min);
+  mv[2] = omx_meter_level_db(ai->data32[1], pr->frames_count, G_METER_INFO[1].min);
   omx_deesser_core_run(&g->core, ai->data32[0], ai->data32[1], ao->data32[0], ao->data32[1], pr->frames_count);
   g_publish(g);
   /* The kernel's readings of this block; a bypassed kernel's state is stale, and reads 0. */
   const int bypassed = g->values[G_BYPASS] > 0.5f;
   mv[0] = bypassed ? 0.0 : (double)omx_deesser_core_meter(&g->core, 0u);
-  mv[3] = g_level_db(ao->data32[0], pr->frames_count, G_METER_INFO[2].min);
-  mv[4] = g_level_db(ao->data32[1], pr->frames_count, G_METER_INFO[2].min);
+  mv[3] = omx_meter_level_db(ao->data32[0], pr->frames_count, G_METER_INFO[2].min);
+  mv[4] = omx_meter_level_db(ao->data32[1], pr->frames_count, G_METER_INFO[2].min);
   omx_meter_ring_publish(&g->meters, mv, G_METER_VALUES);
   /* A parameter that moves the kernel's latency (as the pitch shifter's mix crossing 100 % does):
    * the reported latency holds until the next activation, and the host is asked, once, for the
