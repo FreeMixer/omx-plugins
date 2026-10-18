@@ -7,7 +7,7 @@
 # generated/omx_test_note_echo_decl.h from the declaration.
 #
 #   make            build/omx-test-note-echo.clap (for the oracle; never installed)
-#   make test       the generated header is fresh, the echo oracle at every RME rate
+#   make test       the generated header is fresh, the echo oracle at every oracle rate
 #                   (test/note-echo-oracle.c), and its sabotage arms (test/sabotage.sh)
 
 NAME       := omx-test-note-echo

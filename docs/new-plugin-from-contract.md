@@ -104,7 +104,7 @@ generated, and `tools/gen.mjs` refuses a name whose file is missing). The genera
 each one as it builds the identity test and runs it in `make test` on both faces, as
 `<name> clap <stem>.clap` and `<name> lv2 <bundle> <uri>`. Such an oracle opens the built faces as a
 host does and reads only their audio, so an arm that read the kernel's state in the engine says what
-of it a host can see. It runs at the nine rates an RME interface clocks at (`OMX_RME_RATES`, 32 to
+of it a host can see. It runs at the nine rates an audio interface clocks at (`OMX_ORACLE_FULL_RATES`, 32 to
 192 kHz), the rates omx-dsp's own kernel oracles run at.
 
 ## A plugin made of several kernels: a chain
