@@ -22,10 +22,9 @@
 import { readFileSync } from 'node:fs';
 import { basename, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { choicesOf, hintsView, loadDecl, pluginDirs, scaleOf } from './gen.mjs';
+import { choicesOf, hintsView, loadDecl, lv2UnitRef, pluginDirs, scaleOf } from './gen.mjs';
 
 const ROOT = resolve(fileURLToPath(import.meta.url), '..', '..');
-const UNITS = { Hz: 'hz', dB: 'db', ms: 'ms', s: 's', '%': 'pc', oct: 'oct', cents: 'cent', st: 'semitone12TET' };
 
 /** The hints of each port of a generated TTL, by symbol: `props`, `unit`, `points` ["v label"]. */
 export function ttlHints(text) {
@@ -36,7 +35,7 @@ export function ttlHints(text) {
     if (!sym) continue;
     const props = [];
     for (const m of block.matchAll(/lv2:portProperty\s+([^;\]]+)/g)) props.push(...m[1].split(',').map((s) => s.trim()).filter(Boolean));
-    const unit = /units:unit\s+(units:\w+)/.exec(block)?.[1] ?? null;
+    const unit = /units:unit\s+(units:\w+|<[^>\s]+>)/.exec(block)?.[1] ?? null;
     const points = [...block.matchAll(/\[\s*rdfs:label\s+"((?:[^"\\]|\\.)*)"\s*;\s*rdf:value\s+(-?[\d.]+)\s*\]/g)].map((m) => `${Number(m[2])} ${m[1]}`);
     ports[sym[1]] = { props: [...new Set(props)].sort(), unit, points };
   }
@@ -92,7 +91,7 @@ export function hintErrors(root = ROOT) {
         continue;
       }
       if (scaleOf(q) === 'log' && !got.props.includes('pprops:logarithmic')) errors.push(`${stem}: port "${q.symbol}" is not logarithmic`);
-      if (UNITS[q.unit] && got.unit !== `units:${UNITS[q.unit]}`) errors.push(`${stem}: port "${q.symbol}" has no units:${UNITS[q.unit]}`);
+      if (lv2UnitRef(q.unit) && got.unit !== lv2UnitRef(q.unit)) errors.push(`${stem}: port "${q.symbol}" has no units:unit ${lv2UnitRef(q.unit)}`);
       const choices = choicesOf(q);
       if (choices) {
         if (!got.props.includes('lv2:enumeration')) errors.push(`${stem}: port "${q.symbol}" is not an enumeration`);

@@ -184,6 +184,7 @@
         lv2:minimum -80 ;
         lv2:maximum 0 ;
         lv2:portProperty lv2:integer ;
+        units:unit <urn:openmixer:unit#dBFS> ;
         pg:group <urn:openmixer:reverb#gated>
     ] ,
     [
@@ -243,3 +244,9 @@
     a pg:Group ;
     lv2:symbol "plate" ;
     rdfs:label "Plate" .
+
+<urn:openmixer:unit#dBFS>
+    a units:Unit ;
+    rdfs:label "decibels (full scale)" ;
+    units:render "%f dBFS" ;
+    units:symbol "dBFS" .

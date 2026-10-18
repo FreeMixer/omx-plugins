@@ -105,6 +105,7 @@
         lv2:default 1 ;
         lv2:minimum 0.25 ;
         lv2:maximum 4 ;
+        units:unit units:coef ;
         pg:group <urn:openmixer:rotary#rotary>
     ] ,
     [
