@@ -7,7 +7,7 @@
 # generated/omx_test_sine_voice_decl.h from the declaration.
 #
 #   make            build/omx-test-sine-voice.clap (for the oracle; never installed)
-#   make test       the generated header is fresh, the closed-form oracle at every RME rate
+#   make test       the generated header is fresh, the closed-form oracle at every oracle rate
 #                   (test/sine-voice-oracle.c), and its sabotage arms (test/sabotage.sh)
 
 NAME       := omx-test-sine-voice

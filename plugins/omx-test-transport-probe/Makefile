@@ -7,7 +7,7 @@
 # generated/omx_test_transport_probe_decl.h from the declaration.
 #
 #   make            build/omx-test-transport-probe.clap (for the oracle; never installed)
-#   make test       the generated header is fresh, the oracle at every RME rate
+#   make test       the generated header is fresh, the oracle at every oracle rate
 #                   (test/transport-probe-oracle.c), and its sabotage arms (test/sabotage.sh)
 
 NAME       := omx-test-transport-probe

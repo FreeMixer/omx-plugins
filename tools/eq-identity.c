@@ -2,7 +2,7 @@
 // Copyright (C) 2026 Pau Aliagas <linuxnow@gmail.com>
 /*
  * eq-identity.c — the EQ faces' kernel-identity test: both BUILT faces of omx-eq8, omx-eq16 or
- * omx-eq32, sample for sample, against the console's EQ, at the nine RME rates (32, 44.1, 48, 64,
+ * omx-eq32, sample for sample, against the console's EQ, at the nine oracle rates (32, 44.1, 48, 64,
  * 88.2, 96, 128, 176.4 and 192 kHz), with no tolerance. One source for the three plugins: the
  * band count is a compile-time number, -DOMX_EQ_LV2_BANDS=8|16|32, as it is for the kernel.
  *
@@ -52,12 +52,12 @@
 #include <omxdsp/fx/omx_eq_instance.h>
 #include <omxdsp/omx_biquad.h>
 #include <omxdsp/omx_denormal.h>
-#include <omxcontract/omx_contract_limits.h> /* the RME rates, omx-contract's own */
+#include <omxcontract/omx_contract_limits.h> /* the oracle rates, omx-contract's own */
 #include <omxdsp/omxdsp_definitions.h>       /* the EQ's travels and band count, omx-dsp's */
 #include <omxdsp/omx_eq_design.h>
 
 #define BANDS ((uint32_t)OMX_EQ_LV2_BANDS)
-static const float RATES[] = OMX_RME_RATES_INIT; /* the nine rates an RME interface clocks at */
+static const float RATES[] = OMX_ORACLE_FULL_RATES_INIT; /* the nine rates an audio interface clocks at */
 #define QUANTUM 256u
 #define SEGMENTS 7u
 #define SEG_FRAMES (QUANTUM * 100u) /* 25 600 frames: 0.13 s at 192 kHz, 0.8 s at 32 kHz */
