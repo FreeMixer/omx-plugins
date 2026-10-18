@@ -62,6 +62,10 @@ jobs:
         id: handback-private-refs
         run: make private-refs
 
+      - name: No source carries a copy of a function omx-dsp exports, and a planted copy goes red
+        id: handback-dsp-copies
+        run: make dsp-copies
+
       - name: Every generated file is fresh, built or not
         id: handback-gen
         run: |

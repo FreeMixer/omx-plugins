@@ -21,9 +21,10 @@ if [ "${1:-}" = --self-test ]; then
   (cd "$HERE" && git ls-files -z | xargs -0 cp --parents -t "$scratch")
   git -C "$scratch" init -q && git -C "$scratch" add -A
   omx-dsp-copy-check --enforce --root "$scratch" >/dev/null || { echo "dsp-copies-check self-test: the clean copy of the tree is red" >&2; exit 1; }
-  cat >> "$scratch/plugins/omx-comp/omx_comp_clap.c" <<'C'
+  name=g_level  # the planted name is spelled in two parts so the tree holds no definition of it, even as text
+  cat >> "$scratch/plugins/omx-comp/omx_comp_clap.c" <<C
 
-static double g_level_db(const float *x, uint32_t n, double min) {
+static double ${name}_db(const float *x, uint32_t n, double min) {
   float peak = 0.0f;
   for (uint32_t i = 0; i < n; ++i) {
     const float a = fabsf(x[i]);
