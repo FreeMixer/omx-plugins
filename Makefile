@@ -91,7 +91,7 @@ LIB_FLAGS  := -fPIC -fvisibility=hidden -DOMX_CLAP_STATIC -Iinclude
 # read only by the targets that build the archive, so `make version` and the rest need no omx-dsp
 lib_cflags = $(call dep_check,omxdsp,$(OMXDSP_MIN))$(call dep_check,omx-contract,$(CONTRACT_MIN))$(shell $(PKG_CONFIG) --cflags omxdsp omx-clap-core clap)
 
-.PHONY: presets presets-figures test-role all lib lib-test test test-faces units panel-layout descriptor-view lv2-units contract-union face-descriptor hints look manual install install-devel clean version recipe-test completeness selftest private-refs strip-crosscheck meters-abi meter-level meter-ring
+.PHONY: presets presets-figures test-role all lib lib-test test test-faces units panel-layout descriptor-view lv2-units contract-union face-descriptor hints look manual install install-devel clean version recipe-test completeness selftest private-refs strip-crosscheck meters-abi meter-level dsp-copies meter-ring
 all: lib
 	@for p in $(PLUGINS); do $(MAKE) -C $$p all || exit 1; done
 lib: $(LIB) $(LIB_PC)
@@ -176,6 +176,10 @@ meter-level:
 	  if [ "$$got" != "$$want" ] || [ -z "$$want" ]; then echo "FAIL meter-level $$f: $$got, expected $$want" >&2; exit 1; fi; \
 	  echo "ok   meter-level $$f: the level meters read $$got"; \
 	done
+# no source, hand-written or generated, carries a copy of a function omx-dsp exports (omx-dsp-copy-check --enforce)
+dsp-copies:
+	tools/dsp-copies-check.sh
+	tools/dsp-copies-check.sh --self-test
 meter-ring:
 	tools/meter-ring-check.sh
 	tools/meter-ring-check.sh --self-test
