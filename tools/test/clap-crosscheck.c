@@ -7,6 +7,10 @@
  *
  *   clap-crosscheck <a.clap> <b.clap> <map>
  *
+ * A line `@cap|<A name>|<fraction>|<why>` keeps A's value of that parameter at or below that fraction
+ * of the Nyquist rate at every rate, on both plugins: the stretch above it is a known gap, declared
+ * in the map where it says why, not a difference to wave through. The check prints each cap it applies.
+ *
  * The map says how a setting of A is the same setting of B, one line each ('#' starts a comment;
  * fields are separated by '|', parameter names are the CLAP names, as a host shows them):
  *
@@ -64,6 +68,15 @@ typedef struct {
 
 static Rule rules[MAXP];
 static int nrules;
+
+/* `@cap` lines: A's parameter `a` is held at or below `frac` of Nyquist. */
+typedef struct {
+  int a;
+  double frac;
+  char why[200];
+} Cap;
+static Cap caps[MAXP];
+static int ncaps;
 
 static const void *h_ext(const clap_host_t *h, const char *id) {
   (void)h, (void)id;
@@ -123,6 +136,16 @@ static bool read_map(const char *path, const Plugin *A, const Plugin *B) {
   while (fgets(line, sizeof line, f)) {
     char *s = trim(line);
     if (!*s || *s == '#') continue;
+    if (!strncmp(s, "@cap|", 5)) {
+      char *name = s + 5, *fr = strchr(name, '|'), *why = fr ? strchr(fr + 1, '|') : NULL;
+      if (!why) return fprintf(stderr, "map: @cap wants @cap|<A name>|<fraction>|<why>: %s\n", s), fclose(f), false;
+      *fr++ = 0, *why++ = 0;
+      Cap *c = &caps[ncaps++];
+      c->a = find(A, trim(name)), c->frac = strtod(fr, NULL);
+      snprintf(c->why, sizeof c->why, "%s", trim(why));
+      if (c->a < 0 || c->frac <= 0 || c->frac >= 1 || !*c->why) fprintf(stderr, "map: bad @cap line: %s\n", s), ok = false;
+      continue;
+    }
     char *f1 = s, *f2 = strchr(f1, '|');
     if (!f2) return fprintf(stderr, "map: no '|' in: %s\n", s), fclose(f), false;
     *f2++ = 0;
@@ -174,6 +197,14 @@ typedef struct {
 } Block;
 
 static Block plan[BLOCKS];
+
+/* A's value of parameter `i` in block `k` at `sr`, held under its cap. */
+static double capped(const Block *k, int i, double sr) {
+  double v = k->v[i];
+  for (int c = 0; c < ncaps; c++)
+    if (caps[c].a == i && v > caps[c].frac * sr / 2.0) v = caps[c].frac * sr / 2.0;
+  return v;
+}
 
 static void make_plan(const Plugin *A) {
   for (int b = 0; b < BLOCKS; b++) {
@@ -256,12 +287,12 @@ static bool run(const Plugin *pl, int side, double sr, const float *il, const fl
     const Block *k = &plan[b];
     Events evs = {.n = 0};
     if (side == 0)
-      for (uint32_t i = 0; i < pl->n; i++) push(&evs, pl->p[i].id, k->v[i]);
+      for (uint32_t i = 0; i < pl->n; i++) push(&evs, pl->p[i].id, capped(k, (int)i, sr));
     else
       for (int j = 0; j < nrules; j++)
         for (int q = 0; q < rules[j].nb; q++) {
           bool m = true;
-          const double v = mapped(&rules[j], rules[j].a >= 0 ? k->v[rules[j].a] : 0.0, &m);
+          const double v = mapped(&rules[j], rules[j].a >= 0 ? capped(k, rules[j].a, sr) : 0.0, &m);
           if (!m) return fprintf(stderr, "map: rule %d maps no B value for A's value %g\n", j + 1, k->v[rules[j].a]), false;
           push(&evs, pl->p[rules[j].b[q]].id, v);
         }
@@ -288,6 +319,8 @@ int main(int argc, char **argv) {
   if (!load(&A, argv[1]) || !load(&B, argv[2])) return 2;
   if (!read_map(argv[3], &A, &B)) return 2;
   make_plan(&A);
+  for (int c = 0; c < ncaps; c++)
+    printf("CAP %s <= %.2f of Nyquist: %s\n", A.p[caps[c].a].name, caps[c].frac, caps[c].why);
   int fails = 0;
   for (uint32_t r = 0; r < OMX_DECLARED_RATE_COUNT; r++) {
     const double sr = OMX_DECLARED_RATES[r];
