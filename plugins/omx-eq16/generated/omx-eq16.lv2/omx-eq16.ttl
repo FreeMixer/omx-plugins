@@ -82,6 +82,7 @@
         lv2:minimum 12 ;
         lv2:maximum 24 ;
         lv2:portProperty lv2:integer , lv2:enumeration ;
+        units:unit <urn:openmixer:unit#dBoct> ;
         lv2:scalePoint
             [ rdfs:label "12 dB/oct" ; rdf:value 12 ] ,
             [ rdfs:label "24 dB/oct" ; rdf:value 24 ] ;
@@ -120,6 +121,7 @@
         lv2:minimum 12 ;
         lv2:maximum 24 ;
         lv2:portProperty lv2:integer , lv2:enumeration ;
+        units:unit <urn:openmixer:unit#dBoct> ;
         lv2:scalePoint
             [ rdfs:label "12 dB/oct" ; rdf:value 12 ] ,
             [ rdfs:label "24 dB/oct" ; rdf:value 24 ] ;
@@ -1168,3 +1170,9 @@
     a pg:Group ;
     lv2:symbol "lpf" ;
     rdfs:label "LPF" .
+
+<urn:openmixer:unit#dBoct>
+    a units:Unit ;
+    rdfs:label "decibels per octave" ;
+    units:render "%f dB/oct" ;
+    units:symbol "dB/oct" .
