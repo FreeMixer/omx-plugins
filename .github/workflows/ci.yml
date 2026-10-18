@@ -161,6 +161,10 @@ jobs:
           for f in /usr/include/omx-plugins/omx_clap_static.h /usr/lib64/libomxplugins.a /usr/lib64/pkgconfig/omxplugins.pc; do
             rpm -qlp "$devel" | grep -qx "$f"
           done
+          # a test plugin's generated declaration (the constants and CLAP id a proof predicts from)
+          for t in test-note-echo test-sine-voice test-transport-probe; do
+            rpm -qlp "$devel" | grep -qx "/usr/include/omx-plugins/omx_${t//-/_}_decl.h"
+          done
           for p in $shorts; do
             for f in "omx-$p.so" manifest.ttl "omx-$p.ttl"; do grep -qx "/usr/lib64/lv2/omx-$p.lv2/$f" files-lv2.txt; done
           done
