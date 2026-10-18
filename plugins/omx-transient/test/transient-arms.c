@@ -3,7 +3,7 @@
 /*
  * transient-arms.c — the transient designer's oracle, moved from the console engine with the effect:
  * arms A–E, G and H, the declared travel and the N-thread identity, run through each BUILT face at
- * the nine rates an RME interface clocks at (OMX_RME_RATES, 32 to 192 kHz).
+ * the nine rates an audio interface clocks at (OMX_ORACLE_FULL_RATES, 32 to 192 kHz).
  *
  *   transient-arms clap <omx-transient.clap>
  *   transient-arms lv2 <bundle-dir> <uri>
@@ -61,7 +61,7 @@
 #define MAXLEN 192000u
 #define SETTLE_S 2u /* seconds */
 
-static const float RATES[OMX_RME_RATES_COUNT] = OMX_RME_RATES_INIT;
+static const float RATES[OMX_ORACLE_FULL_RATES_COUNT] = OMX_ORACLE_FULL_RATES_INIT;
 
 static int g_checks = 0, g_failed = 0;
 static const char *g_arm = "";
@@ -480,7 +480,7 @@ static void arm_threads(Face *f, float sr) {
 
 static void all_arms(const char *face, Face *f) {
   g_face = face;
-  for (uint32_t ri = 0; ri < OMX_RME_RATES_COUNT; ri++) {
+  for (uint32_t ri = 0; ri < OMX_ORACLE_FULL_RATES_COUNT; ri++) {
     const float sr = RATES[ri];
     g_sr = sr;
     const int before = g_failed;
@@ -698,6 +698,6 @@ int main(int argc, char **argv) {
   else if (argc == 4 && strcmp(argv[1], "lv2") == 0) rc = lv2_main(argv[2], argv[3]);
   else return fprintf(stderr, "usage: transient-arms clap <x.clap> | lv2 <bundle-dir> <uri>\n"), 2;
   printf("%s %s: %d checks, %d failed, %u rates\n", rc ? "ORACLE-RED" : "ORACLE-GREEN", argv[1], g_checks, g_failed,
-         OMX_RME_RATES_COUNT);
+         OMX_ORACLE_FULL_RATES_COUNT);
   return rc;
 }

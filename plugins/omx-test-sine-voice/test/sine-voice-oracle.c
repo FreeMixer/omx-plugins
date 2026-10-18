@@ -2,7 +2,7 @@
 // Copyright (C) 2026 Pau Aliagas <linuxnow@gmail.com>
 /*
  * sine-voice-oracle.c — omx test-sine-voice against its closed form, through the BUILT .clap, at the
- * nine rates an RME interface clocks at (OMX_RME_RATES, 32 to 192 kHz).
+ * nine rates an audio interface clocks at (OMX_ORACLE_FULL_RATES, 32 to 192 kHz).
  *
  *   sine-voice-oracle <omx-test-sine-voice.clap>
  *
@@ -38,7 +38,7 @@
 #define MAXEV 64u
 #define VOICES ((uint32_t)OMX_TEST_SINE_VOICE_VOICES)
 
-static const float RATES[OMX_RME_RATES_COUNT] = OMX_RME_RATES_INIT;
+static const float RATES[OMX_ORACLE_FULL_RATES_COUNT] = OMX_ORACLE_FULL_RATES_INIT;
 static int failures;
 
 #define CHECK(cond, ...)                                                                                     \
@@ -180,7 +180,7 @@ int main(int argc, char **argv) {
   if (!entry || !entry->init(argv[1])) return fprintf(stderr, "FAIL no clap_entry in %s\n", argv[1]), 1;
   const clap_plugin_factory_t *fac = (const clap_plugin_factory_t *)entry->get_factory(CLAP_PLUGIN_FACTORY_ID);
   const double vel = 100.0 / 127.0;
-  for (uint32_t ri = 0; ri < OMX_RME_RATES_COUNT; ri++) {
+  for (uint32_t ri = 0; ri < OMX_ORACLE_FULL_RATES_COUNT; ri++) {
     const double rate = RATES[ri];
     const clap_plugin_t *p = fac->create_plugin(fac, &HOST, OMX_TEST_SINE_VOICE_CLAP_ID);
     if (!p || !p->init(p) || !p->activate(p, rate, 1, BLOCK) || !p->start_processing(p)) {
@@ -267,6 +267,6 @@ int main(int argc, char **argv) {
     p->destroy(p);
   }
   entry->deinit();
-  printf("sine-voice-oracle: %u rates, %d failures\n", (unsigned)OMX_RME_RATES_COUNT, failures);
+  printf("sine-voice-oracle: %u rates, %d failures\n", (unsigned)OMX_ORACLE_FULL_RATES_COUNT, failures);
   return failures > 100 ? 100 : failures;
 }

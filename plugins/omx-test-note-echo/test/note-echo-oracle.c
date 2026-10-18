@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Pau Aliagas <linuxnow@gmail.com>
 /*
- * note-echo-oracle.c — omx test-note-echo through the BUILT .clap, at the nine rates an RME interface
- * clocks at (OMX_RME_RATES, 32 to 192 kHz), each in its own block size.
+ * note-echo-oracle.c — omx test-note-echo through the BUILT .clap, at the nine rates an audio interface
+ * clocks at (OMX_ORACLE_FULL_RATES, 32 to 192 kHz), each in its own block size.
  *
  *   note-echo-oracle <omx-test-note-echo.clap>
  *
@@ -32,7 +32,7 @@
 #define MAXEV 256u
 #define MAXBLOCK 2048u
 
-static const float RATES[OMX_RME_RATES_COUNT] = OMX_RME_RATES_INIT;
+static const float RATES[OMX_ORACLE_FULL_RATES_COUNT] = OMX_ORACLE_FULL_RATES_INIT;
 static int failures;
 
 #define CHECK(cond, ...)                                                                                     \
@@ -118,7 +118,7 @@ int main(int argc, char **argv) {
   if (!entry || !entry->init(argv[1])) return fprintf(stderr, "FAIL no clap_entry in %s\n", argv[1]), 1;
   const clap_plugin_factory_t *fac = (const clap_plugin_factory_t *)entry->get_factory(CLAP_PLUGIN_FACTORY_ID);
   static float out[OMX_TEST_NOTE_ECHO_OUTPUT_CHANNELS][MAXBLOCK];
-  for (uint32_t ri = 0; ri < OMX_RME_RATES_COUNT; ri++) {
+  for (uint32_t ri = 0; ri < OMX_ORACLE_FULL_RATES_COUNT; ri++) {
     const double rate = RATES[ri];
     const uint32_t block = 64u << (ri % 5); /* 64 .. 1024 */
     const clap_plugin_t *p = fac->create_plugin(fac, &HOST, OMX_TEST_NOTE_ECHO_CLAP_ID);
@@ -198,6 +198,6 @@ int main(int argc, char **argv) {
     p->destroy(p);
   }
   entry->deinit();
-  printf("note-echo-oracle: %u rates, %d failures\n", (unsigned)OMX_RME_RATES_COUNT, failures);
+  printf("note-echo-oracle: %u rates, %d failures\n", (unsigned)OMX_ORACLE_FULL_RATES_COUNT, failures);
   return failures > 100 ? 100 : failures;
 }
