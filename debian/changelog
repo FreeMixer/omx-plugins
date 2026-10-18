@@ -1,3 +1,14 @@
+omx-plugins (0.11.0) unstable; urgency=medium
+
+  * Factory presets: 120 presets for the 19 plugins, installed with the
+    omx-plugins package as files in /usr/share/omx/presets, one directory
+    per plugin. The catalogue presets are checked against their measured
+    figures through the DSP.
+  * omx-plugins-dev also installs the test plugins' generated declaration
+    headers, which hold the constants and CLAP id a test predicts from.
+
+ -- Pau Aliagas <linuxnow@gmail.com>  Sun, 18 Oct 2026 08:00:00 +0000
+
 omx-plugins (0.10.0) unstable; urgency=medium
 
   * Every plugin over one kernel is described in omx-contract's own words: a
