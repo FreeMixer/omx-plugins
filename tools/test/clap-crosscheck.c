@@ -140,6 +140,7 @@ static bool read_map(const char *path, const Plugin *A, const Plugin *B) {
       char *name = s + 5, *fr = strchr(name, '|'), *why = fr ? strchr(fr + 1, '|') : NULL;
       if (!why) return fprintf(stderr, "map: @cap wants @cap|<A name>|<fraction>|<why>: %s\n", s), fclose(f), false;
       *fr++ = 0, *why++ = 0;
+      if (ncaps == MAXP) return fprintf(stderr, "map: more than %d @cap lines\n", MAXP), fclose(f), false;
       Cap *c = &caps[ncaps++];
       c->a = find(A, trim(name)), c->frac = strtod(fr, NULL);
       snprintf(c->why, sizeof c->why, "%s", trim(why));
@@ -151,6 +152,7 @@ static bool read_map(const char *path, const Plugin *A, const Plugin *B) {
     *f2++ = 0;
     char *f3 = strchr(f2, '|');
     if (f3) *f3++ = 0;
+    if (nrules == MAXP) return fprintf(stderr, "map: more than %d lines\n", MAXP), fclose(f), false;
     Rule *r = &rules[nrules++];
     memset(r, 0, sizeof *r);
     f1 = trim(f1);
