@@ -1,0 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 Pau Aliagas <linuxnow@gmail.com>
+# sha256 of the bits of every meter value of the built face, tools/test/meter-level-digest.c (make meter-level)
+c477c7fa7acc7f3402324d9593d05bee93bb213e173559fdc141d7df7246a133  omx-comp
+b079cff1d3f2bf2e1f99c75b6ad01ea415d50a5704a98a07646b13b3894d06f6  omx-deesser

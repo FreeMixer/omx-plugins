@@ -23,8 +23,7 @@
  * key. A host that routes nothing to the key (no second port in the process call, no channel, or
  * no buffer) gets the kernel's own detector, as the face's NULL key is.
 {{/keyed}} */
-{{#meterLevel}}#include <math.h>
-{{/meterLevel}}#include <stdatomic.h>
+#include <stdatomic.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -50,9 +49,8 @@
 {{#metered}}#include <omx-clap-host/clap_meters.h>
 #include "omx_meter_ring.h"
 {{/metered}}#include <omxdsp/omx_denormal.h> /* omx_denormals_off, per callback */
-{{#meterLevel}}#include <omxdsp/mix/omx_meter.h> /* omx_meter_block_peak, a level meter's peak */
-#include <omxdsp/omx_units.h> /* omx_lin_to_db_d, a level meter's dBFS */
-{{/meterLevel}}
+{{#metered}}{{#meterLevel}}#include <omxdsp/mix/omx_meter.h> /* omx_meter_level_db: a level meter's reading */
+{{/meterLevel}}{{/metered}}
 #define G_DECLARED OMX_{{K}}_PARAM_COUNT
 /* The host's bypass, appended after the declared ids. */
 #define G_BYPASS G_DECLARED
@@ -73,15 +71,7 @@ static const struct {
 } G_METER_INFO[G_METERS] = {
 {{#meters}}    {"{{meterName}}", {{meterKind}}, {{meterChannels}}u, {{meterOffset}}u, {{meterMin}}, {{meterMax}}},
 {{/meters}}};
-{{#meterLevel}}
-/** A level meter's reading: one leg's peak over the block, in dBFS, never below the meter's display
- * minimum (silence reads the minimum). */
-static double g_level_db(const float *x, uint32_t n, double min) {
-  const float peak = omx_meter_block_peak(x, NULL, n);
-  const double db = peak > 0.0f ? omx_lin_to_db_d((double)peak, 0.0) : min;
-  return db > min ? db : min;
-}
-{{/meterLevel}}{{/metered}}
+{{/metered}}
 typedef struct {
   clap_plugin_t plugin;
   const clap_host_t *host;
@@ -225,8 +215,8 @@ static clap_process_status g_process(const clap_plugin_t *p, const clap_process_
   omx_{{kernel}}_core_resolve(&g->core, g->values, g->values[G_BYPASS] > 0.5f);
 {{#metered}}  double mv[G_METER_VALUES];
 {{#meters}}{{#isIn}}  /* meter {{meterIndex}}: the inputs' peak, before the kernel runs (the outputs may be the inputs) */
-  mv[{{meterOffset}}] = g_level_db(ai->data32[0], pr->frames_count, G_METER_INFO[{{meterIndex}}].min);
-  mv[{{meterRight}}] = g_level_db(ai->data32[1], pr->frames_count, G_METER_INFO[{{meterIndex}}].min);
+  mv[{{meterOffset}}] = omx_meter_level_db(ai->data32[0], pr->frames_count, G_METER_INFO[{{meterIndex}}].min);
+  mv[{{meterRight}}] = omx_meter_level_db(ai->data32[1], pr->frames_count, G_METER_INFO[{{meterIndex}}].min);
 {{/isIn}}{{/meters}}{{/metered}}{{#keyed}}  const clap_audio_buffer_t *ak = pr->audio_inputs_count > 1 ? &pr->audio_inputs[1] : NULL;
   const float *key = ak && ak->channel_count > 0 && ak->data32 ? ak->data32[0] : NULL;
   omx_{{kernel}}_core_run(&g->core, key, ai->data32[0], ai->data32[1], ao->data32[0], ao->data32[1], pr->frames_count);
@@ -235,8 +225,8 @@ static clap_process_status g_process(const clap_plugin_t *p, const clap_process_
 {{#metered}}{{#meterGr}}  /* The kernel's readings of this block; a bypassed kernel's state is stale, and reads 0. */
   const int bypassed = g->values[G_BYPASS] > 0.5f;
 {{/meterGr}}{{#meters}}{{#isGr}}  mv[{{meterOffset}}] = bypassed ? 0.0 : (double)omx_{{kernel}}_core_meter(&g->core, {{meterIndex}}u);
-{{/isGr}}{{#isOut}}  mv[{{meterOffset}}] = g_level_db(ao->data32[0], pr->frames_count, G_METER_INFO[{{meterIndex}}].min);
-  mv[{{meterRight}}] = g_level_db(ao->data32[1], pr->frames_count, G_METER_INFO[{{meterIndex}}].min);
+{{/isGr}}{{#isOut}}  mv[{{meterOffset}}] = omx_meter_level_db(ao->data32[0], pr->frames_count, G_METER_INFO[{{meterIndex}}].min);
+  mv[{{meterRight}}] = omx_meter_level_db(ao->data32[1], pr->frames_count, G_METER_INFO[{{meterIndex}}].min);
 {{/isOut}}{{/meters}}  omx_meter_ring_publish(&g->meters, mv, G_METER_VALUES);
 {{/metered}}  /* A parameter that moves the kernel's latency (as the pitch shifter's mix crossing 100 % does):
    * the reported latency holds until the next activation, and the host is asked, once, for the
