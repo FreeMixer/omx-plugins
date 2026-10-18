@@ -28,7 +28,9 @@
 #                    plugins are built for (tools/test/meters-abi-test.c, compile and run; part of `make test`)
 #   make strip-crosscheck   omx-strip, a chain, against the hand-ported strip it replaced, bit for bit at
 #                    the old plugin's settings (tools/test/strip-crosscheck.sh; needs the git history, and builds the
-#                    omx-contract and omx-dsp releases the old commit pinned, from sibling checkouts' tags or GitHub)
+#                    omx-contract and omx-dsp releases the old commit pinned, from sibling checkouts' tags or GitHub).
+#                    Known gap: the low-pass above 0.6 of Nyquist at 44.1 and 48 kHz is not compared (omx-dsp's hand-over,
+#                    omx-dsp#105/#116/#119, removed a passband lift the hand-ported strip had); the map's @cap line says so
 #   make presets    the factory presets: fresh against tools/gen-presets.mjs, each value inside its declared travel (part of `make test`)
 #   make presets-figures  the measured figures of the console's two catalogue presets, through omx-dsp's instance faces: the
 #                   amp-input bell (+4.00 dB at 2.5 kHz), the amp-tube harmonics (H2/H3 on the closed form), the dimension's
