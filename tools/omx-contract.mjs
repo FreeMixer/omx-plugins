@@ -262,11 +262,27 @@ export function eqDefaultBands(dir, count, root = ROOT) {
 }
 
 let probe;
-/** build/eq-default-probe, compiled against the installed omx-contract (cc, pkg-config, -lm). */
+/**
+ * build/eq-default-probe, compiled against the installed omx-contract (cc, pkg-config, -lm). Every process
+ * compiles it for itself (`make -j` runs several at once), so it is compiled in a private directory and renamed
+ * into place whole: a process never runs a probe another one's compiler still writes (#195).
+ */
 function eqProbe(root) {
   if (probe) return probe;
   const out = join(root, 'build', 'eq-default-probe');
   mkdirSync(dirname(out), { recursive: true });
+  const tmp = mkdtempSync(join(dirname(out), '.eq-default-probe.tmp-'));
+  try {
+    buildEqProbe(join(tmp, 'eq-default-probe'));
+    renameSync(join(tmp, 'eq-default-probe'), out);
+  } finally {
+    rmSync(tmp, { recursive: true, force: true });
+  }
+  probe = out;
+  return out;
+}
+
+function buildEqProbe(out) {
   const src = `${out}.c`;
   writeFileSync(src, `#include <stdio.h>
 #include <stdlib.h>
@@ -287,8 +303,6 @@ int main(int argc, char **argv) {
     throw new Error(`the EQ default rule is omx-dsp's C render, and \`${PKG_CONFIG()} --cflags omxdsp omx-contract\` failed: ${String(e.stderr ?? e.message).trim()}`);
   }
   execFileSync(process.env.CC || 'cc', ['-O1', '-o', out, src, ...cflags, '-lm'], { stdio: ['ignore', 'ignore', 'inherit'] });
-  probe = out;
-  return out;
 }
 
 /** The band count of a strip type (`eq16`, ...) in EQ_BAND_COUNTS: its default. */
