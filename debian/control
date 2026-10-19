@@ -52,7 +52,7 @@ Description: OpenMixer delay, drive, EQ, strip, gate and effects as CLAP plugins
 Package: omx-plugins-dev
 Section: libdevel
 Architecture: any
-Depends: libomxdsp-dev (>= 0.24.0), clap-headers, ${misc:Depends}
+Depends: libomxdsp-dev (>= 0.24.0), libomx-contract-dev (>= 2.16.0), clap-headers, ${misc:Depends}
 Description: Headers and static library of the OpenMixer plugins
  The headers other projects include to use the OpenMixer plugins' parameters
  and instance code, such as omx_delay_core.h and each plugin's generated
@@ -60,6 +60,8 @@ Description: Headers and static library of the OpenMixer plugins
  (pkg-config omxplugins): every plugin's CLAP face in one static library,
  with the table of their entries in omx_clap_static.h, for a host that runs
  the plugins in its own process without loading .clap files.
+ Each plugin's descriptor, its parameters in omx-contract's words, is
+ installed in omx-contract's contract directory, where a host reads it.
 
 Package: omx-plugins-lv2
 Architecture: any
