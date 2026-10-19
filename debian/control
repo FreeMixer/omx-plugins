@@ -49,6 +49,15 @@ Description: OpenMixer delay, drive, EQ, strip, gate and effects as CLAP plugins
  REAPER, Carla and other CLAP hosts find them. They run the console's own DSP,
  so they sound like the desk, sample for sample.
 
+Package: omx-plugins-test
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: OpenMixer test instruments, for host tests and plugin measurement
+ The test instruments the OpenMixer console's own proofs play: a sine voice,
+ a note echo and a transport probe, as CLAP plugins. They are installed in
+ /usr/libexec/omx-plugins/test, outside every CLAP search path, so no host
+ lists them; a test or the plugin qualifier opens them there by path.
+
 Package: omx-plugins-dev
 Section: libdevel
 Architecture: any

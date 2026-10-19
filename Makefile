@@ -46,18 +46,26 @@
 #   make install-devel   the public headers other projects include: $(INCLUDEDIR)/omx-plugins/*.h,
 #                   and $(LIBDIR)/libomxplugins.a with $(LIBDIR)/pkgconfig/omxplugins.pc
 #   make version    the release version, the one packaging/omx-plugins.spec and debian/changelog carry
-#   make test-role  a test plugin (`"role": "test"`) is linked into the archive and installed by no
-#                   target: tools/test-role-check.sh over a staged install, with its --self-test
+#   make install-test  DESTDIR, PREFIX, TESTCLAPDIR: each test plugin's .clap in $(TESTCLAPDIR), outside every
+#                   CLAP search path (default $(PREFIX)/libexec/omx-plugins/test), for the omx-plugins-test package:
+#                   a host's tests and the qualifier open them there by path; no host or picker finds them
+#   make test-role  a test plugin (`"role": "test"`) is linked into the archive and `make install` never
+#                   installs it: tools/test-role-check.sh over a staged install, with its --self-test
 #                   (part of `make test`)
+#   make package-lists  every plugin the build makes is installed and listed by exactly the package it belongs
+#                   to, in the RPM spec and the Debian .install files: tools/package-lists-check.sh over a staged
+#                   install, with its --self-test (part of `make test`)
 VERSION := 0.11.0
 PLUGINS := $(sort $(dir $(wildcard plugins/*/Makefile)))
-# A test plugin is built, tested and linked into libomxplugins.a like the others, and installed by no
-# target: its declaration says `"role": "test"` (tools/test-plugins.mjs).
+# A test plugin is built, tested and linked into libomxplugins.a like the others; `make install` never installs
+# it, and `make install-test` puts it outside the CLAP path: its declaration says `"role": "test"`
+# (tools/test-plugins.mjs).
 TEST_PLUGINS := $(sort $(dir $(shell grep -l '"role": *"test"' plugins/*/*.decl.json 2>/dev/null)))
 SHIP_PLUGINS := $(filter-out $(TEST_PLUGINS),$(PLUGINS))
 PREFIX     ?= /usr
 INCLUDEDIR ?= $(PREFIX)/include
 LIBDIR     ?= $(PREFIX)/lib
+TESTCLAPDIR ?= $(PREFIX)/libexec/omx-plugins/test
 DATADIR    ?= $(PREFIX)/share
 # Every header a consumer includes: the shared parameter type, the panel description and parameter contract rows, then each shipped plugin's generated
 # parameter header and its instance header (the DSP shell around the omx-dsp kernel). A plugin's
@@ -97,7 +105,7 @@ LIB_FLAGS  := -fPIC -fvisibility=hidden -DOMX_CLAP_STATIC -Iinclude
 # read only by the targets that build the archive, so `make version` and the rest need no omx-dsp
 lib_cflags = $(call dep_check,omxdsp,$(OMXDSP_MIN))$(call dep_check,omx-contract,$(CONTRACT_MIN))$(shell $(PKG_CONFIG) --cflags omxdsp omx-clap-core clap)
 
-.PHONY: presets presets-figures test-role all lib lib-test test test-faces units panel-layout descriptor-view lv2-units contract-union probe-checks eq-probe-race face-descriptor hints look manual install install-devel clean version recipe-test completeness selftest private-refs strip-crosscheck meters-abi meter-level dsp-copies meter-ring
+.PHONY: presets presets-figures test-role install-test package-lists all lib lib-test test test-faces units panel-layout descriptor-view lv2-units contract-union probe-checks eq-probe-race face-descriptor hints look manual install install-devel clean version recipe-test completeness selftest private-refs strip-crosscheck meters-abi meter-level dsp-copies meter-ring
 all: lib
 	@for p in $(PLUGINS); do $(MAKE) -C $$p all || exit 1; done
 lib: $(LIB) $(LIB_PC)
@@ -115,6 +123,7 @@ test: lib units panel-layout descriptor-view lv2-units contract-union probe-chec
 	@$(MAKE) -s meters-abi
 	@$(MAKE) -s meter-level
 	@$(MAKE) -s test-role
+	@$(MAKE) -s package-lists
 # what runs with no omx-contract command (debian/rules: no .deb ships the command yet): the built faces against their
 # committed descriptors, the static table and the ABI checks; nothing here reads the contract directory
 test-faces: all lib contract-union eq-probe-race
@@ -123,6 +132,7 @@ test-faces: all lib contract-union eq-probe-race
 	@$(MAKE) -s meters-abi
 	@$(MAKE) -s meter-level
 	@$(MAKE) -s test-role
+	@$(MAKE) -s package-lists
 units:
 	node tools/test/param-units-check.mjs
 panel-layout:
@@ -203,9 +213,15 @@ strip-crosscheck:
 install:
 	@for p in $(SHIP_PLUGINS); do $(MAKE) -C $$p install || exit 1; done
 	find presets -type f -name '*.json' | while read -r f; do install -D -m644 "$$f" "$(DESTDIR)$(DATADIR)/omx/$$f"; done
+install-test:
+	@for p in $(TEST_PLUGINS); do $(MAKE) -C $$p all || exit 1; \
+	  n=$$(basename $$p); install -Dm755 $$p/build/$$n.clap $(DESTDIR)$(TESTCLAPDIR)/$$n.clap || exit 1; done
 test-role:
 	tools/test-role-check.sh
 	tools/test-role-check.sh --self-test
+package-lists:
+	tools/package-lists-check.sh
+	tools/package-lists-check.sh --self-test
 install-devel: lib
 	install -d $(DESTDIR)$(INCLUDEDIR)/omx-plugins $(DESTDIR)$(LIBDIR)/pkgconfig
 	install -m644 $(HEADERS) $(DESTDIR)$(INCLUDEDIR)/omx-plugins/
