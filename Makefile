@@ -12,6 +12,10 @@
 #                   (tools/test/lv2-units-check.mjs, with its sabotage arms; part of `make test`)
 #   make contract-union  parallel make targets render omx-contract's union into private directories and read it whole
 #                   (tools/test/contract-union-race-test.mjs; part of `make test` and `make test-faces`)
+#   make probe-checks  clap-params-check, panel-check, clap-ext-check and port-groups-check each fail on a built face that is wrong,
+#                   one change at a time (tools/test/probe-checks-selftest.mjs; part of `make test`)
+#   make eq-probe-race  parallel make targets each build build/eq-default-probe privately and run it whole
+#                   (tools/test/eq-probe-race-test.mjs; part of `make test` and `make test-faces`)
 #   make hints      no LV2 face lost a port hint: tools/port-hints.mjs against each declaration's `portHints` pin
 #   make look       tools/look.json, the MOD GUI's colours and font, is what tools/look/tokens.css resolves to
 #   make manual     each declaration's manual follows omx-contract: a travel moved in a copy of the release moves
@@ -26,7 +30,9 @@
 #                    plugins are built for (tools/test/meters-abi-test.c, compile and run; part of `make test`)
 #   make strip-crosscheck   omx-strip, a chain, against the hand-ported strip it replaced, bit for bit at
 #                    the old plugin's settings (tools/test/strip-crosscheck.sh; needs the git history, and builds the
-#                    omx-contract and omx-dsp releases the old commit pinned, from sibling checkouts' tags or GitHub)
+#                    omx-contract and omx-dsp releases the old commit pinned, from sibling checkouts' tags or GitHub).
+#                    Known gap: the low-pass above 0.6 of Nyquist at 44.1 and 48 kHz is not compared (omx-dsp's hand-over,
+#                    omx-dsp#105/#116/#119, removed a passband lift the hand-ported strip had); the map's @cap line says so
 #   make presets    the factory presets: fresh against tools/gen-presets.mjs, each value inside its declared travel (part of `make test`)
 #   make presets-figures  the measured figures of the console's two catalogue presets, through omx-dsp's instance faces: the
 #                   amp-input bell (+4.00 dB at 2.5 kHz), the amp-tube harmonics (H2/H3 on the closed form), the dimension's
@@ -91,11 +97,11 @@ LIB_FLAGS  := -fPIC -fvisibility=hidden -DOMX_CLAP_STATIC -Iinclude
 # read only by the targets that build the archive, so `make version` and the rest need no omx-dsp
 lib_cflags = $(call dep_check,omxdsp,$(OMXDSP_MIN))$(call dep_check,omx-contract,$(CONTRACT_MIN))$(shell $(PKG_CONFIG) --cflags omxdsp omx-clap-core clap)
 
-.PHONY: presets presets-figures test-role all lib lib-test test test-faces units panel-layout descriptor-view lv2-units contract-union face-descriptor hints look manual install install-devel clean version recipe-test completeness selftest private-refs strip-crosscheck meters-abi meter-ring
+.PHONY: presets presets-figures test-role all lib lib-test test test-faces units panel-layout descriptor-view lv2-units contract-union probe-checks eq-probe-race face-descriptor hints look manual install install-devel clean version recipe-test completeness selftest private-refs strip-crosscheck meters-abi meter-level dsp-copies meter-ring
 all: lib
 	@for p in $(PLUGINS); do $(MAKE) -C $$p all || exit 1; done
 lib: $(LIB) $(LIB_PC)
-test: lib units panel-layout descriptor-view lv2-units contract-union
+test: lib units panel-layout descriptor-view lv2-units contract-union probe-checks eq-probe-race
 	@if [ -z "$(PLUGINS)" ]; then echo "no plugins yet"; fi
 	@for p in $(PLUGINS); do $(MAKE) -C $$p test || exit 1; done
 	@$(MAKE) -s face-descriptor
@@ -107,13 +113,15 @@ test: lib units panel-layout descriptor-view lv2-units contract-union
 	@$(MAKE) -s presets
 	@$(MAKE) -s presets-figures
 	@$(MAKE) -s meters-abi
+	@$(MAKE) -s meter-level
 	@$(MAKE) -s test-role
 # what runs with no omx-contract command (debian/rules: no .deb ships the command yet): the built faces against their
 # committed descriptors, the static table and the ABI checks; nothing here reads the contract directory
-test-faces: all lib contract-union
+test-faces: all lib contract-union eq-probe-race
 	@$(MAKE) -s face-descriptor
 	@$(MAKE) -s lib-test
 	@$(MAKE) -s meters-abi
+	@$(MAKE) -s meter-level
 	@$(MAKE) -s test-role
 units:
 	node tools/test/param-units-check.mjs
@@ -127,6 +135,12 @@ lv2-units:
 # the union render is read whole while other processes render it (make -j): a fake CLI, readers a little apart
 contract-union:
 	node tools/test/contract-union-race-test.mjs
+# the four probe checkers (params, panel, CLAP extensions, port groups) each go red on a face that is wrong, one change at a time
+probe-checks:
+	node tools/test/probe-checks-selftest.mjs
+# the EQ default probe is run whole while other processes build it (make -j): a fake compiler, readers a little apart
+eq-probe-race:
+	node tools/test/eq-probe-race-test.mjs
 # the described plugins' built faces, scanned, against their authored descriptors; after the plugins build
 face-descriptor:
 	tools/face-descriptor-check.sh
@@ -162,6 +176,25 @@ meters-abi:
 	$(CC) -std=gnu11 -Wall -Wextra -Werror $(shell $(PKG_CONFIG) --cflags omx-clap-core clap) -o build/meters-abi-test tools/test/meters-abi-test.c
 	build/meters-abi-test
 	@echo "ok   clap.meters/1 as omx-clap-core installs it: id, enums, sizeof and offsetof"
+# every level meter of the metered faces reads bit for bit what tools/test/meter-level.sha256 holds, and every
+# other meter (a gain reduction, float through libm) reads within a tolerance what tools/test/<face>.meter-others.txt holds
+METER_LEVEL_FACES := omx-comp omx-deesser
+meter-level:
+	@mkdir -p build
+	@for f in $(METER_LEVEL_FACES); do $(MAKE) -s -C plugins/$$f all || exit 1; done
+	$(CC) -std=gnu11 -Wall -Wextra -Werror $(shell $(PKG_CONFIG) --cflags omx-clap-core clap) -o build/meter-level-digest tools/test/meter-level-digest.c -ldl -lm
+	node tools/test/meter-values-check.mjs --self-test
+	@for f in $(METER_LEVEL_FACES); do \
+	  got=$$(build/meter-level-digest plugins/$$f/build/$$f.clap --others build/$$f.meter-others.txt | sha256sum | cut -d' ' -f1); \
+	  want=$$(sed -n "s/^\([0-9a-f]*\)  $$f\$$/\1/p" tools/test/meter-level.sha256); \
+	  if [ "$$got" != "$$want" ] || [ -z "$$want" ]; then echo "FAIL meter-level $$f: $$got, expected $$want" >&2; exit 1; fi; \
+	  echo "ok   meter-level $$f: the level meters read $$got"; \
+	  node tools/test/meter-values-check.mjs build/$$f.meter-others.txt tools/test/$$f.meter-others.txt || exit 1; \
+	done
+# no source, hand-written or generated, carries a copy of a function omx-dsp exports (omx-dsp-copy-check --enforce)
+dsp-copies:
+	tools/dsp-copies-check.sh
+	tools/dsp-copies-check.sh --self-test
 meter-ring:
 	tools/meter-ring-check.sh
 	tools/meter-ring-check.sh --self-test

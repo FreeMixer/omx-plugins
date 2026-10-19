@@ -8,6 +8,8 @@ HPF Freq|HPF Freq
 HPF Slope|HPF Slope
 LPF|LPF
 LPF Freq|LPF Freq
+# above 0.6 of Nyquist at 44.1 and 48 kHz the low-pass takes omx-dsp's hand-over, which removes the passband lift (up to +19 dB near Nyquist) the hand-ported strip had: omx-dsp#105, #116, #119. Not compared above that corner.
+@cap|LPF Freq|0.6|omx-dsp low-pass hand-over near Nyquist (#105, #116, #119)
 LPF Slope|LPF Slope
 Gate|Gate
 # the hand-ported strip passed its threshold as both knee edges (a hard knee)
