@@ -42,7 +42,7 @@ jobs:
   # The ruling of 2026-10-10: plugin-qualify's real-time-safety verdict runs over every plugin, THEN omx-plugins
   # is released. The rpm job below publishes the moment it builds, so this job comes first and the release waits
   # on it: tools/qualify-release.sh builds the tree, qualifies every installed .clap and refuses unless each one's
-  # verdict document says suitable. The documents are attached to the run.
+  # qualification record says suitable. The records and the probe outputs they judged are attached to the run.
   qualify:
     name: RT-safety verdict (every plugin)
     runs-on: ${{ inputs.runner || 'ubuntu-latest' }}
@@ -63,16 +63,18 @@ jobs:
       - name: Install the build dependencies and the prober
         run: |
           dnf builddep -y --setopt=install_weak_deps=False packaging/omx-plugins.spec
-          dnf install -y --setopt=install_weak_deps=False plugin-qualify omx-clap-host
+          dnf install -y --setopt=install_weak_deps=False 'plugin-qualify >= 0.11.0' omx-clap-host
 
       - name: Qualify every plugin; refuse the release unless each is suitable
-        run: tools/qualify-release.sh rt-safety
+        run: tools/qualify-release.sh qualification
 
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
-          name: omx-plugins-rt-safety
-          path: rt-safety/*.rt-safety.json
+          name: omx-plugins-qualification
+          path: |
+            qualification/*.qualification.json
+            qualification/*.probe.json
           if-no-files-found: warn
           retention-days: 90
 
