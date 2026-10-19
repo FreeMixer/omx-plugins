@@ -25,6 +25,7 @@ BuildRequires: lv2-devel
 BuildRequires: nodejs
 # make selftest copies the tree with tar
 BuildRequires: tar
+BuildRequires: diffutils
 BuildRequires: lilv
 BuildRequires: lilv-devel
 BuildRequires: sord
