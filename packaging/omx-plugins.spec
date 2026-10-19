@@ -25,6 +25,7 @@ BuildRequires: lv2-devel
 BuildRequires: nodejs
 # make selftest copies the tree with tar
 BuildRequires: tar
+BuildRequires: diffutils
 BuildRequires: lilv
 BuildRequires: lilv-devel
 BuildRequires: sord
@@ -75,6 +76,8 @@ console's own DSP, so they sound like the desk.
 %package devel
 Summary: Headers and static library of the OpenMixer plugins, for projects that build on them
 Requires: omx-dsp-devel >= 0.24.0
+# the contract directory the descriptors install into is omx-contract-devel's
+Requires: omx-contract-devel >= 2.16.0
 Requires: clap-devel
 
 %description devel
@@ -84,6 +87,8 @@ parameter header, installed in %{_includedir}/omx-plugins, and
 libomxplugins.a (pkg-config omxplugins): every plugin's CLAP face in one
 static library, with the table of their entries in omx_clap_static.h, for a
 host that runs the plugins in its own process without loading .clap files.
+Each plugin's descriptor, its parameters in omx-contract's words, is installed
+in omx-contract's contract directory, where a host reads it.
 
 %prep
 %autosetup
@@ -136,6 +141,8 @@ host that runs the plugins in its own process without loading .clap files.
 %{_includedir}/omx-plugins/
 %{_libdir}/libomxplugins.a
 %{_libdir}/pkgconfig/omxplugins.pc
+# each plugin's descriptor, in omx-contract's contract directory (the directory itself is omx-contract-devel's)
+%{_datadir}/omx-contract/contract.d/2/omx-plugins/
 
 %files lv2
 %license LICENSE
