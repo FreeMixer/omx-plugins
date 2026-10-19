@@ -180,8 +180,9 @@ keeps its generated files fresh.
 ## Packages
 
 `packaging/omx-plugins.spec` builds `omx-plugins-clap`, `omx-plugins-lv2`, the `omx-plugins`
-metapackage that requires both, and `omx-plugins-devel` (the headers, `libomxplugins.a` and
-`omxplugins.pc`), and runs `make test` in `%check`; `debian/` builds the same packages for bookworm
+metapackage that requires both, `omx-plugins-devel` (the headers, `libomxplugins.a` and
+`omxplugins.pc`) and `omx-plugins-test` (the test instruments, in `/usr/libexec/omx-plugins/test`,
+outside every CLAP search path, for host tests and for measuring them on a console), and runs `make test` in `%check`; `debian/` builds the same packages for bookworm
 and trixie (`omx-plugins-dev`, with the archive in the multiarch directory) and runs `make test`
 unless `nocheck` is set. The version lives in three places that CI keeps equal: the top-level
 `Makefile` (`make version`), the spec's `Version:` and the top of `debian/changelog`.
