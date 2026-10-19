@@ -176,17 +176,20 @@ meters-abi:
 	$(CC) -std=gnu11 -Wall -Wextra -Werror $(shell $(PKG_CONFIG) --cflags omx-clap-core clap) -o build/meters-abi-test tools/test/meters-abi-test.c
 	build/meters-abi-test
 	@echo "ok   clap.meters/1 as omx-clap-core installs it: id, enums, sizeof and offsetof"
-# every level meter of the metered faces reads bit for bit what tools/test/meter-level.sha256 holds
+# every level meter of the metered faces reads bit for bit what tools/test/meter-level.sha256 holds, and every
+# other meter (a gain reduction, float through libm) reads within a tolerance what tools/test/<face>.meter-others.txt holds
 METER_LEVEL_FACES := omx-comp omx-deesser
 meter-level:
 	@mkdir -p build
 	@for f in $(METER_LEVEL_FACES); do $(MAKE) -s -C plugins/$$f all || exit 1; done
 	$(CC) -std=gnu11 -Wall -Wextra -Werror $(shell $(PKG_CONFIG) --cflags omx-clap-core clap) -o build/meter-level-digest tools/test/meter-level-digest.c -ldl -lm
+	node tools/test/meter-values-check.mjs --self-test
 	@for f in $(METER_LEVEL_FACES); do \
-	  got=$$(build/meter-level-digest plugins/$$f/build/$$f.clap | sha256sum | cut -d' ' -f1); \
+	  got=$$(build/meter-level-digest plugins/$$f/build/$$f.clap --others build/$$f.meter-others.txt | sha256sum | cut -d' ' -f1); \
 	  want=$$(sed -n "s/^\([0-9a-f]*\)  $$f\$$/\1/p" tools/test/meter-level.sha256); \
 	  if [ "$$got" != "$$want" ] || [ -z "$$want" ]; then echo "FAIL meter-level $$f: $$got, expected $$want" >&2; exit 1; fi; \
 	  echo "ok   meter-level $$f: the level meters read $$got"; \
+	  node tools/test/meter-values-check.mjs build/$$f.meter-others.txt tools/test/$$f.meter-others.txt || exit 1; \
 	done
 # no source, hand-written or generated, carries a copy of a function omx-dsp exports (omx-dsp-copy-check --enforce)
 dsp-copies:
