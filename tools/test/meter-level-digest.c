@@ -1,12 +1,17 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Pau Aliagas <linuxnow@gmail.com>
 /*
- * meter-level-digest.c — the clap.meters/1 values of a built face, as bytes: a minimal CLAP host runs
- * the face over a fixed stimulus (silence, dc and noise at levels from 0 dBFS to far below any meter's
- * minimum, sines, impulses, a NaN and an infinite sample, blocks of 1 to 300 frames) and, after every
- * block, writes the bit pattern of every value of every meter. `meter-level-digest <x.clap> | sha256sum`
- * is the digest tools/test/meter-level.sha256 holds: a change to how a level meter reads moves it.
- * Used by `make meter-level`.
+ * meter-level-digest.c — the clap.meters/1 values of a built face: a minimal CLAP host runs the face over
+ * a fixed stimulus (silence, dc and noise at levels from 0 dBFS to far below any meter's minimum, sines,
+ * impulses, a NaN and an infinite sample, blocks of 1 to 300 frames) and, after every block, writes the
+ * bit pattern of every value of every LEVEL meter to stdout. `meter-level-digest <x.clap> | sha256sum`
+ * is the digest tools/test/meter-level.sha256 holds: a change to how a level meter reads moves it. A
+ * level meter is a peak and a log10 in double, which every toolchain rounds alike.
+ *
+ * `--others <file>` writes every other meter's values (a gain reduction: the kernel's own reading, in
+ * float through libm's float functions, whose last bit differs between C libraries) to <file> as text,
+ * one line per value, `<block> <meter> <value>`, %.9g. tools/test/meter-values-check.mjs compares that
+ * file against tools/test/<face>.meter-others.txt within a tolerance. Used by `make meter-level`.
  */
 #include <dlfcn.h>
 #include <math.h>
@@ -65,7 +70,13 @@ static void fill(uint32_t b, uint32_t n, float *l, float *r) {
 }
 
 int main(int argc, char **argv) {
-  if (argc != 2) return fprintf(stderr, "usage: meter-level-digest <x.clap>\n"), 2;
+  FILE *others = NULL;
+  if (argc == 4 && strcmp(argv[2], "--others") == 0) {
+    others = fopen(argv[3], "w");
+    if (!others) return fprintf(stderr, "open %s\n", argv[3]), 2;
+  } else if (argc != 2) {
+    return fprintf(stderr, "usage: meter-level-digest <x.clap> [--others <file>]\n"), 2;
+  }
   void *so = dlopen(argv[1], RTLD_NOW | RTLD_LOCAL);
   if (!so) return fprintf(stderr, "dlopen %s: %s\n", argv[1], dlerror()), 1;
   const clap_plugin_entry_t *entry = (const clap_plugin_entry_t *)dlsym(so, "clap_entry");
@@ -80,10 +91,13 @@ int main(int argc, char **argv) {
 
   const uint32_t nm = m->count(p);
   uint32_t levels = 0;
+  static bool is_level[64];
+  if (nm > 64) return fprintf(stderr, "%u meters, more than this host reads\n", nm), 1;
   for (uint32_t k = 0; k < nm; k++) {
     clap_meter_info_t info;
     if (!m->get_info(p, k, &info)) return fprintf(stderr, "get_info %u\n", k), 1;
-    if (info.kind == CLAP_METER_KIND_LEVEL) levels++;
+    is_level[k] = info.kind == CLAP_METER_KIND_LEVEL;
+    if (is_level[k]) levels++;
   }
   if (levels == 0) return fprintf(stderr, "no level meter: nothing to digest\n"), 1;
 
@@ -108,8 +122,13 @@ int main(int argc, char **argv) {
     for (uint32_t k = 0; k < nm; k++) {
       double v[8] = {0};
       uint32_t got = m->get_values(p, k, v, 8);
-      fwrite(&got, sizeof got, 1, stdout);
-      fwrite(v, sizeof(double), got, stdout);
+      if (is_level[k]) {
+        fwrite(&got, sizeof got, 1, stdout);
+        fwrite(v, sizeof(double), got, stdout);
+      } else if (others) {
+        for (uint32_t j = 0; j < got; j++) fprintf(others, "%u %u %.9g\n", b, k, v[j]);
+        if (got == 0) fprintf(others, "%u %u none\n", b, k);
+      }
     }
   }
   p->stop_processing(p);
@@ -117,5 +136,6 @@ int main(int argc, char **argv) {
   p->destroy(p);
   entry->deinit();
   dlclose(so);
+  if (others && fclose(others) != 0) return fprintf(stderr, "write %s\n", argv[3]), 1;
   return 0;
 }
