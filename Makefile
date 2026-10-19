@@ -45,6 +45,8 @@
 #                   again through the installed omxplugins.pc (part of `make test`)
 #   make install-devel   the public headers other projects include: $(INCLUDEDIR)/omx-plugins/*.h,
 #                   and $(LIBDIR)/libomxplugins.a with $(LIBDIR)/pkgconfig/omxplugins.pc
+#   make clap-validate  clap-validator on every built .clap (tools/clap-validate.sh): one JSON report each in build/clap-validator;
+#                   CI runs it and reports a failure without failing the job until every plugin passes
 #   make version    the release version, the one packaging/omx-plugins.spec and debian/changelog carry
 #   make test-role  a test plugin (`"role": "test"`) is linked into the archive and installed by no
 #                   target: tools/test-role-check.sh over a staged install, with its --self-test
@@ -97,7 +99,7 @@ LIB_FLAGS  := -fPIC -fvisibility=hidden -DOMX_CLAP_STATIC -Iinclude
 # read only by the targets that build the archive, so `make version` and the rest need no omx-dsp
 lib_cflags = $(call dep_check,omxdsp,$(OMXDSP_MIN))$(call dep_check,omx-contract,$(CONTRACT_MIN))$(shell $(PKG_CONFIG) --cflags omxdsp omx-clap-core clap)
 
-.PHONY: presets presets-figures test-role all lib lib-test test test-faces units panel-layout descriptor-view lv2-units contract-union probe-checks eq-probe-race face-descriptor hints look manual install install-devel clean version recipe-test completeness selftest private-refs strip-crosscheck meters-abi meter-level dsp-copies meter-ring
+.PHONY: presets presets-figures test-role all lib lib-test test test-faces units panel-layout descriptor-view lv2-units contract-union probe-checks eq-probe-race face-descriptor hints look manual install install-devel clean version recipe-test completeness selftest private-refs strip-crosscheck meters-abi meter-level dsp-copies meter-ring clap-validate
 all: lib
 	@for p in $(PLUGINS); do $(MAKE) -C $$p all || exit 1; done
 lib: $(LIB) $(LIB_PC)
@@ -256,3 +258,6 @@ lib-test: lib
 	$(LIB_B)/static-table-host $(CLAP_IDS) --test $(TEST_IDS)
 version:
 	@echo $(VERSION)
+
+clap-validate: all
+	tools/clap-validate.sh build/clap-validator
