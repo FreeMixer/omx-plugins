@@ -1,3 +1,15 @@
+omx-plugins (0.12.0) unstable; urgency=medium
+
+  * Each plugin's descriptor is installed byte for byte in omx-contract's
+    contract directory, as contract.d/2/omx-plugins/plugins/<name>.json with
+    a MANIFEST.json that lists every file with its sha256 and this version.
+    omx-plugins-dev and omx-plugins-devel carry them and need omx-contract
+    2.16.0 or newer, which owns the directory.
+  * The spec builds with diffutils, which the new check uses to compare the
+    installed descriptors with the sources.
+
+ -- Pau Aliagas <linuxnow@gmail.com>  Tue, 20 Oct 2026 08:00:00 +0000
+
 omx-plugins (0.11.0) unstable; urgency=medium
 
   * Factory presets: 120 presets for the 19 plugins, installed with the
