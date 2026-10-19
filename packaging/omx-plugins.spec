@@ -14,11 +14,11 @@ BuildRequires: make
 BuildRequires: pkgconf-pkg-config
 # The releases this tree builds against: a floor each (no ceiling), once here and
 # the same in debian/control (tools/deps-check.sh). The Makefile and tools/gen.mjs read them from here.
-BuildRequires: omx-dsp-devel >= 0.22.0
-BuildRequires: omx-contract-devel >= 2.15.0
+BuildRequires: omx-dsp-devel >= 0.24.0
+BuildRequires: omx-contract-devel >= 2.16.0
 BuildRequires: omx-clap-core-devel >= 0.6.0
 # the omx-contract command, first packaged in 2.15.0: the generators read the contract directory through it
-BuildRequires: omx-contract >= 2.15.0
+BuildRequires: omx-contract >= 2.16.0
 BuildRequires: clap-devel
 BuildRequires: lv2-devel
 # %%check: the generators and checks are Node scripts; the hosts that load the built plugins
@@ -74,7 +74,7 @@ console's own DSP, so they sound like the desk.
 
 %package devel
 Summary: Headers and static library of the OpenMixer plugins, for projects that build on them
-Requires: omx-dsp-devel >= 0.22.0
+Requires: omx-dsp-devel >= 0.24.0
 Requires: clap-devel
 
 %description devel
@@ -170,6 +170,18 @@ host that runs the plugins in its own process without loading .clap files.
   through the DSP.
 - omx-plugins-devel also installs the test plugins' generated declaration
   headers, which hold the constants and CLAP id a test predicts from.
+- The compressor and de-esser level meters read their level through omx-dsp's
+  omx_meter_level_db instead of a copy of their own. The readings are bit for
+  bit the same.
+- Builds against omx-dsp >= 0.24.0 and omx-contract >= 2.16.0.
+- The oracles take their sample rates from omx-contract's
+  OMX_ORACLE_FULL_RATES_* names.
+- The strip's cross-check declares the low-pass above 0.6 of Nyquist as a
+  known gap and checks the rest.
+- The parameter, panel, CLAP extension and port group checks each have
+  sabotage tests that must fail on a broken face.
+- A parallel make no longer races on the EQ default probe: each build makes
+  its own copy and moves it into place.
 
 * Sat Oct 17 2026 Pau Aliagas <linuxnow@gmail.com> - 0.10.0-1
 - Every plugin over one kernel is described in omx-contract's own words: a
