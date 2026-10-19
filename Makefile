@@ -39,6 +39,10 @@
 #                   L - R null; each sabotaged by --self-test (tools/test/preset-figures.mjs; part of `make test` and `make test-faces`)
 #   make install    DESTDIR, PREFIX, LIBDIR, CLAPDIR, DATADIR: $(CLAPDIR)/<name>.clap, $(LIBDIR)/lv2/<name>.lv2/ and the
 #                   factory presets in $(DATADIR)/omx/presets/<plugin id>/<preset id>.json
+#   make install-contract  DESTDIR, CONTRACTDIR: each shipped plugin's descriptor into omx-contract's contract directory,
+#                   $(CONTRACTDIR)/2/omx-plugins/plugins/<stem>.json and its MANIFEST.json (run by install-devel)
+#   make contract-dir  the installed tree carries one descriptor per shipped plugin that has one, byte for byte, and
+#                   omx-contract's reader reads it (tools/test/contract-dir-check.sh, with its sabotage arms; part of `make test`)
 #   make lib        build/lib/libomxplugins.a: every shipped plugin's CLAP face and the table of their
 #                   entries (include/omx_clap_static.h), for a host that runs them in-process
 #   make lib-test   a C host linked against the archive opens every face through the table, then
@@ -97,11 +101,11 @@ LIB_FLAGS  := -fPIC -fvisibility=hidden -DOMX_CLAP_STATIC -Iinclude
 # read only by the targets that build the archive, so `make version` and the rest need no omx-dsp
 lib_cflags = $(call dep_check,omxdsp,$(OMXDSP_MIN))$(call dep_check,omx-contract,$(CONTRACT_MIN))$(shell $(PKG_CONFIG) --cflags omxdsp omx-clap-core clap)
 
-.PHONY: presets presets-figures test-role all lib lib-test test test-faces units panel-layout descriptor-view lv2-units contract-union probe-checks eq-probe-race face-descriptor hints look manual install install-devel clean version recipe-test completeness selftest private-refs strip-crosscheck meters-abi meter-level dsp-copies meter-ring
+.PHONY: presets presets-figures test-role all lib lib-test test test-faces units panel-layout descriptor-view lv2-units contract-union probe-checks eq-probe-race face-descriptor hints look manual install install-devel install-contract contract-dir clean version recipe-test completeness selftest private-refs strip-crosscheck meters-abi meter-level dsp-copies meter-ring
 all: lib
 	@for p in $(PLUGINS); do $(MAKE) -C $$p all || exit 1; done
 lib: $(LIB) $(LIB_PC)
-test: lib units panel-layout descriptor-view lv2-units contract-union probe-checks eq-probe-race
+test: lib units panel-layout descriptor-view lv2-units contract-union contract-dir probe-checks eq-probe-race
 	@if [ -z "$(PLUGINS)" ]; then echo "no plugins yet"; fi
 	@for p in $(PLUGINS); do $(MAKE) -C $$p test || exit 1; done
 	@$(MAKE) -s face-descriptor
@@ -206,7 +210,24 @@ install:
 test-role:
 	tools/test-role-check.sh
 	tools/test-role-check.sh --self-test
-install-devel: lib
+# Each shipped plugin's descriptor, plugins/<stem>/<stem>.descriptor.json, installed byte for byte into omx-contract's
+# contract directory as $(CONTRACTDIR)/<schema major>/omx-plugins/plugins/<stem>.json, with a MANIFEST.json naming this
+# version (omx-contract docs/contract-dir.md). The directory is omx-contract-devel's, under the same data directory
+# (`pkg-config --variable=contractdir omx-contract`); the install script too, or OMX_CONTRACT_DIR's, an omx-contract
+# checkout, when no package is installed.
+CONTRACTDIR ?= $(DATADIR)/omx-contract/contract.d
+CONTRACT_SCHEMA_MAJOR := 2
+INSTALL_CONTRACT_DIR = $(firstword $(wildcard $(shell $(PKG_CONFIG) --variable=datadir omx-contract 2>/dev/null)/install-contract-dir.sh) $(wildcard $(OMX_CONTRACT_DIR)/tools/install-contract-dir.sh))
+DESCRIPTORS = $(foreach p,$(SHIP_PLUGINS),$(wildcard $(p)$(notdir $(p:/=)).descriptor.json))
+install-contract:
+	@test -n "$(INSTALL_CONTRACT_DIR)" || { echo "install-contract: no install-contract-dir.sh: install omx-contract-devel, or set OMX_CONTRACT_DIR to a checkout" >&2; exit 1; }
+	@stage=$$(mktemp -d) && trap 'rm -rf "$$stage"' EXIT && mkdir -p "$$stage/plugins" && \
+	  for f in $(DESCRIPTORS); do cp "$$f" "$$stage/plugins/$$(basename "$$f" .descriptor.json).json" || exit 1; done && \
+	  sh $(INSTALL_CONTRACT_DIR) omx-plugins $(VERSION) $(CONTRACT_SCHEMA_MAJOR) "$$stage" $(DESTDIR)$(CONTRACTDIR)
+contract-dir:
+	tools/test/contract-dir-check.sh
+	tools/test/contract-dir-check.sh --self-test
+install-devel: lib install-contract
 	install -d $(DESTDIR)$(INCLUDEDIR)/omx-plugins $(DESTDIR)$(LIBDIR)/pkgconfig
 	install -m644 $(HEADERS) $(DESTDIR)$(INCLUDEDIR)/omx-plugins/
 	install -m644 $(LIB) $(DESTDIR)$(LIBDIR)/
