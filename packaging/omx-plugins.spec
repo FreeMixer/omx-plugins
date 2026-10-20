@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # Copyright (C) 2026 Pau Aliagas <linuxnow@gmail.com>
 Name: omx-plugins
-Version: 0.11.0
+Version: 0.12.0
 Release: 1%{?dist}
 License: GPL-3.0-or-later
 Summary: The OpenMixer console's delay, drive, EQ, channel strip, keyed gate and effects, as plugins for your DAW
@@ -170,6 +170,15 @@ in omx-contract's contract directory, where a host reads it.
 # END GENERATED lv2-files
 
 %changelog
+* Tue Oct 20 2026 Pau Aliagas <linuxnow@gmail.com> - 0.12.0-1
+- Each plugin's descriptor is installed byte for byte in omx-contract's contract
+  directory, as contract.d/2/omx-plugins/plugins/<name>.json, with a
+  MANIFEST.json that lists every file with its sha256 and this version.
+  omx-plugins-devel carries them and needs omx-contract-devel 2.16.0 or newer,
+  which owns the directory.
+- The spec builds with diffutils, which the new check uses to compare the
+  installed descriptors with the sources.
+
 * Sun Oct 18 2026 Pau Aliagas <linuxnow@gmail.com> - 0.11.0-1
 - Factory presets: 120 presets for the 19 plugins, installed with the
   omx-plugins package as files in /usr/share/omx/presets, one directory per
