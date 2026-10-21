@@ -28,7 +28,7 @@
         "step": 1,
         "unit": "st",
         "default": 0,
-        "scale": "linear"
+        "scale": "stepped"
       },
       "group": [
         "Pitch"
@@ -53,7 +53,7 @@
         "step": 1,
         "unit": "cents",
         "default": 0,
-        "scale": "linear"
+        "scale": "stepped"
       },
       "group": [
         "Pitch"
