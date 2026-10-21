@@ -22,6 +22,7 @@ import { spawnSync } from 'node:child_process';
 import { cpSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { DESCRIPTOR_SCHEMA_FLOOR, descriptorFile, descriptorText } from '../descriptor.mjs';
+import { clapFeatureValue } from '../format-tables.mjs';
 import { ROOT, loadDecl, pluginDirs } from '../gen.mjs';
 import { OWNERS, compareVersions, installedDataDir, locateContract } from '../omx-contract.mjs';
 import { validate } from '../schema-validate.mjs';
@@ -137,12 +138,12 @@ editJson(DESC, (x) => { [x.controls[0], x.controls[1]] = [x.controls[1], x.contr
 check('arm: a control out of the parameter order is refused', refusal(() => loadDecl(copy)), `the descriptor's control 0 has id 1; our ids are the parameter order`);
 
 // the descriptor's own words for the faces' description, CLAP features and LV2 class (omx-contract 3.0.0: plugin.doc
-// and the extension bag), read back into the declaration every generator reads, over every described plugin
+// and the extension bag, a CLAP feature by its macro name), read back into the declaration every generator reads, over every described plugin
 for (const d of described) {
   const s = d.split('/').pop(), x = JSON.parse(readFileSync(join(d, descriptorFile(s)), 'utf8')), v = loadDecl(d);
   const types = [x.extensions.lv2['rdf:type']].flat();
   check(`${s}: the description, CLAP features and LV2 class are plugin.doc and the bag's`, [v.description, v.clap.features, ['lv2:Plugin', v.lv2.class].filter((t, i) => i === 0 || t !== 'lv2:Plugin')],
-    [x.plugin.doc, [...x.plugin.features, ...(x.extensions.clap?.['clap_plugin_descriptor.features'] ?? [])], types]);
+    [x.plugin.doc, [...x.plugin.features, ...[x.extensions.clap?.['clap_plugin_descriptor.features'] ?? []].flat().map(clapFeatureValue)], types]);
 }
 
 fresh();

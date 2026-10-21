@@ -155,14 +155,21 @@
       "layout": "stereo"
     }
   ],
+  "needs": {
+    "extensions": {
+      "optional": [
+        "lv2:hardRTCapable"
+      ]
+    }
+  },
   "latency": {
     "reports": true
   },
   "extensions": {
     "clap": {
       "clap_plugin_descriptor.features": [
-        "delay",
-        "stereo"
+        "CLAP_PLUGIN_FEATURE_DELAY",
+        "CLAP_PLUGIN_FEATURE_STEREO"
       ]
     },
     "lv2": {
