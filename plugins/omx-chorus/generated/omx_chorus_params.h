@@ -32,6 +32,16 @@ static const omx_plugin_param OMX_CHORUS_PARAMS[OMX_CHORUS_PARAM_COUNT] = {
   { "mix", "Mix", "%", 0.0f, 100.0f, 35.0f, 0u },
 };
 
+/* Each parameter's CLAP module (clap_param_info.module): its descriptor control's group as a module path, "" for a
+ * plugin with no descriptor. */
+static const char *const OMX_CHORUS_PARAM_MODULES[OMX_CHORUS_PARAM_COUNT] = {
+  "Chorus",
+  "Chorus",
+  "Chorus",
+  "Chorus",
+  "Chorus",
+};
+
 /* One macro per declared bound: what a C face reads where a constant is needed. */
 #define OMX_CHORUS_PARAM_SPREAD_MIN 0.0f
 #define OMX_CHORUS_PARAM_SPREAD_MAX 0.5f

@@ -28,7 +28,7 @@
 import { readFileSync } from 'node:fs';
 import { basename, join, resolve } from 'node:path';
 import { descriptorFile } from './descriptor.mjs';
-import { LV2_UNITS } from './gen.mjs';
+import { lv2UnitNames } from './gen.mjs';
 
 export const FACE_DIFFERS = 'contract.descriptor.face-differs';
 const IS_STEPPED = 1, IS_BYPASS = 1 << 4, IS_AUTOMATABLE = 1 << 5, PORT_IS_MAIN = 1;
@@ -109,7 +109,7 @@ export function faceDifferences(desc, face, rows) {
     differ(where, 'symbol', c.symbol ?? c.id, p.symbol);
     differ(where, 'name', c.name, p.name);
     differ(where, 'range and default', rangeOf(c).map(f32), [p.min, p.max, p.def].map(f32));
-    differ(where, 'unit', c.travel ? LV2_UNITS[c.travel.unit] ?? null : null, p.unit);
+    differ(where, 'unit', c.travel ? lv2UnitNames()[c.travel.unit] ?? null : null, p.unit);
     differ(where, 'toggled', c.kind === 'toggle', has('toggled'));
     differ(where, 'integer', c.kind === 'choice' || (c.kind === 'travel' && c.travel.step === 1), has('integer'));
     differ(where, 'enumeration', c.kind === 'choice' ? c.values.map((v, k) => [v, c.labels[k]]) : [], has('enumeration') ? points(p.index) : []);

@@ -28,6 +28,14 @@ static const omx_plugin_param OMX_LIMITER_PARAMS[OMX_LIMITER_PARAM_COUNT] = {
   { "releaseMs", "Release", "ms", 1.0f, 1000.0f, 50.0f, OMX_PLUGIN_PARAM_INTEGER },
 };
 
+/* Each parameter's CLAP module (clap_param_info.module): its descriptor control's group as a module path, "" for a
+ * plugin with no descriptor. */
+static const char *const OMX_LIMITER_PARAM_MODULES[OMX_LIMITER_PARAM_COUNT] = {
+  "Limiter",
+  "Limiter",
+  "Limiter",
+};
+
 /* One macro per declared bound: what a C face reads where a constant is needed. */
 #define OMX_LIMITER_PARAM_CEILING_DB_MIN -12.0f
 #define OMX_LIMITER_PARAM_CEILING_DB_MAX 0.0f

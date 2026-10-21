@@ -38,6 +38,19 @@ static const omx_plugin_param OMX_DEESSER_PARAMS[OMX_DEESSER_PARAM_COUNT] = {
   { "deessMode", "Mode", "", 0.0f, 1.0f, 0.0f, OMX_PLUGIN_PARAM_INTEGER },
 };
 
+/* Each parameter's CLAP module (clap_param_info.module): its descriptor control's group as a module path, "" for a
+ * plugin with no descriptor. */
+static const char *const OMX_DEESSER_PARAM_MODULES[OMX_DEESSER_PARAM_COUNT] = {
+  "De-esser",
+  "De-esser",
+  "De-esser",
+  "De-esser",
+  "De-esser",
+  "De-esser",
+  "De-esser",
+  "De-esser",
+};
+
 /* One macro per declared bound: what a C face reads where a constant is needed. */
 #define OMX_DEESSER_PARAM_DEESS_FREQ_MIN 2000.0f
 #define OMX_DEESSER_PARAM_DEESS_FREQ_MAX 16000.0f

@@ -48,6 +48,24 @@ static const omx_plugin_param OMX_REVERB_PARAMS[OMX_REVERB_PARAM_COUNT] = {
   { "algorithm", "Algorithm", "", 0.0f, 4.0f, 0.0f, OMX_PLUGIN_PARAM_INTEGER },
 };
 
+/* Each parameter's CLAP module (clap_param_info.module): its descriptor control's group as a module path, "" for a
+ * plugin with no descriptor. */
+static const char *const OMX_REVERB_PARAM_MODULES[OMX_REVERB_PARAM_COUNT] = {
+  "Plate",
+  "Reverb",
+  "Reverb",
+  "Reverb",
+  "Reverb",
+  "Reverb",
+  "Reverb",
+  "Reverb",
+  "Reverse",
+  "Gated",
+  "Gated",
+  "Gated",
+  "Reverb",
+};
+
 /* One macro per declared bound: what a C face reads where a constant is needed. */
 #define OMX_REVERB_PARAM_PLATE_MOD_DEPTH_MIN 0.0f
 #define OMX_REVERB_PARAM_PLATE_MOD_DEPTH_MAX 400.0f

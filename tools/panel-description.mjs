@@ -19,7 +19,7 @@
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { descriptorOf, meaningOfRole } from './descriptor.mjs';
-import { UNITS } from './param-contract.mjs';
+import { servedToken } from './param-contract.mjs';
 
 export const PANEL_ID = 'org.openmixer.panel-description/1';
 
@@ -77,7 +77,7 @@ const CLOSED_FORMS = { gate: ['transfer_curve'], dynamics: ['transfer_curve'], e
 /** A descriptor unit -> the token a role checks it against: the param-contract extension's own table,
  * so a unit it serves is a unit a role can take. A unit it has no token for (`unknown` among them) is
  * a plain number and takes no role. */
-export const unitToken = (unit) => UNITS[unit]?.[0];
+export const unitToken = (unit) => servedToken(unit);
 
 const T = ['ms', 's'], LVL = ['db', 'dbfs', 'dbu', 'lufs'], DB = ['db'], FREQ = ['hz', 'khz'], PLAIN = ['none', 'pc', 'coef'], RATIO = ['ratio', 'coef'], CHOICE = ['none'];
 const WET = { mix: ['pc', 'coef', 'none'], output: DB };

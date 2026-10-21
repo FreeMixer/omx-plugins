@@ -117,6 +117,57 @@ static const omx_plugin_param OMX_EQ8_PARAMS[OMX_EQ8_PARAM_COUNT] = {
   { "b8_on", "Band 8 On", "", 0.0f, 1.0f, 0.0f, OMX_PLUGIN_PARAM_TOGGLE },
 };
 
+/* Each parameter's CLAP module (clap_param_info.module): its descriptor control's group as a module path, "" for a
+ * plugin with no descriptor. */
+static const char *const OMX_EQ8_PARAM_MODULES[OMX_EQ8_PARAM_COUNT] = {
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+};
+
 /* One macro per declared bound: what a C face reads where a constant is needed. */
 #define OMX_EQ8_PARAM_HPF_ON_MIN 0.0f
 #define OMX_EQ8_PARAM_HPF_ON_MAX 1.0f
