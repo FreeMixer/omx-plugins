@@ -59,7 +59,7 @@
 #   make test-role  a test plugin (`"role": "test"`) is linked into the archive and installed by no
 #                   target: tools/test-role-check.sh over a staged install, with its --self-test
 #                   (part of `make test`)
-VERSION := 0.12.0
+VERSION := 0.13.0
 PLUGINS := $(sort $(dir $(wildcard plugins/*/Makefile)))
 # A test plugin is built, tested and linked into libomxplugins.a like the others, and installed by no
 # target: its declaration says `"role": "test"` (tools/test-plugins.mjs).
