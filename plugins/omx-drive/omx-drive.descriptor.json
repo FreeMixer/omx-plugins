@@ -78,7 +78,7 @@
         "step": 1,
         "unit": "Hz",
         "default": 2000,
-        "scale": "log"
+        "scale": "stepped"
       },
       "group": [
         "Drive"

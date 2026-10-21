@@ -28,7 +28,7 @@
         "step": 1,
         "unit": "ms",
         "default": 300,
-        "scale": "linear"
+        "scale": "stepped"
       },
       "group": [
         "Delay"
