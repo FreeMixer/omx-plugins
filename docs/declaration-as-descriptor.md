@@ -84,6 +84,29 @@ What the descriptor has no word for, found laying out our panels, and where each
 | 9 | CLAP's open features (`delay`, `stereo`) and the LV2 class | contract: the extension bag, `extensions` (omx-contract 3.0.0) | done: each descriptor's bag carries them |
 | 10 | The plugin's one-line description (CLAP `description`, LV2 `rdfs:comment`) | contract: `plugin.doc` (omx-contract 3.0.0) | done |
 
+## The faces, from plugin-hostd's tables read backwards
+
+One vocabulary, two directions (FreeMixer/omx-plugins#210, ruling B). plugin-hostd installs one mapping table per
+format into omx-contract's contract directory, `<contractdir>/3/plugin-hostd/formats/{clap,lv2}.json`: how each field a
+scan reads becomes a descriptor word. Our generators write a face from the authored descriptor by reading the same
+rows the other way (`tools/format-tables.mjs`), and only the rows whose transform is `identity` or `lookup`: the row
+whose `lookup` maps a source value to the word's value names what the face writes. No transform is code of ours.
+`$PLUGIN_HOSTD_TABLES`, a directory holding `clap.json` and `lv2.json` (a plugin-hostd checkout's `data/formats`),
+stands in for the installed tables.
+
+- An LV2 port's `units:unit` is the LV2 row mapping its unit (`units:db` for `dB`, `<urn:openmixer:unit#dBFS>` for
+  `dBFS`); a unit no row maps is the declaration's own, defined in the plugin's TTL: `dBu`, `dB/oct` and `ratio`
+  (`urn:openmixer:unit#ratio`, gap 4).
+- An LV2 port's `lv2:designation` is the LV2 row mapping its control's `meaning`: 57 ports carry a `param:` term
+  (gain 31, wetDryRatio 10, release 4, threshold 3, ratio 3, attack 3, hold 1, frequency 1, delay 1). A meaning with
+  no LV2 term is written nowhere.
+- A CLAP parameter's `module` is its control's `group`, the labels joined by `/` (the inverse of plugin-hostd's
+  `group-path`); a plugin with no descriptor writes `""`.
+- param-contract's unit tokens (`tools/param-contract.mjs`) are the LV2 units a face writes, their values
+  `include/omx_param_contract.h`'s.
+
+`make format-tables` (part of `make test`) holds the faces to the tables, with its sabotage arms.
+
 ## The check of our own faces
 
 The authored descriptor is also what our built faces must serve. `tools/face-descriptor-check.mjs` builds

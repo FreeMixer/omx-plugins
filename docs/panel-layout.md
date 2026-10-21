@@ -24,8 +24,8 @@ the one the declared role names (below). The declared panel then goes to the lay
 ## Units
 
 A control's unit is the descriptor's `travel.unit`. A role checks it against the units the
-param-contract extension names (`tools/param-contract.mjs`, `UNITS`: the one table from a declared
-unit to its token), so a unit that table knows (`LUFS`, `dBu` among them) is checked like any other.
+param-contract extension names (`tools/param-contract.mjs`, `contractUnit`: a declared unit's token is the
+LV2 unit its face writes, plugin-hostd's LV2 table read backwards), so a unit that table knows (`LUFS`, `dBu` among them) is checked like any other.
 A unit with no token there, `unknown` included, takes no role and is drawn as a plain number.
 
 The level roles (`threshold`, `ceiling`) take `dB`, `dBFS`, `dBu` and `LUFS`.
