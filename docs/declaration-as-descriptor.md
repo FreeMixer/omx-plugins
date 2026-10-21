@@ -5,8 +5,10 @@
 A plugin of ours is described in omx-contract's words, like anyone's (omx-contract `docs/descriptors.md`):
 `plugins/<stem>/<stem>.descriptor.json` is its `authored` descriptor. `plugins/<stem>/<stem>.decl.json` keeps only
 what the descriptor has no word for and only this repository needs: how the faces are built, the presets'
-source, the panel's hints, the docs and the console's placement. `schema/plugin.decl.schema.json` holds those
-extras and nothing the descriptor says.
+source, the panel's hints, the docs and the console's placement. `schema/plugin.decl.schema.json` is the shape
+of the declaration a generator reads, the descriptor's view with those extras folded in; for a described plugin
+the extras file carries only the extras, and `viewOf` (`tools/descriptor.mjs`) refuses a field the descriptor
+says (the identity, the parameters, the CLAP features, the LV2 class, the description).
 
 `tools/gen.mjs`'s `loadDecl` reads the two and gives every generator the declaration it gave before, so the
 headers, both faces, the panel description, the MOD GUI and its rasters do not change by a byte when a
@@ -39,9 +41,11 @@ link resolves to. A number edited by hand is stale, never a declaration.
 | `name`, `vendor`, `version` | `plugin.name`, `.vendor`, `.version` | |
 | `clap.id` | `plugin.id` (`format: clap`) | |
 | `lv2.uri` | `plugin.uri` | |
-| `clap.features` | `plugin.features`: the four the descriptor names (`audio-effect`, `instrument`, `note-effect`, `analyzer`) | `clap.features`, whole: CLAP's other features (`delay`, `stereo`, ...) have no descriptor word |
-| `lv2.class`, `lv2.enabledPort` | | kept: how the LV2 face is written |
-| `description`, `summary`, `noun`, `manual`, `url` | | kept: what a host and the README show |
+| `clap.features` | `plugin.features`: the four the descriptor names (`audio-effect`, `instrument`, `note-effect`, `analyzer`); CLAP's other features (`delay`, `stereo`, ...) in the extension bag, `extensions.clap["clap_plugin_descriptor.features"]`, in the face's order | |
+| `lv2.class` | the extension bag, `extensions.lv2["rdf:type"]`: the face's types as its `.ttl` states them, `["lv2:Plugin", <class>]` (`"lv2:Plugin"` alone when that is the class) | |
+| `lv2.enabledPort` | | kept: how the LV2 face is written |
+| `description` | `plugin.doc`: the one-line description, CLAP `description` and LV2 `rdfs:comment` | |
+| `summary`, `noun`, `manual`, `url` | | kept: what a host and the README show |
 | `stem`, `kernel`, `kernels`, `binding`, `face`, `variants`, `variantOf`, `chain`, `order`, `key`, `shipped`, `shippedDiff`, `role` | | kept: the kind of face and how it is built |
 | `sidechain` (`symbol`, `name`) | a `ports[]` entry: `kind: audio`, `direction: in`, `role: sidechain`, `channels: 1`, `layout: mono`, named as the CLAP face names it (the symbol) | `sidechain`, whole: the LV2 port's symbol and name |
 | the audio pair | `ports[]`: `in` and `out` (the CLAP face's names), `role: main`, `channels: 2`, `layout: stereo` | |
@@ -54,7 +58,7 @@ link resolves to. A number edited by hand is stale, never a declaration.
 | `params[].symbol` | `controls[].symbol` | |
 | `params[].name` | `controls[].name` | |
 | `params[].ref`, `.field`, `.kernel` | `controls[].source.from`: `data/kernels/<kernel>.json#<ref>[.<field>]` | |
-| resolved `min`, `max`, `def`, `unit`, `kind` | `kind` (`travel`, `toggle`, `choice`), `travel.min`, `.max`, `.default`, `.unit`, `.step` (1 for an integer), or a toggle's `default` | |
+| resolved `min`, `max`, `def`, `unit`, `kind` | `kind` (`travel`, `toggle`, `choice`), `travel.min`, `.max`, `.default`, `.unit`, `.step` (1 for an integer), or a toggle's `default`; `.unit` is `ratio` where the link resolves to `""` and the control is a ratio (n:1), the one word the descriptor states beyond its link | |
 | `params[].scale` | `travel.scale` (left out of the declaration: `log` for Hz, else `linear`) | |
 | resolved `values`, `points` | a `choice`: `ids` (each value as text), `labels`, `values` | |
 | `params[].forKind`, `.defaultRef`, `.defaultId`, `.defaultBand`, `.perBand`, `.values` | the come-up value and the labels they give, stated | kept, by symbol (`controls`): how the value is read, not the value |
@@ -72,13 +76,13 @@ What the descriptor has no word for, found laying out our panels, and where each
 | 1 | A choice's unit: our EQ slopes, 12 and 24 `dB/oct` | contract: an optional `unit` on a choice, and `dB/oct` among the descriptor units | the set's unit, an extra by symbol |
 | 2 | The come-up value per kind of channel (a delay's mix fully wet on a return): the kernel files say it as `byKind` | contract: `travel.byKind`, the kernel word, on a descriptor travel | read through the link at load |
 | 3 | Meanings for a rotor's speeds and speed switch, an LFO's shape, a drive's model, a reverb's algorithm, a de-esser's mode, a filter or band type, a band's on switch, a ping-pong switch | contract: `speed`, `shape`, `model`, `algorithm`, `mode`, `type`, `on`, `pingpong` | the declared roles bind them |
-| 4 | A ratio's unit: LV2 has none, the item list has only `x` | contract: `ratio` (n:1) among the descriptor units, the unit the param-contract vendor block already serves | a ratio role stays unpublished on a scanned plugin |
+| 4 | A ratio's unit: LV2 has none, the item list has only `x` | contract: `ratio` (n:1) among the descriptor units (omx-contract 3.0.0); the LV2 face writes it as `urn:openmixer:unit#ratio` | done: omx-comp `ratio`, omx-deesser `deessRatio`, omx-keyed-gate `ratio` state `ratio` |
 | 5 | What a meter measures | contract: `measurement` on a read-only control: `peak`, `rms`, `vu`, `ppm`, `lufs`, `gainReduction` | a LUFS reading is `lufs`, any other `null` |
 | 6 | `dBu`, which param-contract serves | contract: `dBu` among the descriptor units | the unit stays on our declarations only |
 | 7 | An xy pad (two controls drawn as one) | omx-plugins: a panel hint, `panel.widgets` naming the pair | none of ours draws one |
 | 8 | A momentary control | none: a `trigger` is momentary | |
-| 9 | CLAP's open features (`delay`, `stereo`) and the LV2 class | omx-plugins: they say how a face is labelled, not what the plugin is | extras |
-| 10 | The plugin's one-line description (CLAP `description`, LV2 `rdfs:comment`) | contract: `plugin.doc` | an extra |
+| 9 | CLAP's open features (`delay`, `stereo`) and the LV2 class | contract: the extension bag, `extensions` (omx-contract 3.0.0) | done: each descriptor's bag carries them |
+| 10 | The plugin's one-line description (CLAP `description`, LV2 `rdfs:comment`) | contract: `plugin.doc` (omx-contract 3.0.0) | done |
 
 ## The check of our own faces
 
