@@ -170,7 +170,9 @@ function portsOf(ports = []) {
  * Throws on what a host would refuse whole.
  */
 export function panelDescription(d) {
-  const { descriptor, extras } = descriptorOf(d);
+  // the units the faces serve beside it (the parameter contract, the declaration's): a ratio's descriptor word,
+  // ratio, has no param-contract unit in this release, so its role is judged on the unit the face serves
+  const { descriptor, extras } = descriptorOf({ ...d, descriptor: undefined });
   return panelLayout(descriptor, { panel: d.panel, ns: `fx.${d.face ?? d.kernel}`, where: `plugins/${d.stem}`, ...extras });
 }
 

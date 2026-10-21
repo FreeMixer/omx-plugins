@@ -6,17 +6,6 @@
     "reverb"
   ],
   "url": "https://github.com/FreeMixer/omx-plugins",
-  "description": "The console's reverb: room, plate, hall, reverse and gated algorithms with pre-delay, size, damping, width and low and high cuts, mixed with the dry signal.",
-  "clap": {
-    "features": [
-      "audio-effect",
-      "reverb",
-      "stereo"
-    ]
-  },
-  "lv2": {
-    "class": "lv2:ReverbPlugin"
-  },
   "binding": "instance",
   "controls": {
     "algorithm": {

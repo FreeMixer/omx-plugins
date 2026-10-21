@@ -6,17 +6,6 @@
     "flanger"
   ],
   "url": "https://github.com/FreeMixer/omx-plugins",
-  "description": "The console's flanger: one modulated short delay with signed feedback, swept by one oscillator and mixed with the dry signal.",
-  "clap": {
-    "features": [
-      "audio-effect",
-      "flanger",
-      "stereo"
-    ]
-  },
-  "lv2": {
-    "class": "lv2:FlangerPlugin"
-  },
   "binding": "instance",
   "portHints": {
     "rate": {

@@ -6,17 +6,6 @@
     "tremolo"
   ],
   "url": "https://github.com/FreeMixer/omx-plugins",
-  "description": "The console's tremolo and auto-pan: one oscillator turned into a level change on both legs, or into a left-right pan.",
-  "clap": {
-    "features": [
-      "audio-effect",
-      "tremolo",
-      "stereo"
-    ]
-  },
-  "lv2": {
-    "class": "lv2:ModulatorPlugin"
-  },
   "binding": "instance",
   "controls": {
     "mode": {
