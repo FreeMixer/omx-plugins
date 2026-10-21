@@ -20,7 +20,7 @@ import { installedContractDir, locateContract, ownersOf, packagingRange } from '
 export const descriptorFile = (stem) => `${stem}.descriptor.json`;
 
 /** The schema the descriptor words are in, and the release that added them. */
-export const DESCRIPTOR_SCHEMA = 'https://github.com/FreeMixer/omx-contract/raw/v2/schema/omx-contract.schema.json';
+export const DESCRIPTOR_SCHEMA = 'https://github.com/FreeMixer/omx-contract/raw/v3/schema/omx-contract.schema.json';
 export const DESCRIPTOR_SCHEMA_FLOOR = '2.15.0';
 
 /** The plugin features the descriptor names; a declaration's other CLAP features have no word there. */
