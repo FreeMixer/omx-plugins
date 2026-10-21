@@ -30,6 +30,15 @@ static const omx_plugin_param OMX_TREMOLO_PARAMS[OMX_TREMOLO_PARAM_COUNT] = {
   { "mode", "Mode", "", 0.0f, 1.0f, 0.0f, OMX_PLUGIN_PARAM_INTEGER },
 };
 
+/* Each parameter's CLAP module (clap_param_info.module): its descriptor control's group as a module path, "" for a
+ * plugin with no descriptor. */
+static const char *const OMX_TREMOLO_PARAM_MODULES[OMX_TREMOLO_PARAM_COUNT] = {
+  "Tremolo",
+  "Tremolo",
+  "Tremolo",
+  "Tremolo",
+};
+
 /* One macro per declared bound: what a C face reads where a constant is needed. */
 #define OMX_TREMOLO_PARAM_RATE_HZ_MIN 0.1f
 #define OMX_TREMOLO_PARAM_RATE_HZ_MAX 20.0f

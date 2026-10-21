@@ -84,6 +84,42 @@ static const omx_plugin_param OMX_GEQ_PARAMS[OMX_GEQ_PARAM_COUNT] = {
   { "band31", "20 kHz", "dB", -15.0f, 15.0f, 0.0f, 0u },
 };
 
+/* Each parameter's CLAP module (clap_param_info.module): its descriptor control's group as a module path, "" for a
+ * plugin with no descriptor. */
+static const char *const OMX_GEQ_PARAM_MODULES[OMX_GEQ_PARAM_COUNT] = {
+  "Geq",
+  "Geq",
+  "Geq",
+  "Geq",
+  "Geq",
+  "Geq",
+  "Geq",
+  "Geq",
+  "Geq",
+  "Geq",
+  "Geq",
+  "Geq",
+  "Geq",
+  "Geq",
+  "Geq",
+  "Geq",
+  "Geq",
+  "Geq",
+  "Geq",
+  "Geq",
+  "Geq",
+  "Geq",
+  "Geq",
+  "Geq",
+  "Geq",
+  "Geq",
+  "Geq",
+  "Geq",
+  "Geq",
+  "Geq",
+  "Geq",
+};
+
 /* One macro per declared bound: what a C face reads where a constant is needed. */
 #define OMX_GEQ_PARAM_BAND01_MIN -15.0f
 #define OMX_GEQ_PARAM_BAND01_MAX 15.0f

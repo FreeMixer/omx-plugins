@@ -3,12 +3,13 @@
 // Copyright (C) 2026 Pau Aliagas <linuxnow@gmail.com>
 /*
  * lv2-units-check.mjs — the generated LV2 description states the unit a parameter declares.
- * tools/gen.mjs maps a declared unit to an LV2 unit (LV2_UNITS); a unit it did not map was dropped
+ * tools/gen.mjs maps a declared unit to an LV2 unit (plugin-hostd's LV2 table read backwards, and the declarations' own
+ * units: tools/format-tables.mjs lv2UnitNames); a unit it did not map was dropped
  * without a word, so the installed omx-limiter's ceilingDb port carried no unit at all. Two laws,
  * each with sabotage arms that must go red (--self-test runs them):
  *
  *   1. every unit omx-contract's parameter contract names (tools/param-contract.mjs UNITS), and every
- *      other unit a declaration uses, has an LV2 unit in LV2_UNITS;
+ *      other unit a declaration uses, has an LV2 unit;
  *   2. every control of every plugin that declares a unit has, on its port in the generated TTL, the
  *      LV2 unit that maps to it, and a unit that is not LV2's own is defined in the same file.
  *
@@ -16,18 +17,18 @@
  */
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { LV2_UNITS, loadDecl, pluginDirs, ROOT } from '../gen.mjs';
-import { UNITS as CONTRACT_UNITS } from '../param-contract.mjs';
+import { lv2UnitNames, loadDecl, pluginDirs, ROOT } from '../gen.mjs';
+import { contractUnits } from '../param-contract.mjs';
 import { ttlHints } from '../port-hints.mjs';
 
 /** The part of an LV2 unit reference that names it: `units:db` -> db, `<urn:...#dBFS>` -> dBFS. */
 const nameOf = (ref) => ref?.replace(/^<|>$/g, '').split(/[:#]/).pop() ?? null;
 
 /** Every defect, one line each: `plugins` is `[{ stem, params, ttl }]`, `map` the unit -> LV2 name table. */
-export function unitErrors(plugins, map = LV2_UNITS, contractUnits = Object.keys(CONTRACT_UNITS)) {
+export function unitErrors(plugins, map = lv2UnitNames(), served = Object.entries(contractUnits()).filter(([, [t]]) => t !== 'none').map(([u]) => u)) {
   const errors = [];
-  const used = new Set([...contractUnits, ...plugins.flatMap((p) => p.params.map((q) => q.unit))].filter(Boolean));
-  for (const u of [...used].sort()) if (!map[u]) errors.push(`unit '${u}' has no LV2 unit in LV2_UNITS`);
+  const used = new Set([...served, ...plugins.flatMap((p) => p.params.map((q) => q.unit))].filter(Boolean));
+  for (const u of [...used].sort()) if (!map[u]) errors.push(`unit '${u}' has no LV2 unit`);
   for (const { stem, params, ttl } of plugins) {
     const ports = ttlHints(ttl);
     for (const q of params) {
@@ -57,7 +58,7 @@ if (process.argv[1] && import.meta.url === new URL(`file://${process.argv[1]}`).
     const stripUnits = (ttl) => ttl.replace(/^\s*units:unit [^;]*;\n/gm, '');
     const arms = {
       'a port that lost its units:unit': () => unitErrors(plugins.map((p) => ({ ...p, ttl: stripUnits(p.ttl) }))),
-      'a unit with no LV2 unit': () => unitErrors(plugins, Object.fromEntries(Object.entries(LV2_UNITS).filter(([k]) => k !== 'dBFS'))),
+      'a unit with no LV2 unit': () => unitErrors(plugins, Object.fromEntries(Object.entries(lv2UnitNames()).filter(([k]) => k !== 'dBFS'))),
       'a port with another plugin\'s unit': () => unitErrors(plugins.map((p) => ({ ...p, ttl: p.ttl.replace(/units:unit units:hz ;/g, 'units:unit units:ms ;') }))),
       'a custom unit the TTL never defines': () => unitErrors(plugins.map((p) => ({ ...p, ttl: p.ttl.replace(/\n(<[^>\n]+>)\n    a units:Unit/g, '\n$1\n    a rdfs:Resource') }))),
     };

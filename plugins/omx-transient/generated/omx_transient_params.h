@@ -32,6 +32,16 @@ static const omx_plugin_param OMX_TRANSIENT_PARAMS[OMX_TRANSIENT_PARAM_COUNT] = 
   { "outputDb", "Output", "dB", -24.0f, 12.0f, 0.0f, 0u },
 };
 
+/* Each parameter's CLAP module (clap_param_info.module): its descriptor control's group as a module path, "" for a
+ * plugin with no descriptor. */
+static const char *const OMX_TRANSIENT_PARAM_MODULES[OMX_TRANSIENT_PARAM_COUNT] = {
+  "Transient",
+  "Transient",
+  "Transient",
+  "Transient",
+  "Transient",
+};
+
 /* One macro per declared bound: what a C face reads where a constant is needed. */
 #define OMX_TRANSIENT_PARAM_ATTACK_DB_MIN -24.0f
 #define OMX_TRANSIENT_PARAM_ATTACK_DB_MAX 24.0f

@@ -42,6 +42,21 @@ static const omx_plugin_param OMX_COMP_PARAMS[OMX_COMP_PARAM_COUNT] = {
   { "detectorTopology", "Detector Topology", "", 0.0f, 1.0f, 0.0f, OMX_PLUGIN_PARAM_INTEGER },
 };
 
+/* Each parameter's CLAP module (clap_param_info.module): its descriptor control's group as a module path, "" for a
+ * plugin with no descriptor. */
+static const char *const OMX_COMP_PARAM_MODULES[OMX_COMP_PARAM_COUNT] = {
+  "Comp",
+  "Comp",
+  "Comp",
+  "Comp",
+  "Comp",
+  "Comp",
+  "Comp",
+  "Comp",
+  "Comp",
+  "Comp",
+};
+
 /* One macro per declared bound: what a C face reads where a constant is needed. */
 #define OMX_COMP_PARAM_THRESHOLD_DB_MIN -60.0f
 #define OMX_COMP_PARAM_THRESHOLD_DB_MAX 0.0f

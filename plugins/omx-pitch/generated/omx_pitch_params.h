@@ -28,6 +28,14 @@ static const omx_plugin_param OMX_PITCH_PARAMS[OMX_PITCH_PARAM_COUNT] = {
   { "mix", "Mix", "%", 0.0f, 100.0f, 100.0f, 0u },
 };
 
+/* Each parameter's CLAP module (clap_param_info.module): its descriptor control's group as a module path, "" for a
+ * plugin with no descriptor. */
+static const char *const OMX_PITCH_PARAM_MODULES[OMX_PITCH_PARAM_COUNT] = {
+  "Pitch",
+  "Pitch",
+  "Pitch",
+};
+
 /* One macro per declared bound: what a C face reads where a constant is needed. */
 #define OMX_PITCH_PARAM_SEMITONES_MIN -12.0f
 #define OMX_PITCH_PARAM_SEMITONES_MAX 12.0f

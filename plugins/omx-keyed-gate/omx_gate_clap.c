@@ -216,6 +216,7 @@ static bool g_params_info(const clap_plugin_t *p, uint32_t i, clap_param_info_t 
   } else {
     if (OMX_GATE_PARAMS[i].flags & (OMX_PLUGIN_PARAM_INTEGER | OMX_PLUGIN_PARAM_TOGGLE)) info->flags |= CLAP_PARAM_IS_STEPPED;
     snprintf(info->name, sizeof info->name, "%s", OMX_GATE_PARAMS[i].name);
+    snprintf(info->module, sizeof info->module, "%s", OMX_GATE_PARAM_MODULES[i]);
   }
   info->min_value = g_min(i);
   info->max_value = g_max(i);
