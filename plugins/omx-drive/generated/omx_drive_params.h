@@ -44,6 +44,22 @@ static const omx_plugin_param OMX_DRIVE_PARAMS[OMX_DRIVE_PARAM_COUNT] = {
   { "oversample", "Oversampling", "", 1.0f, 4.0f, 4.0f, OMX_PLUGIN_PARAM_INTEGER },
 };
 
+/* Each parameter's CLAP module (clap_param_info.module): its descriptor control's group as a module path, "" for a
+ * plugin with no descriptor. */
+static const char *const OMX_DRIVE_PARAM_MODULES[OMX_DRIVE_PARAM_COUNT] = {
+  "Drive",
+  "Drive",
+  "Drive",
+  "Drive",
+  "Drive",
+  "Drive",
+  "Drive",
+  "Drive",
+  "Drive",
+  "Drive",
+  "Drive",
+};
+
 /* One macro per declared bound: what a C face reads where a constant is needed. */
 #define OMX_DRIVE_PARAM_AMOUNT_MIN 0.0f
 #define OMX_DRIVE_PARAM_AMOUNT_MAX 36.0f

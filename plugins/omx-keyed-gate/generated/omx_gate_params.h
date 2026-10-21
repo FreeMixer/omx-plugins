@@ -46,6 +46,23 @@ static const omx_plugin_param OMX_GATE_PARAMS[OMX_GATE_PARAM_COUNT] = {
   { "key_lp", "Key Low-pass", "Hz", 0.0f, 20000.0f, 0.0f, OMX_PLUGIN_PARAM_INTEGER },
 };
 
+/* Each parameter's CLAP module (clap_param_info.module): its descriptor control's group as a module path, "" for a
+ * plugin with no descriptor. */
+static const char *const OMX_GATE_PARAM_MODULES[OMX_GATE_PARAM_COUNT] = {
+  "Key",
+  "Gate",
+  "Gate",
+  "Gate",
+  "Gate",
+  "Gate",
+  "Gate",
+  "Gate",
+  "Gate",
+  "Gate",
+  "Key",
+  "Key",
+};
+
 /* One macro per declared bound: what a C face reads where a constant is needed. */
 #define OMX_GATE_PARAM_KEY_EXTERNAL_MIN 0.0f
 #define OMX_GATE_PARAM_KEY_EXTERNAL_MAX 1.0f

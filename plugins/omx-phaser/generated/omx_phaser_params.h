@@ -34,6 +34,17 @@ static const omx_plugin_param OMX_PHASER_PARAMS[OMX_PHASER_PARAM_COUNT] = {
   { "mix", "Mix", "%", 0.0f, 100.0f, 50.0f, 0u },
 };
 
+/* Each parameter's CLAP module (clap_param_info.module): its descriptor control's group as a module path, "" for a
+ * plugin with no descriptor. */
+static const char *const OMX_PHASER_PARAM_MODULES[OMX_PHASER_PARAM_COUNT] = {
+  "Phaser",
+  "Phaser",
+  "Phaser",
+  "Phaser",
+  "Phaser",
+  "Phaser",
+};
+
 /* One macro per declared bound: what a C face reads where a constant is needed. */
 #define OMX_PHASER_PARAM_RATE_HZ_MIN 0.05f
 #define OMX_PHASER_PARAM_RATE_HZ_MAX 5.0f
