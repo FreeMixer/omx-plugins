@@ -139,7 +139,7 @@ check('authored omx delay descriptor, with no panel: family delay, roles by mean
 
 // 7. our plugins
 const ITEM_UNITS = ['dB', 'dBFS', 'ms', 's', 'min', 'Hz', 'oct', 'cents', 'st', '%', 'x', ''];
-const DESCRIPTOR_UNITS = [...ITEM_UNITS, 'frames', 'bpm', 'midiNote', 'LUFS', 'deg'];
+const DESCRIPTOR_UNITS = [...ITEM_UNITS, 'frames', 'bpm', 'midiNote', 'LUFS', 'deg', 'ratio']; // ratio: omx-contract 3.0.0
 const decls = pluginDirs().map((p) => loadDecl(p)).filter((d) => d.panel);
 const stated = decls.flatMap((d) => descriptorOf(d).descriptor.controls.filter((c) => c.meaning === 'unknown' || c.travel?.unit === 'unknown' || c.travel?.scale === 'unknown').map((c) => `${d.stem}.${c.name}`));
 check(`our ${decls.length} authored descriptors state no unknown`, stated, []);

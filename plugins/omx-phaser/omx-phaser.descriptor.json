@@ -1,7 +1,7 @@
 {
   "$schema": "https://github.com/FreeMixer/omx-contract/raw/v3/schema/omx-contract.schema.json",
   "requires": {
-    "omx-contract-schema": ">= 2.15.0"
+    "omx-contract-schema": ">= 3.0.0"
   },
   "origin": "authored",
   "plugin": {
@@ -11,6 +11,7 @@
     "name": "omx phaser",
     "vendor": "openmixer",
     "version": "0.12.0",
+    "doc": "The console's phaser: identical all-pass sections swept in octaves by one oscillator, with feedback around the chain and a wet/dry mix.",
     "features": [
       "audio-effect"
     ]
@@ -187,6 +188,20 @@
   ],
   "latency": {
     "reports": true
+  },
+  "extensions": {
+    "clap": {
+      "clap_plugin_descriptor.features": [
+        "phaser",
+        "stereo"
+      ]
+    },
+    "lv2": {
+      "rdf:type": [
+        "lv2:Plugin",
+        "lv2:PhaserPlugin"
+      ]
+    }
   },
   "source": {
     "impl": "plugins/omx-phaser/omx_phaser_clap.c#clap_entry"

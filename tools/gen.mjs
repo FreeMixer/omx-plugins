@@ -63,7 +63,10 @@ export function loadDecl(dir) {
     // a plugin described in omx-contract's words: its declaration is the descriptor's view, the
     // extras of <stem>.decl.json folded in (tools/descriptor.mjs)
     const described = join(dir, descriptorFile(stem));
-    if (existsSync(described)) d = { ...viewOf(JSON.parse(readFileSync(described, 'utf8')), d, file), described: true };
+    if (existsSync(described)) {
+      const descriptor = JSON.parse(readFileSync(described, 'utf8'));
+      d = { ...viewOf(descriptor, d, file), described: true, descriptor };
+    }
   } else {
     // a variant's folder holds generated files only: its declaration is its base's, expanded
     const base = baseOf(dir);

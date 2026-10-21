@@ -6,17 +6,6 @@
     "transient"
   ],
   "url": "https://github.com/FreeMixer/omx-plugins",
-  "description": "The console's transient designer: more or less attack and sustain, from two envelope contrasts, with no threshold to set.",
-  "clap": {
-    "features": [
-      "audio-effect",
-      "transient-shaper",
-      "stereo"
-    ]
-  },
-  "lv2": {
-    "class": "lv2:DynamicsPlugin"
-  },
   "binding": "instance",
   "oracles": [
     "transient-arms"

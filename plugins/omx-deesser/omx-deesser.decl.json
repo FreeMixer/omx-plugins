@@ -7,17 +7,6 @@
   ],
   "noun": "de-esser",
   "url": "https://github.com/FreeMixer/omx-plugins",
-  "description": "The console's de-esser: a detector on a band around the sibilance drives the compressor's gain computer, and the reduction lands on that band alone or on the whole signal.",
-  "clap": {
-    "features": [
-      "audio-effect",
-      "de-esser",
-      "stereo"
-    ]
-  },
-  "lv2": {
-    "class": "lv2:DynamicsPlugin"
-  },
   "binding": "instance",
   "controls": {
     "deessMode": {
