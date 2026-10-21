@@ -136,7 +136,7 @@ It passes with no `differs`, every bag equal, and each lost word one the tool's 
   ids (12), the audio ports' ids and names (31 each).
 
 A break in plugin-hostd's wave tip is named in `UPSTREAM` and printed with its `differs`, not failing; the run fails
-when one no longer shows, so the entry leaves with the fix. One stands (FreeMixer/openmixer#2097): `describe` keeps a
+when one no longer shows, so the entry leaves with the fix. One stands: `describe` keeps a
 word's last value and the LV2 dump lists `lv2:toggled` before `rdf:type lv2:ControlPort`, so the three LV2 toggles
 (omx-delay `pingpong`, omx-drive `autoGain` and `stereoLink`) scan as travels and lose their default.
 

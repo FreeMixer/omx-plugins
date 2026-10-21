@@ -75,7 +75,7 @@ export const LOSSES = {
   'lv2 controls[].default': 3,
 };
 
-/** A break in plugin-hostd's wave tip, reported (FreeMixer/openmixer#2097), each `differs` it causes printed with it
+/** A break in plugin-hostd's wave tip, reported, each `differs` it causes printed with it
  * and not failing; the run fails when one no longer shows, so the entry leaves with the fix. `plugin-hostd-probe
  * describe` keeps a word's last value, and an LV2 dump lists lv2:portProperty lv2:toggled before rdf:type
  * lv2:ControlPort, so a toggle's kind is the control port's travel. */
