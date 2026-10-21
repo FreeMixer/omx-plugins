@@ -107,10 +107,39 @@ stands in for the installed tables.
 
 `make format-tables` (part of `make test`) holds the faces to the tables, with its sabotage arms.
 
-## The check of our own faces
+## The round trip
 
-The authored descriptor is also what our built faces must serve. `tools/face-descriptor-check.mjs` builds
-the descriptor each face states (the CLAP face through `clap_plugin_params` and its audio ports, the LV2
-bundle through lilv, as a scan reads anyone's plugin) and compares it with the authored one, control by
-control: id, symbol, name, kind, range, default, unit where the format carries one, the ports. Any
-difference fails with `contract.descriptor.face-differs`, naming the plugin, the face and the control.
+The authored descriptor is also what our built faces must serve, read back as plugin-hostd reads anyone's plugin
+(ruling B: the proof of one vocabulary is the round trip). `make round-trip` (`tools/round-trip.{sh,mjs}`, part of
+`make test`) takes every plugin with a descriptor, generates it (`node tools/gen.mjs`), builds both faces, runs
+`plugin-hostd-probe describe` on each built face and compares the scanned descriptor with the authored one word by
+word, one line each: `equal`, `lost <format> <word>` (the face does not carry it: no row of the format's table reads it
+back, or the scan leaves it `unknown`), or `differs`. A lost word is printed by name, never filled in.
+
+What a format states otherwise is named once in the tool: an LV2 plugin's id is its URI and an LV2 control's id its
+symbol; an LV2 face's audio ports are one per channel, with the generator's own symbols and names; a choice's points
+name each value by its label, so its default is compared as the value it designates; a CLAP face reads back the float
+it stores; the face's own bypass (`CLAP_PARAM_IS_BYPASS`, `lv2:enabled`) stands beside the controls; a value no row
+of the table gives a word (a CLAP control a `travel`, a CLAP port that is not main `aux`) is `describe`'s own, so
+lost. The bags are equal: every field an authored bag holds, the scan holds with the same value, as the field dump
+writes it (a CLAP feature by its macro name, `CLAP_PLUGIN_FEATURE_DELAY`; one value as it is, two or more a list).
+
+It passes with no `differs`, every bag equal, and each lost word one the tool's `LOSSES` names, by count:
+
+- OR2's: `meaning` on CLAP (89) and on LV2 (32, those with no LV2 term), the `""` unit on LV2 (13);
+- the `ratio` unit on LV2 (3): plugin-hostd 0.7.0's LV2 table has no row for `urn:openmixer:unit#ratio`;
+- on CLAP, words no row reads: the unit (113), a linear or log scale (85), the step (113), a choice's kind, ids,
+  values, labels and default (15, 12, 12, 12, 15), the symbol (128), the LV2 URI (15), a side-chain's role (1), what
+  an LV2 host may lend (15);
+- on LV2: the step (113), automation (128), the plugin's version and vendor (15 each), the CLAP id (128), our point
+  ids (12), the audio ports' ids and names (31 each).
+
+A break in plugin-hostd's wave tip is named in `UPSTREAM` and printed with its `differs`, not failing; the run fails
+when one no longer shows, so the entry leaves with the fix. One stands (FreeMixer/openmixer#2097): `describe` keeps a
+word's last value and the LV2 dump lists `lv2:toggled` before `rdf:type lv2:ControlPort`, so the three LV2 toggles
+(omx-delay `pingpong`, omx-drive `autoGain` and `stereoLink`) scan as travels and lose their default.
+
+The eight plugins with no descriptor (omx-eq, omx-eq8, omx-eq16, omx-eq32, omx-strip and the three omx-test-*) are
+named as outside the round trip. Its self-test breaks the first described plugin twice, one range in a copy of its
+authored descriptor and one `lv2:maximum` in a copy of its built `.ttl`, and wants each red.
+
