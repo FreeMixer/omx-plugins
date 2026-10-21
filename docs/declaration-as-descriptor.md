@@ -41,7 +41,8 @@ link resolves to. A number edited by hand is stale, never a declaration.
 | `name`, `vendor`, `version` | `plugin.name`, `.vendor`, `.version` | |
 | `clap.id` | `plugin.id` (`format: clap`) | |
 | `lv2.uri` | `plugin.uri` | |
-| `clap.features` | `plugin.features`: the four the descriptor names (`audio-effect`, `instrument`, `note-effect`, `analyzer`); CLAP's other features (`delay`, `stereo`, ...) in the extension bag, `extensions.clap["clap_plugin_descriptor.features"]`, in the face's order | |
+| `clap.features` | `plugin.features`: the four the descriptor names (`audio-effect`, `instrument`, `note-effect`, `analyzer`); CLAP's other features (`delay`, `stereo`, ...) in the extension bag, `extensions.clap["clap_plugin_descriptor.features"]`, in the face's order, each as a scan's field dump writes it: a feature the CLAP headers define by its macro name (`CLAP_PLUGIN_FEATURE_DELAY`, omx-contract's `CLAP_PLUGIN_FEATURES_TERMS`), one feature as it is, two or more a list | |
+| (every LV2 face) `lv2:optionalFeature lv2:hardRTCapable` | `needs.extensions.optional: ["lv2:hardRTCapable"]` | |
 | `lv2.class` | the extension bag, `extensions.lv2["rdf:type"]`: the face's types as its `.ttl` states them, `["lv2:Plugin", <class>]` (`"lv2:Plugin"` alone when that is the class) | |
 | `lv2.enabledPort` | | kept: how the LV2 face is written |
 | `description` | `plugin.doc`: the one-line description, CLAP `description` and LV2 `rdfs:comment` | |
