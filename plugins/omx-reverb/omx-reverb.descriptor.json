@@ -28,7 +28,7 @@
         "step": 1,
         "unit": "%",
         "default": 100,
-        "scale": "linear"
+        "scale": "stepped"
       },
       "group": [
         "Plate"
@@ -152,7 +152,7 @@
         "step": 1,
         "unit": "ms",
         "default": 0,
-        "scale": "linear"
+        "scale": "stepped"
       },
       "group": [
         "Reverb"
@@ -177,7 +177,7 @@
         "step": 1,
         "unit": "Hz",
         "default": 0,
-        "scale": "log"
+        "scale": "stepped"
       },
       "group": [
         "Reverb"
@@ -202,7 +202,7 @@
         "step": 1,
         "unit": "Hz",
         "default": 20000,
-        "scale": "log"
+        "scale": "stepped"
       },
       "group": [
         "Reverb"
@@ -227,7 +227,7 @@
         "step": 1,
         "unit": "ms",
         "default": 300,
-        "scale": "linear"
+        "scale": "stepped"
       },
       "group": [
         "Reverse"
@@ -251,7 +251,7 @@
         "step": 1,
         "unit": "ms",
         "default": 120,
-        "scale": "linear"
+        "scale": "stepped"
       },
       "group": [
         "Gated"
@@ -275,7 +275,7 @@
         "step": 1,
         "unit": "ms",
         "default": 20,
-        "scale": "linear"
+        "scale": "stepped"
       },
       "group": [
         "Gated"
@@ -299,7 +299,7 @@
         "step": 1,
         "unit": "dBFS",
         "default": -40,
-        "scale": "linear"
+        "scale": "stepped"
       },
       "group": [
         "Gated"

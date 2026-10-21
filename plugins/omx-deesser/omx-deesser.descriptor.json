@@ -28,7 +28,7 @@
         "step": 1,
         "unit": "Hz",
         "default": 7000,
-        "scale": "log"
+        "scale": "stepped"
       },
       "group": [
         "De-esser"
@@ -178,7 +178,7 @@
         "step": 1,
         "unit": "ms",
         "default": 60,
-        "scale": "linear"
+        "scale": "stepped"
       },
       "group": [
         "De-esser"

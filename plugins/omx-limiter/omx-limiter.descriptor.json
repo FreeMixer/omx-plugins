@@ -78,7 +78,7 @@
         "step": 1,
         "unit": "ms",
         "default": 50,
-        "scale": "linear"
+        "scale": "stepped"
       },
       "group": [
         "Limiter"

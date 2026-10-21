@@ -54,6 +54,9 @@ function bagOf(descriptor, file) {
 /** A descriptor's unit for a travel whose link resolves to `unit`: the item list's "" is a ratio or a fraction,
  * and a ratio (n:1) states `ratio`, the one word the descriptor says beyond its link (gap 4). */
 const RATIO = 'ratio';
+
+/** An integer travel's scale (PARAM_SCALES): what CLAP_PARAM_IS_STEPPED, lv2:integer and the parameter contract say. */
+const STEPPED = 'stepped';
 export const travelUnit = (unit, authored) => (unit === '' && authored === RATIO ? RATIO : unit);
 
 /** A panel role -> the descriptor meaning it plays, where the two names differ. A role whose name is
@@ -136,7 +139,7 @@ export function descriptorOf(d) {
       if (p.unit) choiceUnits[p.symbol] = p.unit;
     } else {
       c.kind = 'travel';
-      c.travel = { min: p.min, max: p.max, step: p.kind === 'integer' ? 1 : 0, unit: travelUnit(p.unit, d.descriptor?.controls[i]?.travel?.unit), default: p.def, scale: scaleOf(p) };
+      c.travel = { min: p.min, max: p.max, step: p.kind === 'integer' ? 1 : 0, unit: travelUnit(p.unit, d.descriptor?.controls[i]?.travel?.unit), default: p.def, scale: p.kind === 'integer' ? STEPPED : scaleOf(p) };
     }
     if (groupOf.has(p.symbol)) c.group = groupOf.get(p.symbol);
     if (meaningOf.has(p.symbol)) c.meaning = meaningOf.get(p.symbol);
@@ -198,7 +201,8 @@ export function viewOf(descriptor, extras, file) {
       p.ref = link.ref;
       if (link.field) p.field = link.field;
       if (link.kernel && (rest.kernels ?? [rest.kernel]).length > 1) p.kernel = link.kernel;
-      if (c.travel && c.travel.scale !== scaleOf({ unit: c.travel.unit })) p.scale = c.travel.scale;
+      // an integer travel is stepped, as both faces and the parameter contract state it; its faces' log hint is its unit's
+      if (c.travel && c.travel.scale !== (c.travel.step === 1 ? STEPPED : scaleOf({ unit: c.travel.unit }))) p.scale = c.travel.scale;
     } else {
       // a control of the face's own: its travel is typed, the reason kept with it
       if (!x.own) throw new Error(`${file}: '${c.symbol}' has no source link and no "own" reason`);

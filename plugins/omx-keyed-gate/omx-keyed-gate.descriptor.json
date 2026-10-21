@@ -182,7 +182,7 @@
         "step": 1,
         "unit": "dB",
         "default": -43,
-        "scale": "linear"
+        "scale": "stepped"
       },
       "group": [
         "Gate"
@@ -206,7 +206,7 @@
         "step": 1,
         "unit": "dB",
         "default": -37,
-        "scale": "linear"
+        "scale": "stepped"
       },
       "group": [
         "Gate"
@@ -230,7 +230,7 @@
         "step": 1,
         "unit": "ms",
         "default": 10,
-        "scale": "linear"
+        "scale": "stepped"
       },
       "group": [
         "Gate"
@@ -280,7 +280,7 @@
         "step": 1,
         "unit": "Hz",
         "default": 0,
-        "scale": "log"
+        "scale": "stepped"
       },
       "group": [
         "Key"
@@ -304,7 +304,7 @@
         "step": 1,
         "unit": "Hz",
         "default": 0,
-        "scale": "log"
+        "scale": "stepped"
       },
       "group": [
         "Key"

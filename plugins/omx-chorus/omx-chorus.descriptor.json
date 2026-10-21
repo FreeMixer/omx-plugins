@@ -103,7 +103,7 @@
         "step": 1,
         "unit": "",
         "default": 3,
-        "scale": "linear"
+        "scale": "stepped"
       },
       "group": [
         "Chorus"

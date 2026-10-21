@@ -100,7 +100,7 @@
         "step": 1,
         "unit": "ms",
         "default": 250,
-        "scale": "linear"
+        "scale": "stepped"
       },
       "group": [
         "Transient"

@@ -148,7 +148,7 @@
         "step": 1,
         "unit": "%",
         "default": 0,
-        "scale": "linear"
+        "scale": "stepped"
       },
       "group": [
         "Rotary"
