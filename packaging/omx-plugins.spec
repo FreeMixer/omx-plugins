@@ -142,7 +142,7 @@ in omx-contract's contract directory, where a host reads it.
 %{_libdir}/libomxplugins.a
 %{_libdir}/pkgconfig/omxplugins.pc
 # each plugin's descriptor, in omx-contract's contract directory (the directory itself is omx-contract-devel's)
-%{_datadir}/omx-contract/contract.d/2/omx-plugins/
+%{_datadir}/omx-contract/contract.d/3/omx-plugins/
 
 %files lv2
 %license LICENSE

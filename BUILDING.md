@@ -50,7 +50,7 @@ make                      # every plugin: plugins/<name>/build/
 make test                 # every plugin's tests, then the static table's (make lib-test)
 make install DESTDIR=/tmp/stage LIBDIR=/usr/lib64   # <CLAPDIR>/*.clap (default /usr/lib/clap, any LIBDIR), <LIBDIR>/lv2/*.lv2/
 make install-devel DESTDIR=/tmp/stage LIBDIR=/usr/lib64   # headers, <LIBDIR>/libomxplugins.a, <LIBDIR>/pkgconfig/omxplugins.pc, and each plugin's descriptor
-                                                         # in <DATADIR>/omx-contract/contract.d/2/omx-plugins/ (make install-contract, CONTRACTDIR=)
+                                                         # in <DATADIR>/omx-contract/contract.d/3/omx-plugins/ (make install-contract, CONTRACTDIR=)
 make version              # the release version
 ```
 
