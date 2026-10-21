@@ -40,7 +40,7 @@
 #   make install    DESTDIR, PREFIX, LIBDIR, CLAPDIR, DATADIR: $(CLAPDIR)/<name>.clap, $(LIBDIR)/lv2/<name>.lv2/ and the
 #                   factory presets in $(DATADIR)/omx/presets/<plugin id>/<preset id>.json
 #   make install-contract  DESTDIR, CONTRACTDIR: each shipped plugin's descriptor into omx-contract's contract directory,
-#                   $(CONTRACTDIR)/2/omx-plugins/plugins/<stem>.json and its MANIFEST.json (run by install-devel)
+#                   $(CONTRACTDIR)/3/omx-plugins/plugins/<stem>.json and its MANIFEST.json (run by install-devel)
 #   make contract-dir  the installed tree carries one descriptor per shipped plugin that has one, byte for byte, and
 #                   omx-contract's reader reads it (tools/test/contract-dir-check.sh, with its sabotage arms; part of `make test`)
 #   make lib        build/lib/libomxplugins.a: every shipped plugin's CLAP face and the table of their
@@ -216,7 +216,7 @@ test-role:
 # (`pkg-config --variable=contractdir omx-contract`); the install script too, or OMX_CONTRACT_DIR's, an omx-contract
 # checkout, when no package is installed.
 CONTRACTDIR ?= $(DATADIR)/omx-contract/contract.d
-CONTRACT_SCHEMA_MAJOR := 2
+CONTRACT_SCHEMA_MAJOR := 3
 INSTALL_CONTRACT_DIR = $(firstword $(wildcard $(shell $(PKG_CONFIG) --variable=datadir omx-contract 2>/dev/null)/install-contract-dir.sh) $(wildcard $(OMX_CONTRACT_DIR)/tools/install-contract-dir.sh))
 DESCRIPTORS = $(foreach p,$(SHIP_PLUGINS),$(wildcard $(p)$(notdir $(p:/=)).descriptor.json))
 install-contract:

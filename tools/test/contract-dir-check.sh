@@ -3,7 +3,7 @@
 # Copyright (C) 2026 Pau Aliagas <linuxnow@gmail.com>
 #
 # tools/test/contract-dir-check.sh — `make install-contract` puts each shipped plugin's descriptor into omx-contract's
-# contract directory (omx-contract docs/contract-dir.md): <contractdir>/2/omx-plugins/plugins/<stem>.json, byte for
+# contract directory (omx-contract docs/contract-dir.md): <contractdir>/3/omx-plugins/plugins/<stem>.json, byte for
 # byte the plugin folder's <stem>.descriptor.json, one per shipped plugin that has one and nothing else, each listed in
 # the package's MANIFEST.json with its sha256 and this release's version; and omx-contract's own reader reads the
 # installed tree beside the installed contract directory (`omx-contract validate --installed`, with
@@ -42,7 +42,7 @@ cli() {
 
 # check <contractdir> [reader]: one line per refusal; the count is the exit status
 check() {
-  local dir=$1 reader=${2:-reader} pkg=$1/2/omx-plugins bad=0 stem f rel want got listed n=0 c sys stems
+  local dir=$1 reader=${2:-reader} pkg=$1/3/omx-plugins bad=0 stem f rel want got listed n=0 c sys stems
   stems=$(described)
   if [ ! -f "$pkg/MANIFEST.json" ]; then echo "contract-dir: $pkg holds no MANIFEST.json"; return 1; fi
   listed=$(node -e '
@@ -98,8 +98,8 @@ if [ "${1:-}" = --self-test ]; then
   all=$(described); first=${all%%$'\n'*}
   rest=$(for s in $all; do [ "$s" = "$first" ] || printf '%s ' "plugins/$s/$s.descriptor.json"; done)
   rehash() { # <contractdir> <rel>: the manifest lists the file's new sha256, so only the content check can see it
-    local m=$1/2/omx-plugins/MANIFEST.json h
-    h=$(sha256sum "$1/2/omx-plugins/$2" | cut -d' ' -f1)
+    local m=$1/3/omx-plugins/MANIFEST.json h
+    h=$(sha256sum "$1/3/omx-plugins/$2" | cut -d' ' -f1)
     node -e 'const fs = require("fs"); const [p, r, h] = process.argv.slice(1); const m = JSON.parse(fs.readFileSync(p, "utf8"));
       m.files[r] = h; fs.writeFileSync(p, JSON.stringify(m, null, 2) + "\n");' "$m" "$2" "$h"
   }
@@ -109,7 +109,7 @@ if [ "${1:-}" = --self-test ]; then
       left-out) install_into "$t" DESCRIPTORS="$rest" ;;
       *) cp -r "$scratch/good" "$t" ;;
     esac
-    p=$t/2/omx-plugins
+    p=$t/3/omx-plugins
     case $s in
       missing) rm "$p/plugins/$first.json" ;;
       changed) sed -i '0,/"name": "/s//"name": "x/' "$p/plugins/$first.json"; rehash "$t" "plugins/$first.json" ;;
@@ -123,7 +123,7 @@ if [ "${1:-}" = --self-test ]; then
   done
   if [ -n "$(cli)" ]; then
     t=$scratch/reader; cp -r "$scratch/good" "$t"
-    printf ' ' >> "$t/2/omx-plugins/plugins/$first.json"
+    printf ' ' >> "$t/3/omx-plugins/plugins/$first.json"
     out=$(check "$t" reader 2>&1) || true
     if grep -q "reader refuses" <<<"$out"; then echo "SABOTAGE reader: red"; else echo "SABOTAGE reader: STAYED GREEN"; fail=1; fi
   fi
@@ -135,7 +135,7 @@ fi
 
 install_into "$scratch/dir" || { echo "contract-dir: make install-contract failed" >&2; exit 2; }
 if out=$(check "$scratch/dir"); then
-  echo "contract-dir: $(described | wc -l) descriptors installed under 2/omx-plugins/plugins/, byte for byte, listed in MANIFEST.json, read by omx-contract's reader"
+  echo "contract-dir: $(described | wc -l) descriptors installed under 3/omx-plugins/plugins/, byte for byte, listed in MANIFEST.json, read by omx-contract's reader"
 else
   printf '%s\n' "$out"; exit 1
 fi
