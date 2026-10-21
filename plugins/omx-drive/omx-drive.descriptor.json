@@ -1,7 +1,7 @@
 {
   "$schema": "https://github.com/FreeMixer/omx-contract/raw/v3/schema/omx-contract.schema.json",
   "requires": {
-    "omx-contract-schema": ">= 2.15.0"
+    "omx-contract-schema": ">= 3.0.0"
   },
   "origin": "authored",
   "plugin": {
@@ -11,6 +11,7 @@
     "name": "omx drive",
     "vendor": "openmixer",
     "version": "0.12.0",
+    "doc": "The console's drive: one waveshaper (soft, tape, tube or exciter) run inside the console's oversampler, on the full band, the lows, the highs or a tilt, with a wet/dry mix and a trim.",
     "features": [
       "audio-effect"
     ]
@@ -331,6 +332,20 @@
   ],
   "latency": {
     "reports": true
+  },
+  "extensions": {
+    "clap": {
+      "clap_plugin_descriptor.features": [
+        "distortion",
+        "stereo"
+      ]
+    },
+    "lv2": {
+      "rdf:type": [
+        "lv2:Plugin",
+        "lv2:DistortionPlugin"
+      ]
+    }
   },
   "source": {
     "impl": "plugins/omx-drive/omx_drive_clap.c#clap_entry"

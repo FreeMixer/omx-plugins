@@ -1,7 +1,7 @@
 {
   "$schema": "https://github.com/FreeMixer/omx-contract/raw/v3/schema/omx-contract.schema.json",
   "requires": {
-    "omx-contract-schema": ">= 2.15.0"
+    "omx-contract-schema": ">= 3.0.0"
   },
   "origin": "authored",
   "plugin": {
@@ -11,6 +11,7 @@
     "name": "omx geq",
     "vendor": "openmixer",
     "version": "0.12.0",
+    "doc": "The console's 31-band graphic EQ: one fader per ISO third-octave band from 20 Hz to 20 kHz, each cutting or boosting by up to 15 dB.",
     "features": [
       "audio-effect"
     ]
@@ -814,6 +815,20 @@
   ],
   "latency": {
     "reports": true
+  },
+  "extensions": {
+    "clap": {
+      "clap_plugin_descriptor.features": [
+        "equalizer",
+        "stereo"
+      ]
+    },
+    "lv2": {
+      "rdf:type": [
+        "lv2:Plugin",
+        "lv2:EQPlugin"
+      ]
+    }
   },
   "source": {
     "impl": "plugins/omx-geq/omx_geq_clap.c#clap_entry"

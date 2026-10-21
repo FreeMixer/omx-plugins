@@ -1,7 +1,7 @@
 {
   "$schema": "https://github.com/FreeMixer/omx-contract/raw/v3/schema/omx-contract.schema.json",
   "requires": {
-    "omx-contract-schema": ">= 2.15.0"
+    "omx-contract-schema": ">= 3.0.0"
   },
   "origin": "authored",
   "plugin": {
@@ -11,6 +11,7 @@
     "name": "omx comp",
     "vendor": "openmixer",
     "version": "0.12.0",
+    "doc": "The console's compressor: threshold, ratio and knee set how hard it holds the level down, attack and release how fast, with makeup gain and a dry/wet mix. Kind picks the RMS detector (Compressor) or the peak detector (Limiter), and detector oversampling can run the control path at 4x; detector topology has it hear the input (feedforward) or its own output (feedback). The DSP is omx-dsp's <omxdsp/fx/omx_comp_instance.h>, the console's own compressor.",
     "features": [
       "audio-effect"
     ]
@@ -50,7 +51,7 @@
         "min": 1,
         "max": 20,
         "step": 0,
-        "unit": "",
+        "unit": "ratio",
         "default": 4,
         "scale": "linear"
       },
@@ -304,6 +305,20 @@
   ],
   "latency": {
     "reports": true
+  },
+  "extensions": {
+    "clap": {
+      "clap_plugin_descriptor.features": [
+        "compressor",
+        "stereo"
+      ]
+    },
+    "lv2": {
+      "rdf:type": [
+        "lv2:Plugin",
+        "lv2:CompressorPlugin"
+      ]
+    }
   },
   "source": {
     "impl": "plugins/omx-comp/omx_comp_clap.c#clap_entry"

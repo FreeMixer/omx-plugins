@@ -1,7 +1,7 @@
 {
   "$schema": "https://github.com/FreeMixer/omx-contract/raw/v3/schema/omx-contract.schema.json",
   "requires": {
-    "omx-contract-schema": ">= 2.15.0"
+    "omx-contract-schema": ">= 3.0.0"
   },
   "origin": "authored",
   "plugin": {
@@ -11,6 +11,7 @@
     "name": "omx reverb",
     "vendor": "openmixer",
     "version": "0.12.0",
+    "doc": "The console's reverb: room, plate, hall, reverse and gated algorithms with pre-delay, size, damping, width and low and high cuts, mixed with the dry signal.",
     "features": [
       "audio-effect"
     ]
@@ -372,6 +373,20 @@
   ],
   "latency": {
     "reports": true
+  },
+  "extensions": {
+    "clap": {
+      "clap_plugin_descriptor.features": [
+        "reverb",
+        "stereo"
+      ]
+    },
+    "lv2": {
+      "rdf:type": [
+        "lv2:Plugin",
+        "lv2:ReverbPlugin"
+      ]
+    }
   },
   "source": {
     "impl": "plugins/omx-reverb/omx_reverb_clap.c#clap_entry"

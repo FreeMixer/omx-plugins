@@ -6,17 +6,6 @@
     "chorus"
   ],
   "url": "https://github.com/FreeMixer/omx-plugins",
-  "description": "The console's chorus: up to four voices read one modulated delay line, the right leg's sweep offset by the spread, mixed with the dry signal.",
-  "clap": {
-    "features": [
-      "audio-effect",
-      "chorus",
-      "stereo"
-    ]
-  },
-  "lv2": {
-    "class": "lv2:ChorusPlugin"
-  },
   "binding": "instance",
   "portHints": {
     "rate": {
