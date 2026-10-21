@@ -14,6 +14,7 @@
  * tools/panel-description.mjs lays a panel out from a descriptor of any origin; for ours it reads this one.
  */
 import { choicesOf, scaleOf } from './gen.mjs';
+import { clapFeatureField, clapFeatureValue } from './format-tables.mjs';
 import { installedContractDir, locateContract, ownersOf, packagingRange } from './omx-contract.mjs';
 
 /** The descriptor file of a plugin folder. */
@@ -32,11 +33,15 @@ export const CLAP_FEATURES_FIELD = 'clap_plugin_descriptor.features';
 export const LV2_TYPE_FIELD = 'rdf:type';
 const LV2_PLUGIN = 'lv2:Plugin';
 
+/** What every LV2 face states it can use (tools/gen.mjs writes lv2:optionalFeature lv2:hardRTCapable), the
+ * descriptor's needs.extensions.optional. */
+export const LV2_HARD_RT = 'lv2:hardRTCapable';
+
 /** The bag of a declaration: `{ clap?, lv2 }`. */
 export function extensionsOf(d) {
   const open = d.clap.features.filter((f) => !FEATURES.includes(f));
   return {
-    ...(open.length ? { clap: { [CLAP_FEATURES_FIELD]: open } } : {}),
+    ...(open.length ? { clap: { [CLAP_FEATURES_FIELD]: open.length === 1 ? clapFeatureField(open[0]) : open.map(clapFeatureField) } } : {}),
     lv2: { [LV2_TYPE_FIELD]: d.lv2.class === LV2_PLUGIN ? LV2_PLUGIN : [LV2_PLUGIN, d.lv2.class] },
   };
 }
@@ -44,11 +49,11 @@ export function extensionsOf(d) {
 /** The declaration's CLAP features and LV2 class, read back from a descriptor's words and bag. */
 function bagOf(descriptor, file) {
   const ext = descriptor.extensions ?? {};
-  const open = ext.clap?.[CLAP_FEATURES_FIELD] ?? [];
+  const open = [ext.clap?.[CLAP_FEATURES_FIELD] ?? []].flat();
   const types = [ext.lv2?.[LV2_TYPE_FIELD] ?? []].flat();
-  if (!Array.isArray(open) || open.some((f) => FEATURES.includes(f))) throw new Error(`${file}: extensions.clap["${CLAP_FEATURES_FIELD}"] holds CLAP's open features, a list without the ones plugin.features names`);
+  if (!Array.isArray(open) || open.some((f) => FEATURES.includes(clapFeatureValue(f)))) throw new Error(`${file}: extensions.clap["${CLAP_FEATURES_FIELD}"] holds CLAP's open features, a list without the ones plugin.features names`);
   if (!types.includes(LV2_PLUGIN) || types.length > 2) throw new Error(`${file}: extensions.lv2["${LV2_TYPE_FIELD}"] is the LV2 face's types, "${LV2_PLUGIN}" and at most its class`);
-  return { features: [...descriptor.plugin.features, ...open], class: types.find((t) => t !== LV2_PLUGIN) ?? LV2_PLUGIN };
+  return { features: [...descriptor.plugin.features, ...open.map(clapFeatureValue)], class: types.find((t) => t !== LV2_PLUGIN) ?? LV2_PLUGIN };
 }
 
 /** A descriptor's unit for a travel whose link resolves to `unit`: the item list's "" is a ratio or a fraction,
@@ -160,6 +165,7 @@ export function descriptorOf(d) {
     plugin: { id: d.clap.id, format: 'clap', uri: d.lv2.uri, name: d.name, vendor: d.vendor, version: d.version, doc: d.description, features: d.clap.features.filter((f) => FEATURES.includes(f)) },
     controls,
     ports,
+    needs: { extensions: { optional: [LV2_HARD_RT] } },
     latency: { reports: true },
     extensions: extensionsOf(d),
     source: { impl: face },

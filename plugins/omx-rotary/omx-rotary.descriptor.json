@@ -239,14 +239,19 @@
       "layout": "stereo"
     }
   ],
+  "needs": {
+    "extensions": {
+      "optional": [
+        "lv2:hardRTCapable"
+      ]
+    }
+  },
   "latency": {
     "reports": true
   },
   "extensions": {
     "clap": {
-      "clap_plugin_descriptor.features": [
-        "stereo"
-      ]
+      "clap_plugin_descriptor.features": "CLAP_PLUGIN_FEATURE_STEREO"
     },
     "lv2": {
       "rdf:type": "lv2:Plugin"
