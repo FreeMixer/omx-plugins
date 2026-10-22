@@ -13,6 +13,8 @@ override_dh_auto_install:
 	dh_auto_install -- PREFIX=/usr LIBDIR=/usr/lib
 	# libomxplugins.a and omxplugins.pc are the -dev package's, in the multiarch directory
 	$(MAKE) install-devel DESTDIR=$(CURDIR)/debian/tmp PREFIX=/usr LIBDIR=/usr/lib/$(DEB_HOST_MULTIARCH)
+	# the shipped pins.d file still names the shipped binaries' own hashes (sabotage: a changed binary goes red)
+	tools/pins-check.sh debian/tmp/usr/share/plugin-hostd/pins.d/omx-plugins.pins debian/tmp/usr/lib/clap
 
 # The generators read omx-contract's contract directory through the omx-contract command, which no .deb
 # installs yet: where it is absent, the checks that read it are skipped, saying so in one
