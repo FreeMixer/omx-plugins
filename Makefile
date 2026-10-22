@@ -74,7 +74,8 @@ PREFIX     ?= /usr
 INCLUDEDIR ?= $(PREFIX)/include
 LIBDIR     ?= $(PREFIX)/lib
 DATADIR    ?= $(PREFIX)/share
-CLAPDIR    ?= $(LIBDIR)/clap
+# the path every plugin's own Makefile installs its .clap to (the CLAP specification's, whatever LIBDIR is)
+CLAPDIR    ?= $(PREFIX)/lib/clap
 # plugin-hostd's read-only layer of package pins (plugin-hostd issue #42): our own plugins' pins are
 # known at build time, so `make install` writes them here instead of leaving them to be recorded on
 # first use (tools/gen-pins.sh, which needs plugin-qualify >= 0.9.0).
