@@ -14,6 +14,17 @@ override_dh_auto_install:
 	# libomxplugins.a and omxplugins.pc are the -dev package's, in the multiarch directory
 	$(MAKE) install-devel DESTDIR=$(CURDIR)/debian/tmp PREFIX=/usr LIBDIR=/usr/lib/$(DEB_HOST_MULTIARCH)
 
+# the shipped .clap is the stripped one, so its pin is measured again after dh_strip: a pin taken at
+# dh_auto_install names bytes the package never ships. The binaries sit in omx-plugins-clap's tree,
+# the pins file in omx-plugins'; then the shipped pins.d file is held to the shipped binaries' own
+# hashes (sabotage: a changed binary goes red)
+override_dh_strip:
+	dh_strip
+	$(MAKE) -s install-pins DESTDIR=$(CURDIR)/debian/omx-plugins-clap PREFIX=/usr LIBDIR=/usr/lib
+	mv debian/omx-plugins-clap/usr/share/plugin-hostd/pins.d/omx-plugins.pins debian/omx-plugins/usr/share/plugin-hostd/pins.d/omx-plugins.pins
+	rm -r debian/omx-plugins-clap/usr/share/plugin-hostd
+	tools/pins-check.sh debian/omx-plugins/usr/share/plugin-hostd/pins.d/omx-plugins.pins debian/omx-plugins-clap/usr/lib/clap
+
 # The generators read omx-contract's contract directory through the omx-contract command, which no .deb
 # installs yet: where it is absent, the checks that read it are skipped, saying so in one
 # line, and the faces are still held to their committed descriptors (make test-faces). Where it is present,

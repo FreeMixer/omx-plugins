@@ -1,3 +1,20 @@
+omx-plugins (0.14.0) unstable; urgency=medium
+
+  * Our own plugins' pins are known at build time, so they ship with the
+    package instead of being recorded by plugin-hostd on first use
+    (plugin-hostd issue #42, pins.d): plugin-qualify --pins runs over the
+    plugins the build just installed and the result is packaged as
+    /usr/share/plugin-hostd/pins.d/omx-plugins.pins, replaced with the
+    binaries in the same transaction and removed with the package
+    (tools/gen-pins.sh).
+  * The package recommends plugin-hostd (>= 0.5.0), the first release that
+    reads pins.d: a floor only, no ceiling.
+  * dh_auto_install holds the shipped pins to the shipped binaries' own
+    hashes: a plugin's binary changed after its pin was written goes red
+    (tools/pins-check.sh).
+
+ -- Pau Aliagas <linuxnow@gmail.com>  Thu, 22 Oct 2026 08:00:00 +0000
+
 omx-plugins (0.13.0) unstable; urgency=medium
 
   * The descriptors install under contract.d/3, in omx-contract 3.0.0's
