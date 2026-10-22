@@ -746,6 +746,14 @@ static inline void omx_wobble_instance_run(OmxWobbleInstance *s, const float *${
     expect(/omx_gate_instance_resolve\(&c->gate, bypass \|\| values\[OMX_CHAINPROOF_PARAM_GATE_ON\] < 0\.5f,\s*\/\* key_source \*\/ 0,/.test(core) && core.includes('omx_gate_instance_run(&c->gate, NULL,'),
       'chain: the gate, no key of the chain\'s, runs self-keyed, its key source fixed at self');
     const make = (...a) => spawnSync('make', ['-C', join(ct, CP), ...a], { encoding: 'utf8' });
+    // its factory presets, as a new plugin gets them (docs/presets.md): declared in tools/gen-presets.mjs,
+    // generated into presets/ and the bundle, the manifest regenerated to list them
+    const gp = join(ct, 'tools/gen-presets.mjs');
+    writeFileSync(gp, readFileSync(gp, 'utf8').replace('const DEFINITIONS = {\n',
+      "const DEFINITIONS = {\n  'org.openmixer.chainproof': [['gated', 'Gated', { gateOn: 1, compOn: 1 }], ['eq-only', 'EQ Only', { eqOn: 1, gateOn: 0, compOn: 0 }]],\n"));
+    const presetsGen = spawnSync('node', [gp], { cwd: ct, encoding: 'utf8' }), regen = make('gen');
+    expect(presetsGen.status === 0 && regen.status === 0 && existsSync(join(ct, 'presets/org.openmixer.chainproof/gated.json')),
+      `chain: its factory presets generated and listed in its bundle${presetsGen.status === 0 && regen.status === 0 ? '' : `: ${presetsGen.stderr}${regen.stderr}`}`);
     const green = make('test');
     expect(green.status === 0 && /ORACLE-GREEN clap/.test(green.stdout) && /ORACLE-GREEN lv2/.test(green.stdout),
       `chain: make test is green, both faces the chain of faces bit for bit${green.status === 0 ? '' : `: ${`${green.stdout}${green.stderr}`.split('\n').filter((l) => /^FAIL|rror/.test(l)).slice(0, 3).join(' | ')}`}`);
