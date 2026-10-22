@@ -22,6 +22,7 @@ import { spawnSync } from 'node:child_process';
 import { cpSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { DESCRIPTOR_SCHEMA_FLOOR, descriptorFile, descriptorText } from '../descriptor.mjs';
+import { clapFeatureValue } from '../format-tables.mjs';
 import { ROOT, loadDecl, pluginDirs } from '../gen.mjs';
 import { OWNERS, compareVersions, installedDataDir, locateContract } from '../omx-contract.mjs';
 import { validate } from '../schema-validate.mjs';
@@ -135,6 +136,35 @@ check('arm: a control with no link and no reason of its own is refused', refusal
 fresh();
 editJson(DESC, (x) => { [x.controls[0], x.controls[1]] = [x.controls[1], x.controls[0]]; });
 check('arm: a control out of the parameter order is refused', refusal(() => loadDecl(copy)), `the descriptor's control 0 has id 1; our ids are the parameter order`);
+
+// the descriptor's own words for the faces' description, CLAP features and LV2 class (omx-contract 3.0.0: plugin.doc
+// and the extension bag, a CLAP feature by its macro name), read back into the declaration every generator reads, over every described plugin
+for (const d of described) {
+  const s = d.split('/').pop(), x = JSON.parse(readFileSync(join(d, descriptorFile(s)), 'utf8')), v = loadDecl(d);
+  const types = [x.extensions.lv2['rdf:type']].flat();
+  check(`${s}: the description, CLAP features and LV2 class are plugin.doc and the bag's`, [v.description, v.clap.features, ['lv2:Plugin', v.lv2.class].filter((t, i) => i === 0 || t !== 'lv2:Plugin')],
+    [x.plugin.doc, [...x.plugin.features, ...[x.extensions.clap?.['clap_plugin_descriptor.features'] ?? []].flat().map(clapFeatureValue)], types]);
+}
+
+fresh();
+editJson(DECL, (x) => { x.description = 'A description the descriptor already says.'; });
+check('arm: an extras file carrying the description is refused', refusal(() => loadDecl(copy)), `"description" is the descriptor's to say (${DESC})`);
+
+fresh();
+editJson(DECL, (x) => { x.clap = { features: ['audio-effect', 'stereo'] }; });
+check('arm: an extras file carrying the CLAP features is refused', refusal(() => loadDecl(copy)), `the plugin's CLAP id and features, its LV2 URI and class are the descriptor's to say (${DESC}: plugin and extensions)`);
+
+fresh();
+editJson(DESC, (x) => { x.extensions.lv2['rdf:type'] = 'lv2:DelayPlugin'; });
+check('arm: an LV2 bag without lv2:Plugin is refused', refusal(() => loadDecl(copy)), `extensions.lv2["rdf:type"] is the LV2 face's types, "lv2:Plugin" and at most its class`);
+
+const united = JSON.parse(readFileSync(join(dir, DESC), 'utf8')).controls.find((c) => c.kind === 'travel' && c.source?.from && c.travel.unit !== '');
+fresh();
+editJson(DESC, (x) => { x.controls[united.id].travel.unit = 'ratio'; });
+check(`arm: ${united.symbol}, a ${united.travel.unit} travel stating ratio, is stale`, descriptorText(loadDecl(copy)) === readFileSync(join(copy, DESC), 'utf8'), false);
+
+const ratios = described.flatMap((d) => JSON.parse(readFileSync(join(d, descriptorFile(d.split('/').pop())), 'utf8')).controls.filter((c) => c.travel?.unit === 'ratio').map((c) => `${d.split('/').pop()}.${c.symbol}`));
+check('the ratio unit (gap 4) is stated by exactly the three ratio controls', ratios, ['omx-comp.ratio', 'omx-deesser.deessRatio', 'omx-keyed-gate.ratio']);
 
 rmSync(scratch, { recursive: true, force: true });
 console.log(`descriptor-view: ${n - bad}/${n} pass`);

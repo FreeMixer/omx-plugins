@@ -5,8 +5,9 @@ Maintainer: Pau Aliagas <linuxnow@gmail.com>
 Build-Depends: debhelper-compat (= 13),
                clap-headers,
                libomxdsp-dev (>= 0.24.0),
-               libomx-contract-dev (>= 2.16.0),
-               libomx-clap-core-dev (>= 0.6.0),
+               libomx-contract-dev (>= 3.0.0),
+               libomx-clap-core-dev (>= 0.13.0),
+               plugin-hostd-dev (>= 0.7.0),
                lv2-dev,
                pkgconf,
                nodejs <!nocheck>,
@@ -14,7 +15,8 @@ Build-Depends: debhelper-compat (= 13),
                liblilv-dev <!nocheck>,
                lilv-utils <!nocheck>,
                sordi <!nocheck>,
-               omx-clap-host <!nocheck>
+               omx-clap-host <!nocheck>,
+               plugin-hostd (>= 0.7.0) <!nocheck>
 Standards-Version: 4.6.2
 Homepage: https://github.com/FreeMixer/omx-plugins
 Rules-Requires-Root: no
@@ -52,7 +54,7 @@ Description: OpenMixer delay, drive, EQ, strip, gate and effects as CLAP plugins
 Package: omx-plugins-dev
 Section: libdevel
 Architecture: any
-Depends: libomxdsp-dev (>= 0.24.0), libomx-contract-dev (>= 2.16.0), clap-headers, ${misc:Depends}
+Depends: libomxdsp-dev (>= 0.24.0), libomx-contract-dev (>= 3.0.0), clap-headers, ${misc:Depends}
 Description: Headers and static library of the OpenMixer plugins
  The headers other projects include to use the OpenMixer plugins' parameters
  and instance code, such as omx_delay_core.h and each plugin's generated

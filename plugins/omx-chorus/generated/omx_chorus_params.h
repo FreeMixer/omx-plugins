@@ -32,6 +32,16 @@ static const omx_plugin_param OMX_CHORUS_PARAMS[OMX_CHORUS_PARAM_COUNT] = {
   { "mix", "Mix", "%", 0.0f, 100.0f, 35.0f, 0u },
 };
 
+/* Each parameter's CLAP module (clap_param_info.module): its descriptor control's group as a module path, "" for a
+ * plugin with no descriptor. */
+static const char *const OMX_CHORUS_PARAM_MODULES[OMX_CHORUS_PARAM_COUNT] = {
+  "Chorus",
+  "Chorus",
+  "Chorus",
+  "Chorus",
+  "Chorus",
+};
+
 /* One macro per declared bound: what a C face reads where a constant is needed. */
 #define OMX_CHORUS_PARAM_SPREAD_MIN 0.0f
 #define OMX_CHORUS_PARAM_SPREAD_MAX 0.5f
@@ -53,7 +63,7 @@ static const omx_plugin_param OMX_CHORUS_PARAMS[OMX_CHORUS_PARAM_COUNT] = {
 #define OMX_CHORUS_NAME "omx chorus"
 #define OMX_CHORUS_VENDOR "openmixer"
 #define OMX_CHORUS_URL "https://github.com/FreeMixer/omx-plugins"
-#define OMX_CHORUS_VERSION "0.12.0"
+#define OMX_CHORUS_VERSION "0.13.0"
 #define OMX_CHORUS_DESCRIPTION "The console's chorus: up to four voices read one modulated delay line, the right leg's sweep offset by the spread, mixed with the dry signal."
 #define OMX_CHORUS_CLAP_ID "org.openmixer.chorus"
 #define OMX_CHORUS_CLAP_FEATURES "audio-effect", "chorus", "stereo"

@@ -1,3 +1,19 @@
+omx-plugins (0.13.0) unstable; urgency=medium
+
+  * The descriptors install under contract.d/3, in omx-contract 3.0.0's
+    words: CLAP's open features and the LV2 class in the extension bag, the
+    one-line description in plugin.doc, a ratio's unit ratio.
+  * The generators read plugin-hostd's format tables backwards: the LV2 faces
+    state 57 lv2:designation param: terms and the ratio unit
+    urn:openmixer:unit#ratio, the CLAP faces each parameter's module.
+  * make round-trip, in make test, replaces make face-descriptor: every
+    described plugin's faces are built, scanned back with plugin-hostd-probe
+    describe and compared with the authored descriptor word by word.
+  * Builds against omx-contract >= 3.0.0, plugin-hostd >= 0.7.0 and
+    omx-clap-core >= 0.13.0.
+
+ -- Pau Aliagas <linuxnow@gmail.com>  Wed, 21 Oct 2026 08:00:00 +0000
+
 omx-plugins (0.12.0) unstable; urgency=medium
 
   * Each plugin's descriptor is installed byte for byte in omx-contract's

@@ -127,6 +127,62 @@ static const omx_plugin_param OMX_STRIP_PARAMS[OMX_STRIP_PARAM_COUNT] = {
   { "order", "Order", "", 0.0f, 119.0f, 0.0f, OMX_PLUGIN_PARAM_INTEGER },
 };
 
+/* Each parameter's CLAP module (clap_param_info.module): its descriptor control's group as a module path, "" for a
+ * plugin with no descriptor. */
+static const char *const OMX_STRIP_PARAM_MODULES[OMX_STRIP_PARAM_COUNT] = {
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+};
+
 /* One macro per declared bound: what a C face reads where a constant is needed. */
 #define OMX_STRIP_PARAM_TRIM_ON_MIN 0.0f
 #define OMX_STRIP_PARAM_TRIM_ON_MAX 1.0f
@@ -286,7 +342,7 @@ static const omx_plugin_param OMX_STRIP_PARAMS[OMX_STRIP_PARAM_COUNT] = {
 #define OMX_STRIP_NAME "omx strip"
 #define OMX_STRIP_VENDOR "openmixer"
 #define OMX_STRIP_URL "https://github.com/FreeMixer/omx-plugins"
-#define OMX_STRIP_VERSION "0.12.0"
+#define OMX_STRIP_VERSION "0.13.0"
 #define OMX_STRIP_DESCRIPTION "The OpenMixer console's channel strip in one plugin: input trim, high- and low-pass filters, gate, four-band EQ and compressor, in the console's order or any other. No DSP of its own: each stage is omx-dsp's instance face of the console's kernel, called in order."
 #define OMX_STRIP_CLAP_ID "org.openmixer.strip"
 #define OMX_STRIP_CLAP_FEATURES "audio-effect", "mixing", "stereo"

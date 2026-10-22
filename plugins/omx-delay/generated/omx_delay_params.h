@@ -32,6 +32,16 @@ static const omx_plugin_param OMX_DELAY_PARAMS[OMX_DELAY_PARAM_COUNT] = {
   { "pingpong", "Pingpong", "", 0.0f, 1.0f, 0.0f, OMX_PLUGIN_PARAM_TOGGLE },
 };
 
+/* Each parameter's CLAP module (clap_param_info.module): its descriptor control's group as a module path, "" for a
+ * plugin with no descriptor. */
+static const char *const OMX_DELAY_PARAM_MODULES[OMX_DELAY_PARAM_COUNT] = {
+  "Delay",
+  "Delay",
+  "Delay",
+  "Delay",
+  "Delay",
+};
+
 /* One macro per declared bound: what a C face reads where a constant is needed. */
 #define OMX_DELAY_PARAM_FX_DELAY_TIME_MIN 0.0f
 #define OMX_DELAY_PARAM_FX_DELAY_TIME_MAX 2000.0f
@@ -53,7 +63,7 @@ static const omx_plugin_param OMX_DELAY_PARAMS[OMX_DELAY_PARAM_COUNT] = {
 #define OMX_DELAY_NAME "omx delay"
 #define OMX_DELAY_VENDOR "openmixer"
 #define OMX_DELAY_URL "https://github.com/FreeMixer/omx-plugins"
-#define OMX_DELAY_VERSION "0.12.0"
+#define OMX_DELAY_VERSION "0.13.0"
 #define OMX_DELAY_DESCRIPTION "The OpenMixer console's stereo delay: one time, feedback through a tone filter, ping-pong and a wet/dry mix."
 #define OMX_DELAY_CLAP_ID "org.openmixer.delay"
 #define OMX_DELAY_CLAP_FEATURES "audio-effect", "delay", "stereo"
