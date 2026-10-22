@@ -6,17 +6,6 @@
     "limiter"
   ],
   "url": "https://github.com/FreeMixer/omx-plugins",
-  "description": "The precision limiter: a look-ahead, true-peak, stereo-linked brickwall.",
-  "clap": {
-    "features": [
-      "audio-effect",
-      "limiter",
-      "stereo"
-    ]
-  },
-  "lv2": {
-    "class": "lv2:LimiterPlugin"
-  },
   "binding": "instance",
   "portHints": {
     "lookaheadMs": {

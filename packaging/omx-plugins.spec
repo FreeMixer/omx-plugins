@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # Copyright (C) 2026 Pau Aliagas <linuxnow@gmail.com>
 Name: omx-plugins
-Version: 0.12.0
+Version: 0.13.0
 Release: 1%{?dist}
 License: GPL-3.0-or-later
 Summary: The OpenMixer console's delay, drive, EQ, channel strip, keyed gate and effects, as plugins for your DAW
@@ -15,10 +15,12 @@ BuildRequires: pkgconf-pkg-config
 # The releases this tree builds against: a floor each (no ceiling), once here and
 # the same in debian/control (tools/deps-check.sh). The Makefile and tools/gen.mjs read them from here.
 BuildRequires: omx-dsp-devel >= 0.24.0
-BuildRequires: omx-contract-devel >= 2.16.0
-BuildRequires: omx-clap-core-devel >= 0.6.0
+BuildRequires: omx-contract-devel >= 3.0.0
+BuildRequires: omx-clap-core-devel >= 0.13.0
+# plugin-hostd's format tables, which the generators read backwards (tools/format-tables.mjs)
+BuildRequires: plugin-hostd-devel >= 0.7.0
 # the omx-contract command, first packaged in 2.15.0: the generators read the contract directory through it
-BuildRequires: omx-contract >= 2.16.0
+BuildRequires: omx-contract >= 3.0.0
 BuildRequires: clap-devel
 BuildRequires: lv2-devel
 # %%check: the generators and checks are Node scripts; the hosts that load the built plugins
@@ -30,6 +32,8 @@ BuildRequires: lilv
 BuildRequires: lilv-devel
 BuildRequires: sord
 BuildRequires: omx-clap-host
+# %%check: make round-trip scans the built faces back with plugin-hostd-probe describe
+BuildRequires: plugin-hostd >= 0.7.0
 
 # The name a user installs: both formats.
 Requires: %{name}-clap%{?_isa} = %{version}-%{release}
@@ -77,7 +81,7 @@ console's own DSP, so they sound like the desk.
 Summary: Headers and static library of the OpenMixer plugins, for projects that build on them
 Requires: omx-dsp-devel >= 0.24.0
 # the contract directory the descriptors install into is omx-contract-devel's
-Requires: omx-contract-devel >= 2.16.0
+Requires: omx-contract-devel >= 3.0.0
 Requires: clap-devel
 
 %description devel
@@ -142,7 +146,7 @@ in omx-contract's contract directory, where a host reads it.
 %{_libdir}/libomxplugins.a
 %{_libdir}/pkgconfig/omxplugins.pc
 # each plugin's descriptor, in omx-contract's contract directory (the directory itself is omx-contract-devel's)
-%{_datadir}/omx-contract/contract.d/2/omx-plugins/
+%{_datadir}/omx-contract/contract.d/3/omx-plugins/
 
 %files lv2
 %license LICENSE
@@ -170,6 +174,19 @@ in omx-contract's contract directory, where a host reads it.
 # END GENERATED lv2-files
 
 %changelog
+* Wed Oct 21 2026 Pau Aliagas <linuxnow@gmail.com> - 0.13.0-1
+- The descriptors install under contract.d/3, in omx-contract 3.0.0's words:
+  CLAP's open features and the LV2 class in the extension bag, the one-line
+  description in plugin.doc, a ratio's unit ratio.
+- The generators read plugin-hostd's format tables backwards: the LV2 faces
+  state 57 lv2:designation param: terms and the ratio unit
+  urn:openmixer:unit#ratio, the CLAP faces each parameter's module.
+- make round-trip, in make test, replaces make face-descriptor: every described
+  plugin's faces are built, scanned back with plugin-hostd-probe describe and
+  compared with the authored descriptor word by word.
+- Builds against omx-contract >= 3.0.0, plugin-hostd-devel >= 0.7.0 and
+  omx-clap-core-devel >= 0.13.0.
+
 * Tue Oct 20 2026 Pau Aliagas <linuxnow@gmail.com> - 0.12.0-1
 - Each plugin's descriptor is installed byte for byte in omx-contract's contract
   directory, as contract.d/2/omx-plugins/plugins/<name>.json, with a

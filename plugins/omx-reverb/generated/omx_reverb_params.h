@@ -48,6 +48,24 @@ static const omx_plugin_param OMX_REVERB_PARAMS[OMX_REVERB_PARAM_COUNT] = {
   { "algorithm", "Algorithm", "", 0.0f, 4.0f, 0.0f, OMX_PLUGIN_PARAM_INTEGER },
 };
 
+/* Each parameter's CLAP module (clap_param_info.module): its descriptor control's group as a module path, "" for a
+ * plugin with no descriptor. */
+static const char *const OMX_REVERB_PARAM_MODULES[OMX_REVERB_PARAM_COUNT] = {
+  "Plate",
+  "Reverb",
+  "Reverb",
+  "Reverb",
+  "Reverb",
+  "Reverb",
+  "Reverb",
+  "Reverb",
+  "Reverse",
+  "Gated",
+  "Gated",
+  "Gated",
+  "Reverb",
+};
+
 /* One macro per declared bound: what a C face reads where a constant is needed. */
 #define OMX_REVERB_PARAM_PLATE_MOD_DEPTH_MIN 0.0f
 #define OMX_REVERB_PARAM_PLATE_MOD_DEPTH_MAX 400.0f
@@ -93,7 +111,7 @@ static const omx_plugin_param OMX_REVERB_PARAMS[OMX_REVERB_PARAM_COUNT] = {
 #define OMX_REVERB_NAME "omx reverb"
 #define OMX_REVERB_VENDOR "openmixer"
 #define OMX_REVERB_URL "https://github.com/FreeMixer/omx-plugins"
-#define OMX_REVERB_VERSION "0.12.0"
+#define OMX_REVERB_VERSION "0.13.0"
 #define OMX_REVERB_DESCRIPTION "The console's reverb: room, plate, hall, reverse and gated algorithms with pre-delay, size, damping, width and low and high cuts, mixed with the dry signal."
 #define OMX_REVERB_CLAP_ID "org.openmixer.reverb"
 #define OMX_REVERB_CLAP_FEATURES "audio-effect", "reverb", "stereo"

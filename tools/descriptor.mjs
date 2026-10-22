@@ -14,17 +14,55 @@
  * tools/panel-description.mjs lays a panel out from a descriptor of any origin; for ours it reads this one.
  */
 import { choicesOf, scaleOf } from './gen.mjs';
+import { clapFeatureField, clapFeatureValue } from './format-tables.mjs';
 import { installedContractDir, locateContract, ownersOf, packagingRange } from './omx-contract.mjs';
 
 /** The descriptor file of a plugin folder. */
 export const descriptorFile = (stem) => `${stem}.descriptor.json`;
 
 /** The schema the descriptor words are in, and the release that added them. */
-export const DESCRIPTOR_SCHEMA = 'https://github.com/FreeMixer/omx-contract/raw/v2/schema/omx-contract.schema.json';
-export const DESCRIPTOR_SCHEMA_FLOOR = '2.15.0';
+export const DESCRIPTOR_SCHEMA = 'https://github.com/FreeMixer/omx-contract/raw/v3/schema/omx-contract.schema.json';
+export const DESCRIPTOR_SCHEMA_FLOOR = '3.0.0';
 
 /** The plugin features the descriptor names; a declaration's other CLAP features have no word there. */
 export const FEATURES = ['audio-effect', 'instrument', 'note-effect', 'analyzer'];
+
+/** The extension bag's source fields our faces write (omx-contract docs/descriptors.md, The extension bag): CLAP's
+ * open features, in the face's order, and the LV2 face's types as its .ttl states them. */
+export const CLAP_FEATURES_FIELD = 'clap_plugin_descriptor.features';
+export const LV2_TYPE_FIELD = 'rdf:type';
+const LV2_PLUGIN = 'lv2:Plugin';
+
+/** What every LV2 face states it can use (tools/gen.mjs writes lv2:optionalFeature lv2:hardRTCapable), the
+ * descriptor's needs.extensions.optional. */
+export const LV2_HARD_RT = 'lv2:hardRTCapable';
+
+/** The bag of a declaration: `{ clap?, lv2 }`. */
+export function extensionsOf(d) {
+  const open = d.clap.features.filter((f) => !FEATURES.includes(f));
+  return {
+    ...(open.length ? { clap: { [CLAP_FEATURES_FIELD]: open.length === 1 ? clapFeatureField(open[0]) : open.map(clapFeatureField) } } : {}),
+    lv2: { [LV2_TYPE_FIELD]: d.lv2.class === LV2_PLUGIN ? LV2_PLUGIN : [LV2_PLUGIN, d.lv2.class] },
+  };
+}
+
+/** The declaration's CLAP features and LV2 class, read back from a descriptor's words and bag. */
+function bagOf(descriptor, file) {
+  const ext = descriptor.extensions ?? {};
+  const open = [ext.clap?.[CLAP_FEATURES_FIELD] ?? []].flat();
+  const types = [ext.lv2?.[LV2_TYPE_FIELD] ?? []].flat();
+  if (!Array.isArray(open) || open.some((f) => FEATURES.includes(clapFeatureValue(f)))) throw new Error(`${file}: extensions.clap["${CLAP_FEATURES_FIELD}"] holds CLAP's open features, a list without the ones plugin.features names`);
+  if (!types.includes(LV2_PLUGIN) || types.length > 2) throw new Error(`${file}: extensions.lv2["${LV2_TYPE_FIELD}"] is the LV2 face's types, "${LV2_PLUGIN}" and at most its class`);
+  return { features: [...descriptor.plugin.features, ...open.map(clapFeatureValue)], class: types.find((t) => t !== LV2_PLUGIN) ?? LV2_PLUGIN };
+}
+
+/** A descriptor's unit for a travel whose link resolves to `unit`: the item list's "" is a ratio or a fraction,
+ * and a ratio (n:1) states `ratio`, the one word the descriptor says beyond its link (gap 4). */
+const RATIO = 'ratio';
+
+/** An integer travel's scale (PARAM_SCALES): what CLAP_PARAM_IS_STEPPED, lv2:integer and the parameter contract say. */
+const STEPPED = 'stepped';
+export const travelUnit = (unit, authored) => (unit === '' && authored === RATIO ? RATIO : unit);
 
 /** A panel role -> the descriptor meaning it plays, where the two names differ. A role whose name is
  * a meaning plays that meaning; a role in neither has no meaning word and is bound only by a panel. */
@@ -106,7 +144,7 @@ export function descriptorOf(d) {
       if (p.unit) choiceUnits[p.symbol] = p.unit;
     } else {
       c.kind = 'travel';
-      c.travel = { min: p.min, max: p.max, step: p.kind === 'integer' ? 1 : 0, unit: p.unit, default: p.def, scale: scaleOf(p) };
+      c.travel = { min: p.min, max: p.max, step: p.kind === 'integer' ? 1 : 0, unit: travelUnit(p.unit, d.descriptor?.controls[i]?.travel?.unit), default: p.def, scale: p.kind === 'integer' ? STEPPED : scaleOf(p) };
     }
     if (groupOf.has(p.symbol)) c.group = groupOf.get(p.symbol);
     if (meaningOf.has(p.symbol)) c.meaning = meaningOf.get(p.symbol);
@@ -124,10 +162,12 @@ export function descriptorOf(d) {
     $schema: DESCRIPTOR_SCHEMA,
     requires: { 'omx-contract-schema': `>= ${DESCRIPTOR_SCHEMA_FLOOR}` },
     origin: 'authored',
-    plugin: { id: d.clap.id, format: 'clap', uri: d.lv2.uri, name: d.name, vendor: d.vendor, version: d.version, features: d.clap.features.filter((f) => FEATURES.includes(f)) },
+    plugin: { id: d.clap.id, format: 'clap', uri: d.lv2.uri, name: d.name, vendor: d.vendor, version: d.version, doc: d.description, features: d.clap.features.filter((f) => FEATURES.includes(f)) },
     controls,
     ports,
+    needs: { extensions: { optional: [LV2_HARD_RT] } },
     latency: { reports: true },
+    extensions: extensionsOf(d),
     source: { impl: face },
   };
   return { descriptor, extras: { choiceUnits, byKind } };
@@ -137,7 +177,7 @@ export function descriptorOf(d) {
 export const descriptorText = (d) => `${JSON.stringify(descriptorOf(d).descriptor, null, 2)}\n`;
 
 /** The declaration fields the descriptor says: an extras file beside a descriptor carries none of them. */
-const SAID = ['name', 'vendor', 'version', 'params'];
+const SAID = ['name', 'vendor', 'version', 'params', 'description'];
 
 /**
  * The declaration `extras` (a <stem>.decl.json beside a descriptor) and `descriptor` make together, as
@@ -148,12 +188,13 @@ const SAID = ['name', 'vendor', 'version', 'params'];
  */
 export function viewOf(descriptor, extras, file) {
   for (const k of SAID) if (k in extras) throw new Error(`${file}: "${k}" is the descriptor's to say (${descriptorFile(extras.stem)})`);
-  if (extras.clap?.id !== undefined || extras.lv2?.uri !== undefined) throw new Error(`${file}: the plugin's CLAP id and LV2 URI are the descriptor's to say (${descriptorFile(extras.stem)})`);
+  if (extras.clap !== undefined || extras.lv2?.uri !== undefined || extras.lv2?.class !== undefined) throw new Error(`${file}: the plugin's CLAP id and features, its LV2 URI and class are the descriptor's to say (${descriptorFile(extras.stem)}: plugin and extensions)`);
   if (descriptor.origin !== 'authored') throw new Error(`${file}: ${descriptorFile(extras.stem)} is ${descriptor.origin}; ours is authored`);
   const known = new Set(descriptor.controls.map((c) => c.symbol));
   for (const sym of Object.keys(extras.controls ?? {})) if (!known.has(sym)) throw new Error(`${file}: "controls" names '${sym}', no control of the descriptor`);
   const { controls: perControl = {}, ...rest } = extras;
   const pl = descriptor.plugin;
+  const bag = bagOf(descriptor, file);
   const params = descriptor.controls.map((c, i) => {
     if (c.id !== i) throw new Error(`${file}: the descriptor's control ${i} has id ${JSON.stringify(c.id)}; our ids are the parameter order`);
     const x = perControl[c.symbol] ?? {};
@@ -166,7 +207,8 @@ export function viewOf(descriptor, extras, file) {
       p.ref = link.ref;
       if (link.field) p.field = link.field;
       if (link.kernel && (rest.kernels ?? [rest.kernel]).length > 1) p.kernel = link.kernel;
-      if (c.travel && c.travel.scale !== scaleOf({ unit: c.travel.unit })) p.scale = c.travel.scale;
+      // an integer travel is stepped, as both faces and the parameter contract state it; its faces' log hint is its unit's
+      if (c.travel && c.travel.scale !== (c.travel.step === 1 ? STEPPED : scaleOf({ unit: c.travel.unit }))) p.scale = c.travel.scale;
     } else {
       // a control of the face's own: its travel is typed, the reason kept with it
       if (!x.own) throw new Error(`${file}: '${c.symbol}' has no source link and no "own" reason`);
@@ -176,5 +218,5 @@ export function viewOf(descriptor, extras, file) {
     }
     return { ...p, ...x };
   });
-  return { ...rest, name: pl.name, vendor: pl.vendor, version: pl.version, clap: { id: pl.id, ...rest.clap }, lv2: { uri: pl.uri, ...rest.lv2 }, params };
+  return { ...rest, name: pl.name, vendor: pl.vendor, version: pl.version, description: pl.doc, clap: { id: pl.id, features: bag.features }, lv2: { uri: pl.uri, class: bag.class, ...rest.lv2 }, params };
 }

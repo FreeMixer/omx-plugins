@@ -4,6 +4,7 @@
 @prefix doap:  <http://usefulinc.com/ns/doap#> .
 @prefix foaf:  <http://xmlns.com/foaf/0.1/> .
 @prefix lv2:   <http://lv2plug.in/ns/lv2core#> .
+@prefix param: <http://lv2plug.in/ns/ext/parameters#> .
 @prefix pg:    <http://lv2plug.in/ns/ext/port-groups#> .
 @prefix pprops: <http://lv2plug.in/ns/ext/port-props#> .
 @prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
@@ -20,7 +21,7 @@
     doap:name "omx reverb" ;
     doap:license <https://www.gnu.org/licenses/gpl-3.0.html> ;
     lv2:project <https://github.com/FreeMixer/omx-plugins> ;
-    lv2:minorVersion 12 ;
+    lv2:minorVersion 13 ;
     lv2:microVersion 0 ;
     rdfs:comment "The console's reverb: room, plate, hall, reverse and gated algorithms with pre-delay, size, damping, width and low and high cuts, mixed with the dry signal." ;
     lv2:optionalFeature lv2:hardRTCapable ;
@@ -69,6 +70,7 @@
         lv2:default 0.3 ;
         lv2:minimum 0 ;
         lv2:maximum 1 ;
+        lv2:designation param:wetDryRatio ;
         pg:group <urn:openmixer:reverb#reverb>
     ] ,
     [

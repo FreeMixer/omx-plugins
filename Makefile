@@ -10,6 +10,12 @@
 #                   block is dbfs, dbu, ratio, lufs (tools/test/param-units-check.mjs)
 #   make lv2-units  every unit a declaration uses has an LV2 unit, and every port states the unit it declares
 #                   (tools/test/lv2-units-check.mjs, with its sabotage arms; part of `make test`)
+#   make format-tables  the generators read plugin-hostd's installed format tables backwards (tools/format-tables.mjs):
+#                   the units, the 57 lv2:designation lines and the ratio unit, the CLAP modules from the descriptors'
+#                   groups (tools/test/format-tables-test.mjs, with its sabotage arms; part of `make test`)
+#   make round-trip  every described plugin generated, both faces built and scanned back by plugin-hostd-probe describe,
+#                   compared with its authored descriptor word by word: equal, lost <format> <word> or differs
+#                   (tools/round-trip.{sh,mjs}, with its two sabotage arms; part of `make test`)
 #   make contract-union  parallel make targets render omx-contract's union into private directories and read it whole
 #                   (tools/test/contract-union-race-test.mjs; part of `make test` and `make test-faces`)
 #   make probe-checks  clap-params-check, panel-check, clap-ext-check and port-groups-check each fail on a built face that is wrong,
@@ -40,7 +46,7 @@
 #   make install    DESTDIR, PREFIX, LIBDIR, CLAPDIR, DATADIR: $(CLAPDIR)/<name>.clap, $(LIBDIR)/lv2/<name>.lv2/ and the
 #                   factory presets in $(DATADIR)/omx/presets/<plugin id>/<preset id>.json
 #   make install-contract  DESTDIR, CONTRACTDIR: each shipped plugin's descriptor into omx-contract's contract directory,
-#                   $(CONTRACTDIR)/2/omx-plugins/plugins/<stem>.json and its MANIFEST.json (run by install-devel)
+#                   $(CONTRACTDIR)/3/omx-plugins/plugins/<stem>.json and its MANIFEST.json (run by install-devel)
 #   make contract-dir  the installed tree carries one descriptor per shipped plugin that has one, byte for byte, and
 #                   omx-contract's reader reads it (tools/test/contract-dir-check.sh, with its sabotage arms; part of `make test`)
 #   make lib        build/lib/libomxplugins.a: every shipped plugin's CLAP face and the table of their
@@ -53,7 +59,7 @@
 #   make test-role  a test plugin (`"role": "test"`) is linked into the archive and installed by no
 #                   target: tools/test-role-check.sh over a staged install, with its --self-test
 #                   (part of `make test`)
-VERSION := 0.12.0
+VERSION := 0.13.0
 PLUGINS := $(sort $(dir $(wildcard plugins/*/Makefile)))
 # A test plugin is built, tested and linked into libomxplugins.a like the others, and installed by no
 # target: its declaration says `"role": "test"` (tools/test-plugins.mjs).
@@ -101,14 +107,14 @@ LIB_FLAGS  := -fPIC -fvisibility=hidden -DOMX_CLAP_STATIC -Iinclude
 # read only by the targets that build the archive, so `make version` and the rest need no omx-dsp
 lib_cflags = $(call dep_check,omxdsp,$(OMXDSP_MIN))$(call dep_check,omx-contract,$(CONTRACT_MIN))$(shell $(PKG_CONFIG) --cflags omxdsp omx-clap-core clap)
 
-.PHONY: presets presets-figures test-role all lib lib-test test test-faces units panel-layout descriptor-view lv2-units contract-union probe-checks eq-probe-race face-descriptor hints look manual install install-devel install-contract contract-dir clean version recipe-test completeness selftest private-refs strip-crosscheck meters-abi meter-level dsp-copies meter-ring
+.PHONY: presets presets-figures test-role all lib lib-test test test-faces units panel-layout descriptor-view lv2-units format-tables contract-union probe-checks eq-probe-race round-trip hints look manual install install-devel install-contract contract-dir clean version recipe-test completeness selftest private-refs strip-crosscheck meters-abi meter-level dsp-copies meter-ring
 all: lib
 	@for p in $(PLUGINS); do $(MAKE) -C $$p all || exit 1; done
 lib: $(LIB) $(LIB_PC)
-test: lib units panel-layout descriptor-view lv2-units contract-union contract-dir probe-checks eq-probe-race
+test: lib units panel-layout descriptor-view lv2-units format-tables contract-union contract-dir probe-checks eq-probe-race
 	@if [ -z "$(PLUGINS)" ]; then echo "no plugins yet"; fi
 	@for p in $(PLUGINS); do $(MAKE) -C $$p test || exit 1; done
-	@$(MAKE) -s face-descriptor
+	@$(MAKE) -s round-trip
 	@$(MAKE) -s presets-figures
 	@$(MAKE) -s lib-test
 	@$(MAKE) -s hints
@@ -119,10 +125,9 @@ test: lib units panel-layout descriptor-view lv2-units contract-union contract-d
 	@$(MAKE) -s meters-abi
 	@$(MAKE) -s meter-level
 	@$(MAKE) -s test-role
-# what runs with no omx-contract command (debian/rules: no .deb ships the command yet): the built faces against their
-# committed descriptors, the static table and the ABI checks; nothing here reads the contract directory
+# what runs with no omx-contract command (debian/rules: no .deb ships the command yet): the built faces, the static
+# table and the ABI checks; nothing here reads the contract directory (the round trip generates, so it runs in make test)
 test-faces: all lib contract-union eq-probe-race
-	@$(MAKE) -s face-descriptor
 	@$(MAKE) -s lib-test
 	@$(MAKE) -s meters-abi
 	@$(MAKE) -s meter-level
@@ -136,6 +141,9 @@ descriptor-view:
 # every declared unit is stated by its port in the generated TTL, with its sabotage arms
 lv2-units:
 	node tools/test/lv2-units-check.mjs --self-test
+# the generators read plugin-hostd's format tables backwards, held by value, with its sabotage arms
+format-tables:
+	node tools/test/format-tables-test.mjs
 # the union render is read whole while other processes render it (make -j): a fake CLI, readers a little apart
 contract-union:
 	node tools/test/contract-union-race-test.mjs
@@ -145,10 +153,10 @@ probe-checks:
 # the EQ default probe is run whole while other processes build it (make -j): a fake compiler, readers a little apart
 eq-probe-race:
 	node tools/test/eq-probe-race-test.mjs
-# the described plugins' built faces, scanned, against their authored descriptors; after the plugins build
-face-descriptor:
-	tools/face-descriptor-check.sh
-	tools/face-descriptor-check.sh --self-test
+# author, generate both faces, scan them back through plugin-hostd and compare, with its two sabotage arms
+round-trip:
+	tools/round-trip.sh
+	tools/round-trip.sh --self-test
 hints:
 	node tools/gen.mjs --check
 	node tools/gen.mjs
@@ -216,7 +224,7 @@ test-role:
 # (`pkg-config --variable=contractdir omx-contract`); the install script too, or OMX_CONTRACT_DIR's, an omx-contract
 # checkout, when no package is installed.
 CONTRACTDIR ?= $(DATADIR)/omx-contract/contract.d
-CONTRACT_SCHEMA_MAJOR := 2
+CONTRACT_SCHEMA_MAJOR := 3
 INSTALL_CONTRACT_DIR = $(firstword $(wildcard $(shell $(PKG_CONFIG) --variable=datadir omx-contract 2>/dev/null)/install-contract-dir.sh) $(wildcard $(OMX_CONTRACT_DIR)/tools/install-contract-dir.sh))
 DESCRIPTORS = $(foreach p,$(SHIP_PLUGINS),$(wildcard $(p)$(notdir $(p:/=)).descriptor.json))
 install-contract:

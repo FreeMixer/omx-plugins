@@ -4,6 +4,7 @@
 @prefix doap:  <http://usefulinc.com/ns/doap#> .
 @prefix foaf:  <http://xmlns.com/foaf/0.1/> .
 @prefix lv2:   <http://lv2plug.in/ns/lv2core#> .
+@prefix param: <http://lv2plug.in/ns/ext/parameters#> .
 @prefix pg:    <http://lv2plug.in/ns/ext/port-groups#> .
 @prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix units: <http://lv2plug.in/ns/extensions/units#> .
@@ -18,7 +19,7 @@
     doap:name "omx delay" ;
     doap:license <https://www.gnu.org/licenses/gpl-3.0.html> ;
     lv2:project <https://github.com/FreeMixer/omx-plugins> ;
-    lv2:minorVersion 12 ;
+    lv2:minorVersion 13 ;
     lv2:microVersion 0 ;
     rdfs:comment "The OpenMixer console's stereo delay: one time, feedback through a tone filter, ping-pong and a wet/dry mix." ;
     lv2:optionalFeature lv2:hardRTCapable ;
@@ -57,6 +58,7 @@
         lv2:maximum 2000 ;
         lv2:portProperty lv2:integer ;
         units:unit units:ms ;
+        lv2:designation param:delay ;
         pg:group <urn:openmixer:delay#delay>
     ] ,
     [
@@ -87,6 +89,7 @@
         lv2:default 0.3 ;
         lv2:minimum 0 ;
         lv2:maximum 1 ;
+        lv2:designation param:wetDryRatio ;
         pg:group <urn:openmixer:delay#delay>
     ] ,
     [

@@ -6,7 +6,7 @@
   "name": "omx test-transport-probe",
   "vendor": "openmixer",
   "url": "https://github.com/FreeMixer/omx-plugins",
-  "version": "0.12.0",
+  "version": "0.13.0",
   "description": "A test probe: audio passes unchanged, and the transport handed to each block is recorded whole for a test to read back.",
   "clap": {
     "id": "org.openmixer.test-transport-probe",

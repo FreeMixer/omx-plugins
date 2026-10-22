@@ -6,17 +6,6 @@
     "pitch"
   ],
   "url": "https://github.com/FreeMixer/omx-plugins",
-  "description": "The console's pitch shifter: shifts both channels up or down by semitones and cents, without changing their length, mixed with the dry signal.",
-  "clap": {
-    "features": [
-      "audio-effect",
-      "pitch-shifter",
-      "stereo"
-    ]
-  },
-  "lv2": {
-    "class": "lv2:PitchPlugin"
-  },
   "binding": "instance",
   "portHints": {
     "enabled": {
