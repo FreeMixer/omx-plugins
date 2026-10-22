@@ -76,7 +76,7 @@ DATADIR    ?= $(PREFIX)/share
 # is installed with them, and so is its generated generated/omx_<kernel>_decl.h: the constants a
 # proof predicts from (and the CLAP id) have one home, the declaration, not a hardcoded second copy
 # in the host that reads it. Neither declares anything a picker lists: macros only.
-HEADERS := include/omx_plugin_param.h include/omx_panel_description.h include/omx_param_contract.h include/omx_clap_static.h $(foreach p,$(SHIP_PLUGINS),$(wildcard $(p)*.h) $(wildcard $(p)generated/*.h)) $(foreach p,$(TEST_PLUGINS),$(wildcard $(p)*.h) $(wildcard $(p)generated/*.h))
+HEADERS := include/omx_plugin_param.h include/omx_panel_description.h include/omx_param_contract.h include/omx_preset_file.h include/omx_clap_static.h $(foreach p,$(SHIP_PLUGINS),$(wildcard $(p)*.h) $(wildcard $(p)generated/*.h)) $(foreach p,$(TEST_PLUGINS),$(wildcard $(p)*.h) $(wildcard $(p)generated/*.h))
 
 # libomxplugins.a: each shipped plugin's CLAP face built with -DOMX_CLAP_STATIC (no `clap_entry`;
 # its `omx_clap_entry_<kernel>` stays) and lib/omx_clap_static.c, the table of those entries by CLAP
@@ -255,7 +255,7 @@ $(LIB_B)/omx_clap_static.o: lib/omx_clap_static.c include/omx_clap_static.h | $(
 
 # One rule per face: its generated headers sit in its own folder.
 define face_rule
-$(LIB_B)/$(notdir $(1:.c=.o)): $(1) $(wildcard $(dir $(1))*.h $(dir $(1))generated/*.h) include/omx_panel_description.h include/omx_param_contract.h | $(LIB_B)
+$(LIB_B)/$(notdir $(1:.c=.o)): $(1) $(wildcard $(dir $(1))*.h $(dir $(1))generated/*.h) include/omx_panel_description.h include/omx_param_contract.h include/omx_preset_file.h | $(LIB_B)
 	$$(CC) $$(CPPFLAGS) $$(CFLAGS) $$(LIB_WARN) $$(LIB_FLAGS) -I$(dir $(1))generated $$(lib_cflags) -c -o $$@ $$<
 endef
 $(foreach f,$(CLAP_FACES),$(eval $(call face_rule,$(f))))
