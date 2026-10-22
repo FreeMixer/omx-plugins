@@ -50,7 +50,7 @@ CLAPDIR ?= $(PREFIX)/lib/clap
 TTL      := $(GEN)/$(NAME).lv2
 TTL_SRCS := $(shell find $(TTL) -type f 2>/dev/null)
 CORE     := omx_strip_core.h $(GEN)/omx_strip_params.h $(ROOT)/include/omx_panel_description.h \
-            $(ROOT)/include/omx_param_contract.h
+            $(ROOT)/include/omx_param_contract.h $(ROOT)/include/omx_preset_file.h
 
 all: $(B)/$(NAME).clap $(BUNDLE)/$(NAME).so $(BUNDLE)/manifest.ttl
 
