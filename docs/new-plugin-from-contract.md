@@ -71,6 +71,11 @@ settled it fills the derived fields and runs `tools/gen.mjs`, which writes:
 `node tools/gen.mjs --check` holds every one of them; CI runs it. Then the wizard runs the plugin's
 `make test` and `make completeness` for it, and prints the commit plan in the recipe's layer order.
 
+A plugin ships its factory presets (docs/presets.md): until its clap id has an entry in
+`tools/gen-presets.mjs`'s `DEFINITIONS`, its `make test` refuses (`no factory presets for <id>`).
+Declare them there, run `node tools/gen-presets.mjs` (the JSON in `presets/<id>/` and the
+bundle's `presets.ttl`), then `make -C plugins/<stem> gen` so the manifest lists them.
+
 ## The identity test
 
 One template, filled from the declaration. The plan has three parts. First, a deterministic stimulus
