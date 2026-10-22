@@ -44,7 +44,12 @@
 #                   amp-input bell (+4.00 dB at 2.5 kHz), the amp-tube harmonics (H2/H3 on the closed form), the dimension's
 #                   L - R null; each sabotaged by --self-test (tools/test/preset-figures.mjs; part of `make test` and `make test-faces`)
 #   make install    DESTDIR, PREFIX, LIBDIR, CLAPDIR, DATADIR: $(CLAPDIR)/<name>.clap, $(LIBDIR)/lv2/<name>.lv2/ and the
-#                   factory presets in $(DATADIR)/omx/presets/<plugin id>/<preset id>.json
+#                   factory presets in $(DATADIR)/omx/presets/<plugin id>/<preset id>.json, then install-pins
+#   make install-pins  PINS_DIR, PINS_FILE: plugin-qualify --pins over the just-installed .clap files, written to
+#                   $(DESTDIR)$(PINS_DIR)/$(PINS_FILE) with the buildroot rewritten to the final $(CLAPDIR)
+#                   (tools/gen-pins.sh, with its --self-test; needs plugin-qualify >= 0.9.0); tools/pins-check.sh
+#                   checks the shipped pins against the shipped binaries' hashes (with its --self-test, part of
+#                   `make selftest`), run by a package's own build (%check / dh_auto_install), not by this Makefile
 #   make install-contract  DESTDIR, CONTRACTDIR: each shipped plugin's descriptor into omx-contract's contract directory,
 #                   $(CONTRACTDIR)/3/omx-plugins/plugins/<stem>.json and its MANIFEST.json (run by install-devel)
 #   make contract-dir  the installed tree carries one descriptor per shipped plugin that has one, byte for byte, and
@@ -59,7 +64,7 @@
 #   make test-role  a test plugin (`"role": "test"`) is linked into the archive and installed by no
 #                   target: tools/test-role-check.sh over a staged install, with its --self-test
 #                   (part of `make test`)
-VERSION := 0.13.0
+VERSION := 0.14.0
 PLUGINS := $(sort $(dir $(wildcard plugins/*/Makefile)))
 # A test plugin is built, tested and linked into libomxplugins.a like the others, and installed by no
 # target: its declaration says `"role": "test"` (tools/test-plugins.mjs).
@@ -69,6 +74,13 @@ PREFIX     ?= /usr
 INCLUDEDIR ?= $(PREFIX)/include
 LIBDIR     ?= $(PREFIX)/lib
 DATADIR    ?= $(PREFIX)/share
+# the path every plugin's own Makefile installs its .clap to (the CLAP specification's, whatever LIBDIR is)
+CLAPDIR    ?= $(PREFIX)/lib/clap
+# plugin-hostd's read-only layer of package pins (plugin-hostd issue #42): our own plugins' pins are
+# known at build time, so `make install` writes them here instead of leaving them to be recorded on
+# first use (tools/gen-pins.sh, which needs plugin-qualify >= 0.9.0).
+PINS_DIR   ?= $(DATADIR)/plugin-hostd/pins.d
+PINS_FILE  := omx-plugins.pins
 # Every header a consumer includes: the shared parameter type, the panel description and parameter contract rows, then each shipped plugin's generated
 # parameter header and its instance header (the DSP shell around the omx-dsp kernel). A plugin's
 # headers are the .h files beside its Makefile and in its generated/ directory.
@@ -107,7 +119,7 @@ LIB_FLAGS  := -fPIC -fvisibility=hidden -DOMX_CLAP_STATIC -Iinclude
 # read only by the targets that build the archive, so `make version` and the rest need no omx-dsp
 lib_cflags = $(call dep_check,omxdsp,$(OMXDSP_MIN))$(call dep_check,omx-contract,$(CONTRACT_MIN))$(shell $(PKG_CONFIG) --cflags omxdsp omx-clap-core clap)
 
-.PHONY: presets presets-figures test-role all lib lib-test test test-faces units panel-layout descriptor-view lv2-units format-tables contract-union probe-checks eq-probe-race round-trip hints look manual install install-devel install-contract contract-dir clean version recipe-test completeness selftest private-refs strip-crosscheck meters-abi meter-level dsp-copies meter-ring
+.PHONY: presets presets-figures test-role all lib lib-test test test-faces units panel-layout descriptor-view lv2-units format-tables contract-union probe-checks eq-probe-race round-trip hints look manual install install-pins install-devel install-contract contract-dir clean version recipe-test completeness selftest private-refs strip-crosscheck meters-abi meter-level dsp-copies meter-ring
 all: lib
 	@for p in $(PLUGINS); do $(MAKE) -C $$p all || exit 1; done
 lib: $(LIB) $(LIB_PC)
@@ -180,6 +192,8 @@ completeness:
 selftest:
 	node tools/test/recipe-selftest.mjs
 	tools/qualify-release.sh --self-test
+	tools/gen-pins.sh --self-test
+	tools/pins-check.sh --self-test
 private-refs:
 	tools/private-refs-check.sh
 	tools/private-refs-check.sh --self-test
@@ -215,6 +229,13 @@ strip-crosscheck:
 install:
 	@for p in $(SHIP_PLUGINS); do $(MAKE) -C $$p install || exit 1; done
 	find presets -type f -name '*.json' | while read -r f; do install -D -m644 "$$f" "$(DESTDIR)$(DATADIR)/omx/$$f"; done
+	$(MAKE) -s install-pins
+# every shipped plugin's pin, known at build time: scans the .clap files the step above just installed,
+# so the pins ship beside the binaries they were measured from (tools/gen-pins.sh, which needs
+# plugin-qualify >= 0.9.0; run on its own once the plugins are already installed, e.g. in a package's
+# %check against %{buildroot})
+install-pins:
+	tools/gen-pins.sh "$(DESTDIR)" "$(CLAPDIR)" "$(PINS_DIR)" "$(PINS_FILE)"
 test-role:
 	tools/test-role-check.sh
 	tools/test-role-check.sh --self-test
