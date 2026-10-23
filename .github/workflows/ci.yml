@@ -73,6 +73,7 @@ jobs:
           node tools/gen.mjs --check
           node tools/look.mjs --check
           node tools/gen-presets.mjs --check
+          node tools/modgui-gen.mjs --check
 
       - name: make test, and nothing skipped
         id: handback-test
