@@ -24,6 +24,7 @@
 #                   (tools/test/eq-probe-race-test.mjs; part of `make test` and `make test-faces`)
 #   make hints      no LV2 face lost a port hint: tools/port-hints.mjs against each declaration's `portHints` pin
 #   make look       tools/look.json, the MOD GUI's colours and font, is what tools/look/tokens.css resolves to
+#   make modgui     every plugin's MOD GUI is fresh against tools/modgui-gen.mjs (tools/modgui-gen.mjs --check)
 #   make manual     each declaration's manual follows omx-contract: a travel moved in a copy of the release moves
 #                   the README section's range and default (tools/test/manual-perturb.mjs)
 #   make private-refs  no tracked file (generated ones included) points into a private repository, issue, branch or path
@@ -119,7 +120,7 @@ LIB_FLAGS  := -fPIC -fvisibility=hidden -DOMX_CLAP_STATIC -Iinclude
 # read only by the targets that build the archive, so `make version` and the rest need no omx-dsp
 lib_cflags = $(call dep_check,omxdsp,$(OMXDSP_MIN))$(call dep_check,omx-contract,$(CONTRACT_MIN))$(shell $(PKG_CONFIG) --cflags omxdsp omx-clap-core clap)
 
-.PHONY: presets presets-figures test-role all lib lib-test test test-faces units panel-layout descriptor-view lv2-units format-tables contract-union probe-checks eq-probe-race round-trip hints look manual install install-pins install-devel install-contract contract-dir clean version recipe-test completeness selftest private-refs strip-crosscheck meters-abi meter-level dsp-copies meter-ring
+.PHONY: presets presets-figures test-role all lib lib-test test test-faces units panel-layout descriptor-view lv2-units format-tables contract-union probe-checks eq-probe-race round-trip hints look modgui manual install install-pins install-devel install-contract contract-dir clean version recipe-test completeness selftest private-refs strip-crosscheck meters-abi meter-level dsp-copies meter-ring
 all: lib
 	@for p in $(PLUGINS); do $(MAKE) -C $$p all || exit 1; done
 lib: $(LIB) $(LIB_PC)
@@ -131,6 +132,7 @@ test: lib units panel-layout descriptor-view lv2-units format-tables contract-un
 	@$(MAKE) -s lib-test
 	@$(MAKE) -s hints
 	@$(MAKE) -s look
+	@$(MAKE) -s modgui
 	@$(MAKE) -s manual
 	@$(MAKE) -s presets
 	@$(MAKE) -s presets-figures
@@ -175,6 +177,10 @@ hints:
 	node tools/port-hints.mjs
 look:
 	node tools/look.mjs --check
+# every plugin's MOD GUI (modgui.ttl, its template, stylesheet and rasters) is fresh against
+# tools/modgui-gen.mjs: the declaration's panel block, its ports and tools/look.json
+modgui:
+	node tools/modgui-gen.mjs --check
 manual:
 	node tools/test/manual-perturb.mjs
 # the factory presets: fresh against tools/gen-presets.mjs, every value inside its declared travel
