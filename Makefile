@@ -119,11 +119,11 @@ LIB_FLAGS  := -fPIC -fvisibility=hidden -DOMX_CLAP_STATIC -Iinclude
 # read only by the targets that build the archive, so `make version` and the rest need no omx-dsp
 lib_cflags = $(call dep_check,omxdsp,$(OMXDSP_MIN))$(call dep_check,omx-contract,$(CONTRACT_MIN))$(shell $(PKG_CONFIG) --cflags omxdsp omx-clap-core clap)
 
-.PHONY: presets presets-figures test-role all lib lib-test test test-faces units panel-layout descriptor-view lv2-units format-tables contract-union probe-checks eq-probe-race round-trip hints look manual install install-pins install-devel install-contract contract-dir clean version recipe-test completeness selftest private-refs strip-crosscheck meters-abi meter-level dsp-copies meter-ring
+.PHONY: presets presets-figures test-role all lib lib-test test test-faces units panel-layout descriptor-view lv2-units format-tables contract-union probe-checks eq-probe-race round-trip hints look manual install install-pins install-devel install-contract contract-dir clean version recipe-test completeness selftest private-refs strip-crosscheck meters-abi meter-level dsp-copies meter-ring modgui-import
 all: lib
 	@for p in $(PLUGINS); do $(MAKE) -C $$p all || exit 1; done
 lib: $(LIB) $(LIB_PC)
-test: lib units panel-layout descriptor-view lv2-units format-tables contract-union contract-dir probe-checks eq-probe-race
+test: lib units panel-layout descriptor-view lv2-units format-tables contract-union contract-dir probe-checks eq-probe-race modgui-import
 	@if [ -z "$(PLUGINS)" ]; then echo "no plugins yet"; fi
 	@for p in $(PLUGINS); do $(MAKE) -C $$p test || exit 1; done
 	@$(MAKE) -s round-trip
@@ -165,6 +165,9 @@ probe-checks:
 # the EQ default probe is run whole while other processes build it (make -j): a fake compiler, readers a little apart
 eq-probe-race:
 	node tools/test/eq-probe-race-test.mjs
+# a MOD modgui bundle in, a skin package out, refusing an unreusable licence (tools/modgui-import.mjs)
+modgui-import:
+	node tools/test/modgui-import-test.mjs
 # author, generate both faces, scan them back through plugin-hostd and compare, with its two sabotage arms
 round-trip:
 	tools/round-trip.sh
