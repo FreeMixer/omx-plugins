@@ -30,6 +30,7 @@
 
 #include <clap/clap.h>
 #include <lilv/lilv.h>
+#include <omx-clap-host/omx_clap_raw.h>
 
 #include "omx_eq8_params.h"
 
@@ -506,8 +507,7 @@ static bool ev_push(const clap_output_events_t *l, const clap_event_header_t *e)
 }
 
 typedef struct {
-  const clap_plugin_entry_t *entry;
-  const clap_plugin_factory_t *factory;
+  omx_clap_raw_t raw;
 } ClapFace;
 
 static bool clap_param(const clap_plugin_params_t *pp, const clap_plugin_t *p, const char *name, clap_id *id) {
@@ -526,8 +526,8 @@ static bool clap_param(const clap_plugin_params_t *pp, const clap_plugin_t *p, c
 static bool clap_run(void *face, const Block *plan, size_t nblocks, double sr, const float *key, const float *il,
                      const float *ir, float *ol, float *orr, uint32_t *latency) {
   ClapFace *c = (ClapFace *)face;
-  const clap_plugin_descriptor_t *desc = c->factory->get_plugin_descriptor(c->factory, 0);
-  const clap_plugin_t *p = c->factory->create_plugin(c->factory, &HOST, desc->id);
+  const clap_plugin_descriptor_t *desc = c->raw.factory->get_plugin_descriptor(c->raw.factory, 0);
+  const clap_plugin_t *p = c->raw.factory->create_plugin(c->raw.factory, &HOST, desc->id);
   if (!p || !p->init(p)) return false;
   const clap_plugin_params_t *pp = (const clap_plugin_params_t *)p->get_extension(p, CLAP_EXT_PARAMS);
   const clap_plugin_latency_t *lat = (const clap_plugin_latency_t *)p->get_extension(p, CLAP_EXT_LATENCY);
@@ -575,16 +575,13 @@ static bool clap_run(void *face, const Block *plan, size_t nblocks, double sr, c
 }
 
 static int clap_main(const char *path) {
-  void *lib = dlopen(path, RTLD_NOW | RTLD_LOCAL);
-  if (!lib) return fprintf(stderr, "FAIL dlopen %s: %s\n", path, dlerror()), 1;
-  ClapFace c = {(const clap_plugin_entry_t *)dlsym(lib, "clap_entry"), NULL};
-  if (!c.entry || !c.entry->init(path)) return fprintf(stderr, "FAIL clap_entry %s\n", path), 1;
-  c.factory = (const clap_plugin_factory_t *)c.entry->get_factory(CLAP_PLUGIN_FACTORY_ID);
-  if (!c.factory || c.factory->get_plugin_count(c.factory) != 1) return fprintf(stderr, "FAIL factory\n"), 1;
+  ClapFace c = {0};
+  const char *why = omx_clap_raw_open(&c.raw, path);
+  if (why) return fprintf(stderr, "FAIL entry %s: %s\n", path, why), 1;
+  if (c.raw.factory->get_plugin_count(c.raw.factory) != 1) return fprintf(stderr, "FAIL factory\n"), 1;
   Driver d = {clap_run, &c};
   for (uint32_t i = 0; i < OMX_DECLARED_RATE_COUNT; i++) rate_checks("clap", &d, (double)OMX_DECLARED_RATES[i]);
-  c.entry->deinit();
-  dlclose(lib);
+  omx_clap_raw_close(&c.raw);
   return failures ? 1 : 0;
 }
 
