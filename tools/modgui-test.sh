@@ -5,6 +5,8 @@
 # tools/modgui-test.sh plugins/<stem> — the plugin's MOD GUI carries its declaration, tested on
 # VALUES:
 #   (a) `node tools/modgui-gen.mjs --check` is clean;
+#   (a2) a generated modgui file edited directly (the committed bytes, not their source) makes
+#        `--check` refuse it, on a copy — the real tree is never touched;
 #   (b) every declared parameter is drawn in the template with its symbol, min, max and default;
 #   (c) sord_validate passes the bundle against the LV2 specs and tools/modgui-terms.ttl (skipped
 #       when sord_validate is not installed);
@@ -32,6 +34,23 @@ if node "$ROOT/tools/modgui-gen.mjs" --check "$PDIR" >"$TMP/check.out" 2>&1; the
   pass "modgui-gen --check $STEM"
 else
   fail "modgui-gen --check $STEM: $(head -1 "$TMP/check.out")"
+fi
+
+# (a2) sabotage: a byte appended to a committed generated file, on a copy — `--check` must see the
+# stale bytes and go red; the copy is discarded (TMP's trap) rather than the real file edited and undone.
+mkdir -p "$TMP/sab" && cp -R "$PDIR" "$TMP/sab/$STEM"
+SFILE="$TMP/sab/$STEM/generated/$STEM.lv2/modgui/icon-$STEM.html"
+if [ -f "$SFILE" ]; then
+  printf '<!-- sabotage -->\n' >>"$SFILE"
+  if node "$ROOT/tools/modgui-gen.mjs" --check "$TMP/sab/$STEM" >"$TMP/sabotage.out" 2>&1; then
+    fail "an edited generated file makes modgui-gen --check fail"
+  elif grep -q "STALE" "$TMP/sabotage.out"; then
+    pass "an edited generated file makes modgui-gen --check fail"
+  else
+    fail "an edited generated file makes modgui-gen --check fail (unexpected: $(head -1 "$TMP/sabotage.out"))"
+  fi
+else
+  fail "generated modgui template exists to sabotage ($SFILE)"
 fi
 
 # (b) every declared parameter, with its numbers, in the template. The declared rows come from the
