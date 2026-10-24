@@ -225,6 +225,10 @@ tools/pins-check.sh %{buildroot}%{_datadir}/plugin-hostd/pins.d/omx-plugins.pins
   ceiling; it co-owns the pins.d directory.
 - %%check (RPM) and dh_auto_install (DEB) hold the shipped pins to the shipped binaries' own hashes:
   a plugin's binary changed after its pin was written goes red (tools/pins-check.sh).
+- Every plugin declares its resource hints (omx-contract 3.1.0): threads-spawned 0, streams-from-disk
+  false and opens-sockets false, served by the CLAP face as org.openmixer.resource-hints.draft/0 and stated
+  by the LV2 face as omxres: properties, both from the one declaration. The footprints and the activate
+  time stay undeclared until a measurement backs them. Builds against omx-contract >= 3.1.0.
 
 * Wed Oct 21 2026 Pau Aliagas <linuxnow@gmail.com> - 0.13.0-1
 - The descriptors install under contract.d/3, in omx-contract 3.0.0's words:
