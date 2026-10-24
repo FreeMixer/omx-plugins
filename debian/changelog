@@ -50,6 +50,11 @@ omx-plugins (0.14.0) unstable; urgency=medium
     stated by the LV2 face as omxres: properties, both from the one
     declaration. The footprints and the activate time stay undeclared until
     a measurement backs them. Builds against omx-contract >= 3.1.0.
+  * The Zynthian tarball is repacked from the trixie arm64 DEBs, for ZynthianOS
+    Vangelis (Debian trixie); Oram (bookworm) gets no upstream updates. The
+    bundle check refuses a glibc symbol above trixie's 2.41 and a library a
+    bare trixie lacks (tools/zynthian-bundle.sh, FreeMixer/omx-plugins issue
+    #225).
 
  -- Pau Aliagas <linuxnow@gmail.com>  Thu, 22 Oct 2026 08:00:00 +0000
 
