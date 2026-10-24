@@ -60,6 +60,7 @@ typedef struct {
   _Atomic uint32_t latency;        /* the frames the host was told of at the last activation */
   _Atomic int restart_asked;       /* a restart asked for since, for a latency the values moved */
   const clap_host_latency_t *host_latency; /* the host's clap.latency, when it offers one */
+  const clap_host_params_t *host_params;   /* the host's clap.params, when it offers one */
   int active, processing;
   const clap_host_track_info_t *track_info; /* the host's clap.track-info, when it offers one */
   unsigned char touched[G_PARAMS];          /* set by the host or a state: a placement default leaves it */
@@ -132,6 +133,8 @@ static bool g_init(const clap_plugin_t *p) {
     g->track_info = (const clap_host_track_info_t *)g->host->get_extension(g->host, CLAP_EXT_TRACK_INFO);
   if (g->host && g->host->get_extension)
     g->host_latency = (const clap_host_latency_t *)g->host->get_extension(g->host, CLAP_EXT_LATENCY);
+  if (g->host && g->host->get_extension)
+    g->host_params = (const clap_host_params_t *)g->host->get_extension(g->host, CLAP_EXT_PARAMS);
   g_place(g, g_placement(g));
   g_publish(g);
   return true;
@@ -334,6 +337,8 @@ static bool g_state_load(const clap_plugin_t *p, const clap_istream_t *s) {
     }
   }
   g_publish(g);
+  /* The values a state set are new to the host: it reads them again (clap.params rescan). */
+  if (g->host_params && g->host_params->rescan) g->host_params->rescan(g->host, CLAP_PARAM_RESCAN_VALUES);
   return true;
 }
 
