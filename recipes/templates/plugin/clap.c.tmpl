@@ -443,6 +443,8 @@ static bool g_preset_from_location(const clap_plugin_t *p, uint32_t kind, const 
     return false;
   }
   g_publish(g);
+  /* as after a state load: the values are new to the host, it reads them again */
+  if (g->host_params && g->host_params->rescan) g->host_params->rescan(g->host, CLAP_PARAM_RESCAN_VALUES);
   if (h && h->loaded) h->loaded(g->host, kind, location, load_key);
   return true;
 }

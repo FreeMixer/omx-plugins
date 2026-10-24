@@ -28,8 +28,9 @@ Every CLAP face exports, beside its plugin factory:
 - `clap.preset-load` (and `clap.preset-load.draft/2`): `from_location` of kind file reads the
   file and applies each of its `params` as `clap.state`'s load does: a known symbol's value
   clamped to the parameter's declared range, an unknown symbol ignored, a parameter the file does
-  not name left as it was. It then tells the host's `clap.preset-load` (`loaded`, or
-  `on_error` for a file it cannot read). It refuses while processing, as the state load does.
+  not name left as it was. It then asks the host to read the values again (`clap.params`
+  rescan) and tells the host's `clap.preset-load` (`loaded`, or `on_error` for a file it cannot
+  read). It refuses while processing, as the state load does.
 
 The JSON reader is `include/omx_preset_file.h`, shared by every face.
 

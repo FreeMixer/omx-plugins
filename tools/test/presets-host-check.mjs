@@ -10,7 +10,8 @@
  *     type json, the plugin's soundpack); crawled (from the tree's presets/), its provider lists
  *     exactly the plugin's presets, each by its name and the plugin id; each, loaded through
  *     clap.preset-load into a fresh instance and read back through clap.params, gives every value
- *     of the file exactly (as the plugin's float holds it), and the host hears `loaded` once;
+ *     of the file exactly (as the plugin's float holds it), and the host hears `loaded` once and
+ *     is asked once to rescan the values;
  *   - LV2: lilv lists the bundle's presets, as many as the files, each with its label and exactly
  *     the file's port values.
  *
@@ -28,6 +29,7 @@ import { PRESET_DIR, ROOT, plugins, presetUri } from '../preset-lib.mjs';
 
 const INSTALLED = '/usr/share/omx/presets';
 const FACTORY = 1; // CLAP_PRESET_DISCOVERY_IS_FACTORY_CONTENT
+const RESCAN_VALUES = 1; // CLAP_PARAM_RESCAN_VALUES
 
 const args = process.argv.slice(2).filter((a) => a !== '--self-test');
 if (args.length !== 2) {
@@ -76,8 +78,11 @@ function clapProblems(tree) {
   }
   const values = rows(out, 'value');
   const loaded = rows(out, 'loaded').map((r) => r[0]);
+  const rescans = rows(out, 'rescan');
   for (const { file, preset } of want) {
     if (loaded.filter((f) => f === file).length !== 1) bad.push(`clap: the host heard ${file} loaded ${loaded.filter((f) => f === file).length} times`);
+    const mine = rescans.filter((r) => r[0] === file);
+    if (mine.length !== 1 || Number(mine[0][1]) !== RESCAN_VALUES) bad.push(`clap: loading ${file}, the host was asked to rescan ${JSON.stringify(mine.map((r) => r[1]))}, want once for the values`);
     for (const { symbol, value } of preset.params) {
       const id = plugin.params.findIndex((p) => p.symbol === symbol);
       const got = values.find((v) => v[0] === file && Number(v[1]) === id)?.[2];
