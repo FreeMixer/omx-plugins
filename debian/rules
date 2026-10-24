@@ -13,6 +13,8 @@ override_dh_auto_install:
 	dh_auto_install -- PREFIX=/usr LIBDIR=/usr/lib
 	# libomxplugins.a and omxplugins.pc are the -dev package's, in the multiarch directory
 	$(MAKE) install-devel DESTDIR=$(CURDIR)/debian/tmp PREFIX=/usr LIBDIR=/usr/lib/$(DEB_HOST_MULTIARCH)
+	# the test instruments are omx-plugins-test's, outside every CLAP search path
+	$(MAKE) install-test DESTDIR=$(CURDIR)/debian/tmp PREFIX=/usr TESTCLAPDIR=/usr/libexec/omx-plugins/test
 
 # the shipped .clap is the stripped one, so its pin is measured again after dh_strip: a pin taken at
 # dh_auto_install names bytes the package never ships. The binaries sit in omx-plugins-clap's tree,
