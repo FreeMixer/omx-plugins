@@ -2,8 +2,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # Copyright (C) 2026 Pau Aliagas <linuxnow@gmail.com>
 #
-# Pack the plugins for a Zynthian (Raspberry Pi OS / Debian bookworm, arm64) as one tarball, from the
-# bookworm DEBs the release workflow has just built. Nothing is rebuilt: the tarball carries exactly the
+# Pack the plugins for a Zynthian (ZynthianOS Vangelis, Debian trixie, arm64) as one tarball, from the
+# trixie DEBs the release workflow has just built. Nothing is rebuilt: the tarball carries exactly the
 # files of omx-plugins-lv2 and omx-plugins-clap, laid out for Zynthian's plugin directories.
 #
 #   tools/zynthian-bundle.sh DEB_DIR ARCH OUT_DIR
@@ -14,7 +14,7 @@
 # and its .sha256.
 #
 # Refused, before anything is packed: a missing DEB, an ELF of another architecture, a glibc symbol
-# version above bookworm's 2.36, a NEEDED library a bare bookworm does not have, a CLAP without
+# version above trixie's 2.41, a NEEDED library a bare trixie does not have, a CLAP without
 # clap_entry, and an LV2 plugin lilv cannot find, describe, instantiate and run (lv2bench). The probes
 # need make, file, binutils and lilv-utils.
 set -euo pipefail
@@ -29,8 +29,8 @@ case "$arch" in
   *) die "unknown architecture '$arch' (arm64 or amd64)" ;;
 esac
 
-# bookworm's libc6 is 2.36: Zynthian's floor
-CEIL_GLIBC=2.36
+# trixie's libc6 is 2.41: Zynthian Vangelis's floor
+CEIL_GLIBC=2.41
 NEEDED_OK=" libc.so.6 libm.so.6 libdl.so.2 libpthread.so.0 libgcc_s.so.1 libstdc++.so.6 ld-linux-aarch64.so.1 ld-linux-x86-64.so.2 "
 
 root=$(cd "$(dirname "$0")/.." && pwd)
@@ -74,11 +74,11 @@ for f in "${elfs[@]}"; do
   [ -n "$vers" ] || { echo "REFUSED $rel: objdump -T shows no GLIBC_ version" >&2; bad=1; continue; }
   for v in $vers; do
     num=${v#GLIBC_}
-    ver_gt "$num" "$CEIL_GLIBC" && { echo "REFUSED $rel: needs $v, above bookworm's GLIBC_$CEIL_GLIBC" >&2; bad=1; }
+    ver_gt "$num" "$CEIL_GLIBC" && { echo "REFUSED $rel: needs $v, above trixie's GLIBC_$CEIL_GLIBC" >&2; bad=1; }
     ver_gt "$num" "$max" && max=$num
   done
   for lib in $(objdump -p "$f" | awk '$1 == "NEEDED" { print $2 }'); do
-    case "$NEEDED_OK" in *" $lib "*) ;; *) echo "REFUSED $rel: NEEDED $lib is not on a bare bookworm" >&2; bad=1 ;; esac
+    case "$NEEDED_OK" in *" $lib "*) ;; *) echo "REFUSED $rel: NEEDED $lib is not on a bare trixie" >&2; bad=1 ;; esac
   done
   case "$f" in
     *.clap) objdump -T "$f" | grep -qw clap_entry || { echo "REFUSED $rel: no clap_entry symbol" >&2; bad=1; } ;;
@@ -107,9 +107,9 @@ done
 claps=$(find "$stage/clap" -name '*.clap' | wc -l)
 
 cat >"$stage/README" <<EOF
-omx-plugins $version for Zynthian ($arch, Debian bookworm / Raspberry Pi OS, glibc >= 2.36)
+omx-plugins $version for Zynthian ($arch, Debian trixie / ZynthianOS Vangelis, glibc >= 2.41)
 
-The files of the omx-plugins-lv2 and omx-plugins-clap $version packages for bookworm, as a tarball.
+The files of the omx-plugins-lv2 and omx-plugins-clap $version packages for trixie, as a tarball.
 Highest glibc symbol: GLIBC_$max. $lv2s LV2 bundles, $claps CLAP plugins.
 
 lv2/   copy each .lv2 directory into /zynthian/zynthian-plugins/lv2 (Zynthian's own LV2 directory;
