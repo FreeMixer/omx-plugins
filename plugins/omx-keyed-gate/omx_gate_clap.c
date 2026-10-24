@@ -315,30 +315,45 @@ static bool g_state_save(const clap_plugin_t *p, const clap_ostream_t *s) {
   return true;
 }
 
+/* A state the face writes holds at most G_PARAMS lines of a symbol and a %.9g value; this bound leaves
+ * room for lines a later version adds, and refuses anything far larger before it is parsed. */
+#define G_STATE_MAX (G_PARAMS * 256u)
+
 static bool g_state_load(const clap_plugin_t *p, const clap_istream_t *s) {
   G *g = (G *)p->plugin_data;
   if (g->processing) return false; /* never race the audio thread's values */
-  char buf[4096];
+  char *buf = malloc(G_STATE_MAX + 1u);
+  if (!buf) return false;
   size_t len = 0;
   for (;;) {
-    if (len == sizeof buf - 1) return false;
-    int64_t r = s->read(s, buf + len, sizeof buf - 1 - len);
-    if (r < 0) return false;
+    if (len == G_STATE_MAX) return free(buf), false;
+    int64_t r = s->read(s, buf + len, G_STATE_MAX - len);
+    if (r < 0) return free(buf), false;
     if (r == 0) break;
     len += (size_t)r;
   }
   buf[len] = 0;
+  /* parsed first, applied only when at least one line names a parameter: an empty or foreign state
+   * is refused and leaves the instance as it was */
+  float v[G_PARAMS];
+  unsigned char set[G_PARAMS] = {0};
+  bool any = false;
   for (char *line = strtok(buf, "\n"); line; line = strtok(NULL, "\n")) {
     char *eq = strchr(line, '=');
     if (!eq) continue;
     *eq = 0;
     for (uint32_t i = 0; i < G_PARAMS; ++i) {
       if (strcmp(line, g_state_symbol(i)) == 0) {
-        g->values[i] = g_clamp(i, strtod(eq + 1, NULL));
-        g->touched[i] = 1;
+        v[i] = g_clamp(i, strtod(eq + 1, NULL));
+        set[i] = 1;
+        any = true;
       }
     }
   }
+  free(buf);
+  if (!any) return false;
+  for (uint32_t i = 0; i < G_PARAMS; ++i)
+    if (set[i]) g->values[i] = v[i], g->touched[i] = 1;
   g_publish(g);
   /* The values a state set are new to the host: it reads them again (clap.params rescan). */
   if (g->host_params && g->host_params->rescan) g->host_params->rescan(g->host, CLAP_PARAM_RESCAN_VALUES);
