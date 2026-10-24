@@ -38,6 +38,19 @@ static const omx_plugin_param OMX_ROTARY_PARAMS[OMX_ROTARY_PARAM_COUNT] = {
   { "speed", "Speed", "", 0.0f, 2.0f, 1.0f, OMX_PLUGIN_PARAM_INTEGER },
 };
 
+/* Each parameter's CLAP module (clap_param_info.module): its descriptor control's group as a module path, "" for a
+ * plugin with no descriptor. */
+static const char *const OMX_ROTARY_PARAM_MODULES[OMX_ROTARY_PARAM_COUNT] = {
+  "Rotary",
+  "Rotary",
+  "Rotary",
+  "Rotary",
+  "Rotary",
+  "Rotary",
+  "Rotary",
+  "Rotary",
+};
+
 /* One macro per declared bound: what a C face reads where a constant is needed. */
 #define OMX_ROTARY_PARAM_HORN_SLOW_HZ_MIN 0.1f
 #define OMX_ROTARY_PARAM_HORN_SLOW_HZ_MAX 2.0f
@@ -68,7 +81,7 @@ static const omx_plugin_param OMX_ROTARY_PARAMS[OMX_ROTARY_PARAM_COUNT] = {
 #define OMX_ROTARY_NAME "omx rotary"
 #define OMX_ROTARY_VENDOR "openmixer"
 #define OMX_ROTARY_URL "https://github.com/FreeMixer/omx-plugins"
-#define OMX_ROTARY_VERSION "0.11.0"
+#define OMX_ROTARY_VERSION "0.13.0"
 #define OMX_ROTARY_DESCRIPTION "The console's rotary speaker: a drum rotor on the low band and a horn rotor on the high band, with stop, slow and fast speeds, mixed with the dry signal."
 #define OMX_ROTARY_CLAP_ID "org.openmixer.rotary"
 #define OMX_ROTARY_CLAP_FEATURES "audio-effect", "stereo"

@@ -6,18 +6,7 @@
     "delay"
   ],
   "url": "https://github.com/FreeMixer/omx-plugins",
-  "description": "The OpenMixer console's stereo delay: one time, feedback through a tone filter, ping-pong and a wet/dry mix.",
   "summary": "Stereo delay up to 2 s: feedback through a tone filter that darkens each repeat, ping-pong, wet/dry mix. Zero latency, real-time safe, 44.1 to 192 kHz.",
-  "clap": {
-    "features": [
-      "audio-effect",
-      "delay",
-      "stereo"
-    ]
-  },
-  "lv2": {
-    "class": "lv2:DelayPlugin"
-  },
   "binding": "instance",
   "portHints": {
     "fxDelayTime": {

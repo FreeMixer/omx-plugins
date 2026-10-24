@@ -10,6 +10,12 @@
 #                   block is dbfs, dbu, ratio, lufs (tools/test/param-units-check.mjs)
 #   make lv2-units  every unit a declaration uses has an LV2 unit, and every port states the unit it declares
 #                   (tools/test/lv2-units-check.mjs, with its sabotage arms; part of `make test`)
+#   make format-tables  the generators read plugin-hostd's installed format tables backwards (tools/format-tables.mjs):
+#                   the units, the 57 lv2:designation lines and the ratio unit, the CLAP modules from the descriptors'
+#                   groups (tools/test/format-tables-test.mjs, with its sabotage arms; part of `make test`)
+#   make round-trip  every described plugin generated, both faces built and scanned back by plugin-hostd-probe describe,
+#                   compared with its authored descriptor word by word: equal, lost <format> <word> or differs
+#                   (tools/round-trip.{sh,mjs}, with its two sabotage arms; part of `make test`)
 #   make contract-union  parallel make targets render omx-contract's union into private directories and read it whole
 #                   (tools/test/contract-union-race-test.mjs; part of `make test` and `make test-faces`)
 #   make probe-checks  clap-params-check, panel-check, clap-ext-check and port-groups-check each fail on a built face that is wrong,
@@ -38,7 +44,16 @@
 #                   amp-input bell (+4.00 dB at 2.5 kHz), the amp-tube harmonics (H2/H3 on the closed form), the dimension's
 #                   L - R null; each sabotaged by --self-test (tools/test/preset-figures.mjs; part of `make test` and `make test-faces`)
 #   make install    DESTDIR, PREFIX, LIBDIR, CLAPDIR, DATADIR: $(CLAPDIR)/<name>.clap, $(LIBDIR)/lv2/<name>.lv2/ and the
-#                   factory presets in $(DATADIR)/omx/presets/<plugin id>/<preset id>.json
+#                   factory presets in $(DATADIR)/omx/presets/<plugin id>/<preset id>.json, then install-pins
+#   make install-pins  PINS_DIR, PINS_FILE: plugin-qualify --pins over the just-installed .clap files, written to
+#                   $(DESTDIR)$(PINS_DIR)/$(PINS_FILE) with the buildroot rewritten to the final $(CLAPDIR)
+#                   (tools/gen-pins.sh, with its --self-test; needs plugin-qualify >= 0.9.0); tools/pins-check.sh
+#                   checks the shipped pins against the shipped binaries' hashes (with its --self-test, part of
+#                   `make selftest`), run by a package's own build (%check / dh_auto_install), not by this Makefile
+#   make install-contract  DESTDIR, CONTRACTDIR: each shipped plugin's descriptor into omx-contract's contract directory,
+#                   $(CONTRACTDIR)/3/omx-plugins/plugins/<stem>.json and its MANIFEST.json (run by install-devel)
+#   make contract-dir  the installed tree carries one descriptor per shipped plugin that has one, byte for byte, and
+#                   omx-contract's reader reads it (tools/test/contract-dir-check.sh, with its sabotage arms; part of `make test`)
 #   make lib        build/lib/libomxplugins.a: every shipped plugin's CLAP face and the table of their
 #                   entries (include/omx_clap_static.h), for a host that runs them in-process
 #   make lib-test   a C host linked against the archive opens every face through the table, then
@@ -55,7 +70,7 @@
 #   make package-lists  every plugin the build makes is installed and listed by exactly the package it belongs
 #                   to, in the RPM spec and the Debian .install files: tools/package-lists-check.sh over a staged
 #                   install, with its --self-test (part of `make test`)
-VERSION := 0.11.0
+VERSION := 0.14.0
 PLUGINS := $(sort $(dir $(wildcard plugins/*/Makefile)))
 # A test plugin is built, tested and linked into libomxplugins.a like the others; `make install` never installs
 # it, and `make install-test` puts it outside the CLAP path: its declaration says `"role": "test"`
@@ -67,6 +82,13 @@ INCLUDEDIR ?= $(PREFIX)/include
 LIBDIR     ?= $(PREFIX)/lib
 TESTCLAPDIR ?= $(PREFIX)/libexec/omx-plugins/test
 DATADIR    ?= $(PREFIX)/share
+# the path every plugin's own Makefile installs its .clap to (the CLAP specification's, whatever LIBDIR is)
+CLAPDIR    ?= $(PREFIX)/lib/clap
+# plugin-hostd's read-only layer of package pins (plugin-hostd issue #42): our own plugins' pins are
+# known at build time, so `make install` writes them here instead of leaving them to be recorded on
+# first use (tools/gen-pins.sh, which needs plugin-qualify >= 0.9.0).
+PINS_DIR   ?= $(DATADIR)/plugin-hostd/pins.d
+PINS_FILE  := omx-plugins.pins
 # Every header a consumer includes: the shared parameter type, the panel description and parameter contract rows, then each shipped plugin's generated
 # parameter header and its instance header (the DSP shell around the omx-dsp kernel). A plugin's
 # headers are the .h files beside its Makefile and in its generated/ directory.
@@ -105,14 +127,14 @@ LIB_FLAGS  := -fPIC -fvisibility=hidden -DOMX_CLAP_STATIC -Iinclude
 # read only by the targets that build the archive, so `make version` and the rest need no omx-dsp
 lib_cflags = $(call dep_check,omxdsp,$(OMXDSP_MIN))$(call dep_check,omx-contract,$(CONTRACT_MIN))$(shell $(PKG_CONFIG) --cflags omxdsp omx-clap-core clap)
 
-.PHONY: presets presets-figures test-role install-test package-lists all lib lib-test test test-faces units panel-layout descriptor-view lv2-units contract-union probe-checks eq-probe-race face-descriptor hints look manual install install-devel clean version recipe-test completeness selftest private-refs strip-crosscheck meters-abi meter-level dsp-copies meter-ring
+.PHONY: presets presets-figures test-role all lib lib-test test test-faces units panel-layout descriptor-view lv2-units format-tables contract-union probe-checks eq-probe-race round-trip hints look manual install install-pins install-test package-lists install-devel install-contract contract-dir clean version recipe-test completeness selftest private-refs strip-crosscheck meters-abi meter-level dsp-copies meter-ring
 all: lib
 	@for p in $(PLUGINS); do $(MAKE) -C $$p all || exit 1; done
 lib: $(LIB) $(LIB_PC)
-test: lib units panel-layout descriptor-view lv2-units contract-union probe-checks eq-probe-race
+test: lib units panel-layout descriptor-view lv2-units format-tables contract-union contract-dir probe-checks eq-probe-race
 	@if [ -z "$(PLUGINS)" ]; then echo "no plugins yet"; fi
 	@for p in $(PLUGINS); do $(MAKE) -C $$p test || exit 1; done
-	@$(MAKE) -s face-descriptor
+	@$(MAKE) -s round-trip
 	@$(MAKE) -s presets-figures
 	@$(MAKE) -s lib-test
 	@$(MAKE) -s hints
@@ -124,10 +146,9 @@ test: lib units panel-layout descriptor-view lv2-units contract-union probe-chec
 	@$(MAKE) -s meter-level
 	@$(MAKE) -s test-role
 	@$(MAKE) -s package-lists
-# what runs with no omx-contract command (debian/rules: no .deb ships the command yet): the built faces against their
-# committed descriptors, the static table and the ABI checks; nothing here reads the contract directory
+# what runs with no omx-contract command (debian/rules: no .deb ships the command yet): the built faces, the static
+# table and the ABI checks; nothing here reads the contract directory (the round trip generates, so it runs in make test)
 test-faces: all lib contract-union eq-probe-race
-	@$(MAKE) -s face-descriptor
 	@$(MAKE) -s lib-test
 	@$(MAKE) -s meters-abi
 	@$(MAKE) -s meter-level
@@ -142,6 +163,9 @@ descriptor-view:
 # every declared unit is stated by its port in the generated TTL, with its sabotage arms
 lv2-units:
 	node tools/test/lv2-units-check.mjs --self-test
+# the generators read plugin-hostd's format tables backwards, held by value, with its sabotage arms
+format-tables:
+	node tools/test/format-tables-test.mjs
 # the union render is read whole while other processes render it (make -j): a fake CLI, readers a little apart
 contract-union:
 	node tools/test/contract-union-race-test.mjs
@@ -151,10 +175,10 @@ probe-checks:
 # the EQ default probe is run whole while other processes build it (make -j): a fake compiler, readers a little apart
 eq-probe-race:
 	node tools/test/eq-probe-race-test.mjs
-# the described plugins' built faces, scanned, against their authored descriptors; after the plugins build
-face-descriptor:
-	tools/face-descriptor-check.sh
-	tools/face-descriptor-check.sh --self-test
+# author, generate both faces, scan them back through plugin-hostd and compare, with its two sabotage arms
+round-trip:
+	tools/round-trip.sh
+	tools/round-trip.sh --self-test
 hints:
 	node tools/gen.mjs --check
 	node tools/gen.mjs
@@ -178,6 +202,8 @@ completeness:
 selftest:
 	node tools/test/recipe-selftest.mjs
 	tools/qualify-release.sh --self-test
+	tools/gen-pins.sh --self-test
+	tools/pins-check.sh --self-test
 private-refs:
 	tools/private-refs-check.sh
 	tools/private-refs-check.sh --self-test
@@ -213,6 +239,13 @@ strip-crosscheck:
 install:
 	@for p in $(SHIP_PLUGINS); do $(MAKE) -C $$p install || exit 1; done
 	find presets -type f -name '*.json' | while read -r f; do install -D -m644 "$$f" "$(DESTDIR)$(DATADIR)/omx/$$f"; done
+	$(MAKE) -s install-pins
+# every shipped plugin's pin, known at build time: scans the .clap files the step above just installed,
+# so the pins ship beside the binaries they were measured from (tools/gen-pins.sh, which needs
+# plugin-qualify >= 0.9.0; run on its own once the plugins are already installed, e.g. in a package's
+# %check against %{buildroot})
+install-pins:
+	tools/gen-pins.sh "$(DESTDIR)" "$(CLAPDIR)" "$(PINS_DIR)" "$(PINS_FILE)"
 install-test:
 	@for p in $(TEST_PLUGINS); do $(MAKE) -C $$p all || exit 1; \
 	  n=$$(basename $$p); install -Dm755 $$p/build/$$n.clap $(DESTDIR)$(TESTCLAPDIR)/$$n.clap || exit 1; done
@@ -222,7 +255,24 @@ test-role:
 package-lists:
 	tools/package-lists-check.sh
 	tools/package-lists-check.sh --self-test
-install-devel: lib
+# Each shipped plugin's descriptor, plugins/<stem>/<stem>.descriptor.json, installed byte for byte into omx-contract's
+# contract directory as $(CONTRACTDIR)/<schema major>/omx-plugins/plugins/<stem>.json, with a MANIFEST.json naming this
+# version (omx-contract docs/contract-dir.md). The directory is omx-contract-devel's, under the same data directory
+# (`pkg-config --variable=contractdir omx-contract`); the install script too, or OMX_CONTRACT_DIR's, an omx-contract
+# checkout, when no package is installed.
+CONTRACTDIR ?= $(DATADIR)/omx-contract/contract.d
+CONTRACT_SCHEMA_MAJOR := 3
+INSTALL_CONTRACT_DIR = $(firstword $(wildcard $(shell $(PKG_CONFIG) --variable=datadir omx-contract 2>/dev/null)/install-contract-dir.sh) $(wildcard $(OMX_CONTRACT_DIR)/tools/install-contract-dir.sh))
+DESCRIPTORS = $(foreach p,$(SHIP_PLUGINS),$(wildcard $(p)$(notdir $(p:/=)).descriptor.json))
+install-contract:
+	@test -n "$(INSTALL_CONTRACT_DIR)" || { echo "install-contract: no install-contract-dir.sh: install omx-contract-devel, or set OMX_CONTRACT_DIR to a checkout" >&2; exit 1; }
+	@stage=$$(mktemp -d) && trap 'rm -rf "$$stage"' EXIT && mkdir -p "$$stage/plugins" && \
+	  for f in $(DESCRIPTORS); do cp "$$f" "$$stage/plugins/$$(basename "$$f" .descriptor.json).json" || exit 1; done && \
+	  sh $(INSTALL_CONTRACT_DIR) omx-plugins $(VERSION) $(CONTRACT_SCHEMA_MAJOR) "$$stage" $(DESTDIR)$(CONTRACTDIR)
+contract-dir:
+	tools/test/contract-dir-check.sh
+	tools/test/contract-dir-check.sh --self-test
+install-devel: lib install-contract
 	install -d $(DESTDIR)$(INCLUDEDIR)/omx-plugins $(DESTDIR)$(LIBDIR)/pkgconfig
 	install -m644 $(HEADERS) $(DESTDIR)$(INCLUDEDIR)/omx-plugins/
 	install -m644 $(LIB) $(DESTDIR)$(LIBDIR)/

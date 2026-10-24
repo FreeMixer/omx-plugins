@@ -28,8 +28,7 @@ package that owns each definition, from the directory's manifests.
 
 A Debian build host has no omx-contract command yet (no .deb ships it yet). There
 `debian/rules` prints one line, `NO-CONTRACT-COMMAND omx-plugins: no omx-contract command on this build host
-...: the generator checks ... are skipped; make test-faces runs`, and runs `make test-faces`: the built faces
-against their committed descriptors (`make face-descriptor`), the static table, the meters ABI and the test
+...: the generator checks ... are skipped; make test-faces runs`, and runs `make test-faces`: the built faces, the static table, the meters ABI and the test
 roles. Where the command is present, `make test` runs whole.
 
 The channel is FreeMixer's package repository: `https://freemixer.github.io/rpm/freemixer.repo` for
@@ -49,7 +48,8 @@ and what `pkg-config` finds installed, when an installed release is below it.
 make                      # every plugin: plugins/<name>/build/
 make test                 # every plugin's tests, then the static table's (make lib-test)
 make install DESTDIR=/tmp/stage LIBDIR=/usr/lib64   # <CLAPDIR>/*.clap (default /usr/lib/clap, any LIBDIR), <LIBDIR>/lv2/*.lv2/
-make install-devel DESTDIR=/tmp/stage LIBDIR=/usr/lib64   # headers, <LIBDIR>/libomxplugins.a, <LIBDIR>/pkgconfig/omxplugins.pc
+make install-devel DESTDIR=/tmp/stage LIBDIR=/usr/lib64   # headers, <LIBDIR>/libomxplugins.a, <LIBDIR>/pkgconfig/omxplugins.pc, and each plugin's descriptor
+                                                         # in <DATADIR>/omx-contract/contract.d/3/omx-plugins/ (make install-contract, CONTRACTDIR=)
 make version              # the release version
 ```
 
@@ -69,11 +69,12 @@ omx-contract's example descriptors and our own plugins) and `make descriptor-vie
 (`tools/test/descriptor-view-test.mjs`: each described plugin's descriptor fresh and in omx-contract's
 words, and the declaration its view).
 
-After the plugins, `make face-descriptor` scans every described plugin's built CLAP and LV2 faces as a
-host scans anyone's plugin (`tools/face-scan.c`) and holds what they state to the plugin's authored
-descriptor (`tools/face-descriptor-check.mjs`); a difference is `contract.descriptor.face-differs`, and
-its self-test breaks a copy of a descriptor and of a built `.ttl` and wants both red
-([docs/declaration-as-descriptor.md](docs/declaration-as-descriptor.md)).
+After the plugins, `make round-trip` runs the round trip: for every plugin with a descriptor it generates
+(`node tools/gen.mjs`), builds both faces, scans each built face back with `plugin-hostd-probe describe` (plugin-hostd
+>= 0.7.0 on `PATH`, its format tables installed) and compares the scanned descriptor with the authored one word by
+word (`tools/round-trip.{sh,mjs}`): `equal`, `lost <format> <word>` or `differs`. It fails on a `differs`, a bag
+that is not equal or a loss it does not name, and its self-test breaks a copy of a descriptor and of a built `.ttl`
+and wants both red ([docs/declaration-as-descriptor.md](docs/declaration-as-descriptor.md)).
 
 `make test` for a plugin runs, in order:
 

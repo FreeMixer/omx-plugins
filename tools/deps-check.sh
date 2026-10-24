@@ -5,7 +5,7 @@
 # deps-check.sh — the releases this repository builds against are declared only in the packaging, as a
 # FLOOR and nothing above it (operator ruling 2026-10-15: library dependencies carry no ceiling):
 # packaging/omx-plugins.spec's BuildRequires (one `>=` line per dependency, no `<`), the -devel package's
-# Requires on omx-dsp, and debian/control's Build-Depends and the -dev package's Depends, written the same.
+# Requires on omx-dsp and omx-contract, and debian/control's Build-Depends and the -dev package's Depends, written the same.
 # A ceiling anywhere is a failure.
 #
 #   tools/deps-check.sh              the check
@@ -18,7 +18,7 @@ count() { { grep -oF -- "$1" "$2" || true; } | wc -l; }
 check() {
   local root="$1" fail=0 spec="$1/packaging/omx-plugins.spec" control="$1/debian/control"
   # rpm name, deb name, how many times debian/control must carry the deb floor, does -devel require it
-  for row in "omx-dsp-devel libomxdsp-dev 2 yes" "omx-contract-devel libomx-contract-dev 1 no" "omx-clap-core-devel libomx-clap-core-dev 1 no"; do
+  for row in "omx-dsp-devel libomxdsp-dev 2 yes" "omx-contract-devel libomx-contract-dev 2 yes" "omx-clap-core-devel libomx-clap-core-dev 1 no" "plugin-hostd-devel plugin-hostd-dev 1 no"; do
     read -r rpm deb times devel <<<"$row"
     local floor
     floor="$(sed -n "s/^BuildRequires: $rpm >= \([0-9.]*\)\$/\1/p" "$spec")"
