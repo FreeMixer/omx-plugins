@@ -745,10 +745,21 @@ static inline void omx_wobble_instance_run(OmxWobbleInstance *s, const float *${
     const coreFile = join(ct, CP, 'omx_chainproof_core.h'), core = readFileSync(coreFile, 'utf8');
     expect(/omx_gate_instance_resolve\(&c->gate, bypass \|\| values\[OMX_CHAINPROOF_PARAM_GATE_ON\] < 0\.5f,\s*\/\* key_source \*\/ 0,/.test(core) && core.includes('omx_gate_instance_run(&c->gate, NULL,'),
       'chain: the gate, no key of the chain\'s, runs self-keyed, its key source fixed at self');
+    // a shipped plugin carries factory presets (tools/gen-presets.mjs refuses one without, and make test lists and
+    // loads them through both faces): one declared as a person declares it, then the preset file, presets.ttl and
+    // the bundle's manifest generated
+    const presetsJs = join(ct, 'tools/gen-presets.mjs');
+    writeFileSync(presetsJs, readFileSync(presetsJs, 'utf8').replace('const DEFINITIONS = {\n',
+      `const DEFINITIONS = {\n  'org.openmixer.chainproof': [['gate-first', 'Gate First', { gateOn: 1 }]],\n`));
+    const presetGen = spawnSync('node', ['tools/gen-presets.mjs'], { cwd: ct, encoding: 'utf8' });
+    const manifestGen = spawnSync('node', ['tools/gen.mjs', CP], { cwd: ct, encoding: 'utf8' });
+    expect(presetGen.status === 0 && manifestGen.status === 0 && existsSync(join(ct, 'presets/org.openmixer.chainproof/gate-first.json')) &&
+      readFileSync(join(ct, CP, `generated/${stem}.lv2/manifest.ttl`), 'utf8').includes('#preset-gate-first>'),
+      `chain: its factory preset declared, the preset file and the bundle's pset:Preset are generated${presetGen.status === 0 && manifestGen.status === 0 ? '' : `: ${`${presetGen.stderr}${manifestGen.stderr}`.trim().split('\n')[0]}`}`);
     const make = (...a) => spawnSync('make', ['-C', join(ct, CP), ...a], { encoding: 'utf8' });
     const green = make('test');
     expect(green.status === 0 && /ORACLE-GREEN clap/.test(green.stdout) && /ORACLE-GREEN lv2/.test(green.stdout),
-      `chain: make test is green, both faces the chain of faces bit for bit${green.status === 0 ? '' : `: ${`${green.stdout}${green.stderr}`.split('\n').filter((l) => /^FAIL|rror/.test(l)).slice(0, 3).join(' | ')}`}`);
+      `chain: make test is green, both faces the chain of faces bit for bit${green.status === 0 ? '' : `: ${`${green.stdout}${green.stderr}`.split('\n').filter((l) => /^FAIL|\bError\b|\berror\b|^presets-host-check/.test(l)).slice(0, 3).join(' | ')}`}`);
     const oracle = () => {
       const b = make('build/omx-chainproof.clap', 'build/chainproof-oracle');
       if (b.status !== 0) return `build failed: ${b.stderr.trim().split('\n').at(-1)}`;

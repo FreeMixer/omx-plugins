@@ -9,7 +9,7 @@
  * the DSP is omx-dsp's drive kernel, reached through omx_drive_core.h, the binding both faces
  * share. This file adds no arithmetic on the audio path: drain the events, resolve, run.
  *
- * Extensions: params, latency, audio-ports, state; org.openmixer.declaration/1, panel-description/1
+ * Extensions: params, latency, audio-ports, state, preset-load; org.openmixer.declaration/1, panel-description/1
  * and param-contract/1; clap.remote-controls (the panel's sections as pages of eight) and
  * clap.track-info (a placement's defaults, the contract's per-kind ones, on every parameter the host
  * or a state has not set).
@@ -25,10 +25,12 @@
 #include "clap/ext/audio-ports.h"
 #include "clap/ext/latency.h"
 #include "clap/ext/params.h"
+#include "clap/ext/preset-load.h"
 #include "clap/ext/remote-controls.h"
 #include "clap/ext/state.h"
 #include "clap/ext/track-info.h"
 #include "clap/factory/plugin-factory.h"
+#include "clap/factory/preset-discovery.h"
 #include "clap/plugin.h"
 #include "clap/process.h"
 #include "clap/stream.h"
@@ -37,6 +39,7 @@
 #include "omx_drive_params.h"
 #include "omx_drive_core.h"
 #include <omx-clap-host/omx_clap_ext.h>
+#include "omx_preset_file.h"
 #include <omxdsp/omx_denormal.h> /* omx_denormals_off, per callback */
 
 #define G_DECLARED OMX_DRIVE_PARAM_COUNT
@@ -349,6 +352,41 @@ static bool g_state_load(const clap_plugin_t *p, const clap_istream_t *s) {
 
 static const clap_plugin_state_t G_STATE_EXT = {g_state_save, g_state_load};
 
+/* ---- clap.preset-load: a factory preset file, its params as the state load applies them -------- */
+
+static void g_preset_param(const char *symbol, double value, void *ctx) {
+  G *g = (G *)ctx;
+  for (uint32_t i = 0; i < G_DECLARED; ++i) {
+    if (strcmp(symbol, OMX_DRIVE_PARAMS[i].symbol) == 0) {
+      g->values[i] = g_clamp(i, value);
+      g->touched[i] = 1;
+    }
+  }
+}
+
+static bool g_preset_from_location(const clap_plugin_t *p, uint32_t kind, const char *location, const char *load_key) {
+  G *g = (G *)p->plugin_data;
+  const clap_host_preset_load_t *h = g->host && g->host->get_extension
+      ? (const clap_host_preset_load_t *)g->host->get_extension(g->host, CLAP_EXT_PRESET_LOAD) : NULL;
+  if (!h && g->host && g->host->get_extension)
+    h = (const clap_host_preset_load_t *)g->host->get_extension(g->host, CLAP_EXT_PRESET_LOAD_COMPAT);
+  char *text = kind == CLAP_PRESET_DISCOVERY_LOCATION_FILE && !g->processing ? omx_preset_slurp(location) : NULL;
+  struct omx_preset_head head;
+  bool ok = text && omx_preset_head(text, OMX_DRIVE_CLAP_ID, &head) && omx_preset_params(&head, g_preset_param, g);
+  free(text);
+  if (!ok) {
+    if (h && h->on_error) h->on_error(g->host, kind, location, load_key, 0, "not an org.openmixer.preset/1 file of this plugin");
+    return false;
+  }
+  g_publish(g);
+  /* as after a state load: the values are new to the host, it reads them again */
+  if (g->host_params && g->host_params->rescan) g->host_params->rescan(g->host, CLAP_PARAM_RESCAN_VALUES);
+  if (h && h->loaded) h->loaded(g->host, kind, location, load_key);
+  return true;
+}
+
+static const clap_plugin_preset_load_t G_PRESET_LOAD_EXT = {g_preset_from_location};
+
 /* ---- omx.declaration -------------------------------------------------------------- */
 
 static const char *g_decl_source(const clap_plugin_t *p) {
@@ -464,6 +502,7 @@ static const void *g_get_extension(const clap_plugin_t *p, const char *id) {
   if (strcmp(id, CLAP_EXT_LATENCY) == 0) return &G_LATENCY_EXT;
   if (strcmp(id, CLAP_EXT_AUDIO_PORTS) == 0) return &G_PORTS_EXT;
   if (strcmp(id, CLAP_EXT_STATE) == 0) return &G_STATE_EXT;
+  if (strcmp(id, CLAP_EXT_PRESET_LOAD) == 0 || strcmp(id, CLAP_EXT_PRESET_LOAD_COMPAT) == 0) return &G_PRESET_LOAD_EXT;
   if (strcmp(id, OMX_CLAP_EXT_DECLARATION) == 0) return &G_DECL_EXT;
   if (strcmp(id, OMX_PANEL_DESCRIPTION_ID) == 0) return &G_PANEL_EXT;
   if (strcmp(id, OMX_PARAM_CONTRACT_ID) == 0) return &G_CONTRACT_EXT;
@@ -520,6 +559,76 @@ static const clap_plugin_t *f_create(const clap_plugin_factory_t *f, const clap_
 
 static const clap_plugin_factory_t G_FACTORY = {f_count, f_desc, f_create};
 
+/* ---- clap.preset-discovery: the factory presets' location, one preset per file --------------- */
+
+#define G_PRESET_LOCATION OMX_PRESET_ROOT "/" OMX_DRIVE_CLAP_ID "/"
+
+static const clap_preset_discovery_provider_descriptor_t G_PROVIDER_DESC = {
+    CLAP_VERSION_INIT, OMX_DRIVE_CLAP_ID ".presets", OMX_DRIVE_NAME " factory presets", OMX_DRIVE_VENDOR};
+
+typedef struct {
+  clap_preset_discovery_provider_t provider;
+  const clap_preset_discovery_indexer_t *indexer;
+} G_PROVIDER;
+
+static bool p_init(const clap_preset_discovery_provider_t *pv) {
+  const clap_preset_discovery_indexer_t *ix = ((const G_PROVIDER *)pv->provider_data)->indexer;
+  const clap_preset_discovery_filetype_t type = {"OpenMixer preset", OMX_PRESET_FORMAT, "json"};
+  const clap_preset_discovery_soundpack_t pack = {CLAP_PRESET_DISCOVERY_IS_FACTORY_CONTENT, OMX_DRIVE_CLAP_ID, OMX_DRIVE_NAME " factory presets",
+                                                  NULL, OMX_DRIVE_URL, OMX_DRIVE_VENDOR, NULL, CLAP_TIMESTAMP_UNKNOWN};
+  const clap_preset_discovery_location_t where = {CLAP_PRESET_DISCOVERY_IS_FACTORY_CONTENT, OMX_DRIVE_NAME " factory presets",
+                                                  CLAP_PRESET_DISCOVERY_LOCATION_FILE, G_PRESET_LOCATION};
+  return ix->declare_filetype(ix, &type) && ix->declare_soundpack(ix, &pack) && ix->declare_location(ix, &where);
+}
+
+static void p_destroy(const clap_preset_discovery_provider_t *pv) { free(pv->provider_data); }
+
+static bool p_get_metadata(const clap_preset_discovery_provider_t *pv, uint32_t kind, const char *location,
+                           const clap_preset_discovery_metadata_receiver_t *r) {
+  (void)pv;
+  if (kind != CLAP_PRESET_DISCOVERY_LOCATION_FILE) return false;
+  char *text = omx_preset_slurp(location);
+  struct omx_preset_head head;
+  bool ok = text && omx_preset_head(text, OMX_DRIVE_CLAP_ID, &head);
+  free(text);
+  if (!ok) return true; /* not one of ours: no preset in it */
+  if (!r->begin_preset(r, head.name, NULL)) return true;
+  const clap_universal_plugin_id_t id = {"clap", OMX_DRIVE_CLAP_ID};
+  r->add_plugin_id(r, &id);
+  r->set_soundpack_id(r, OMX_DRIVE_CLAP_ID);
+  r->set_flags(r, CLAP_PRESET_DISCOVERY_IS_FACTORY_CONTENT);
+  return true;
+}
+
+static const void *p_get_extension(const clap_preset_discovery_provider_t *pv, const char *id) {
+  (void)pv;
+  (void)id;
+  return NULL;
+}
+
+static uint32_t d_count(const clap_preset_discovery_factory_t *f) {
+  (void)f;
+  return 1;
+}
+
+static const clap_preset_discovery_provider_descriptor_t *d_desc(const clap_preset_discovery_factory_t *f, uint32_t i) {
+  (void)f;
+  return i == 0 ? &G_PROVIDER_DESC : NULL;
+}
+
+static const clap_preset_discovery_provider_t *d_create(const clap_preset_discovery_factory_t *f,
+                                                        const clap_preset_discovery_indexer_t *ix, const char *id) {
+  (void)f;
+  if (!ix || !id || strcmp(id, G_PROVIDER_DESC.id) != 0) return NULL;
+  G_PROVIDER *pv = (G_PROVIDER *)calloc(1, sizeof *pv);
+  if (!pv) return NULL;
+  pv->indexer = ix;
+  pv->provider = (clap_preset_discovery_provider_t){&G_PROVIDER_DESC, pv, p_init, p_destroy, p_get_metadata, p_get_extension};
+  return &pv->provider;
+}
+
+static const clap_preset_discovery_factory_t G_PRESET_FACTORY = {d_count, d_desc, d_create};
+
 static bool e_init(const char *path) {
   (void)path;
   return true;
@@ -527,7 +636,11 @@ static bool e_init(const char *path) {
 
 static void e_deinit(void) {}
 
-static const void *e_factory(const char *id) { return strcmp(id, CLAP_PLUGIN_FACTORY_ID) == 0 ? &G_FACTORY : NULL; }
+static const void *e_factory(const char *id) {
+  if (strcmp(id, CLAP_PLUGIN_FACTORY_ID) == 0) return &G_FACTORY;
+  if (strcmp(id, CLAP_PRESET_DISCOVERY_FACTORY_ID) == 0 || strcmp(id, CLAP_PRESET_DISCOVERY_FACTORY_ID_COMPAT) == 0) return &G_PRESET_FACTORY;
+  return NULL;
+}
 
 /* The entry by name, for a host that links the plugin statically and opens it by id without dlopen. */
 const clap_plugin_entry_t omx_clap_entry_drive = {CLAP_VERSION_INIT, e_init, e_deinit, e_factory};
