@@ -7,11 +7,11 @@
 #
 #   make            build/omx-pitch.clap and build/omx-pitch.lv2/ (binary, TTL, MOD GUI)
 #   make test       freshness of every generated file, the parameters as declared, every parameter
-#                   live, the pitch kernel-identity oracle, the panel description both faces serve, the
-#                   CLAP face's parameter contract, remote controls and track-info, the LV2 port
-#                   groups, the MOD GUI checks, the factory presets as hosts find and load them
-#                   (CLAP preset discovery and preset-load, lilv), and the host checks (omx-clap-scan,
-#                   lv2info) where installed
+#                   live, the CLAP state's round trip, the pitch kernel-identity oracle, the panel
+#                   description both faces serve, the CLAP face's parameter contract, remote controls
+#                   and track-info, the LV2 port groups, the MOD GUI checks, the factory
+#                   presets as hosts find and load them (CLAP preset discovery and preset-load, lilv), and
+#                   the host checks (omx-clap-scan, lv2info) where installed
 #   make gen        regenerate generated/ from the declaration (commit the result)
 #   make install    DESTDIR/PREFIX/LIBDIR/CLAPDIR: $(CLAPDIR)/omx-pitch.clap, $(LIBDIR)/lv2/omx-pitch.lv2/
 #
@@ -97,9 +97,11 @@ check:
 	node $(ROOT)/tools/modgui-gen.mjs --check $(CURDIR)
 
 # The parameter test: the built CLAP face's parameters are the declaration's, and every one of them
-# reaches the kernel. The kernel-identity test: both faces, sample for sample, against omx-dsp's
-# pitch kernel called directly. The panel test: org.openmixer.panel-description/1 read from
-# each built face as a host reads it, equal to the declaration's panel. The CLAP extension test: the
+# reaches the kernel. The state test: a saved state, loaded into a fresh instance, gives back every
+# value, the same state and the same output. The kernel-identity test: both faces, sample for
+# sample, against omx-dsp's pitch kernel called directly. The panel test:
+# org.openmixer.panel-description/1 read from each built face as a host reads it, equal to the
+# declaration's panel. The CLAP extension test: the
 # parameter contract, the remote-control pages and each placement's defaults, read as a host reads
 # them, equal to the declaration's. The port-group test: the LV2 bundle, read through lilv, puts each
 # panel section's parameters in that section's pg:Group. The preset test: the factory presets listed
@@ -111,6 +113,7 @@ test: all check $(B)/clap-probe $(B)/panel-probe $(B)/clap-ext-probe $(B)/port-g
 	$(B)/clap-probe params $(B)/$(NAME).clap > $(B)/clap-params.txt && \
 	  node $(ROOT)/tools/clap-params-check.mjs $(CURDIR) $(B)/clap-params.txt || fail=1; \
 	$(B)/clap-probe live $(B)/$(NAME).clap || fail=1; \
+	$(B)/clap-probe state $(B)/$(NAME).clap || fail=1; \
 	$(B)/pitch-oracle clap $(B)/$(NAME).clap || fail=1; \
 	$(B)/pitch-oracle lv2 $(BUNDLE) $(URI) || fail=1; \
 	$(B)/panel-probe clap $(B)/$(NAME).clap > $(B)/panel-clap.txt && \

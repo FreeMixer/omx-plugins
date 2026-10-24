@@ -334,6 +334,7 @@ jobs:
     # thread rules). It runs on every built .clap, the test plugins included, and keeps one JSON report each.
     # Until every plugin is clean a failed test is reported (a warning, the job summary, the report artifact)
     # and does not fail the job; the step is made required, continue-on-error removed, once they pass.
+    # The state tests are required: the step after the summary fails the job on any of them.
     name: clap-validator (fedora:44, amd64)
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -378,6 +379,11 @@ jobs:
           if [ "${{ steps.validate.outcome }}" = failure ]; then
             echo "::warning::clap-validator reported failures (not yet required); see the job summary and the report artifact"
           fi
+
+      - name: The state tests are required
+        # every plugin's state round trip (state-reproducibility-*, state-invalid-*) must pass; the
+        # repo's own test of it is `clap-probe state`, in every plugin's make test
+        run: node tools/clap-validate-required.mjs build/clap-validator state-
 
       - uses: actions/upload-artifact@v4
         if: always()
