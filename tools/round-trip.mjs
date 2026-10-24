@@ -97,11 +97,11 @@ export const UPSTREAM = {
   // whichever of the two sord yields last. That order moves with the bundle's path and contents: the same omx-reverb
   // bundle scans "stepped" from one directory and "log" from another, and CI's make test and RPM jobs flip different
   // ports of the same commit. So the entry names every port that states both words (the only ones that can flip), a
-  // flip on any other port fails, and the entry holds through the plugin-hostd release #142 was filed against: a
-  // newer plugin-hostd fails the run until the entry is retired or moved on.
+  // flip on any other port fails, and the entry holds through the newest plugin-hostd release seen still flipping
+  // (0.9.0, in CI): a newer plugin-hostd fails the run until the entry is retired or moved on.
   'lv2 controls[].travel.scale "stepped" "log"': {
     ports: ['omx-deesser deessFreq', 'omx-drive bandFreq', 'omx-keyed-gate key_hp', 'omx-keyed-gate key_lp', 'omx-phaser baseHz', 'omx-reverb lowcut', 'omx-reverb highcut'],
-    through: '0.8.0',
+    through: '0.9.0',
     why: 'plugin-hostd#142: of lv2:integer and pprops:logarithmic, describe keeps the last sord yields (src/describe.c get())',
   },
 };
