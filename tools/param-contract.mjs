@@ -10,17 +10,42 @@
  * symbol, unit, scale, travel or stepping changes the fingerprint and needs the next version.
  */
 import { createHash } from 'node:crypto';
+import { readFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { lv2UnitNames, lv2UnitRef } from './format-tables.mjs';
 
 export const CONTRACT_ID = 'org.openmixer.param-contract/1';
 export const CONTRACT_VERSION = 1;
 
-/** A declared unit -> the contract's unit: its token (the LV2 local name, or the vendor block's)
- * and its enum value. A unit with no token here is NONE, its text left to value_to_text. */
-export const UNITS = {
-  '': ['none', 0], s: ['s', 1], ms: ['ms', 2], min: ['min', 3], dB: ['db', 13], '%': ['pc', 14], x: ['coef', 15],
-  Hz: ['hz', 16], oct: ['oct', 20], cents: ['cent', 21], st: ['semitone12TET', 22], dBFS: ['dbfs', 0x100], dBu: ['dbu', 0x101],
-  LUFS: ['lufs', 0x103],
-};
+/** The header the contract's unit values are read from, and its enum's values by name (OMX_CLAP_UNIT_<NAME>, the name
+ * without its underscores: SEMITONE12TET). */
+export const PARAM_CONTRACT_H = join(dirname(fileURLToPath(import.meta.url)), '..', 'include', 'omx_param_contract.h');
+let header;
+export function headerUnits(file = PARAM_CONTRACT_H) {
+  if (file === PARAM_CONTRACT_H && header) return header;
+  const body = readFileSync(file, 'utf8').match(/enum omx_clap_param_unit \{([\s\S]*?)\};/)?.[1] ?? '';
+  const out = new Map([...body.matchAll(/OMX_CLAP_UNIT_(\w+)\s*=\s*(0x[0-9a-fA-F]+|\d+)/g)].map((m) => [m[1].replaceAll('_', ''), Number(m[2])]));
+  if (file === PARAM_CONTRACT_H) header = out;
+  return out;
+}
+
+/** A declared unit -> the contract's unit, `[token, enum value]`: the token is the LV2 unit the face writes for it
+ * (plugin-hostd's LV2 table read backwards, tools/format-tables.mjs: units:db -> db; a plugin-defined unit's name in
+ * the vendor block's lower case: urn:openmixer:unit#dBFS -> dbfs), the value the header's. A unit the header has no
+ * value for (dB/oct), and "", is NONE, its text left to value_to_text. */
+export function contractUnit(unit) {
+  const ref = lv2UnitRef(unit);
+  const token = ref && (ref.startsWith('units:') ? ref.slice('units:'.length) : ref.replace(/^<|>$/g, '').split('#').pop().toLowerCase());
+  const value = token && headerUnits().get(token.toUpperCase());
+  return value === undefined ? ['none', 0] : [token, value];
+}
+
+/** The token of a unit the contract serves (one with a header value, or "" for none), else undefined. */
+export const servedToken = (unit) => (unit === '' ? 'none' : contractUnit(unit)[1] ? contractUnit(unit)[0] : undefined);
+
+/** Every unit a face can write, with its contract unit: `{ <unit>: [token, value] }`, "" among them. */
+export const contractUnits = () => Object.fromEntries(['', ...Object.keys(lv2UnitNames())].map((u) => [u, contractUnit(u)]));
 export const SCALES = ['linear', 'log', 'stepped'];
 const STEPPED = 0x1, BYPASS = 0x10;
 
@@ -29,7 +54,7 @@ const STEPPED = 0x1, BYPASS = 0x10;
 export function contractOf(d, scaleOf) {
   const where = `plugins/${d.stem}`;
   const rows = d.params.map((p) => {
-    const [unit, unitEnum] = UNITS[p.unit] ?? UNITS[''];
+    const [unit, unitEnum] = contractUnit(p.unit);
     const scale = p.kind ? 'stepped' : scaleOf(p) === 'log' ? 'log' : 'linear';
     if (scale === 'log' && !(p.min > 0 && p.max > 0)) throw new Error(`${where}: '${p.symbol}' is logarithmic over ${p.min}..${p.max}; a log scale needs a positive travel`);
     return { symbol: p.symbol, unit, unitEnum, scale, min: Math.fround(p.min), max: Math.fround(p.max), def: Math.fround(p.def), step: scale === 'stepped' ? 1 : 0, flags: p.kind ? STEPPED : 0 };

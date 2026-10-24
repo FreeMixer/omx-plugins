@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # Copyright (C) 2026 Pau Aliagas <linuxnow@gmail.com>
 Name: omx-plugins
-Version: 0.11.0
+Version: 0.14.0
 Release: 1%{?dist}
 License: GPL-3.0-or-later
 Summary: The OpenMixer console's delay, drive, EQ, channel strip, keyed gate and effects, as plugins for your DAW
@@ -15,24 +15,42 @@ BuildRequires: pkgconf-pkg-config
 # The releases this tree builds against: a floor each (no ceiling), once here and
 # the same in debian/control (tools/deps-check.sh). The Makefile and tools/gen.mjs read them from here.
 BuildRequires: omx-dsp-devel >= 0.24.0
-BuildRequires: omx-contract-devel >= 2.16.0
-BuildRequires: omx-clap-core-devel >= 0.6.0
+BuildRequires: omx-contract-devel >= 3.0.0
+BuildRequires: omx-clap-core-devel >= 0.13.0
+# plugin-hostd's format tables, which the generators read backwards (tools/format-tables.mjs)
+BuildRequires: plugin-hostd-devel >= 0.7.0
 # the omx-contract command, first packaged in 2.15.0: the generators read the contract directory through it
-BuildRequires: omx-contract >= 2.16.0
+BuildRequires: omx-contract >= 3.0.0
 BuildRequires: clap-devel
 BuildRequires: lv2-devel
 # %%check: the generators and checks are Node scripts; the hosts that load the built plugins
 BuildRequires: nodejs
 # make selftest copies the tree with tar
 BuildRequires: tar
+BuildRequires: diffutils
 BuildRequires: lilv
 BuildRequires: lilv-devel
 BuildRequires: sord
 BuildRequires: omx-clap-host
+# %%check: make round-trip scans the built faces back with plugin-hostd-probe describe
+BuildRequires: plugin-hostd >= 0.7.0
+# %%install: our own plugins' pins are known at build time (tools/gen-pins.sh); %%check then holds the
+# shipped pins.d file to the shipped binaries' hashes (tools/pins-check.sh)
+BuildRequires: plugin-qualify >= 0.9.0
+# the shipped .clap is the stripped one (find-debuginfo runs after %%install), so its pin is measured
+# again once the buildroot is stripped: a pin taken at %%install names bytes the package never ships
+%define __spec_install_post \
+    %{?__debug_package:%{__debug_install_post}}\
+    %{__arch_install_post}\
+    %{__os_install_post}\
+    %{__make} -s install-pins DESTDIR=%{buildroot} PREFIX=%{_prefix} LIBDIR=%{_libdir} CLAPDIR=/usr/lib/clap\
+%{nil}
 
 # The name a user installs: both formats.
 Requires: %{name}-clap%{?_isa} = %{version}-%{release}
 Requires: %{name}-lv2%{?_isa} = %{version}-%{release}
+# the first plugin-hostd release that reads pins.d (plugin-hostd issue #42): a floor only, no ceiling
+Recommends: plugin-hostd >= 0.5.0
 
 %description
 Take the sound of the OpenMixer console into your DAW or onto your own rig:
@@ -75,6 +93,8 @@ console's own DSP, so they sound like the desk.
 %package devel
 Summary: Headers and static library of the OpenMixer plugins, for projects that build on them
 Requires: omx-dsp-devel >= 0.24.0
+# the contract directory the descriptors install into is omx-contract-devel's
+Requires: omx-contract-devel >= 3.0.0
 Requires: clap-devel
 
 %description devel
@@ -84,6 +104,8 @@ parameter header, installed in %{_includedir}/omx-plugins, and
 libomxplugins.a (pkg-config omxplugins): every plugin's CLAP face in one
 static library, with the table of their entries in omx_clap_static.h, for a
 host that runs the plugins in its own process without loading .clap files.
+Each plugin's descriptor, its parameters in omx-contract's words, is installed
+in omx-contract's contract directory, where a host reads it.
 
 %prep
 %autosetup
@@ -98,12 +120,18 @@ host that runs the plugins in its own process without loading .clap files.
 
 %check
 %make_build test
+# the shipped pins.d file still names the shipped binaries' own hashes (sabotage: a changed binary goes red)
+tools/pins-check.sh %{buildroot}%{_datadir}/plugin-hostd/pins.d/omx-plugins.pins %{buildroot}/usr/lib/clap
 
 %files
 %license LICENSE
 %doc README.md
 # the factory presets of every plugin, read only data the console's preset library lists (presets/)
 %{_datadir}/omx/presets/
+# our own plugins' pins, known at build time (plugin-hostd issue #42's pins.d, a floor-only Recommends above);
+# the directory is plugin-hostd's, co-owned here so the package stands on its own at %%files time
+%dir %{_datadir}/plugin-hostd/pins.d
+%{_datadir}/plugin-hostd/pins.d/omx-plugins.pins
 
 %files clap
 %license LICENSE
@@ -136,6 +164,8 @@ host that runs the plugins in its own process without loading .clap files.
 %{_includedir}/omx-plugins/
 %{_libdir}/libomxplugins.a
 %{_libdir}/pkgconfig/omxplugins.pc
+# each plugin's descriptor, in omx-contract's contract directory (the directory itself is omx-contract-devel's)
+%{_datadir}/omx-contract/contract.d/3/omx-plugins/
 
 %files lv2
 %license LICENSE
@@ -163,6 +193,39 @@ host that runs the plugins in its own process without loading .clap files.
 # END GENERATED lv2-files
 
 %changelog
+* Thu Oct 22 2026 Pau Aliagas <linuxnow@gmail.com> - 0.14.0-1
+- Our own plugins' pins are known at build time, so they ship with the package instead of being
+  recorded by plugin-hostd on first use (plugin-hostd issue #42, pins.d): plugin-qualify --pins runs
+  over the plugins the build just installed and the result is packaged as
+  /usr/share/plugin-hostd/pins.d/omx-plugins.pins (RPM and DEB), replaced with the binaries in the
+  same transaction and removed with the package (tools/gen-pins.sh).
+- The package recommends plugin-hostd >= 0.5.0, the first release that reads pins.d: a floor only, no
+  ceiling; it co-owns the pins.d directory.
+- %%check (RPM) and dh_auto_install (DEB) hold the shipped pins to the shipped binaries' own hashes:
+  a plugin's binary changed after its pin was written goes red (tools/pins-check.sh).
+
+* Wed Oct 21 2026 Pau Aliagas <linuxnow@gmail.com> - 0.13.0-1
+- The descriptors install under contract.d/3, in omx-contract 3.0.0's words:
+  CLAP's open features and the LV2 class in the extension bag, the one-line
+  description in plugin.doc, a ratio's unit ratio.
+- The generators read plugin-hostd's format tables backwards: the LV2 faces
+  state 57 lv2:designation param: terms and the ratio unit
+  urn:openmixer:unit#ratio, the CLAP faces each parameter's module.
+- make round-trip, in make test, replaces make face-descriptor: every described
+  plugin's faces are built, scanned back with plugin-hostd-probe describe and
+  compared with the authored descriptor word by word.
+- Builds against omx-contract >= 3.0.0, plugin-hostd-devel >= 0.7.0 and
+  omx-clap-core-devel >= 0.13.0.
+
+* Tue Oct 20 2026 Pau Aliagas <linuxnow@gmail.com> - 0.12.0-1
+- Each plugin's descriptor is installed byte for byte in omx-contract's contract
+  directory, as contract.d/2/omx-plugins/plugins/<name>.json, with a
+  MANIFEST.json that lists every file with its sha256 and this version.
+  omx-plugins-devel carries them and needs omx-contract-devel 2.16.0 or newer,
+  which owns the directory.
+- The spec builds with diffutils, which the new check uses to compare the
+  installed descriptors with the sources.
+
 * Sun Oct 18 2026 Pau Aliagas <linuxnow@gmail.com> - 0.11.0-1
 - Factory presets: 120 presets for the 19 plugins, installed with the
   omx-plugins package as files in /usr/share/omx/presets, one directory per

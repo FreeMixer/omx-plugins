@@ -1,7 +1,7 @@
 {
-  "$schema": "https://github.com/FreeMixer/omx-contract/raw/v2/schema/omx-contract.schema.json",
+  "$schema": "https://github.com/FreeMixer/omx-contract/raw/v3/schema/omx-contract.schema.json",
   "requires": {
-    "omx-contract-schema": ">= 2.15.0"
+    "omx-contract-schema": ">= 3.0.0"
   },
   "origin": "authored",
   "plugin": {
@@ -10,7 +10,8 @@
     "uri": "urn:openmixer:limiter",
     "name": "omx limiter",
     "vendor": "openmixer",
-    "version": "0.11.0",
+    "version": "0.13.0",
+    "doc": "The precision limiter: a look-ahead, true-peak, stereo-linked brickwall.",
     "features": [
       "audio-effect"
     ]
@@ -77,7 +78,7 @@
         "step": 1,
         "unit": "ms",
         "default": 50,
-        "scale": "linear"
+        "scale": "stepped"
       },
       "group": [
         "Limiter"
@@ -112,8 +113,29 @@
       "layout": "stereo"
     }
   ],
+  "needs": {
+    "extensions": {
+      "optional": [
+        "lv2:hardRTCapable"
+      ]
+    }
+  },
   "latency": {
     "reports": true
+  },
+  "extensions": {
+    "clap": {
+      "clap_plugin_descriptor.features": [
+        "CLAP_PLUGIN_FEATURE_LIMITER",
+        "CLAP_PLUGIN_FEATURE_STEREO"
+      ]
+    },
+    "lv2": {
+      "rdf:type": [
+        "lv2:Plugin",
+        "lv2:LimiterPlugin"
+      ]
+    }
   },
   "source": {
     "impl": "plugins/omx-limiter/omx_limiter_clap.c#clap_entry"

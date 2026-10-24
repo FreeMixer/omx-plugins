@@ -1,7 +1,7 @@
 {
-  "$schema": "https://github.com/FreeMixer/omx-contract/raw/v2/schema/omx-contract.schema.json",
+  "$schema": "https://github.com/FreeMixer/omx-contract/raw/v3/schema/omx-contract.schema.json",
   "requires": {
-    "omx-contract-schema": ">= 2.15.0"
+    "omx-contract-schema": ">= 3.0.0"
   },
   "origin": "authored",
   "plugin": {
@@ -10,7 +10,8 @@
     "uri": "urn:openmixer:reverb",
     "name": "omx reverb",
     "vendor": "openmixer",
-    "version": "0.11.0",
+    "version": "0.13.0",
+    "doc": "The console's reverb: room, plate, hall, reverse and gated algorithms with pre-delay, size, damping, width and low and high cuts, mixed with the dry signal.",
     "features": [
       "audio-effect"
     ]
@@ -27,7 +28,7 @@
         "step": 1,
         "unit": "%",
         "default": 100,
-        "scale": "linear"
+        "scale": "stepped"
       },
       "group": [
         "Plate"
@@ -151,7 +152,7 @@
         "step": 1,
         "unit": "ms",
         "default": 0,
-        "scale": "linear"
+        "scale": "stepped"
       },
       "group": [
         "Reverb"
@@ -176,7 +177,7 @@
         "step": 1,
         "unit": "Hz",
         "default": 0,
-        "scale": "log"
+        "scale": "stepped"
       },
       "group": [
         "Reverb"
@@ -201,7 +202,7 @@
         "step": 1,
         "unit": "Hz",
         "default": 20000,
-        "scale": "log"
+        "scale": "stepped"
       },
       "group": [
         "Reverb"
@@ -226,7 +227,7 @@
         "step": 1,
         "unit": "ms",
         "default": 300,
-        "scale": "linear"
+        "scale": "stepped"
       },
       "group": [
         "Reverse"
@@ -250,7 +251,7 @@
         "step": 1,
         "unit": "ms",
         "default": 120,
-        "scale": "linear"
+        "scale": "stepped"
       },
       "group": [
         "Gated"
@@ -274,7 +275,7 @@
         "step": 1,
         "unit": "ms",
         "default": 20,
-        "scale": "linear"
+        "scale": "stepped"
       },
       "group": [
         "Gated"
@@ -298,7 +299,7 @@
         "step": 1,
         "unit": "dBFS",
         "default": -40,
-        "scale": "linear"
+        "scale": "stepped"
       },
       "group": [
         "Gated"
@@ -370,8 +371,29 @@
       "layout": "stereo"
     }
   ],
+  "needs": {
+    "extensions": {
+      "optional": [
+        "lv2:hardRTCapable"
+      ]
+    }
+  },
   "latency": {
     "reports": true
+  },
+  "extensions": {
+    "clap": {
+      "clap_plugin_descriptor.features": [
+        "CLAP_PLUGIN_FEATURE_REVERB",
+        "CLAP_PLUGIN_FEATURE_STEREO"
+      ]
+    },
+    "lv2": {
+      "rdf:type": [
+        "lv2:Plugin",
+        "lv2:ReverbPlugin"
+      ]
+    }
   },
   "source": {
     "impl": "plugins/omx-reverb/omx_reverb_clap.c#clap_entry"
