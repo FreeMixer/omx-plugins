@@ -98,10 +98,11 @@ export const UPSTREAM = {
   // bundle scans "stepped" from one directory and "log" from another, and CI's make test and RPM jobs flip different
   // ports of the same commit. So the entry names every port that states both words (the only ones that can flip), a
   // flip on any other port fails, and the entry holds through the newest plugin-hostd release seen still flipping
-  // (0.9.0, in CI): a newer plugin-hostd fails the run until the entry is retired or moved on.
+  // (0.9.1, in CI): a newer plugin-hostd fails the run until the entry is retired or moved on. plugin-hostd#142 is still
+  // open and 0.9.1's release notes do not touch the scale flip, so the hold moves on from 0.9.0.
   'lv2 controls[].travel.scale "stepped" "log"': {
     ports: ['omx-deesser deessFreq', 'omx-drive bandFreq', 'omx-keyed-gate key_hp', 'omx-keyed-gate key_lp', 'omx-phaser baseHz', 'omx-reverb lowcut', 'omx-reverb highcut'],
-    through: '0.9.0',
+    through: '0.9.1',
     why: 'plugin-hostd#142: of lv2:integer and pprops:logarithmic, describe keeps the last sord yields (src/describe.c get())',
   },
 };
