@@ -31,7 +31,8 @@ import { loadDecl, pluginDirs, ROOT } from '../gen.mjs';
 import { installedDataDir, locateContract } from '../omx-contract.mjs';
 import { REQUIRED_HINTS, hintVocabulary, maskOf } from '../resource-hints.mjs';
 
-/** The carrier the contract names, as #216 and omx-contract#140 settled it. */
+/** The pin: the LV2 prefix and namespace as #216 and omx-contract#140 settled them, which this check holds the installed
+ * contract to. No generator reads them; tools/gen.mjs takes both from the contract (tools/resource-hints.mjs). */
 export const LV2_PREFIX = 'omxres';
 export const LV2_NAMESPACE = 'https://www.openmixer.org/ns/resource-hints#';
 const XSD = 'http://www.w3.org/2001/XMLSchema#';
