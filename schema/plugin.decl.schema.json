@@ -82,7 +82,7 @@
           "type": "string",
           "minLength": 20,
           "title": "Description",
-          "description": "One plain sentence a host shows: what the effect does for you."
+          "description": "One plain sentence a host shows: what the effect does for you. A described plugin's is its descriptor's plugin.doc, never its extras file."
         },
         "summary": {
           "type": "string",
@@ -113,7 +113,7 @@
               "minItems": 1,
               "uniqueItems": true,
               "title": "CLAP features",
-              "description": "The CLAP feature strings: audio-effect and stereo for every effect, plus the kind (delay, distortion, equalizer, ...)."
+              "description": "The CLAP feature strings: audio-effect and stereo for every effect, plus the kind (delay, distortion, equalizer, ...). A described plugin's are its descriptor's plugin.features and extension bag (docs/declaration-as-descriptor.md), never its extras file."
             }
           }
         },
@@ -135,7 +135,7 @@
               "type": "string",
               "pattern": "^lv2:[A-Za-z]*Plugin$",
               "title": "LV2 class",
-              "description": "The LV2 plugin class: lv2:DelayPlugin, lv2:ModulatorPlugin, lv2:Plugin, ..."
+              "description": "The LV2 plugin class: lv2:DelayPlugin, lv2:ModulatorPlugin, lv2:Plugin, ... A described plugin's is in its descriptor's extension bag (rdf:type), never its extras file."
             },
             "enabledPort": {
               "enum": [

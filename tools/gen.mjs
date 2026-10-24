@@ -40,7 +40,8 @@ import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 
 import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { faceBinding } from './instance-face.mjs';
-import { descriptorFile, descriptorText, viewOf } from './descriptor.mjs';
+import { descriptorFile, descriptorText, travelUnit, viewOf } from './descriptor.mjs';
+import { lv2Designation, lv2UnitNames, lv2UnitRef } from './format-tables.mjs';
 import { DISPLAY_KINDS, DISPLAY_SOURCES, FAMILIES, PLACEMENTS, WIDGETS, pagesOf, panelDescription, panelFingerprint } from './panel-description.mjs';
 import { CONTRACT_VERSION, contractFingerprint, contractOf } from './param-contract.mjs';
 import { SPEC_FILE, controlOf, eqDefaultBands, findName, kernelControls, locateContract, packagingRange, paramKernel, resolveParam } from './omx-contract.mjs';
@@ -63,7 +64,10 @@ export function loadDecl(dir) {
     // a plugin described in omx-contract's words: its declaration is the descriptor's view, the
     // extras of <stem>.decl.json folded in (tools/descriptor.mjs)
     const described = join(dir, descriptorFile(stem));
-    if (existsSync(described)) d = { ...viewOf(JSON.parse(readFileSync(described, 'utf8')), d, file), described: true };
+    if (existsSync(described)) {
+      const descriptor = JSON.parse(readFileSync(described, 'utf8'));
+      d = { ...viewOf(descriptor, d, file), described: true, descriptor };
+    }
   } else {
     // a variant's folder holds generated files only: its declaration is its base's, expanded
     const base = baseOf(dir);
@@ -341,27 +345,17 @@ export function digestOf(params) {
   return createHash('sha256').update(JSON.stringify(rows)).digest('hex');
 }
 
-/** The LV2 unit of a declared unit, where the units extension names one. */
-export const LV2_UNITS = {
-  Hz: 'hz', dB: 'db', ms: 'ms', s: 's', min: 'min', '%': 'pc', x: 'coef', oct: 'oct', cents: 'cent', st: 'semitone12TET',
-  dBFS: 'dBFS', dBu: 'dBu', LUFS: 'LUFS', 'dB/oct': 'dBoct',
-};
-
-/** The declared units the LV2 units extension has no name for: defined (units:Unit) in the plugin's own
- * TTL under urn:openmixer:unit#<name>, so a host that reads units:unit finds the unit and how to write it. */
+/** The plugin-defined units, by name (urn:openmixer:unit#<name>): defined (units:Unit) in the plugin's own TTL, so a
+ * host that reads units:unit finds the unit and how to write it. */
 export const LV2_CUSTOM_UNITS = {
   dBFS: { label: 'decibels (full scale)', render: '%f dBFS', symbol: 'dBFS' },
   dBu: { label: 'decibels (unloaded)', render: '%f dBu', symbol: 'dBu' },
   LUFS: { label: 'loudness units (full scale)', render: '%f LUFS', symbol: 'LUFS' },
   dBoct: { label: 'decibels per octave', render: '%f dB/oct', symbol: 'dB/oct' },
+  ratio: { label: 'ratio', render: '%f:1', symbol: ':1' },
 };
 
-/** The `units:unit` value of a declared unit: the extension's own name, or the plugin-defined unit. */
-export const lv2UnitRef = (unit) => {
-  const name = LV2_UNITS[unit];
-  if (!name) return undefined;
-  return name in LV2_CUSTOM_UNITS ? `<urn:openmixer:unit#${name}>` : `units:${name}`;
-};
+export { lv2Designation, lv2UnitNames, lv2UnitRef };
 
 /** How a host draws a travel: as declared, else a frequency logarithmic (the console's every
  * frequency control is), else linear. */
@@ -471,6 +465,12 @@ static const omx_plugin_param OMX_${K}_PARAMS[${P}_COUNT] = {
 ${d.params.map((p) => `  { "${p.symbol}", "${p.name}", "${p.unit}", ${cf(p.min)}, ${cf(p.max)}, ${cf(p.def)}, ${flags(p)} },`).join('\n')}
 };
 
+/* Each parameter's CLAP module (clap_param_info.module): its descriptor control's group as a module path, "" for a
+ * plugin with no descriptor. */
+static const char *const OMX_${K}_PARAM_MODULES[${P}_COUNT] = {
+${d.params.map((p, i) => `  ${cstr(moduleOf(d, i))},`).join('\n')}
+};
+
 /* One macro per declared bound: what a C face reads where a constant is needed. */
 ${d.params.map((p) => [['MIN', p.min], ['MAX', p.max], ['DEFAULT', p.def]].map(([k, v]) => `#define ${P}_${macro(p.symbol)}_${k} ${cf(v)}`).join('\n')).join('\n')}
 
@@ -520,6 +520,11 @@ export function emitManifest(d, { modgui = false } = {}) {
 `;
 }
 
+/** What a face states of parameter `i` beyond the declaration: its descriptor control's unit (a ratio's `ratio`, which
+ * its link resolves to "") and meaning, for a plugin described in omx-contract's words; the declared unit otherwise. */
+const faceUnit = (d, i) => travelUnit(d.params[i].unit, d.descriptor?.controls[i]?.travel?.unit);
+const faceDesignation = (d, i) => lv2Designation(d.descriptor?.controls[i]?.meaning);
+
 export function emitPluginTtl(d) {
   const port = (p) => {
     const lines = [`        a ${p.a} ;`, `        lv2:index ${p.index} ;`, `        lv2:symbol "${p.symbol}" ;`, `        lv2:name "${p.name}" ;`];
@@ -530,7 +535,9 @@ export function emitPluginTtl(d) {
       if (q.kind === 'integer') lines.push(`        lv2:portProperty lv2:integer${choices ? ' , lv2:enumeration' : ''} ;`);
       if (scaleOf(q) === 'log') lines.push('        lv2:portProperty pprops:logarithmic ;');
       if (q.kind === 'toggle') lines.push('        lv2:portProperty lv2:toggled ;');
-      if (lv2UnitRef(q.unit)) lines.push(`        units:unit ${lv2UnitRef(q.unit)} ;`);
+      const i = d.params.indexOf(q);
+      if (lv2UnitRef(faceUnit(d, i))) lines.push(`        units:unit ${lv2UnitRef(faceUnit(d, i))} ;`);
+      if (faceDesignation(d, i)) lines.push(`        lv2:designation ${faceDesignation(d, i)} ;`);
       if (choices) {
         const points = choices.map((c) => `            [ rdfs:label ${ttlStr(c.label)} ; rdf:value ${c.value} ]`);
         lines.push(`        lv2:scalePoint\n${points.join(' ,\n')} ;`);
@@ -551,7 +558,7 @@ export function emitPluginTtl(d) {
 @prefix doap:  <http://usefulinc.com/ns/doap#> .
 @prefix foaf:  <http://xmlns.com/foaf/0.1/> .
 @prefix lv2:   <http://lv2plug.in/ns/lv2core#> .
-${d.panel ? '@prefix pg:    <http://lv2plug.in/ns/ext/port-groups#> .\n' : ''}${d.params.some((q) => scaleOf(q) === 'log') ? '@prefix pprops: <http://lv2plug.in/ns/ext/port-props#> .\n' : ''}${d.params.some((q) => choicesOf(q)) ? '@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .\n' : ''}@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+${d.params.some((q, i) => faceDesignation(d, i)?.startsWith('param:')) ? '@prefix param: <http://lv2plug.in/ns/ext/parameters#> .\n' : ''}${d.panel ? '@prefix pg:    <http://lv2plug.in/ns/ext/port-groups#> .\n' : ''}${d.params.some((q) => scaleOf(q) === 'log') ? '@prefix pprops: <http://lv2plug.in/ns/ext/port-props#> .\n' : ''}${d.params.some((q) => choicesOf(q)) ? '@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .\n' : ''}@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix units: <http://lv2plug.in/ns/extensions/units#> .
 
 <${d.url}>
@@ -585,7 +592,10 @@ ${(d.panel?.sections ?? []).map((g) => `
 }
 
 /** The plugin-defined units this plugin's ports use, in a fixed order. */
-const customUnitsOf = (d) => Object.keys(LV2_CUSTOM_UNITS).filter((name) => d.params.some((q) => LV2_UNITS[q.unit] === name));
+const customUnitsOf = (d) => Object.keys(LV2_CUSTOM_UNITS).filter((name) => d.params.some((q, i) => lv2UnitRef(faceUnit(d, i)) === `<urn:openmixer:unit#${name}>`));
+
+/** A control's group as a CLAP module path (plugin-hostd's group-path, written: the labels joined by "/"). */
+const moduleOf = (d, i) => (d.descriptor?.controls[i]?.group ?? []).join('/');
 
 /** The panel section a parameter is drawn in: its LV2 port group (pg:Group), one per section. */
 const groupOf = (d, symbol) => d.panel?.sections.find((s) => s.controls.includes(symbol));

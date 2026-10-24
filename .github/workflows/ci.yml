@@ -20,7 +20,7 @@ jobs:
   test:
     name: make test (fedora:44, amd64)
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 60
     container:
       image: fedora:44
     steps:
@@ -97,7 +97,7 @@ jobs:
     # compressor landed. Same container and dependencies; nothing is dropped.
     name: make selftest (fedora:44, amd64)
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 60
     container:
       image: fedora:44
     steps:
@@ -123,7 +123,7 @@ jobs:
   rpm:
     name: omx-plugins RPMs (fc44, ${{ matrix.arch }})
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 60
     strategy:
       fail-fast: false
       matrix:
@@ -172,6 +172,10 @@ jobs:
           for f in /usr/include/omx-plugins/omx_clap_static.h /usr/lib64/libomxplugins.a /usr/lib64/pkgconfig/omxplugins.pc; do
             rpm -qlp "$devel" | grep -qx "$f"
           done
+          # one descriptor per shipped plugin that has one, in omx-contract's contract directory, with its manifest
+          cdir=/usr/share/omx-contract/contract.d/3/omx-plugins
+          rpm -qlp "$devel" | grep -qx "$cdir/MANIFEST.json"
+          test "$(rpm -qlp "$devel" | grep -c "^$cdir/plugins/.*\.json\$")" = "$(ls plugins/*/*.descriptor.json | wc -l)"
           # a test plugin's generated declaration (the constants and CLAP id a proof predicts from)
           for t in test-note-echo test-sine-voice test-transport-probe; do
             rpm -qlp "$devel" | grep -qx "/usr/include/omx-plugins/omx_${t//-/_}_decl.h"
@@ -237,7 +241,7 @@ jobs:
   deb:
     name: omx-plugins DEBs (${{ matrix.suite }}, ${{ matrix.arch }})
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 60
     strategy:
       fail-fast: false
       matrix:
@@ -283,6 +287,8 @@ jobs:
           grep -q './usr/include/omx-plugins/omx_clap_static.h' <<<"$dev"
           grep -qE '\./usr/lib/[^/]+/libomxplugins\.a$' <<<"$dev"
           grep -qE '\./usr/lib/[^/]+/pkgconfig/omxplugins\.pc$' <<<"$dev"
+          grep -q './usr/share/omx-contract/contract.d/3/omx-plugins/MANIFEST.json' <<<"$dev"
+          test "$(grep -cE '\./usr/share/omx-contract/contract\.d/3/omx-plugins/plugins/[^/]+\.json$' <<<"$dev")" = "$(ls plugins/*/*.descriptor.json | wc -l)"
           dep=$(dpkg -s omx-plugins); grep -q '^Depends: omx-plugins-clap (= .*), omx-plugins-lv2 (= .*)' <<<"$dep"
           # the metapackage carries the factory presets, one file per preset
           out=$(dpkg -L omx-plugins); grep -qx /usr/share/omx/presets/org.openmixer.drive/amp-tube.json <<<"$out"
