@@ -9,8 +9,9 @@
 #   make test       freshness of every generated file, the parameters as declared, every parameter
 #                   live, the CLAP state's round trip, the tremolo kernel-identity oracle, the panel
 #                   description both faces serve, the CLAP face's parameter contract, remote controls
-#                   and track-info, the LV2 port groups, the MOD GUI checks, and the host
-#                   checks (omx-clap-scan, lv2info) where installed
+#                   and track-info, the LV2 port groups, the MOD GUI checks, the factory
+#                   presets as hosts find and load them (CLAP preset discovery and preset-load, lilv), and
+#                   the host checks (omx-clap-scan, lv2info) where installed
 #   make gen        regenerate generated/ from the declaration (commit the result)
 #   make install    DESTDIR/PREFIX/LIBDIR/CLAPDIR: $(CLAPDIR)/omx-tremolo.clap, $(LIBDIR)/lv2/omx-tremolo.lv2/
 #
@@ -53,7 +54,7 @@ CLAPDIR ?= $(PREFIX)/lib/clap
 TTL      := $(GEN)/$(NAME).lv2
 TTL_SRCS := $(shell find $(TTL) -type f 2>/dev/null)
 CORE     := omx_tremolo_core.h $(GEN)/omx_tremolo_params.h $(ROOT)/include/omx_panel_description.h \
-            $(ROOT)/include/omx_param_contract.h
+            $(ROOT)/include/omx_param_contract.h $(ROOT)/include/omx_preset_file.h
 
 all: $(B)/$(NAME).clap $(BUNDLE)/$(NAME).so $(BUNDLE)/manifest.ttl
 
@@ -84,6 +85,9 @@ $(B)/clap-ext-probe: $(ROOT)/tools/clap-ext-probe.c $(ROOT)/include/omx_param_co
 $(B)/port-groups-probe: $(ROOT)/tools/port-groups-probe.c | $(B)
 	$(CC) $(CFLAGS) $(WARN) -o $@ $< $(LILV)
 
+$(B)/preset-probe: $(ROOT)/tools/preset-probe.c | $(B)
+	$(CC) $(CFLAGS) $(WARN) $(ABI_CFLAGS) -o $@ $< $(LILV) -ldl
+
 $(B)/tremolo-oracle: test/tremolo-oracle.c $(CORE) | $(B)
 	$(CC) $(CFLAGS) $(WARN) -I$(GEN) -I$(ROOT)/include $(DSP_CFLAGS) $(ABI_CFLAGS) -o $@ $< $(LILV) -ldl $(LDLIBS)
 
@@ -104,9 +108,12 @@ check:
 # each placement's defaults and the resource hints, read as a host reads them, equal to the
 # declaration's. The resource-hint import test: no import of either built face refutes a hint the
 # declaration states (no thread, socket or file call). The port-group test: the LV2 bundle, read
-# through lilv, puts each panel section's parameters in that section's pg:Group. Every test runs, and
-# the target fails if any failed, so a new plugin shows all its red tests at once.
-test: all check $(B)/clap-probe $(B)/panel-probe $(B)/clap-ext-probe $(B)/port-groups-probe $(B)/tremolo-oracle
+# through lilv, puts each panel section's parameters in that section's pg:Group. The preset test: the
+# factory presets listed by the CLAP face's preset discovery and lilv, and loaded through
+# clap.preset-load, exactly the preset files' (docs/presets.md), each sabotaged red by --self-test.
+# Every test runs, and the target fails if any failed, so a new plugin shows all its red tests at
+# once.
+test: all check $(B)/clap-probe $(B)/panel-probe $(B)/clap-ext-probe $(B)/port-groups-probe $(B)/preset-probe $(B)/tremolo-oracle
 	@fail=0; \
 	$(B)/clap-probe params $(B)/$(NAME).clap > $(B)/clap-params.txt && \
 	  node $(ROOT)/tools/clap-params-check.mjs $(CURDIR) $(B)/clap-params.txt || fail=1; \
@@ -124,6 +131,7 @@ test: all check $(B)/clap-probe $(B)/panel-probe $(B)/clap-ext-probe $(B)/port-g
 	$(B)/port-groups-probe $(BUNDLE) $(URI) > $(B)/port-groups.txt && \
 	  node $(ROOT)/tools/port-groups-check.mjs $(CURDIR) $(B)/port-groups.txt || fail=1; \
 	sh $(ROOT)/tools/modgui-test.sh $(CURDIR) || fail=1; \
+	node $(ROOT)/tools/test/presets-host-check.mjs --self-test $(B)/preset-probe $(CURDIR) || fail=1; \
 	sh $(ROOT)/tools/host-check.sh $(B)/$(NAME).clap $(BUNDLE) $(URI) $(CLAP_ID) || fail=1; \
 	exit $$fail
 
