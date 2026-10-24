@@ -4,7 +4,7 @@ name: release
 
 # A version tag builds omx-plugins-clap and omx-plugins-lv2 as RPMs (Fedora 44, x86_64 and aarch64) and
 # DEBs (bookworm and trixie, amd64 and arm64), signs them, publishes them into the rpm/ and deb/ trees of
-# the FreeMixer Pages repository and attaches them to the GitHub release, with the bookworm arm64 DEBs
+# the FreeMixer Pages repository and attaches them to the GitHub release, with the trixie arm64 DEBs
 # repacked as a Zynthian tarball beside them. Anything else builds unsigned trees and publishes nothing. Everything is in FreeMixer/.github; the secrets are the organisation's.
 # The build dependencies the distributions do not carry (omx-dsp-devel, omx-clap-core-devel,
 # omx-clap-host) come from the FreeMixer channel, inside the build containers only.
@@ -107,12 +107,12 @@ jobs:
       channel-deps: true
     secrets: inherit
 
-  # The bookworm DEBs just built, repacked as one tarball laid out for a Zynthian's plugin directories
+  # The trixie DEBs just built, repacked as one tarball laid out for a Zynthian's plugin directories
   # (tools/zynthian-bundle.sh): no rebuild, the same files the packages carry, checked and every LV2
   # plugin instantiated on the target architecture. arm64 at release; the pull-request dry run packs the
   # amd64 build the same way.
   zynthian:
-    name: Zynthian tarball (bookworm, ${{ (github.event_name != 'push' && inputs.arm == false) && 'amd64' || 'arm64' }})
+    name: Zynthian tarball (trixie, ${{ (github.event_name != 'push' && inputs.arm == false) && 'amd64' || 'arm64' }})
     needs: deb
     if: ${{ !cancelled() && needs.deb.result == 'success' }}
     runs-on: ${{ (github.event_name != 'push' && inputs.arm == false) && (inputs.runner || 'ubuntu-latest') || 'ubuntu-24.04-arm' }}
@@ -120,7 +120,7 @@ jobs:
     permissions:
       contents: read
     container:
-      image: debian:bookworm
+      image: debian:trixie
     env:
       ARCH: ${{ (github.event_name != 'push' && inputs.arm == false) && 'amd64' || 'arm64' }}
     defaults:
@@ -136,7 +136,7 @@ jobs:
 
       - uses: actions/download-artifact@v4
         with:
-          name: omx-plugins-debs-bookworm-${{ env.ARCH }}
+          name: omx-plugins-debs-trixie-${{ env.ARCH }}
           path: debs
 
       - name: Pack, check and probe

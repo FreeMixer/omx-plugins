@@ -252,6 +252,10 @@ tools/pins-check.sh %{buildroot}%{_datadir}/plugin-hostd/pins.d/omx-plugins.pins
   false and opens-sockets false, served by the CLAP face as org.openmixer.resource-hints.draft/0 and stated
   by the LV2 face as omxres: properties, both from the one declaration. The footprints and the activate
   time stay undeclared until a measurement backs them. Builds against omx-contract >= 3.1.0.
+- The Zynthian tarball is repacked from the trixie arm64 DEBs, for ZynthianOS Vangelis (Debian
+  trixie); Oram (bookworm) gets no upstream updates. The bundle check refuses a glibc symbol above
+  trixie's 2.41 and a library a bare trixie lacks (tools/zynthian-bundle.sh, FreeMixer/omx-plugins
+  issue #225).
 
 * Wed Oct 21 2026 Pau Aliagas <linuxnow@gmail.com> - 0.13.0-1
 - The descriptors install under contract.d/3, in omx-contract 3.0.0's words:
