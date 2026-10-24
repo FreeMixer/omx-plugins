@@ -158,7 +158,7 @@ export function ownersOf(contractdir = installedContractDir()) {
     for (const [rel, o] of Object.entries(JSON.parse(readFileSync(join(contractdir, OWNERS), 'utf8')))) out.set(rel, o);
     return out;
   }
-  const base = contractdir && join(contractdir, '2');
+  const base = contractdir && join(contractdir, '3');
   if (!base || !existsSync(base)) return out;
   for (const pkg of readdirSync(base)) {
     const file = join(base, pkg, 'MANIFEST.json');
@@ -241,8 +241,8 @@ function sheetValue(dir, kernel, path, symbol) {
 const eqCache = new Map();
 /**
  * The default bands of an EQ with `count` bands, by omx-contract's own rule: its C render,
- * omx_eq_default_centres() and omx_eq_default_type() of omx-dsp's <omxdsp/omxdsp_definitions.h> (omx-contract's
- * own until 2.15.0)
+ * omx_eq_default_centres() and omx_eq_default_type() of omx-dsp's <omxdsp/omx_eq_defaults.h> (from omx-dsp 0.25.0;
+ * <omxdsp/omxdsp_definitions.h> before it, and omx-contract's own until 2.15.0)
  * (the package installs no JavaScript), run through a small probe built once into build/; gain and Q
  * are EQ_BAND_DEFAULTS of the render at `dir`. `[{ type, freqHz, gainDb, q }]`.
  */
@@ -286,7 +286,11 @@ function buildEqProbe(out) {
   const src = `${out}.c`;
   writeFileSync(src, `#include <stdio.h>
 #include <stdlib.h>
+#if __has_include(<omxdsp/omx_eq_defaults.h>)
+#include <omxdsp/omx_eq_defaults.h>
+#else
 #include <omxdsp/omxdsp_definitions.h>
+#endif
 int main(int argc, char **argv) {
   static float hz[1024];
   unsigned n = argc > 1 ? (unsigned)strtoul(argv[1], NULL, 10) : 0;

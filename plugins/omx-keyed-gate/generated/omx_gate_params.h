@@ -46,6 +46,23 @@ static const omx_plugin_param OMX_GATE_PARAMS[OMX_GATE_PARAM_COUNT] = {
   { "key_lp", "Key Low-pass", "Hz", 0.0f, 20000.0f, 0.0f, OMX_PLUGIN_PARAM_INTEGER },
 };
 
+/* Each parameter's CLAP module (clap_param_info.module): its descriptor control's group as a module path, "" for a
+ * plugin with no descriptor. */
+static const char *const OMX_GATE_PARAM_MODULES[OMX_GATE_PARAM_COUNT] = {
+  "Key",
+  "Gate",
+  "Gate",
+  "Gate",
+  "Gate",
+  "Gate",
+  "Gate",
+  "Gate",
+  "Gate",
+  "Gate",
+  "Key",
+  "Key",
+};
+
 /* One macro per declared bound: what a C face reads where a constant is needed. */
 #define OMX_GATE_PARAM_KEY_EXTERNAL_MIN 0.0f
 #define OMX_GATE_PARAM_KEY_EXTERNAL_MAX 1.0f
@@ -88,7 +105,7 @@ static const omx_plugin_param OMX_GATE_PARAMS[OMX_GATE_PARAM_COUNT] = {
 #define OMX_GATE_NAME "omx keyed-gate"
 #define OMX_GATE_VENDOR "openmixer"
 #define OMX_GATE_URL "https://github.com/FreeMixer/omx-plugins"
-#define OMX_GATE_VERSION "0.11.0"
+#define OMX_GATE_VERSION "0.13.0"
 #define OMX_GATE_DESCRIPTION "The OpenMixer console's channel gate with an external key: the stereo signal is gated while the detector listens to the sidechain input the host routes to it, or to the signal itself with the key unconnected or set to Self. One gain drives both legs. An attack under 0.5 ms engages 4x detector oversampling, which adds 72 frames of latency, reported to the host. The DSP is omx-dsp's <omxdsp/fx/omx_gate_instance.h>, the console's own gate."
 #define OMX_GATE_CLAP_ID "org.openmixer.keyed-gate"
 #define OMX_GATE_CLAP_FEATURES "audio-effect", "gate", "stereo"

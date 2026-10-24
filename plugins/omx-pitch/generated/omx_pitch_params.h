@@ -28,6 +28,14 @@ static const omx_plugin_param OMX_PITCH_PARAMS[OMX_PITCH_PARAM_COUNT] = {
   { "mix", "Mix", "%", 0.0f, 100.0f, 100.0f, 0u },
 };
 
+/* Each parameter's CLAP module (clap_param_info.module): its descriptor control's group as a module path, "" for a
+ * plugin with no descriptor. */
+static const char *const OMX_PITCH_PARAM_MODULES[OMX_PITCH_PARAM_COUNT] = {
+  "Pitch",
+  "Pitch",
+  "Pitch",
+};
+
 /* One macro per declared bound: what a C face reads where a constant is needed. */
 #define OMX_PITCH_PARAM_SEMITONES_MIN -12.0f
 #define OMX_PITCH_PARAM_SEMITONES_MAX 12.0f
@@ -43,7 +51,7 @@ static const omx_plugin_param OMX_PITCH_PARAMS[OMX_PITCH_PARAM_COUNT] = {
 #define OMX_PITCH_NAME "omx pitch"
 #define OMX_PITCH_VENDOR "openmixer"
 #define OMX_PITCH_URL "https://github.com/FreeMixer/omx-plugins"
-#define OMX_PITCH_VERSION "0.11.0"
+#define OMX_PITCH_VERSION "0.13.0"
 #define OMX_PITCH_DESCRIPTION "The console's pitch shifter: shifts both channels up or down by semitones and cents, without changing their length, mixed with the dry signal."
 #define OMX_PITCH_CLAP_ID "org.openmixer.pitch"
 #define OMX_PITCH_CLAP_FEATURES "audio-effect", "pitch-shifter", "stereo"

@@ -5,8 +5,9 @@ Maintainer: Pau Aliagas <linuxnow@gmail.com>
 Build-Depends: debhelper-compat (= 13),
                clap-headers,
                libomxdsp-dev (>= 0.24.0),
-               libomx-contract-dev (>= 2.16.0),
-               libomx-clap-core-dev (>= 0.6.0),
+               libomx-contract-dev (>= 3.0.0),
+               libomx-clap-core-dev (>= 0.13.0),
+               plugin-hostd-dev (>= 0.7.0),
                lv2-dev,
                pkgconf,
                nodejs <!nocheck>,
@@ -14,7 +15,9 @@ Build-Depends: debhelper-compat (= 13),
                liblilv-dev <!nocheck>,
                lilv-utils <!nocheck>,
                sordi <!nocheck>,
-               omx-clap-host <!nocheck>
+               omx-clap-host <!nocheck>,
+               plugin-hostd (>= 0.7.0) <!nocheck>,
+               plugin-qualify (>= 0.9.0)
 Standards-Version: 4.6.2
 Homepage: https://github.com/FreeMixer/omx-plugins
 Rules-Requires-Root: no
@@ -23,6 +26,7 @@ Package: omx-plugins
 Section: metapackages
 Architecture: any
 Depends: omx-plugins-clap (= ${binary:Version}), omx-plugins-lv2 (= ${binary:Version}), ${misc:Depends}
+Recommends: plugin-hostd (>= 0.5.0)
 Description: OpenMixer delay, drive, EQ, strip, gate and effects (CLAP, LV2)
  Take the sound of the OpenMixer console into your DAW or onto your own rig:
  delay, drive, the channel EQ as an 8-band EQ, a 16-band EQ or a 32-band EQ,
@@ -52,7 +56,7 @@ Description: OpenMixer delay, drive, EQ, strip, gate and effects as CLAP plugins
 Package: omx-plugins-dev
 Section: libdevel
 Architecture: any
-Depends: libomxdsp-dev (>= 0.24.0), clap-headers, ${misc:Depends}
+Depends: libomxdsp-dev (>= 0.24.0), libomx-contract-dev (>= 3.0.0), clap-headers, ${misc:Depends}
 Description: Headers and static library of the OpenMixer plugins
  The headers other projects include to use the OpenMixer plugins' parameters
  and instance code, such as omx_delay_core.h and each plugin's generated
@@ -60,6 +64,8 @@ Description: Headers and static library of the OpenMixer plugins
  (pkg-config omxplugins): every plugin's CLAP face in one static library,
  with the table of their entries in omx_clap_static.h, for a host that runs
  the plugins in its own process without loading .clap files.
+ Each plugin's descriptor, its parameters in omx-contract's words, is
+ installed in omx-contract's contract directory, where a host reads it.
 
 Package: omx-plugins-lv2
 Architecture: any

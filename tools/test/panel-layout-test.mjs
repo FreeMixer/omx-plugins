@@ -28,7 +28,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { descriptorOf, meaningOfRole } from '../descriptor.mjs';
 import { loadDecl, pluginDirs } from '../gen.mjs';
-import { UNITS } from '../param-contract.mjs';
+import { contractUnits } from '../param-contract.mjs';
 import { panelLayout, servedWidget, unitToken, widgetOf } from '../panel-description.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -74,7 +74,7 @@ lost.controls[0].travel.unit = 'unknown';
 const lostX = panelLayout(lost, { panel: levels });
 check('arm: an unknown unit takes no role, named', [rolesOf(lostX), lostX.unpublished], [[['ceiling', 0, 'c1', 'dBu']], [{ role: 'threshold', symbol: 'c0', why: 'the threshold role takes db, dbfs, dbu, lufs, not unknown' }]]);
 check('an unknown unit is a plain number: a knob with no token', [lostX.controls[0].standard, lostX.controls[0].unit, unitToken('unknown')], [{ widget: 'knob' }, 'unknown', undefined]);
-check('every unit the param-contract table serves has a token a role reads', Object.keys(UNITS).filter((u) => typeof unitToken(u) !== 'string'), []);
+check('every unit the param-contract table serves has a token a role reads', Object.entries(contractUnits()).filter(([, [, v]]) => v !== 0).map(([u]) => u).filter((u) => typeof unitToken(u) !== 'string'), []);
 
 // 3. roles from meanings, with no declared panel
 const comp = descriptor([travel('dB', { meaning: 'threshold' }), { kind: 'travel', meaning: 'ratio', travel: { min: 1, max: 20, unit: 'x', default: 4, scale: 'log' } }, travel('dB', { meaning: 'makeup' })]);
@@ -139,7 +139,7 @@ check('authored omx delay descriptor, with no panel: family delay, roles by mean
 
 // 7. our plugins
 const ITEM_UNITS = ['dB', 'dBFS', 'ms', 's', 'min', 'Hz', 'oct', 'cents', 'st', '%', 'x', ''];
-const DESCRIPTOR_UNITS = [...ITEM_UNITS, 'frames', 'bpm', 'midiNote', 'LUFS', 'deg'];
+const DESCRIPTOR_UNITS = [...ITEM_UNITS, 'frames', 'bpm', 'midiNote', 'LUFS', 'deg', 'ratio']; // ratio: omx-contract 3.0.0
 const decls = pluginDirs().map((p) => loadDecl(p)).filter((d) => d.panel);
 const stated = decls.flatMap((d) => descriptorOf(d).descriptor.controls.filter((c) => c.meaning === 'unknown' || c.travel?.unit === 'unknown' || c.travel?.scale === 'unknown').map((c) => `${d.stem}.${c.name}`));
 check(`our ${decls.length} authored descriptors state no unknown`, stated, []);
