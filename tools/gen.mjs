@@ -58,13 +58,14 @@ const TTL_BANNER = '# SPDX-License-Identifier: GPL-3.0-or-later\n# Copyright (C)
 export function loadDecl(dir) {
   const stem = basename(resolve(dir));
   let file = join(dir, `${stem}.decl.json`);
-  let d;
+  let d, whole;
   if (existsSync(file) || !baseOf(dir)) {
     d = JSON.parse(readFileSync(file, 'utf8'));
+    whole = isWhole(d);
     // a plugin described in omx-contract's words: its declaration is the descriptor's view, the
     // extras of <stem>.decl.json folded in (tools/descriptor.mjs)
     const described = join(dir, descriptorFile(stem));
-    if (existsSync(described) && !isWhole(d)) {
+    if (existsSync(described) && !whole) {
       const descriptor = JSON.parse(readFileSync(described, 'utf8'));
       d = { ...viewOf(descriptor, d, file), described: true, descriptor };
     }
@@ -72,6 +73,7 @@ export function loadDecl(dir) {
     // a variant's folder holds generated files only: its declaration is its base's, expanded
     const base = baseOf(dir);
     file = base.file;
+    whole = isWhole(base.decl);
     const where = locateContract(treeOf(file));
     if (!where.dir) throw new Error(`${file}: its variant ${stem} is expanded from omx-contract and ${where.why}`);
     d = expandVariant(where.dir, base.decl, base.decl.variants.of.find((v) => v.stem === stem));
@@ -79,7 +81,7 @@ export function loadDecl(dir) {
   const prepared = prepareDecl(file, d, stem, dir);
   // a whole declaration (a base of variants, a chain) is rendered as the descriptor its faces are held to, as a
   // described plugin's is read from it: the faces state the designations, units and modules it states
-  return prepared.described || !(prepared.variantOf || prepared.binding === 'chain') ? prepared : { ...prepared, described: true, descriptor: descriptorOf(prepared).descriptor };
+  return prepared.described || !whole ? prepared : { ...prepared, described: true, descriptor: descriptorOf(prepared).descriptor };
 }
 
 /** A declaration read from `file` (or about to be written there: the wizard's plan), validated and
