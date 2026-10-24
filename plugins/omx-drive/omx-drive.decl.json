@@ -112,6 +112,11 @@
       "unit": "units:frame"
     }
   },
+  "resourceHints": {
+    "threads-spawned": 0,
+    "streams-from-disk": false,
+    "opens-sockets": false
+  },
   "panel": {
     "family": "drive",
     "roles": {
