@@ -12,6 +12,12 @@ omx-plugins (0.14.0) unstable; urgency=medium
   * dh_auto_install holds the shipped pins to the shipped binaries' own
     hashes: a plugin's binary changed after its pin was written goes red
     (tools/pins-check.sh).
+  * Every plugin declares its resource hints (omx-contract 3.1.0):
+    threads-spawned 0, streams-from-disk false and opens-sockets false,
+    served by the CLAP face as org.openmixer.resource-hints.draft/0 and
+    stated by the LV2 face as omxres: properties, both from the one
+    declaration. The footprints and the activate time stay undeclared until
+    a measurement backs them. Builds against omx-contract >= 3.1.0.
 
  -- Pau Aliagas <linuxnow@gmail.com>  Thu, 22 Oct 2026 08:00:00 +0000
 
