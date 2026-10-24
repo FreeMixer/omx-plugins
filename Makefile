@@ -11,7 +11,7 @@
 #   make lv2-units  every unit a declaration uses has an LV2 unit, and every port states the unit it declares
 #                   (tools/test/lv2-units-check.mjs, with its sabotage arms; part of `make test`)
 #   make format-tables  the generators read plugin-hostd's installed format tables backwards (tools/format-tables.mjs):
-#                   the units, the 57 lv2:designation lines and the ratio unit, the CLAP modules from the descriptors'
+#                   the units, the 169 lv2:designation lines and the ratio unit, the CLAP modules from the descriptors'
 #                   groups (tools/test/format-tables-test.mjs, with its sabotage arms; part of `make test`)
 #   make round-trip  every described plugin generated, both faces built and scanned back by plugin-hostd-probe describe,
 #                   compared with its authored descriptor word by word: equal, lost <format> <word> or differs
