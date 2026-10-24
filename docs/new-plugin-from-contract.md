@@ -157,6 +157,11 @@ A test plugin is linked into libomxplugins.a in a table of its own, `OMX_CLAP_ST
 `OMX_CLAP_STATIC_PLUGINS`, the one entry's factory listing, the README, the packages' plugin lists,
 the completeness recipe and `make install` never carry it, so no picker lists it and the release
 gate, which probes every installed `.clap`, never sees it. `make test-role` holds that over a staged
-install (`tools/test-role-check.sh`, with its self-test).
+install (`tools/test-role-check.sh`, with its self-test). `make install-test` installs it in
+`/usr/libexec/omx-plugins/test`, outside every CLAP search path, for the `omx-plugins-test` package:
+a host's tests and the plugin qualifier open it there by path. `make package-lists`
+(`tools/package-lists-check.sh`) checks that every plugin the build makes is installed and listed by
+its own package in the RPM spec and the Debian `.install` files, so a new test plugin cannot be built
+and shipped by nothing.
 
 Each test plugin's face says, in its header comment, what a test reads from it.

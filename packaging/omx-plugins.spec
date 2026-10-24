@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # Copyright (C) 2026 Pau Aliagas <linuxnow@gmail.com>
 Name: omx-plugins
-Version: 0.13.0
+Version: 0.14.0
 Release: 1%{?dist}
 License: GPL-3.0-or-later
 Summary: The OpenMixer console's delay, drive, EQ, channel strip, keyed gate and effects, as plugins for your DAW
@@ -34,10 +34,23 @@ BuildRequires: sord
 BuildRequires: omx-clap-host
 # %%check: make round-trip scans the built faces back with plugin-hostd-probe describe
 BuildRequires: plugin-hostd >= 0.7.0
+# %%install: our own plugins' pins are known at build time (tools/gen-pins.sh); %%check then holds the
+# shipped pins.d file to the shipped binaries' hashes (tools/pins-check.sh)
+BuildRequires: plugin-qualify >= 0.9.0
+# the shipped .clap is the stripped one (find-debuginfo runs after %%install), so its pin is measured
+# again once the buildroot is stripped: a pin taken at %%install names bytes the package never ships
+%define __spec_install_post \
+    %{?__debug_package:%{__debug_install_post}}\
+    %{__arch_install_post}\
+    %{__os_install_post}\
+    %{__make} -s install-pins DESTDIR=%{buildroot} PREFIX=%{_prefix} LIBDIR=%{_libdir} CLAPDIR=/usr/lib/clap\
+%{nil}
 
 # The name a user installs: both formats.
 Requires: %{name}-clap%{?_isa} = %{version}-%{release}
 Requires: %{name}-lv2%{?_isa} = %{version}-%{release}
+# the first plugin-hostd release that reads pins.d (plugin-hostd issue #42): a floor only, no ceiling
+Recommends: plugin-hostd >= 0.5.0
 
 %description
 Take the sound of the OpenMixer console into your DAW or onto your own rig:
@@ -77,6 +90,17 @@ LV2 plugins, installed in %{_libdir}/lv2 where Ardour, Carla, MOD
 and Zynthian find them, with a MOD GUI where the plugin has one. They run the
 console's own DSP, so they sound like the desk.
 
+%package test
+Summary: The OpenMixer test instruments, for host tests and plugin measurement
+
+%description test
+The test instruments the OpenMixer console's own proofs play: a sine voice, a
+note echo and a transport probe, as CLAP plugins. They are installed in
+%{_libexecdir}/omx-plugins/test, outside every CLAP search path, so no host
+lists them; a test or the plugin qualifier opens them there by path. Install
+this package on a console to measure the linked test instruments' cost on its
+own machine.
+
 %package devel
 Summary: Headers and static library of the OpenMixer plugins, for projects that build on them
 Requires: omx-dsp-devel >= 0.24.0
@@ -104,15 +128,22 @@ in omx-contract's contract directory, where a host reads it.
 %install
 %make_install PREFIX=%{_prefix} LIBDIR=%{_libdir} CLAPDIR=/usr/lib/clap
 %{__make} install-devel DESTDIR=%{buildroot} PREFIX=%{_prefix} LIBDIR=%{_libdir}
+%{__make} install-test DESTDIR=%{buildroot} PREFIX=%{_prefix} TESTCLAPDIR=%{_libexecdir}/omx-plugins/test
 
 %check
 %make_build test
+# the shipped pins.d file still names the shipped binaries' own hashes (sabotage: a changed binary goes red)
+tools/pins-check.sh %{buildroot}%{_datadir}/plugin-hostd/pins.d/omx-plugins.pins %{buildroot}/usr/lib/clap
 
 %files
 %license LICENSE
 %doc README.md
 # the factory presets of every plugin, read only data the console's preset library lists (presets/)
 %{_datadir}/omx/presets/
+# our own plugins' pins, known at build time (plugin-hostd issue #42's pins.d, a floor-only Recommends above);
+# the directory is plugin-hostd's, co-owned here so the package stands on its own at %%files time
+%dir %{_datadir}/plugin-hostd/pins.d
+%{_datadir}/plugin-hostd/pins.d/omx-plugins.pins
 
 %files clap
 %license LICENSE
@@ -139,6 +170,16 @@ in omx-contract's contract directory, where a host reads it.
 /usr/lib/clap/omx-transient.clap
 /usr/lib/clap/omx-tremolo.clap
 # END GENERATED clap-files
+
+%files test
+%license LICENSE
+%dir %{_libexecdir}/omx-plugins
+%dir %{_libexecdir}/omx-plugins/test
+# BEGIN GENERATED clap-test-files: tools/gen.mjs, one line per test plugin
+%{_libexecdir}/omx-plugins/test/omx-test-note-echo.clap
+%{_libexecdir}/omx-plugins/test/omx-test-sine-voice.clap
+%{_libexecdir}/omx-plugins/test/omx-test-transport-probe.clap
+# END GENERATED clap-test-files
 
 %files devel
 %license LICENSE
@@ -174,6 +215,17 @@ in omx-contract's contract directory, where a host reads it.
 # END GENERATED lv2-files
 
 %changelog
+* Thu Oct 22 2026 Pau Aliagas <linuxnow@gmail.com> - 0.14.0-1
+- Our own plugins' pins are known at build time, so they ship with the package instead of being
+  recorded by plugin-hostd on first use (plugin-hostd issue #42, pins.d): plugin-qualify --pins runs
+  over the plugins the build just installed and the result is packaged as
+  /usr/share/plugin-hostd/pins.d/omx-plugins.pins (RPM and DEB), replaced with the binaries in the
+  same transaction and removed with the package (tools/gen-pins.sh).
+- The package recommends plugin-hostd >= 0.5.0, the first release that reads pins.d: a floor only, no
+  ceiling; it co-owns the pins.d directory.
+- %%check (RPM) and dh_auto_install (DEB) hold the shipped pins to the shipped binaries' own hashes:
+  a plugin's binary changed after its pin was written goes red (tools/pins-check.sh).
+
 * Wed Oct 21 2026 Pau Aliagas <linuxnow@gmail.com> - 0.13.0-1
 - The descriptors install under contract.d/3, in omx-contract 3.0.0's words:
   CLAP's open features and the LV2 class in the extension bag, the one-line
