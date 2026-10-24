@@ -11,7 +11,10 @@
  *   - clap.remote-controls: the pages of the page rule over the declaration's panel sections;
  *   - clap.track-info: under each placement, before activation and after it, every parameter reads
  *     the placement's default the contract states for it, else its own default; a parameter the host
- *     has set keeps its value.
+ *     has set keeps its value;
+ *   - org.openmixer.resource-hints.draft/0: `declared` holds the bits of the hints the declaration's
+ *     "resourceHints" states (tools/resource-hints.mjs) and no other, get answers whether there is one,
+ *     and each stated member is the declaration's value.
  *
  * Usage: node tools/clap-ext-check.mjs plugins/<stem> <probe output>
  */
@@ -19,6 +22,7 @@ import { readFileSync } from 'node:fs';
 import { loadDecl, scaleOf } from './gen.mjs';
 import { CONTRACT_VERSION, SCALES, contractCanonical, contractFingerprint, contractOf } from './param-contract.mjs';
 import { PLACEMENTS, pagesOf, panelDescription } from './panel-description.mjs';
+import { maskOf } from './resource-hints.mjs';
 
 const [dir, dump] = process.argv.slice(2);
 const d = loadDecl(dir);
@@ -68,5 +72,21 @@ for (const how of ['placed', 'moved', 'kept']) {
     const named = desc.defaults.filter((x) => x.placement === PLACEMENTS[placement]).map((x) => `${x.symbol} ${x.value}`).join(', ');
     check(same(got, exp), `track-info ${how} ${PLACEMENTS[placement]}: ${how === 'kept' ? 'the values the host set stay' : named || 'every default its own'}`, `got ${JSON.stringify(got)}, want ${JSON.stringify(exp)}`);
   }
+}
+
+// the resource hints
+const hintsRow = of('hints')[0];
+const stated = d.hints;
+const mask = maskOf(stated);
+const words = stated.map((h) => h.word).join(', ') || 'none';
+if (!hintsRow || hintsRow[0] === 'absent') check(false, 'resource-hints: the face serves org.openmixer.resource-hints.draft/0', hintsRow ? 'absent' : 'no hints row');
+else {
+  const [answer, declared] = hintsRow;
+  check(parseInt(declared, 16) === mask, `resource-hints: declared holds the bits of the declaration's hints (${words})`, `0x${declared}, the declaration's 0x${mask.toString(16)}`);
+  check(Number(answer) === (mask ? 1 : 0), `resource-hints: get answers ${mask ? 'true' : 'false'}`, `it answers ${answer}`);
+  const member = Object.fromEntries(of('hint'));
+  const value = (h) => (h.figureUnit === 'flag' ? (h.value ? '1' : '0') : `${h.value}`);
+  const got = stated.map((h) => [h.word, member[h.member]]), want = stated.map((h) => [h.word, value(h)]);
+  check(same(got, want), "resource-hints: each stated hint is the declaration's value", `${JSON.stringify(got)}, the declaration's ${JSON.stringify(want)}`);
 }
 process.exit(bad ? 1 : 0);
