@@ -11,7 +11,7 @@
  * Extensions: params, latency, audio-ports, state, preset-load; org.openmixer.declaration/1, panel-description/1
  * and param-contract/1; clap.remote-controls (the panel's sections as pages of eight) and
  * clap.track-info (a placement's defaults, the contract's per-kind ones, on every parameter the host
- * or a state has not set).
+ * or a state has not set); org.openmixer.resource-hints.draft/0 (the declaration's resource hints).
 {{#metered}} * clap.meters/1: the declaration's meters, every one coherent: after each block the face publishes all
  * their values at once through include/omx_meter_ring.h, and a read copies one block's (docs/meters.md).
 {{#meterGr}} * A gain reduction is the kernel's own reading after the block, 0 while bypassed.
@@ -523,6 +523,16 @@ static bool g_contract_migration(const clap_plugin_t *p, uint32_t index, omx_cla
 static const omx_clap_plugin_param_contract_t G_CONTRACT_EXT = {g_contract_version, g_contract_fingerprint, g_contract_get,
                                                                 g_contract_migrations, g_contract_migration};
 
+/* ---- org.openmixer.resource-hints.draft/0: OMX_{{K}}_RESOURCE_HINTS, the declaration's hints -------- */
+
+static bool g_resource_hints_get(const clap_plugin_t *p, omx_resource_hints_t *hints) {
+  (void)p;
+  *hints = OMX_{{K}}_RESOURCE_HINTS;
+  return hints->declared != 0u;
+}
+
+static const omx_clap_plugin_resource_hints_t G_RESOURCE_HINTS_EXT = {g_resource_hints_get};
+
 /* ---- clap.remote-controls: the panel's pages, OMX_{{K}}_PANEL_PAGES ------------------------ */
 
 static uint32_t g_pages_count(const clap_plugin_t *p) {
@@ -604,6 +614,7 @@ static const clap_plugin_meters_t G_METERS_EXT = {g_meters_count, g_meters_info,
   if (strcmp(id, OMX_PARAM_CONTRACT_ID) == 0) return &G_CONTRACT_EXT;
   if (strcmp(id, CLAP_EXT_REMOTE_CONTROLS) == 0) return &G_PAGES_EXT;
   if (strcmp(id, CLAP_EXT_TRACK_INFO) == 0) return &G_TRACK_INFO_EXT;
+  if (strcmp(id, OMX_CLAP_EXT_RESOURCE_HINTS_DRAFT) == 0) return &G_RESOURCE_HINTS_EXT;
 {{#metered}}  if (strcmp(id, CLAP_EXT_METERS) == 0) return &G_METERS_EXT;
 {{/metered}}  return NULL;
 }

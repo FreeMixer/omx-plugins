@@ -2,7 +2,8 @@
 // Copyright (C) 2026 Pau Aliagas <linuxnow@gmail.com>
 /*
  * clap-ext-probe.c — a CLAP host that reads the extensions a built omx plugin serves beyond its
- * parameters, as a host would: it knows no plugin, only CLAP and include/omx_param_contract.h.
+ * parameters, as a host would: it knows no plugin, only CLAP, include/omx_param_contract.h and
+ * omx-contract's <omxcontract/omx_resource_hints.h>.
  *
  *   clap-ext-probe <x.clap>
  *
@@ -18,6 +19,9 @@
  *       placed: the host says the placement before init, the plugin is activated, get_value;
  *       moved: the host says it after activation, calls changed(), flushes, get_value;
  *       kept: as moved, after the host set every parameter to its maximum by a flush.
+ *   hints <get's answer, 0 or 1> <declared, hex> | hints absent
+ *   hint <member> <value>
+ *       org.openmixer.resource-hints.draft/0's get, every member of the structure whatever its bit says.
  *
  * tools/clap-ext-check.mjs reads it back against the declaration. Exit 1 when an extension is
  * absent or a call fails.
@@ -39,6 +43,7 @@
 #include "clap/host.h"
 
 #include "omx_param_contract.h"
+#include <omxcontract/omx_resource_hints.h>
 
 #define MAX_PARAMS 512u
 
@@ -180,6 +185,22 @@ int main(int argc, char **argv) {
   }
   clap_remote_controls_page_t page;
   if (rc_ext->get(p, rc_ext->count(p), &page)) fprintf(stderr, "a page past the count is served\n"), rc = 1;
+  const omx_clap_plugin_resource_hints_t *rh =
+      (const omx_clap_plugin_resource_hints_t *)p->get_extension(p, OMX_CLAP_EXT_RESOURCE_HINTS_DRAFT);
+  if (!rh) printf("hints\tabsent\n");
+  else {
+    omx_resource_hints_t h;
+    memset(&h, 0, sizeof h);
+    const bool got = rh->get(p, &h);
+    printf("hints\t%d\t%" PRIx32 "\n", got ? 1 : 0, h.declared);
+    printf("hint\tfootprint_at_rest\t%" PRIu64 "\n", h.footprint_at_rest);
+    printf("hint\tfootprint_per_voice\t%" PRIu64 "\n", h.footprint_per_voice);
+    printf("hint\tshared_load\t%" PRIu64 "\n", h.shared_load);
+    printf("hint\tthreads_spawned\t%" PRIu32 "\n", h.threads_spawned);
+    printf("hint\tstreams_from_disk\t%d\n", h.streams_from_disk ? 1 : 0);
+    printf("hint\topens_sockets\t%d\n", h.opens_sockets ? 1 : 0);
+    printf("hint\tactivate_time\t%" PRIu32 "\n", h.activate_time);
+  }
   p->destroy(p);
 
   for (uint32_t placement = 0; placement < 4; ++placement) {

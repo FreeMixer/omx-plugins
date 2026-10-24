@@ -72,6 +72,12 @@ const swap = (kind, a, b) => (rows) => {
   return out;
 };
 const plus = (k) => (v) => `${Number(v) + k}`;
+/** The `hint <member> <value>` row of `member`, its value changed by `f`. */
+const hint = (member, f) => (rows) => {
+  const at = rows.findIndex((r) => r[0] === 'hint' && r[1] === member);
+  const i = need(at < 0 ? undefined : at, `hint ${member} row`);
+  return rows.map((r, k) => (k === i ? [r[0], r[1], f(r[2])] : r));
+};
 const bit = (m) => (v) => `${Number(v) ^ m}`;
 const flip = (v) => `${v.slice(0, -1)}${v.endsWith('0') ? '1' : '0'}`;
 
@@ -121,6 +127,11 @@ const extArms = [
   ['a default read after placement changed', set('placed', 0, 3, plus(1)), /FAIL clap-ext track-info placed/],
   ['a placement default ignored when the host moved', set('moved', 5, 3, plus(1)), /FAIL clap-ext track-info moved/],
   ['a value the host set not kept', set('kept', 0, 3, plus(1)), /FAIL clap-ext track-info kept/],
+  ['a stated hint served with another value', hint('threads_spawned', plus(1)), /FAIL clap-ext resource-hints: each stated hint/],
+  ['a stated hint\'s bit cleared', set('hints', 0, 2, (v) => (parseInt(v, 16) & ~0x8).toString(16) /* bit 3, threads-spawned */), /FAIL clap-ext resource-hints: declared/],
+  ['an unstated hint\'s bit set', set('hints', 0, 2, (v) => (parseInt(v, 16) | 0x1).toString(16) /* bit 0, footprint-at-rest, which no plugin states */), /FAIL clap-ext resource-hints: declared/],
+  ['get answers false', set('hints', 0, 1, '0'), /FAIL clap-ext resource-hints: get answers/],
+  ['the resource-hints extension absent', (rows) => rows.filter((r) => r[0] !== 'hint').map((r) => (r[0] === 'hints' ? ['hints', 'absent'] : r)), /FAIL clap-ext resource-hints: the face serves/],
 ];
 
 /** A face whose travel moved, and whose fingerprint was recomputed over what it serves: self-consistent, so only
