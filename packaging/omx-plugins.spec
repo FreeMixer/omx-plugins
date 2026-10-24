@@ -248,6 +248,10 @@ tools/pins-check.sh %{buildroot}%{_datadir}/plugin-hostd/pins.d/omx-plugins.pins
   designations, as every described plugin's do (tools/test/contract-dir-check.sh requires the four).
 - The round-trip ledger records the seven EQ frequency ports that are authored stepped and scan
   back as log, against plugin-hostd issue #147.
+- The Zynthian tarball is repacked from the trixie arm64 DEBs, for ZynthianOS Vangelis (Debian
+  trixie); Oram (bookworm) gets no upstream updates. The bundle check refuses a glibc symbol above
+  trixie's 2.41 and a library a bare trixie lacks (tools/zynthian-bundle.sh, FreeMixer/omx-plugins
+  issue #225).
 
 * Wed Oct 21 2026 Pau Aliagas <linuxnow@gmail.com> - 0.13.0-1
 - The descriptors install under contract.d/3, in omx-contract 3.0.0's words:
