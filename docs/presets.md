@@ -2,10 +2,10 @@
 <!-- Copyright (C) 2026 Pau Aliagas <linuxnow@gmail.com> -->
 # Factory presets in every host
 
-A plugin's factory presets are useful only if a host can list and load them. The console's preset
-library reads `presets/<plugin id>/<preset id>.json` (`org.openmixer.preset/1`, installed read only
-under `/usr/share/omx/presets/`); every other host reads presets through its plugin format, so each
-face serves the same files the way its format asks (plugin-hostd#131, 'PRESETS IN THE HOST').
+A plugin's factory presets are useful only if a host can list and load them. They are files,
+`presets/<plugin id>/<preset id>.json` (`org.openmixer.preset/1`), installed read only under
+`/usr/share/omx/presets/`. A host reads presets through its plugin format, so each face serves the
+same files the way its format asks (plugin-hostd#131, 'PRESETS IN THE HOST').
 
 ## One source
 
@@ -53,5 +53,11 @@ builds:
   file's values exactly (as the plugin's float holds them);
 - lilv lists the bundle's presets, the same count, each with the file's values.
 
-`--self-test` drops a file from a copy of the directory and changes a value in another, and each
-check goes red.
+`--self-test` drops a file from a copy of the directory, changes a value in another copy, drops a
+preset from a copy of the bundle's manifest and changes a value in a copy of its `presets.ttl`, and
+each goes red.
+
+A new plugin has no presets until they are declared in `tools/gen-presets.mjs` (`DEFINITIONS`, by
+the plugin's CLAP id) and generated (`node tools/gen-presets.mjs`, then `node tools/gen.mjs
+plugins/<stem>` for the bundle's manifest); until then `tools/gen-presets.mjs` refuses the tree and
+the plugin's `make test` is red, naming the plugin.
