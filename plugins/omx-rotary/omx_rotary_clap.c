@@ -9,7 +9,7 @@
  * the DSP is omx-dsp's rotary kernel, reached through omx_rotary_core.h, the binding both faces
  * share. This file adds no arithmetic on the audio path: drain the events, resolve, run.
  *
- * Extensions: params, latency, audio-ports, state; org.openmixer.declaration/1, panel-description/1
+ * Extensions: params, latency, audio-ports, state, preset-load; org.openmixer.declaration/1, panel-description/1
  * and param-contract/1; clap.remote-controls (the panel's sections as pages of eight) and
  * clap.track-info (a placement's defaults, the contract's per-kind ones, on every parameter the host
  * or a state has not set).
@@ -25,10 +25,12 @@
 #include "clap/ext/audio-ports.h"
 #include "clap/ext/latency.h"
 #include "clap/ext/params.h"
+#include "clap/ext/preset-load.h"
 #include "clap/ext/remote-controls.h"
 #include "clap/ext/state.h"
 #include "clap/ext/track-info.h"
 #include "clap/factory/plugin-factory.h"
+#include "clap/factory/preset-discovery.h"
 #include "clap/plugin.h"
 #include "clap/process.h"
 #include "clap/stream.h"
@@ -37,6 +39,7 @@
 #include "omx_rotary_params.h"
 #include "omx_rotary_core.h"
 #include <omx-clap-host/omx_clap_ext.h>
+#include "omx_preset_file.h"
 #include <omxdsp/omx_denormal.h> /* omx_denormals_off, per callback */
 
 #define G_DECLARED OMX_ROTARY_PARAM_COUNT
@@ -56,6 +59,7 @@ typedef struct {
   _Atomic uint32_t latency;        /* the frames the host was told of at the last activation */
   _Atomic int restart_asked;       /* a restart asked for since, for a latency the values moved */
   const clap_host_latency_t *host_latency; /* the host's clap.latency, when it offers one */
+  const clap_host_params_t *host_params;   /* the host's clap.params, when it offers one */
   int active, processing;
   const clap_host_track_info_t *track_info; /* the host's clap.track-info, when it offers one */
   unsigned char touched[G_PARAMS];          /* set by the host or a state: a placement default leaves it */
@@ -128,6 +132,8 @@ static bool g_init(const clap_plugin_t *p) {
     g->track_info = (const clap_host_track_info_t *)g->host->get_extension(g->host, CLAP_EXT_TRACK_INFO);
   if (g->host && g->host->get_extension)
     g->host_latency = (const clap_host_latency_t *)g->host->get_extension(g->host, CLAP_EXT_LATENCY);
+  if (g->host && g->host->get_extension)
+    g->host_params = (const clap_host_params_t *)g->host->get_extension(g->host, CLAP_EXT_PARAMS);
   g_place(g, g_placement(g));
   g_publish(g);
   return true;
@@ -280,13 +286,16 @@ static bool g_ports_get(const clap_plugin_t *p, uint32_t index, bool is_input, c
 
 static const clap_plugin_audio_ports_t G_PORTS_EXT = {g_ports_count, g_ports_get};
 
-/* ---- state: symbol=value lines, declaration order ----------------------------------- */
+/* ---- state: symbol=value lines, declaration order, then the host's bypass ------------------- */
+
+/** Parameter `i`'s name in the state: the declaration's symbol, `bypass` for the host's bypass. */
+static const char *g_state_symbol(uint32_t i) { return i < G_DECLARED ? OMX_ROTARY_PARAMS[i].symbol : "bypass"; }
 
 static bool g_state_save(const clap_plugin_t *p, const clap_ostream_t *s) {
   G *g = (G *)p->plugin_data;
   char line[160];
-  for (uint32_t i = 0; i < G_DECLARED; ++i) {
-    int n = snprintf(line, sizeof line, "%s=%.9g\n", OMX_ROTARY_PARAMS[i].symbol, (double)atomic_load(&g->applied[i]));
+  for (uint32_t i = 0; i < G_PARAMS; ++i) {
+    int n = snprintf(line, sizeof line, "%s=%.9g\n", g_state_symbol(i), (double)atomic_load(&g->applied[i]));
     for (int off = 0; off < n;) {
       int64_t w = s->write(s, line + off, (uint64_t)(n - off));
       if (w <= 0) return false;
@@ -296,35 +305,87 @@ static bool g_state_save(const clap_plugin_t *p, const clap_ostream_t *s) {
   return true;
 }
 
+/* A state the face writes holds at most G_PARAMS lines of a symbol and a %.9g value; this bound leaves
+ * room for lines a later version adds, and refuses anything far larger before it is parsed. */
+#define G_STATE_MAX (G_PARAMS * 256u)
+
 static bool g_state_load(const clap_plugin_t *p, const clap_istream_t *s) {
   G *g = (G *)p->plugin_data;
   if (g->processing) return false; /* never race the audio thread's values */
-  char buf[4096];
+  char *buf = malloc(G_STATE_MAX + 1u);
+  if (!buf) return false;
   size_t len = 0;
   for (;;) {
-    if (len == sizeof buf - 1) return false;
-    int64_t r = s->read(s, buf + len, sizeof buf - 1 - len);
-    if (r < 0) return false;
+    if (len == G_STATE_MAX) return free(buf), false;
+    int64_t r = s->read(s, buf + len, G_STATE_MAX - len);
+    if (r < 0) return free(buf), false;
     if (r == 0) break;
     len += (size_t)r;
   }
   buf[len] = 0;
+  /* parsed first, applied only when at least one line names a parameter: an empty or foreign state
+   * is refused and leaves the instance as it was */
+  float v[G_PARAMS];
+  unsigned char set[G_PARAMS] = {0};
+  bool any = false;
   for (char *line = strtok(buf, "\n"); line; line = strtok(NULL, "\n")) {
     char *eq = strchr(line, '=');
     if (!eq) continue;
     *eq = 0;
-    for (uint32_t i = 0; i < G_DECLARED; ++i) {
-      if (strcmp(line, OMX_ROTARY_PARAMS[i].symbol) == 0) {
-        g->values[i] = g_clamp(i, strtod(eq + 1, NULL));
-        g->touched[i] = 1;
+    for (uint32_t i = 0; i < G_PARAMS; ++i) {
+      if (strcmp(line, g_state_symbol(i)) == 0) {
+        v[i] = g_clamp(i, strtod(eq + 1, NULL));
+        set[i] = 1;
+        any = true;
       }
     }
   }
+  free(buf);
+  if (!any) return false;
+  for (uint32_t i = 0; i < G_PARAMS; ++i)
+    if (set[i]) g->values[i] = v[i], g->touched[i] = 1;
   g_publish(g);
+  /* The values a state set are new to the host: it reads them again (clap.params rescan). */
+  if (g->host_params && g->host_params->rescan) g->host_params->rescan(g->host, CLAP_PARAM_RESCAN_VALUES);
   return true;
 }
 
 static const clap_plugin_state_t G_STATE_EXT = {g_state_save, g_state_load};
+
+/* ---- clap.preset-load: a factory preset file, its params as the state load applies them -------- */
+
+static void g_preset_param(const char *symbol, double value, void *ctx) {
+  G *g = (G *)ctx;
+  for (uint32_t i = 0; i < G_DECLARED; ++i) {
+    if (strcmp(symbol, OMX_ROTARY_PARAMS[i].symbol) == 0) {
+      g->values[i] = g_clamp(i, value);
+      g->touched[i] = 1;
+    }
+  }
+}
+
+static bool g_preset_from_location(const clap_plugin_t *p, uint32_t kind, const char *location, const char *load_key) {
+  G *g = (G *)p->plugin_data;
+  const clap_host_preset_load_t *h = g->host && g->host->get_extension
+      ? (const clap_host_preset_load_t *)g->host->get_extension(g->host, CLAP_EXT_PRESET_LOAD) : NULL;
+  if (!h && g->host && g->host->get_extension)
+    h = (const clap_host_preset_load_t *)g->host->get_extension(g->host, CLAP_EXT_PRESET_LOAD_COMPAT);
+  char *text = kind == CLAP_PRESET_DISCOVERY_LOCATION_FILE && !g->processing ? omx_preset_slurp(location) : NULL;
+  struct omx_preset_head head;
+  bool ok = text && omx_preset_head(text, OMX_ROTARY_CLAP_ID, &head) && omx_preset_params(&head, g_preset_param, g);
+  free(text);
+  if (!ok) {
+    if (h && h->on_error) h->on_error(g->host, kind, location, load_key, 0, "not an org.openmixer.preset/1 file of this plugin");
+    return false;
+  }
+  g_publish(g);
+  /* as after a state load: the values are new to the host, it reads them again */
+  if (g->host_params && g->host_params->rescan) g->host_params->rescan(g->host, CLAP_PARAM_RESCAN_VALUES);
+  if (h && h->loaded) h->loaded(g->host, kind, location, load_key);
+  return true;
+}
+
+static const clap_plugin_preset_load_t G_PRESET_LOAD_EXT = {g_preset_from_location};
 
 /* ---- omx.declaration -------------------------------------------------------------- */
 
@@ -441,6 +502,7 @@ static const void *g_get_extension(const clap_plugin_t *p, const char *id) {
   if (strcmp(id, CLAP_EXT_LATENCY) == 0) return &G_LATENCY_EXT;
   if (strcmp(id, CLAP_EXT_AUDIO_PORTS) == 0) return &G_PORTS_EXT;
   if (strcmp(id, CLAP_EXT_STATE) == 0) return &G_STATE_EXT;
+  if (strcmp(id, CLAP_EXT_PRESET_LOAD) == 0 || strcmp(id, CLAP_EXT_PRESET_LOAD_COMPAT) == 0) return &G_PRESET_LOAD_EXT;
   if (strcmp(id, OMX_CLAP_EXT_DECLARATION) == 0) return &G_DECL_EXT;
   if (strcmp(id, OMX_PANEL_DESCRIPTION_ID) == 0) return &G_PANEL_EXT;
   if (strcmp(id, OMX_PARAM_CONTRACT_ID) == 0) return &G_CONTRACT_EXT;
@@ -497,6 +559,76 @@ static const clap_plugin_t *f_create(const clap_plugin_factory_t *f, const clap_
 
 static const clap_plugin_factory_t G_FACTORY = {f_count, f_desc, f_create};
 
+/* ---- clap.preset-discovery: the factory presets' location, one preset per file --------------- */
+
+#define G_PRESET_LOCATION OMX_PRESET_ROOT "/" OMX_ROTARY_CLAP_ID "/"
+
+static const clap_preset_discovery_provider_descriptor_t G_PROVIDER_DESC = {
+    CLAP_VERSION_INIT, OMX_ROTARY_CLAP_ID ".presets", OMX_ROTARY_NAME " factory presets", OMX_ROTARY_VENDOR};
+
+typedef struct {
+  clap_preset_discovery_provider_t provider;
+  const clap_preset_discovery_indexer_t *indexer;
+} G_PROVIDER;
+
+static bool p_init(const clap_preset_discovery_provider_t *pv) {
+  const clap_preset_discovery_indexer_t *ix = ((const G_PROVIDER *)pv->provider_data)->indexer;
+  const clap_preset_discovery_filetype_t type = {"OpenMixer preset", OMX_PRESET_FORMAT, "json"};
+  const clap_preset_discovery_soundpack_t pack = {CLAP_PRESET_DISCOVERY_IS_FACTORY_CONTENT, OMX_ROTARY_CLAP_ID, OMX_ROTARY_NAME " factory presets",
+                                                  NULL, OMX_ROTARY_URL, OMX_ROTARY_VENDOR, NULL, CLAP_TIMESTAMP_UNKNOWN};
+  const clap_preset_discovery_location_t where = {CLAP_PRESET_DISCOVERY_IS_FACTORY_CONTENT, OMX_ROTARY_NAME " factory presets",
+                                                  CLAP_PRESET_DISCOVERY_LOCATION_FILE, G_PRESET_LOCATION};
+  return ix->declare_filetype(ix, &type) && ix->declare_soundpack(ix, &pack) && ix->declare_location(ix, &where);
+}
+
+static void p_destroy(const clap_preset_discovery_provider_t *pv) { free(pv->provider_data); }
+
+static bool p_get_metadata(const clap_preset_discovery_provider_t *pv, uint32_t kind, const char *location,
+                           const clap_preset_discovery_metadata_receiver_t *r) {
+  (void)pv;
+  if (kind != CLAP_PRESET_DISCOVERY_LOCATION_FILE) return false;
+  char *text = omx_preset_slurp(location);
+  struct omx_preset_head head;
+  bool ok = text && omx_preset_head(text, OMX_ROTARY_CLAP_ID, &head);
+  free(text);
+  if (!ok) return true; /* not one of ours: no preset in it */
+  if (!r->begin_preset(r, head.name, NULL)) return true;
+  const clap_universal_plugin_id_t id = {"clap", OMX_ROTARY_CLAP_ID};
+  r->add_plugin_id(r, &id);
+  r->set_soundpack_id(r, OMX_ROTARY_CLAP_ID);
+  r->set_flags(r, CLAP_PRESET_DISCOVERY_IS_FACTORY_CONTENT);
+  return true;
+}
+
+static const void *p_get_extension(const clap_preset_discovery_provider_t *pv, const char *id) {
+  (void)pv;
+  (void)id;
+  return NULL;
+}
+
+static uint32_t d_count(const clap_preset_discovery_factory_t *f) {
+  (void)f;
+  return 1;
+}
+
+static const clap_preset_discovery_provider_descriptor_t *d_desc(const clap_preset_discovery_factory_t *f, uint32_t i) {
+  (void)f;
+  return i == 0 ? &G_PROVIDER_DESC : NULL;
+}
+
+static const clap_preset_discovery_provider_t *d_create(const clap_preset_discovery_factory_t *f,
+                                                        const clap_preset_discovery_indexer_t *ix, const char *id) {
+  (void)f;
+  if (!ix || !id || strcmp(id, G_PROVIDER_DESC.id) != 0) return NULL;
+  G_PROVIDER *pv = (G_PROVIDER *)calloc(1, sizeof *pv);
+  if (!pv) return NULL;
+  pv->indexer = ix;
+  pv->provider = (clap_preset_discovery_provider_t){&G_PROVIDER_DESC, pv, p_init, p_destroy, p_get_metadata, p_get_extension};
+  return &pv->provider;
+}
+
+static const clap_preset_discovery_factory_t G_PRESET_FACTORY = {d_count, d_desc, d_create};
+
 static bool e_init(const char *path) {
   (void)path;
   return true;
@@ -504,7 +636,11 @@ static bool e_init(const char *path) {
 
 static void e_deinit(void) {}
 
-static const void *e_factory(const char *id) { return strcmp(id, CLAP_PLUGIN_FACTORY_ID) == 0 ? &G_FACTORY : NULL; }
+static const void *e_factory(const char *id) {
+  if (strcmp(id, CLAP_PLUGIN_FACTORY_ID) == 0) return &G_FACTORY;
+  if (strcmp(id, CLAP_PRESET_DISCOVERY_FACTORY_ID) == 0 || strcmp(id, CLAP_PRESET_DISCOVERY_FACTORY_ID_COMPAT) == 0) return &G_PRESET_FACTORY;
+  return NULL;
+}
 
 /* The entry by name, for a host that links the plugin statically and opens it by id without dlopen. */
 const clap_plugin_entry_t omx_clap_entry_rotary = {CLAP_VERSION_INIT, e_init, e_deinit, e_factory};
