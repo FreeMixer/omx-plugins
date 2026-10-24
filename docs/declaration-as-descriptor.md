@@ -15,6 +15,12 @@ headers, both faces, the panel description, the MOD GUI and its rasters do not c
 plugin moves to a descriptor (`node tools/gen.mjs --check`, `node tools/modgui-gen.mjs --check`,
 `node tools/look.mjs --check`, `make panel-layout`).
 
+Two plugins keep a whole declaration: omx-eq, a base of three variants, and omx-strip, a chain. Their declaration is
+no extras file, so their descriptors are rendered from it (`node tools/gen.mjs` writes `omx-eq8`, `omx-eq16`,
+`omx-eq32` and `omx-strip` `.descriptor.json`, `--check` holds them fresh) and are not read back. Their faces state
+what the descriptor states, as every described plugin's do: the CLAP parameter modules from the groups, the LV2
+designations from the meanings.
+
 A link carries the release it is read from, `at`: `omx-contract@<floor>`, the packaging's floor.
 
 ## Where a host reads it
@@ -98,8 +104,8 @@ stands in for the installed tables.
 - An LV2 port's `units:unit` is the LV2 row mapping its unit (`units:db` for `dB`, `<urn:openmixer:unit#dBFS>` for
   `dBFS`); a unit no row maps is the declaration's own, defined in the plugin's TTL: `dBu`, `dB/oct` and `ratio`
   (`urn:openmixer:unit#ratio`, gap 4).
-- An LV2 port's `lv2:designation` is the LV2 row mapping its control's `meaning`: 57 ports carry a `param:` term
-  (gain 31, wetDryRatio 10, release 4, threshold 3, ratio 3, attack 3, hold 1, frequency 1, delay 1). A meaning with
+- An LV2 port's `lv2:designation` is the LV2 row mapping its control's `meaning`: 169 ports carry a `param:` term
+  (gain 87, frequency 57, wetDryRatio 10, release 4, threshold 3, ratio 3, attack 3, hold 1, delay 1). A meaning with
   no LV2 term is written nowhere.
 - A CLAP parameter's `module` is its control's `group`, the labels joined by `/` (the inverse of plugin-hostd's
   `group-path`); a plugin with no descriptor writes `""`.

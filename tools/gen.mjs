@@ -40,7 +40,7 @@ import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 
 import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { faceBinding } from './instance-face.mjs';
-import { descriptorFile, descriptorText, travelUnit, viewOf } from './descriptor.mjs';
+import { descriptorFile, descriptorOf, descriptorText, isWhole, travelUnit, viewOf } from './descriptor.mjs';
 import { lv2Designation, lv2UnitNames, lv2UnitRef } from './format-tables.mjs';
 import { DISPLAY_KINDS, DISPLAY_SOURCES, FAMILIES, PLACEMENTS, WIDGETS, pagesOf, panelDescription, panelFingerprint } from './panel-description.mjs';
 import { CONTRACT_VERSION, contractFingerprint, contractOf } from './param-contract.mjs';
@@ -64,7 +64,7 @@ export function loadDecl(dir) {
     // a plugin described in omx-contract's words: its declaration is the descriptor's view, the
     // extras of <stem>.decl.json folded in (tools/descriptor.mjs)
     const described = join(dir, descriptorFile(stem));
-    if (existsSync(described)) {
+    if (existsSync(described) && !isWhole(d)) {
       const descriptor = JSON.parse(readFileSync(described, 'utf8'));
       d = { ...viewOf(descriptor, d, file), described: true, descriptor };
     }
@@ -76,7 +76,10 @@ export function loadDecl(dir) {
     if (!where.dir) throw new Error(`${file}: its variant ${stem} is expanded from omx-contract and ${where.why}`);
     d = expandVariant(where.dir, base.decl, base.decl.variants.of.find((v) => v.stem === stem));
   }
-  return prepareDecl(file, d, stem, dir);
+  const prepared = prepareDecl(file, d, stem, dir);
+  // a whole declaration (a base of variants, a chain) is rendered as the descriptor its faces are held to, as a
+  // described plugin's is read from it: the faces state the designations, units and modules it states
+  return prepared.described || !(prepared.variantOf || prepared.binding === 'chain') ? prepared : { ...prepared, described: true, descriptor: descriptorOf(prepared).descriptor };
 }
 
 /** A declaration read from `file` (or about to be written there: the wizard's plan), validated and
@@ -1042,7 +1045,7 @@ export function generate(d) {
     [`${lv2}/${d.stem}.ttl`]: emitPluginTtl(d),
     ...(d.binding === 'instance' ? generateInstance(d) : {}),
     ...(d.binding === 'chain' ? generateChain(d) : {}),
-    ...(d.described ? { [descriptorFile(d.stem)]: descriptorText(d) } : {}),
+    ...(d.descriptor ? { [descriptorFile(d.stem)]: descriptorText(d) } : {}),
   };
 }
 
