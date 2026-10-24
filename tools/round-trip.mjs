@@ -98,10 +98,11 @@ export const UPSTREAM = {
   // (deesser deessFreq, drive bandFreq). The same seven on the desk and in CI; the cause is not isolated yet. The entry
   // holds through the newest plugin-hostd release seen still showing them (0.9.1, in CI; 0.9.1's release notes do not
   // touch the scale flip): a newer plugin-hostd fails the run until the entry is retired or moved on.
-  // The two gate key filters (omx-keyed-gate key_hp and key_lp) flip the same way as the seven EQ ports, under 0.9.1 in CI
+  // The two gate key filters (omx-keyed-gate key_hp and key_lp) flip the same way as the seven EQ ports, under 0.9.1 in CI;
+  // so can the other integer Hz ports that state both words (deesser, drive, phaser, reverb): plugin-hostd#142
   'lv2 controls[].travel.scale "stepped" "log"': {
     through: '0.9.1',
-    at: ['omx-eq8 b6_freq', 'omx-eq16 b6_freq', 'omx-eq16 b9_freq', 'omx-eq32 b6_freq', 'omx-eq32 b9_freq', 'omx-eq32 b18_freq', 'omx-eq32 b19_freq', 'omx-keyed-gate key_hp', 'omx-keyed-gate key_lp'],
+    at: ['omx-eq8 b6_freq', 'omx-eq16 b6_freq', 'omx-eq16 b9_freq', 'omx-eq32 b6_freq', 'omx-eq32 b9_freq', 'omx-eq32 b18_freq', 'omx-eq32 b19_freq', 'omx-keyed-gate key_hp', 'omx-keyed-gate key_lp', 'omx-deesser deessFreq', 'omx-drive bandFreq', 'omx-phaser baseHz', 'omx-reverb lowcut', 'omx-reverb highcut'],
     why: 'the scan reports log where the face says stepped, on seven ports whose lv2:integer and pprops:logarithmic lines equal their passing neighbours\'; cause not isolated; https://github.com/FreeMixer/plugin-hostd/issues/147',
   },
 };
@@ -270,5 +271,5 @@ if (process.argv[1] && resolve(process.argv[1]) === resolve(new URL(import.meta.
   const up = lines.filter((l) => l.startsWith('differs ') && l.includes(' (upstream: ')).length;
   console.log(`round-trip: ${inside.length} plugins, both faces: ${count('equal')} equal, ${count('lost')} lost, ${count('differs') - up} differs, ${up} upstream; ${outside.length} outside (${outside.join(', ')})`);
   if (fails) console.log(`FAIL round-trip: ${fails} difference(s) or unnamed loss(es)`);
-  process.exit(fails ? 1 : 0);
+  process.exitCode = fails ? 1 : 0;
 }
