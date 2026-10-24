@@ -29,6 +29,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { loadDecl, pluginDirs, ROOT } from '../gen.mjs';
 import { installedDataDir, locateContract } from '../omx-contract.mjs';
+import { presetsOf } from '../preset-lib.mjs';
 import { REQUIRED_HINTS, hintVocabulary, maskOf } from '../resource-hints.mjs';
 
 /** The pin: the LV2 prefix and namespace as #216 and omx-contract#140 settled them, which this check holds the installed
@@ -108,15 +109,20 @@ export function headerErrors(v, d, header) {
   return errors;
 }
 
-/** The built binaries' imports against the declaration's claims. */
-export function importErrors(d, files, importsOf) {
+/** The stdio calls of omx_preset_file.h, which a face with factory presets imports to read a preset file when the
+ * host asks for it (never while it processes, which is what streams-from-disk states). */
+export const PRESET_READER = ['fopen', 'fopen64', 'fread'];
+
+/** The built binaries' imports against the declaration's claims. `presetReader`: the plugin ships factory presets,
+ * so PRESET_READER is not a refutation of streams-from-disk false. */
+export function importErrors(d, files, importsOf, presetReader = false) {
   const errors = [];
   for (const file of files) {
     const imported = new Set(importsOf(file));
     for (const h of d.hints) {
       const r = REFUTED_BY[h.word];
       if (!r || !r.when(h.value)) continue;
-      const hit = r.symbols.filter((s) => imported.has(s));
+      const hit = r.symbols.filter((s) => imported.has(s) && !(presetReader && h.word === 'streams-from-disk' && PRESET_READER.includes(s)));
       if (hit.length) errors.push(`${d.stem}: declares ${h.word} ${h.value}, and ${file} imports ${hit.join(', ')}`);
     }
   }
@@ -159,7 +165,7 @@ if (process.argv[1] && import.meta.url === new URL(`file://${process.argv[1]}`).
   if (args[0] === '--binaries') {
     const [, dir, ...files] = args;
     const d = loadDecl(dir);
-    const errors = importErrors(d, files, nmImports);
+    const errors = importErrors(d, files, nmImports, presetsOf(`org.openmixer.${d.stem.replace(/^omx-/, '')}`, ROOT).length > 0);
     for (const e of errors) console.log(`FAIL resource-hints ${e}`);
     if (!errors.length) console.log(`PASS resource-hints ${d.stem}: no import of ${files.length} built face(s) refutes ${d.hints.map((h) => `${h.word} ${h.value}`).join(', ') || 'a stated hint'}`);
     process.exit(errors.length ? 1 : 0);
@@ -189,6 +195,8 @@ if (process.argv[1] && import.meta.url === new URL(`file://${process.argv[1]}`).
       'an installed header whose bit order moved': () => vocabularyErrors(c.v, c.header.replace('OMX_RESOURCE_HINT_THREADS_SPAWNED (1u << 3)', 'OMX_RESOURCE_HINT_THREADS_SPAWNED (1u << 4)'), c.ttl),
       [`${delay.stem}'s face importing pthread_create`]: () => importErrors(delay, ['face.clap'], () => ['calloc', 'pthread_create']),
       [`${delay.stem}'s face importing fopen`]: () => importErrors(delay, ['face.so'], () => ['fopen']),
+      [`${delay.stem}'s face importing open, with presets shipped`]: () => importErrors(delay, ['face.so'], () => ['open', 'fopen'], true),
+      [`${delay.stem}'s face importing fread, no presets shipped`]: () => importErrors(delay, ['face.so'], () => ['fread'], false),
       [`${delay.stem}'s face importing socket`]: () => importErrors(delay, ['face.so'], () => ['socket']),
     };
     for (const [what, run] of Object.entries(arms)) {
