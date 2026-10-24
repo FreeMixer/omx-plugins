@@ -41,38 +41,38 @@ export const FORMATS = ['clap', 'lv2'];
 export const LOSSES = {
   // OR2: a meaning has a CLAP word only for the bypass, an LV2 term only for some (lv2:designation); LV2 has no unit
   // for "" (a plain number)
-  'clap controls[].meaning': 89,
-  'lv2 controls[].meaning': 32,
-  'lv2 controls[].travel.unit ""': 13,
+  'clap controls[].meaning': 269,
+  'lv2 controls[].meaning': 100,
+  'lv2 controls[].travel.unit ""': 76,
   // plugin-hostd 0.7.0's LV2 table has no row for urn:openmixer:unit#ratio, the ratio unit our faces write (gap 4)
   'lv2 controls[].travel.unit "ratio"': 3,
   // CLAP: no row reads a unit, a linear or log scale, a step, a choice (our faces set no CLAP_PARAM_IS_ENUM), the
   // session symbol, the LV2 URI, a side-chain's role or what an LV2 host may lend
-  'clap controls[].travel.unit': 113,
-  'clap controls[].travel.scale': 85,
-  'clap controls[].travel.step': 113,
-  'clap controls[].kind': 15,
-  'clap controls[].ids': 12,
-  'clap controls[].values': 12,
-  'clap controls[].labels': 12,
-  'clap controls[].default': 15,
-  'clap controls[].symbol': 128,
-  'clap plugin.uri': 15,
+  'clap controls[].travel.unit': 319,
+  'clap controls[].travel.scale': 218,
+  'clap controls[].travel.step': 319,
+  'clap controls[].kind': 158,
+  'clap controls[].ids': 82,
+  'clap controls[].values': 82,
+  'clap controls[].labels': 82,
+  'clap controls[].default': 158,
+  'clap controls[].symbol': 477,
+  'clap plugin.uri': 19,
   'clap ports[].role': 1,
-  'clap needs.extensions.optional': 15,
+  'clap needs.extensions.optional': 19,
   // LV2: no row reads a step, automation, the plugin's version or vendor (our .ttl writes no doap:maintainer); a
   // control's id is its symbol and a point's id its label, so the CLAP id and our point ids are no LV2 word; the
   // audio ports are one per channel, with the generator's symbols and names
-  'lv2 controls[].travel.step': 113,
-  'lv2 controls[].automatable': 128,
-  'lv2 controls[].id': 128,
-  'lv2 controls[].ids': 12,
-  'lv2 plugin.version': 15,
-  'lv2 plugin.vendor': 15,
-  'lv2 ports[].id': 31,
-  'lv2 ports[].name': 31,
-  // the three toggles UPSTREAM names, scanned as travels, carry no toggle's default
-  'lv2 controls[].default': 3,
+  'lv2 controls[].travel.step': 319,
+  'lv2 controls[].automatable': 477,
+  'lv2 controls[].id': 477,
+  'lv2 controls[].ids': 82,
+  'lv2 plugin.version': 19,
+  'lv2 plugin.vendor': 19,
+  'lv2 ports[].id': 39,
+  'lv2 ports[].name': 39,
+  // the toggles UPSTREAM names, scanned as travels, carry no toggle's default
+  'lv2 controls[].default': 76,
 };
 
 /** A break in plugin-hostd's wave tip, reported, each `differs` it causes printed with it
@@ -80,7 +80,12 @@ export const LOSSES = {
  * describe` keeps a word's last value, and an LV2 dump lists lv2:portProperty lv2:toggled before rdf:type
  * lv2:ControlPort, so a toggle's kind is the control port's travel. */
 export const UPSTREAM = {
-  'lv2 controls[].kind "toggle" "travel"': { count: 3, why: 'plugin-hostd 83e54db describe: lv2:ControlPort overwrites lv2:toggled (src/describe.c get(), the last value)' },
+  'lv2 controls[].kind "toggle" "travel"': { count: 76, why: 'plugin-hostd 83e54db describe: lv2:ControlPort overwrites lv2:toggled (src/describe.c get(), the last value)' },
+  // seven EQ frequency ports (omx-eq8 b6, omx-eq16 b6 and b9, omx-eq32 b6, b9, b18 and b19) list lv2:integer and
+  // pprops:logarithmic exactly as their neighbours do, and scan as log where the neighbours scan as stepped: describe
+  // keeps the last of the two words, so the order the scan lists the two properties in differs between ports of one
+  // .ttl shape. The cause is in the scan (the same seven on the desk and in CI), not in the face.
+  'lv2 controls[].travel.scale "stepped" "log"': { count: 7, why: 'plugin-hostd describe keeps the last of lv2:integer (stepped) and pprops:logarithmic (log); the scan orders them differently on seven ports with the same .ttl lines' },
 };
 
 /** The described plugins (a descriptor beside the declaration), and the ones outside the round trip. */
