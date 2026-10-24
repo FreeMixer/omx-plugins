@@ -21,6 +21,10 @@ set -euo pipefail
 HERE=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)
 VERSION=$(make -s -C "$HERE" version)
 
+# the plugins whose descriptor a host reads from the contract directory (FreeMixer/omx-plugins#219): each must ship
+# one, and the install must list it
+REQUIRED="omx-eq8 omx-eq16 omx-eq32 omx-strip"
+
 # ship stems with a descriptor: the plugin folders the top Makefile builds whose declaration does not say
 # `"role": "test"`, holding <stem>.descriptor.json
 described() {
@@ -63,6 +67,11 @@ check() {
     got=$(awk -v r="$rel" '$1 == "file" && $2 == r {print $3}' <<<"$listed")
     [ "$got" = "$want" ] || { echo "contract-dir: $stem: MANIFEST.json lists $rel as ${got:-nothing}, the file is $want"; bad=$((bad + 1)); }
   done
+  for stem in $REQUIRED; do
+    grep -qx "$stem" <<<"$stems" || { echo "contract-dir: $stem ships no descriptor (plugins/$stem/$stem.descriptor.json)"; bad=$((bad + 1)); continue; }
+    awk -v r="plugins/$stem.json" '$1 == "file" && $2 == r {f = 1} END {exit !f}' <<<"$listed" \
+      || { echo "contract-dir: $stem: MANIFEST.json does not list plugins/$stem.json"; bad=$((bad + 1)); }
+  done
   [ "$n" -gt 0 ] || { echo "contract-dir: no shipped plugin has a descriptor"; bad=$((bad + 1)); }
   while IFS= read -r f; do
     rel=${f#"$pkg"/}
@@ -103,7 +112,7 @@ if [ "${1:-}" = --self-test ]; then
     node -e 'const fs = require("fs"); const [p, r, h] = process.argv.slice(1); const m = JSON.parse(fs.readFileSync(p, "utf8"));
       m.files[r] = h; fs.writeFileSync(p, JSON.stringify(m, null, 2) + "\n");' "$m" "$2" "$h"
   }
-  for s in left-out missing changed extra hash version; do
+  for s in left-out missing changed extra hash version $(for r in $REQUIRED; do printf 'unlisted-%s ' "$r"; done); do
     t=$scratch/$s; rm -rf "$t"
     case $s in
       left-out) install_into "$t" DESCRIPTORS="$rest" ;;
@@ -116,6 +125,8 @@ if [ "${1:-}" = --self-test ]; then
       extra) cp "$p/plugins/$first.json" "$p/plugins/omx-test-sine-voice.json"; rehash "$t" plugins/omx-test-sine-voice.json ;;
       hash) sed -i "s|\"plugins/$first.json\": \"[0-9a-f]*\"|\"plugins/$first.json\": \"$(printf '0%.0s' $(seq 64))\"|" "$p/MANIFEST.json" ;;
       version) sed -i 's/"version": "[0-9.]*"/"version": "0.0.1"/' "$p/MANIFEST.json" ;;
+      unlisted-*) node -e 'const fs = require("fs"); const [f, r] = process.argv.slice(1); const m = JSON.parse(fs.readFileSync(f, "utf8"));
+          delete m.files[r]; fs.writeFileSync(f, JSON.stringify(m, null, 2) + "\n");' "$p/MANIFEST.json" "plugins/${s#unlisted-}.json" ;;
     esac
     if out=$(check "$t" none 2>&1); then echo "SABOTAGE $s: STAYED GREEN"; fail=1
     elif [ -z "$out" ]; then echo "SABOTAGE $s: the check stopped naming nothing"; fail=1
