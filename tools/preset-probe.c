@@ -18,6 +18,7 @@
  *   filetype <extension>         soundpack <id>          location <flags> <declared location>
  *   preset <file> <plugin id> <flags> <name>
  *   loaded <file>                (the host's clap.preset-load `loaded`, once per load)
+ *   rescan <file> <flags>        (the host's clap.params `rescan`, during that file's load)
  *   value <file> <param id> <value, %.9g>
  *
  * lv2: every pset:Preset lilv relates to the plugin, loaded and read as a state:
@@ -63,8 +64,16 @@ static void h_error(const clap_host_t *h, uint32_t kind, const char *location, c
   fprintf(stderr, "preset-load error %s: %s\n", location, msg ? msg : "");
 }
 static const clap_host_preset_load_t HOST_PRESET_LOAD = {h_error, h_loaded};
+static void h_rescan(const clap_host_t *h, clap_param_rescan_flags flags) {
+  (void)h;
+  printf("rescan\t%s\t%u\n", g_file ? g_file : "-", (unsigned)flags);
+}
+static void h_clear(const clap_host_t *h, clap_id id, clap_param_clear_flags flags) { (void)h, (void)id, (void)flags; }
+static void h_flush(const clap_host_t *h) { (void)h; }
+static const clap_host_params_t HOST_PARAMS = {h_rescan, h_clear, h_flush};
 static const void *h_ext(const clap_host_t *h, const char *id) {
   (void)h;
+  if (strcmp(id, CLAP_EXT_PARAMS) == 0) return &HOST_PARAMS;
   return strcmp(id, CLAP_EXT_PRESET_LOAD) == 0 ? &HOST_PRESET_LOAD : NULL;
 }
 static void h_noop(const clap_host_t *h) { (void)h; }
