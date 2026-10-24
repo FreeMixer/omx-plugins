@@ -329,6 +329,66 @@ jobs:
           gcc -o static-table-host tools/test/static-table-host.c $(pkg-config --cflags --libs omxplugins)
           ./static-table-host $(for p in $shorts; do echo "org.openmixer.$p"; done) --test $tests
 
+  clap-validator:
+    # clap-validator is the CLAP project's own conformance tester (state round trips, parameter fuzzing,
+    # thread rules). It runs on every built .clap, the test plugins included, and keeps one JSON report each.
+    # Until every plugin is clean a failed test is reported (a warning, the job summary, the report artifact)
+    # and does not fail the job; the step is made required, continue-on-error removed, once they pass.
+    name: clap-validator (fedora:44, amd64)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    container:
+      image: fedora:44
+    steps:
+      - name: Install the build dependencies
+        run: |
+          dnf install -y --setopt=install_weak_deps=False git dnf5-plugins
+          dnf config-manager addrepo --from-repofile=https://freemixer.github.io/rpm/freemixer.repo
+
+      - uses: actions/checkout@v4
+
+      - name: Install what the spec builds with, and clap-validator from the Audinux COPR
+        run: |
+          set -euo pipefail
+          dnf builddep -y --setopt=install_weak_deps=False packaging/omx-plugins.spec
+          dnf copr enable -y ycollet/audinux
+          dnf install -y --setopt=install_weak_deps=False clap-validator nodejs
+
+      - name: Build every plugin
+        run: make -j"$(nproc)" all
+
+      - name: Validate every built .clap
+        id: validate
+        continue-on-error: true
+        run: |
+          set -euo pipefail
+          mkdir -p build
+          tools/clap-validate.sh build/clap-validator 2>&1 | tee build/clap-validator.log
+        shell: bash
+
+      - name: Show the failures on the run page
+        if: always()
+        run: |
+          {
+            echo '### clap-validator'
+            echo '```'
+            grep -E '^(omx-|  FAIL|FAIL)' build/clap-validator.log || echo 'no failed test'
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          if [ "${{ steps.validate.outcome }}" = failure ]; then
+            echo "::warning::clap-validator reported failures (not yet required); see the job summary and the report artifact"
+          fi
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: clap-validator-reports
+          path: |
+            build/clap-validator/
+            build/clap-validator.log
+          if-no-files-found: error
+          retention-days: 30
+
   release-dry-run:
     name: release workflow, dry run
     permissions:
