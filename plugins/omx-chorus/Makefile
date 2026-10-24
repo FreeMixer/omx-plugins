@@ -7,10 +7,10 @@
 #
 #   make            build/omx-chorus.clap and build/omx-chorus.lv2/ (binary, TTL, MOD GUI)
 #   make test       freshness of every generated file, the parameters as declared, every parameter
-#                   live, the chorus kernel-identity oracle, the panel description both faces serve, the
-#                   CLAP face's parameter contract, remote controls and track-info, the LV2 port
-#                   groups, the MOD GUI checks, and the host checks (omx-clap-scan, lv2info) where
-#                   installed
+#                   live, the CLAP state's round trip, the chorus kernel-identity oracle, the panel
+#                   description both faces serve, the CLAP face's parameter contract, remote controls
+#                   and track-info, the LV2 port groups, the MOD GUI checks, and the host
+#                   checks (omx-clap-scan, lv2info) where installed
 #   make gen        regenerate generated/ from the declaration (commit the result)
 #   make install    DESTDIR/PREFIX/LIBDIR/CLAPDIR: $(CLAPDIR)/omx-chorus.clap, $(LIBDIR)/lv2/omx-chorus.lv2/
 #
@@ -96,19 +96,22 @@ check:
 	node $(ROOT)/tools/modgui-gen.mjs --check $(CURDIR)
 
 # The parameter test: the built CLAP face's parameters are the declaration's, and every one of them
-# reaches the kernel. The kernel-identity test: both faces, sample for sample, against omx-dsp's
-# chorus kernel called directly. The panel test: org.openmixer.panel-description/1 read from
-# each built face as a host reads it, equal to the declaration's panel. The CLAP extension test: the
-# parameter contract, the remote-control pages, each placement's defaults and the resource hints, read as
-# a host reads them, equal to the declaration's. The resource-hint import test: no import of either built
-# face refutes a hint the declaration states (no thread, socket or file call). The port-group test: the
-# LV2 bundle, read through lilv, puts each panel section's parameters in that section's pg:Group. Every
-# test runs, and the target fails if any failed, so a new plugin shows all its red tests at once.
+# reaches the kernel. The state test: a saved state, loaded into a fresh instance, gives back every
+# value, the same state and the same output. The kernel-identity test: both faces, sample for
+# sample, against omx-dsp's chorus kernel called directly. The panel test:
+# org.openmixer.panel-description/1 read from each built face as a host reads it, equal to the
+# declaration's panel. The CLAP extension test: the parameter contract, the remote-control pages,
+# each placement's defaults and the resource hints, read as a host reads them, equal to the
+# declaration's. The resource-hint import test: no import of either built face refutes a hint the
+# declaration states (no thread, socket or file call). The port-group test: the LV2 bundle, read
+# through lilv, puts each panel section's parameters in that section's pg:Group. Every test runs, and
+# the target fails if any failed, so a new plugin shows all its red tests at once.
 test: all check $(B)/clap-probe $(B)/panel-probe $(B)/clap-ext-probe $(B)/port-groups-probe $(B)/chorus-oracle
 	@fail=0; \
 	$(B)/clap-probe params $(B)/$(NAME).clap > $(B)/clap-params.txt && \
 	  node $(ROOT)/tools/clap-params-check.mjs $(CURDIR) $(B)/clap-params.txt || fail=1; \
 	$(B)/clap-probe live $(B)/$(NAME).clap || fail=1; \
+	$(B)/clap-probe state $(B)/$(NAME).clap || fail=1; \
 	$(B)/chorus-oracle clap $(B)/$(NAME).clap || fail=1; \
 	$(B)/chorus-oracle lv2 $(BUNDLE) $(URI) || fail=1; \
 	$(B)/panel-probe clap $(B)/$(NAME).clap > $(B)/panel-clap.txt && \

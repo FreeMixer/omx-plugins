@@ -56,6 +56,7 @@ typedef struct {
   _Atomic uint32_t latency;        /* the frames the host was told of at the last activation */
   _Atomic int restart_asked;       /* a restart asked for since, for a latency the values moved */
   const clap_host_latency_t *host_latency; /* the host's clap.latency, when it offers one */
+  const clap_host_params_t *host_params;   /* the host's clap.params, when it offers one */
   int active, processing;
   const clap_host_track_info_t *track_info; /* the host's clap.track-info, when it offers one */
   unsigned char touched[G_PARAMS];          /* set by the host or a state: a placement default leaves it */
@@ -128,6 +129,8 @@ static bool g_init(const clap_plugin_t *p) {
     g->track_info = (const clap_host_track_info_t *)g->host->get_extension(g->host, CLAP_EXT_TRACK_INFO);
   if (g->host && g->host->get_extension)
     g->host_latency = (const clap_host_latency_t *)g->host->get_extension(g->host, CLAP_EXT_LATENCY);
+  if (g->host && g->host->get_extension)
+    g->host_params = (const clap_host_params_t *)g->host->get_extension(g->host, CLAP_EXT_PARAMS);
   g_place(g, g_placement(g));
   g_publish(g);
   return true;
@@ -280,13 +283,16 @@ static bool g_ports_get(const clap_plugin_t *p, uint32_t index, bool is_input, c
 
 static const clap_plugin_audio_ports_t G_PORTS_EXT = {g_ports_count, g_ports_get};
 
-/* ---- state: symbol=value lines, declaration order ----------------------------------- */
+/* ---- state: symbol=value lines, declaration order, then the host's bypass ------------------- */
+
+/** Parameter `i`'s name in the state: the declaration's symbol, `bypass` for the host's bypass. */
+static const char *g_state_symbol(uint32_t i) { return i < G_DECLARED ? OMX_PITCH_PARAMS[i].symbol : "bypass"; }
 
 static bool g_state_save(const clap_plugin_t *p, const clap_ostream_t *s) {
   G *g = (G *)p->plugin_data;
   char line[160];
-  for (uint32_t i = 0; i < G_DECLARED; ++i) {
-    int n = snprintf(line, sizeof line, "%s=%.9g\n", OMX_PITCH_PARAMS[i].symbol, (double)atomic_load(&g->applied[i]));
+  for (uint32_t i = 0; i < G_PARAMS; ++i) {
+    int n = snprintf(line, sizeof line, "%s=%.9g\n", g_state_symbol(i), (double)atomic_load(&g->applied[i]));
     for (int off = 0; off < n;) {
       int64_t w = s->write(s, line + off, (uint64_t)(n - off));
       if (w <= 0) return false;
@@ -296,31 +302,48 @@ static bool g_state_save(const clap_plugin_t *p, const clap_ostream_t *s) {
   return true;
 }
 
+/* A state the face writes holds at most G_PARAMS lines of a symbol and a %.9g value; this bound leaves
+ * room for lines a later version adds, and refuses anything far larger before it is parsed. */
+#define G_STATE_MAX (G_PARAMS * 256u)
+
 static bool g_state_load(const clap_plugin_t *p, const clap_istream_t *s) {
   G *g = (G *)p->plugin_data;
   if (g->processing) return false; /* never race the audio thread's values */
-  char buf[4096];
+  char *buf = malloc(G_STATE_MAX + 1u);
+  if (!buf) return false;
   size_t len = 0;
   for (;;) {
-    if (len == sizeof buf - 1) return false;
-    int64_t r = s->read(s, buf + len, sizeof buf - 1 - len);
-    if (r < 0) return false;
+    if (len == G_STATE_MAX) return free(buf), false;
+    int64_t r = s->read(s, buf + len, G_STATE_MAX - len);
+    if (r < 0) return free(buf), false;
     if (r == 0) break;
     len += (size_t)r;
   }
   buf[len] = 0;
+  /* parsed first, applied only when at least one line names a parameter: an empty or foreign state
+   * is refused and leaves the instance as it was */
+  float v[G_PARAMS];
+  unsigned char set[G_PARAMS] = {0};
+  bool any = false;
   for (char *line = strtok(buf, "\n"); line; line = strtok(NULL, "\n")) {
     char *eq = strchr(line, '=');
     if (!eq) continue;
     *eq = 0;
-    for (uint32_t i = 0; i < G_DECLARED; ++i) {
-      if (strcmp(line, OMX_PITCH_PARAMS[i].symbol) == 0) {
-        g->values[i] = g_clamp(i, strtod(eq + 1, NULL));
-        g->touched[i] = 1;
+    for (uint32_t i = 0; i < G_PARAMS; ++i) {
+      if (strcmp(line, g_state_symbol(i)) == 0) {
+        v[i] = g_clamp(i, strtod(eq + 1, NULL));
+        set[i] = 1;
+        any = true;
       }
     }
   }
+  free(buf);
+  if (!any) return false;
+  for (uint32_t i = 0; i < G_PARAMS; ++i)
+    if (set[i]) g->values[i] = v[i], g->touched[i] = 1;
   g_publish(g);
+  /* The values a state set are new to the host: it reads them again (clap.params rescan). */
+  if (g->host_params && g->host_params->rescan) g->host_params->rescan(g->host, CLAP_PARAM_RESCAN_VALUES);
   return true;
 }
 
