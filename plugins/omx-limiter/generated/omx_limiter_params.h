@@ -11,6 +11,8 @@
  */
 #include <stddef.h>
 
+#include <omxcontract/omx_resource_hints.h>
+
 #include "omx_panel_description.h"
 #include "omx_param_contract.h"
 #include "omx_plugin_param.h"
@@ -68,6 +70,15 @@ static const struct omx_param_contract_row OMX_LIMITER_PARAM_CONTRACT[OMX_LIMITE
   { 256u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* ceilingDb dbfs */
   { 2u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* lookaheadMs ms */
   { 2u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* releaseMs ms */
+};
+
+/* org.openmixer.resource-hints.draft/0 (omx-contract RESOURCE_HINTS, tools/resource-hints.mjs): the hints the
+ * declaration's "resourceHints" states. A hint it leaves out has its bit of `declared` clear: unknown, never zero. */
+static const omx_resource_hints_t OMX_LIMITER_RESOURCE_HINTS = {
+  .declared = OMX_RESOURCE_HINT_THREADS_SPAWNED | OMX_RESOURCE_HINT_STREAMS_FROM_DISK | OMX_RESOURCE_HINT_OPENS_SOCKETS,
+  .threads_spawned = 0u,
+  .streams_from_disk = false,
+  .opens_sockets = false,
 };
 
 /* org.openmixer.panel-description/1 (tools/panel-description.mjs): the declaration's panel as the rows

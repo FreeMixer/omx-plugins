@@ -48,6 +48,7 @@ import { SPEC_FILE, controlOf, eqDefaultBands, findName, kernelControls, locateC
 import { bandsMacro, baseOf, expandVariant, variantStems } from './variants.mjs';
 import { omxdspInclude, render } from './template.mjs';
 import { generateTest, isTestDir, loadTestDecl, testPluginDirs } from './test-plugins.mjs';
+import { emitHintsC, hintPrefixes, hintTriples, statedHints } from './resource-hints.mjs';
 import { presetsManifest, presetsOf } from './preset-lib.mjs';
 
 export const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -97,6 +98,14 @@ export function prepareDecl(file, d, stem, dir = dirname(file)) {
   } else if (d.chain !== undefined || d.order !== undefined || d.key !== undefined) throw new Error(`${file}: "chain", "order" and "key" belong to a "binding": "chain" declaration`);
   const { params, controls } = resolveParams(file, d);
   d.params = params;
+  // the resource hints, by word, from the contract's RESOURCE_HINTS (tools/resource-hints.mjs)
+  const hints = statedHints(file, d, () => {
+    const where = locateContract(treeOf(file));
+    if (!where.dir) throw new Error(`${file}: its "resourceHints" are words of omx-contract's RESOURCE_HINTS and ${where.why}`);
+    return where.dir;
+  });
+  d.hints = hints.stated;
+  d.hintVocabulary = hints.vocabulary;
   if (generatedBinding(d)) d.controls = controls();
   const seen = new Set();
   for (const p of d.params) {
@@ -452,6 +461,8 @@ export function emitParamsHeader(d) {
  */
 #include <stddef.h>
 
+#include <omxcontract/omx_resource_hints.h>
+
 #include "omx_panel_description.h"
 #include "omx_param_contract.h"
 #include "omx_plugin_param.h"
@@ -501,6 +512,7 @@ static const struct omx_param_contract_row OMX_${K}_PARAM_CONTRACT[${P}_COUNT] =
 ${contractOf(d, scaleOf).slice(0, -1).map((r) => `  { ${r.unitEnum}u, OMX_CLAP_SCALE_${r.scale.toUpperCase()}, ${r.step}.0 }, /* ${r.symbol} ${r.unit} */`).join('\n')}
 };
 
+${emitHintsC(K, d.hints ?? [])}
 ${emitPanelRows(d)}
 /* LV2 port indices (tools/gen.mjs lv2Ports): audio, then parameter i at FIRST_PARAM + i, then these. */
 ${ports.filter((p) => !p.param).map((p) => `#define OMX_${K}_LV2_PORT_${macro(p.symbol)} ${p.index}u`).join('\n')}
@@ -567,9 +579,9 @@ export function emitPluginTtl(d) {
 @prefix doap:  <http://usefulinc.com/ns/doap#> .
 @prefix foaf:  <http://xmlns.com/foaf/0.1/> .
 @prefix lv2:   <http://lv2plug.in/ns/lv2core#> .
-${d.params.some((q, i) => faceDesignation(d, i)?.startsWith('param:')) ? '@prefix param: <http://lv2plug.in/ns/ext/parameters#> .\n' : ''}${d.panel ? '@prefix pg:    <http://lv2plug.in/ns/ext/port-groups#> .\n' : ''}${d.params.some((q) => scaleOf(q) === 'log') ? '@prefix pprops: <http://lv2plug.in/ns/ext/port-props#> .\n' : ''}${d.params.some((q) => choicesOf(q)) ? '@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .\n' : ''}@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+${hintPrefix(d, (p) => p !== 'xsd')}${d.params.some((q, i) => faceDesignation(d, i)?.startsWith('param:')) ? '@prefix param: <http://lv2plug.in/ns/ext/parameters#> .\n' : ''}${d.panel ? '@prefix pg:    <http://lv2plug.in/ns/ext/port-groups#> .\n' : ''}${d.params.some((q) => scaleOf(q) === 'log') ? '@prefix pprops: <http://lv2plug.in/ns/ext/port-props#> .\n' : ''}${d.params.some((q) => choicesOf(q)) ? '@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .\n' : ''}@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix units: <http://lv2plug.in/ns/extensions/units#> .
-
+${hintPrefix(d, (p) => p === 'xsd')}
 <${d.url}>
     a doap:Project ;
     doap:name "omx-plugins" ;
@@ -584,7 +596,7 @@ ${d.params.some((q, i) => faceDesignation(d, i)?.startsWith('param:')) ? '@prefi
     lv2:microVersion ${d.version.split('.')[2]} ;
     rdfs:comment ${ttlStr(d.description)} ;
     lv2:optionalFeature lv2:hardRTCapable ;
-    lv2:port
+${hintTriples(d.hintVocabulary, d.hints ?? []).map((l) => `${l}\n`).join('')}    lv2:port
 ${lv2Ports(d).map(port).join(' ,\n')} .
 ${(d.panel?.sections ?? []).map((g) => `
 <${groupUri(d, g)}>
@@ -599,6 +611,9 @@ ${(d.panel?.sections ?? []).map((g) => `
     units:symbol ${ttlStr(LV2_CUSTOM_UNITS[name].symbol)} .
 `).join('')}`;
 }
+
+/** The @prefix lines of the stated resource hints (tools/resource-hints.mjs) that `pick` keeps, in the TTL's column. */
+const hintPrefix = (d, pick) => hintPrefixes(d.hintVocabulary, d.hints ?? []).filter(([p]) => pick(p)).map(([p, ns]) => `@prefix ${`${p}:`.padEnd(6)} <${ns}> .\n`).join('');
 
 /** The plugin-defined units this plugin's ports use, in a fixed order. */
 const customUnitsOf = (d) => Object.keys(LV2_CUSTOM_UNITS).filter((name) => d.params.some((q, i) => lv2UnitRef(faceUnit(d, i)) === `<urn:openmixer:unit#${name}>`));

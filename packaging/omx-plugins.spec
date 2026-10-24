@@ -15,12 +15,12 @@ BuildRequires: pkgconf-pkg-config
 # The releases this tree builds against: a floor each (no ceiling), once here and
 # the same in debian/control (tools/deps-check.sh). The Makefile and tools/gen.mjs read them from here.
 BuildRequires: omx-dsp-devel >= 0.24.0
-BuildRequires: omx-contract-devel >= 3.0.0
+BuildRequires: omx-contract-devel >= 3.1.0
 BuildRequires: omx-clap-core-devel >= 0.13.0
 # plugin-hostd's format tables, which the generators read backwards (tools/format-tables.mjs)
 BuildRequires: plugin-hostd-devel >= 0.7.0
 # the omx-contract command, first packaged in 2.15.0: the generators read the contract directory through it
-BuildRequires: omx-contract >= 3.0.0
+BuildRequires: omx-contract >= 3.1.0
 BuildRequires: clap-devel
 BuildRequires: lv2-devel
 # %%check: the generators and checks are Node scripts; the hosts that load the built plugins
@@ -105,7 +105,7 @@ own machine.
 Summary: Headers and static library of the OpenMixer plugins, for projects that build on them
 Requires: omx-dsp-devel >= 0.24.0
 # the contract directory the descriptors install into is omx-contract-devel's
-Requires: omx-contract-devel >= 3.0.0
+Requires: omx-contract-devel >= 3.1.0
 Requires: clap-devel
 
 %description devel
@@ -248,6 +248,10 @@ tools/pins-check.sh %{buildroot}%{_datadir}/plugin-hostd/pins.d/omx-plugins.pins
   designations, as every described plugin's do (tools/test/contract-dir-check.sh requires the four).
 - The round-trip ledger records the seven EQ frequency ports that are authored stepped and scan
   back as log, against plugin-hostd issue #147.
+- Every plugin declares its resource hints (omx-contract 3.1.0): threads-spawned 0, streams-from-disk
+  false and opens-sockets false, served by the CLAP face as org.openmixer.resource-hints.draft/0 and stated
+  by the LV2 face as omxres: properties, both from the one declaration. The footprints and the activate
+  time stay undeclared until a measurement backs them. Builds against omx-contract >= 3.1.0.
 - The Zynthian tarball is repacked from the trixie arm64 DEBs, for ZynthianOS Vangelis (Debian
   trixie); Oram (bookworm) gets no upstream updates. The bundle check refuses a glibc symbol above
   trixie's 2.41 and a library a bare trixie lacks (tools/zynthian-bundle.sh, FreeMixer/omx-plugins
