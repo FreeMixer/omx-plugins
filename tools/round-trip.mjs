@@ -27,10 +27,21 @@
  * and <stem>.lv2.json for every described plugin. --authored reads another descriptor in the plugin's place (the
  * sabotage arm's). Exit 1 when it does not pass.
  */
+import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { descriptorFile } from './descriptor.mjs';
 import { lookupValues, tableRows, tableWords } from './format-tables.mjs';
+import { compareVersions } from './omx-contract.mjs';
+
+/** The installed plugin-hostd's version, as pkg-config reads it, or undefined. */
+function hostdVersion() {
+  try {
+    return execFileSync(process.env.PKG_CONFIG || 'pkg-config', ['--modversion', 'plugin-hostd'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim() || undefined;
+  } catch {
+    return undefined;
+  }
+}
 
 export const ROOT = resolve(new URL('..', import.meta.url).pathname);
 export const FORMATS = ['clap', 'lv2'];
@@ -76,17 +87,28 @@ export const LOSSES = {
 };
 
 /** A break in plugin-hostd's wave tip, reported, each `differs` it causes printed with it
- * and not failing; the run fails when one no longer shows (an `upTo` entry: when more show), so the entry leaves with
- * the fix. `plugin-hostd-probe
+ * and not failing; the run fails when one no longer shows, so the entry leaves with the fix (an entry that names its
+ * `ports`: when a port outside them shows, or the installed plugin-hostd is past its `through`). `plugin-hostd-probe
  * describe` keeps a word's last value, and an LV2 dump lists lv2:portProperty lv2:toggled before rdf:type
  * lv2:ControlPort, so a toggle's kind is the control port's travel. */
 export const UPSTREAM = {
   'lv2 controls[].kind "toggle" "travel"': { count: 3, why: 'plugin-hostd 83e54db describe: lv2:ControlPort overwrites lv2:toggled (src/describe.c get(), the last value)' },
-  // an integer Hz port states lv2:integer (stepped) and pprops:logarithmic (log); which of the two lilv lists last
-  // follows the order sord keeps its nodes in, which moves with the bundle's path and contents (the same omx-reverb
-  // bundle scans "stepped" in one directory and "log" in another), so the count is a ceiling, not a figure
-  'lv2 controls[].travel.scale "stepped" "log"': { upTo: 3, why: 'plugin-hostd describe: of lv2:integer and pprops:logarithmic the last listed wins (src/describe.c get()), in sord\'s node order' },
+  // plugin-hostd#142: an integer Hz port states lv2:integer (stepped) and pprops:logarithmic (log), and describe keeps
+  // whichever of the two sord yields last. That order moves with the bundle's path and contents: the same omx-reverb
+  // bundle scans "stepped" from one directory and "log" from another, and CI's make test and RPM jobs flip different
+  // ports of the same commit. So the entry names every port that states both words (the only ones that can flip), a
+  // flip on any other port fails, and the entry holds through the plugin-hostd release #142 was filed against: a
+  // newer plugin-hostd fails the run until the entry is retired or moved on.
+  'lv2 controls[].travel.scale "stepped" "log"': {
+    ports: ['omx-deesser deessFreq', 'omx-drive bandFreq', 'omx-keyed-gate key_hp', 'omx-keyed-gate key_lp', 'omx-phaser baseHz', 'omx-reverb lowcut', 'omx-reverb highcut'],
+    through: '0.8.0',
+    why: 'plugin-hostd#142: of lv2:integer and pprops:logarithmic, describe keeps the last sord yields (src/describe.c get())',
+  },
 };
+
+/** The UPSTREAM entry a difference `k` at `port` (`<stem> <where>`) is, or undefined: an entry that names its ports
+ * covers those alone. */
+const upstreamOf = (k, port) => (UPSTREAM[k] && (!UPSTREAM[k].ports || UPSTREAM[k].ports.includes(port)) ? UPSTREAM[k] : undefined);
 
 /** The described plugins (a descriptor beside the declaration), and the ones outside the round trip. */
 export function described(root = ROOT) {
@@ -205,7 +227,7 @@ export function roundTrip(scansDir, { root = ROOT, authoredFiles = {} } = {}) {
           lines.push(`lost ${format} ${stem} ${r.where} ${r.word} ${show(r.authored)}`);
           const k = r.word === 'controls[].travel.unit' && format === 'lv2' ? `${format} ${r.word} ${show(r.authored)}` : `${format} ${r.word}`;
           losses[k] = (losses[k] ?? 0) + 1;
-        } else if (UPSTREAM[`${format} ${r.word} ${show(r.authored)} ${show(r.scanned)}`]) {
+        } else if (upstreamOf(`${format} ${r.word} ${show(r.authored)} ${show(r.scanned)}`, `${stem} ${r.where}`)) {
           const k = `${format} ${r.word} ${show(r.authored)} ${show(r.scanned)}`;
           lines.push(`differs ${format} ${stem} ${r.where} ${r.word}: authored ${show(r.authored)}, scanned ${show(r.scanned)} (upstream: ${UPSTREAM[k].why})`);
           upstream[k] = (upstream[k] ?? 0) + 1;
@@ -222,9 +244,17 @@ export function roundTrip(scansDir, { root = ROOT, authoredFiles = {} } = {}) {
     lines.push(`${ok ? 'named' : 'unnamed'} loss ${k}: ${losses[k] ?? 0} word(s)${ok ? '' : `, LOSSES names ${LOSSES[k] ?? 0}`}`);
     if (!ok) fails++;
   }
-  for (const [k, { count, upTo }] of Object.entries(UPSTREAM)) {
-    const ok = upTo === undefined ? upstream[k] === count : (upstream[k] ?? 0) <= upTo;
-    lines.push(`${ok ? 'upstream' : 'unnamed upstream'} ${k}: ${upstream[k] ?? 0} word(s)${ok ? '' : `, UPSTREAM names ${upTo === undefined ? count : `at most ${upTo}`} (fixed upstream? remove the entry)`}`);
+  for (const [k, { count, ports, through }] of Object.entries(UPSTREAM)) {
+    if (ports) {
+      const at = hostdVersion();
+      const ok = at !== undefined && compareVersions(at, through) <= 0;
+      lines.push(ok ? `upstream ${k}: ${upstream[k] ?? 0} of the ${ports.length} named port(s) flip under plugin-hostd ${at}`
+        : `unnamed upstream ${k}: plugin-hostd ${at ?? '(no version: pkg-config --modversion plugin-hostd)'} is past ${through}, the release the entry holds through: run without it, retire it if no named port flips, else move it on`);
+      if (!ok) fails++;
+      continue;
+    }
+    const ok = upstream[k] === count;
+    lines.push(`${ok ? 'upstream' : 'unnamed upstream'} ${k}: ${upstream[k] ?? 0} word(s)${ok ? '' : `, UPSTREAM names ${count} (fixed upstream? remove the entry)`}`);
     if (!ok) fails++;
   }
   return { lines, losses, fails, inside, outside };
