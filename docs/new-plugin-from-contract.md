@@ -71,6 +71,10 @@ settled it fills the derived fields and runs `tools/gen.mjs`, which writes:
 `node tools/gen.mjs --check` holds every one of them; CI runs it. Then the wizard runs the plugin's
 `make test` and `make completeness` for it, and prints the commit plan in the recipe's layer order.
 
+The wizard writes no factory presets. A shipped plugin carries them (`docs/presets.md`): until a
+person declares them in `tools/gen-presets.mjs` and generates them, the plugin's `make test` is red
+on its presets check.
+
 ## The identity test
 
 One template, filled from the declaration. The plan has three parts. First, a deterministic stimulus
