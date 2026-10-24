@@ -81,11 +81,10 @@ export const LOSSES = {
  * lv2:ControlPort, so a toggle's kind is the control port's travel. */
 export const UPSTREAM = {
   'lv2 controls[].kind "toggle" "travel"': { count: 76, why: 'plugin-hostd 83e54db describe: lv2:ControlPort overwrites lv2:toggled (src/describe.c get(), the last value)' },
-  // seven EQ frequency ports (omx-eq8 b6, omx-eq16 b6 and b9, omx-eq32 b6, b9, b18 and b19) list lv2:integer and
-  // pprops:logarithmic exactly as their neighbours do, and scan as log where the neighbours scan as stepped: describe
-  // keeps the last of the two words, so the order the scan lists the two properties in differs between ports of one
-  // .ttl shape. The cause is in the scan (the same seven on the desk and in CI), not in the face.
-  'lv2 controls[].travel.scale "stepped" "log"': { count: 7, why: 'plugin-hostd describe keeps the last of lv2:integer (stepped) and pprops:logarithmic (log); the scan orders them differently on seven ports with the same .ttl lines' },
+  // seven EQ frequency ports (omx-eq8 b6, omx-eq16 b6 and b9, omx-eq32 b6, b9, b18 and b19) are authored stepped and
+  // scan as log, though their lv2:integer and pprops:logarithmic lines equal those of the neighbours that scan stepped
+  // (deesser deessFreq, drive bandFreq). The same seven on the desk and in CI; the cause is not isolated yet
+  'lv2 controls[].travel.scale "stepped" "log"': { count: 7, why: 'the scan reports log where the face says stepped, on seven ports whose lv2:integer and pprops:logarithmic lines equal their passing neighbours\'; cause not isolated' },
 };
 
 /** The described plugins (a descriptor beside the declaration), and the ones outside the round trip. */
