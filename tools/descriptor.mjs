@@ -176,6 +176,14 @@ export function descriptorOf(d) {
 /** The descriptor file's text: what `node tools/gen.mjs` writes and `--check` holds equal. */
 export const descriptorText = (d) => `${JSON.stringify(descriptorOf(d).descriptor, null, 2)}\n`;
 
+/**
+ * Whether declaration `decl` is whole: a base of variants (omx-eq) or a chain (omx-strip) keeps its own
+ * parameters, identity and prose, and its descriptor is a render of it (gen.mjs writes it, --check holds it),
+ * never an input. A single-kernel plugin's <stem>.decl.json is the extras of its descriptor, and carries none
+ * of these.
+ */
+export const isWhole = (decl) => decl.variants !== undefined || decl.binding === 'chain';
+
 /** The declaration fields the descriptor says: an extras file beside a descriptor carries none of them. */
 const SAID = ['name', 'vendor', 'version', 'params', 'description'];
 

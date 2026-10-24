@@ -8,7 +8,7 @@
  *   1. the LV2 units a face writes are the ones tools/gen.mjs held before it read the table (LV2_UNITS), each
  *      unit the table maps read from it, the declarations' own (dBu, dB/oct, ratio) beside it;
  *   2. every described control whose meaning the LV2 table maps (param:gain, ...) carries it as its port's
- *      lv2:designation in the generated TTL, and no other control does: the 57 of this release, by term;
+ *      lv2:designation in the generated TTL, and no other control does: the 169 of this release, by term;
  *   3. the three ratio controls state urn:openmixer:unit#ratio, and the TTL defines it;
  *   4. each generated header's OMX_<K>_PARAM_MODULES is its descriptor's groups as module paths, "" without one.
  *
@@ -68,7 +68,7 @@ const { got, want } = designations(lv2Designation);
 check('every described control whose meaning the LV2 table maps is designated by it, and no other', got, want);
 const byTerm = {};
 for (const g of got) byTerm[g.split(' ')[1]] = (byTerm[g.split(' ')[1]] ?? 0) + 1;
-check('the designations of this release, by term', Object.fromEntries(Object.entries(byTerm).sort((x, y) => y[1] - x[1] || x[0].localeCompare(y[0]))), { 'param:gain': 31, 'param:wetDryRatio': 10, 'param:release': 4, 'param:attack': 3, 'param:ratio': 3, 'param:threshold': 3, 'param:delay': 1, 'param:frequency': 1, 'param:hold': 1 });
+check('the designations of this release, by term', Object.fromEntries(Object.entries(byTerm).sort((x, y) => y[1] - x[1] || x[0].localeCompare(y[0]))), { 'param:gain': 87, 'param:frequency': 57, 'param:wetDryRatio': 10, 'param:release': 4, 'param:attack': 3, 'param:ratio': 3, 'param:threshold': 3, 'param:delay': 1, 'param:hold': 1 });
 
 // 3. the ratio unit
 const ratios = [];
