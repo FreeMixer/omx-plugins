@@ -3,9 +3,10 @@
 # Copyright (C) 2026 Pau Aliagas <linuxnow@gmail.com>
 #
 # tools/test-role-check.sh — a test plugin (its declaration says `"role": "test"`,
-# tools/test-plugins.mjs) is linked into libomxplugins.a and installed by no target, so no package
-# carries it and the release gate (tools/qualify-release.sh, which probes every INSTALLED .clap)
-# never sees it; every shipped plugin is installed.
+# tools/test-plugins.mjs) is linked into libomxplugins.a and `make install` never installs it, so
+# no CLAP or LV2 package carries it and the release gate (tools/qualify-release.sh, which probes every
+# INSTALLED .clap) never sees it; every shipped plugin is installed. `make install-test` puts it in
+# omx-plugins-test's directory outside the CLAP path (tools/package-lists-check.sh checks that one).
 #
 #   tools/test-role-check.sh               `make install` into a scratch stage, then the check over it
 #                                          and build/lib/libomxplugins.a

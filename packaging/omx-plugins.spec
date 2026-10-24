@@ -90,6 +90,17 @@ LV2 plugins, installed in %{_libdir}/lv2 where Ardour, Carla, MOD
 and Zynthian find them, with a MOD GUI where the plugin has one. They run the
 console's own DSP, so they sound like the desk.
 
+%package test
+Summary: The OpenMixer test instruments, for host tests and plugin measurement
+
+%description test
+The test instruments the OpenMixer console's own proofs play: a sine voice, a
+note echo and a transport probe, as CLAP plugins. They are installed in
+%{_libexecdir}/omx-plugins/test, outside every CLAP search path, so no host
+lists them; a test or the plugin qualifier opens them there by path. Install
+this package on a console to measure the linked test instruments' cost on its
+own machine.
+
 %package devel
 Summary: Headers and static library of the OpenMixer plugins, for projects that build on them
 Requires: omx-dsp-devel >= 0.24.0
@@ -117,6 +128,7 @@ in omx-contract's contract directory, where a host reads it.
 %install
 %make_install PREFIX=%{_prefix} LIBDIR=%{_libdir} CLAPDIR=/usr/lib/clap
 %{__make} install-devel DESTDIR=%{buildroot} PREFIX=%{_prefix} LIBDIR=%{_libdir}
+%{__make} install-test DESTDIR=%{buildroot} PREFIX=%{_prefix} TESTCLAPDIR=%{_libexecdir}/omx-plugins/test
 
 %check
 %make_build test
@@ -158,6 +170,16 @@ tools/pins-check.sh %{buildroot}%{_datadir}/plugin-hostd/pins.d/omx-plugins.pins
 /usr/lib/clap/omx-transient.clap
 /usr/lib/clap/omx-tremolo.clap
 # END GENERATED clap-files
+
+%files test
+%license LICENSE
+%dir %{_libexecdir}/omx-plugins
+%dir %{_libexecdir}/omx-plugins/test
+# BEGIN GENERATED clap-test-files: tools/gen.mjs, one line per test plugin
+%{_libexecdir}/omx-plugins/test/omx-test-note-echo.clap
+%{_libexecdir}/omx-plugins/test/omx-test-sine-voice.clap
+%{_libexecdir}/omx-plugins/test/omx-test-transport-probe.clap
+# END GENERATED clap-test-files
 
 %files devel
 %license LICENSE

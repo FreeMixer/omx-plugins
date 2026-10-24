@@ -63,18 +63,26 @@
 #   make clap-validate  clap-validator on every built .clap (tools/clap-validate.sh): one JSON report each in build/clap-validator;
 #                   CI runs it and reports a failure without failing the job until every plugin passes
 #   make version    the release version, the one packaging/omx-plugins.spec and debian/changelog carry
-#   make test-role  a test plugin (`"role": "test"`) is linked into the archive and installed by no
-#                   target: tools/test-role-check.sh over a staged install, with its --self-test
+#   make install-test  DESTDIR, PREFIX, TESTCLAPDIR: each test plugin's .clap in $(TESTCLAPDIR), outside every
+#                   CLAP search path (default $(PREFIX)/libexec/omx-plugins/test), for the omx-plugins-test package:
+#                   a host's tests and the qualifier open them there by path; no host or picker finds them
+#   make test-role  a test plugin (`"role": "test"`) is linked into the archive and `make install` never
+#                   installs it: tools/test-role-check.sh over a staged install, with its --self-test
 #                   (part of `make test`)
+#   make package-lists  every plugin the build makes is installed and listed by exactly the package it belongs
+#                   to, in the RPM spec and the Debian .install files: tools/package-lists-check.sh over a staged
+#                   install, with its --self-test (part of `make test`)
 VERSION := 0.14.0
 PLUGINS := $(sort $(dir $(wildcard plugins/*/Makefile)))
-# A test plugin is built, tested and linked into libomxplugins.a like the others, and installed by no
-# target: its declaration says `"role": "test"` (tools/test-plugins.mjs).
+# A test plugin is built, tested and linked into libomxplugins.a like the others; `make install` never installs
+# it, and `make install-test` puts it outside the CLAP path: its declaration says `"role": "test"`
+# (tools/test-plugins.mjs).
 TEST_PLUGINS := $(sort $(dir $(shell grep -l '"role": *"test"' plugins/*/*.decl.json 2>/dev/null)))
 SHIP_PLUGINS := $(filter-out $(TEST_PLUGINS),$(PLUGINS))
 PREFIX     ?= /usr
 INCLUDEDIR ?= $(PREFIX)/include
 LIBDIR     ?= $(PREFIX)/lib
+TESTCLAPDIR ?= $(PREFIX)/libexec/omx-plugins/test
 DATADIR    ?= $(PREFIX)/share
 # the path every plugin's own Makefile installs its .clap to (the CLAP specification's, whatever LIBDIR is)
 CLAPDIR    ?= $(PREFIX)/lib/clap
@@ -121,7 +129,7 @@ LIB_FLAGS  := -fPIC -fvisibility=hidden -DOMX_CLAP_STATIC -Iinclude
 # read only by the targets that build the archive, so `make version` and the rest need no omx-dsp
 lib_cflags = $(call dep_check,omxdsp,$(OMXDSP_MIN))$(call dep_check,omx-contract,$(CONTRACT_MIN))$(shell $(PKG_CONFIG) --cflags omxdsp omx-clap-core clap)
 
-.PHONY: presets presets-figures test-role all lib lib-test test test-faces units panel-layout descriptor-view lv2-units format-tables contract-union probe-checks eq-probe-race round-trip hints look manual install install-pins install-devel install-contract contract-dir clean version recipe-test completeness selftest private-refs strip-crosscheck meters-abi meter-level dsp-copies meter-ring clap-validate
+.PHONY: presets presets-figures test-role all lib lib-test test test-faces units panel-layout descriptor-view lv2-units format-tables contract-union probe-checks eq-probe-race round-trip hints look manual install install-pins install-test package-lists install-devel install-contract contract-dir clean version recipe-test completeness selftest private-refs strip-crosscheck meters-abi meter-level dsp-copies meter-ring clap-validate
 all: lib
 	@for p in $(PLUGINS); do $(MAKE) -C $$p all || exit 1; done
 lib: $(LIB) $(LIB_PC)
@@ -139,6 +147,7 @@ test: lib units panel-layout descriptor-view lv2-units format-tables contract-un
 	@$(MAKE) -s meters-abi
 	@$(MAKE) -s meter-level
 	@$(MAKE) -s test-role
+	@$(MAKE) -s package-lists
 # what runs with no omx-contract command (debian/rules: no .deb ships the command yet): the built faces, the static
 # table and the ABI checks; nothing here reads the contract directory (the round trip generates, so it runs in make test)
 test-faces: all lib contract-union eq-probe-race
@@ -146,6 +155,7 @@ test-faces: all lib contract-union eq-probe-race
 	@$(MAKE) -s meters-abi
 	@$(MAKE) -s meter-level
 	@$(MAKE) -s test-role
+	@$(MAKE) -s package-lists
 units:
 	node tools/test/param-units-check.mjs
 panel-layout:
@@ -238,9 +248,15 @@ install:
 # %check against %{buildroot})
 install-pins:
 	tools/gen-pins.sh "$(DESTDIR)" "$(CLAPDIR)" "$(PINS_DIR)" "$(PINS_FILE)"
+install-test:
+	@for p in $(TEST_PLUGINS); do $(MAKE) -C $$p all || exit 1; \
+	  n=$$(basename $$p); install -Dm755 $$p/build/$$n.clap $(DESTDIR)$(TESTCLAPDIR)/$$n.clap || exit 1; done
 test-role:
 	tools/test-role-check.sh
 	tools/test-role-check.sh --self-test
+package-lists:
+	tools/package-lists-check.sh
+	tools/package-lists-check.sh --self-test
 # Each shipped plugin's descriptor, plugins/<stem>/<stem>.descriptor.json, installed byte for byte into omx-contract's
 # contract directory as $(CONTRACTDIR)/<schema major>/omx-plugins/plugins/<stem>.json, with a MANIFEST.json naming this
 # version (omx-contract docs/contract-dir.md). The directory is omx-contract-devel's, under the same data directory

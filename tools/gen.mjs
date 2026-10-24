@@ -1087,6 +1087,8 @@ export const SHARED = {
   'packaging/omx-plugins.spec': {
     'clap-files': (ds) => ds.map((d) => `/usr/lib/clap/${d.stem}.clap`),
     'lv2-files': (ds) => ds.map((d) => `%{_libdir}/lv2/${d.stem}.lv2/`),
+    // the test plugins (`"role": "test"`): omx-plugins-test, outside every CLAP search path (`make install-test`)
+    'clap-test-files': (ds, ts = []) => ts.map((d) => `%{_libexecdir}/omx-plugins/test/${d.stem}.clap`),
   },
   '.github/workflows/ci.yml': {
     // the test plugins' ids too: static-table-host expects them after `--test`, and a hand-written
@@ -1095,6 +1097,7 @@ export const SHARED = {
       `shorts="${ds.map((d) => d.stem.replace(/^omx-/, '')).join(' ')}"`,
       `kernels="${ds.map((d) => d.kernel).join(' ')}"`,
       `tests="${ts.map((d) => d.clap.id).join(' ')}"`,
+      `teststems="${ts.map((d) => d.stem).join(' ')}"`,
     ],
   },  // libomxplugins: each face's entry, defined by omx_<kernel>_clap.c, listed by its CLAP id
   'include/omx_clap_static.h': {
