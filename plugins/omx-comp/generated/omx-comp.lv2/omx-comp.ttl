@@ -4,11 +4,13 @@
 @prefix doap:  <http://usefulinc.com/ns/doap#> .
 @prefix foaf:  <http://xmlns.com/foaf/0.1/> .
 @prefix lv2:   <http://lv2plug.in/ns/lv2core#> .
+@prefix omxres: <https://www.openmixer.org/ns/resource-hints#> .
 @prefix param: <http://lv2plug.in/ns/ext/parameters#> .
 @prefix pg:    <http://lv2plug.in/ns/ext/port-groups#> .
 @prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix units: <http://lv2plug.in/ns/extensions/units#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
 
 <https://github.com/FreeMixer/omx-plugins>
     a doap:Project ;
@@ -24,6 +26,9 @@
     lv2:microVersion 0 ;
     rdfs:comment "The console's compressor: threshold, ratio and knee set how hard it holds the level down, attack and release how fast, with makeup gain and a dry/wet mix. Kind picks the RMS detector (Compressor) or the peak detector (Limiter), and detector oversampling can run the control path at 4x; detector topology has it hear the input (feedforward) or its own output (feedback). The DSP is omx-dsp's <omxdsp/fx/omx_comp_instance.h>, the console's own compressor." ;
     lv2:optionalFeature lv2:hardRTCapable ;
+    omxres:threadsSpawned "0"^^xsd:unsignedInt ;
+    omxres:streamsFromDisk false ;
+    omxres:opensSockets false ;
     lv2:port
     [
         a lv2:AudioPort , lv2:InputPort ;

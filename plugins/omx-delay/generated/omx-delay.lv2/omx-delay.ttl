@@ -4,10 +4,12 @@
 @prefix doap:  <http://usefulinc.com/ns/doap#> .
 @prefix foaf:  <http://xmlns.com/foaf/0.1/> .
 @prefix lv2:   <http://lv2plug.in/ns/lv2core#> .
+@prefix omxres: <https://www.openmixer.org/ns/resource-hints#> .
 @prefix param: <http://lv2plug.in/ns/ext/parameters#> .
 @prefix pg:    <http://lv2plug.in/ns/ext/port-groups#> .
 @prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix units: <http://lv2plug.in/ns/extensions/units#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
 
 <https://github.com/FreeMixer/omx-plugins>
     a doap:Project ;
@@ -23,6 +25,9 @@
     lv2:microVersion 0 ;
     rdfs:comment "The OpenMixer console's stereo delay: one time, feedback through a tone filter, ping-pong and a wet/dry mix." ;
     lv2:optionalFeature lv2:hardRTCapable ;
+    omxres:threadsSpawned "0"^^xsd:unsignedInt ;
+    omxres:streamsFromDisk false ;
+    omxres:opensSockets false ;
     lv2:port
     [
         a lv2:AudioPort , lv2:InputPort ;

@@ -12,7 +12,7 @@
  * Extensions: params, latency, audio-ports, state; org.openmixer.declaration/1, panel-description/1
  * and param-contract/1; clap.remote-controls (the panel's sections as pages of eight) and
  * clap.track-info (a placement's defaults, the contract's per-kind ones, on every parameter the host
- * or a state has not set).
+ * or a state has not set); org.openmixer.resource-hints.draft/0 (the declaration's resource hints).
  */
 #include <stdatomic.h>
 #include <stdbool.h>
@@ -398,6 +398,16 @@ static bool g_contract_migration(const clap_plugin_t *p, uint32_t index, omx_cla
 static const omx_clap_plugin_param_contract_t G_CONTRACT_EXT = {g_contract_version, g_contract_fingerprint, g_contract_get,
                                                                 g_contract_migrations, g_contract_migration};
 
+/* ---- org.openmixer.resource-hints.draft/0: OMX_PITCH_RESOURCE_HINTS, the declaration's hints -------- */
+
+static bool g_resource_hints_get(const clap_plugin_t *p, omx_resource_hints_t *hints) {
+  (void)p;
+  *hints = OMX_PITCH_RESOURCE_HINTS;
+  return hints->declared != 0u;
+}
+
+static const omx_clap_plugin_resource_hints_t G_RESOURCE_HINTS_EXT = {g_resource_hints_get};
+
 /* ---- clap.remote-controls: the panel's pages, OMX_PITCH_PANEL_PAGES ------------------------ */
 
 static uint32_t g_pages_count(const clap_plugin_t *p) {
@@ -446,6 +456,7 @@ static const void *g_get_extension(const clap_plugin_t *p, const char *id) {
   if (strcmp(id, OMX_PARAM_CONTRACT_ID) == 0) return &G_CONTRACT_EXT;
   if (strcmp(id, CLAP_EXT_REMOTE_CONTROLS) == 0) return &G_PAGES_EXT;
   if (strcmp(id, CLAP_EXT_TRACK_INFO) == 0) return &G_TRACK_INFO_EXT;
+  if (strcmp(id, OMX_CLAP_EXT_RESOURCE_HINTS_DRAFT) == 0) return &G_RESOURCE_HINTS_EXT;
   return NULL;
 }
 
