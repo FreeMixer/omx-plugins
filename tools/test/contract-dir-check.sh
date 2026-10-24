@@ -21,8 +21,8 @@ set -euo pipefail
 HERE=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)
 VERSION=$(make -s -C "$HERE" version)
 
-# the plugins whose descriptor a host reads from the contract directory and no longer from the generated headers and
-# TTLs (FreeMixer/omx-plugins#219): each must ship one, and the install must list it
+# the plugins whose descriptor a host reads from the contract directory (FreeMixer/omx-plugins#219): each must ship
+# one, and the install must list it
 REQUIRED="omx-eq8 omx-eq16 omx-eq32 omx-strip"
 
 # ship stems with a descriptor: the plugin folders the top Makefile builds whose declaration does not say
