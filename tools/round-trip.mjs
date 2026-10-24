@@ -84,8 +84,14 @@ export const UPSTREAM = {
   // seven EQ frequency ports (omx-eq8 b6, omx-eq16 b6 and b9, omx-eq32 b6, b9, b18 and b19) are authored stepped and
   // scan as log, though their lv2:integer and pprops:logarithmic lines equal those of the neighbours that scan stepped
   // (deesser deessFreq, drive bandFreq). The same seven on the desk and in CI; the cause is not isolated yet
-  'lv2 controls[].travel.scale "stepped" "log"': { count: 7, why: 'the scan reports log where the face says stepped, on seven ports whose lv2:integer and pprops:logarithmic lines equal their passing neighbours\'; cause not isolated; https://github.com/FreeMixer/plugin-hostd/issues/147' },
+  'lv2 controls[].travel.scale "stepped" "log"': {
+    at: ['omx-eq8 b6_freq', 'omx-eq16 b6_freq', 'omx-eq16 b9_freq', 'omx-eq32 b6_freq', 'omx-eq32 b9_freq', 'omx-eq32 b18_freq', 'omx-eq32 b19_freq'],
+    why: 'the scan reports log where the face says stepped, on seven ports whose lv2:integer and pprops:logarithmic lines equal their passing neighbours\'; cause not isolated; https://github.com/FreeMixer/plugin-hostd/issues/147',
+  },
 };
+
+/** An UPSTREAM entry excuses a differ when it names no ports (`at`), or names this plugin's port. */
+const excused = (entry, stem, where) => entry !== undefined && (entry.at === undefined || entry.at.includes(`${stem} ${where}`));
 
 /** The described plugins (a descriptor beside the declaration), and the ones outside the round trip. */
 export function described(root = ROOT) {
@@ -204,7 +210,7 @@ export function roundTrip(scansDir, { root = ROOT, authoredFiles = {} } = {}) {
           lines.push(`lost ${format} ${stem} ${r.where} ${r.word} ${show(r.authored)}`);
           const k = r.word === 'controls[].travel.unit' && format === 'lv2' ? `${format} ${r.word} ${show(r.authored)}` : `${format} ${r.word}`;
           losses[k] = (losses[k] ?? 0) + 1;
-        } else if (UPSTREAM[`${format} ${r.word} ${show(r.authored)} ${show(r.scanned)}`]) {
+        } else if (excused(UPSTREAM[`${format} ${r.word} ${show(r.authored)} ${show(r.scanned)}`], stem, r.where)) {
           const k = `${format} ${r.word} ${show(r.authored)} ${show(r.scanned)}`;
           lines.push(`differs ${format} ${stem} ${r.where} ${r.word}: authored ${show(r.authored)}, scanned ${show(r.scanned)} (upstream: ${UPSTREAM[k].why})`);
           upstream[k] = (upstream[k] ?? 0) + 1;
@@ -221,7 +227,8 @@ export function roundTrip(scansDir, { root = ROOT, authoredFiles = {} } = {}) {
     lines.push(`${ok ? 'named' : 'unnamed'} loss ${k}: ${losses[k] ?? 0} word(s)${ok ? '' : `, LOSSES names ${LOSSES[k] ?? 0}`}`);
     if (!ok) fails++;
   }
-  for (const [k, { count }] of Object.entries(UPSTREAM)) {
+  for (const [k, { count: named, at }] of Object.entries(UPSTREAM)) {
+    const count = at?.length ?? named;
     const ok = upstream[k] === count;
     lines.push(`${ok ? 'upstream' : 'unnamed upstream'} ${k}: ${upstream[k] ?? 0} word(s)${ok ? '' : `, UPSTREAM names ${count} (fixed upstream? remove the entry)`}`);
     if (!ok) fails++;
