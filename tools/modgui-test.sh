@@ -100,19 +100,22 @@ if command -v sord_validate >/dev/null 2>&1; then
     set -- "$@" "$HINTS_TTL"
     out=$(sord_validate "$BUNDLE"/*.ttl "$@" "$HERE/modgui-terms.ttl" 2>&1)
     summary=$(printf '%s\n' "$out" | tail -1)
-    # omx-contract 3.1.0's Turtle draws errors of its own: its annotation properties (omxres:resource, :unit,
-    # :basis) carry no rdfs:label. Those name a subject in its namespace, a term of the contract's, and are the
-    # contract's to fix; every other error, any about this bundle's own triples, counts.
+    # omx-contract#144: 3.1.0's omx-resource-hints.ttl declares omxres:resource, omxres:unit and omxres:basis without an
+    # rdfs:label, and sord_validate reports "has no label" for each use. Exactly those errors are the contract's to fix;
+    # every other one counts, any about this bundle's own triples (an omxres: value out of its range among them).
     NS=$(sed -n 's/^@prefix omxres: <\(.*\)> \.$/\1/p' "$HINTS_TTL")
-    own=$(printf '%s\n' "$out" | awk -v ns="$NS" '/^error: / { e = $0; s = ""; getline s; t = s; sub(/^ +/, "", t); if (ns == "" || index(t, ns) != 1) { print e; print s } }')
-    theirs=$(printf '%s\n' "$out" | grep -c '^error: ')
+    own=$(printf '%s\n' "$out" | awk -v ns="$NS" '
+      /^error: / { e = $0; s = ""; getline s
+        if (ns != "" && (e == "error: Property <" ns "resource> has no label" || e == "error: Property <" ns "unit> has no label" || e == "error: Property <" ns "basis> has no label")) next
+        print e; print s }')
+    theirs=$(printf '%s\n' "$out" | grep -cE "^error: Property <$NS(resource|unit|basis)> has no label$")
     case "$summary" in
       "Found "*" errors among "*) ;;
       *) own="${own}${own:+
 }sord_validate did not finish: $summary" ;;
     esac
     if [ -z "$own" ]; then
-      pass "sord_validate $STEM.lv2/*.ttl against the LV2 specs, modgui terms and resource-hint terms ($summary; all $theirs the contract vocabulary's own)"
+      pass "sord_validate $STEM.lv2/*.ttl against the LV2 specs, modgui terms and resource-hint terms ($summary; all $theirs the label errors of omx-contract#144)"
     else
       printf '%s\n' "$own" | head -20 >&2; fail "sord_validate $STEM.lv2/*.ttl ($summary)"
     fi
