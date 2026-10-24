@@ -27,6 +27,15 @@
  *       binding is red here, by design. Every input port past the main one (a sidechain key) is
  *       connected too, fed a signal of its own: square-wave bursts the main signal does not have, so a
  *       parameter that picks what the detector listens to can move the output.
+ *   clap-probe state <x.clap>
+ *       the state round trip, as a host restores a session: every parameter, the host's bypass
+ *       included, is set off its default (a travel to a value with nine significant digits) on one
+ *       instance through clap_plugin_params.flush, and its state saved; a fresh instance loads that
+ *       state through a stream that hands over 17 bytes at a time. The loading instance must ask the
+ *       host to rescan the values, report every value the first one did (exactly, as doubles), save a
+ *       state byte-identical to the one it loaded, and, both activated on the same signal, put out
+ *       the same samples. Run once with the bypass off and once with it on. An empty state must be
+ *       refused, the instance's values untouched. `PASS state ...` / `FAIL state ...` lines.
  */
 #include <dlfcn.h>
 #include <stdint.h>
@@ -37,18 +46,27 @@
 #include "clap/entry.h"
 #include "clap/ext/audio-ports.h"
 #include "clap/ext/params.h"
+#include "clap/ext/state.h"
 #include "clap/factory/plugin-factory.h"
 #include "clap/host.h"
 
 #define RATE 48000.0
 #define BLOCK 256u
 #define FRAMES (282u * BLOCK) /* 1.5 s at 48 kHz in whole blocks: a delay's second repeat */
+#define STATE_FRAMES (188u * BLOCK) /* the state test's run: one second at 48 kHz in whole blocks */
 #define MAX_PARAMS 256u
 #define MAX_SIDE 8u /* channels over every input port past the main one */
 
+/* The host's clap.params: what `state` reads is whether a loaded state asked for a rescan. */
+static clap_param_rescan_flags rescanned;
+static void host_params_rescan(const clap_host_t *h, clap_param_rescan_flags f) { (void)h, rescanned |= f; }
+static void host_params_clear(const clap_host_t *h, clap_id id, clap_param_clear_flags f) { (void)h, (void)id, (void)f; }
+static void host_params_flush(const clap_host_t *h) { (void)h; }
+static const clap_host_params_t HOST_PARAMS = {host_params_rescan, host_params_clear, host_params_flush};
+
 static const void *host_get_extension(const clap_host_t *h, const char *id) {
-  (void)h, (void)id;
-  return NULL;
+  (void)h;
+  return strcmp(id, CLAP_EXT_PARAMS) == 0 ? &HOST_PARAMS : NULL;
 }
 static void host_noop(const clap_host_t *h) { (void)h; }
 
@@ -310,9 +328,208 @@ static int live(const char *path) {
   return fails ? 1 : 0;
 }
 
+/* ---- state: the round trip a host makes when it restores a session --------------------------- */
+
+typedef struct {
+  unsigned char *data;
+  size_t len, cap, pos;
+} Blob;
+
+static int64_t blob_write(const clap_ostream_t *s, const void *buf, uint64_t size) {
+  Blob *b = (Blob *)s->ctx;
+  if (b->len + size > b->cap) {
+    size_t cap = (b->len + size) * 2u;
+    unsigned char *d = realloc(b->data, cap);
+    if (!d) return -1;
+    b->data = d, b->cap = cap;
+  }
+  memcpy(b->data + b->len, buf, size);
+  b->len += size;
+  return (int64_t)size;
+}
+
+/** 17 bytes at a time, as clap-validator's buffered test reads: a loader that assumes one read is caught. */
+static int64_t blob_read(const clap_istream_t *s, void *buf, uint64_t size) {
+  Blob *b = (Blob *)s->ctx;
+  uint64_t n = b->len - b->pos;
+  if (n > size) n = size;
+  if (n > 17u) n = 17u;
+  memcpy(buf, b->data + b->pos, n);
+  b->pos += n;
+  return (int64_t)n;
+}
+
+static int state_save(const Clap *c, const clap_plugin_state_t *st, Blob *b) {
+  memset(b, 0, sizeof *b);
+  clap_ostream_t os = {b, blob_write};
+  return st->save(c->plugin, &os);
+}
+
+static int state_load(const Clap *c, const clap_plugin_state_t *st, Blob *b) {
+  b->pos = 0;
+  clap_istream_t is = {b, blob_read};
+  return st->load(c->plugin, &is);
+}
+
+/** Parameter `i`'s value off its default: a stepped one a whole step away, a travel at a fraction of
+ * its range that prints with nine significant digits, distinct per parameter. */
+static double off_default(const clap_param_info_t *p, uint32_t i, int bypass) {
+  if (p->flags & CLAP_PARAM_IS_BYPASS) return bypass ? 1.0 : 0.0;
+  if (p->flags & CLAP_PARAM_IS_STEPPED) {
+    double v = p->default_value + 1.0 + (double)(i % 3u);
+    if (v > p->max_value) v = p->default_value - 1.0;
+    return v < p->min_value ? p->min_value : v;
+  }
+  double f = 0.1 + 0.8 * ((double)(i + 1u) * 0.6180339887498949 - (double)(uint32_t)((double)(i + 1u) * 0.6180339887498949));
+  double v = p->min_value + (p->max_value - p->min_value) * f;
+  if (v == p->default_value) v = p->min_value + (p->max_value - p->min_value) * 0.0317;
+  return v;
+}
+
+/** One second of the probe's signal through an instance already set, from its activation. */
+static int run_open(const Clap *c, const float *il, const float *ir, float *ol, float *or_) {
+  if (!c->plugin->activate(c->plugin, RATE, 1, BLOCK) || !c->plugin->start_processing(c->plugin)) return 0;
+  static EvList none;
+  none.n = 0;
+  for (uint32_t f = 0; f < STATE_FRAMES; f += BLOCK) {
+    clap_input_events_t in_ev = {&none, ev_size, ev_get};
+    clap_output_events_t out_ev = {NULL, ev_push};
+    float *ins[2] = {(float *)il + f, (float *)ir + f};
+    float *outs[2] = {ol + f, or_ + f};
+    clap_audio_buffer_t ain = {ins, NULL, 2, 0, 0};
+    clap_audio_buffer_t aout = {outs, NULL, 2, 0, 0};
+    clap_process_t pr;
+    memset(&pr, 0, sizeof pr);
+    pr.steady_time = f;
+    pr.frames_count = BLOCK;
+    pr.audio_inputs = &ain;
+    pr.audio_outputs = &aout;
+    pr.audio_inputs_count = 1;
+    pr.audio_outputs_count = 1;
+    pr.in_events = &in_ev;
+    pr.out_events = &out_ev;
+    if (c->plugin->process(c->plugin, &pr) == CLAP_PROCESS_ERROR) return 0;
+  }
+  c->plugin->stop_processing(c->plugin);
+  c->plugin->deactivate(c->plugin);
+  return 1;
+}
+
+/** One round trip, the bypass `bypass`: the number of failed checks, -1 on a host error. */
+static int state_round(const char *path, int bypass, const float *il, const float *ir, float *al, float *ar, float *bl,
+                       float *br) {
+  const char *mode = bypass ? "bypass on" : "bypass off";
+  Clap a, b;
+  if (!clap_open(&a, path)) return -1;
+  const clap_plugin_state_t *sta = (const clap_plugin_state_t *)a.plugin->get_extension(a.plugin, CLAP_EXT_STATE);
+  if (!sta) return printf("FAIL state: no clap.state extension\n"), clap_close(&a), 1;
+  const uint32_t n = a.params->count(a.plugin);
+  if (n > MAX_PARAMS) return fprintf(stderr, "%u parameters, more than %u\n", n, MAX_PARAMS), clap_close(&a), -1;
+  static clap_param_info_t info[MAX_PARAMS];
+  static double va[MAX_PARAMS], vb[MAX_PARAMS];
+  static EvList evs;
+  evs.n = 0;
+  for (uint32_t i = 0; i < n; i++) {
+    a.params->get_info(a.plugin, i, &info[i]);
+    clap_event_param_value_t *e = &evs.ev[evs.n++];
+    memset(e, 0, sizeof *e);
+    e->header.size = sizeof *e;
+    e->header.space_id = CLAP_CORE_EVENT_SPACE_ID;
+    e->header.type = CLAP_EVENT_PARAM_VALUE;
+    e->param_id = info[i].id;
+    e->note_id = -1, e->port_index = -1, e->channel = -1, e->key = -1;
+    e->value = off_default(&info[i], i, bypass);
+  }
+  clap_input_events_t in_ev = {&evs, ev_size, ev_get};
+  clap_output_events_t out_ev = {NULL, ev_push};
+  a.params->flush(a.plugin, &in_ev, &out_ev);
+  for (uint32_t i = 0; i < n; i++) a.params->get_value(a.plugin, info[i].id, &va[i]);
+  Blob sa, sb;
+  if (!state_save(&a, sta, &sa)) return printf("FAIL state (%s): save refused\n", mode), clap_close(&a), 1;
+
+  if (!clap_open(&b, path)) return clap_close(&a), -1;
+  const clap_plugin_state_t *stb = (const clap_plugin_state_t *)b.plugin->get_extension(b.plugin, CLAP_EXT_STATE);
+  int fails = 0;
+  rescanned = 0;
+  if (!state_load(&b, stb, &sa)) {
+    printf("FAIL state (%s): a fresh instance refused the %zu-byte state the first one saved\n", mode, sa.len);
+    fails++;
+  }
+  if (!(rescanned & (CLAP_PARAM_RESCAN_VALUES | CLAP_PARAM_RESCAN_ALL))) {
+    printf("FAIL state (%s): loading the state changed the values and asked the host for no rescan\n", mode);
+    fails++;
+  }
+  for (uint32_t i = 0; i < n; i++) {
+    b.params->get_value(b.plugin, info[i].id, &vb[i]);
+    if (vb[i] != va[i]) {
+      printf("FAIL state (%s): %s is %.17g after the load, %.17g when saved\n", mode, info[i].name, vb[i], va[i]);
+      fails++;
+    }
+  }
+  if (!state_save(&b, stb, &sb)) {
+    printf("FAIL state (%s): the loaded instance refused to save\n", mode);
+    fails++;
+  } else if (sb.len != sa.len || memcmp(sa.data, sb.data, sa.len) != 0) {
+    printf("FAIL state (%s): the state saved after the load differs from the one loaded (%zu vs %zu bytes)\n", mode,
+           sb.len, sa.len);
+    fails++;
+  }
+  if (!run_open(&a, il, ir, al, ar) || !run_open(&b, il, ir, bl, br)) {
+    free(sa.data), free(sb.data), clap_close(&a), clap_close(&b);
+    return fprintf(stderr, "activate/process\n"), -1;
+  }
+  if (memcmp(al, bl, STATE_FRAMES * sizeof(float)) != 0 || memcmp(ar, br, STATE_FRAMES * sizeof(float)) != 0) {
+    printf("FAIL state (%s): the instance that loaded the state does not put out the samples the one that saved it does\n", mode);
+    fails++;
+  }
+  if (!fails)
+    printf("PASS state (%s): %u values, a %zu-byte state, the output sample for sample\n", mode, n, sa.len);
+  free(sa.data), free(sb.data);
+  clap_close(&a);
+  clap_close(&b);
+  return fails;
+}
+
+/** An empty state is refused, and leaves the instance as it was. */
+static int state_empty(const char *path) {
+  Clap c;
+  if (!clap_open(&c, path)) return -1;
+  const clap_plugin_state_t *st = (const clap_plugin_state_t *)c.plugin->get_extension(c.plugin, CLAP_EXT_STATE);
+  const uint32_t n = c.params->count(c.plugin);
+  static double before[MAX_PARAMS];
+  for (uint32_t i = 0; i < n && i < MAX_PARAMS; i++) c.params->get_value(c.plugin, i, &before[i]);
+  Blob empty = {NULL, 0, 0, 0};
+  int fails = 0;
+  if (state_load(&c, st, &empty)) printf("FAIL state: an empty state was accepted\n"), fails++;
+  for (uint32_t i = 0; i < n && i < MAX_PARAMS; i++) {
+    double v;
+    c.params->get_value(c.plugin, i, &v);
+    if (v != before[i]) printf("FAIL state: a refused empty state moved parameter %u\n", i), fails++;
+  }
+  if (!fails) printf("PASS state: an empty state is refused, the values untouched\n");
+  clap_close(&c);
+  return fails;
+}
+
+static int state(const char *path) {
+  float *buf[6];
+  for (int k = 0; k < 6; k++) buf[k] = calloc(FRAMES, sizeof(float));
+  make_signal(buf[0], buf[1]);
+  int fails = 0, r;
+  for (int bypass = 0; bypass < 2; bypass++) {
+    if ((r = state_round(path, bypass, buf[0], buf[1], buf[2], buf[3], buf[4], buf[5])) < 0) return 1;
+    fails += r;
+  }
+  if ((r = state_empty(path)) < 0) return 1;
+  fails += r;
+  for (int k = 0; k < 6; k++) free(buf[k]);
+  return fails ? 1 : 0;
+}
+
 int main(int argc, char **argv) {
   if (argc == 3 && strcmp(argv[1], "params") == 0) return params_dump(argv[2]);
   if (argc == 3 && strcmp(argv[1], "live") == 0) return live(argv[2]);
-  fprintf(stderr, "usage: clap-probe params|live <x.clap>\n");
+  if (argc == 3 && strcmp(argv[1], "state") == 0) return state(argv[2]);
+  fprintf(stderr, "usage: clap-probe params|live|state <x.clap>\n");
   return 2;
 }
