@@ -84,7 +84,7 @@ export const UPSTREAM = {
   // seven EQ frequency ports (omx-eq8 b6, omx-eq16 b6 and b9, omx-eq32 b6, b9, b18 and b19) are authored stepped and
   // scan as log, though their lv2:integer and pprops:logarithmic lines equal those of the neighbours that scan stepped
   // (deesser deessFreq, drive bandFreq). The same seven on the desk and in CI; the cause is not isolated yet
-  'lv2 controls[].travel.scale "stepped" "log"': { count: 7, why: 'the scan reports log where the face says stepped, on seven ports whose lv2:integer and pprops:logarithmic lines equal their passing neighbours\'; cause not isolated' },
+  'lv2 controls[].travel.scale "stepped" "log"': { count: 7, why: 'the scan reports log where the face says stepped, on seven ports whose lv2:integer and pprops:logarithmic lines equal their passing neighbours\'; cause not isolated; https://github.com/FreeMixer/plugin-hostd/issues/147' },
 };
 
 /** The described plugins (a descriptor beside the declaration), and the ones outside the round trip. */
