@@ -14,7 +14,8 @@
 #   make install    DESTDIR/PREFIX/LIBDIR/CLAPDIR: $(CLAPDIR)/{{stem}}.clap, $(LIBDIR)/lv2/{{stem}}.lv2/
 #
 # Build deps: omx-dsp (pkg-config omxdsp, >= OMXDSP_MIN, the floor packaging/omx-plugins.spec declares),
-# omx-clap-core (the CLAP ABI's openmixer extensions), clap, lv2; for the tests lilv and node.
+# omx-contract (its resource-hints header), omx-clap-core (the CLAP ABI's openmixer extensions), clap, lv2; for the
+# tests lilv and node.
 
 NAME       := {{stem}}
 URI        := {{uri}}
@@ -29,7 +30,9 @@ PKG_CONFIG ?= pkg-config
 ifeq ($(shell $(PKG_CONFIG) --atleast-version=$(OMXDSP_MIN) omxdsp && echo y),)
 $(error omx-dsp >= $(OMXDSP_MIN) is required (packaging/omx-plugins.spec); `$(PKG_CONFIG) omxdsp` finds $(or $(shell $(PKG_CONFIG) --modversion omxdsp 2>/dev/null),none): install omx-dsp-devel or libomxdsp-dev from the channel (BUILDING.md))
 endif
-DSP_CFLAGS := $(shell $(PKG_CONFIG) --cflags omxdsp)
+# omx-contract's headers: <omxcontract/omx_resource_hints.h>, which the generated parameter header includes
+CONTRACT_CFLAGS := $(shell $(PKG_CONFIG) --cflags omx-contract)
+DSP_CFLAGS := $(shell $(PKG_CONFIG) --cflags omxdsp) $(CONTRACT_CFLAGS)
 DSP_LIBS   := $(shell $(PKG_CONFIG) --libs omxdsp)
 ABI_CFLAGS := $(shell $(PKG_CONFIG) --cflags omx-clap-core clap 2>/dev/null)
 LV2_CFLAGS := $(shell $(PKG_CONFIG) --cflags lv2 2>/dev/null)
@@ -75,7 +78,7 @@ $(B)/panel-probe: $(ROOT)/tools/panel-probe.c $(ROOT)/include/omx_panel_descript
 	$(CC) $(CFLAGS) $(WARN) -I$(ROOT)/include $(ABI_CFLAGS) -o $@ $< $(LILV) -ldl
 
 $(B)/clap-ext-probe: $(ROOT)/tools/clap-ext-probe.c $(ROOT)/include/omx_param_contract.h | $(B)
-	$(CC) $(CFLAGS) $(WARN) -I$(ROOT)/include $(ABI_CFLAGS) -o $@ $< -ldl
+	$(CC) $(CFLAGS) $(WARN) -I$(ROOT)/include $(ABI_CFLAGS) $(CONTRACT_CFLAGS) -o $@ $< -ldl
 
 $(B)/port-groups-probe: $(ROOT)/tools/port-groups-probe.c | $(B)
 	$(CC) $(CFLAGS) $(WARN) -o $@ $< $(LILV)

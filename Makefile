@@ -127,7 +127,7 @@ CFLAGS     ?= -O2 -g
 LIB_WARN   := -std=gnu11 -Wall -Wextra -Werror
 LIB_FLAGS  := -fPIC -fvisibility=hidden -DOMX_CLAP_STATIC -Iinclude
 # read only by the targets that build the archive, so `make version` and the rest need no omx-dsp
-lib_cflags = $(call dep_check,omxdsp,$(OMXDSP_MIN))$(call dep_check,omx-contract,$(CONTRACT_MIN))$(shell $(PKG_CONFIG) --cflags omxdsp omx-clap-core clap)
+lib_cflags = $(call dep_check,omxdsp,$(OMXDSP_MIN))$(call dep_check,omx-contract,$(CONTRACT_MIN))$(shell $(PKG_CONFIG) --cflags omxdsp omx-contract omx-clap-core clap)
 
 .PHONY: presets presets-figures test-role all lib lib-test test test-faces units panel-layout descriptor-view lv2-units format-tables contract-union probe-checks eq-probe-race round-trip hints look manual install install-pins install-test package-lists install-devel install-contract contract-dir clean version recipe-test completeness selftest private-refs strip-crosscheck meters-abi meter-level dsp-copies meter-ring clap-validate
 all: lib
@@ -299,9 +299,9 @@ $(LIB_B)/$(notdir $(1:.c=.o)): $(1) $(wildcard $(dir $(1))*.h $(dir $(1))generat
 endef
 $(foreach f,$(CLAP_FACES),$(eval $(call face_rule,$(f))))
 
-# The prefix, libdir and includedir are filled at install; the version and the omx-dsp range here.
+# The prefix, libdir and includedir are filled at install; the version and the omx-dsp and omx-contract floors here.
 $(LIB_PC): lib/omxplugins.pc.in Makefile $(SPEC) | $(LIB_B)
-	sed -e 's,@VERSION@,$(VERSION),' -e 's,@OMXDSP_MIN@,$(OMXDSP_MIN),' $< > $@
+	sed -e 's,@VERSION@,$(VERSION),' -e 's,@OMXDSP_MIN@,$(OMXDSP_MIN),' -e 's,@CONTRACT_MIN@,$(CONTRACT_MIN),' $< > $@
 
 $(LIB_B):
 	@mkdir -p $@
