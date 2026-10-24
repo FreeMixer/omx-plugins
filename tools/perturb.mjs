@@ -10,7 +10,7 @@
  */
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { basename, join, resolve } from 'node:path';
-import { descriptorFile, viewOf } from './descriptor.mjs';
+import { descriptorFile, isWhole, viewOf } from './descriptor.mjs';
 import { RESOLVED, ROOT, locateContract, paramKernel, perturbCopy } from './omx-contract.mjs';
 import { baseOf } from './variants.mjs';
 
@@ -21,7 +21,7 @@ const file = existsSync(own) ? own : (baseOf(pdir)?.file ?? own);
 const raw = JSON.parse(readFileSync(file, 'utf8'));
 // a plugin described in omx-contract's words: its parameters are its descriptor's controls
 const descFile = join(pdir, descriptorFile(basename(resolve(pdir))));
-const desc = existsSync(descFile) ? JSON.parse(readFileSync(descFile, 'utf8')) : undefined;
+const desc = existsSync(descFile) && !isWhole(raw) ? JSON.parse(readFileSync(descFile, 'utf8')) : undefined;
 const d = desc ? viewOf(desc, raw, file) : raw;
 if (d.binding === 'chain' && d.chain?.length) {
   raw.chain[0].on = !raw.chain[0].on;

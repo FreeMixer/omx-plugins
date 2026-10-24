@@ -52,64 +52,61 @@ export const FORMATS = ['clap', 'lv2'];
 export const LOSSES = {
   // OR2: a meaning has a CLAP word only for the bypass, an LV2 term only for some (lv2:designation); LV2 has no unit
   // for "" (a plain number)
-  'clap controls[].meaning': 89,
-  'lv2 controls[].meaning': 32,
-  'lv2 controls[].travel.unit ""': 13,
+  'clap controls[].meaning': 269,
+  'lv2 controls[].meaning': 100,
+  'lv2 controls[].travel.unit ""': 76,
   // plugin-hostd 0.7.0's LV2 table has no row for urn:openmixer:unit#ratio, the ratio unit our faces write (gap 4)
   'lv2 controls[].travel.unit "ratio"': 3,
   // CLAP: no row reads a unit, a linear or log scale, a step, a choice (our faces set no CLAP_PARAM_IS_ENUM), the
   // session symbol, the LV2 URI, a side-chain's role or what an LV2 host may lend
-  'clap controls[].travel.unit': 113,
-  'clap controls[].travel.scale': 85,
-  'clap controls[].travel.step': 113,
-  'clap controls[].kind': 15,
-  'clap controls[].ids': 12,
-  'clap controls[].values': 12,
-  'clap controls[].labels': 12,
-  'clap controls[].default': 15,
-  'clap controls[].symbol': 128,
-  'clap plugin.uri': 15,
+  'clap controls[].travel.unit': 319,
+  'clap controls[].travel.scale': 218,
+  'clap controls[].travel.step': 319,
+  'clap controls[].kind': 158,
+  'clap controls[].ids': 82,
+  'clap controls[].values': 82,
+  'clap controls[].labels': 82,
+  'clap controls[].default': 158,
+  'clap controls[].symbol': 477,
+  'clap plugin.uri': 19,
   'clap ports[].role': 1,
-  'clap needs.extensions.optional': 15,
+  'clap needs.extensions.optional': 19,
   // LV2: no row reads a step, automation, the plugin's version or vendor (our .ttl writes no doap:maintainer); a
   // control's id is its symbol and a point's id its label, so the CLAP id and our point ids are no LV2 word; the
   // audio ports are one per channel, with the generator's symbols and names
-  'lv2 controls[].travel.step': 113,
-  'lv2 controls[].automatable': 128,
-  'lv2 controls[].id': 128,
-  'lv2 controls[].ids': 12,
-  'lv2 plugin.version': 15,
-  'lv2 plugin.vendor': 15,
-  'lv2 ports[].id': 31,
-  'lv2 ports[].name': 31,
-  // the three toggles UPSTREAM names, scanned as travels, carry no toggle's default
-  'lv2 controls[].default': 3,
+  'lv2 controls[].travel.step': 319,
+  'lv2 controls[].automatable': 477,
+  'lv2 controls[].id': 477,
+  'lv2 controls[].ids': 82,
+  'lv2 plugin.version': 19,
+  'lv2 plugin.vendor': 19,
+  'lv2 ports[].id': 39,
+  'lv2 ports[].name': 39,
+  // the toggles UPSTREAM names, scanned as travels, carry no toggle's default
+  'lv2 controls[].default': 76,
 };
 
 /** A break in plugin-hostd's wave tip, reported, each `differs` it causes printed with it
  * and not failing; the run fails when one no longer shows, so the entry leaves with the fix (an entry that names its
- * `ports`: when a port outside them shows, or the installed plugin-hostd is past its `through`). `plugin-hostd-probe
+ * `at` ports: when a port outside them differs; an entry with a `through` also, when the installed plugin-hostd is past it). `plugin-hostd-probe
  * describe` keeps a word's last value, and an LV2 dump lists lv2:portProperty lv2:toggled before rdf:type
  * lv2:ControlPort, so a toggle's kind is the control port's travel. */
 export const UPSTREAM = {
-  'lv2 controls[].kind "toggle" "travel"': { count: 3, why: 'plugin-hostd 83e54db describe: lv2:ControlPort overwrites lv2:toggled (src/describe.c get(), the last value)' },
-  // plugin-hostd#142: an integer Hz port states lv2:integer (stepped) and pprops:logarithmic (log), and describe keeps
-  // whichever of the two sord yields last. That order moves with the bundle's path and contents: the same omx-reverb
-  // bundle scans "stepped" from one directory and "log" from another, and CI's make test and RPM jobs flip different
-  // ports of the same commit. So the entry names every port that states both words (the only ones that can flip), a
-  // flip on any other port fails, and the entry holds through the newest plugin-hostd release seen still flipping
-  // (0.9.1, in CI): a newer plugin-hostd fails the run until the entry is retired or moved on. plugin-hostd#142 is still
-  // open and 0.9.1's release notes do not touch the scale flip, so the hold moves on from 0.9.0.
+  'lv2 controls[].kind "toggle" "travel"': { count: 76, why: 'plugin-hostd 83e54db describe: lv2:ControlPort overwrites lv2:toggled (src/describe.c get(), the last value)' },
+  // seven EQ frequency ports (omx-eq8 b6, omx-eq16 b6 and b9, omx-eq32 b6, b9, b18 and b19) are authored stepped and
+  // scan as log, though their lv2:integer and pprops:logarithmic lines equal those of the neighbours that scan stepped
+  // (deesser deessFreq, drive bandFreq). The same seven on the desk and in CI; the cause is not isolated yet. The entry
+  // holds through the newest plugin-hostd release seen still showing them (0.9.1, in CI; 0.9.1's release notes do not
+  // touch the scale flip): a newer plugin-hostd fails the run until the entry is retired or moved on
   'lv2 controls[].travel.scale "stepped" "log"': {
-    ports: ['omx-deesser deessFreq', 'omx-drive bandFreq', 'omx-keyed-gate key_hp', 'omx-keyed-gate key_lp', 'omx-phaser baseHz', 'omx-reverb lowcut', 'omx-reverb highcut'],
     through: '0.9.1',
-    why: 'plugin-hostd#142: of lv2:integer and pprops:logarithmic, describe keeps the last sord yields (src/describe.c get())',
+    at: ['omx-eq8 b6_freq', 'omx-eq16 b6_freq', 'omx-eq16 b9_freq', 'omx-eq32 b6_freq', 'omx-eq32 b9_freq', 'omx-eq32 b18_freq', 'omx-eq32 b19_freq'],
+    why: 'the scan reports log where the face says stepped, on seven ports whose lv2:integer and pprops:logarithmic lines equal their passing neighbours\'; cause not isolated; https://github.com/FreeMixer/plugin-hostd/issues/147',
   },
 };
 
-/** The UPSTREAM entry a difference `k` at `port` (`<stem> <where>`) is, or undefined: an entry that names its ports
- * covers those alone. */
-const upstreamOf = (k, port) => (UPSTREAM[k] && (!UPSTREAM[k].ports || UPSTREAM[k].ports.includes(port)) ? UPSTREAM[k] : undefined);
+/** An UPSTREAM entry excuses a differ when it names no ports (`at`), or names this plugin's port. */
+const excused = (entry, stem, where) => entry !== undefined && (entry.at === undefined || entry.at.includes(`${stem} ${where}`));
 
 /** The described plugins (a descriptor beside the declaration), and the ones outside the round trip. */
 export function described(root = ROOT) {
@@ -228,7 +225,7 @@ export function roundTrip(scansDir, { root = ROOT, authoredFiles = {} } = {}) {
           lines.push(`lost ${format} ${stem} ${r.where} ${r.word} ${show(r.authored)}`);
           const k = r.word === 'controls[].travel.unit' && format === 'lv2' ? `${format} ${r.word} ${show(r.authored)}` : `${format} ${r.word}`;
           losses[k] = (losses[k] ?? 0) + 1;
-        } else if (upstreamOf(`${format} ${r.word} ${show(r.authored)} ${show(r.scanned)}`, `${stem} ${r.where}`)) {
+        } else if (excused(UPSTREAM[`${format} ${r.word} ${show(r.authored)} ${show(r.scanned)}`], stem, r.where)) {
           const k = `${format} ${r.word} ${show(r.authored)} ${show(r.scanned)}`;
           lines.push(`differs ${format} ${stem} ${r.where} ${r.word}: authored ${show(r.authored)}, scanned ${show(r.scanned)} (upstream: ${UPSTREAM[k].why})`);
           upstream[k] = (upstream[k] ?? 0) + 1;
@@ -245,14 +242,15 @@ export function roundTrip(scansDir, { root = ROOT, authoredFiles = {} } = {}) {
     lines.push(`${ok ? 'named' : 'unnamed'} loss ${k}: ${losses[k] ?? 0} word(s)${ok ? '' : `, LOSSES names ${LOSSES[k] ?? 0}`}`);
     if (!ok) fails++;
   }
-  for (const [k, { count, ports, through }] of Object.entries(UPSTREAM)) {
-    if (ports) {
-      const at = hostdVersion();
-      const ok = at !== undefined && compareVersions(at, through) <= 0;
-      lines.push(ok ? `upstream ${k}: ${upstream[k] ?? 0} of the ${ports.length} named port(s) flip under plugin-hostd ${at}`
-        : `unnamed upstream ${k}: plugin-hostd ${at ?? '(no version: pkg-config --modversion plugin-hostd)'} is past ${through}, the release the entry holds through: run without it, retire it if no named port flips, else move it on`);
-      if (!ok) fails++;
-      continue;
+  for (const [k, { count: named, at, through }] of Object.entries(UPSTREAM)) {
+    const count = at?.length ?? named;
+    if (through !== undefined) {
+      const v = hostdVersion();
+      if (v === undefined || compareVersions(v, through) > 0) {
+        lines.push(`unnamed upstream ${k}: plugin-hostd ${v ?? '(no version: pkg-config --modversion plugin-hostd)'} is past ${through}, the release the entry holds through: run without it, retire it if no named port differs, else move it on`);
+        fails++;
+        continue;
+      }
     }
     const ok = upstream[k] === count;
     lines.push(`${ok ? 'upstream' : 'unnamed upstream'} ${k}: ${upstream[k] ?? 0} word(s)${ok ? '' : `, UPSTREAM names ${count} (fixed upstream? remove the entry)`}`);

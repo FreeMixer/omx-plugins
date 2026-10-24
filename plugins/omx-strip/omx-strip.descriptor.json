@@ -1,0 +1,1288 @@
+{
+  "$schema": "https://github.com/FreeMixer/omx-contract/raw/v3/schema/omx-contract.schema.json",
+  "requires": {
+    "omx-contract-schema": ">= 3.0.0"
+  },
+  "origin": "authored",
+  "plugin": {
+    "id": "org.openmixer.strip",
+    "format": "clap",
+    "uri": "urn:openmixer:strip",
+    "name": "omx strip",
+    "vendor": "openmixer",
+    "version": "0.13.0",
+    "doc": "The OpenMixer console's channel strip in one plugin: input trim, high- and low-pass filters, gate, four-band EQ and compressor, in the console's order or any other. No DSP of its own: each stage is omx-dsp's instance face of the console's kernel, called in order.",
+    "features": [
+      "audio-effect"
+    ]
+  },
+  "controls": [
+    {
+      "id": 0,
+      "symbol": "trimOn",
+      "name": "Input",
+      "kind": "toggle",
+      "default": true,
+      "group": [
+        "Input"
+      ],
+      "automatable": true,
+      "source": {
+        "impl": "plugins/omx-strip/omx_strip_clap.c#clap_entry"
+      }
+    },
+    {
+      "id": 1,
+      "symbol": "trimDb",
+      "name": "Trim",
+      "kind": "travel",
+      "travel": {
+        "min": -24,
+        "max": 24,
+        "step": 0,
+        "unit": "dB",
+        "default": 0,
+        "scale": "linear"
+      },
+      "group": [
+        "Input"
+      ],
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/trim.json#TRIM_RANGE",
+          "at": "omx-dsp@0.24.0"
+        }
+      }
+    },
+    {
+      "id": 2,
+      "symbol": "filterOn",
+      "name": "Filters",
+      "kind": "toggle",
+      "default": true,
+      "group": [
+        "Filters"
+      ],
+      "automatable": true,
+      "source": {
+        "impl": "plugins/omx-strip/omx_strip_clap.c#clap_entry"
+      }
+    },
+    {
+      "id": 3,
+      "symbol": "hpfOn",
+      "name": "HPF",
+      "kind": "toggle",
+      "default": false,
+      "group": [
+        "Filters"
+      ],
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/eq.json#EQ_HPF_ONS",
+          "at": "omx-dsp@0.24.0"
+        }
+      }
+    },
+    {
+      "id": 4,
+      "symbol": "hpfFreq",
+      "name": "HPF Freq",
+      "kind": "travel",
+      "travel": {
+        "min": 20,
+        "max": 1000,
+        "step": 1,
+        "unit": "Hz",
+        "default": 80,
+        "scale": "stepped"
+      },
+      "group": [
+        "Filters"
+      ],
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/eq.json#HPF_FREQ_RANGE",
+          "at": "omx-dsp@0.24.0"
+        }
+      }
+    },
+    {
+      "id": 5,
+      "symbol": "hpfSlope",
+      "name": "HPF Slope",
+      "kind": "choice",
+      "ids": [
+        "12",
+        "24"
+      ],
+      "labels": [
+        "12 dB/oct",
+        "24 dB/oct"
+      ],
+      "values": [
+        12,
+        24
+      ],
+      "default": "12",
+      "group": [
+        "Filters"
+      ],
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/eq.json#FILTER_SLOPES",
+          "at": "omx-dsp@0.24.0"
+        }
+      }
+    },
+    {
+      "id": 6,
+      "symbol": "lpfOn",
+      "name": "LPF",
+      "kind": "toggle",
+      "default": false,
+      "group": [
+        "Filters"
+      ],
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/eq.json#EQ_LPF_ONS",
+          "at": "omx-dsp@0.24.0"
+        }
+      }
+    },
+    {
+      "id": 7,
+      "symbol": "lpfFreq",
+      "name": "LPF Freq",
+      "kind": "travel",
+      "travel": {
+        "min": 1000,
+        "max": 20000,
+        "step": 1,
+        "unit": "Hz",
+        "default": 18000,
+        "scale": "stepped"
+      },
+      "group": [
+        "Filters"
+      ],
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/eq.json#LPF_FREQ_RANGE",
+          "at": "omx-dsp@0.24.0"
+        }
+      }
+    },
+    {
+      "id": 8,
+      "symbol": "lpfSlope",
+      "name": "LPF Slope",
+      "kind": "choice",
+      "ids": [
+        "12",
+        "24"
+      ],
+      "labels": [
+        "12 dB/oct",
+        "24 dB/oct"
+      ],
+      "values": [
+        12,
+        24
+      ],
+      "default": "12",
+      "group": [
+        "Filters"
+      ],
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/eq.json#FILTER_SLOPES",
+          "at": "omx-dsp@0.24.0"
+        }
+      }
+    },
+    {
+      "id": 9,
+      "symbol": "gateOn",
+      "name": "Gate",
+      "kind": "toggle",
+      "default": false,
+      "group": [
+        "Gate"
+      ],
+      "automatable": true,
+      "source": {
+        "impl": "plugins/omx-strip/omx_strip_clap.c#clap_entry"
+      }
+    },
+    {
+      "id": 10,
+      "symbol": "gateThreshold",
+      "name": "Gate Threshold",
+      "kind": "travel",
+      "travel": {
+        "min": -80,
+        "max": 0,
+        "step": 0,
+        "unit": "dB",
+        "default": -40,
+        "scale": "linear"
+      },
+      "group": [
+        "Gate"
+      ],
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/primitives/gate-continuous-travels.json#GATE_CONTINUOUS_TRAVELS.thresholdDb",
+          "at": "omx-dsp@0.24.0"
+        }
+      }
+    },
+    {
+      "id": 11,
+      "symbol": "gateRatio",
+      "name": "Gate Ratio",
+      "kind": "travel",
+      "travel": {
+        "min": 1,
+        "max": 100,
+        "step": 0,
+        "unit": "",
+        "default": 16,
+        "scale": "linear"
+      },
+      "group": [
+        "Gate"
+      ],
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/primitives/gate-continuous-travels.json#GATE_CONTINUOUS_TRAVELS.ratio",
+          "at": "omx-dsp@0.24.0"
+        }
+      }
+    },
+    {
+      "id": 12,
+      "symbol": "gateRange",
+      "name": "Gate Range",
+      "kind": "travel",
+      "travel": {
+        "min": -90,
+        "max": 0,
+        "step": 0,
+        "unit": "dB",
+        "default": -90,
+        "scale": "linear"
+      },
+      "group": [
+        "Gate"
+      ],
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/primitives/gate-continuous-travels.json#GATE_CONTINUOUS_TRAVELS.rangeDb",
+          "at": "omx-dsp@0.24.0"
+        }
+      }
+    },
+    {
+      "id": 13,
+      "symbol": "gateAttack",
+      "name": "Gate Attack",
+      "kind": "travel",
+      "travel": {
+        "min": 0,
+        "max": 500,
+        "step": 0,
+        "unit": "ms",
+        "default": 1,
+        "scale": "linear"
+      },
+      "group": [
+        "Gate"
+      ],
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/gate.json#GATE_LIMITS.attackMs",
+          "at": "omx-dsp@0.24.0"
+        }
+      }
+    },
+    {
+      "id": 14,
+      "symbol": "gateRelease",
+      "name": "Gate Release",
+      "kind": "travel",
+      "travel": {
+        "min": 0,
+        "max": 5000,
+        "step": 0,
+        "unit": "ms",
+        "default": 100,
+        "scale": "linear"
+      },
+      "group": [
+        "Gate"
+      ],
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/primitives/gate-continuous-travels.json#GATE_CONTINUOUS_TRAVELS.releaseMs",
+          "at": "omx-dsp@0.24.0"
+        }
+      }
+    },
+    {
+      "id": 15,
+      "symbol": "gateKneeStart",
+      "name": "Gate Knee Start",
+      "kind": "travel",
+      "travel": {
+        "min": -80,
+        "max": 0,
+        "step": 1,
+        "unit": "dB",
+        "default": -43,
+        "scale": "stepped"
+      },
+      "group": [
+        "Gate"
+      ],
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/gate.json#GATE_LIMITS.kneeStartDb",
+          "at": "omx-dsp@0.24.0"
+        }
+      }
+    },
+    {
+      "id": 16,
+      "symbol": "gateKneeEnd",
+      "name": "Gate Knee End",
+      "kind": "travel",
+      "travel": {
+        "min": -80,
+        "max": 0,
+        "step": 1,
+        "unit": "dB",
+        "default": -37,
+        "scale": "stepped"
+      },
+      "group": [
+        "Gate"
+      ],
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/gate.json#GATE_LIMITS.kneeEndDb",
+          "at": "omx-dsp@0.24.0"
+        }
+      }
+    },
+    {
+      "id": 17,
+      "symbol": "gateHold",
+      "name": "Gate Hold",
+      "kind": "travel",
+      "travel": {
+        "min": 0,
+        "max": 2000,
+        "step": 1,
+        "unit": "ms",
+        "default": 10,
+        "scale": "stepped"
+      },
+      "group": [
+        "Gate"
+      ],
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/gate.json#GATE_LIMITS.holdMs",
+          "at": "omx-dsp@0.24.0"
+        }
+      }
+    },
+    {
+      "id": 18,
+      "symbol": "gateHysteresis",
+      "name": "Gate Hysteresis",
+      "kind": "travel",
+      "travel": {
+        "min": 0,
+        "max": 24,
+        "step": 0,
+        "unit": "dB",
+        "default": 3,
+        "scale": "linear"
+      },
+      "group": [
+        "Gate"
+      ],
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/gate.json#GATE_LIMITS.hysteresisDb",
+          "at": "omx-dsp@0.24.0"
+        }
+      }
+    },
+    {
+      "id": 19,
+      "symbol": "eqOn",
+      "name": "EQ",
+      "kind": "toggle",
+      "default": true,
+      "group": [
+        "EQ"
+      ],
+      "automatable": true,
+      "source": {
+        "impl": "plugins/omx-strip/omx_strip_clap.c#clap_entry"
+      }
+    },
+    {
+      "id": 20,
+      "symbol": "eq1Type",
+      "name": "EQ 1 Type",
+      "kind": "choice",
+      "ids": [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ],
+      "labels": [
+        "Bell",
+        "Low Shelf",
+        "High Shelf",
+        "Notch",
+        "All-pass 1st",
+        "All-pass 2nd"
+      ],
+      "values": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "default": "1",
+      "group": [
+        "EQ"
+      ],
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/eq.json#EQ_BAND_TYPES",
+          "at": "omx-dsp@0.24.0"
+        }
+      }
+    },
+    {
+      "id": 21,
+      "symbol": "eq1Freq",
+      "name": "EQ 1 Freq",
+      "kind": "travel",
+      "travel": {
+        "min": 20,
+        "max": 20000,
+        "step": 1,
+        "unit": "Hz",
+        "default": 100,
+        "scale": "stepped"
+      },
+      "group": [
+        "EQ"
+      ],
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/eq.json#EQ_FREQ_RANGE",
+          "at": "omx-dsp@0.24.0"
+        }
+      }
+    },
+    {
+      "id": 22,
+      "symbol": "eq1Gain",
+      "name": "EQ 1 Gain",
+      "kind": "travel",
+      "travel": {
+        "min": -15,
+        "max": 15,
+        "step": 0,
+        "unit": "dB",
+        "default": 0,
+        "scale": "linear"
+      },
+      "group": [
+        "EQ"
+      ],
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/eq.json#EQ_GAIN_RANGE",
+          "at": "omx-dsp@0.24.0"
+        }
+      }
+    },
+    {
+      "id": 23,
+      "symbol": "eq1Q",
+      "name": "EQ 1 Q",
+      "kind": "travel",
+      "travel": {
+        "min": 0.3,
+        "max": 116,
+        "step": 0,
+        "unit": "",
+        "default": 1,
+        "scale": "linear"
+      },
+      "group": [
+        "EQ"
+      ],
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/eq.json#EQ_Q_RANGE",
+          "at": "omx-dsp@0.24.0"
+        }
+      }
+    },
+    {
+      "id": 24,
+      "symbol": "eq1On",
+      "name": "EQ 1",
+      "kind": "toggle",
+      "default": false,
+      "group": [
+        "EQ"
+      ],
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/eq.json#EQ_BAND_ONS",
+          "at": "omx-dsp@0.24.0"
+        }
+      }
+    },
+    {
+      "id": 25,
+      "symbol": "eq2Type",
+      "name": "EQ 2 Type",
+      "kind": "choice",
+      "ids": [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ],
+      "labels": [
+        "Bell",
+        "Low Shelf",
+        "High Shelf",
+        "Notch",
+        "All-pass 1st",
+        "All-pass 2nd"
+      ],
+      "values": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "default": "0",
+      "group": [
+        "EQ"
+      ],
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/eq.json#EQ_BAND_TYPES",
+          "at": "omx-dsp@0.24.0"
+        }
+      }
+    },
+    {
+      "id": 26,
+      "symbol": "eq2Freq",
+      "name": "EQ 2 Freq",
+      "kind": "travel",
+      "travel": {
+        "min": 20,
+        "max": 20000,
+        "step": 1,
+        "unit": "Hz",
+        "default": 400,
+        "scale": "stepped"
+      },
+      "group": [
+        "EQ"
+      ],
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/eq.json#EQ_FREQ_RANGE",
+          "at": "omx-dsp@0.24.0"
+        }
+      }
+    },
+    {
+      "id": 27,
+      "symbol": "eq2Gain",
+      "name": "EQ 2 Gain",
+      "kind": "travel",
+      "travel": {
+        "min": -15,
+        "max": 15,
+        "step": 0,
+        "unit": "dB",
+        "default": 0,
+        "scale": "linear"
+      },
+      "group": [
+        "EQ"
+      ],
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/eq.json#EQ_GAIN_RANGE",
+          "at": "omx-dsp@0.24.0"
+        }
+      }
+    },
+    {
+      "id": 28,
+      "symbol": "eq2Q",
+      "name": "EQ 2 Q",
+      "kind": "travel",
+      "travel": {
+        "min": 0.3,
+        "max": 116,
+        "step": 0,
+        "unit": "",
+        "default": 1,
+        "scale": "linear"
+      },
+      "group": [
+        "EQ"
+      ],
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/eq.json#EQ_Q_RANGE",
+          "at": "omx-dsp@0.24.0"
+        }
+      }
+    },
+    {
+      "id": 29,
+      "symbol": "eq2On",
+      "name": "EQ 2",
+      "kind": "toggle",
+      "default": false,
+      "group": [
+        "EQ"
+      ],
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/eq.json#EQ_BAND_ONS",
+          "at": "omx-dsp@0.24.0"
+        }
+      }
+    },
+    {
+      "id": 30,
+      "symbol": "eq3Type",
+      "name": "EQ 3 Type",
+      "kind": "choice",
+      "ids": [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ],
+      "labels": [
+        "Bell",
+        "Low Shelf",
+        "High Shelf",
+        "Notch",
+        "All-pass 1st",
+        "All-pass 2nd"
+      ],
+      "values": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "default": "0",
+      "group": [
+        "EQ"
+      ],
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/eq.json#EQ_BAND_TYPES",
+          "at": "omx-dsp@0.24.0"
+        }
+      }
+    },
+    {
+      "id": 31,
+      "symbol": "eq3Freq",
+      "name": "EQ 3 Freq",
+      "kind": "travel",
+      "travel": {
+        "min": 20,
+        "max": 20000,
+        "step": 1,
+        "unit": "Hz",
+        "default": 2000,
+        "scale": "stepped"
+      },
+      "group": [
+        "EQ"
+      ],
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/eq.json#EQ_FREQ_RANGE",
+          "at": "omx-dsp@0.24.0"
+        }
+      }
+    },
+    {
+      "id": 32,
+      "symbol": "eq3Gain",
+      "name": "EQ 3 Gain",
+      "kind": "travel",
+      "travel": {
+        "min": -15,
+        "max": 15,
+        "step": 0,
+        "unit": "dB",
+        "default": 0,
+        "scale": "linear"
+      },
+      "group": [
+        "EQ"
+      ],
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/eq.json#EQ_GAIN_RANGE",
+          "at": "omx-dsp@0.24.0"
+        }
+      }
+    },
+    {
+      "id": 33,
+      "symbol": "eq3Q",
+      "name": "EQ 3 Q",
+      "kind": "travel",
+      "travel": {
+        "min": 0.3,
+        "max": 116,
+        "step": 0,
+        "unit": "",
+        "default": 1,
+        "scale": "linear"
+      },
+      "group": [
+        "EQ"
+      ],
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/eq.json#EQ_Q_RANGE",
+          "at": "omx-dsp@0.24.0"
+        }
+      }
+    },
+    {
+      "id": 34,
+      "symbol": "eq3On",
+      "name": "EQ 3",
+      "kind": "toggle",
+      "default": false,
+      "group": [
+        "EQ"
+      ],
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/eq.json#EQ_BAND_ONS",
+          "at": "omx-dsp@0.24.0"
+        }
+      }
+    },
+    {
+      "id": 35,
+      "symbol": "eq4Type",
+      "name": "EQ 4 Type",
+      "kind": "choice",
+      "ids": [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ],
+      "labels": [
+        "Bell",
+        "Low Shelf",
+        "High Shelf",
+        "Notch",
+        "All-pass 1st",
+        "All-pass 2nd"
+      ],
+      "values": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "default": "2",
+      "group": [
+        "EQ"
+      ],
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/eq.json#EQ_BAND_TYPES",
+          "at": "omx-dsp@0.24.0"
+        }
+      }
+    },
+    {
+      "id": 36,
+      "symbol": "eq4Freq",
+      "name": "EQ 4 Freq",
+      "kind": "travel",
+      "travel": {
+        "min": 20,
+        "max": 20000,
+        "step": 1,
+        "unit": "Hz",
+        "default": 8000,
+        "scale": "stepped"
+      },
+      "group": [
+        "EQ"
+      ],
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/eq.json#EQ_FREQ_RANGE",
+          "at": "omx-dsp@0.24.0"
+        }
+      }
+    },
+    {
+      "id": 37,
+      "symbol": "eq4Gain",
+      "name": "EQ 4 Gain",
+      "kind": "travel",
+      "travel": {
+        "min": -15,
+        "max": 15,
+        "step": 0,
+        "unit": "dB",
+        "default": 0,
+        "scale": "linear"
+      },
+      "group": [
+        "EQ"
+      ],
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/eq.json#EQ_GAIN_RANGE",
+          "at": "omx-dsp@0.24.0"
+        }
+      }
+    },
+    {
+      "id": 38,
+      "symbol": "eq4Q",
+      "name": "EQ 4 Q",
+      "kind": "travel",
+      "travel": {
+        "min": 0.3,
+        "max": 116,
+        "step": 0,
+        "unit": "",
+        "default": 1,
+        "scale": "linear"
+      },
+      "group": [
+        "EQ"
+      ],
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/eq.json#EQ_Q_RANGE",
+          "at": "omx-dsp@0.24.0"
+        }
+      }
+    },
+    {
+      "id": 39,
+      "symbol": "eq4On",
+      "name": "EQ 4",
+      "kind": "toggle",
+      "default": false,
+      "group": [
+        "EQ"
+      ],
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/eq.json#EQ_BAND_ONS",
+          "at": "omx-dsp@0.24.0"
+        }
+      }
+    },
+    {
+      "id": 40,
+      "symbol": "compOn",
+      "name": "Comp",
+      "kind": "toggle",
+      "default": false,
+      "group": [
+        "Comp"
+      ],
+      "automatable": true,
+      "source": {
+        "impl": "plugins/omx-strip/omx_strip_clap.c#clap_entry"
+      }
+    },
+    {
+      "id": 41,
+      "symbol": "compThreshold",
+      "name": "Comp Threshold",
+      "kind": "travel",
+      "travel": {
+        "min": -60,
+        "max": 0,
+        "step": 0,
+        "unit": "dB",
+        "default": -18,
+        "scale": "linear"
+      },
+      "group": [
+        "Comp"
+      ],
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/primitives/comp-continuous-travels.json#COMP_CONTINUOUS_TRAVELS.thresholdDb",
+          "at": "omx-dsp@0.24.0"
+        }
+      }
+    },
+    {
+      "id": 42,
+      "symbol": "compRatio",
+      "name": "Comp Ratio",
+      "kind": "travel",
+      "travel": {
+        "min": 1,
+        "max": 20,
+        "step": 0,
+        "unit": "",
+        "default": 4,
+        "scale": "linear"
+      },
+      "group": [
+        "Comp"
+      ],
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/comp.json#COMP_LIMITS.ratio",
+          "at": "omx-dsp@0.24.0"
+        }
+      }
+    },
+    {
+      "id": 43,
+      "symbol": "compKnee",
+      "name": "Comp Knee",
+      "kind": "travel",
+      "travel": {
+        "min": 0,
+        "max": 24,
+        "step": 0,
+        "unit": "dB",
+        "default": 6,
+        "scale": "linear"
+      },
+      "group": [
+        "Comp"
+      ],
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/comp.json#COMP_LIMITS.kneeDb",
+          "at": "omx-dsp@0.24.0"
+        }
+      }
+    },
+    {
+      "id": 44,
+      "symbol": "compAttack",
+      "name": "Comp Attack",
+      "kind": "travel",
+      "travel": {
+        "min": 0.1,
+        "max": 100,
+        "step": 0,
+        "unit": "ms",
+        "default": 5,
+        "scale": "linear"
+      },
+      "group": [
+        "Comp"
+      ],
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/comp.json#COMP_LIMITS.attackMs",
+          "at": "omx-dsp@0.24.0"
+        }
+      }
+    },
+    {
+      "id": 45,
+      "symbol": "compRelease",
+      "name": "Comp Release",
+      "kind": "travel",
+      "travel": {
+        "min": 5,
+        "max": 3000,
+        "step": 0,
+        "unit": "ms",
+        "default": 200,
+        "scale": "linear"
+      },
+      "group": [
+        "Comp"
+      ],
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/primitives/comp-continuous-travels.json#COMP_CONTINUOUS_TRAVELS.releaseMs",
+          "at": "omx-dsp@0.24.0"
+        }
+      }
+    },
+    {
+      "id": 46,
+      "symbol": "compMakeup",
+      "name": "Comp Makeup",
+      "kind": "travel",
+      "travel": {
+        "min": 0,
+        "max": 24,
+        "step": 0,
+        "unit": "dB",
+        "default": 0,
+        "scale": "linear"
+      },
+      "group": [
+        "Comp"
+      ],
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/comp.json#COMP_LIMITS.makeupDb",
+          "at": "omx-dsp@0.24.0"
+        }
+      }
+    },
+    {
+      "id": 47,
+      "symbol": "compKind",
+      "name": "Comp Kind",
+      "kind": "choice",
+      "ids": [
+        "0",
+        "1"
+      ],
+      "labels": [
+        "Compressor",
+        "Limiter"
+      ],
+      "values": [
+        0,
+        1
+      ],
+      "default": "0",
+      "group": [
+        "Comp"
+      ],
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/comp.json#COMP_KINDS",
+          "at": "omx-dsp@0.24.0"
+        }
+      }
+    },
+    {
+      "id": 48,
+      "symbol": "compMix",
+      "name": "Comp Mix",
+      "kind": "travel",
+      "travel": {
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "%",
+        "default": 100,
+        "scale": "stepped"
+      },
+      "group": [
+        "Comp"
+      ],
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/comp.json#COMP_LIMITS.mixPct",
+          "at": "omx-dsp@0.24.0"
+        }
+      }
+    },
+    {
+      "id": 49,
+      "symbol": "compDetectorOversampling",
+      "name": "Comp Detector Oversampling",
+      "kind": "choice",
+      "ids": [
+        "0",
+        "1",
+        "2"
+      ],
+      "labels": [
+        "Auto",
+        "Off",
+        "4x"
+      ],
+      "values": [
+        0,
+        1,
+        2
+      ],
+      "default": "0",
+      "group": [
+        "Comp"
+      ],
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/comp.json#DETECTOR_OVERSAMPLINGS",
+          "at": "omx-dsp@0.24.0"
+        }
+      }
+    },
+    {
+      "id": 50,
+      "symbol": "order",
+      "name": "Order",
+      "kind": "travel",
+      "travel": {
+        "min": 0,
+        "max": 119,
+        "step": 1,
+        "unit": "",
+        "default": 0,
+        "scale": "stepped"
+      },
+      "group": [
+        "Order"
+      ],
+      "automatable": true,
+      "source": {
+        "impl": "plugins/omx-strip/omx_strip_clap.c#clap_entry"
+      }
+    }
+  ],
+  "ports": [
+    {
+      "id": 0,
+      "name": "in",
+      "kind": "audio",
+      "direction": "in",
+      "role": "main",
+      "channels": 2,
+      "layout": "stereo"
+    },
+    {
+      "id": 0,
+      "name": "out",
+      "kind": "audio",
+      "direction": "out",
+      "role": "main",
+      "channels": 2,
+      "layout": "stereo"
+    }
+  ],
+  "needs": {
+    "extensions": {
+      "optional": [
+        "lv2:hardRTCapable"
+      ]
+    }
+  },
+  "latency": {
+    "reports": true
+  },
+  "extensions": {
+    "clap": {
+      "clap_plugin_descriptor.features": [
+        "CLAP_PLUGIN_FEATURE_MIXING",
+        "CLAP_PLUGIN_FEATURE_STEREO"
+      ]
+    },
+    "lv2": {
+      "rdf:type": [
+        "lv2:Plugin",
+        "lv2:MixerPlugin"
+      ]
+    }
+  },
+  "source": {
+    "impl": "plugins/omx-strip/omx_strip_clap.c#clap_entry"
+  }
+}

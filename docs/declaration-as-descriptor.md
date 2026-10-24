@@ -15,6 +15,12 @@ headers, both faces, the panel description, the MOD GUI and its rasters do not c
 plugin moves to a descriptor (`node tools/gen.mjs --check`, `node tools/modgui-gen.mjs --check`,
 `node tools/look.mjs --check`, `make panel-layout`).
 
+Two plugins keep a whole declaration: omx-eq, a base of three variants, and omx-strip, a chain. Their declaration is
+no extras file, so their descriptors are rendered from it (`node tools/gen.mjs` writes `omx-eq8`, `omx-eq16`,
+`omx-eq32` and `omx-strip` `.descriptor.json`, `--check` holds them fresh) and are not read back. Their faces state
+what the descriptor states, as every described plugin's do: the CLAP parameter modules from the groups, the LV2
+designations from the meanings.
+
 A link carries the release it is read from, `at`: `omx-contract@<floor>`, the packaging's floor.
 
 ## Where a host reads it
@@ -98,8 +104,8 @@ stands in for the installed tables.
 - An LV2 port's `units:unit` is the LV2 row mapping its unit (`units:db` for `dB`, `<urn:openmixer:unit#dBFS>` for
   `dBFS`); a unit no row maps is the declaration's own, defined in the plugin's TTL: `dBu`, `dB/oct` and `ratio`
   (`urn:openmixer:unit#ratio`, gap 4).
-- An LV2 port's `lv2:designation` is the LV2 row mapping its control's `meaning`: 57 ports carry a `param:` term
-  (gain 31, wetDryRatio 10, release 4, threshold 3, ratio 3, attack 3, hold 1, frequency 1, delay 1). A meaning with
+- An LV2 port's `lv2:designation` is the LV2 row mapping its control's `meaning`: 169 ports carry a `param:` term
+  (gain 87, frequency 57, wetDryRatio 10, release 4, threshold 3, ratio 3, attack 3, hold 1, delay 1). A meaning with
   no LV2 term is written nowhere.
 - A CLAP parameter's `module` is its control's `group`, the labels joined by `/` (the inverse of plugin-hostd's
   `group-path`); a plugin with no descriptor writes `""`.
@@ -127,20 +133,21 @@ writes it (a CLAP feature by its macro name, `CLAP_PLUGIN_FEATURE_DELAY`; one va
 
 It passes with no `differs`, every bag equal, and each lost word one the tool's `LOSSES` names, by count:
 
-- OR2's: `meaning` on CLAP (89) and on LV2 (32, those with no LV2 term), the `""` unit on LV2 (13);
+- OR2's: `meaning` on CLAP (269) and on LV2 (100, those with no LV2 term), the `""` unit on LV2 (76);
 - the `ratio` unit on LV2 (3): plugin-hostd 0.7.0's LV2 table has no row for `urn:openmixer:unit#ratio`;
-- on CLAP, words no row reads: the unit (113), a linear or log scale (85), the step (113), a choice's kind, ids,
-  values, labels and default (15, 12, 12, 12, 15), the symbol (128), the LV2 URI (15), a side-chain's role (1), what
-  an LV2 host may lend (15);
-- on LV2: the step (113), automation (128), the plugin's version and vendor (15 each), the CLAP id (128), our point
-  ids (12), the audio ports' ids and names (31 each).
+- on CLAP, words no row reads: the unit (319), a linear or log scale (218), the step (319), a choice's kind, ids,
+  values, labels and default (158, 82, 82, 82, 158), the symbol (477), the LV2 URI (19), a side-chain's role (1), what
+  an LV2 host may lend (19);
+- on LV2: the step (319), automation (477), the plugin's version and vendor (19 each), the CLAP id (477), our point
+  ids (82), the audio ports' ids and names (39 each).
 
 A break in plugin-hostd's wave tip is named in `UPSTREAM` and printed with its `differs`, not failing; the run fails
 when one no longer shows, so the entry leaves with the fix. One stands: `describe` keeps a
-word's last value and the LV2 dump lists `lv2:toggled` before `rdf:type lv2:ControlPort`, so the three LV2 toggles
-(omx-delay `pingpong`, omx-drive `autoGain` and `stereoLink`) scan as travels and lose their default.
+word's last value and the LV2 dump lists `lv2:toggled` before `rdf:type lv2:ControlPort`, so the 76 LV2 toggles
+(omx-delay `pingpong`, omx-drive `autoGain` and `stereoLink`, the band, filter and stage switches of omx-eq8, omx-eq16,
+omx-eq32 and omx-strip) scan as travels and lose their default.
 
-The eight plugins with no descriptor (omx-eq, omx-eq8, omx-eq16, omx-eq32, omx-strip and the three omx-test-*) are
+The four folders with no descriptor (omx-eq, the base of the three EQ variants, and the three omx-test-*) are
 named as outside the round trip. Its self-test breaks the first described plugin twice, one range in a copy of its
 authored descriptor and one `lv2:maximum` in a copy of its built `.ttl`, and wants each red.
 

@@ -5,6 +5,7 @@
 @prefix foaf:  <http://xmlns.com/foaf/0.1/> .
 @prefix lv2:   <http://lv2plug.in/ns/lv2core#> .
 @prefix omxres: <https://www.openmixer.org/ns/resource-hints#> .
+@prefix param: <http://lv2plug.in/ns/ext/parameters#> .
 @prefix pg:    <http://lv2plug.in/ns/ext/port-groups#> .
 @prefix pprops: <http://lv2plug.in/ns/ext/port-props#> .
 @prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
@@ -161,6 +162,7 @@
         lv2:portProperty lv2:integer ;
         lv2:portProperty pprops:logarithmic ;
         units:unit units:hz ;
+        lv2:designation param:frequency ;
         pg:group <urn:openmixer:eq8#bands>
     ] ,
     [
@@ -172,6 +174,7 @@
         lv2:minimum -15 ;
         lv2:maximum 15 ;
         units:unit units:db ;
+        lv2:designation param:gain ;
         pg:group <urn:openmixer:eq8#bands>
     ] ,
     [
@@ -224,6 +227,7 @@
         lv2:portProperty lv2:integer ;
         lv2:portProperty pprops:logarithmic ;
         units:unit units:hz ;
+        lv2:designation param:frequency ;
         pg:group <urn:openmixer:eq8#bands>
     ] ,
     [
@@ -235,6 +239,7 @@
         lv2:minimum -15 ;
         lv2:maximum 15 ;
         units:unit units:db ;
+        lv2:designation param:gain ;
         pg:group <urn:openmixer:eq8#bands>
     ] ,
     [
@@ -287,6 +292,7 @@
         lv2:portProperty lv2:integer ;
         lv2:portProperty pprops:logarithmic ;
         units:unit units:hz ;
+        lv2:designation param:frequency ;
         pg:group <urn:openmixer:eq8#bands>
     ] ,
     [
@@ -298,6 +304,7 @@
         lv2:minimum -15 ;
         lv2:maximum 15 ;
         units:unit units:db ;
+        lv2:designation param:gain ;
         pg:group <urn:openmixer:eq8#bands>
     ] ,
     [
@@ -350,6 +357,7 @@
         lv2:portProperty lv2:integer ;
         lv2:portProperty pprops:logarithmic ;
         units:unit units:hz ;
+        lv2:designation param:frequency ;
         pg:group <urn:openmixer:eq8#bands>
     ] ,
     [
@@ -361,6 +369,7 @@
         lv2:minimum -15 ;
         lv2:maximum 15 ;
         units:unit units:db ;
+        lv2:designation param:gain ;
         pg:group <urn:openmixer:eq8#bands>
     ] ,
     [
@@ -413,6 +422,7 @@
         lv2:portProperty lv2:integer ;
         lv2:portProperty pprops:logarithmic ;
         units:unit units:hz ;
+        lv2:designation param:frequency ;
         pg:group <urn:openmixer:eq8#bands>
     ] ,
     [
@@ -424,6 +434,7 @@
         lv2:minimum -15 ;
         lv2:maximum 15 ;
         units:unit units:db ;
+        lv2:designation param:gain ;
         pg:group <urn:openmixer:eq8#bands>
     ] ,
     [
@@ -476,6 +487,7 @@
         lv2:portProperty lv2:integer ;
         lv2:portProperty pprops:logarithmic ;
         units:unit units:hz ;
+        lv2:designation param:frequency ;
         pg:group <urn:openmixer:eq8#bands>
     ] ,
     [
@@ -487,6 +499,7 @@
         lv2:minimum -15 ;
         lv2:maximum 15 ;
         units:unit units:db ;
+        lv2:designation param:gain ;
         pg:group <urn:openmixer:eq8#bands>
     ] ,
     [
@@ -539,6 +552,7 @@
         lv2:portProperty lv2:integer ;
         lv2:portProperty pprops:logarithmic ;
         units:unit units:hz ;
+        lv2:designation param:frequency ;
         pg:group <urn:openmixer:eq8#bands>
     ] ,
     [
@@ -550,6 +564,7 @@
         lv2:minimum -15 ;
         lv2:maximum 15 ;
         units:unit units:db ;
+        lv2:designation param:gain ;
         pg:group <urn:openmixer:eq8#bands>
     ] ,
     [
@@ -602,6 +617,7 @@
         lv2:portProperty lv2:integer ;
         lv2:portProperty pprops:logarithmic ;
         units:unit units:hz ;
+        lv2:designation param:frequency ;
         pg:group <urn:openmixer:eq8#bands>
     ] ,
     [
@@ -613,6 +629,7 @@
         lv2:minimum -15 ;
         lv2:maximum 15 ;
         units:unit units:db ;
+        lv2:designation param:gain ;
         pg:group <urn:openmixer:eq8#bands>
     ] ,
     [
