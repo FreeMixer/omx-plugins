@@ -11,10 +11,13 @@
  *
  * Usage: `node tools/gen-presets.mjs [--check]` — `--check` writes nothing and fails on a stale,
  * missing or extra file. The files are installed read only to $(PREFIX)/share/omx/presets.
+ *
+ * From the same presets, each LV2 bundle's plugins/<stem>/generated/<stem>.lv2/presets.ttl: one
+ * pset:Preset per file (docs/presets.md); tools/gen.mjs lists them in the bundle's manifest.
  */
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { FORMAT, PRESET_DIR, ROOT, plugins, presetFiles } from './preset-lib.mjs';
+import { FORMAT, PRESET_DIR, ROOT, plugins, presetFiles, presetsTtl } from './preset-lib.mjs';
 
 /** The date every factory file carries: fixed, so regenerating changes nothing. */
 const WHEN = '2026-10-17T00:00:00Z';
@@ -228,11 +231,15 @@ export function build() {
   for (const [id, list] of Object.entries(DEFINITIONS)) {
     const plugin = shipped.find((p) => p.id === id);
     if (!plugin) throw new Error(`no shipped plugin ${id}`);
+    const presets = [];
     for (const [pid, name, def] of list) {
       const values = def.points ? geqValues(plugin, def) : def;
       const preset = { format: FORMAT, plugin: id, id: pid, name, carries: 'params', params: paramsOf(plugin, values), created: WHEN, modified: WHEN, copyOf: null };
       files.set(`${PRESET_DIR}/${id}/${pid}.json`, `${JSON.stringify(preset, null, 2)}\n`);
+      presets.push(preset);
     }
+    presets.sort((a, b) => (`${a.id}.json` < `${b.id}.json` ? -1 : 1));
+    files.set(`plugins/${plugin.stem}/generated/${plugin.stem}.lv2/presets.ttl`, presetsTtl(plugin, presets));
   }
   const missing = shipped.filter((p) => !(p.id in DEFINITIONS)).map((p) => p.id);
   if (missing.length) throw new Error(`no factory presets for ${missing.join(', ')}`);
@@ -259,5 +266,6 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     for (const e of extra) console.error(`gen-presets: ${e} is not a declared preset`);
     process.exit(1);
   }
-  console.log(`gen-presets: ${want.size} presets for ${new Set([...want.keys()].map((p) => p.split('/')[1])).size} plugins${check ? ' are fresh' : `, ${stale.length} written, ${extra.length} removed`}`);
+  const json = [...want.keys()].filter((p) => p.startsWith(`${PRESET_DIR}/`));
+  console.log(`gen-presets: ${json.length} presets for ${new Set(json.map((p) => p.split('/')[1])).size} plugins${check ? ' are fresh' : `, ${stale.length} written, ${extra.length} removed`}`);
 }
