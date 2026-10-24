@@ -15,7 +15,8 @@
 #   make install    DESTDIR/PREFIX/LIBDIR/CLAPDIR: $(CLAPDIR)/omx-drive.clap, $(LIBDIR)/lv2/omx-drive.lv2/
 #
 # Build deps: omx-dsp (pkg-config omxdsp, >= OMXDSP_MIN, the floor packaging/omx-plugins.spec declares),
-# omx-clap-core (the CLAP ABI's openmixer extensions), clap, lv2; for the tests lilv and node.
+# omx-contract (its resource-hints header), omx-clap-core (the CLAP ABI's openmixer extensions), clap, lv2; for the
+# tests lilv and node.
 
 NAME       := omx-drive
 URI        := urn:openmixer:drive
@@ -30,7 +31,9 @@ PKG_CONFIG ?= pkg-config
 ifeq ($(shell $(PKG_CONFIG) --atleast-version=$(OMXDSP_MIN) omxdsp && echo y),)
 $(error omx-dsp >= $(OMXDSP_MIN) is required (packaging/omx-plugins.spec); `$(PKG_CONFIG) omxdsp` finds $(or $(shell $(PKG_CONFIG) --modversion omxdsp 2>/dev/null),none): install omx-dsp-devel or libomxdsp-dev from the channel (BUILDING.md))
 endif
-DSP_CFLAGS := $(shell $(PKG_CONFIG) --cflags omxdsp)
+# omx-contract's headers: <omxcontract/omx_resource_hints.h>, which the generated parameter header includes
+CONTRACT_CFLAGS := $(shell $(PKG_CONFIG) --cflags omx-contract)
+DSP_CFLAGS := $(shell $(PKG_CONFIG) --cflags omxdsp) $(CONTRACT_CFLAGS)
 DSP_LIBS   := $(shell $(PKG_CONFIG) --libs omxdsp)
 ABI_CFLAGS := $(shell $(PKG_CONFIG) --cflags omx-clap-core clap 2>/dev/null)
 LV2_CFLAGS := $(shell $(PKG_CONFIG) --cflags lv2 2>/dev/null)
@@ -76,7 +79,7 @@ $(B)/panel-probe: $(ROOT)/tools/panel-probe.c $(ROOT)/include/omx_panel_descript
 	$(CC) $(CFLAGS) $(WARN) -I$(ROOT)/include $(ABI_CFLAGS) -o $@ $< $(LILV) -ldl
 
 $(B)/clap-ext-probe: $(ROOT)/tools/clap-ext-probe.c $(ROOT)/include/omx_param_contract.h | $(B)
-	$(CC) $(CFLAGS) $(WARN) -I$(ROOT)/include $(ABI_CFLAGS) -o $@ $< -ldl
+	$(CC) $(CFLAGS) $(WARN) -I$(ROOT)/include $(ABI_CFLAGS) $(CONTRACT_CFLAGS) -o $@ $< -ldl
 
 $(B)/port-groups-probe: $(ROOT)/tools/port-groups-probe.c | $(B)
 	$(CC) $(CFLAGS) $(WARN) -o $@ $< $(LILV)
@@ -96,10 +99,11 @@ check:
 # reaches the kernel. The kernel-identity test: both faces, sample for sample, against omx-dsp's
 # drive kernel called directly. The panel test: org.openmixer.panel-description/1 read from
 # each built face as a host reads it, equal to the declaration's panel. The CLAP extension test: the
-# parameter contract, the remote-control pages and each placement's defaults, read as a host reads
-# them, equal to the declaration's. The port-group test: the LV2 bundle, read through lilv, puts each
-# panel section's parameters in that section's pg:Group. Every test runs, and the target fails if any
-# failed, so a new plugin shows all its red tests at once.
+# parameter contract, the remote-control pages, each placement's defaults and the resource hints, read as
+# a host reads them, equal to the declaration's. The resource-hint import test: no import of either built
+# face refutes a hint the declaration states (no thread, socket or file call). The port-group test: the
+# LV2 bundle, read through lilv, puts each panel section's parameters in that section's pg:Group. Every
+# test runs, and the target fails if any failed, so a new plugin shows all its red tests at once.
 test: all check $(B)/clap-probe $(B)/panel-probe $(B)/clap-ext-probe $(B)/port-groups-probe $(B)/drive-oracle
 	@fail=0; \
 	$(B)/clap-probe params $(B)/$(NAME).clap > $(B)/clap-params.txt && \
@@ -113,6 +117,7 @@ test: all check $(B)/clap-probe $(B)/panel-probe $(B)/clap-ext-probe $(B)/port-g
 	  node $(ROOT)/tools/panel-check.mjs $(CURDIR) lv2 $(B)/panel-lv2.txt || fail=1; \
 	$(B)/clap-ext-probe $(B)/$(NAME).clap > $(B)/clap-ext.txt && \
 	  node $(ROOT)/tools/clap-ext-check.mjs $(CURDIR) $(B)/clap-ext.txt || fail=1; \
+	node $(ROOT)/tools/test/resource-hints-check.mjs --binaries $(CURDIR) $(B)/$(NAME).clap $(BUNDLE)/$(NAME).so || fail=1; \
 	$(B)/port-groups-probe $(BUNDLE) $(URI) > $(B)/port-groups.txt && \
 	  node $(ROOT)/tools/port-groups-check.mjs $(CURDIR) $(B)/port-groups.txt || fail=1; \
 	sh $(ROOT)/tools/modgui-test.sh $(CURDIR) || fail=1; \

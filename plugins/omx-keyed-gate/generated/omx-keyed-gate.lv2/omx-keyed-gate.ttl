@@ -4,12 +4,14 @@
 @prefix doap:  <http://usefulinc.com/ns/doap#> .
 @prefix foaf:  <http://xmlns.com/foaf/0.1/> .
 @prefix lv2:   <http://lv2plug.in/ns/lv2core#> .
+@prefix omxres: <https://www.openmixer.org/ns/resource-hints#> .
 @prefix param: <http://lv2plug.in/ns/ext/parameters#> .
 @prefix pg:    <http://lv2plug.in/ns/ext/port-groups#> .
 @prefix pprops: <http://lv2plug.in/ns/ext/port-props#> .
 @prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix units: <http://lv2plug.in/ns/extensions/units#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
 
 <https://github.com/FreeMixer/omx-plugins>
     a doap:Project ;
@@ -25,6 +27,9 @@
     lv2:microVersion 0 ;
     rdfs:comment "The OpenMixer console's channel gate with an external key: the stereo signal is gated while the detector listens to the sidechain input the host routes to it, or to the signal itself with the key unconnected or set to Self. One gain drives both legs. An attack under 0.5 ms engages 4x detector oversampling, which adds 72 frames of latency, reported to the host. The DSP is omx-dsp's <omxdsp/fx/omx_gate_instance.h>, the console's own gate." ;
     lv2:optionalFeature lv2:hardRTCapable ;
+    omxres:threadsSpawned "0"^^xsd:unsignedInt ;
+    omxres:streamsFromDisk false ;
+    omxres:opensSockets false ;
     lv2:port
     [
         a lv2:AudioPort , lv2:InputPort ;
