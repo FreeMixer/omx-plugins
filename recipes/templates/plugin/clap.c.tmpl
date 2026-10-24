@@ -347,13 +347,16 @@ static bool g_ports_get(const clap_plugin_t *p, uint32_t index, bool is_input, c
 
 static const clap_plugin_audio_ports_t G_PORTS_EXT = {g_ports_count, g_ports_get};
 
-/* ---- state: symbol=value lines, declaration order ----------------------------------- */
+/* ---- state: symbol=value lines, declaration order, then the host's bypass ------------------- */
+
+/** Parameter `i`'s name in the state: the declaration's symbol, `bypass` for the host's bypass. */
+static const char *g_state_symbol(uint32_t i) { return i < G_DECLARED ? OMX_{{K}}_PARAMS[i].symbol : "bypass"; }
 
 static bool g_state_save(const clap_plugin_t *p, const clap_ostream_t *s) {
   G *g = (G *)p->plugin_data;
   char line[160];
-  for (uint32_t i = 0; i < G_DECLARED; ++i) {
-    int n = snprintf(line, sizeof line, "%s=%.9g\n", OMX_{{K}}_PARAMS[i].symbol, (double)atomic_load(&g->applied[i]));
+  for (uint32_t i = 0; i < G_PARAMS; ++i) {
+    int n = snprintf(line, sizeof line, "%s=%.9g\n", g_state_symbol(i), (double)atomic_load(&g->applied[i]));
     for (int off = 0; off < n;) {
       int64_t w = s->write(s, line + off, (uint64_t)(n - off));
       if (w <= 0) return false;
@@ -380,8 +383,8 @@ static bool g_state_load(const clap_plugin_t *p, const clap_istream_t *s) {
     char *eq = strchr(line, '=');
     if (!eq) continue;
     *eq = 0;
-    for (uint32_t i = 0; i < G_DECLARED; ++i) {
-      if (strcmp(line, OMX_{{K}}_PARAMS[i].symbol) == 0) {
+    for (uint32_t i = 0; i < G_PARAMS; ++i) {
+      if (strcmp(line, g_state_symbol(i)) == 0) {
         g->values[i] = g_clamp(i, strtod(eq + 1, NULL));
         g->touched[i] = 1;
       }
