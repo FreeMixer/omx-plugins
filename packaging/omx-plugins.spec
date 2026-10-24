@@ -225,6 +225,29 @@ tools/pins-check.sh %{buildroot}%{_datadir}/plugin-hostd/pins.d/omx-plugins.pins
   ceiling; it co-owns the pins.d directory.
 - %%check (RPM) and dh_auto_install (DEB) hold the shipped pins to the shipped binaries' own hashes:
   a plugin's binary changed after its pin was written goes red (tools/pins-check.sh).
+- The shipped pin is measured after the package is stripped, so it names the bytes the package ships:
+  find-debuginfo (RPM) and dh_strip (DEB) run before make install-pins.
+- The new subpackage omx-plugins-test (RPM and DEB) carries the test instruments, a sine voice, a note
+  echo and a transport probe, in %%{_libexecdir}/omx-plugins/test, outside every CLAP search path; make
+  install-test installs them, make install never does. tools/package-lists-check.sh (make
+  package-lists, in make test) refuses a built plugin that no package lists.
+- CI runs clap-validator on every built CLAP plugin (tools/clap-validate.sh) and keeps the JSON
+  reports; its state-* tests are required (tools/clap-validate-required.mjs), the others are reported.
+- Every plugin's CLAP state round trips exactly: a loaded state asks the host to rescan the values, the
+  state carries the host's bypass (older states still load), a state that names no parameter is refused
+  and a plugin's worst-case state fits the loader. clap-probe state, in every plugin's make test,
+  checks it.
+- The factory presets, the JSON files in presets/, are offered in every host: CLAP preset-discovery
+  (clap.preset-discovery-factory, files in /usr/share/omx/presets/<clap id>/) and clap.preset-load,
+  which applies a preset's parameters and asks the host to rescan the values, and a presets.ttl in each
+  LV2 bundle with one pset:Preset per file. make test lists and loads them through CLAP discovery,
+  preset-load and lilv (FreeMixer/omx-plugins issue #214).
+- omx-eq8, omx-eq16, omx-eq32 and omx-strip install their descriptors too: tools/gen.mjs renders the
+  descriptor of a base of variants and of a chain, so the contract directory holds all nineteen and
+  MANIFEST.json lists them; their CLAP faces state the parameter modules and their LV2 faces the
+  designations, as every described plugin's do (tools/test/contract-dir-check.sh requires the four).
+- The round-trip ledger records the seven EQ frequency ports that are authored stepped and scan
+  back as log, against plugin-hostd issue #147.
 - Every plugin declares its resource hints (omx-contract 3.1.0): threads-spawned 0, streams-from-disk
   false and opens-sockets false, served by the CLAP face as org.openmixer.resource-hints.draft/0 and stated
   by the LV2 face as omxres: properties, both from the one declaration. The footprints and the activate
