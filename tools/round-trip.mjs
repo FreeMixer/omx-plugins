@@ -76,11 +76,16 @@ export const LOSSES = {
 };
 
 /** A break in plugin-hostd's wave tip, reported, each `differs` it causes printed with it
- * and not failing; the run fails when one no longer shows, so the entry leaves with the fix. `plugin-hostd-probe
+ * and not failing; the run fails when one no longer shows (an `upTo` entry: when more show), so the entry leaves with
+ * the fix. `plugin-hostd-probe
  * describe` keeps a word's last value, and an LV2 dump lists lv2:portProperty lv2:toggled before rdf:type
  * lv2:ControlPort, so a toggle's kind is the control port's travel. */
 export const UPSTREAM = {
   'lv2 controls[].kind "toggle" "travel"': { count: 3, why: 'plugin-hostd 83e54db describe: lv2:ControlPort overwrites lv2:toggled (src/describe.c get(), the last value)' },
+  // an integer Hz port states lv2:integer (stepped) and pprops:logarithmic (log); which of the two lilv lists last
+  // follows the order sord keeps its nodes in, which moves with the bundle's path and contents (the same omx-reverb
+  // bundle scans "stepped" in one directory and "log" in another), so the count is a ceiling, not a figure
+  'lv2 controls[].travel.scale "stepped" "log"': { upTo: 3, why: 'plugin-hostd describe: of lv2:integer and pprops:logarithmic the last listed wins (src/describe.c get()), in sord\'s node order' },
 };
 
 /** The described plugins (a descriptor beside the declaration), and the ones outside the round trip. */
@@ -217,9 +222,9 @@ export function roundTrip(scansDir, { root = ROOT, authoredFiles = {} } = {}) {
     lines.push(`${ok ? 'named' : 'unnamed'} loss ${k}: ${losses[k] ?? 0} word(s)${ok ? '' : `, LOSSES names ${LOSSES[k] ?? 0}`}`);
     if (!ok) fails++;
   }
-  for (const [k, { count }] of Object.entries(UPSTREAM)) {
-    const ok = upstream[k] === count;
-    lines.push(`${ok ? 'upstream' : 'unnamed upstream'} ${k}: ${upstream[k] ?? 0} word(s)${ok ? '' : `, UPSTREAM names ${count} (fixed upstream? remove the entry)`}`);
+  for (const [k, { count, upTo }] of Object.entries(UPSTREAM)) {
+    const ok = upTo === undefined ? upstream[k] === count : (upstream[k] ?? 0) <= upTo;
+    lines.push(`${ok ? 'upstream' : 'unnamed upstream'} ${k}: ${upstream[k] ?? 0} word(s)${ok ? '' : `, UPSTREAM names ${upTo === undefined ? count : `at most ${upTo}`} (fixed upstream? remove the entry)`}`);
     if (!ok) fails++;
   }
   return { lines, losses, fails, inside, outside };

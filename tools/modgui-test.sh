@@ -6,8 +6,9 @@
 # VALUES:
 #   (a) `node tools/modgui-gen.mjs --check` is clean;
 #   (b) every declared parameter is drawn in the template with its symbol, min, max and default;
-#   (c) sord_validate passes the bundle against the LV2 specs and tools/modgui-terms.ttl (skipped
-#       when sord_validate is not installed);
+#   (c) sord_validate passes the bundle against the LV2 specs, tools/modgui-terms.ttl and the installed
+#       omx-contract's omx-resource-hints.ttl, the terms of the omxres: hints (skipped when sord_validate is
+#       not installed);
 #   (d) a perturbed declaration (a parameter's default moved) makes `--check` fail.
 # One `PASS <what>` / `FAIL <what>` line per check; exits nonzero on any FAIL.
 set -u
@@ -90,15 +91,31 @@ if command -v sord_validate >/dev/null 2>&1; then
            data-access event uri-map schemas; do
     for f in "$LV2DIR/$s.lv2"/*.ttl; do [ -f "$f" ] && set -- "$@" "$f"; done
   done
+  HINTS_TTL="$(${PKG_CONFIG:-pkg-config} --variable=datadir omx-contract 2>/dev/null)/omx-resource-hints.ttl"
   if [ $# -le 20 ]; then
     fail "sord_validate: LV2 spec bundles not found under $LV2DIR"
+  elif [ ! -f "$HINTS_TTL" ]; then
+    fail "sord_validate: omx-contract's omx-resource-hints.ttl not found ($HINTS_TTL; omx-contract >= 3.1.0 installs it)"
   else
+    set -- "$@" "$HINTS_TTL"
     out=$(sord_validate "$BUNDLE"/*.ttl "$@" "$HERE/modgui-terms.ttl" 2>&1)
     summary=$(printf '%s\n' "$out" | tail -1)
+    # omx-contract 3.1.0's Turtle draws errors of its own: its annotation properties (omxres:resource, :unit,
+    # :basis) carry no rdfs:label. Those name a subject in its namespace, a term of the contract's, and are the
+    # contract's to fix; every other error, any about this bundle's own triples, counts.
+    NS=$(sed -n 's/^@prefix omxres: <\(.*\)> \.$/\1/p' "$HINTS_TTL")
+    own=$(printf '%s\n' "$out" | awk -v ns="$NS" '/^error: / { e = $0; s = ""; getline s; t = s; sub(/^ +/, "", t); if (ns == "" || index(t, ns) != 1) { print e; print s } }')
+    theirs=$(printf '%s\n' "$out" | grep -c '^error: ')
     case "$summary" in
-      "Found 0 errors among "*) pass "sord_validate $STEM.lv2/*.ttl against the LV2 specs and modgui terms ($summary)" ;;
-      *) printf '%s\n' "$out" | head -20 >&2; fail "sord_validate $STEM.lv2/*.ttl ($summary)" ;;
+      "Found "*" errors among "*) ;;
+      *) own="${own}${own:+
+}sord_validate did not finish: $summary" ;;
     esac
+    if [ -z "$own" ]; then
+      pass "sord_validate $STEM.lv2/*.ttl against the LV2 specs, modgui terms and resource-hint terms ($summary; all $theirs the contract vocabulary's own)"
+    else
+      printf '%s\n' "$own" | head -20 >&2; fail "sord_validate $STEM.lv2/*.ttl ($summary)"
+    fi
     # Red on a property outside the closed modgui vocabulary.
     mkdir -p "$TMP/sord" && cp -R "$BUNDLE" "$TMP/sord/"
     awk '{ print } /^        modgui:brand / { print "        modgui:invented \"x\" ;" }' "$BUNDLE/modgui.ttl" >"$TMP/sord/$STEM.lv2/modgui.ttl"
