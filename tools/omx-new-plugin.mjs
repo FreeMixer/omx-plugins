@@ -39,6 +39,7 @@ import { bindFace, instanceHeader, parseFace } from './instance-face.mjs';
 import { controlOf, items, kernelControls, kernelExists, locateContract, resolveParam } from './omx-contract.mjs';
 import { ROOT, checkPlugin, consoleErrors, gapLines, layerOfPath, loadRecipe, loadSchema, panelErrors, pluginFacts, pluginStems, validate } from './plugin-recipe.mjs';
 import { chainBindings, defaultPanel, prepareDecl } from './gen.mjs';
+import { modgui } from './panel-file.mjs';
 import { pinOfTtl } from './port-hints.mjs';
 import { omxdspInclude } from './template.mjs';
 import { expandVariant } from './variants.mjs';
@@ -260,14 +261,14 @@ async function checkPanelConsole(schema, decl, symbols, resolved, refuse, root) 
   // the panel's family and roles are the console's; the panel and the console name declared parameters
   for (const e of [...panelErrors(schema, decl, symbols), ...consoleErrors(decl, symbols)]) refuse(e.split(':')[0], e.slice(e.indexOf(':') + 2));
 
-  // the panel, drawn as the MOD GUI generator draws it (every parameter on it, selectors included)
+  // the panel, drawn as omx-panel draws the MOD GUI (every parameter on it, selectors included)
   if (decl.panel && !refuse.count()) {
-    const mg = await import(join(root, 'tools', 'modgui-gen.mjs'));
     try {
-      mg.resolvePanel({ ...decl, params: resolved });
+      const r = modgui({ ...decl, params: resolved, dir: join(root, 'plugins', decl.stem), tree: root }, '--emit-stdout');
+      if (r.status !== 0) throw new Error(r.stderr.trim().split('\n')[0]);
       const drawn = new Set(decl.panel.sections.flatMap((x) => x.controls));
       const undrawn = resolved.filter((p) => !drawn.has(p.symbol)).map((p) => p.symbol);
-      if (undrawn.length) throw new Error(`the MOD GUI draws every parameter (tools/modgui-test.sh), and the panel leaves out ${undrawn.join(', ')}`);
+      if (undrawn.length) throw new Error(`the MOD GUI draws every parameter (omx-panel's modgui-test.sh), and the panel leaves out ${undrawn.join(', ')}`);
     } catch (e) {
       refuse('/panel', `${e.message}; put every parameter on the panel, or leave the panel out and the MOD GUI draws every parameter in one section`);
     }
@@ -434,7 +435,7 @@ export function writePlugin(plan, { root = ROOT } = {}) {
     writeFileSync(join(root, rel), text);
   }
   // a generated plugin always has its MOD GUI: its declared panel, or gen.mjs's one section of every parameter
-  const tools = [[join(root, 'tools', 'gen.mjs')], ...(d.panel || d.binding === 'instance' || d.binding === 'chain' ? [[join(root, 'tools', 'modgui-gen.mjs'), join(root, 'plugins', d.stem)]] : [])];
+  const tools = [[join(root, 'tools', 'gen.mjs')], ...(d.panel || d.binding === 'instance' || d.binding === 'chain' ? [[join(root, 'tools', 'panel-file.mjs'), '--modgui', join(root, 'plugins', d.stem)]] : [])];
   for (const args of tools) {
     const r = run('node', args, { cwd: root });
     if (r.code !== 0) throw new Error(`${relative(root, args[0])}: ${r.out.trim()}`);
@@ -576,7 +577,7 @@ async function variantsMain(raw, src, { root, recipe, declPath, argv, opt }) {
     plans.push(plan);
   }
   const written = [relative(root, declPath)];
-  const tools = [[join(root, 'tools', 'gen.mjs')], ...plans.map((p) => [join(root, 'tools', 'modgui-gen.mjs'), join(root, 'plugins', p.decl.stem)])];
+  const tools = [[join(root, 'tools', 'gen.mjs')], ...plans.map((p) => [join(root, 'tools', 'panel-file.mjs'), '--modgui', join(root, 'plugins', p.decl.stem)])];
   for (const args of tools) {
     const r = run('node', args, { cwd: root });
     if (r.code !== 0) throw new Error(`${relative(root, args[0])}: ${r.out.trim()}`);

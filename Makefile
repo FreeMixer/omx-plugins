@@ -5,7 +5,7 @@
 # `install` and `clean`.
 #
 #   make            build every plugin
-#   make test       every plugin's tests (what the package builds run), then `make hints`, `make look` and `make manual`
+#   make test       every plugin's tests (what the package builds run), then `make hints` and `make manual`
 #   make units      the declared units' contract codes (tools/param-contract.mjs) are the header's enum, and its vendor
 #                   block is dbfs, dbu, ratio, lufs (tools/test/param-units-check.mjs)
 #   make lv2-units  every unit a declaration uses has an LV2 unit, and every port states the unit it declares
@@ -23,7 +23,8 @@
 #   make eq-probe-race  parallel make targets each build build/eq-default-probe privately and run it whole
 #                   (tools/test/eq-probe-race-test.mjs; part of `make test` and `make test-faces`)
 #   make hints      no LV2 face lost a port hint: tools/port-hints.mjs against each declaration's `portHints` pin
-#   make look       tools/look.json, the MOD GUI's colours and font, is what tools/look/tokens.css resolves to
+#   make modgui     every plugin's MOD GUI is what omx-panel writes from its descriptor and its declared panel: each plugin's
+#                   `make check` (the generated-fresh step of CI runs it beside `node tools/gen.mjs --check`)
 #   make manual     each declaration's manual follows omx-contract: a travel moved in a copy of the release moves
 #                   the README section's range and default (tools/test/manual-perturb.mjs)
 #   make private-refs  no tracked file (generated ones included) points into a private repository, issue, branch or path
@@ -129,7 +130,7 @@ LIB_FLAGS  := -fPIC -fvisibility=hidden -DOMX_CLAP_STATIC -Iinclude
 # read only by the targets that build the archive, so `make version` and the rest need no omx-dsp
 lib_cflags = $(call dep_check,omxdsp,$(OMXDSP_MIN))$(call dep_check,omx-contract,$(CONTRACT_MIN))$(shell $(PKG_CONFIG) --cflags omxdsp omx-contract omx-clap-core clap)
 
-.PHONY: presets presets-figures test-role all lib lib-test test test-faces units panel-layout descriptor-view lv2-units resource-hints format-tables contract-union probe-checks eq-probe-race round-trip hints look manual install install-pins install-test package-lists install-devel install-contract contract-dir clean version recipe-test completeness selftest private-refs strip-crosscheck meters-abi meter-level dsp-copies meter-ring clap-validate
+.PHONY: presets presets-figures test-role all lib lib-test test test-faces units panel-layout descriptor-view lv2-units resource-hints format-tables contract-union probe-checks eq-probe-race round-trip hints modgui manual install install-pins install-test package-lists install-devel install-contract contract-dir clean version recipe-test completeness selftest private-refs strip-crosscheck meters-abi meter-level dsp-copies meter-ring clap-validate
 all: lib
 	@for p in $(PLUGINS); do $(MAKE) -C $$p all || exit 1; done
 lib: $(LIB) $(LIB_PC)
@@ -140,7 +141,6 @@ test: lib units panel-layout descriptor-view lv2-units resource-hints format-tab
 	@$(MAKE) -s presets-figures
 	@$(MAKE) -s lib-test
 	@$(MAKE) -s hints
-	@$(MAKE) -s look
 	@$(MAKE) -s manual
 	@$(MAKE) -s presets
 	@$(MAKE) -s presets-figures
@@ -188,8 +188,9 @@ hints:
 	node tools/gen.mjs --check
 	node tools/gen.mjs
 	node tools/port-hints.mjs
-look:
-	node tools/look.mjs --check
+# the plugins that have a panel say so in their Makefile (PANEL_FILE); `make check` holds gen.mjs's files and the MOD GUI fresh
+modgui:
+	@for p in $(PLUGINS); do if grep -q '^PANEL_FILE' $$p/Makefile; then $(MAKE) -s -C $$p check || exit 1; fi; done
 manual:
 	node tools/test/manual-perturb.mjs
 # the factory presets: fresh against tools/gen-presets.mjs, every value inside its declared travel
