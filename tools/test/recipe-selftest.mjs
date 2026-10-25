@@ -328,6 +328,9 @@ async function main() {
     ['declValid', 'declaration', () => edit(`${P}/omx-drive.decl.json`, (s) => JSON.stringify((({ console: c, panel: p, ...d }) => ({ ...d, panel: p, console: { ...c, panel: { sections: p.sections } } }))(JSON.parse(s)), null, 2))],
     ['declValid', 'declaration', () => edit(`${P}/omx-drive.decl.json`, (s) => s.replace('"family": "drive"', '"family": "saturation"'))],
     ['declValid', 'declaration', () => edit(`${P}/omx-drive.decl.json`, (s) => s.replace('"tone": "character"', '"character": "character"'))],
+    // the schema's roles are omx-panel's table (ROLES): a role added to one family in the schema, or taken from one, is red
+    ['declValid', 'declaration', () => edit('schema/plugin.decl.schema.json', (s) => s.replace('"range",\n            "attack"', '"range",\n            "wobble",\n            "attack"'))],
+    ['declValid', 'declaration', () => edit('schema/plugin.decl.schema.json', (s) => s.replace('"lookahead",\n            "mix",\n            "output"\n          ]\n        },\n        "limiter"', '"mix",\n            "output"\n          ]\n        },\n        "limiter"'))],
     // a control both read by reference (its descriptor link) and the face's own (its extras' reason)
     ['paramsByReference', 'params-by-reference', () => edit(`${P}/omx-drive.decl.json`, (s) => s.replace('"controls": {\n', '"controls": {\n    "amount": { "own": "switch" },\n'))],
   ];

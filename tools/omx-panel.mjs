@@ -24,7 +24,7 @@ if (!existsSync(at('bin', 'omx-panel.mjs'))) {
 
 /** omx-panel's layout module: a descriptor, of any origin, laid out under a declared panel (its docs/panel-layout.md). */
 const layout = await import(pathToFileURL(at('tools', 'panel-description.mjs')).href);
-export const { DISPLAY_KINDS, DISPLAY_SOURCES, FAMILIES, INDEXED_ROLES, PLACEMENTS, WIDGETS, pagesOf, panelCanonical, panelFingerprint, panelLayout, servedWidget, unitToken, widgetOf } = layout;
+export const { DISPLAY_KINDS, DISPLAY_SOURCES, FAMILIES, INDEXED_ROLES, PLACEMENTS, ROLES, WIDGETS, pagesOf, panelCanonical, panelFingerprint, panelLayout, servedWidget, unitToken, widgetOf } = layout;
 
 /** omx-panel's reader of the installed vocabulary: the meanings, and the meaning each panel role plays. */
 export const { meaningOfRole } = await import(pathToFileURL(at('tools', 'vocabulary.mjs')).href);
