@@ -18,6 +18,8 @@
  * gate: `keySource` is not a parameter; it is passed at "self".
  * gate: `hpHz` is not a parameter; it is passed at 0.
  * gate: `lpHz` is not a parameter; it is passed at 0.
+ * gate: `key_listen` is no parameter: the declaration holds it at its kernel's declared default, OMX_GATE_KEY_LISTENS_DEFAULT.
+ * gate: `key_tilt_db` is no parameter: the declaration holds it at its kernel's declared default, OMX_GATE_KEY_TILT_DB_RANGE_DEFAULT.
  * eq: `hpfOn` is not a parameter; it is passed at "off".
  * eq: `hpfFreq` is not a parameter; it is passed at {"defaultRef":"EQ_PASS_FILTER_DEFAULTS.hpfFreqHz"}.
  * eq: `hpfSlope` is not a parameter; it is passed at "default".
@@ -30,6 +32,15 @@
  * eq: `q` is not a parameter; it is passed at "default".
  * eq: `bandOn` is not a parameter; it is passed at "off".
  * comp: `detectorTopology` is not a parameter; it is passed at "feedforward".
+ * comp: `key_source` is no parameter: the declaration holds it at its kernel's declared default, OMX_COMP_KEY_SOURCES_DEFAULT.
+ * comp: `key_hp_hz` is no parameter: the declaration holds it at its kernel's declared default, OMX_COMP_KEY_HP_HZ_RANGE_DEFAULT.
+ * comp: `key_lp_hz` is no parameter: the declaration holds it at its kernel's declared default, OMX_COMP_KEY_LP_HZ_RANGE_DEFAULT.
+ * comp: `key_tilt_db` is no parameter: the declaration holds it at its kernel's declared default, OMX_COMP_KEY_TILT_DB_RANGE_DEFAULT.
+ * comp: `key_listen` is no parameter: the declaration holds it at its kernel's declared default, OMX_COMP_KEY_LISTENS_DEFAULT.
+ * comp: `hold_ms` is no parameter: the declaration holds it at its kernel's declared default, OMX_COMP_HOLD_MS_RANGE_DEFAULT.
+ * comp: `detect_link` is no parameter: the declaration holds it at its kernel's declared default, OMX_COMP_DETECT_LINKS_DEFAULT.
+ * comp: `duck` is no parameter: the declaration holds it at its kernel's declared default, OMX_COMP_DUCKS_DEFAULT.
+ * comp: `range_db` is no parameter: the declaration holds it at its kernel's declared default, OMX_COMP_RANGE_DB_RANGE_DEFAULT.
  */
 #ifndef OMX_STRIP_CORE_H
 #define OMX_STRIP_CORE_H
@@ -234,7 +245,9 @@ static inline void omx_strip_core_resolve(OmxStripCore *c, const float *values, 
                                   /* hysteresis_db */ values[OMX_STRIP_PARAM_GATE_HYSTERESIS],
                                   /* ratio */ values[OMX_STRIP_PARAM_GATE_RATIO],
                                   /* hp_hz */ 0.0f,
-                                  /* lp_hz */ 0.0f);
+                                  /* lp_hz */ 0.0f,
+                                  /* key_listen */ (int)OMX_GATE_KEY_LISTENS_DEFAULT,
+                                  /* key_tilt_db */ (float)OMX_GATE_KEY_TILT_DB_RANGE_DEFAULT);
   omx_eq_instance_resolve(&c->eq, bypass || values[OMX_STRIP_PARAM_EQ_ON] < 0.5f,
                                   /* hpf_on */ 0,
                                   /* hpf_freq */ 80.0f,
@@ -257,7 +270,16 @@ static inline void omx_strip_core_resolve(OmxStripCore *c, const float *values, 
                                   /* mix_pct */ values[OMX_STRIP_PARAM_COMP_MIX],
                                   /* kind */ (int)lrintf(values[OMX_STRIP_PARAM_COMP_KIND]),
                                   /* detector_oversampling */ (int)lrintf(values[OMX_STRIP_PARAM_COMP_DETECTOR_OVERSAMPLING]),
-                                  /* detector_topology */ 0);
+                                  /* detector_topology */ 0,
+                                  /* key_source */ (int)OMX_COMP_KEY_SOURCES_DEFAULT,
+                                  /* key_hp_hz */ (float)OMX_COMP_KEY_HP_HZ_RANGE_DEFAULT,
+                                  /* key_lp_hz */ (float)OMX_COMP_KEY_LP_HZ_RANGE_DEFAULT,
+                                  /* key_tilt_db */ (float)OMX_COMP_KEY_TILT_DB_RANGE_DEFAULT,
+                                  /* key_listen */ (int)OMX_COMP_KEY_LISTENS_DEFAULT,
+                                  /* hold_ms */ (float)OMX_COMP_HOLD_MS_RANGE_DEFAULT,
+                                  /* detect_link */ (int)OMX_COMP_DETECT_LINKS_DEFAULT,
+                                  /* duck */ (int)OMX_COMP_DUCKS_DEFAULT,
+                                  /* range_db */ (float)OMX_COMP_RANGE_DB_RANGE_DEFAULT);
   const float o = values[OMX_STRIP_PARAM_ORDER];
   const long row = o - o == 0.0f ? lrintf(o) : 0;
   c->order = row >= 0 && row < (long)OMX_STRIP_CHAIN_ORDERS ? (uint32_t)row : 0u;
