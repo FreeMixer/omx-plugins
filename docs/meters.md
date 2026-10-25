@@ -30,7 +30,11 @@ A `gain_reduction` (one channel: one detector drives both legs) names:
 
 - `field`: where the kernel's own reading is, in its instance face's state
   (`state.band.gr_min_db` for the de-esser). The face reads it and nothing else: no meter is
-  computed twice.
+  computed twice. Or, where the reading is a function of the face (a band's gain computer re-run on
+  its detector's level, omx-dsp's readout),
+- `read`: the face's reading, `omx_<kernel>_instance_<read>`, with its band index when it takes one
+  (`band_gr_db(0)` for the multiband's first band). The generator refuses a reading the face's header
+  does not declare as `float omx_<kernel>_instance_<read>(const <Instance> *[, uint32_t])`.
 - `floor`: the parameter whose travel's low end is the deepest reduction the kernel can apply; it
   is the display range's minimum, and 0 dB its maximum. Or, for a kernel with no such parameter,
 - `readout`: the kernel's readout in omx-contract (`GAIN_REDUCTION_DB`), whose declared range is
@@ -47,6 +51,10 @@ The kernels keep no level of their own, so the face measures one: the largest ma
 leg's samples over the block, at the inputs before the kernel runs (the outputs may be the same
 buffers) and at the outputs after it ran, as `20 log10(peak)`. That is one pass over each buffer
 per block, and only a plugin that declares a level pays it.
+
+A level a kernel does read, its detector's (the compressor's `keyLevelDb`, what the detector hears),
+is one channel and names `read` and `readout` instead: the face reads it as it reads a gain
+reduction, over the readout's declared range, and publishes the range's minimum while bypassed.
 
 The de-esser declares its gain reduction (`deessGr`, id 0), its input level (`deessIn`, id 1) and
 its output level (`deessOut`, id 2); the compressor its gain reduction (`compGr`, over the comp
@@ -76,7 +84,8 @@ dBFS.
   buffers whatever the bypass, so a bypassed plugin's output level is its input's.
 - **Nothing before the first block.** After activation, until a block is processed,
   `get_values()` writes nothing and returns 0.
-- `channel_count` is 1 for a gain reduction and 2 for a level, and every meter is coherent.
+- `channel_count` is 1 for a gain reduction and a level the kernel reads, 2 for a level the face
+  measures, and every meter is coherent.
 
 ## The tests
 

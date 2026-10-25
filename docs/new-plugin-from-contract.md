@@ -33,9 +33,14 @@ Step 1 checks before it writes:
   with the omx-dsp work named. A control the kernel takes once per band is one array argument,
   `const float band[OMX_GEQ_BANDS]`, sized by a count the contract renders: the draft gives it one
   parameter per band (`band01` … `band31`), the binding passes them in declaration order, and the
-  generated code asserts their count is the extent. A keyed face takes the sidechain block first,
+  generated code asserts their count is the extent. Where the extent is the face's own macro
+  (`OMX_DYNEQ_INSTANCE_BANDS`), the count is the one the control declares (`DYNEQ_BANDS`), and the same
+  assertion holds the two equal. A keyed face takes the sidechain block first,
   `run(s, key, in_l, in_r, out_l, out_r, n)` (`NULL`: nothing routed, the kernel's own detector); its
-  declaration names the key port in `sidechain`, and the faces and the identity test carry the key;
+  declaration names the key port in `sidechain`, and the faces and the identity test carry the key.
+  A keyable face keeps an unkeyed `run` and adds `run_keyed(s, key_l, key_r, in_l, in_r, out_l, out_r, n)`
+  (the compressor's): a declaration that names a `sidechain` runs it with the mono key on `key_l` and
+  `key_r` `NULL` (one leg read on both), one that names none runs `run`;
 - every `resolve` argument binds to exactly one contract control BY NAME: the argument is the
   control's name in snake case (`attackDb` → `attack_db`). An argument that still carries an older
   short name (`attack_ms` for `attackTimeMs`) binds when its words are, in order, a unique subset
@@ -98,6 +103,15 @@ look-ahead, for example, rebuilds the rings and restarts the gain at unity. Movi
 would test the re-arm, not the identity. The flag is read from omx-contract's JSON render, where
 `kernels.<kernel>.controls` lists each kernel's controls in declared order. The oracle's header comment names each held parameter, and the sabotage arm still moves it
 by one step. The other parameters move as before.
+
+## A control the plugin does not expose
+
+A kernel release can add controls to a face a plugin already binds (omx-dsp 0.26.0's delay, gate and
+reverb). Until the plugin takes them as parameters, its declaration names each in `fixed`, as a chain
+element does: a set's id, a travel's number, `"default"` or `{"defaultRef": "<SHEET>.<field>"}`. The
+binding passes the value, the identity test's reference passes the same, and no port, state word or
+descriptor control is added; the binding's header comment names each one. At `"default"` the plugin is
+the one it was: omx-dsp holds every added control's default bit-identical to the kernel without it.
 
 ## Oracles beside the identity test
 
