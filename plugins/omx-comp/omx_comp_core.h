@@ -9,6 +9,15 @@
  *
  * GENERATED — DO NOT EDIT BY HAND. Produced by tools/gen.mjs from plugins/omx-comp/omx-comp.decl.json and
  * the face's resolve() prototype: each argument takes the parameter whose contract control it names.
+ * `key_source` is no parameter: the declaration holds it at its kernel's declared default, OMX_COMP_KEY_SOURCES_DEFAULT.
+ * `key_hp_hz` is no parameter: the declaration holds it at its kernel's declared default, OMX_COMP_KEY_HP_HZ_RANGE_DEFAULT.
+ * `key_lp_hz` is no parameter: the declaration holds it at its kernel's declared default, OMX_COMP_KEY_LP_HZ_RANGE_DEFAULT.
+ * `key_tilt_db` is no parameter: the declaration holds it at its kernel's declared default, OMX_COMP_KEY_TILT_DB_RANGE_DEFAULT.
+ * `key_listen` is no parameter: the declaration holds it at its kernel's declared default, OMX_COMP_KEY_LISTENS_DEFAULT.
+ * `hold_ms` is no parameter: the declaration holds it at its kernel's declared default, OMX_COMP_HOLD_MS_RANGE_DEFAULT.
+ * `detect_link` is no parameter: the declaration holds it at its kernel's declared default, OMX_COMP_DETECT_LINKS_DEFAULT.
+ * `duck` is no parameter: the declaration holds it at its kernel's declared default, OMX_COMP_DUCKS_DEFAULT.
+ * `range_db` is no parameter: the declaration holds it at its kernel's declared default, OMX_COMP_RANGE_DB_RANGE_DEFAULT.
  */
 #ifndef OMX_COMP_CORE_H
 #define OMX_COMP_CORE_H
@@ -47,7 +56,16 @@ static inline void omx_comp_core_resolve(OmxCompCore *c, const float *values, in
                                   /* mix_pct */ values[OMX_COMP_PARAM_MIX_PCT],
                                   /* kind */ (int)lrintf(values[OMX_COMP_PARAM_KIND]),
                                   /* detector_oversampling */ (int)lrintf(values[OMX_COMP_PARAM_DETECTOR_OVERSAMPLING]),
-                                  /* detector_topology */ (int)lrintf(values[OMX_COMP_PARAM_DETECTOR_TOPOLOGY]));
+                                  /* detector_topology */ (int)lrintf(values[OMX_COMP_PARAM_DETECTOR_TOPOLOGY]),
+                                  /* key_source */ (int)OMX_COMP_KEY_SOURCES_DEFAULT,
+                                  /* key_hp_hz */ (float)OMX_COMP_KEY_HP_HZ_RANGE_DEFAULT,
+                                  /* key_lp_hz */ (float)OMX_COMP_KEY_LP_HZ_RANGE_DEFAULT,
+                                  /* key_tilt_db */ (float)OMX_COMP_KEY_TILT_DB_RANGE_DEFAULT,
+                                  /* key_listen */ (int)OMX_COMP_KEY_LISTENS_DEFAULT,
+                                  /* hold_ms */ (float)OMX_COMP_HOLD_MS_RANGE_DEFAULT,
+                                  /* detect_link */ (int)OMX_COMP_DETECT_LINKS_DEFAULT,
+                                  /* duck */ (int)OMX_COMP_DUCKS_DEFAULT,
+                                  /* range_db */ (float)OMX_COMP_RANGE_DB_RANGE_DEFAULT);
 }
 
 /** The latency the kernel adds, in samples. */
