@@ -59,7 +59,7 @@ import { chainSources, commitPlan, draftChain, draftDeclaration, kernelSources, 
 import { bindFace, parseFace } from '../instance-face.mjs';
 import { kernelControls, locateContract } from '../omx-contract.mjs';
 import { omxdspInclude } from '../template.mjs';
-import { defaultPanel, emitPluginTtl, generateInstance, loadDecl } from '../gen.mjs';
+import { defaultPanel, emitPluginTtl, generateInstance, loadDecl, meterRows } from '../gen.mjs';
 import { hintErrors } from '../port-hints.mjs';
 import { expandVariant, variantBands } from '../variants.mjs';
 import { checkPlugin, debtGrowth, debtVerdict, gapLines, loadDebt, loadRecipe, pluginStems, recipeErrors } from '../plugin-recipe.mjs';
@@ -530,6 +530,31 @@ static inline void omx_wobble_instance_run_keyed(OmxWobbleInstance *s, ${legs}, 
     expect(keyable.keyable === true && keyable.keyed === false, `a run_keyed beside an unkeyed run is a keyable face (${keyable.error ?? `keyable ${keyable.keyable}, keyed ${keyable.keyed}`})`);
     expect(/run_keyed takes/.test(one.error ?? '') && /run_keyed takes/.test(named.error ?? ''),
       `a run_keyed of one key leg, or of legs not named key_l and key_r, is refused (${one.error ?? 'ACCEPTED'}; ${named.error ?? 'ACCEPTED'})`);
+  }
+  {
+    // a meter read through the face: its readings are the face's float functions of the instance, a band index or none
+    const face = parseFace(`static inline int omx_wobble_instance_init(OmxWobbleInstance *s, float sr) { return 1; }
+static inline void omx_wobble_instance_resolve(OmxWobbleInstance *s, int bypass, float depth) { }
+static inline void omx_wobble_instance_run(OmxWobbleInstance *s, const float *in_l, const float *in_r, float *out_l, float *out_r, uint32_t n) { }
+static inline float omx_wobble_instance_band_gr_db(const OmxWobbleInstance *s, uint32_t k) { return 0.0f; }
+static inline float omx_wobble_instance_level_db(const OmxWobbleInstance *s) { return 0.0f; }
+#define OMX_WOBBLE_INSTANCE_LATENCY_FRAMES 0.0f`, 'wobble');
+    const rows = (meters) => {
+      try {
+        return meterRows({ stem: 'omx-wobble', kernel: 'wobble', params: [], meters }, face);
+      } catch (e) {
+        return e.message;
+      }
+    };
+    const ok = rows([{ id: 'gr2', kind: 'gain_reduction', read: 'band_gr_db(1)', readout: 'BAND2_GR_DB' }, { id: 'lvl', kind: 'level', read: 'level_db', readout: 'LEVEL_DB' }]);
+    expect(Array.isArray(ok) && ok[0].meterReadCore === 'omx_wobble_instance_band_gr_db(&c->inst, 1u)' && ok[0].meterReadRef === 'omx_wobble_instance_band_gr_db(&inst, 1u)' &&
+      ok[1].meterChannels === 1 && ok[1].isRead && !ok[1].isGr && ok[1].meterBypass === 'G_METER_INFO[1].min' && ok[1].meterMin === '(double)OMX_WOBBLE_READOUT_LEVEL_DB_MIN',
+      `meters: a band's reading and a level the kernel reads are called on the instance, the level one channel over its readout (${Array.isArray(ok) ? ok.map((r) => r.meterReadCore).join(', ') : ok})`);
+    const missing = rows([{ id: 'gr', kind: 'gain_reduction', read: 'gr_db', readout: 'GR_DB' }]);
+    const unbanded = rows([{ id: 'gr', kind: 'gain_reduction', read: 'band_gr_db', readout: 'GR_DB' }]);
+    const both = rows([{ id: 'gr', kind: 'gain_reduction', read: 'band_gr_db(0)', field: 'st.gr_min_db', readout: 'GR_DB' }]);
+    expect(/has no float omx_wobble_instance_gr_db/.test(missing) && /takes band index/.test(unbanded) && /takes no 'field'/.test(both),
+      `meters: a reading the face lacks, a band index left out, and a field beside a read are refused (${[missing, unbanded, both].map((x) => (typeof x === 'string' ? x.split(': ').pop() : 'ACCEPTED')).join('; ')})`);
   }
 
   // ---- 6. the port hints ---------------------------------------------------------------------

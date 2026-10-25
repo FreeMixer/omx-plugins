@@ -829,8 +829,9 @@ const cdouble = (n) => (typeof n === 'string' || /[.e]/.test(`${n}`) ? `${n}` : 
  * parameter's travel to 0 dB, or over the range omx-contract declares for the kernel's `readout`
  * of that name (OMX_<KERNEL>_READOUT_<readout>_MIN/_MAX, read by the compiler); a level is the stereo pair's peak in dBFS at the plugin's `input` or
  * `output`, its range as declared. */
-export function meterRows(d) {
+export function meterRows(d, face) {
   const taken = new Set([...d.params.map((p) => p.symbol), ...FIXED_PORTS]);
+  const K = (d.face ?? d.kernel);
   let offset = 0;
   const rows = (d.meters ?? []).map((m, k) => {
     const where = `plugins/${d.stem}: meters[${k}]`;
@@ -838,33 +839,53 @@ export function meterRows(d) {
     if (!/^[A-Za-z][A-Za-z0-9_]*$/.test(m.id ?? '')) throw new Error(`${where}: id '${m.id}' is not a symbol`);
     if (taken.has(m.id)) throw new Error(`${where}: id '${m.id}' is taken`);
     taken.add(m.id);
-    const own = m.kind === 'gain_reduction' ? ['field', 'readout' in m ? 'readout' : 'floor'] : ['source', 'min', 'max'];
-    for (const key of ['field', 'floor', 'readout', 'source', 'min', 'max']) {
+    // a reading of the kernel's: a gain reduction, or a level the kernel reads itself (its detector's)
+    const reads = m.kind === 'gain_reduction' || 'read' in m;
+    const at = 'read' in m ? 'read' : 'field';
+    const own = m.kind === 'gain_reduction' ? [at, 'readout' in m ? 'readout' : 'floor'] : reads ? ['read', 'readout'] : ['source', 'min', 'max'];
+    for (const key of ['field', 'read', 'floor', 'readout', 'source', 'min', 'max']) {
       if (own.includes(key) && !(key in m)) throw new Error(`${where}: a ${m.kind} meter names its '${key}'`);
-      if (!own.includes(key) && key in m) throw new Error(`${where}: a ${m.kind} meter takes no '${key}'`);
+      if (!own.includes(key) && key in m) throw new Error(`${where}: a ${m.kind} meter ${reads && m.kind === 'level' ? 'the kernel reads ' : ''}takes no '${key}'`);
     }
     let row;
-    if (m.kind === 'gain_reduction') {
-      if (!/^[a-z_][a-z0-9_]*(\.[a-z_][a-z0-9_]*)*$/.test(m.field)) throw new Error(`${where}: field '${m.field}' is not a member path`);
+    if (reads) {
+      // where the reading is: a member of the instance, or the face's reading function, banded or not
+      let core, ref;
+      if (at === 'field') {
+        if (!/^[a-z_][a-z0-9_]*(\.[a-z_][a-z0-9_]*)*$/.test(m.field)) throw new Error(`${where}: field '${m.field}' is not a member path`);
+        core = `c->inst.${m.field}`;
+        ref = `inst.${m.field}`;
+      } else {
+        const r = m.read.match(/^([a-z][a-z0-9_]*)(?:\(([0-9]+)\))?$/);
+        if (!r) throw new Error(`${where}: read '${m.read}' is not <reading> or <reading>(<band>)`);
+        const reading = face?.readings?.[r[1]];
+        if (face && !reading) throw new Error(`${where}: omx-dsp's <omxdsp/fx/omx_${K}_instance.h> has no float omx_${K}_instance_${r[1]}(const ${face.type} *${r[2] === undefined ? '' : ', uint32_t'})`);
+        if (reading && reading.banded !== (r[2] !== undefined)) throw new Error(`${where}: omx_${K}_instance_${r[1]} ${reading.banded ? 'takes' : 'takes no'} band index`);
+        const call = (self) => `omx_${K}_instance_${r[1]}(${self}${r[2] === undefined ? '' : `, ${r[2]}u`})`;
+        core = call('&c->inst');
+        ref = call('&inst');
+      }
       if ('readout' in m) {
         if (!/^[A-Z][A-Z0-9_]*$/.test(m.readout)) throw new Error(`${where}: readout '${m.readout}' is not a readout name`);
         const r = `OMX_${d.kernel.toUpperCase()}_READOUT_${m.readout}`;
-        row = { channels: 1, min: `(double)${r}_MIN`, max: `(double)${r}_MAX`, meterField: m.field };
+        row = { channels: 1, min: `(double)${r}_MIN`, max: `(double)${r}_MAX`, core, ref };
       } else {
         const p = d.params.find((q) => q.symbol === m.floor);
         if (!p) throw new Error(`${where}: floor '${m.floor}' is no parameter`);
         if (!(p.min < 0)) throw new Error(`${where}: floor '${m.floor}' starts at ${p.min}, not below 0 dB`);
-        row = { channels: 1, min: p.min, max: 0, meterField: m.field };
+        row = { channels: 1, min: p.min, max: 0, core, ref };
       }
     } else {
       if (m.source !== 'input' && m.source !== 'output') throw new Error(`${where}: source '${m.source}' is not input or output`);
       if (!(Number.isFinite(m.min) && Number.isFinite(m.max) && m.min < m.max)) throw new Error(`${where}: the range ${m.min}..${m.max} is not a range`);
-      row = { channels: 2, min: m.min, max: m.max, meterField: '' };
+      row = { channels: 2, min: m.min, max: m.max, core: '', ref: '' };
     }
     const out = {
-      meterIndex: k, meterName: m.id, meterKind: METER_KINDS[m.kind], meterField: row.meterField,
+      meterIndex: k, meterName: m.id, meterKind: METER_KINDS[m.kind], meterReadCore: row.core, meterReadRef: row.ref,
       meterChannels: row.channels, meterOffset: offset, meterRight: offset + 1, meterMin: cdouble(row.min), meterMax: cdouble(row.max),
-      isGr: m.kind === 'gain_reduction', isIn: m.source === 'input', isOut: m.source === 'output',
+      isGr: m.kind === 'gain_reduction', isRead: reads, isIn: m.source === 'input', isOut: m.source === 'output',
+      // what a bypassed kernel's stale reading publishes: no reduction, or a level's display minimum
+      meterBypass: m.kind === 'gain_reduction' ? '0.0' : `G_METER_INFO[${k}].min`, meterBypassRef: m.kind === 'gain_reduction' ? '0.0' : `METERS[${k}].min`,
     };
     offset += row.channels;
     return out;
@@ -874,13 +895,14 @@ export function meterRows(d) {
 }
 
 /** The template's view of the meters: the rows, how many, how many values, which levels are read. */
-function meterView(d) {
-  const meters = meterRows(d);
+function meterView(d, face) {
+  const meters = meterRows(d, face);
   return {
     meters, metered: meters.length > 0, meterCount: meters.length,
     meterValues: meters.reduce((n, m) => n + m.meterChannels, 0),
     meterGr: meters.some((m) => m.isGr), meterIn: meters.some((m) => m.isIn), meterOut: meters.some((m) => m.isOut),
     meterLevel: meters.some((m) => m.isIn || m.isOut),
+    meterRead: meters.some((m) => m.isRead), meterKernelLevel: meters.some((m) => m.isRead && !m.isGr),
   };
 }
 
@@ -966,7 +988,7 @@ export function generateInstance(d) {
     plan: oraclePlan(d.params, d.controls ?? []), held: heldOf(d), stretch: oracleStretch(face), steps: d.params.map((p) => cfloat(stepOf(p))).join(', '),
     chain: false,
     latencyChecks: latencyRows(d), measuresLatency: Boolean(d.latencyChecks),
-    ...meterView(d),
+    ...meterView(d, face),
   };
   return {
     Makefile: withBanner(render(template('Makefile.tmpl'), view), d, '#'),
