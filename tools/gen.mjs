@@ -137,7 +137,7 @@ export function prepareDecl(file, d, stem, dir = dirname(file)) {
  * none of them; a kernel named after a family is that family, any other kernel `none`. */
 export const FAMILY_OF_KERNEL = Object.freeze({
   comp: 'dynamics', transient: 'dynamics', chorus: 'modulation', flanger: 'modulation', phaser: 'modulation',
-  tremolo: 'modulation', rotary: 'modulation', geq: 'eq',
+  tremolo: 'modulation', rotary: 'modulation', geq: 'eq', dyneq: 'eq', mbcomp: 'dynamics',
 });
 
 /** The panel family a kernel's plugin draws as: FAMILY_OF_KERNEL's, else the family of its own name. */
