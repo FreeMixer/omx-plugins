@@ -78,7 +78,7 @@ if (carriesWords) {
       const { loadDecl } = await import(${JSON.stringify(join(ROOT, 'tools', 'gen.mjs'))});
       const { descriptorText } = await import(${JSON.stringify(join(ROOT, 'tools', 'descriptor.mjs'))});
       process.stdout.write(descriptorText(loadDecl(${JSON.stringify(first)})));`],
-    { encoding: 'utf8', env: { ...process.env, OMX_CONTRACT_DIR: dir, PKG_CONFIG_PATH: '/nonexistent', PKG_CONFIG_LIBDIR: '/nonexistent' } });
+    { encoding: 'utf8', env: { ...process.env, OMX_CONTRACT_DIR: dir, OMX_CONTRACT_SCHEMA: schemaFile, PKG_CONFIG_PATH: '/nonexistent', PKG_CONFIG_LIBDIR: '/nonexistent' } });
     return r.status === 0 ? r.stdout : `refused: ${r.stderr.trim().split('\n').find((l) => l.startsWith('Error')) ?? r.stderr.trim()}`;
   };
   const render = join(ROOT, 'build', 'tmp', 'descriptor-view-render');
