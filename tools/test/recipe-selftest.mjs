@@ -57,7 +57,7 @@ import { fileURLToPath } from 'node:url';
 import { checkCommits, rangeCommits } from '../commit-plan-check.mjs';
 import { chainSources, commitPlan, draftChain, draftDeclaration, kernelSources, planChain, planPlugin, reviewMarks, writePlugin } from '../omx-new-plugin.mjs';
 import { bindFace, parseFace } from '../instance-face.mjs';
-import { kernelControls, locateContract } from '../omx-contract.mjs';
+import { eqDefaultBands, kernelControls, locateContract, resolveParam } from '../omx-contract.mjs';
 import { omxdspInclude } from '../template.mjs';
 import { defaultPanel, emitPluginTtl, generateInstance, loadDecl, meterRows } from '../gen.mjs';
 import { hintErrors } from '../port-hints.mjs';
@@ -560,6 +560,21 @@ static inline float omx_wobble_instance_level_db(const OmxWobbleInstance *s) { r
   // ---- 6. the port hints ---------------------------------------------------------------------
   delete process.env.OMX_CONTRACT_DIR; // the real tree reads the installed release
   delete process.env.OMXDSP_INCLUDE;
+  {
+    // a band's centre at a contract count: the dynamic EQ's bands come up by the EQ rule for DYNEQ_BANDS
+    const real = locateContract(ROOT).dir;
+    const centre = (k, count) => {
+      try {
+        return resolveParam(real, 'dyneq', { symbol: `freq${k + 1}`, ref: 'DYNEQ_FREQ_RANGE', defaultBand: { count, index: k, of: 'centre' } }).def;
+      } catch (e) {
+        return e.message;
+      }
+    };
+    const rule = eqDefaultBands(real, 6).map((b) => b.freqHz);
+    const got = [0, 1, 2, 3, 4, 5].map((k) => centre(k, 'DYNEQ_BANDS'));
+    expect(JSON.stringify(got) === JSON.stringify(rule) && rule[3] !== rule[0], `defaultBand: the dynamic EQ's six centres are the EQ rule's for DYNEQ_BANDS (${got.join(' ')})`);
+    expect(/no count omx-contract declares/.test(String(centre(0, 'DYNEQ_FREQ_RANGE'))), `defaultBand: a count that is no count is refused (${centre(0, 'DYNEQ_FREQ_RANGE')})`);
+  }
   // ---- 5b. variants: one declaration, several band counts (tools/variants.mjs) ------------------
   {
     const real = locateContract(ROOT).dir;

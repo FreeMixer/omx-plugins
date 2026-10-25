@@ -526,11 +526,21 @@
           ],
           "additionalProperties": false,
           "title": "Default band",
-          "description": "For an EQ band: the default of band `index` (0-based) in an EQ of the strip type `strip` (a key of EQ_BAND_COUNTS), by omx-contract's one default rule for a fresh EQ. `of` is `centre` for the band's frequency travel and `type` for its band type set. A per-band parameter gives `of` alone; tools/variants.mjs fills `strip` and `index` for each band.",
+          "description": "For an EQ band: the default of band `index` (0-based) in an EQ of the strip type `strip` (a key of EQ_BAND_COUNTS), or in a bank of `count` bands (a count omx-contract declares, DYNEQ_BANDS), by omx-contract's one default rule for a fresh EQ. `of` is `centre` for the band's frequency travel and `type` for its band type set. A per-band parameter gives `of` alone; tools/variants.mjs fills `strip` and `index` for each band.",
+          "not": {
+            "required": [
+              "strip",
+              "count"
+            ]
+          },
           "properties": {
             "strip": {
               "type": "string",
               "pattern": "^[a-z][a-z0-9]*$"
+            },
+            "count": {
+              "type": "string",
+              "pattern": "^[A-Z][A-Z0-9_]*$"
             },
             "index": {
               "type": "integer",
