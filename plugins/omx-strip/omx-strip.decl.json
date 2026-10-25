@@ -150,7 +150,9 @@
       "fixed": {
         "keySource": "self",
         "hpHz": 0,
-        "lpHz": 0
+        "lpHz": 0,
+        "keyListen": "default",
+        "keyTiltDb": "default"
       }
     },
     {
@@ -388,7 +390,16 @@
         }
       ],
       "fixed": {
-        "detectorTopology": "feedforward"
+        "detectorTopology": "feedforward",
+        "keySource": "default",
+        "keyHpHz": "default",
+        "keyLpHz": "default",
+        "keyTiltDb": "default",
+        "keyListen": "default",
+        "holdMs": "default",
+        "detectLink": "default",
+        "duck": "default",
+        "rangeDb": "default"
       }
     }
   ],

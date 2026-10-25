@@ -18,6 +18,8 @@
  * gate: `keySource` is not a parameter; it is passed at "self".
  * gate: `hpHz` is not a parameter; it is passed at 0.
  * gate: `lpHz` is not a parameter; it is passed at 0.
+ * gate: `keyListen` is not a parameter; it is passed at "default".
+ * gate: `keyTiltDb` is not a parameter; it is passed at "default".
  * eq: `hpfOn` is not a parameter; it is passed at "off".
  * eq: `hpfFreq` is not a parameter; it is passed at {"defaultRef":"EQ_PASS_FILTER_DEFAULTS.hpfFreqHz"}.
  * eq: `hpfSlope` is not a parameter; it is passed at "default".
@@ -30,6 +32,15 @@
  * eq: `q` is not a parameter; it is passed at "default".
  * eq: `bandOn` is not a parameter; it is passed at "off".
  * comp: `detectorTopology` is not a parameter; it is passed at "feedforward".
+ * comp: `keySource` is not a parameter; it is passed at "default".
+ * comp: `keyHpHz` is not a parameter; it is passed at "default".
+ * comp: `keyLpHz` is not a parameter; it is passed at "default".
+ * comp: `keyTiltDb` is not a parameter; it is passed at "default".
+ * comp: `keyListen` is not a parameter; it is passed at "default".
+ * comp: `holdMs` is not a parameter; it is passed at "default".
+ * comp: `detectLink` is not a parameter; it is passed at "default".
+ * comp: `duck` is not a parameter; it is passed at "default".
+ * comp: `rangeDb` is not a parameter; it is passed at "default".
  */
 #ifndef OMX_STRIP_CORE_H
 #define OMX_STRIP_CORE_H
@@ -234,7 +245,9 @@ static inline void omx_strip_core_resolve(OmxStripCore *c, const float *values, 
                                   /* hysteresis_db */ values[OMX_STRIP_PARAM_GATE_HYSTERESIS],
                                   /* ratio */ values[OMX_STRIP_PARAM_GATE_RATIO],
                                   /* hp_hz */ 0.0f,
-                                  /* lp_hz */ 0.0f);
+                                  /* lp_hz */ 0.0f,
+                                  /* key_listen */ 0,
+                                  /* key_tilt_db */ 0.0f);
   omx_eq_instance_resolve(&c->eq, bypass || values[OMX_STRIP_PARAM_EQ_ON] < 0.5f,
                                   /* hpf_on */ 0,
                                   /* hpf_freq */ 80.0f,
@@ -257,7 +270,16 @@ static inline void omx_strip_core_resolve(OmxStripCore *c, const float *values, 
                                   /* mix_pct */ values[OMX_STRIP_PARAM_COMP_MIX],
                                   /* kind */ (int)lrintf(values[OMX_STRIP_PARAM_COMP_KIND]),
                                   /* detector_oversampling */ (int)lrintf(values[OMX_STRIP_PARAM_COMP_DETECTOR_OVERSAMPLING]),
-                                  /* detector_topology */ 0);
+                                  /* detector_topology */ 0,
+                                  /* key_source */ 0,
+                                  /* key_hp_hz */ 0.0f,
+                                  /* key_lp_hz */ 0.0f,
+                                  /* key_tilt_db */ 0.0f,
+                                  /* key_listen */ 0,
+                                  /* hold_ms */ 0.0f,
+                                  /* detect_link */ 0,
+                                  /* duck */ 0,
+                                  /* range_db */ -12.0f);
   const float o = values[OMX_STRIP_PARAM_ORDER];
   const long row = o - o == 0.0f ? lrintf(o) : 0;
   c->order = row >= 0 && row < (long)OMX_STRIP_CHAIN_ORDERS ? (uint32_t)row : 0u;

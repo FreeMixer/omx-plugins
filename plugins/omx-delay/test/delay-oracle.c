@@ -167,7 +167,7 @@ static void reference(double sr, int off, const float *key, const float *il, con
     values_of(k, off, values);
     const uint32_t frames = frames_of(k, sr);
     for (uint32_t r = 0; r < STRETCH; r++) {
-      omx_delay_instance_resolve(&inst, k->bypass, values[OMX_DELAY_PARAM_FX_DELAY_TIME], values[OMX_DELAY_PARAM_FX_DELAY_FEEDBACK], values[OMX_DELAY_PARAM_TONE], values[OMX_DELAY_PARAM_MIX], (int)lrintf(values[OMX_DELAY_PARAM_PINGPONG]));
+      omx_delay_instance_resolve(&inst, k->bypass, values[OMX_DELAY_PARAM_FX_DELAY_TIME], values[OMX_DELAY_PARAM_FX_DELAY_FEEDBACK], values[OMX_DELAY_PARAM_TONE], values[OMX_DELAY_PARAM_MIX], (int)lrintf(values[OMX_DELAY_PARAM_PINGPONG]), 0, 6, 0, 0.0f, -30.0f, 250.0f);
 #if KEYED
       omx_delay_instance_run(&inst, key ? key + at : NULL, il + at, ir + at, ol + at, orr + at, frames);
 #else

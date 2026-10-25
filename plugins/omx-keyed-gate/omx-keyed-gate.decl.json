@@ -25,6 +25,10 @@
     "symbol": "key",
     "name": "Key (Sidechain)"
   },
+  "fixed": {
+    "keyListen": "default",
+    "keyTiltDb": "default"
+  },
   "portHints": {
     "key": {
       "props": [

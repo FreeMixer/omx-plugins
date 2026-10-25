@@ -15,6 +15,17 @@
       ]
     }
   },
+  "fixed": {
+    "keySource": "default",
+    "keyHpHz": "default",
+    "keyLpHz": "default",
+    "keyTiltDb": "default",
+    "keyListen": "default",
+    "holdMs": "default",
+    "detectLink": "default",
+    "duck": "default",
+    "rangeDb": "default"
+  },
   "portHints": {
     "thresholdDb": {
       "props": [

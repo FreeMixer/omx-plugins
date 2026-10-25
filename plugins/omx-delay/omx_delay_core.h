@@ -9,6 +9,12 @@
  *
  * GENERATED — DO NOT EDIT BY HAND. Produced by tools/gen.mjs from plugins/omx-delay/omx-delay.decl.json and
  * the face's resolve() prototype: each argument takes the parameter whose contract control it names.
+ * `sync` is not a parameter of this plugin: it is passed at "default".
+ * `division` is not a parameter of this plugin: it is passed at "default".
+ * `mode` is not a parameter of this plugin: it is passed at "default".
+ * `duckDb` is not a parameter of this plugin: it is passed at "default".
+ * `duckThresholdDb` is not a parameter of this plugin: it is passed at "default".
+ * `duckReleaseMs` is not a parameter of this plugin: it is passed at "default".
  */
 #ifndef OMX_DELAY_CORE_H
 #define OMX_DELAY_CORE_H
@@ -42,7 +48,13 @@ static inline void omx_delay_core_resolve(OmxDelayCore *c, const float *values, 
                                   /* fx_delay_feedback */ values[OMX_DELAY_PARAM_FX_DELAY_FEEDBACK],
                                   /* tone */ values[OMX_DELAY_PARAM_TONE],
                                   /* mix */ values[OMX_DELAY_PARAM_MIX],
-                                  /* pingpong */ (int)lrintf(values[OMX_DELAY_PARAM_PINGPONG]));
+                                  /* pingpong */ (int)lrintf(values[OMX_DELAY_PARAM_PINGPONG]),
+                                  /* sync */ 0,
+                                  /* division */ 6,
+                                  /* mode */ 0,
+                                  /* duck_db */ 0.0f,
+                                  /* duck_threshold_db */ -30.0f,
+                                  /* duck_release_ms */ 250.0f);
 }
 
 /** The latency the kernel adds, in samples. */

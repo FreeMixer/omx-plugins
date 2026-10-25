@@ -176,7 +176,7 @@ static void reference(double sr, int off, const float *key, const float *il, con
     values_of(k, off, values);
     const uint32_t frames = frames_of(k, sr);
     for (uint32_t r = 0; r < STRETCH; r++) {
-      omx_reverb_instance_resolve(&inst, k->bypass, values[OMX_REVERB_PARAM_PLATE_MOD_DEPTH], values[OMX_REVERB_PARAM_MIX], values[OMX_REVERB_PARAM_SIZE], values[OMX_REVERB_PARAM_DAMPING], values[OMX_REVERB_PARAM_WIDTH], values[OMX_REVERB_PARAM_PREDELAY], values[OMX_REVERB_PARAM_LOWCUT], values[OMX_REVERB_PARAM_HIGHCUT], values[OMX_REVERB_PARAM_REVERSE], values[OMX_REVERB_PARAM_HOLD], values[OMX_REVERB_PARAM_RELEASE], values[OMX_REVERB_PARAM_GATE_THRESHOLD], (int)lrintf(values[OMX_REVERB_PARAM_ALGORITHM]));
+      omx_reverb_instance_resolve(&inst, k->bypass, values[OMX_REVERB_PARAM_PLATE_MOD_DEPTH], values[OMX_REVERB_PARAM_MIX], values[OMX_REVERB_PARAM_SIZE], values[OMX_REVERB_PARAM_DAMPING], values[OMX_REVERB_PARAM_WIDTH], values[OMX_REVERB_PARAM_PREDELAY], values[OMX_REVERB_PARAM_LOWCUT], values[OMX_REVERB_PARAM_HIGHCUT], values[OMX_REVERB_PARAM_REVERSE], values[OMX_REVERB_PARAM_HOLD], values[OMX_REVERB_PARAM_RELEASE], values[OMX_REVERB_PARAM_GATE_THRESHOLD], (int)lrintf(values[OMX_REVERB_PARAM_ALGORITHM]), -60.0f, 0.0f, 50.0f, 0.0f, -30.0f, 250.0f, 0, 7000.0f, -30.0f);
 #if KEYED
       omx_reverb_instance_run(&inst, key ? key + at : NULL, il + at, ir + at, ol + at, orr + at, frames);
 #else

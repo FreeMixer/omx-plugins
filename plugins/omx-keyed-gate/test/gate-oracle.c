@@ -171,7 +171,7 @@ static void reference(double sr, int off, const float *key, const float *il, con
     values_of(k, off, values);
     const uint32_t frames = frames_of(k, sr);
     for (uint32_t r = 0; r < STRETCH; r++) {
-      omx_gate_instance_resolve(&inst, k->bypass, (int)lrintf(values[OMX_GATE_PARAM_KEY_EXTERNAL]), values[OMX_GATE_PARAM_THRESHOLD], values[OMX_GATE_PARAM_RANGE], values[OMX_GATE_PARAM_KNEE_START], values[OMX_GATE_PARAM_KNEE_END], values[OMX_GATE_PARAM_ATTACK], values[OMX_GATE_PARAM_HOLD], values[OMX_GATE_PARAM_RELEASE], values[OMX_GATE_PARAM_HYSTERESIS], values[OMX_GATE_PARAM_RATIO], values[OMX_GATE_PARAM_KEY_HP], values[OMX_GATE_PARAM_KEY_LP]);
+      omx_gate_instance_resolve(&inst, k->bypass, (int)lrintf(values[OMX_GATE_PARAM_KEY_EXTERNAL]), values[OMX_GATE_PARAM_THRESHOLD], values[OMX_GATE_PARAM_RANGE], values[OMX_GATE_PARAM_KNEE_START], values[OMX_GATE_PARAM_KNEE_END], values[OMX_GATE_PARAM_ATTACK], values[OMX_GATE_PARAM_HOLD], values[OMX_GATE_PARAM_RELEASE], values[OMX_GATE_PARAM_HYSTERESIS], values[OMX_GATE_PARAM_RATIO], values[OMX_GATE_PARAM_KEY_HP], values[OMX_GATE_PARAM_KEY_LP], 0, 0.0f);
 #if KEYED
       omx_gate_instance_run(&inst, key ? key + at : NULL, il + at, ir + at, ol + at, orr + at, frames);
 #else

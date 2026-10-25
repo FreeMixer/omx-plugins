@@ -18,6 +18,17 @@
       ]
     }
   },
+  "fixed": {
+    "earlyDb": "default",
+    "tailDb": "default",
+    "earlySizePct": "default",
+    "duckDb": "default",
+    "duckThresholdDb": "default",
+    "duckReleaseMs": "default",
+    "wetDeess": "default",
+    "deessFreqHz": "default",
+    "deessThresholdDb": "default"
+  },
   "portHints": {
     "plateModDepth": {
       "props": [

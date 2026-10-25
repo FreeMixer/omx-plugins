@@ -9,6 +9,15 @@
  *
  * GENERATED — DO NOT EDIT BY HAND. Produced by tools/gen.mjs from plugins/omx-comp/omx-comp.decl.json and
  * the face's resolve() prototype: each argument takes the parameter whose contract control it names.
+ * `keySource` is not a parameter of this plugin: it is passed at "default".
+ * `keyHpHz` is not a parameter of this plugin: it is passed at "default".
+ * `keyLpHz` is not a parameter of this plugin: it is passed at "default".
+ * `keyTiltDb` is not a parameter of this plugin: it is passed at "default".
+ * `keyListen` is not a parameter of this plugin: it is passed at "default".
+ * `holdMs` is not a parameter of this plugin: it is passed at "default".
+ * `detectLink` is not a parameter of this plugin: it is passed at "default".
+ * `duck` is not a parameter of this plugin: it is passed at "default".
+ * `rangeDb` is not a parameter of this plugin: it is passed at "default".
  */
 #ifndef OMX_COMP_CORE_H
 #define OMX_COMP_CORE_H
@@ -47,7 +56,16 @@ static inline void omx_comp_core_resolve(OmxCompCore *c, const float *values, in
                                   /* mix_pct */ values[OMX_COMP_PARAM_MIX_PCT],
                                   /* kind */ (int)lrintf(values[OMX_COMP_PARAM_KIND]),
                                   /* detector_oversampling */ (int)lrintf(values[OMX_COMP_PARAM_DETECTOR_OVERSAMPLING]),
-                                  /* detector_topology */ (int)lrintf(values[OMX_COMP_PARAM_DETECTOR_TOPOLOGY]));
+                                  /* detector_topology */ (int)lrintf(values[OMX_COMP_PARAM_DETECTOR_TOPOLOGY]),
+                                  /* key_source */ 0,
+                                  /* key_hp_hz */ 0.0f,
+                                  /* key_lp_hz */ 0.0f,
+                                  /* key_tilt_db */ 0.0f,
+                                  /* key_listen */ 0,
+                                  /* hold_ms */ 0.0f,
+                                  /* detect_link */ 0,
+                                  /* duck */ 0,
+                                  /* range_db */ -12.0f);
 }
 
 /** The latency the kernel adds, in samples. */

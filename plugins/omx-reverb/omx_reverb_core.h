@@ -9,6 +9,15 @@
  *
  * GENERATED — DO NOT EDIT BY HAND. Produced by tools/gen.mjs from plugins/omx-reverb/omx-reverb.decl.json and
  * the face's resolve() prototype: each argument takes the parameter whose contract control it names.
+ * `earlyDb` is not a parameter of this plugin: it is passed at "default".
+ * `tailDb` is not a parameter of this plugin: it is passed at "default".
+ * `earlySizePct` is not a parameter of this plugin: it is passed at "default".
+ * `duckDb` is not a parameter of this plugin: it is passed at "default".
+ * `duckThresholdDb` is not a parameter of this plugin: it is passed at "default".
+ * `duckReleaseMs` is not a parameter of this plugin: it is passed at "default".
+ * `wetDeess` is not a parameter of this plugin: it is passed at "default".
+ * `deessFreqHz` is not a parameter of this plugin: it is passed at "default".
+ * `deessThresholdDb` is not a parameter of this plugin: it is passed at "default".
  */
 #ifndef OMX_REVERB_CORE_H
 #define OMX_REVERB_CORE_H
@@ -50,7 +59,16 @@ static inline void omx_reverb_core_resolve(OmxReverbCore *c, const float *values
                                   /* hold */ values[OMX_REVERB_PARAM_HOLD],
                                   /* release */ values[OMX_REVERB_PARAM_RELEASE],
                                   /* gate_threshold */ values[OMX_REVERB_PARAM_GATE_THRESHOLD],
-                                  /* algorithm */ (int)lrintf(values[OMX_REVERB_PARAM_ALGORITHM]));
+                                  /* algorithm */ (int)lrintf(values[OMX_REVERB_PARAM_ALGORITHM]),
+                                  /* early_db */ -60.0f,
+                                  /* tail_db */ 0.0f,
+                                  /* early_size_pct */ 50.0f,
+                                  /* duck_db */ 0.0f,
+                                  /* duck_threshold_db */ -30.0f,
+                                  /* duck_release_ms */ 250.0f,
+                                  /* wet_deess */ 0,
+                                  /* deess_freq_hz */ 7000.0f,
+                                  /* deess_threshold_db */ -30.0f);
 }
 
 /** The latency the kernel adds, in samples. */

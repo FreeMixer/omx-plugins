@@ -220,7 +220,7 @@ static void reference(double sr, int off, const float *key, const float *il, con
     values_of(k, off, values);
     const uint32_t frames = frames_of(k, sr);
     for (uint32_t r = 0; r < STRETCH; r++) {
-      omx_comp_instance_resolve(&inst, k->bypass, values[OMX_COMP_PARAM_THRESHOLD_DB], values[OMX_COMP_PARAM_RATIO], values[OMX_COMP_PARAM_KNEE_DB], values[OMX_COMP_PARAM_ATTACK_MS], values[OMX_COMP_PARAM_RELEASE_MS], values[OMX_COMP_PARAM_MAKEUP_DB], values[OMX_COMP_PARAM_MIX_PCT], (int)lrintf(values[OMX_COMP_PARAM_KIND]), (int)lrintf(values[OMX_COMP_PARAM_DETECTOR_OVERSAMPLING]), (int)lrintf(values[OMX_COMP_PARAM_DETECTOR_TOPOLOGY]));
+      omx_comp_instance_resolve(&inst, k->bypass, values[OMX_COMP_PARAM_THRESHOLD_DB], values[OMX_COMP_PARAM_RATIO], values[OMX_COMP_PARAM_KNEE_DB], values[OMX_COMP_PARAM_ATTACK_MS], values[OMX_COMP_PARAM_RELEASE_MS], values[OMX_COMP_PARAM_MAKEUP_DB], values[OMX_COMP_PARAM_MIX_PCT], (int)lrintf(values[OMX_COMP_PARAM_KIND]), (int)lrintf(values[OMX_COMP_PARAM_DETECTOR_OVERSAMPLING]), (int)lrintf(values[OMX_COMP_PARAM_DETECTOR_TOPOLOGY]), 0, 0.0f, 0.0f, 0.0f, 0, 0.0f, 0, 0, -12.0f);
 #if KEYED
       omx_comp_instance_run(&inst, key ? key + at : NULL, il + at, ir + at, ol + at, orr + at, frames);
 #else

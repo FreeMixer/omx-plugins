@@ -9,6 +9,8 @@
  *
  * GENERATED — DO NOT EDIT BY HAND. Produced by tools/gen.mjs from plugins/omx-keyed-gate/omx-keyed-gate.decl.json and
  * the face's resolve() prototype: each argument takes the parameter whose contract control it names.
+ * `keyListen` is not a parameter of this plugin: it is passed at "default".
+ * `keyTiltDb` is not a parameter of this plugin: it is passed at "default".
  */
 #ifndef OMX_GATE_CORE_H
 #define OMX_GATE_CORE_H
@@ -49,7 +51,9 @@ static inline void omx_gate_core_resolve(OmxGateCore *c, const float *values, in
                                   /* hysteresis_db */ values[OMX_GATE_PARAM_HYSTERESIS],
                                   /* ratio */ values[OMX_GATE_PARAM_RATIO],
                                   /* hp_hz */ values[OMX_GATE_PARAM_KEY_HP],
-                                  /* lp_hz */ values[OMX_GATE_PARAM_KEY_LP]);
+                                  /* lp_hz */ values[OMX_GATE_PARAM_KEY_LP],
+                                  /* key_listen */ 0,
+                                  /* key_tilt_db */ 0.0f);
 }
 
 /** The latency the kernel adds, in samples. */
