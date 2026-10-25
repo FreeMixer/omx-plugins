@@ -149,9 +149,11 @@ export function draftDeclaration(kernel, src, { root = ROOT, recipe = loadRecipe
       variantsOf = count;
       return [{ ...p, perBand: true }];
     }
-    // a per-band array: one parameter per band, the count the contract renders as the extent
-    const n = items(src.contract)[b.extent.replace(/^OMX_/, '')]?.value;
-    if (!Number.isInteger(n) || n < 1) throw new Error(`resolve argument '${b.arg}[${b.extent}]': omx-contract renders no count ${b.extent.replace(/^OMX_/, '')}`);
+    // a per-band array: one parameter per band, the count the contract renders as the extent, or,
+    // where the extent is the face's own macro (OMX_DYNEQ_INSTANCE_BANDS), the count the control
+    // declares; the generated binding asserts the two are equal
+    const n = items(src.contract)[b.extent.replace(/^OMX_/, '')]?.value ?? items(src.contract)[count]?.value;
+    if (!Number.isInteger(n) || n < 1) throw new Error(`resolve argument '${b.arg}[${b.extent}]': omx-contract renders no count ${b.extent.replace(/^OMX_/, '')}${count ? ` and its control's count ${count} is no number` : ''}`);
     const w = String(n).length;
     return Array.from({ length: n }, (_x, k) => ({ ...p, symbol: `${p.symbol}${String(k + 1).padStart(w, '0')}`, name: `${p.name} ${k + 1}` }));
   });
