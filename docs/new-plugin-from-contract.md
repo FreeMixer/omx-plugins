@@ -35,7 +35,10 @@ Step 1 checks before it writes:
   parameter per band (`band01` … `band31`), the binding passes them in declaration order, and the
   generated code asserts their count is the extent. Where the extent is the face's own macro
   (`OMX_DYNEQ_INSTANCE_BANDS`), the count is the one the control declares (`DYNEQ_BANDS`), and the same
-  assertion holds the two equal. A keyed face takes the sidechain block first,
+  assertion holds the two equal. A band's centre whose travel names no default (the dynamic EQ's: its
+  bands come up spread, as an EQ's do) is settled by a person with `defaultBand` `{ "count": "DYNEQ_BANDS",
+  "index": <band>, "of": "centre" }`: the centre omx-contract's EQ default rule gives that band in a bank
+  of that count, the one the face comes up at. A keyed face takes the sidechain block first,
   `run(s, key, in_l, in_r, out_l, out_r, n)` (`NULL`: nothing routed, the kernel's own detector); its
   declaration names the key port in `sidechain`, and the faces and the identity test carry the key.
   A keyable face keeps an unkeyed `run` and adds `run_keyed(s, key_l, key_r, in_l, in_r, out_l, out_r, n)`
