@@ -28,7 +28,7 @@
  * and the hint view tools/test/port-hints.json (git-ignored), assembled from every declaration's
  * `portHints` (the pin of its LV2 port hints) for tools/port-hints.mjs.
  *
- * The MOD GUI of the same bundle is tools/modgui-gen.mjs's, which reads the port list from here.
+ * The MOD GUI of the same bundle is omx-panel's (tools/panel-file.mjs hands it the declared panel).
  *
  * Usage: `node tools/gen.mjs [--check] [plugins/<stem> ...]` — `--check` writes nothing and fails on a
  * stale, missing or changed file. Named plugins are generated alone; with none, every plugin and

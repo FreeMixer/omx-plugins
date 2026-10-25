@@ -33,7 +33,7 @@
   "steps": {
     "identity": "the plugin's declaration: stem, kernel, CLAP id, LV2 URI, parameters by reference, panel",
     "kernel": "the kernels the parameters reference: their files in the installed omx-contract (by the kernel recipe in omx-contract and omx-dsp when one is new), and the packaging's omx-contract floor",
-    "generate": "the files tools/gen.mjs and tools/modgui-gen.mjs write from the declaration",
+    "generate": "the files tools/gen.mjs writes from the declaration and omx-panel writes from its descriptor and declared panel",
     "faces": "the build and the CLAP and LV2 faces, plain C over omx-dsp, and their binding to the kernel",
     "tests": "the parameter test and the kernel-identity test",
     "packaging": "the RPM and DEB file lists, the metapackage's description and CI's installed-file checks",
@@ -174,7 +174,7 @@
       "questions": [
         "/$defs/plugin/properties/panel"
       ],
-      "template": "tools/modgui-gen.mjs",
+      "template": "tools/panel-file.mjs",
       "when": "panel",
       "checker": {
         "fn": "modguiFresh"

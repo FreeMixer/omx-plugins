@@ -288,10 +288,10 @@ export const CHECKERS = {
     return stale.length ? missing(`${stale.join(', ')} (make -C plugins/${facts.stem} gen)`) : ok(files.map((f) => fill(f, facts)).join(', '));
   },
 
-  /** The MOD GUI is what tools/modgui-gen.mjs writes now, and nothing more. */
+  /** The MOD GUI is what omx-panel writes now from the descriptor and the declared panel, and nothing more. */
   async modguiFresh(root, _recipe, facts) {
     const gen = await import(join(root, 'tools', 'gen.mjs'));
-    const mg = await import(join(root, 'tools', 'modgui-gen.mjs'));
+    const pf = await import(join(root, 'tools', 'panel-file.mjs'));
     let d;
     try {
       d = gen.loadDecl(join(root, 'plugins', facts.stem));
@@ -299,11 +299,8 @@ export const CHECKERS = {
       return missing(`cannot generate: ${e.message}`);
     }
     const dir = join('plugins', facts.stem, 'generated', `${facts.stem}.lv2`);
-    const out = mg.generateModgui(d, mg.loadLook());
-    const bad = out.filter(([p, bytes]) => !has(root, join(dir, p)) || !readFileSync(join(root, dir, p)).equals(bytes)).map(([p]) => join(dir, p));
-    const want = new Set(out.map(([p]) => join(dir, p)));
-    const extra = walk(root, join(dir, mg.MODGUI_DIR)).filter((p) => !want.has(p));
-    if (bad.length || extra.length) return missing(`${[...bad.map((p) => `${p} stale or missing`), ...extra.map((p) => `${p} extra`)].join(', ')} (make -C plugins/${facts.stem} gen)`);
+    const r = pf.modgui(d, '--check');
+    if (r.status !== 0) return missing(`${r.stderr.trim().split('\n').map((l) => l.replace(/^modgui: /, '')).join(', ')} (make -C plugins/${facts.stem} gen)`);
     return ok(`${dir}/modgui.ttl and modgui/`);
   },
 
