@@ -880,7 +880,10 @@ export function bindingOf(d) {
 export function generateInstance(d) {
   const { face, binding, renames } = bindingOf(d);
   if (face.keyed && !d.sidechain) throw new Error(`plugins/${d.stem}: omx_${d.kernel}_instance_run takes a key; the declaration names its port in "sidechain"`);
-  if (!face.keyed && d.sidechain) throw new Error(`plugins/${d.stem}: declares a "sidechain", and omx_${d.kernel}_instance_run takes no key`);
+  if (!face.keyed && !face.keyable && d.sidechain) throw new Error(`plugins/${d.stem}: declares a "sidechain", and omx_${d.kernel}_instance_run takes no key (nor has it a run_keyed)`);
+  // keyed: the plugin's key port reaches the face, through run (the key first) or run_keyed (the
+  // mono key on key_l, key_r NULL)
+  const keyed = face.keyed || (face.keyable && Boolean(d.sidechain));
   const K = d.kernel.toUpperCase();
   const macro_ = (sym) => `OMX_${K}_PARAM_${macro(sym)}`;
   const one = (type, sym) => (type === 'int' ? `(int)lrintf(values[${macro_(sym)}])` : `values[${macro_(sym)}]`);
@@ -894,7 +897,8 @@ export function generateInstance(d) {
     arrays: binding.filter((b) => b.extent).map((b) => ({ arg: b.arg, count: b.params.length, extent: b.extent })),
     renames: renames.map((b) => ({ arg: b.arg, rename: b.rename })),
     latency: lat('&c->inst'), refLatency: lat('&inst'),
-    keyed: face.keyed, keyPort: face.keyed ? macro(d.sidechain.symbol) : '', keySymbol: face.keyed ? d.sidechain.symbol : '',
+    keyed, keyPort: keyed ? macro(d.sidechain.symbol) : '', keySymbol: keyed ? d.sidechain.symbol : '',
+    runFn: keyed && !face.keyed ? 'run_keyed' : 'run', keyTail: keyed && !face.keyed ? ', NULL' : '',
     plan: oraclePlan(d.params, d.controls ?? []), held: heldOf(d), stretch: oracleStretch(face), steps: d.params.map((p) => cfloat(stepOf(p))).join(', '),
     chain: false,
     latencyChecks: latencyRows(d), measuresLatency: Boolean(d.latencyChecks),

@@ -518,6 +518,19 @@ static inline void omx_wobble_instance_run(OmxWobbleInstance *s, const float *${
     const keyed = parseFace(face('key'), 'wobble'), odd = parseFace(face('side'), 'wobble');
     expect(keyed.keyed === true && /nor a key first/.test(odd.error ?? ''), `a key first is a keyed face, another block first is refused (${keyed.error ?? keyed.keyed}; ${odd.error ?? 'ACCEPTED'})`);
   }
+  {
+    // a keyable face: an unkeyed run and a run_keyed beside it, the two key legs first, by name
+    const face = (legs) => `static inline int omx_wobble_instance_init(OmxWobbleInstance *s, float sr) { return 1; }
+static inline void omx_wobble_instance_resolve(OmxWobbleInstance *s, int bypass, float depth) { }
+static inline void omx_wobble_instance_run(OmxWobbleInstance *s, const float *in_l, const float *in_r, float *out_l, float *out_r, uint32_t n) { }
+static inline void omx_wobble_instance_run_keyed(OmxWobbleInstance *s, ${legs}, const float *in_l, const float *in_r, float *out_l, float *out_r, uint32_t n) { }
+#define OMX_WOBBLE_INSTANCE_LATENCY_FRAMES 0.0f`;
+    const keyable = parseFace(face('const float *key_l, const float *key_r'), 'wobble');
+    const one = parseFace(face('const float *key_l'), 'wobble'), named = parseFace(face('const float *side_l, const float *side_r'), 'wobble');
+    expect(keyable.keyable === true && keyable.keyed === false, `a run_keyed beside an unkeyed run is a keyable face (${keyable.error ?? `keyable ${keyable.keyable}, keyed ${keyable.keyed}`})`);
+    expect(/run_keyed takes/.test(one.error ?? '') && /run_keyed takes/.test(named.error ?? ''),
+      `a run_keyed of one key leg, or of legs not named key_l and key_r, is refused (${one.error ?? 'ACCEPTED'}; ${named.error ?? 'ACCEPTED'})`);
+  }
 
   // ---- 6. the port hints ---------------------------------------------------------------------
   delete process.env.OMX_CONTRACT_DIR; // the real tree reads the installed release
