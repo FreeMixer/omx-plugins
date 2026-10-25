@@ -14,9 +14,9 @@
  * `make panel-layout`, part of `make test`. It loads the declarations, so it needs omx-contract and
  * omx-dsp as `make test` does.
  */
-import { descriptorOf, meaningOfRole } from '../descriptor.mjs';
+import { descriptorOf } from '../descriptor.mjs';
 import { loadDecl, pluginDirs } from '../gen.mjs';
-import { panelLayout, unitToken } from '../omx-panel.mjs';
+import { meaningOfRole, panelLayout, unitToken } from '../omx-panel.mjs';
 import { contractUnits } from '../param-contract.mjs';
 
 let bad = 0, n = 0;
