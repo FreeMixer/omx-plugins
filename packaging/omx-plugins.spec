@@ -21,6 +21,8 @@ BuildRequires: omx-clap-core-devel >= 0.13.0
 BuildRequires: plugin-hostd-devel >= 0.7.0
 # the omx-contract command, first packaged in 2.15.0: the generators read the contract directory through it
 BuildRequires: omx-contract >= 3.1.0
+# the panel layout and the MOD GUI are omx-panel's, from a descriptor and the declared panel (tools/omx-panel.mjs)
+BuildRequires: omx-panel >= 0.2.0
 BuildRequires: clap-devel
 BuildRequires: lv2-devel
 # %%check: the generators and checks are Node scripts; the hosts that load the built plugins
