@@ -115,6 +115,11 @@ would test the re-arm, not the identity. The flag is read from omx-contract's JS
 `kernels.<kernel>.controls` lists each kernel's controls in declared order. The oracle's header comment names each held parameter, and the sabotage arm still moves it
 by one step. The other parameters move as before.
 
+A parameter the declaration names in `monitors` replaces the output while it is on (a detector's
+listen: the dynamic EQ's band listens, the compressor's key listen). The plan holds it at its default in
+the moving blocks and when it steps the other parameters, so what it would replace stays heard; it still
+gets its own section, each of its values over a burst and two tails, and the sabotage arm still moves it.
+
 ## A control the plugin does not expose
 
 A kernel release can add controls to a face a plugin already binds (omx-dsp 0.26.0's delay, gate and
