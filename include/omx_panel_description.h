@@ -18,7 +18,7 @@
  * The fingerprint is the lowercase hex SHA-256 of the canonical serialisation of the description:
  * the extension id, then one TAB-separated line per family, section, control, role (sorted by role,
  * then index), display and placement default (sorted by placement, then symbol), parameters named
- * by symbol, the fallback labels left out (tools/panel-description.mjs writes it).
+ * by symbol, the fallback labels left out (tools/gen.mjs writes it from omx-panel's layout).
  *
  * Plain C, no CLAP or LV2 header needed: a key or label is copied into the fixed-size fields of the
  * host's structure, whose sizes are CLAP's (CLAP_NAME_SIZE is 256, clap_id a uint32_t,

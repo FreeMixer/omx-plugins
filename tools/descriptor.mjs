@@ -11,11 +11,12 @@
  *   - viewOf(descriptor, extras): the declaration tools/gen.mjs resolves, from the descriptor and the
  *     extras its <stem>.decl.json keeps: what the descriptor has no word for.
  *
- * tools/panel-description.mjs lays a panel out from a descriptor of any origin; for ours it reads this one.
+ * omx-panel lays a panel out from a descriptor of any origin (tools/omx-panel.mjs); for ours it reads this one.
  */
 import { choicesOf, scaleOf } from './gen.mjs';
 import { clapFeatureField, clapFeatureValue } from './format-tables.mjs';
 import { installedContractDir, locateContract, ownersOf, packagingRange } from './omx-contract.mjs';
+import { panelLayout } from './omx-panel.mjs';
 
 /** The descriptor file of a plugin folder. */
 export const descriptorFile = (stem) => `${stem}.descriptor.json`;
@@ -175,6 +176,18 @@ export function descriptorOf(d) {
 
 /** The descriptor file's text: what `node tools/gen.mjs` writes and `--check` holds equal. */
 export const descriptorText = (d) => `${JSON.stringify(descriptorOf(d).descriptor, null, 2)}\n`;
+
+/**
+ * The description of declaration `d` (as tools/gen.mjs loads it): its descriptor laid out by omx-panel under its
+ * declared panel. Every table in published order, each parameter by its symbol and its declared id.
+ * Throws on what a host would refuse whole.
+ */
+export function panelDescription(d) {
+  // the units the faces serve beside it (the parameter contract, the declaration's): a ratio's descriptor word,
+  // ratio, has no param-contract unit in this release, so its role is judged on the unit the face serves
+  const { descriptor, extras } = descriptorOf({ ...d, descriptor: undefined });
+  return panelLayout(descriptor, { panel: d.panel, ns: `fx.${d.face ?? d.kernel}`, where: `plugins/${d.stem}`, ...extras });
+}
 
 /**
  * Whether declaration `decl` is whole: a base of variants (omx-eq) or a chain (omx-strip) keeps its own

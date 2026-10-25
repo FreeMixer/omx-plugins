@@ -14,12 +14,17 @@
 import { spawnSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
+import { pathToFileURL } from 'node:url';
 
 export const PANEL_DIR = process.env.OMX_PANEL_DIR || '/usr/share/omx-panel';
 const at = (...p) => join(PANEL_DIR, ...p);
 if (!existsSync(at('bin', 'omx-panel.mjs'))) {
   throw new Error(`omx-panel is not installed at ${PANEL_DIR}: install omx-panel from the channel, or set OMX_PANEL_DIR to its tree (BUILDING.md)`);
 }
+
+/** omx-panel's layout module: a descriptor, of any origin, laid out under a declared panel (its docs/panel-layout.md). */
+const layout = await import(pathToFileURL(at('tools', 'panel-description.mjs')).href);
+export const { DISPLAY_KINDS, DISPLAY_SOURCES, FAMILIES, INDEXED_ROLES, PLACEMENTS, WIDGETS, pagesOf, panelCanonical, panelFingerprint, panelLayout, servedWidget, unitToken, widgetOf } = layout;
 
 /** Runs `omx-panel <args>`: `{ status, stdout, stderr }`. */
 export function omxPanel(args, options = {}) {
