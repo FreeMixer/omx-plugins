@@ -12,7 +12,7 @@
  * `schema/`, `bin/omx-panel.mjs`).
  */
 import { spawnSync } from 'node:child_process';
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
@@ -25,6 +25,10 @@ if (!existsSync(at('bin', 'omx-panel.mjs'))) {
 /** omx-panel's layout module: a descriptor, of any origin, laid out under a declared panel (its docs/panel-layout.md). */
 const layout = await import(pathToFileURL(at('tools', 'panel-description.mjs')).href);
 export const { DISPLAY_KINDS, DISPLAY_SOURCES, FAMILIES, INDEXED_ROLES, PLACEMENTS, WIDGETS, pagesOf, panelCanonical, panelFingerprint, panelLayout, servedWidget, unitToken, widgetOf } = layout;
+
+/** omx-panel's declared lists (schema/panel.schema.json): the widgets a control is drawn with and the roles that repeat by
+ * index. A plugin's declaration schema references its `$defs` by this schema's `$id`. */
+export const PANEL_SCHEMA = JSON.parse(readFileSync(at('schema', 'panel.schema.json'), 'utf8'));
 
 /** Runs `omx-panel <args>`: `{ status, stdout, stderr }`. */
 export function omxPanel(args, options = {}) {

@@ -27,6 +27,7 @@ import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { descriptorFile, isWhole, viewOf } from './descriptor.mjs';
 import { compareVersions, declKernels, declParams, findName, kernelExists, locateContract, packagingRange, paramKernel } from './omx-contract.mjs';
+import { INDEXED_ROLES } from './omx-panel.mjs';
 import { validate } from './schema-validate.mjs';
 import { omxdspInclude, render } from './template.mjs';
 import { baseOf, expandVariant, variantStems } from './variants.mjs';
@@ -196,7 +197,7 @@ export function panelErrors(schema, decl, symbols) {
   if (!p) return errs;
   const families = schema.$defs.family.enum;
   const tables = schema.$defs.familyRoles.properties;
-  const indexed = new Set(schema.$defs.indexedRole.enum);
+  const indexed = new Set(INDEXED_ROLES);
   if (families.join() !== Object.keys(tables).join()) errs.push(`schema: $defs.family (${families.join(', ')}) and $defs.familyRoles (${Object.keys(tables).join(', ')}) are not one list`);
   const drawn = new Set();
   for (const s of p.sections ?? []) {
