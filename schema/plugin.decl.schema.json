@@ -625,7 +625,7 @@
       ],
       "additionalProperties": false,
       "title": "Panel",
-      "description": "The plugin's one panel, which every renderer draws: the MOD GUI (tools/modgui-gen.mjs reads it), the OpenMixer console and, later, a native window. A family, each control's role, each control's widget, and the sections in drawing order, each with the graph drawn over it. Every plugin declares one, and it draws every parameter; the wizard drafts one section of every parameter, its family from the kernel's.",
+      "description": "The plugin's one panel, which every renderer draws: the MOD GUI (omx-panel writes it), the OpenMixer console and, later, a native window. A family, each control's role, each control's widget, and the sections in drawing order, each with the graph drawn over it. Every plugin declares one, and it draws every parameter; the wizard drafts one section of every parameter, its family from the kernel's.",
       "properties": {
         "family": {
           "$ref": "#/$defs/family"
@@ -838,25 +838,12 @@
       }
     },
     "indexedRole": {
-      "enum": [
-        "band_type",
-        "band_freq",
-        "band_gain",
-        "band_q",
-        "band_on"
-      ],
-      "title": "Indexed role",
-      "description": "The roles that repeat by index, one parameter per band: the only roles that may name a list of symbols."
+      "$ref": "https://github.com/FreeMixer/omx-panel/schema/panel.schema.json#/$defs/indexedRole",
+      "description": "The roles that repeat by index, one parameter per band: the only roles that may name a list of symbols. The list is omx-panel's (schema/panel.schema.json), the one place it is written."
     },
     "widget": {
-      "enum": [
-        "knob",
-        "fader",
-        "switch",
-        "selector"
-      ],
-      "title": "Widget",
-      "description": "The shared widgets a control is drawn with, by the names the console reads (its `auto` is a control left out of `widgets`): a knob or a fader for a travel, a switch for a toggle, a selector for an integer travel or labelled values. The schema, tools/modgui-gen.mjs and the console read this one list; a new one is added here once, and in each renderer, for every plugin."
+      "$ref": "https://github.com/FreeMixer/omx-panel/schema/panel.schema.json#/$defs/widget",
+      "description": "The shared widgets a control is drawn with, by the names the console reads (its `auto` is a control left out of `widgets`). The list is omx-panel's (schema/panel.schema.json), the one place it is written, and every renderer reads it."
     },
     "graph": {
       "enum": [
