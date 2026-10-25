@@ -17,7 +17,7 @@ drawn from one declaration: its CLAP parameters, its LV2 ports and its MOD GUI c
 | Plugin | CLAP id | LV2 URI | What it does |
 |---|---|---|---|
 | **omx chorus** | `org.openmixer.chorus` | `urn:openmixer:chorus` | The console's chorus: up to four voices read one modulated delay line, the right leg's sweep offset by the spread, mixed with the dry signal. |
-| **omx comp** | `org.openmixer.comp` | `urn:openmixer:comp` | The console's compressor: threshold, ratio and knee set how hard it holds the level down, attack and release how fast, with makeup gain and a dry/wet mix. Kind picks the RMS detector (Compressor) or the peak detector (Limiter), and detector oversampling can run the control path at 4x; detector topology has it hear the input (feedforward) or its own output (feedback). The DSP is omx-dsp's <omxdsp/fx/omx_comp_instance.h>, the console's own compressor. |
+| **omx comp** | `org.openmixer.comp` | `urn:openmixer:comp` | The console's compressor: threshold, ratio and knee set how hard it holds the level down, attack and release how fast, with makeup gain and a dry/wet mix. Kind picks the RMS detector (Compressor) or the peak detector (Limiter), and detector oversampling can run the control path at 4x; detector topology has it hear the input (feedforward) or its own output (feedback). Its detector can listen to a key routed to its sidechain input instead, through a high-pass, a low-pass and a tilt, on the louder leg, the mid or the side, with a hold; key listen puts what the detector hears on the output, and duck holds the reduction to a set depth. The DSP is omx-dsp's <omxdsp/fx/omx_comp_instance.h>, the console's own compressor. |
 | **omx deesser** | `org.openmixer.deesser` | `urn:openmixer:deesser` | The console's de-esser: a detector on a band around the sibilance drives the compressor's gain computer, and the reduction lands on that band alone or on the whole signal. |
 | **omx delay** | `org.openmixer.delay` | `urn:openmixer:delay` | Stereo delay up to 2 s: feedback through a tone filter that darkens each repeat, ping-pong, wet/dry mix. Zero latency, real-time safe, 44.1 to 192 kHz. |
 | **omx drive** | `org.openmixer.drive` | `urn:openmixer:drive` | The console's drive: one waveshaper (soft, tape, tube or exciter) run inside the console's 4x oversampler, on the full band, the lows, the highs or a tilt, with drive, character, wet/dry mix and trim. Stereo, real-time safe, 44.1 to 192 kHz. |
@@ -66,6 +66,15 @@ Plus the host's bypass.
 | Kind | Compressor / Limiter | Compressor |
 | Detector Oversampling | Auto / Off / 4x | Auto |
 | Detector Topology | Feedforward / Feedback | Feedforward |
+| Key Source | Self / Sidechain | Self |
+| Key HP | 0 to 2000 Hz, whole steps | 0 Hz |
+| Key LP | 0 to 20000 Hz, whole steps | 0 Hz |
+| Key Tilt | -6 to 6 dB/oct | 0 dB/oct |
+| Key Listen | off / on | off |
+| Hold | 0 to 2000 ms, whole steps | 0 ms |
+| Detect Link | Linked / Mid / Side / Max | Linked |
+| Duck | off / on | off |
+| Duck Range | -40 to 0 dB, whole steps | -12 dB |
 
 Plus the host's bypass.
 

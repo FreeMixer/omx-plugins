@@ -57,6 +57,47 @@
       "unit": "",
       "value": 0,
       "label": "Feedforward"
+    },
+    {
+      "symbol": "keyHpHz",
+      "unit": "Hz",
+      "value": 0
+    },
+    {
+      "symbol": "keyLpHz",
+      "unit": "Hz",
+      "value": 0
+    },
+    {
+      "symbol": "keyTiltDb",
+      "unit": "dB/oct",
+      "value": 0
+    },
+    {
+      "symbol": "keyListen",
+      "unit": "",
+      "value": 0
+    },
+    {
+      "symbol": "holdMs",
+      "unit": "ms",
+      "value": 0
+    },
+    {
+      "symbol": "detectLink",
+      "unit": "",
+      "value": 0,
+      "label": "Linked"
+    },
+    {
+      "symbol": "duck",
+      "unit": "",
+      "value": 0
+    },
+    {
+      "symbol": "rangeDb",
+      "unit": "dB",
+      "value": -12
     }
   ],
   "created": "2026-10-17T00:00:00Z",

@@ -15,16 +15,9 @@
       ]
     }
   },
-  "fixed": {
-    "keySource": "default",
-    "keyHpHz": "default",
-    "keyLpHz": "default",
-    "keyTiltDb": "default",
-    "keyListen": "default",
-    "holdMs": "default",
-    "detectLink": "default",
-    "duck": "default",
-    "rangeDb": "default"
+  "sidechain": {
+    "symbol": "key",
+    "name": "Key (Sidechain)"
   },
   "portHints": {
     "thresholdDb": {
@@ -85,6 +78,76 @@
         "1 Feedback"
       ]
     },
+    "key": {
+      "props": [
+        "lv2:connectionOptional",
+        "lv2:isSideChain"
+      ]
+    },
+    "ratio": {
+      "unit": "<urn:openmixer:unit#ratio>"
+    },
+    "keySource": {
+      "props": [
+        "lv2:enumeration",
+        "lv2:integer"
+      ],
+      "points": [
+        "0 Self",
+        "1 Sidechain"
+      ]
+    },
+    "keyHpHz": {
+      "props": [
+        "lv2:integer",
+        "pprops:logarithmic"
+      ],
+      "unit": "units:hz"
+    },
+    "keyLpHz": {
+      "props": [
+        "lv2:integer",
+        "pprops:logarithmic"
+      ],
+      "unit": "units:hz"
+    },
+    "keyTiltDb": {
+      "unit": "<urn:openmixer:unit#dBoct>"
+    },
+    "keyListen": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "holdMs": {
+      "props": [
+        "lv2:integer"
+      ],
+      "unit": "units:ms"
+    },
+    "detectLink": {
+      "props": [
+        "lv2:enumeration",
+        "lv2:integer"
+      ],
+      "points": [
+        "0 Linked",
+        "1 Mid",
+        "2 Side",
+        "3 Max"
+      ]
+    },
+    "duck": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "rangeDb": {
+      "props": [
+        "lv2:integer"
+      ],
+      "unit": "units:db"
+    },
     "enabled": {
       "props": [
         "lv2:toggled"
@@ -103,6 +166,9 @@
     "streams-from-disk": false,
     "opens-sockets": false
   },
+  "oracles": [
+    "comp-key"
+  ],
   "meters": [
     {
       "id": "compGr",
@@ -123,6 +189,12 @@
       "source": "output",
       "min": -60,
       "max": 6
+    },
+    {
+      "id": "compKey",
+      "kind": "level",
+      "read": "key_level_db",
+      "readout": "KEY_LEVEL_DB"
     }
   ],
   "panel": {
@@ -146,11 +218,32 @@
           "kneeDb",
           "attackMs",
           "releaseMs",
+          "holdMs",
           "makeupDb",
           "mixPct",
           "kind",
           "detectorOversampling",
           "detectorTopology"
+        ]
+      },
+      {
+        "key": "key",
+        "label": "Key",
+        "controls": [
+          "keySource",
+          "keyHpHz",
+          "keyLpHz",
+          "keyTiltDb",
+          "detectLink",
+          "keyListen"
+        ]
+      },
+      {
+        "key": "duck",
+        "label": "Duck",
+        "controls": [
+          "duck",
+          "rangeDb"
         ]
       }
     ]
