@@ -51,18 +51,18 @@ static inline uint32_t omx_{{kernel}}_core_latency(const Omx{{Kernel}}Core *c) {
   return (uint32_t)lrintf((float)({{latency}}));
 }
 
-{{#meterGr}}/** Gain-reduction meter `i`'s reading (the declaration's `meters`, in order): the kernel's own, after the
+{{#meterRead}}/** {{^meterKernelLevel}}Gain-reduction meter{{/meterKernelLevel}}{{#meterKernelLevel}}Kernel-read meter (a gain reduction, or a level the kernel reads){{/meterKernelLevel}} `i`'s reading (the declaration's `meters`, in order): the kernel's own, after the
  * last block. */
 static inline float omx_{{kernel}}_core_meter(const Omx{{Kernel}}Core *c, uint32_t i) {
   switch (i) {
-{{#meters}}{{#isGr}}  case {{meterIndex}}:
-    return c->inst.{{meterField}};
-{{/isGr}}{{/meters}}  default:
+{{#meters}}{{#isRead}}  case {{meterIndex}}:
+    return {{meterReadCore}};
+{{/isRead}}{{/meters}}  default:
     return 0.0f;
   }
 }
 
-{{/meterGr}}{{^keyed}}/** One block, stereo; the outputs may alias the inputs. */
+{{/meterRead}}{{^keyed}}/** One block, stereo; the outputs may alias the inputs. */
 static inline void omx_{{kernel}}_core_run(Omx{{Kernel}}Core *c, const float *in_l, const float *in_r, float *out_l,
                                          float *out_r, uint32_t frames) {
   omx_{{face}}_instance_run(&c->inst, in_l, in_r, out_l, out_r, frames);

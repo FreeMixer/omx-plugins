@@ -15,7 +15,9 @@
 {{#metered}} * clap.meters/1: the declaration's meters, every one coherent: after each block the face publishes all
  * their values at once through include/omx_meter_ring.h, and a read copies one block's (docs/meters.md).
 {{#meterGr}} * A gain reduction is the kernel's own reading after the block, 0 while bypassed.
-{{/meterGr}}{{#meterIn}} * An input level is the block's peak at the inputs, in dBFS, measured here before the kernel runs (the
+{{/meterGr}}{{#meterKernelLevel}} * A level the kernel reads (its detector's) is its own reading after the block, the display minimum while
+ * bypassed.
+{{/meterKernelLevel}}{{#meterIn}} * An input level is the block's peak at the inputs, in dBFS, measured here before the kernel runs (the
  * kernel keeps no level of its own).
 {{/meterIn}}{{#meterOut}} * An output level is the block's peak at the outputs, in dBFS, measured here after the kernel ran.
 {{/meterOut}}{{/metered}}{{#keyed}} *
@@ -228,10 +230,11 @@ static clap_process_status g_process(const clap_plugin_t *p, const clap_process_
   omx_{{kernel}}_core_run(&g->core, key, ai->data32[0], ai->data32[1], ao->data32[0], ao->data32[1], pr->frames_count);
 {{/keyed}}{{^keyed}}  omx_{{kernel}}_core_run(&g->core, ai->data32[0], ai->data32[1], ao->data32[0], ao->data32[1], pr->frames_count);
 {{/keyed}}  g_publish(g);
-{{#metered}}{{#meterGr}}  /* The kernel's readings of this block; a bypassed kernel's state is stale, and reads 0. */
+{{#metered}}{{#meterRead}}  /* The kernel's readings of this block; a bypassed kernel's state is stale, and reads 0{{#meterKernelLevel}} (a level the
+   * kernel reads, its display minimum){{/meterKernelLevel}}. */
   const int bypassed = g->values[G_BYPASS] > 0.5f;
-{{/meterGr}}{{#meters}}{{#isGr}}  mv[{{meterOffset}}] = bypassed ? 0.0 : (double)omx_{{kernel}}_core_meter(&g->core, {{meterIndex}}u);
-{{/isGr}}{{#isOut}}  mv[{{meterOffset}}] = omx_meter_level_db(ao->data32[0], pr->frames_count, G_METER_INFO[{{meterIndex}}].min);
+{{/meterRead}}{{#meters}}{{#isRead}}  mv[{{meterOffset}}] = bypassed ? {{meterBypass}} : (double)omx_{{kernel}}_core_meter(&g->core, {{meterIndex}}u);
+{{/isRead}}{{#isOut}}  mv[{{meterOffset}}] = omx_meter_level_db(ao->data32[0], pr->frames_count, G_METER_INFO[{{meterIndex}}].min);
   mv[{{meterRight}}] = omx_meter_level_db(ao->data32[1], pr->frames_count, G_METER_INFO[{{meterIndex}}].min);
 {{/isOut}}{{/meters}}  omx_meter_ring_publish(&g->meters, mv, G_METER_VALUES);
 {{/metered}}  /* A parameter that moves the kernel's latency (as the pitch shifter's mix crossing 100 % does):

@@ -912,12 +912,17 @@
             "gain_reduction",
             "level"
           ],
-          "description": "`gain_reduction`: dB with CLAP's sign, 0 none, negative a reduction; one channel (one detector drives every leg), the kernel's reading at `field`; 0 while bypassed. `level`: the stereo pair's peak over the block in dBFS at the plugin's `source`, two channels (left, right), measured by the face because the kernel keeps no level; floored at `min`."
+          "description": "`gain_reduction`: dB with CLAP's sign, 0 none, negative a reduction; one channel (one detector drives every leg), the kernel's reading at `field` or through `read`; 0 while bypassed. `level`: the stereo pair's peak over the block in dBFS at the plugin's `source`, two channels (left, right), measured by the face because the kernel keeps no level; floored at `min`. Or a level the kernel reads itself (a detector's): one channel through `read`, over the range of its `readout`, the range's minimum while bypassed."
         },
         "field": {
           "type": "string",
           "pattern": "^[a-z_][a-z0-9_]*(\\.[a-z_][a-z0-9_]*)*$",
           "description": "Where the kernel's reading is in its instance face's state, a member path of the instance (`state.band.gr_min_db`): the face reads it after each block and computes nothing of its own."
+        },
+        "read": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*(\\([0-9]+\\))?$",
+          "description": "Instead of `field`: the instance face's reading function, `omx_<kernel>_instance_<read>`, called on the instance after each block, with its band index when one is given (`band_gr_db(0)`): the kernel's readout as omx-dsp computes it, nothing computed here."
         },
         "floor": {
           "type": "string",
@@ -927,7 +932,7 @@
         "readout": {
           "type": "string",
           "pattern": "^[A-Z][A-Z0-9_]*$",
-          "description": "A gain reduction's, instead of `floor`: the kernel's readout in omx-contract (`GAIN_REDUCTION_DB`), whose declared range is the meter's display range."
+          "description": "A gain reduction's, instead of `floor`, and a level the kernel reads: the kernel's readout in omx-contract (`GAIN_REDUCTION_DB`), whose declared range is the meter's display range."
         },
         "source": {
           "enum": [
@@ -955,18 +960,33 @@
             }
           },
           "then": {
-            "required": [
-              "field"
-            ],
-            "oneOf": [
+            "allOf": [
               {
-                "required": [
-                  "floor"
+                "oneOf": [
+                  {
+                    "required": [
+                      "field"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "read"
+                    ]
+                  }
                 ]
               },
               {
-                "required": [
-                  "readout"
+                "oneOf": [
+                  {
+                    "required": [
+                      "floor"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "readout"
+                    ]
+                  }
                 ]
               }
             ],
@@ -1000,30 +1020,74 @@
             }
           },
           "then": {
-            "required": [
-              "source",
-              "min",
-              "max"
-            ],
-            "not": {
-              "anyOf": [
-                {
-                  "required": [
-                    "field"
-                  ]
-                },
-                {
-                  "required": [
-                    "floor"
-                  ]
-                },
-                {
-                  "required": [
-                    "readout"
+            "oneOf": [
+              {
+                "required": [
+                  "source",
+                  "min",
+                  "max"
+                ],
+                "not": {
+                  "anyOf": [
+                    {
+                      "required": [
+                        "field"
+                      ]
+                    },
+                    {
+                      "required": [
+                        "floor"
+                      ]
+                    },
+                    {
+                      "required": [
+                        "readout"
+                      ]
+                    },
+                    {
+                      "required": [
+                        "read"
+                      ]
+                    }
                   ]
                 }
-              ]
-            }
+              },
+              {
+                "required": [
+                  "read",
+                  "readout"
+                ],
+                "not": {
+                  "anyOf": [
+                    {
+                      "required": [
+                        "field"
+                      ]
+                    },
+                    {
+                      "required": [
+                        "floor"
+                      ]
+                    },
+                    {
+                      "required": [
+                        "source"
+                      ]
+                    },
+                    {
+                      "required": [
+                        "min"
+                      ]
+                    },
+                    {
+                      "required": [
+                        "max"
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
           }
         }
       ]
