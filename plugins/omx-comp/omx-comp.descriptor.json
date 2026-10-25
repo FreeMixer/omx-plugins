@@ -11,7 +11,7 @@
     "name": "omx comp",
     "vendor": "openmixer",
     "version": "0.16.0",
-    "doc": "The console's compressor: threshold, ratio and knee set how hard it holds the level down, attack and release how fast, with makeup gain and a dry/wet mix. Kind picks the RMS detector (Compressor) or the peak detector (Limiter), and detector oversampling can run the control path at 4x; detector topology has it hear the input (feedforward) or its own output (feedback). The DSP is omx-dsp's <omxdsp/fx/omx_comp_instance.h>, the console's own compressor.",
+    "doc": "The console's compressor: threshold, ratio and knee set how hard it holds the level down, attack and release how fast, with makeup gain and a dry/wet mix. Kind picks the RMS detector (Compressor) or the peak detector (Limiter), and detector oversampling can run the control path at 4x; detector topology has it hear the input (feedforward) or its own output (feedback). Its detector can listen to a key routed to its sidechain input instead, through a high-pass, a low-pass and a tilt, on the louder leg, the mid or the side, with a hold; key listen puts what the detector hears on the output, and duck holds the reduction to a set depth. The DSP is omx-dsp's <omxdsp/fx/omx_comp_instance.h>, the console's own compressor.",
     "features": [
       "audio-effect"
     ]
@@ -281,6 +281,224 @@
           "at": "omx-dsp@0.26.0"
         }
       }
+    },
+    {
+      "id": 10,
+      "symbol": "keySource",
+      "name": "Key Source",
+      "kind": "choice",
+      "ids": [
+        "0",
+        "1"
+      ],
+      "labels": [
+        "Self",
+        "Sidechain"
+      ],
+      "values": [
+        0,
+        1
+      ],
+      "default": "0",
+      "group": [
+        "Key"
+      ],
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/comp.json#COMP_KEY_SOURCES",
+          "at": "omx-dsp@0.26.0"
+        }
+      }
+    },
+    {
+      "id": 11,
+      "symbol": "keyHpHz",
+      "name": "Key HP",
+      "kind": "travel",
+      "travel": {
+        "min": 0,
+        "max": 2000,
+        "step": 1,
+        "unit": "Hz",
+        "default": 0,
+        "scale": "stepped"
+      },
+      "group": [
+        "Key"
+      ],
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/comp.json#COMP_KEY_HP_HZ_RANGE",
+          "at": "omx-dsp@0.26.0"
+        }
+      }
+    },
+    {
+      "id": 12,
+      "symbol": "keyLpHz",
+      "name": "Key LP",
+      "kind": "travel",
+      "travel": {
+        "min": 0,
+        "max": 20000,
+        "step": 1,
+        "unit": "Hz",
+        "default": 0,
+        "scale": "stepped"
+      },
+      "group": [
+        "Key"
+      ],
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/comp.json#COMP_KEY_LP_HZ_RANGE",
+          "at": "omx-dsp@0.26.0"
+        }
+      }
+    },
+    {
+      "id": 13,
+      "symbol": "keyTiltDb",
+      "name": "Key Tilt",
+      "kind": "travel",
+      "travel": {
+        "min": -6,
+        "max": 6,
+        "step": 0,
+        "unit": "dB/oct",
+        "default": 0,
+        "scale": "linear"
+      },
+      "group": [
+        "Key"
+      ],
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/comp.json#COMP_KEY_TILT_DB_RANGE",
+          "at": "omx-dsp@0.26.0"
+        }
+      }
+    },
+    {
+      "id": 14,
+      "symbol": "keyListen",
+      "name": "Key Listen",
+      "kind": "toggle",
+      "default": false,
+      "group": [
+        "Key"
+      ],
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/comp.json#COMP_KEY_LISTENS",
+          "at": "omx-dsp@0.26.0"
+        }
+      }
+    },
+    {
+      "id": 15,
+      "symbol": "holdMs",
+      "name": "Hold",
+      "kind": "travel",
+      "travel": {
+        "min": 0,
+        "max": 2000,
+        "step": 1,
+        "unit": "ms",
+        "default": 0,
+        "scale": "stepped"
+      },
+      "group": [
+        "Comp"
+      ],
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/comp.json#COMP_HOLD_MS_RANGE",
+          "at": "omx-dsp@0.26.0"
+        }
+      }
+    },
+    {
+      "id": 16,
+      "symbol": "detectLink",
+      "name": "Detect Link",
+      "kind": "choice",
+      "ids": [
+        "0",
+        "1",
+        "2",
+        "3"
+      ],
+      "labels": [
+        "Linked",
+        "Mid",
+        "Side",
+        "Max"
+      ],
+      "values": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "default": "0",
+      "group": [
+        "Key"
+      ],
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/comp.json#COMP_DETECT_LINKS",
+          "at": "omx-dsp@0.26.0"
+        }
+      }
+    },
+    {
+      "id": 17,
+      "symbol": "duck",
+      "name": "Duck",
+      "kind": "toggle",
+      "default": false,
+      "group": [
+        "Duck"
+      ],
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/comp.json#COMP_DUCKS",
+          "at": "omx-dsp@0.26.0"
+        }
+      }
+    },
+    {
+      "id": 18,
+      "symbol": "rangeDb",
+      "name": "Duck Range",
+      "kind": "travel",
+      "travel": {
+        "min": -40,
+        "max": 0,
+        "step": 1,
+        "unit": "dB",
+        "default": -12,
+        "scale": "stepped"
+      },
+      "group": [
+        "Duck"
+      ],
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/comp.json#COMP_RANGE_DB_RANGE",
+          "at": "omx-dsp@0.26.0"
+        }
+      }
     }
   ],
   "ports": [
@@ -292,6 +510,15 @@
       "role": "main",
       "channels": 2,
       "layout": "stereo"
+    },
+    {
+      "id": 1,
+      "name": "key",
+      "kind": "audio",
+      "direction": "in",
+      "role": "sidechain",
+      "channels": 1,
+      "layout": "mono"
     },
     {
       "id": 0,

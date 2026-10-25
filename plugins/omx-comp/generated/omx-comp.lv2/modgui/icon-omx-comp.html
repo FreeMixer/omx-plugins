@@ -1,4 +1,4 @@
-<div class="omx-pedal{{{cns}}} omx-family-dynamics" style="width:624px;height:242px">
+<div class="omx-pedal{{{cns}}} omx-family-dynamics" style="width:624px;height:458px">
     <!-- SPDX-License-Identifier: GPL-3.0-or-later -->
     <!-- Copyright (C) 2026 Pau Aliagas <linuxnow@gmail.com> -->
     <!-- GENERATED — DO NOT EDIT BY HAND. Produced by tools/modgui-gen.mjs from -->
@@ -35,15 +35,19 @@
                 <div class="omx-knob-image" mod-role="input-control-port" mod-port-symbol="releaseMs"></div>
                 <span class="omx-control-title">Release</span>
             </div>
-            <div class="omx-control omx-knob" style="left:368px;top:18px" title="Makeup" data-symbol="makeupDb" data-min="0" data-max="24" data-default="0">
+            <div class="omx-control omx-knob" style="left:368px;top:18px" title="Hold" data-symbol="holdMs" data-min="0" data-max="2000" data-default="0">
+                <div class="omx-knob-image" mod-role="input-control-port" mod-port-symbol="holdMs"></div>
+                <span class="omx-control-title">Hold</span>
+            </div>
+            <div class="omx-control omx-knob" style="left:440px;top:18px" title="Makeup" data-symbol="makeupDb" data-min="0" data-max="24" data-default="0">
                 <div class="omx-knob-image" mod-role="input-control-port" mod-port-symbol="makeupDb"></div>
                 <span class="omx-control-title">Makeup</span>
             </div>
-            <div class="omx-control omx-knob" style="left:440px;top:18px" title="Mix" data-symbol="mixPct" data-min="0" data-max="100" data-default="100">
+            <div class="omx-control omx-knob" style="left:512px;top:18px" title="Mix" data-symbol="mixPct" data-min="0" data-max="100" data-default="100">
                 <div class="omx-knob-image" mod-role="input-control-port" mod-port-symbol="mixPct"></div>
                 <span class="omx-control-title">Mix</span>
             </div>
-            <div class="omx-control omx-selector" style="left:512px;top:18px" title="Kind" data-symbol="kind" data-min="0" data-max="1" data-default="0">
+            <div class="omx-control omx-selector" style="left:8px;top:94px" title="Kind" data-symbol="kind" data-min="0" data-max="1" data-default="0">
                 <div class="omx-selector-image" mod-role="input-control-port" mod-port-symbol="kind" mod-widget="custom-select">
                     <div class="omx-selector-value" mod-role="input-control-value" mod-port-symbol="kind"></div>
                     <div class="omx-selector-list">
@@ -53,7 +57,7 @@
                 </div>
                 <span class="omx-control-title">Kind</span>
             </div>
-            <div class="omx-control omx-selector" style="left:8px;top:94px" title="Detector Oversampling" data-symbol="detectorOversampling" data-min="0" data-max="2" data-default="0">
+            <div class="omx-control omx-selector" style="left:80px;top:94px" title="Detector Oversampling" data-symbol="detectorOversampling" data-min="0" data-max="2" data-default="0">
                 <div class="omx-selector-image" mod-role="input-control-port" mod-port-symbol="detectorOversampling" mod-widget="custom-select">
                     <div class="omx-selector-value" mod-role="input-control-value" mod-port-symbol="detectorOversampling"></div>
                     <div class="omx-selector-list">
@@ -64,7 +68,7 @@
                 </div>
                 <span class="omx-control-title">Detector Oversampling</span>
             </div>
-            <div class="omx-control omx-selector" style="left:80px;top:94px" title="Detector Topology" data-symbol="detectorTopology" data-min="0" data-max="1" data-default="0">
+            <div class="omx-control omx-selector" style="left:152px;top:94px" title="Detector Topology" data-symbol="detectorTopology" data-min="0" data-max="1" data-default="0">
                 <div class="omx-selector-image" mod-role="input-control-port" mod-port-symbol="detectorTopology" mod-widget="custom-select">
                     <div class="omx-selector-value" mod-role="input-control-value" mod-port-symbol="detectorTopology"></div>
                     <div class="omx-selector-list">
@@ -73,6 +77,58 @@
                     </div>
                 </div>
                 <span class="omx-control-title">Detector Topology</span>
+            </div>
+        </div>
+        <div class="omx-section" data-section="key" style="left:16px;top:236px;width:592px;height:98px">
+            <h2 class="omx-section-title">Key</h2>
+            <div class="omx-control omx-selector" style="left:8px;top:18px" title="Key Source" data-symbol="keySource" data-min="0" data-max="1" data-default="0">
+                <div class="omx-selector-image" mod-role="input-control-port" mod-port-symbol="keySource" mod-widget="custom-select">
+                    <div class="omx-selector-value" mod-role="input-control-value" mod-port-symbol="keySource"></div>
+                    <div class="omx-selector-list">
+                    <div class="omx-selector-option" mod-role="enumeration-option" mod-port-value="0">Self</div>
+                    <div class="omx-selector-option" mod-role="enumeration-option" mod-port-value="1">Sidechain</div>
+                    </div>
+                </div>
+                <span class="omx-control-title">Key Source</span>
+            </div>
+            <div class="omx-control omx-knob" style="left:80px;top:18px" title="Key HP" data-symbol="keyHpHz" data-min="0" data-max="2000" data-default="0">
+                <div class="omx-knob-image" mod-role="input-control-port" mod-port-symbol="keyHpHz"></div>
+                <span class="omx-control-title">Key HP</span>
+            </div>
+            <div class="omx-control omx-knob" style="left:152px;top:18px" title="Key LP" data-symbol="keyLpHz" data-min="0" data-max="20000" data-default="0">
+                <div class="omx-knob-image" mod-role="input-control-port" mod-port-symbol="keyLpHz"></div>
+                <span class="omx-control-title">Key LP</span>
+            </div>
+            <div class="omx-control omx-knob" style="left:224px;top:18px" title="Key Tilt" data-symbol="keyTiltDb" data-min="-6" data-max="6" data-default="0">
+                <div class="omx-knob-image" mod-role="input-control-port" mod-port-symbol="keyTiltDb"></div>
+                <span class="omx-control-title">Key Tilt</span>
+            </div>
+            <div class="omx-control omx-selector" style="left:296px;top:18px" title="Detect Link" data-symbol="detectLink" data-min="0" data-max="3" data-default="0">
+                <div class="omx-selector-image" mod-role="input-control-port" mod-port-symbol="detectLink" mod-widget="custom-select">
+                    <div class="omx-selector-value" mod-role="input-control-value" mod-port-symbol="detectLink"></div>
+                    <div class="omx-selector-list">
+                    <div class="omx-selector-option" mod-role="enumeration-option" mod-port-value="0">Linked</div>
+                    <div class="omx-selector-option" mod-role="enumeration-option" mod-port-value="1">Mid</div>
+                    <div class="omx-selector-option" mod-role="enumeration-option" mod-port-value="2">Side</div>
+                    <div class="omx-selector-option" mod-role="enumeration-option" mod-port-value="3">Max</div>
+                    </div>
+                </div>
+                <span class="omx-control-title">Detect Link</span>
+            </div>
+            <div class="omx-control omx-switch" style="left:368px;top:18px" title="Key Listen" data-symbol="keyListen" data-min="0" data-max="1" data-default="0">
+                <div class="omx-switch-image" mod-role="input-control-port" mod-port-symbol="keyListen" mod-widget="switch"></div>
+                <span class="omx-control-title">Key Listen</span>
+            </div>
+        </div>
+        <div class="omx-section" data-section="duck" style="left:16px;top:344px;width:592px;height:98px">
+            <h2 class="omx-section-title">Duck</h2>
+            <div class="omx-control omx-switch" style="left:8px;top:18px" title="Duck" data-symbol="duck" data-min="0" data-max="1" data-default="0">
+                <div class="omx-switch-image" mod-role="input-control-port" mod-port-symbol="duck" mod-widget="switch"></div>
+                <span class="omx-control-title">Duck</span>
+            </div>
+            <div class="omx-control omx-knob" style="left:80px;top:18px" title="Duck Range" data-symbol="rangeDb" data-min="-40" data-max="0" data-default="-12">
+                <div class="omx-knob-image" mod-role="input-control-port" mod-port-symbol="rangeDb"></div>
+                <span class="omx-control-title">Duck Range</span>
             </div>
         </div>
     <div class="mod-pedal-input">

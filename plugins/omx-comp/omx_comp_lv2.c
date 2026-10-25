@@ -10,6 +10,8 @@
  * Ports: in_l, in_r, out_l, out_r, then the declared parameters in order, then `enabled`
  * (lv2:enabled; 0 is the bypass) and `latency`. A parameter port the host left unconnected reads
  * its declared default.
+ * The sidechain `key` (lv2:isSideChain, connectionOptional) follows in_l and in_r; an
+ * unconnected key is the kernel's own detector.
  */
 #include <stdbool.h>
 #include <stdint.h>
@@ -26,6 +28,7 @@
 typedef struct {
   OmxCompCore core;
   const float *in_l, *in_r;
+  const float *key;
   float *out_l, *out_r;
   const float *param[OMX_COMP_PARAM_COUNT];
   const float *enabled;
@@ -49,6 +52,7 @@ static void connect_port(LV2_Handle h, uint32_t port, void *data) {
   switch (port) {
   case OMX_COMP_LV2_PORT_IN_L: s->in_l = (const float *)data; return;
   case OMX_COMP_LV2_PORT_IN_R: s->in_r = (const float *)data; return;
+  case OMX_COMP_LV2_PORT_KEY: s->key = (const float *)data; return;
   case OMX_COMP_LV2_PORT_OUT_L: s->out_l = (float *)data; return;
   case OMX_COMP_LV2_PORT_OUT_R: s->out_r = (float *)data; return;
   case OMX_COMP_LV2_PORT_ENABLED: s->enabled = (const float *)data; return;
@@ -71,7 +75,7 @@ static void run(LV2_Handle h, uint32_t frames) {
   for (uint32_t i = 0; i < OMX_COMP_PARAM_COUNT; ++i) values[i] = value(s, i);
   omx_comp_core_resolve(&s->core, values, bypass);
   if (s->latency) *s->latency = (float)omx_comp_core_latency(&s->core);
-  omx_comp_core_run(&s->core, s->in_l, s->in_r, s->out_l, s->out_r, frames);
+  omx_comp_core_run(&s->core, s->key, s->in_l, s->in_r, s->out_l, s->out_r, frames);
 }
 
 static void cleanup(LV2_Handle h) { free(h); }

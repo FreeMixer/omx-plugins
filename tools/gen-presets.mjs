@@ -6,7 +6,7 @@
  * in the console's preset format (org.openmixer.preset/1). Every preset names the values it changes;
  * the rest come up at the plugin's declared defaults, so each file carries the whole plugin. A
  * choice is written by its label ('Tube') and the file records both the value and the label.
- * Parameters a preset must not decide are left out: the gate's key source, and the mix of the
+ * Parameters a preset must not decide are left out: the gate's and the compressor's key source, and the mix of the
  * reverb and the delay, which belong to the place the plugin sits in.
  *
  * Usage: `node tools/gen-presets.mjs [--check]` — `--check` writes nothing and fails on a stale,
@@ -22,7 +22,7 @@ import { FORMAT, PRESET_DIR, ROOT, plugins, presetFiles, presetsTtl } from './pr
 /** The date every factory file carries: fixed, so regenerating changes nothing. */
 const WHEN = '2026-10-17T00:00:00Z';
 /** Parameters a preset leaves to the host: they depend on where the plugin sits. */
-const LEFT_OUT = { 'org.openmixer.keyed-gate': ['key_external'], 'org.openmixer.reverb': ['mix'], 'org.openmixer.delay': ['mix'] };
+const LEFT_OUT = { 'org.openmixer.keyed-gate': ['key_external'], 'org.openmixer.comp': ['keySource'], 'org.openmixer.reverb': ['mix'], 'org.openmixer.delay': ['mix'] };
 
 /** The slots of an EQ: type, freq, gain, q and on of band n, named as the plugin names them. */
 const eqBands = (list, style = 'eq8') => Object.fromEntries(list.flatMap(([type, freq, gain, q], i) => {
