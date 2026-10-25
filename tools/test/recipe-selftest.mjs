@@ -671,6 +671,27 @@ static inline void omx_wobble_instance_run_keyed(OmxWobbleInstance *s, ${legs}, 
     fakeContract(moving, { wobble: WOBBLE }, wobbleControls(false));
     const m = planOf(moving);
     expect(varies(m.cols[1] ?? []) && !/Held at its default/.test(m.oracle), 'sabotage oracle: without rearms, depth moves again and nothing is named held');
+    // a plugin's own `fixed`: the mode is no parameter, the binding and the oracle's reference pass its value
+    const fixedCore = (fixed) => {
+      process.env.OMX_CONTRACT_DIR = moving;
+      process.env.OMXDSP_INCLUDE = inc;
+      try {
+        const d = loadDecl(join(tree, P_));
+        const k = d.params.findIndex((p) => p.symbol === 'mode');
+        const files = generateInstance({ ...d, params: d.params.filter((_, i) => i !== k), controls: d.controls.filter((_, i) => i !== k), fixed });
+        return { core: files['omx_wobble_core.h'], oracle: files['test/wobble-oracle.c'] };
+      } catch (e) {
+        return { error: e.message };
+      } finally {
+        delete process.env.OMX_CONTRACT_DIR;
+        delete process.env.OMXDSP_INCLUDE;
+      }
+    };
+    const pan = fixedCore({ mode: 'pan' });
+    expect(/\/\* mode \*\/ 1\)/.test(pan.core ?? '') && /, 1\);/.test(pan.oracle ?? '') && !/PARAM_MODE/.test(pan.core ?? '') && pan.core?.includes('`mode` is not a parameter of this plugin: it is passed at "pan".'),
+      `fixed: a plugin's fixed mode is passed at pan's index to the face and to the reference, and named in the binding's comment (${pan.error ?? 'see the generated core'})`);
+    const stray = fixedCore({ speed: 'default' });
+    expect(/fixes 'speed', no control of the wobble kernel/.test(stray.error ?? ''), `fixed: a control the kernel does not have is refused (${stray.error ?? 'ACCEPTED'})`);
     const unlisted = join(WORK, 'omx-contract-unlisted');
     fakeContract(unlisted, { wobble: WOBBLE });
     let why = '';

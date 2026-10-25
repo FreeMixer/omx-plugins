@@ -871,8 +871,12 @@ const stepOf = (p) => (p.kind === 'toggle' || p.kind === 'integer' ? 1 : (p.max 
 
 /** The binding of `d` to its kernel's instance face, or a thrown error naming what is missing. */
 export function bindingOf(d) {
-  const b = faceBinding(omxdspInclude(), d.face ?? d.kernel, d.params, d.controls ?? []);
-  if (b.errors.length) throw new Error(`plugins/${d.stem}: binding: instance, but ${b.errors.join('; ')}`);
+  const errors = [];
+  // the controls of the face this plugin does not expose, each passed at its `fixed` value
+  const fixed = fixedArgs(d, { id: d.kernel, kernel: d.face ?? d.kernel, fixed: d.fixed }, d.controls ?? [], errors);
+  const b = faceBinding(omxdspInclude(), d.face ?? d.kernel, [...d.params, ...fixed.map((f) => f.p)], [...(d.controls ?? []), ...fixed.map((f) => f.c)]);
+  errors.push(...b.errors);
+  if (errors.length) throw new Error(`plugins/${d.stem}: binding: instance, but ${errors.join('; ')}`);
   return b;
 }
 
@@ -886,9 +890,10 @@ export function generateInstance(d) {
   const keyed = face.keyed || (face.keyable && Boolean(d.sidechain));
   const K = d.kernel.toUpperCase();
   const macro_ = (sym) => `OMX_${K}_PARAM_${macro(sym)}`;
-  const one = (type, sym) => (type === 'int' ? `(int)lrintf(values[${macro_(sym)}])` : `values[${macro_(sym)}]`);
+  // a fixed control is its value, a parameter its port's
+  const one = (type, p) => (p.fixed !== undefined ? (type === 'int' ? `${p.fixed}` : cfloat(p.fixed)) : type === 'int' ? `(int)lrintf(values[${macro_(p.symbol)}])` : `values[${macro_(p.symbol)}]`);
   // a per-band array: a compound literal of its parameters, in declaration order
-  const value = (b) => (b.extent ? `(const ${b.elem}[${b.extent}]){${b.params.map((p) => one(b.elem, p.symbol)).join(', ')}}` : one(b.type, b.param.symbol));
+  const value = (b) => (b.extent ? `(const ${b.elem}[${b.extent}]){${b.params.map((p) => one(b.elem, p)).join(', ')}}` : one(b.type, b.param));
   const lat = (self) => (face.latency.fn ? `${face.latency.fn}(${self})` : face.latency.macro);
   const view = {
     ...templateView(d),
@@ -896,6 +901,7 @@ export function generateInstance(d) {
     binding: binding.map((b) => ({ arg: b.arg, value: value(b) })),
     arrays: binding.filter((b) => b.extent).map((b) => ({ arg: b.arg, count: b.params.length, extent: b.extent })),
     renames: renames.map((b) => ({ arg: b.arg, rename: b.rename })),
+    fixed: Object.entries(d.fixed ?? {}).map(([name, v]) => ({ control: name, at: JSON.stringify(v) })),
     latency: lat('&c->inst'), refLatency: lat('&inst'),
     keyed, keyPort: keyed ? macro(d.sidechain.symbol) : '', keySymbol: keyed ? d.sidechain.symbol : '',
     runFn: keyed && !face.keyed ? 'run_keyed' : 'run', keyTail: keyed && !face.keyed ? ', NULL' : '',
@@ -963,6 +969,34 @@ function fixedBands(d, el, control, v, exposed) {
 }
 
 /**
+ * The controls a face is handed at a fixed value, never a port: a chain element's `fixed`, or an
+ * instance plugin's own (`el` is then the plugin, its id its kernel): `[{ p, c }]`, each bound like a
+ * parameter (`p.fixed` the value) to its control `c`. `controls` are the exposed parameters' controls;
+ * a refusal is pushed to `errors`.
+ */
+function fixedArgs(d, el, controls, errors) {
+  const where = locateContract(d.tree ?? ROOT);
+  return Object.entries(el.fixed ?? {}).flatMap(([name, v]) => {
+    const c = where.dir ? kernelControls(where.dir, el.kernel).find((x) => x.name === name) : undefined;
+    if (!c) {
+      errors.push(`element '${el.id}' fixes '${name}', no control of the ${el.kernel} kernel`);
+      return [];
+    }
+    try {
+      // a per-band control: one fixed value per band, bound as the face's array argument
+      if (c.count) {
+        const exposed = controls.filter((x) => x?.name === name).length;
+        return fixedBands(d, el, c, v, exposed).map((x, k) => ({ p: { symbol: `${el.id}.${name}[${exposed + k}]`, fixed: x }, c: { name } }));
+      }
+      return [{ p: { symbol: `${el.id}.${name}`, fixed: fixedValue(d, el, c, v) }, c: { name } }];
+    } catch (e) {
+      errors.push(e.message);
+      return [];
+    }
+  });
+}
+
+/**
  * Each element of a chain bound to its own kernel's instance face, exactly as a single plugin's
  * parameters are (bindFace, by name): `[{ el, face, binding, renames, fixed }]`, or a thrown error
  * naming every element that does not bind. An element's `fixed` controls (`{ control: id | number }`)
@@ -987,24 +1021,7 @@ export function chainBindings(d) {
         if (have && have !== want) errors.push(`element '${el.id}' exposes ${have} '${c.name}' parameters, and its "bands" '${el.bands}' counts ${want}`);
       }
     }
-    const fixed = Object.entries(el.fixed ?? {}).flatMap(([name, v]) => {
-      const c = where.dir ? kernelControls(where.dir, el.kernel).find((x) => x.name === name) : undefined;
-      if (!c) {
-        errors.push(`element '${el.id}' fixes '${name}', no control of the ${el.kernel} kernel`);
-        return [];
-      }
-      try {
-        // a per-band control: one fixed value per band, bound as the face's array argument
-        if (c.count) {
-          const exposed = controls.filter((x) => x?.name === name).length;
-          return fixedBands(d, el, c, v, exposed).map((x, k) => ({ p: { symbol: `${el.id}.${name}[${exposed + k}]`, fixed: x }, c: { name } }));
-        }
-        return [{ p: { symbol: `${el.id}.${name}`, fixed: fixedValue(d, el, c, v) }, c: { name } }];
-      } catch (e) {
-        errors.push(e.message);
-        return [];
-      }
-    });
+    const fixed = fixedArgs(d, el, controls, errors);
     const b = faceBinding(inc, el.kernel, [...params, ...fixed.map((f) => f.p)], [...controls, ...fixed.map((f) => f.c)]);
     for (const e of b.errors) errors.push(`element '${el.id}' (${el.kernel}): ${e}`);
     if (b.face && !b.face.keyed && d.key === el.id) errors.push(`"key" names '${el.id}', and omx_${el.kernel}_instance_run takes no key`);
