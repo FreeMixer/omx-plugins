@@ -695,7 +695,7 @@
     },
     "familyRoles": {
       "title": "Roles of each family",
-      "description": "Each family's roles, the only ones the console reads for it (a role outside its family is dropped). One entry per `family`, which tools/plugin-recipe.mjs holds equal.",
+      "description": "Each family's roles, the only ones the console reads for it (a role outside its family is dropped). One entry per `family`, each family's roles omx-panel's (its `ROLES`, the one table), which tools/plugin-recipe.mjs holds equal.",
       "type": "object",
       "additionalProperties": false,
       "properties": {
