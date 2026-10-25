@@ -21,7 +21,9 @@
  *       byte-identical in all five, and under every value of every other choice or toggle in turn (the
  *       rest at their defaults: a control read only under one mode), and with every other toggle on and
  *       each other travel in turn at either end of it (the rest at their defaults: a strip's gate hold is
- *       heard only once its trim lowers the quiet bed under the gate's threshold), is one the face does
+ *       heard only once its trim lowers the quiet bed under the gate's threshold), and with each other
+ *       travel in turn at either end, the rest at their defaults (a ducker heard only against a depth
+ *       its default does not reach, which a key listen switched on would hide), is one the face does
  *       not deliver.
  *       `PASS live <name>` / `FAIL live <name>` per parameter. A face still on the wizard's stub
  *       binding is red here, by design. Every input port past the main one (a sidechain key) is
@@ -238,7 +240,7 @@ static float *in_l, *in_r, *a_l, *a_r, *b_l, *b_r;
  * `setting` (0 defaults, 1 toggles on, 2 at their far values, 3 toggles on and the rest far, 4 the
  * other stepped choices far and the rest at their defaults, 5 the other choice or toggle `k` at
  * `kv` and the rest at their defaults, 6 every other toggle on and the travel `k` at `kv`, the rest at
- * their defaults)? -1 on a host error. */
+ * their defaults, 7 the travel `k` at `kv` and the rest at their defaults)? -1 on a host error. */
 static int moves(const char *path, const clap_param_info_t *info, uint32_t n, uint32_t i, int setting, uint32_t k_at,
                  double kv) {
   static clap_id ids[MAX_PARAMS];
@@ -252,6 +254,7 @@ static int moves(const char *path, const clap_param_info_t *info, uint32_t n, ui
     if (setting == 4 && is_choice(&info[k])) ids[m] = info[k].id, vals[m++] = far_of(&info[k]);
     if (setting == 5 && k == k_at) ids[m] = info[k].id, vals[m++] = kv;
     if (setting == 6 && (k == k_at || is_toggle(&info[k]))) ids[m] = info[k].id, vals[m++] = k == k_at ? kv : 1.0;
+    if (setting == 7 && k == k_at) ids[m] = info[k].id, vals[m++] = kv;
   }
   ids[m] = info[i].id;
   vals[m] = info[i].default_value;
@@ -309,8 +312,22 @@ static int live(const char *path) {
         k_at = k, kv = end[e], ends = 1;
       }
     }
+    /* then each other travel in turn at either end of it, the toggles at their defaults too: a switch
+     * heard only while a travel it reads leaves its default (a ducker against its depth), which a
+     * toggle that replaces the output (a key listen) would hide */
+    for (uint32_t k = 0; r == 0 && k < n; k++) {
+      if (k == i || is_choice(&info[k]) || is_toggle(&info[k]) || (info[k].flags & CLAP_PARAM_IS_BYPASS)) continue;
+      const double end[2] = {info[k].min_value, info[k].max_value};
+      for (int e = 0; r == 0 && e < 2; e++) {
+        if (end[e] == info[k].default_value) continue;
+        r = moves(path, info, n, i, 7, k, end[e]);
+        k_at = k, kv = end[e], ends = 2;
+      }
+    }
     if (r < 0) return 1;
-    if (r && ends) {
+    if (r && ends == 2) {
+      printf("PASS live %s moves the output (%s at %g, the rest at their defaults)\n", info[i].name, info[k_at].name, kv);
+    } else if (r && ends) {
       printf("PASS live %s moves the output (every other toggle on, %s at %g, the rest at their defaults)\n", info[i].name, info[k_at].name, kv);
     } else if (r && setting < 5) {
       printf("PASS live %s moves the output (%s)\n", info[i].name, SETTING[setting]);
