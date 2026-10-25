@@ -227,6 +227,11 @@
             }
           }
         },
+        "fixed": {
+          "$ref": "#/$defs/element/properties/fixed",
+          "title": "Fixed",
+          "description": "A `binding: instance` plugin's controls of its kernel that are no parameter, each passed at one value, as a chain element's `fixed` says: controls a kernel release added that the plugin does not expose yet (each at its declared default, which omx-dsp holds bit-identical to the kernel without it)."
+        },
         "portHints": {
           "type": "object",
           "title": "Port hints",
