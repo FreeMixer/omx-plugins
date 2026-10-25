@@ -76,6 +76,14 @@ settled it fills the derived fields and runs `tools/gen.mjs`, which writes:
 - across plugins, from the folders: the README's catalogue and sections, the RPM `%files` lists and
   CI's installed-file lists, each between `BEGIN GENERATED` and `END GENERATED` lines.
 
+The settled declaration is then written as the plugin's two hand-written files, as every
+single-kernel plugin of ours is described (docs/declaration-as-descriptor.md): `<stem>.descriptor.json`,
+its `authored` descriptor, rendered from the declaration, and `<stem>.decl.json`, the declaration's
+extras (each parameter's own words, such as a set's `values` or a band's `defaultBand`, kept under
+`controls` by symbol). The faces and every generated file are the same bytes from either form; the
+plugin's Makefile hands omx-panel the descriptor. From then on the two files are the plugin: the wizard
+drafts a new plugin only.
+
 `node tools/gen.mjs --check` holds every one of them; CI runs it. Then the wizard runs the plugin's
 `make test` and `make completeness` for it, and prints the commit plan in the recipe's layer order.
 
