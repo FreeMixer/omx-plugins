@@ -29,6 +29,7 @@ const struct omx_clap_static_plugin OMX_CLAP_STATIC_PLUGINS[] = {
     {"org.openmixer.geq", &omx_clap_entry_geq},
     {"org.openmixer.keyed-gate", &omx_clap_entry_gate},
     {"org.openmixer.limiter", &omx_clap_entry_limiter},
+    {"org.openmixer.multiband", &omx_clap_entry_mbcomp},
     {"org.openmixer.phaser", &omx_clap_entry_phaser},
     {"org.openmixer.pitch", &omx_clap_entry_pitch},
     {"org.openmixer.reverb", &omx_clap_entry_reverb},

@@ -63,6 +63,10 @@ const DYNEQ = (n, type, freq, q, threshold, ratio, range, attack, release) => ({
   [`bandOn${n}`]: 1, [`bandType${n}`]: type, [`freq${n}`]: freq, [`q${n}`]: q, [`dynMode${n}`]: 'Down',
   [`threshold${n}`]: threshold, [`ratio${n}`]: ratio, [`range${n}`]: range, [`attack${n}`]: attack, [`release${n}`]: release,
 });
+/** omx-multiband over `bands` bands, each band's threshold, one ratio for all. */
+const MBAND = (bands, thresholds, ratio) => ({
+  bands, ...Object.fromEntries(thresholds.flatMap((t, k) => [[`thresholdDb${k + 1}`, t], [`ratio${k + 1}`, ratio]])),
+});
 
 /** plugin id -> [[preset id, name, values]]. A value of a choice is its label. */
 const DEFINITIONS = {
@@ -120,6 +124,12 @@ const DEFINITIONS = {
     ['harsh-vocal', 'Harsh Vocal', DYNEQ(4, 'Bell', 3500, 1.4, -30, 3, -6, 5, 120)],
     ['proximity', 'Proximity', DYNEQ(1, 'Low Shelf', 150, 0.7, -24, 2.5, -6, 10, 200)],
     ['monitor-ring', 'Monitor Ring', DYNEQ(3, 'Bell', 2500, 4, -24, 4, -9, 2, 80)],
+  ],
+  // the card's uses (FX-3): in-ear mixes, a vocal whose low mid swells, a playback bus
+  'org.openmixer.multiband': [
+    ['iem-control', 'IEM Control', MBAND(3, [-24, -24, -24], 2.5)],
+    ['vocal-low-mid', 'Vocal Low Mid', { ...MBAND(3, [-30, -18, -18], 3), xoverHz1: 250, xoverHz2: 2500 }],
+    ['playback-bus', 'Playback Bus', MBAND(4, [-20, -20, -20, -20], 2)],
   ],
   'org.openmixer.deesser': [
     ['vocal-s', 'Vocal S', { deessFreq: 6000, deessMode: 'Split' }],
