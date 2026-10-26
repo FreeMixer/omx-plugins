@@ -23,8 +23,12 @@
  *       each other travel in turn at either end of it (the rest at their defaults: a strip's gate hold is
  *       heard only once its trim lowers the quiet bed under the gate's threshold), and with each other
  *       travel in turn at either end, the rest at their defaults (a ducker heard only against a depth
- *       its default does not reach, which a key listen switched on would hide), is one the face does
- *       not deliver.
+ *       its default does not reach, which a key listen switched on would hide), and with each other
+ *       toggle that comes up off on alone, the choices at their far values and the travels at their
+ *       defaults (a dynamic band's own switch on and its dynamics in a mode, its listens off), and,
+ *       last, with each pair of other travels at their ends, the rest at their defaults (a multiband's
+ *       fourth band, heard once the band count includes it and a crossover gives it width), is one
+ *       the face does not deliver.
  *       `PASS live <name>` / `FAIL live <name>` per parameter. A face still on the wizard's stub
  *       binding is red here, by design. Every input port past the main one (a sidechain key) is
  *       connected too, fed a signal of its own: square-wave bursts the main signal does not have, so a
@@ -235,12 +239,17 @@ static int is_toggle(const clap_param_info_t *p) {
 }
 
 static float *in_l, *in_r, *a_l, *a_r, *b_l, *b_r;
+/* setting 9's second travel and its value */
+static uint32_t pair_at;
+static double pair_v;
 
 /** Does moving parameter `i` from its default to its far value change the output, the others set by
  * `setting` (0 defaults, 1 toggles on, 2 at their far values, 3 toggles on and the rest far, 4 the
  * other stepped choices far and the rest at their defaults, 5 the other choice or toggle `k` at
  * `kv` and the rest at their defaults, 6 every other toggle on and the travel `k` at `kv`, the rest at
- * their defaults, 7 the travel `k` at `kv` and the rest at their defaults)? -1 on a host error. */
+ * their defaults, 7 the travel `k` at `kv` and the rest at their defaults, 8 the toggle `k` on, the
+ * choices at their far values and the rest at their defaults, 9 the travels `k` at `kv` and pair_at at
+ * pair_v, the rest at their defaults)? -1 on a host error. */
 static int moves(const char *path, const clap_param_info_t *info, uint32_t n, uint32_t i, int setting, uint32_t k_at,
                  double kv) {
   static clap_id ids[MAX_PARAMS];
@@ -255,6 +264,8 @@ static int moves(const char *path, const clap_param_info_t *info, uint32_t n, ui
     if (setting == 5 && k == k_at) ids[m] = info[k].id, vals[m++] = kv;
     if (setting == 6 && (k == k_at || is_toggle(&info[k]))) ids[m] = info[k].id, vals[m++] = k == k_at ? kv : 1.0;
     if (setting == 7 && k == k_at) ids[m] = info[k].id, vals[m++] = kv;
+    if (setting == 8 && (k == k_at || is_choice(&info[k]))) ids[m] = info[k].id, vals[m++] = k == k_at ? 1.0 : far_of(&info[k]);
+    if (setting == 9 && (k == k_at || k == pair_at)) ids[m] = info[k].id, vals[m++] = k == k_at ? kv : pair_v;
   }
   ids[m] = info[i].id;
   vals[m] = info[i].default_value;
@@ -324,8 +335,37 @@ static int live(const char *path) {
         k_at = k, kv = end[e], ends = 2;
       }
     }
+    /* then each other toggle on alone, the choices at their far values, the travels at their defaults: a
+     * band's own switch on and its dynamics in a mode, while the toggles that replace the output (its
+     * listens) stay off and no travel (a mix at 0) hides it */
+    for (uint32_t k = 0; r == 0 && k < n; k++) {
+      if (k == i || !is_toggle(&info[k]) || info[k].default_value != 0.0) continue;
+      r = moves(path, info, n, i, 8, k, 1.0);
+      k_at = k, kv = 1.0, ends = 3;
+    }
+    /* last, each pair of other travels at their ends, the rest at their defaults: a band that is heard only
+     * once the band count includes it and a crossover gives it the width the signal fills */
+    for (uint32_t k = 0; r == 0 && k < n; k++) {
+      if (k == i || is_choice(&info[k]) || is_toggle(&info[k]) || (info[k].flags & CLAP_PARAM_IS_BYPASS)) continue;
+      for (uint32_t j = k + 1; r == 0 && j < n; j++) {
+        if (j == i || is_choice(&info[j]) || is_toggle(&info[j]) || (info[j].flags & CLAP_PARAM_IS_BYPASS)) continue;
+        const double ek[2] = {info[k].min_value, info[k].max_value}, ej[2] = {info[j].min_value, info[j].max_value};
+        for (int a = 0; r == 0 && a < 2; a++)
+          for (int b = 0; r == 0 && b < 2; b++) {
+            if (ek[a] == info[k].default_value || ej[b] == info[j].default_value) continue;
+            pair_at = j, pair_v = ej[b];
+            r = moves(path, info, n, i, 9, k, ek[a]);
+            k_at = k, kv = ek[a], ends = 4;
+          }
+      }
+    }
     if (r < 0) return 1;
-    if (r && ends == 2) {
+    if (r && ends == 4) {
+      printf("PASS live %s moves the output (%s at %g and %s at %g, the rest at their defaults)\n", info[i].name, info[k_at].name, kv,
+             info[pair_at].name, pair_v);
+    } else if (r && ends == 3) {
+      printf("PASS live %s moves the output (%s on alone, the choices at their far values, the rest at their defaults)\n", info[i].name, info[k_at].name);
+    } else if (r && ends == 2) {
       printf("PASS live %s moves the output (%s at %g, the rest at their defaults)\n", info[i].name, info[k_at].name, kv);
     } else if (r && ends) {
       printf("PASS live %s moves the output (every other toggle on, %s at %g, the rest at their defaults)\n", info[i].name, info[k_at].name, kv);
