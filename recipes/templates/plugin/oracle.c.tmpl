@@ -263,7 +263,7 @@ static void reference(double sr, int off, const float *key, const float *il, con
       for (uint32_t s = 0; s < LENGTH; s++) {
         switch (element_at(row, s)) {
 {{#elements}}        case {{index}}:
-          omx_{{face}}_instance_run(&{{id}}, {{#keyedFace}}{{keyRef}}, {{/keyedFace}}ol + at, orr + at, ol + at, orr + at, frames);
+          omx_{{face}}_instance_{{runFn}}(&{{id}}, {{#keyedFace}}{{keyRef}}, {{/keyedFace}}ol + at, orr + at, ol + at, orr + at, frames);
           break;
 {{/elements}}        }
       }

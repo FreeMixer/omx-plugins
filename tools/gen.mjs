@@ -1164,8 +1164,11 @@ export function generateChain(d) {
     renames: b.renames.map((x) => ({ arg: x.arg, rename: x.rename })),
     fixed: (b.el.fixed ? Object.entries(b.el.fixed) : []).map(([name, v]) => ({ control: name, at: JSON.stringify(v) })),
     heldArgs: b.binding.filter((x) => x.param.held).map((x) => ({ arg: x.arg, at: x.param.held })),
-    keyedFace: b.face.keyed, keyArg: b.face.keyed ? (d.key === b.el.id ? 'key' : 'NULL') : '',
-    keyRef: b.face.keyed && d.key === b.el.id ? 'key ? key + at : NULL' : 'NULL',
+    // a keyable face (the compressor's) runs keyed with no key, so its key filter, tilt and link act on its
+    // own legs; idle, run_keyed is run bit for bit
+    runFn: b.face.keyable ? 'run_keyed' : 'run',
+    keyedFace: b.face.keyed || b.face.keyable, keyArg: b.face.keyable ? 'NULL, NULL' : b.face.keyed ? (d.key === b.el.id ? 'key' : 'NULL') : '',
+    keyRef: b.face.keyable ? 'NULL, NULL' : b.face.keyed && d.key === b.el.id ? 'key ? key + at : NULL' : 'NULL',
     latency: lat(b, `&c->${b.el.id}`), refLatency: lat(b, `&${b.el.id}`),
   }));
   const rows = d.order === 'permutable' ? permutations(d.chain.length) : [[...d.chain.keys()]];
