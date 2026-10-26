@@ -71,7 +71,7 @@ static inline void omx_{{kernel}}_core_element(Omx{{Kernel}}Core *c, uint32_t e,
   (void)key;
   switch (e) {
 {{#elements}}  case OMX_{{K}}_CHAIN_{{index}}_{{id}}:
-    omx_{{face}}_instance_run(&c->{{id}}, {{#keyedFace}}{{keyArg}}, {{/keyedFace}}out_l, out_r, out_l, out_r, frames);
+    omx_{{face}}_instance_{{runFn}}(&c->{{id}}, {{#keyedFace}}{{keyArg}}, {{/keyedFace}}out_l, out_r, out_l, out_r, frames);
     return;
 {{/elements}}  }
 }

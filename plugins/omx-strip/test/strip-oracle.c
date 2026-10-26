@@ -241,7 +241,7 @@ static const Block PLAN[] = {
 #define NBLOCKS (sizeof PLAN / sizeof PLAN[0])
 
 /* One step of each parameter: what the sabotage arm moves it by. */
-static const float STEP[NP] = { 1.0f, 0.48f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.8f, 0.99f, 0.9f, 5.0f, 50.0f, 1.0f, 1.0f, 1.0f, 0.24f, 1.0f, 1.0f, 1.0f, 0.3f, 1.157f, 1.0f, 1.0f, 1.0f, 0.3f, 1.157f, 1.0f, 1.0f, 1.0f, 0.3f, 1.157f, 1.0f, 1.0f, 1.0f, 0.3f, 1.157f, 1.0f, 1.0f, 0.6f, 0.19f, 0.24f, 0.999f, 29.95f, 0.24f, 1.0f, 1.0f, 1.0f, 1.0f };
+static const float STEP[NP] = { 1.0f, 0.48f, 1.0f, 1.0f, 10.0f, 1.0f, 1.0f, 190.0f, 1.0f, 1.0f, 0.8f, 0.99f, 0.9f, 25.0f, 250.0f, 1.0f, 1.0f, 100.0f, 0.24f, 1.0f, 1.0f, 200.0f, 0.3f, 1.157f, 1.0f, 1.0f, 200.0f, 0.3f, 1.157f, 1.0f, 1.0f, 200.0f, 0.3f, 1.157f, 1.0f, 1.0f, 200.0f, 0.3f, 1.157f, 1.0f, 1.0f, 0.6f, 0.19f, 0.24f, 4.995f, 149.75f, 0.24f, 1.0f, 1.0f, 1.0f, 1.0f };
 
 static int failures;
 
@@ -381,7 +381,7 @@ static void reference(double sr, int off, const float *key, const float *il, con
           omx_eq_instance_run(&eq, ol + at, orr + at, ol + at, orr + at, frames);
           break;
         case 4:
-          omx_comp_instance_run(&comp, ol + at, orr + at, ol + at, orr + at, frames);
+          omx_comp_instance_run_keyed(&comp, NULL, NULL, ol + at, orr + at, ol + at, orr + at, frames);
           break;
         }
       }

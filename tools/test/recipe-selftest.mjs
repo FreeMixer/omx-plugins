@@ -809,9 +809,13 @@ static inline float omx_wobble_instance_level_db(const OmxWobbleInstance *s) { r
     eq.bands = 'eq8';
     eq.params = eq.params.filter((p) => !/^eq\d+/.test(p.symbol) || Number(p.symbol.match(/^eq(\d+)/)[1]) <= 8);
     gate.on = false;
-    gate.fixed = { keySource: 'self' };
-    gate.params = gate.params.filter((p) => p.symbol !== 'gateKeySource');
+    // no key reaches a chain's gate or compressor (no "key"): each listens to itself, and no key listen
+    // puts its detector on the strip's output in place of what follows it
+    gate.fixed = { keySource: 'self', keyListen: 'off' };
+    gate.params = gate.params.filter((p) => !['gateKeySource', 'gateKeyListen'].includes(p.symbol));
     comp.on = true;
+    comp.fixed = { keySource: 'self', keyListen: 'off' };
+    comp.params = comp.params.filter((p) => !['compKeySource', 'compKeyListen'].includes(p.symbol));
     // the detector topology's set carries no labels in the contract: the person names them, as omx-comp does
     for (const p of comp.params.filter((x) => x.ref === 'DETECTOR_TOPOLOGY')) p.values = ['Feedforward', 'Feedback'];
     settled.order = 'permutable';
