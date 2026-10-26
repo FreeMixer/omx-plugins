@@ -177,7 +177,7 @@ jobs:
           # version, read at run time with no -devel installed
           cdir=/usr/share/omx-contract/contract.d/3/omx-plugins
           rpm -qlp rpms/omx-plugins-contract-[0-9]*.noarch.rpm | sort > files-contract.txt
-          { printf '%s\n' "$cdir" "$cdir/MANIFEST.json" "$cdir/plugins" \
+          { printf '%s\n' "$cdir" "$cdir/MANIFEST.json" "$cdir/param-units.json" "$cdir/plugins" \
               /usr/share/licenses/omx-plugins-contract /usr/share/licenses/omx-plugins-contract/LICENSE
             for d in plugins/*/*.descriptor.json; do echo "$cdir/plugins/$(basename "$d" .descriptor.json).json"; done; } | sort > expected-contract.txt
           diff -u expected-contract.txt files-contract.txt
@@ -205,6 +205,7 @@ jobs:
             rpms/omx-plugins-contract-[0-9]*.noarch.rpm
           # the descriptors come with the metapackage, no -devel installed
           rpm -qf /usr/share/omx-contract/contract.d/3/omx-plugins/MANIFEST.json | grep -q '^omx-plugins-contract-'
+          rpm -qf /usr/share/omx-contract/contract.d/3/omx-plugins/param-units.json | grep -q '^omx-plugins-contract-'
           ! rpm -q omx-plugins-devel
           req=$(rpm -q --requires omx-plugins)
           grep -qE '^omx-plugins-clap\([a-z0-9-]+\) = ' <<<"$req"
@@ -308,6 +309,8 @@ jobs:
           # version, installed here with no -dev
           out=$(dpkg -L omx-plugins-contract)
           grep -qx /usr/share/omx-contract/contract.d/3/omx-plugins/MANIFEST.json <<<"$out"
+          # the param-contract extension's unit codes, which a runtime reader reads in place of the header
+          grep -qx /usr/share/omx-contract/contract.d/3/omx-plugins/param-units.json <<<"$out"
           test "$(grep -cE '^/usr/share/omx-contract/contract\.d/3/omx-plugins/plugins/[^/]+\.json$' <<<"$out")" = "$(ls plugins/*/*.descriptor.json | wc -l)"
           ! dpkg -s omx-plugins-dev >/dev/null 2>&1
           info=$(dpkg -I debs/omx-plugins-contract_*_all.deb)
