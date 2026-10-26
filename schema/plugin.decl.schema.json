@@ -275,6 +275,29 @@
             "pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*$"
           }
         },
+        "monitors": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "title": "Monitors",
+          "description": "The parameters that replace the output while on, by symbol (a detector's listen): the identity test holds each at its default where it moves or steps the others, so what it replaces stays heard, and still holds each of its values over its own section. Each is a toggle or a choice.",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+          }
+        },
+        "engaged": {
+          "type": "object",
+          "minProperties": 1,
+          "title": "Engaged",
+          "description": "Values the identity test holds in its release and choice sections instead of the defaults, by parameter symbol, never stepped there: a band driven past its threshold at every rate (the multiband's thresholds). Each inside its parameter's travel.",
+          "propertyNames": {
+            "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+          },
+          "additionalProperties": {
+            "type": "number"
+          }
+        },
         "meters": {
           "type": "array",
           "minItems": 1,

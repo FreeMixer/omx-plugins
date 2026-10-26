@@ -36,7 +36,10 @@
  * output differ in some block{{/meterOut}}{{/meterIn}}.
 {{/meterLevel}}{{/metered}}{{#held}} * Held at its default in every block, because changing it re-arms the kernel's state (omx-contract
  * `rearms`): {{symbol}}.
-{{/held}}{{#keyed}} *
+{{/held}}{{#monitors}} * Held at its default where the others move or are stepped, a monitor (it replaces the output while on),
+ * with its own section still: {{symbol}}.
+{{/monitors}}{{#engaged}} * Held at {{value}} in the release and choice sections, never stepped there (engaged): {{symbol}}.
+{{/engaged}}{{#keyed}} *
  * KEYED: the face listens to a sidechain. The plan runs twice per rate: with a key that differs from
  * the main signal (the sabotage arm runs here), and with no key routed (NULL: the kernel's own
  * detector). A reference keyed by that key must differ from the unkeyed one, or the key is ignored.
