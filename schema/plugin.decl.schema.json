@@ -155,6 +155,9 @@
           "title": "Binding",
           "description": "`instance`: the plugin runs omx-dsp's instance face of its kernel (<omxdsp/fx/omx_<kernel>_instance.h>), and tools/gen.mjs generates the kernel binding, the kernel-identity test, both faces and the Makefile from this declaration; each parameter binds to the `resolve` argument named after its contract control. `chain`: a composite, its parameters generated from `chain`: each element binds to its own kernel's instance face exactly as `instance` does, and the binding runs them in order. Left out, those files are the plugin's own (a composite, a face omx-dsp does not have)."
         },
+        "held": {
+          "$ref": "#/$defs/held"
+        },
         "params": {
           "type": "array",
           "minItems": 1,
@@ -1125,6 +1128,16 @@
         }
       }
     },
+    "held": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z][A-Za-z0-9]*$"
+      },
+      "title": "Held",
+      "description": "Controls of the kernel's instance face that are no parameter yet: each `resolve` argument is passed at its kernel's declared default, by the default's named macro (OMX_<ref>_DEFAULT), and is never a port. For a face argument a newer omx-dsp adds before the plugin exposes it. A control that is a field of a sheet has no macro of its own; pass it as `fixed`."
+    },
     "element": {
       "type": "object",
       "required": [
@@ -1211,6 +1224,9 @@
           },
           "title": "Fixed",
           "description": "Controls of the element's kernel that are no parameter, each passed at one value: a set's id, a travel's number, \"default\" (its declared default), or {\"defaultRef\": \"<SHEET>.<field>\"} (a default an omx-contract sheet holds). A per-band control is passed so for every band the element does not expose. For a control a chain cannot use, such as the key source of a keyed face that is not the chain's `key` (it runs self-keyed)."
+        },
+        "held": {
+          "$ref": "#/$defs/held"
         }
       }
     },

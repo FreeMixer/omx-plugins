@@ -12,7 +12,8 @@
  * each face's resolve() prototype.
 {{#elements}}{{#renames}} * RENAME OWED by omx-dsp's name conformance: {{id}}'s resolve argument `{{arg}}` is the contract's `{{rename}}`.
 {{/renames}}{{#fixed}} * {{id}}: `{{control}}` is not a parameter; it is passed at {{at}}.
-{{/fixed}}{{/elements}} */
+{{/fixed}}{{#heldArgs}} * {{id}}: `{{arg}}` is no parameter: the declaration holds it at its kernel's declared default, {{at}}.
+{{/heldArgs}}{{/elements}} */
 #ifndef OMX_{{K}}_CORE_H
 #define OMX_{{K}}_CORE_H
 
