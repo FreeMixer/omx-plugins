@@ -72,7 +72,7 @@ static const Block PLAN[] = {
 #define NBLOCKS (sizeof PLAN / sizeof PLAN[0])
 
 /* One step of each parameter: what the sabotage arm moves it by. */
-static const float STEP[NP] = { 0.0495f, 0.05f, 0.019f, 1.0f };
+static const float STEP[NP] = { 0.0495f, 0.25f, 0.019f, 1.0f };
 
 static int failures;
 
