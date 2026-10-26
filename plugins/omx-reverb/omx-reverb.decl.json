@@ -7,6 +7,17 @@
   ],
   "url": "https://github.com/FreeMixer/omx-plugins",
   "binding": "instance",
+  "held": [
+    "earlyDb",
+    "tailDb",
+    "earlySizePct",
+    "duckDb",
+    "duckThresholdDb",
+    "duckReleaseMs",
+    "wetDeess",
+    "deessFreqHz",
+    "deessThresholdDb"
+  ],
   "controls": {
     "algorithm": {
       "values": [
