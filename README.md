@@ -21,6 +21,7 @@ drawn from one declaration: its CLAP parameters, its LV2 ports and its MOD GUI c
 | **omx deesser** | `org.openmixer.deesser` | `urn:openmixer:deesser` | The console's de-esser: a detector on a band around the sibilance drives the compressor's gain computer, and the reduction lands on that band alone or on the whole signal. |
 | **omx delay** | `org.openmixer.delay` | `urn:openmixer:delay` | Stereo delay up to 2 s: feedback through a tone filter that darkens each repeat, ping-pong, wet/dry mix. Zero latency, real-time safe, 44.1 to 192 kHz. |
 | **omx drive** | `org.openmixer.drive` | `urn:openmixer:drive` | The console's drive: one waveshaper (soft, tape, tube or exciter) run inside the console's 4x oversampler, on the full band, the lows, the highs or a tilt, with drive, character, wet/dry mix and trim. Stereo, real-time safe, 44.1 to 192 kHz. |
+| **omx dyneq** | `org.openmixer.dyneq` | `urn:openmixer:dyneq` | A six-band dynamic EQ: each band is an EQ bell or shelf whose gain also moves with the level of its own band, cutting above a threshold (down) or lifting below it (up), held to a range, so a harsh or boomy band is tamed only while it is too loud. |
 | **omx eq8** | `org.openmixer.eq8` | `urn:openmixer:eq8` | The console's channel EQ in its 8-band form: 8 parametric bands (bell, shelves, notch, all-pass) plus high- and low-pass filters at 12 or 24 dB/oct. Stereo, zero latency, 44.1 to 192 kHz. |
 | **omx eq16** | `org.openmixer.eq16` | `urn:openmixer:eq16` | The console's channel EQ in its 16-band form: 16 parametric bands (bell, shelves, notch, all-pass) plus high- and low-pass filters at 12 or 24 dB/oct. Stereo, zero latency, 44.1 to 192 kHz. |
 | **omx eq32** | `org.openmixer.eq32` | `urn:openmixer:eq32` | The console's channel EQ in its 32-band form: 32 parametric bands (bell, shelves, notch, all-pass) plus high- and low-pass filters at 12 or 24 dB/oct. Stereo, zero latency, 44.1 to 192 kHz. |
@@ -121,6 +122,86 @@ moved from 48 to 96 kHz sounds the same.
 | Stereo Link | off / on | on |
 | HF Roll-off | Off / 12 kHz / 16 kHz | Off |
 | Oversampling | 1 / 2 / 4 | 4 |
+
+Plus the host's bypass.
+
+### omx dyneq
+
+| Parameter | Range | Default |
+|---|---|---|
+| Band 1 On | off / on | off |
+| Band 2 On | off / on | off |
+| Band 3 On | off / on | off |
+| Band 4 On | off / on | off |
+| Band 5 On | off / on | off |
+| Band 6 On | off / on | off |
+| Band 1 Type | Bell / Low Shelf / High Shelf | Bell |
+| Band 2 Type | Bell / Low Shelf / High Shelf | Bell |
+| Band 3 Type | Bell / Low Shelf / High Shelf | Bell |
+| Band 4 Type | Bell / Low Shelf / High Shelf | Bell |
+| Band 5 Type | Bell / Low Shelf / High Shelf | Bell |
+| Band 6 Type | Bell / Low Shelf / High Shelf | Bell |
+| Band 1 Freq | 20 to 20000 Hz, whole steps | 40 Hz |
+| Band 2 Freq | 20 to 20000 Hz, whole steps | 125 Hz |
+| Band 3 Freq | 20 to 20000 Hz, whole steps | 400 Hz |
+| Band 4 Freq | 20 to 20000 Hz, whole steps | 1250 Hz |
+| Band 5 Freq | 20 to 20000 Hz, whole steps | 4000 Hz |
+| Band 6 Freq | 20 to 20000 Hz, whole steps | 12500 Hz |
+| Band 1 Gain | -15 to 15 dB | 0 dB |
+| Band 2 Gain | -15 to 15 dB | 0 dB |
+| Band 3 Gain | -15 to 15 dB | 0 dB |
+| Band 4 Gain | -15 to 15 dB | 0 dB |
+| Band 5 Gain | -15 to 15 dB | 0 dB |
+| Band 6 Gain | -15 to 15 dB | 0 dB |
+| Band 1 Q | 0.3 to 8 | 1 |
+| Band 2 Q | 0.3 to 8 | 1 |
+| Band 3 Q | 0.3 to 8 | 1 |
+| Band 4 Q | 0.3 to 8 | 1 |
+| Band 5 Q | 0.3 to 8 | 1 |
+| Band 6 Q | 0.3 to 8 | 1 |
+| Band 1 Dynamics | Off / Down / Up | Off |
+| Band 2 Dynamics | Off / Down / Up | Off |
+| Band 3 Dynamics | Off / Down / Up | Off |
+| Band 4 Dynamics | Off / Down / Up | Off |
+| Band 5 Dynamics | Off / Down / Up | Off |
+| Band 6 Dynamics | Off / Down / Up | Off |
+| Band 1 Threshold | -60 to 0 dB | -30 dB |
+| Band 2 Threshold | -60 to 0 dB | -30 dB |
+| Band 3 Threshold | -60 to 0 dB | -30 dB |
+| Band 4 Threshold | -60 to 0 dB | -30 dB |
+| Band 5 Threshold | -60 to 0 dB | -30 dB |
+| Band 6 Threshold | -60 to 0 dB | -30 dB |
+| Band 1 Ratio | 1 to 20 | 2 |
+| Band 2 Ratio | 1 to 20 | 2 |
+| Band 3 Ratio | 1 to 20 | 2 |
+| Band 4 Ratio | 1 to 20 | 2 |
+| Band 5 Ratio | 1 to 20 | 2 |
+| Band 6 Ratio | 1 to 20 | 2 |
+| Band 1 Range | -24 to 12 dB | -6 dB |
+| Band 2 Range | -24 to 12 dB | -6 dB |
+| Band 3 Range | -24 to 12 dB | -6 dB |
+| Band 4 Range | -24 to 12 dB | -6 dB |
+| Band 5 Range | -24 to 12 dB | -6 dB |
+| Band 6 Range | -24 to 12 dB | -6 dB |
+| Band 1 Attack | 0.5 to 100 ms | 5 ms |
+| Band 2 Attack | 0.5 to 100 ms | 5 ms |
+| Band 3 Attack | 0.5 to 100 ms | 5 ms |
+| Band 4 Attack | 0.5 to 100 ms | 5 ms |
+| Band 5 Attack | 0.5 to 100 ms | 5 ms |
+| Band 6 Attack | 0.5 to 100 ms | 5 ms |
+| Band 1 Release | 5 to 3000 ms, whole steps | 100 ms |
+| Band 2 Release | 5 to 3000 ms, whole steps | 100 ms |
+| Band 3 Release | 5 to 3000 ms, whole steps | 100 ms |
+| Band 4 Release | 5 to 3000 ms, whole steps | 100 ms |
+| Band 5 Release | 5 to 3000 ms, whole steps | 100 ms |
+| Band 6 Release | 5 to 3000 ms, whole steps | 100 ms |
+| Band 1 Listen | off / on | off |
+| Band 2 Listen | off / on | off |
+| Band 3 Listen | off / on | off |
+| Band 4 Listen | off / on | off |
+| Band 5 Listen | off / on | off |
+| Band 6 Listen | off / on | off |
+| Mix | 0 to 100 %, whole steps | 100 % |
 
 Plus the host's bypass.
 

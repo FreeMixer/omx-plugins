@@ -1,0 +1,389 @@
+{
+  "format": "org.openmixer.preset/1",
+  "plugin": "org.openmixer.dyneq",
+  "id": "harsh-vocal",
+  "name": "Harsh Vocal",
+  "carries": "params",
+  "params": [
+    {
+      "symbol": "bandOn1",
+      "unit": "",
+      "value": 0
+    },
+    {
+      "symbol": "bandOn2",
+      "unit": "",
+      "value": 0
+    },
+    {
+      "symbol": "bandOn3",
+      "unit": "",
+      "value": 0
+    },
+    {
+      "symbol": "bandOn4",
+      "unit": "",
+      "value": 1
+    },
+    {
+      "symbol": "bandOn5",
+      "unit": "",
+      "value": 0
+    },
+    {
+      "symbol": "bandOn6",
+      "unit": "",
+      "value": 0
+    },
+    {
+      "symbol": "bandType1",
+      "unit": "",
+      "value": 0,
+      "label": "Bell"
+    },
+    {
+      "symbol": "bandType2",
+      "unit": "",
+      "value": 0,
+      "label": "Bell"
+    },
+    {
+      "symbol": "bandType3",
+      "unit": "",
+      "value": 0,
+      "label": "Bell"
+    },
+    {
+      "symbol": "bandType4",
+      "unit": "",
+      "value": 0,
+      "label": "Bell"
+    },
+    {
+      "symbol": "bandType5",
+      "unit": "",
+      "value": 0,
+      "label": "Bell"
+    },
+    {
+      "symbol": "bandType6",
+      "unit": "",
+      "value": 0,
+      "label": "Bell"
+    },
+    {
+      "symbol": "freq1",
+      "unit": "Hz",
+      "value": 40
+    },
+    {
+      "symbol": "freq2",
+      "unit": "Hz",
+      "value": 125
+    },
+    {
+      "symbol": "freq3",
+      "unit": "Hz",
+      "value": 400
+    },
+    {
+      "symbol": "freq4",
+      "unit": "Hz",
+      "value": 3500
+    },
+    {
+      "symbol": "freq5",
+      "unit": "Hz",
+      "value": 4000
+    },
+    {
+      "symbol": "freq6",
+      "unit": "Hz",
+      "value": 12500
+    },
+    {
+      "symbol": "gain1",
+      "unit": "dB",
+      "value": 0
+    },
+    {
+      "symbol": "gain2",
+      "unit": "dB",
+      "value": 0
+    },
+    {
+      "symbol": "gain3",
+      "unit": "dB",
+      "value": 0
+    },
+    {
+      "symbol": "gain4",
+      "unit": "dB",
+      "value": 0
+    },
+    {
+      "symbol": "gain5",
+      "unit": "dB",
+      "value": 0
+    },
+    {
+      "symbol": "gain6",
+      "unit": "dB",
+      "value": 0
+    },
+    {
+      "symbol": "q1",
+      "unit": "",
+      "value": 1
+    },
+    {
+      "symbol": "q2",
+      "unit": "",
+      "value": 1
+    },
+    {
+      "symbol": "q3",
+      "unit": "",
+      "value": 1
+    },
+    {
+      "symbol": "q4",
+      "unit": "",
+      "value": 1.4
+    },
+    {
+      "symbol": "q5",
+      "unit": "",
+      "value": 1
+    },
+    {
+      "symbol": "q6",
+      "unit": "",
+      "value": 1
+    },
+    {
+      "symbol": "dynMode1",
+      "unit": "",
+      "value": 0,
+      "label": "Off"
+    },
+    {
+      "symbol": "dynMode2",
+      "unit": "",
+      "value": 0,
+      "label": "Off"
+    },
+    {
+      "symbol": "dynMode3",
+      "unit": "",
+      "value": 0,
+      "label": "Off"
+    },
+    {
+      "symbol": "dynMode4",
+      "unit": "",
+      "value": 1,
+      "label": "Down"
+    },
+    {
+      "symbol": "dynMode5",
+      "unit": "",
+      "value": 0,
+      "label": "Off"
+    },
+    {
+      "symbol": "dynMode6",
+      "unit": "",
+      "value": 0,
+      "label": "Off"
+    },
+    {
+      "symbol": "threshold1",
+      "unit": "dB",
+      "value": -30
+    },
+    {
+      "symbol": "threshold2",
+      "unit": "dB",
+      "value": -30
+    },
+    {
+      "symbol": "threshold3",
+      "unit": "dB",
+      "value": -30
+    },
+    {
+      "symbol": "threshold4",
+      "unit": "dB",
+      "value": -30
+    },
+    {
+      "symbol": "threshold5",
+      "unit": "dB",
+      "value": -30
+    },
+    {
+      "symbol": "threshold6",
+      "unit": "dB",
+      "value": -30
+    },
+    {
+      "symbol": "ratio1",
+      "unit": "",
+      "value": 2
+    },
+    {
+      "symbol": "ratio2",
+      "unit": "",
+      "value": 2
+    },
+    {
+      "symbol": "ratio3",
+      "unit": "",
+      "value": 2
+    },
+    {
+      "symbol": "ratio4",
+      "unit": "",
+      "value": 3
+    },
+    {
+      "symbol": "ratio5",
+      "unit": "",
+      "value": 2
+    },
+    {
+      "symbol": "ratio6",
+      "unit": "",
+      "value": 2
+    },
+    {
+      "symbol": "range1",
+      "unit": "dB",
+      "value": -6
+    },
+    {
+      "symbol": "range2",
+      "unit": "dB",
+      "value": -6
+    },
+    {
+      "symbol": "range3",
+      "unit": "dB",
+      "value": -6
+    },
+    {
+      "symbol": "range4",
+      "unit": "dB",
+      "value": -6
+    },
+    {
+      "symbol": "range5",
+      "unit": "dB",
+      "value": -6
+    },
+    {
+      "symbol": "range6",
+      "unit": "dB",
+      "value": -6
+    },
+    {
+      "symbol": "attack1",
+      "unit": "ms",
+      "value": 5
+    },
+    {
+      "symbol": "attack2",
+      "unit": "ms",
+      "value": 5
+    },
+    {
+      "symbol": "attack3",
+      "unit": "ms",
+      "value": 5
+    },
+    {
+      "symbol": "attack4",
+      "unit": "ms",
+      "value": 5
+    },
+    {
+      "symbol": "attack5",
+      "unit": "ms",
+      "value": 5
+    },
+    {
+      "symbol": "attack6",
+      "unit": "ms",
+      "value": 5
+    },
+    {
+      "symbol": "release1",
+      "unit": "ms",
+      "value": 100
+    },
+    {
+      "symbol": "release2",
+      "unit": "ms",
+      "value": 100
+    },
+    {
+      "symbol": "release3",
+      "unit": "ms",
+      "value": 100
+    },
+    {
+      "symbol": "release4",
+      "unit": "ms",
+      "value": 120
+    },
+    {
+      "symbol": "release5",
+      "unit": "ms",
+      "value": 100
+    },
+    {
+      "symbol": "release6",
+      "unit": "ms",
+      "value": 100
+    },
+    {
+      "symbol": "listen1",
+      "unit": "",
+      "value": 0
+    },
+    {
+      "symbol": "listen2",
+      "unit": "",
+      "value": 0
+    },
+    {
+      "symbol": "listen3",
+      "unit": "",
+      "value": 0
+    },
+    {
+      "symbol": "listen4",
+      "unit": "",
+      "value": 0
+    },
+    {
+      "symbol": "listen5",
+      "unit": "",
+      "value": 0
+    },
+    {
+      "symbol": "listen6",
+      "unit": "",
+      "value": 0
+    },
+    {
+      "symbol": "mixPct",
+      "unit": "%",
+      "value": 100
+    }
+  ],
+  "created": "2026-10-17T00:00:00Z",
+  "modified": "2026-10-17T00:00:00Z",
+  "copyOf": null
+}
