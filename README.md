@@ -377,7 +377,10 @@ the apt channel, `omx-plugins-zynthian-<version>-arm64.tar.gz`: copy its `lv2/` 
 
 Projects that build on the plugins' parameters and instance code install the headers instead of
 copying them: `omx-plugins-devel` on Fedora, `omx-plugins-dev` on Debian (they land in
-`/usr/include/omx-plugins`). The same package carries `libomxplugins.a` (`pkg-config omxplugins`):
+`/usr/include/omx-plugins`). Each plugin's descriptor, its parameters in omx-contract's words, is in
+`omx-plugins-contract`, which `omx-plugins` and the devel package require: files in omx-contract's
+contract directory (`/usr/share/omx-contract/contract.d/3/omx-plugins/`) that a host reads at run time.
+The devel package carries `libomxplugins.a` (`pkg-config omxplugins`):
 every plugin's CLAP face in one static library, for a host that runs them in its own process
 without loading `.clap` files. `<omx-plugins/omx_clap_static.h>` lists their entries by CLAP id:
 
