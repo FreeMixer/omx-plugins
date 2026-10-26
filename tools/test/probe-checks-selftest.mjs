@@ -22,7 +22,11 @@ import { fileURLToPath } from 'node:url';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const { loadDecl, scaleOf } = await import('../gen.mjs');
-const { SCALES, contractFingerprint, contractOf } = await import('../param-contract.mjs');
+const { contractFingerprint, contractOf, scalesOf } = await import('../param-contract.mjs');
+const { locateContract } = await import('../omx-contract.mjs');
+const contract = locateContract(ROOT);
+if (!contract.dir) throw new Error(`probe-checks: ${contract.why}`);
+const SCALES = scalesOf(contract.dir);
 const TMP = mkdtempSync(join(tmpdir(), 'probe-checks-'));
 process.on('exit', () => rmSync(TMP, { recursive: true, force: true }));
 

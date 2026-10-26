@@ -15,6 +15,7 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { lv2UnitNames, lv2UnitRef } from './format-tables.mjs';
+import { items } from './omx-contract.mjs';
 
 export const CONTRACT_ID = 'org.openmixer.param-contract/1';
 export const CONTRACT_VERSION = 1;
@@ -68,7 +69,14 @@ export const servedToken = (unit) => (unit === '' ? 'none' : contractUnit(unit)[
 
 /** Every unit a face can write, with its contract unit: `{ <unit>: [token, value] }`, "" among them. */
 export const contractUnits = () => Object.fromEntries(['', ...Object.keys(lv2UnitNames())].map((u) => [u, contractUnit(u)]));
-export const SCALES = ['linear', 'log', 'stepped'];
+
+/** The scale words in the order of their codes (OMX_CLAP_SCALE_*), PARAM_SCALES of the resolved contract at `dir`
+ * (tools/omx-contract.mjs locateContract): the list is omx-contract's, never retyped here. */
+export function scalesOf(dir) {
+  const scales = items(dir).PARAM_SCALES?.value;
+  if (!Array.isArray(scales) || scales.length === 0) throw new Error(`${dir}: the resolved contract has no PARAM_SCALES list`);
+  return scales;
+}
 const STEPPED = 0x1, BYPASS = 0x10;
 
 /** Each parameter's contract, in id order, the host's bypass last: `{ symbol, unit, unitEnum, scale,
