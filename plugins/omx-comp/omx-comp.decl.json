@@ -84,9 +84,6 @@
         "lv2:isSideChain"
       ]
     },
-    "ratio": {
-      "unit": "<urn:openmixer:unit#ratio>"
-    },
     "keySource": {
       "props": [
         "lv2:enumeration",
@@ -110,9 +107,6 @@
         "pprops:logarithmic"
       ],
       "unit": "units:hz"
-    },
-    "keyTiltDb": {
-      "unit": "<urn:openmixer:unit#dBoct>"
     },
     "keyListen": {
       "props": [
@@ -168,6 +162,9 @@
   },
   "oracles": [
     "comp-key"
+  ],
+  "monitors": [
+    "keyListen"
   ],
   "meters": [
     {
