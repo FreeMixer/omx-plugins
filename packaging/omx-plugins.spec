@@ -59,7 +59,8 @@ Take the sound of the OpenMixer console into your DAW or onto your own rig:
 delay, drive, the channel EQ as an 8-band EQ, a 16-band EQ or a 32-band EQ, a
 31-band graphic EQ, the full channel strip and the keyed gate with its sidechain
 input, and the console's effects: chorus, flanger, phaser, tremolo, rotary
-speaker, reverb, pitch shifter, transient shaper, de-esser, limiter and compressor. They come
+speaker, reverb, pitch shifter, transient shaper, de-esser, limiter, compressor
+with its sidechain key, multiband compressor and dynamic EQ. They come
 as CLAP plugins for Bitwig, REAPER and Carla, and as LV2 plugins for Ardour,
 Carla, MOD and Zynthian. Each one runs the same DSP as the console, so a track sounds the same
 in a session as it does on the desk, sample for sample. Every plugin comes in
@@ -165,6 +166,7 @@ tools/pins-check.sh %{buildroot}%{_datadir}/plugin-hostd/pins.d/omx-plugins.pins
 /usr/lib/clap/omx-geq.clap
 /usr/lib/clap/omx-keyed-gate.clap
 /usr/lib/clap/omx-limiter.clap
+/usr/lib/clap/omx-multiband.clap
 /usr/lib/clap/omx-phaser.clap
 /usr/lib/clap/omx-pitch.clap
 /usr/lib/clap/omx-reverb.clap
@@ -209,6 +211,7 @@ tools/pins-check.sh %{buildroot}%{_datadir}/plugin-hostd/pins.d/omx-plugins.pins
 %{_libdir}/lv2/omx-geq.lv2/
 %{_libdir}/lv2/omx-keyed-gate.lv2/
 %{_libdir}/lv2/omx-limiter.lv2/
+%{_libdir}/lv2/omx-multiband.lv2/
 %{_libdir}/lv2/omx-phaser.lv2/
 %{_libdir}/lv2/omx-pitch.lv2/
 %{_libdir}/lv2/omx-reverb.lv2/

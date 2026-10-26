@@ -1,0 +1,223 @@
+{
+  "format": "org.openmixer.preset/1",
+  "plugin": "org.openmixer.multiband",
+  "id": "iem-control",
+  "name": "IEM Control",
+  "carries": "params",
+  "params": [
+    {
+      "symbol": "bands",
+      "unit": "",
+      "value": 3,
+      "label": "3"
+    },
+    {
+      "symbol": "xoverHz1",
+      "unit": "Hz",
+      "value": 200
+    },
+    {
+      "symbol": "xoverHz2",
+      "unit": "Hz",
+      "value": 2000
+    },
+    {
+      "symbol": "xoverHz3",
+      "unit": "Hz",
+      "value": 5000
+    },
+    {
+      "symbol": "xoverHz4",
+      "unit": "Hz",
+      "value": 6400
+    },
+    {
+      "symbol": "thresholdDb1",
+      "unit": "dB",
+      "value": -24
+    },
+    {
+      "symbol": "thresholdDb2",
+      "unit": "dB",
+      "value": -24
+    },
+    {
+      "symbol": "thresholdDb3",
+      "unit": "dB",
+      "value": -24
+    },
+    {
+      "symbol": "thresholdDb4",
+      "unit": "dB",
+      "value": -20
+    },
+    {
+      "symbol": "thresholdDb5",
+      "unit": "dB",
+      "value": -20
+    },
+    {
+      "symbol": "ratio1",
+      "unit": "",
+      "value": 2.5
+    },
+    {
+      "symbol": "ratio2",
+      "unit": "",
+      "value": 2.5
+    },
+    {
+      "symbol": "ratio3",
+      "unit": "",
+      "value": 2.5
+    },
+    {
+      "symbol": "ratio4",
+      "unit": "",
+      "value": 2
+    },
+    {
+      "symbol": "ratio5",
+      "unit": "",
+      "value": 2
+    },
+    {
+      "symbol": "attackMs1",
+      "unit": "ms",
+      "value": 10
+    },
+    {
+      "symbol": "attackMs2",
+      "unit": "ms",
+      "value": 10
+    },
+    {
+      "symbol": "attackMs3",
+      "unit": "ms",
+      "value": 10
+    },
+    {
+      "symbol": "attackMs4",
+      "unit": "ms",
+      "value": 10
+    },
+    {
+      "symbol": "attackMs5",
+      "unit": "ms",
+      "value": 10
+    },
+    {
+      "symbol": "releaseMs1",
+      "unit": "ms",
+      "value": 150
+    },
+    {
+      "symbol": "releaseMs2",
+      "unit": "ms",
+      "value": 150
+    },
+    {
+      "symbol": "releaseMs3",
+      "unit": "ms",
+      "value": 150
+    },
+    {
+      "symbol": "releaseMs4",
+      "unit": "ms",
+      "value": 150
+    },
+    {
+      "symbol": "releaseMs5",
+      "unit": "ms",
+      "value": 150
+    },
+    {
+      "symbol": "makeupDb1",
+      "unit": "dB",
+      "value": 0
+    },
+    {
+      "symbol": "makeupDb2",
+      "unit": "dB",
+      "value": 0
+    },
+    {
+      "symbol": "makeupDb3",
+      "unit": "dB",
+      "value": 0
+    },
+    {
+      "symbol": "makeupDb4",
+      "unit": "dB",
+      "value": 0
+    },
+    {
+      "symbol": "makeupDb5",
+      "unit": "dB",
+      "value": 0
+    },
+    {
+      "symbol": "solo1",
+      "unit": "",
+      "value": 0
+    },
+    {
+      "symbol": "solo2",
+      "unit": "",
+      "value": 0
+    },
+    {
+      "symbol": "solo3",
+      "unit": "",
+      "value": 0
+    },
+    {
+      "symbol": "solo4",
+      "unit": "",
+      "value": 0
+    },
+    {
+      "symbol": "solo5",
+      "unit": "",
+      "value": 0
+    },
+    {
+      "symbol": "bandBypass1",
+      "unit": "",
+      "value": 0
+    },
+    {
+      "symbol": "bandBypass2",
+      "unit": "",
+      "value": 0
+    },
+    {
+      "symbol": "bandBypass3",
+      "unit": "",
+      "value": 0
+    },
+    {
+      "symbol": "bandBypass4",
+      "unit": "",
+      "value": 0
+    },
+    {
+      "symbol": "bandBypass5",
+      "unit": "",
+      "value": 0
+    },
+    {
+      "symbol": "mixPct",
+      "unit": "%",
+      "value": 100
+    },
+    {
+      "symbol": "outputDb",
+      "unit": "dB",
+      "value": 0
+    }
+  ],
+  "created": "2026-10-17T00:00:00Z",
+  "modified": "2026-10-17T00:00:00Z",
+  "copyOf": null
+}

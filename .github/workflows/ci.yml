@@ -150,8 +150,8 @@ jobs:
             rpm -qlp "$rpm" | grep -v '^/usr/lib/.build-id' | sort > files-$sub.txt
           done
           # BEGIN GENERATED plugins: tools/gen.mjs, the shipped plugins' short names and kernels, the test plugins' ids
-          shorts="chorus comp deesser delay drive eq8 eq16 eq32 flanger geq keyed-gate limiter phaser pitch reverb rotary strip transient tremolo"
-          kernels="chorus comp deesser delay drive eq8 eq16 eq32 flanger geq gate limiter phaser pitch reverb rotary strip transient tremolo"
+          shorts="chorus comp deesser delay drive dyneq eq8 eq16 eq32 flanger geq keyed-gate limiter multiband phaser pitch reverb rotary strip transient tremolo"
+          kernels="chorus comp deesser delay drive dyneq eq8 eq16 eq32 flanger geq gate limiter mbcomp phaser pitch reverb rotary strip transient tremolo"
           tests="org.openmixer.test-note-echo org.openmixer.test-sine-voice org.openmixer.test-transport-probe"
           teststems="omx-test-note-echo omx-test-sine-voice omx-test-transport-probe"
           # END GENERATED plugins
@@ -198,8 +198,8 @@ jobs:
           out=$(rpm -ql omx-plugins); grep -qx /usr/share/omx/presets/org.openmixer.drive/amp-tube.json <<<"$out"
           test "$(grep -c '^/usr/share/omx/presets/.*\.json$' <<<"$out")" = "$(find presets -name '*.json' | wc -l)"
           # BEGIN GENERATED plugins: tools/gen.mjs, the shipped plugins' short names and kernels, the test plugins' ids
-          shorts="chorus comp deesser delay drive eq8 eq16 eq32 flanger geq keyed-gate limiter phaser pitch reverb rotary strip transient tremolo"
-          kernels="chorus comp deesser delay drive eq8 eq16 eq32 flanger geq gate limiter phaser pitch reverb rotary strip transient tremolo"
+          shorts="chorus comp deesser delay drive dyneq eq8 eq16 eq32 flanger geq keyed-gate limiter multiband phaser pitch reverb rotary strip transient tremolo"
+          kernels="chorus comp deesser delay drive dyneq eq8 eq16 eq32 flanger geq gate limiter mbcomp phaser pitch reverb rotary strip transient tremolo"
           tests="org.openmixer.test-note-echo org.openmixer.test-sine-voice org.openmixer.test-transport-probe"
           teststems="omx-test-note-echo omx-test-sine-voice omx-test-transport-probe"
           # END GENERATED plugins
@@ -221,8 +221,8 @@ jobs:
           devel=$(find rpms -maxdepth 1 -name "omx-plugins-devel-[0-9]*.rpm" ! -name "*.src.rpm" | head -1)
           dnf install -y --setopt=install_weak_deps=False "$devel"
           # BEGIN GENERATED plugins: tools/gen.mjs, the shipped plugins' short names and kernels, the test plugins' ids
-          shorts="chorus comp deesser delay drive eq8 eq16 eq32 flanger geq keyed-gate limiter phaser pitch reverb rotary strip transient tremolo"
-          kernels="chorus comp deesser delay drive eq8 eq16 eq32 flanger geq gate limiter phaser pitch reverb rotary strip transient tremolo"
+          shorts="chorus comp deesser delay drive dyneq eq8 eq16 eq32 flanger geq keyed-gate limiter multiband phaser pitch reverb rotary strip transient tremolo"
+          kernels="chorus comp deesser delay drive dyneq eq8 eq16 eq32 flanger geq gate limiter mbcomp phaser pitch reverb rotary strip transient tremolo"
           tests="org.openmixer.test-note-echo org.openmixer.test-sine-voice org.openmixer.test-transport-probe"
           teststems="omx-test-note-echo omx-test-sine-voice omx-test-transport-probe"
           # END GENERATED plugins
@@ -294,8 +294,8 @@ jobs:
           out=$(dpkg -L omx-plugins); grep -qx /usr/share/omx/presets/org.openmixer.drive/amp-tube.json <<<"$out"
           test "$(grep -c '^/usr/share/omx/presets/.*\.json$' <<<"$out")" = "$(find presets -name '*.json' | wc -l)"
           # BEGIN GENERATED plugins: tools/gen.mjs, the shipped plugins' short names and kernels, the test plugins' ids
-          shorts="chorus comp deesser delay drive eq8 eq16 eq32 flanger geq keyed-gate limiter phaser pitch reverb rotary strip transient tremolo"
-          kernels="chorus comp deesser delay drive eq8 eq16 eq32 flanger geq gate limiter phaser pitch reverb rotary strip transient tremolo"
+          shorts="chorus comp deesser delay drive dyneq eq8 eq16 eq32 flanger geq keyed-gate limiter multiband phaser pitch reverb rotary strip transient tremolo"
+          kernels="chorus comp deesser delay drive dyneq eq8 eq16 eq32 flanger geq gate limiter mbcomp phaser pitch reverb rotary strip transient tremolo"
           tests="org.openmixer.test-note-echo org.openmixer.test-sine-voice org.openmixer.test-transport-probe"
           teststems="omx-test-note-echo omx-test-sine-voice omx-test-transport-probe"
           # END GENERATED plugins
@@ -321,8 +321,8 @@ jobs:
           set -euo pipefail
           apt-get install -y --no-install-recommends ./debs/omx-plugins-dev_*.deb
           # BEGIN GENERATED plugins: tools/gen.mjs, the shipped plugins' short names and kernels, the test plugins' ids
-          shorts="chorus comp deesser delay drive eq8 eq16 eq32 flanger geq keyed-gate limiter phaser pitch reverb rotary strip transient tremolo"
-          kernels="chorus comp deesser delay drive eq8 eq16 eq32 flanger geq gate limiter phaser pitch reverb rotary strip transient tremolo"
+          shorts="chorus comp deesser delay drive dyneq eq8 eq16 eq32 flanger geq keyed-gate limiter multiband phaser pitch reverb rotary strip transient tremolo"
+          kernels="chorus comp deesser delay drive dyneq eq8 eq16 eq32 flanger geq gate limiter mbcomp phaser pitch reverb rotary strip transient tremolo"
           tests="org.openmixer.test-note-echo org.openmixer.test-sine-voice org.openmixer.test-transport-probe"
           teststems="omx-test-note-echo omx-test-sine-voice omx-test-transport-probe"
           # END GENERATED plugins

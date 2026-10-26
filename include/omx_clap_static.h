@@ -69,6 +69,7 @@ extern const clap_plugin_entry_t omx_clap_entry_flanger;
 extern const clap_plugin_entry_t omx_clap_entry_geq;
 extern const clap_plugin_entry_t omx_clap_entry_gate;
 extern const clap_plugin_entry_t omx_clap_entry_limiter;
+extern const clap_plugin_entry_t omx_clap_entry_mbcomp;
 extern const clap_plugin_entry_t omx_clap_entry_phaser;
 extern const clap_plugin_entry_t omx_clap_entry_pitch;
 extern const clap_plugin_entry_t omx_clap_entry_reverb;
