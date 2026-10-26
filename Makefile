@@ -6,8 +6,9 @@
 #
 #   make            build every plugin
 #   make test       every plugin's tests (what the package builds run), then `make hints`, `make look` and `make manual`
-#   make units      the declared units' contract codes (tools/param-contract.mjs) are the header's enum, and its vendor
-#                   block is dbfs, dbu, ratio, lufs (tools/test/param-units-check.mjs)
+#   make units      the declared units' contract codes (tools/param-contract.mjs) are the header's enum, its vendor
+#                   block is dbfs, dbu, ratio, lufs, and the enum is written from contract/param-units.json with
+#                   nothing apart, a unit changed on either side red (tools/test/param-units-check.mjs)
 #   make lv2-units  every unit a declaration uses has an LV2 unit, and every port states the unit it declares
 #                   (tools/test/lv2-units-check.mjs, with its sabotage arms; part of `make test`)
 #   make format-tables  the generators read plugin-hostd's installed format tables backwards (tools/format-tables.mjs):
@@ -157,7 +158,7 @@ test-faces: all lib contract-union eq-probe-race
 	@$(MAKE) -s test-role
 	@$(MAKE) -s package-lists
 units:
-	node tools/test/param-units-check.mjs
+	node tools/test/param-units-check.mjs --self-test
 panel-layout:
 	node tools/test/panel-layout-test.mjs
 descriptor-view:
