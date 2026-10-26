@@ -4,7 +4,8 @@
 #
 # tools/test/contract-dir-check.sh — `make install-contract` puts each shipped plugin's descriptor into omx-contract's
 # contract directory (omx-contract docs/contract-dir.md): <contractdir>/3/omx-plugins/plugins/<stem>.json, byte for
-# byte the plugin folder's <stem>.descriptor.json, one per shipped plugin that has one and nothing else, each listed in
+# byte the plugin folder's <stem>.descriptor.json, one per shipped plugin that has one, and each definition file of
+# contract/ as <contractdir>/3/omx-plugins/<file>.json byte for byte, and nothing else, each listed in
 # the package's MANIFEST.json with its sha256 and this release's version; and omx-contract's own reader reads the
 # installed tree beside the installed contract directory (`omx-contract validate --installed`, with
 # OMX_CONTRACT_PATH naming both), needing omx-plugins at this version.
@@ -73,11 +74,20 @@ check() {
       || { echo "contract-dir: $stem: MANIFEST.json does not list plugins/$stem.json"; bad=$((bad + 1)); }
   done
   [ "$n" -gt 0 ] || { echo "contract-dir: no shipped plugin has a descriptor"; bad=$((bad + 1)); }
+  for f in "$HERE"/contract/*.json; do
+    rel=$(basename "$f")
+    if [ ! -f "$pkg/$rel" ]; then echo "contract-dir: contract/$rel is not installed as $rel"; bad=$((bad + 1)); continue; fi
+    cmp -s "$f" "$pkg/$rel" || { echo "contract-dir: $rel is not contract/$rel byte for byte"; bad=$((bad + 1)); }
+    want=$(sha256sum "$pkg/$rel" | cut -d' ' -f1)
+    got=$(awk -v r="$rel" '$1 == "file" && $2 == r {print $3}' <<<"$listed")
+    [ "$got" = "$want" ] || { echo "contract-dir: MANIFEST.json lists $rel as ${got:-nothing}, the file is $want"; bad=$((bad + 1)); }
+  done
   while IFS= read -r f; do
     rel=${f#"$pkg"/}
     [ "$rel" = MANIFEST.json ] && continue
     case $rel in plugins/*.json) stem=$(basename "$rel" .json); grep -qx "$stem" <<<"$stems" && continue ;; esac
-    echo "contract-dir: $rel is installed and is no shipped plugin's descriptor"; bad=$((bad + 1))
+    [ -f "$HERE/contract/$rel" ] && continue
+    echo "contract-dir: $rel is installed and is no shipped plugin's descriptor nor a file of contract/"; bad=$((bad + 1))
   done < <(find "$pkg" -type f | LC_ALL=C sort)
   awk '$1 == "file" {print $2}' <<<"$listed" | while read -r rel; do [ -f "$pkg/$rel" ] || echo "contract-dir: MANIFEST.json lists $rel, which is not installed"; done | grep . && bad=$((bad + 1))
   if [ "$reader" = reader ]; then
@@ -112,7 +122,7 @@ if [ "${1:-}" = --self-test ]; then
     node -e 'const fs = require("fs"); const [p, r, h] = process.argv.slice(1); const m = JSON.parse(fs.readFileSync(p, "utf8"));
       m.files[r] = h; fs.writeFileSync(p, JSON.stringify(m, null, 2) + "\n");' "$m" "$2" "$h"
   }
-  for s in left-out missing changed extra hash version $(for r in $REQUIRED; do printf 'unlisted-%s ' "$r"; done); do
+  for s in left-out missing changed extra hash version units-missing units-changed $(for r in $REQUIRED; do printf 'unlisted-%s ' "$r"; done); do
     t=$scratch/$s; rm -rf "$t"
     case $s in
       left-out) install_into "$t" DESCRIPTORS="$rest" ;;
@@ -121,6 +131,8 @@ if [ "${1:-}" = --self-test ]; then
     p=$t/3/omx-plugins
     case $s in
       missing) rm "$p/plugins/$first.json" ;;
+      units-missing) rm "$p/param-units.json" ;;
+      units-changed) sed -i 's/"db": 13/"db": 12/' "$p/param-units.json"; rehash "$t" param-units.json ;;
       changed) sed -i '0,/"name": "/s//"name": "x/' "$p/plugins/$first.json"; rehash "$t" "plugins/$first.json" ;;
       extra) cp "$p/plugins/$first.json" "$p/plugins/omx-test-sine-voice.json"; rehash "$t" plugins/omx-test-sine-voice.json ;;
       hash) sed -i "s|\"plugins/$first.json\": \"[0-9a-f]*\"|\"plugins/$first.json\": \"$(printf '0%.0s' $(seq 64))\"|" "$p/MANIFEST.json" ;;
