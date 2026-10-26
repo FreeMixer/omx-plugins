@@ -1,4 +1,3 @@
 usr/include/omx-plugins
 usr/lib/*/libomxplugins.a
 usr/lib/*/pkgconfig/omxplugins.pc
-usr/share/omx-contract/contract.d/3/omx-plugins
