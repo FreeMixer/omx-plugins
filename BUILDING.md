@@ -7,9 +7,9 @@
 | What | Fedora | Debian | Used for |
 |---|---|---|---|
 | omx-dsp ≥ 0.26.0 (`pkg-config omxdsp`) | `omx-dsp-devel` (channel) | `libomxdsp-dev` (channel) | the DSP: every kernel lives there, none here |
-| omx-contract ≥ 2.16.0 (`pkg-config omx-contract`) | `omx-contract-devel` (channel) | `libomx-contract-dev` (channel) | the declarations: every parameter's travel, read from its installed `omx-contract.json`, and the EQ default rule (its C render; the generators build a small probe, so they need the C compiler too) |
+| omx-contract ≥ 3.3.0 (`pkg-config omx-contract`) | `omx-contract-devel` (channel) | `libomx-contract-dev` (channel) | the declarations: every parameter's travel, read from its installed `omx-contract.json`, and the EQ default rule (its C render; the generators build a small probe, so they need the C compiler too) |
 | openmixer CLAP extensions | `omx-clap-core-devel` (channel) | `libomx-clap-core-dev` (channel) | `<omx-clap-host/omx_clap_ext.h>` |
-| the omx-contract command ≥ 2.16.0 | `omx-contract` (channel) | not packaged yet | the generators: the union of the contract directory, read through `omx-contract render --installed` |
+| the omx-contract command ≥ 3.3.0 | `omx-contract` (channel) | `omx-contract` (channel) | the generators: the union of the contract directory, read through `omx-contract render --installed` |
 | CLAP 1.2 headers | `clap-devel` | `clap-headers` (built from the pinned CLAP, see FreeMixer/.github) | the CLAP face |
 | LV2 headers | `lv2-devel` | `lv2-dev` | the LV2 face |
 | C compiler, make, pkg-config | `gcc make pkgconf-pkg-config` | `build-essential pkgconf` | |
@@ -182,9 +182,12 @@ keeps its generated files fresh.
 
 `packaging/omx-plugins.spec` builds `omx-plugins-clap`, `omx-plugins-lv2`, the `omx-plugins`
 metapackage that requires both, `omx-plugins-devel` (the headers, `libomxplugins.a` and
-`omxplugins.pc`) and `omx-plugins-test` (the test instruments, in `/usr/libexec/omx-plugins/test`,
+`omxplugins.pc`), `omx-plugins-contract` (noarch; each plugin's descriptor and the manifest in
+omx-contract's contract directory, which a host and the console read at run time; `omx-plugins` and
+`omx-plugins-devel` require it at their own version) and `omx-plugins-test` (the test instruments, in `/usr/libexec/omx-plugins/test`,
 outside every CLAP search path, for host tests and for measuring them on a console), and runs `make test` in `%check`; `debian/` builds the same packages for bookworm
-and trixie (`omx-plugins-dev`, with the archive in the multiarch directory) and runs `make test`
+and trixie (`omx-plugins-dev`, with the archive in the multiarch directory, and `omx-plugins-contract`,
+`Architecture: all`) and runs `make test`
 unless `nocheck` is set. The version lives in three places that CI keeps equal: the top-level
 `Makefile` (`make version`), the spec's `Version:` and the top of `debian/changelog`.
 
