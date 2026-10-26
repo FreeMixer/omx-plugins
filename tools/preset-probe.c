@@ -157,9 +157,16 @@ static int clap_mode(const char *path, const char *installed, const char *tree) 
     if (!pv || !pv->init(pv)) return fprintf(stderr, "%s: provider %u does not start\n", path, k), 1;
     for (int l = 0; l < g_locs; ++l) {
       size_t n = strlen(installed);
-      char dir[2048];
-      if (strncmp(g_loc[l], installed, n) == 0) snprintf(dir, sizeof dir, "%s%s", tree, g_loc[l] + n);
-      else snprintf(dir, sizeof dir, "%s", g_loc[l]);
+      char staged[2048];
+      const char *dir = g_loc[l];
+      if (strncmp(g_loc[l], installed, n) == 0) {
+        if (snprintf(staged, sizeof staged, "%s%s", tree, g_loc[l] + n) >= (int)sizeof staged) {
+          fprintf(stderr, "%s: declared location %s under %s is longer than %zu bytes\n", path, g_loc[l], tree, sizeof staged - 1);
+          rc = 1;
+          continue;
+        }
+        dir = staged;
+      }
       DIR *d = opendir(dir);
       if (!d) { fprintf(stderr, "%s: declared location %s (%s) does not open\n", path, g_loc[l], dir); rc = 1; continue; }
       int first = nfiles;

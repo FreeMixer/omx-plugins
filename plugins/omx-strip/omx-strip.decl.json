@@ -151,7 +151,11 @@
         "keySource": "self",
         "hpHz": 0,
         "lpHz": 0
-      }
+      },
+      "held": [
+        "keyListen",
+        "keyTiltDb"
+      ]
     },
     {
       "id": "eq",
@@ -389,7 +393,18 @@
       ],
       "fixed": {
         "detectorTopology": "feedforward"
-      }
+      },
+      "held": [
+        "keySource",
+        "keyHpHz",
+        "keyLpHz",
+        "keyTiltDb",
+        "keyListen",
+        "holdMs",
+        "detectLink",
+        "duck",
+        "rangeDb"
+      ]
     }
   ],
   "order": "permutable",

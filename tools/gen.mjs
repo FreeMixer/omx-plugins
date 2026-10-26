@@ -869,12 +869,44 @@ export const oracleStretch = (face) => (face.keyed ? 64 : 1);
 /** One step of each parameter, the sabotage arm's move: 1 % of a travel, the next value of a choice. */
 const stepOf = (p) => (p.kind === 'toggle' || p.kind === 'integer' ? 1 : (p.max - p.min) / 100);
 
+/**
+ * The controls of `kernel` a declaration (or a chain element) `holds`: no parameter, no port, each
+ * passed at its kernel's declared default by the default's named macro, OMX_<ref>_DEFAULT (a face
+ * argument the plugin does not expose yet). `[{ p: { symbol, held }, c: { name } }]`, each symbol
+ * `<prefix>.<control>`, the errors pushed on `errors`; `who` names the holder in them.
+ */
+function heldControls(d, kernel, names, prefix, who, errors) {
+  if (names === undefined) return [];
+  if (!Array.isArray(names) || names.some((n) => typeof n !== 'string')) {
+    errors.push(`${who}'s "held" lists control names`);
+    return [];
+  }
+  const where = locateContract(d.tree ?? ROOT);
+  if (!where.dir) {
+    errors.push(`${who} holds ${names.join(', ')} and ${where.why}`);
+    return [];
+  }
+  return names.flatMap((name) => {
+    const c = kernelControls(where.dir, kernel).find((x) => x.name === name);
+    if (!c) errors.push(`${who} holds '${name}', no control of the ${kernel} kernel`);
+    else if (c.field || c.count) errors.push(`${who} holds '${name}', a field of ${c.ref} with no default macro of its own: pass it as "fixed"`);
+    else return [{ p: { symbol: `${prefix}.${name}`, held: `OMX_${c.ref}_DEFAULT` }, c: { name } }];
+    return [];
+  });
+}
+
 /** The binding of `d` to its kernel's instance face, or a thrown error naming what is missing. */
 export function bindingOf(d) {
-  const b = faceBinding(omxdspInclude(), d.face ?? d.kernel, d.params, d.controls ?? []);
-  if (b.errors.length) throw new Error(`plugins/${d.stem}: binding: instance, but ${b.errors.join('; ')}`);
+  const errors = [];
+  const held = heldControls(d, d.face ?? d.kernel, d.held, d.stem, d.stem, errors);
+  const b = faceBinding(omxdspInclude(), d.face ?? d.kernel, [...d.params, ...held.map((h) => h.p)], [...(d.controls ?? []), ...held.map((h) => h.c)]);
+  errors.push(...b.errors);
+  if (errors.length) throw new Error(`plugins/${d.stem}: binding: instance, but ${errors.join('; ')}`);
   return b;
 }
+
+/** A held argument's value at the call site: its default's macro, cast to the argument's type. */
+const heldValue = (type, p) => `(${type})${p.held}`;
 
 /** The files of a `binding: instance` plugin beyond generated/: path relative to the plugin dir -> text. */
 export function generateInstance(d) {
@@ -885,7 +917,7 @@ export function generateInstance(d) {
   const macro_ = (sym) => `OMX_${K}_PARAM_${macro(sym)}`;
   const one = (type, sym) => (type === 'int' ? `(int)lrintf(values[${macro_(sym)}])` : `values[${macro_(sym)}]`);
   // a per-band array: a compound literal of its parameters, in declaration order
-  const value = (b) => (b.extent ? `(const ${b.elem}[${b.extent}]){${b.params.map((p) => one(b.elem, p.symbol)).join(', ')}}` : one(b.type, b.param.symbol));
+  const value = (b) => (b.extent ? `(const ${b.elem}[${b.extent}]){${b.params.map((p) => one(b.elem, p.symbol)).join(', ')}}` : b.param.held ? heldValue(b.type, b.param) : one(b.type, b.param.symbol));
   const lat = (self) => (face.latency.fn ? `${face.latency.fn}(${self})` : face.latency.macro);
   const view = {
     ...templateView(d),
@@ -893,6 +925,7 @@ export function generateInstance(d) {
     binding: binding.map((b) => ({ arg: b.arg, value: value(b) })),
     arrays: binding.filter((b) => b.extent).map((b) => ({ arg: b.arg, count: b.params.length, extent: b.extent })),
     renames: renames.map((b) => ({ arg: b.arg, rename: b.rename })),
+    heldArgs: binding.filter((b) => b.param.held).map((b) => ({ arg: b.arg, at: b.param.held })),
     latency: lat('&c->inst'), refLatency: lat('&inst'),
     keyed: face.keyed, keyPort: face.keyed ? macro(d.sidechain.symbol) : '', keySymbol: face.keyed ? d.sidechain.symbol : '',
     plan: oraclePlan(d.params, d.controls ?? []), held: heldOf(d), stretch: oracleStretch(face), steps: d.params.map((p) => cfloat(stepOf(p))).join(', '),
@@ -1001,7 +1034,9 @@ export function chainBindings(d) {
         return [];
       }
     });
-    const b = faceBinding(inc, el.kernel, [...params, ...fixed.map((f) => f.p)], [...controls, ...fixed.map((f) => f.c)]);
+    const held = heldControls(d, el.kernel, el.held, el.id, `element '${el.id}'`, errors);
+    const extra = [...fixed, ...held];
+    const b = faceBinding(inc, el.kernel, [...params, ...extra.map((f) => f.p)], [...controls, ...extra.map((f) => f.c)]);
     for (const e of b.errors) errors.push(`element '${el.id}' (${el.kernel}): ${e}`);
     if (b.face && !b.face.keyed && d.key === el.id) errors.push(`"key" names '${el.id}', and omx_${el.kernel}_instance_run takes no key`);
     return { el, ...b };
@@ -1018,7 +1053,7 @@ export function generateChain(d) {
   const bound = chainBindings(d);
   const K = d.kernel.toUpperCase();
   const macro_ = (sym) => `OMX_${K}_PARAM_${macro(sym)}`;
-  const one = (type, p) => (p.fixed !== undefined ? (type === 'int' ? `${p.fixed}` : cfloat(p.fixed)) : type === 'int' ? `(int)lrintf(values[${macro_(p.symbol)}])` : `values[${macro_(p.symbol)}]`);
+  const one = (type, p) => (p.held ? heldValue(type, p) : p.fixed !== undefined ? (type === 'int' ? `${p.fixed}` : cfloat(p.fixed)) : type === 'int' ? `(int)lrintf(values[${macro_(p.symbol)}])` : `values[${macro_(p.symbol)}]`);
   const value = (b) => (b.extent ? `(const ${b.elem}[${b.extent}]){${b.params.map((p) => one(b.elem, p)).join(', ')}}` : one(b.type, b.param));
   const lat = (b, self) => (b.face.latency.fn ? `${b.face.latency.fn}(${self})` : b.face.latency.macro);
   const keyed = d.key !== undefined;
@@ -1029,6 +1064,7 @@ export function generateChain(d) {
     arrays: b.binding.filter((x) => x.extent).map((x) => ({ arg: x.arg, count: x.params.length, extent: x.extent })),
     renames: b.renames.map((x) => ({ arg: x.arg, rename: x.rename })),
     fixed: (b.el.fixed ? Object.entries(b.el.fixed) : []).map(([name, v]) => ({ control: name, at: JSON.stringify(v) })),
+    heldArgs: b.binding.filter((x) => x.param.held).map((x) => ({ arg: x.arg, at: x.param.held })),
     keyedFace: b.face.keyed, keyArg: b.face.keyed ? (d.key === b.el.id ? 'key' : 'NULL') : '',
     keyRef: b.face.keyed && d.key === b.el.id ? 'key ? key + at : NULL' : 'NULL',
     latency: lat(b, `&c->${b.el.id}`), refLatency: lat(b, `&${b.el.id}`),
@@ -1046,7 +1082,7 @@ export function generateChain(d) {
     held: heldOf(d), stretch: keyed ? 64 : 1, steps: d.params.map((p) => cfloat(stepOf(p))).join(', '),
     latencyChecks: latencyRows(d), measuresLatency: Boolean(d.latencyChecks),
     // the single-face fields the shared templates read, empty for a chain
-    faceType: '', srType: '', binding: [], arrays: [], renames: [],
+    faceType: '', srType: '', binding: [], arrays: [], renames: [], heldArgs: [],
   };
   return {
     Makefile: withBanner(render(template('Makefile.tmpl'), view), d, '#'),

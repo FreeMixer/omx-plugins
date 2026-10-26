@@ -22,7 +22,7 @@
 NAME       := omx-deesser
 URI        := urn:openmixer:deesser
 CLAP_ID    := org.openmixer.deesser
-OMXDSP_MIN ?= 0.24.0
+OMXDSP_MIN ?= 0.26.0
 ROOT       := $(abspath ../..)
 GEN        := generated
 B          := build
