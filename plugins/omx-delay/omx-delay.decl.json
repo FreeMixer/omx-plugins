@@ -8,6 +8,14 @@
   "url": "https://github.com/FreeMixer/omx-plugins",
   "summary": "Stereo delay up to 2 s: feedback through a tone filter that darkens each repeat, ping-pong, wet/dry mix. Zero latency, real-time safe, 44.1 to 192 kHz.",
   "binding": "instance",
+  "held": [
+    "sync",
+    "division",
+    "mode",
+    "duckDb",
+    "duckThresholdDb",
+    "duckReleaseMs"
+  ],
   "portHints": {
     "fxDelayTime": {
       "props": [

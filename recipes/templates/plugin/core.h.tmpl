@@ -10,7 +10,8 @@
  * GENERATED — DO NOT EDIT BY HAND. Produced by tools/gen.mjs from plugins/{{stem}}/{{stem}}.decl.json and
  * the face's resolve() prototype: each argument takes the parameter whose contract control it names.
 {{#renames}} * RENAME OWED by omx-dsp's name conformance: resolve argument `{{arg}}` is the contract's `{{rename}}`.
-{{/renames}} */
+{{/renames}}{{#heldArgs}} * `{{arg}}` is no parameter: the declaration holds it at its kernel's declared default, {{at}}.
+{{/heldArgs}} */
 #ifndef OMX_{{K}}_CORE_H
 #define OMX_{{K}}_CORE_H
 
