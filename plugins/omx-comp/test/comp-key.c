@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Pau Aliagas <linuxnow@gmail.com>
 /*
- * comp-key.c — the compressor's key, through each BUILT face at the nine rates an audio interface clocks
+ * comp-key.c: the compressor's key, through each BUILT face at the nine rates an audio interface clocks
  * at (OMX_ORACLE_FULL_RATES, 32 to 192 kHz), read from the audio a host sees:
  *
  *   comp-key clap <omx-comp.clap>
