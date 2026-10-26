@@ -261,7 +261,9 @@ package-lists:
 	tools/package-lists-check.sh
 	tools/package-lists-check.sh --self-test
 # Each shipped plugin's descriptor, plugins/<stem>/<stem>.descriptor.json, installed byte for byte into omx-contract's
-# contract directory as $(CONTRACTDIR)/<schema major>/omx-plugins/plugins/<stem>.json, with a MANIFEST.json naming this
+# contract directory as $(CONTRACTDIR)/<schema major>/omx-plugins/plugins/<stem>.json, and each definition file of
+# contract/ (param-units.json: the param-contract extension's unit codes) as
+# $(CONTRACTDIR)/<schema major>/omx-plugins/<file>.json, with a MANIFEST.json naming this
 # version (omx-contract docs/contract-dir.md); the packages ship it in omx-plugins-contract. The directory is
 # omx-contract-data's, under the same data directory
 # (`pkg-config --variable=contractdir omx-contract`); the install script too, or OMX_CONTRACT_DIR's, an omx-contract
@@ -270,10 +272,12 @@ CONTRACTDIR ?= $(DATADIR)/omx-contract/contract.d
 CONTRACT_SCHEMA_MAJOR := 3
 INSTALL_CONTRACT_DIR = $(firstword $(wildcard $(shell $(PKG_CONFIG) --variable=datadir omx-contract 2>/dev/null)/install-contract-dir.sh) $(wildcard $(OMX_CONTRACT_DIR)/tools/install-contract-dir.sh))
 DESCRIPTORS = $(foreach p,$(SHIP_PLUGINS),$(wildcard $(p)$(notdir $(p:/=)).descriptor.json))
+CONTRACT_FILES = $(wildcard contract/*.json)
 install-contract:
 	@test -n "$(INSTALL_CONTRACT_DIR)" || { echo "install-contract: no install-contract-dir.sh: install omx-contract-devel, or set OMX_CONTRACT_DIR to a checkout" >&2; exit 1; }
 	@stage=$$(mktemp -d) && trap 'rm -rf "$$stage"' EXIT && mkdir -p "$$stage/plugins" && \
 	  for f in $(DESCRIPTORS); do cp "$$f" "$$stage/plugins/$$(basename "$$f" .descriptor.json).json" || exit 1; done && \
+	  for f in $(CONTRACT_FILES); do cp "$$f" "$$stage/" || exit 1; done && \
 	  sh $(INSTALL_CONTRACT_DIR) omx-plugins $(VERSION) $(CONTRACT_SCHEMA_MAJOR) "$$stage" $(DESTDIR)$(CONTRACTDIR)
 contract-dir:
 	tools/test/contract-dir-check.sh
