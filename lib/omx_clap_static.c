@@ -21,6 +21,7 @@ const struct omx_clap_static_plugin OMX_CLAP_STATIC_PLUGINS[] = {
     {"org.openmixer.deesser", &omx_clap_entry_deesser},
     {"org.openmixer.delay", &omx_clap_entry_delay},
     {"org.openmixer.drive", &omx_clap_entry_drive},
+    {"org.openmixer.dyneq", &omx_clap_entry_dyneq},
     {"org.openmixer.eq8", &omx_clap_entry_eq8},
     {"org.openmixer.eq16", &omx_clap_entry_eq16},
     {"org.openmixer.eq32", &omx_clap_entry_eq32},

@@ -61,6 +61,7 @@ extern const clap_plugin_entry_t omx_clap_entry_comp;
 extern const clap_plugin_entry_t omx_clap_entry_deesser;
 extern const clap_plugin_entry_t omx_clap_entry_delay;
 extern const clap_plugin_entry_t omx_clap_entry_drive;
+extern const clap_plugin_entry_t omx_clap_entry_dyneq;
 extern const clap_plugin_entry_t omx_clap_entry_eq8;
 extern const clap_plugin_entry_t omx_clap_entry_eq16;
 extern const clap_plugin_entry_t omx_clap_entry_eq32;

@@ -177,6 +177,7 @@ tools/pins-check.sh %{buildroot}%{_datadir}/plugin-hostd/pins.d/omx-plugins.pins
 /usr/lib/clap/omx-deesser.clap
 /usr/lib/clap/omx-delay.clap
 /usr/lib/clap/omx-drive.clap
+/usr/lib/clap/omx-dyneq.clap
 /usr/lib/clap/omx-eq8.clap
 /usr/lib/clap/omx-eq16.clap
 /usr/lib/clap/omx-eq32.clap
@@ -223,6 +224,7 @@ tools/pins-check.sh %{buildroot}%{_datadir}/plugin-hostd/pins.d/omx-plugins.pins
 %{_libdir}/lv2/omx-deesser.lv2/
 %{_libdir}/lv2/omx-delay.lv2/
 %{_libdir}/lv2/omx-drive.lv2/
+%{_libdir}/lv2/omx-dyneq.lv2/
 %{_libdir}/lv2/omx-eq8.lv2/
 %{_libdir}/lv2/omx-eq16.lv2/
 %{_libdir}/lv2/omx-eq32.lv2/
