@@ -68,7 +68,7 @@ const { got, want } = designations(lv2Designation);
 check('every described control whose meaning the LV2 table maps is designated by it, and no other', got, want);
 const byTerm = {};
 for (const g of got) byTerm[g.split(' ')[1]] = (byTerm[g.split(' ')[1]] ?? 0) + 1;
-check('the designations of this release, by term', Object.fromEntries(Object.entries(byTerm).sort((x, y) => y[1] - x[1] || x[0].localeCompare(y[0]))), { 'param:gain': 87, 'param:frequency': 57, 'param:wetDryRatio': 10, 'param:release': 4, 'param:attack': 3, 'param:ratio': 3, 'param:threshold': 3, 'param:delay': 1, 'param:hold': 1 });
+check('the designations of this release, by term', Object.fromEntries(Object.entries(byTerm).sort((x, y) => y[1] - x[1] || x[0].localeCompare(y[0]))), { 'param:gain': 93, 'param:frequency': 63, 'param:wetDryRatio': 11, 'param:release': 5, 'param:attack': 4, 'param:ratio': 4, 'param:threshold': 4, 'param:delay': 1, 'param:hold': 1 });
 
 // 3. the ratio unit
 const ratios = [];
@@ -76,7 +76,9 @@ for (const dir of described) {
   const stem = dir.split('/').pop(), ttl = ttlOf(dir, stem), ports = portsOf(ttl);
   for (const [sym, p] of Object.entries(ports)) if (p.unit === '<urn:openmixer:unit#ratio>') ratios.push(`${stem}.${sym}${ttl.includes('<urn:openmixer:unit#ratio>\n    a units:Unit') ? '' : ' (undefined)'}`);
 }
-check('the ratio controls state urn:openmixer:unit#ratio, defined in their TTL', ratios, ['omx-comp.ratio', 'omx-deesser.deessRatio', 'omx-keyed-gate.ratio']);
+check('the ratio controls state urn:openmixer:unit#ratio, defined in their TTL', ratios, [
+  'omx-comp.ratio', 'omx-deesser.deessRatio', ...[1, 2, 3, 4, 5, 6].map((n) => `omx-dyneq.ratio${n}`), 'omx-keyed-gate.ratio', ...[1, 2, 3, 4, 5].map((n) => `omx-multiband.ratio${n}`),
+]);
 
 // 4. the CLAP modules
 for (const dir of pluginDirs()) {

@@ -164,7 +164,9 @@ editJson(DESC, (x) => { x.controls[united.id].travel.unit = 'ratio'; });
 check(`arm: ${united.symbol}, a ${united.travel.unit} travel stating ratio, is stale`, descriptorText(loadDecl(copy)) === readFileSync(join(copy, DESC), 'utf8'), false);
 
 const ratios = described.flatMap((d) => JSON.parse(readFileSync(join(d, descriptorFile(d.split('/').pop())), 'utf8')).controls.filter((c) => c.travel?.unit === 'ratio').map((c) => `${d.split('/').pop()}.${c.symbol}`));
-check('the ratio unit (gap 4) is stated by exactly the three ratio controls', ratios, ['omx-comp.ratio', 'omx-deesser.deessRatio', 'omx-keyed-gate.ratio']);
+check('the ratio unit (gap 4) is stated by exactly the ratio controls: comp, de-esser, gate, the dynamic EQ\'s six bands and the multiband\'s five', ratios, [
+  'omx-comp.ratio', 'omx-deesser.deessRatio', ...[1, 2, 3, 4, 5, 6].map((n) => `omx-dyneq.ratio${n}`), 'omx-keyed-gate.ratio', ...[1, 2, 3, 4, 5].map((n) => `omx-multiband.ratio${n}`),
+]);
 
 rmSync(scratch, { recursive: true, force: true });
 console.log(`descriptor-view: ${n - bad}/${n} pass`);
