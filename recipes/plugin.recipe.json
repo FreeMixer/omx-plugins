@@ -90,7 +90,8 @@
       "made": "DECLARED",
       "target": "plugins/{stem}/{stem}.decl.json",
       "paths": [
-        "plugins/{stem}/{stem}.decl.json"
+        "plugins/{stem}/{stem}.decl.json",
+        "plugins/{stem}/{stem}.descriptor.json"
       ],
       "questions": [
         "/$defs/plugin"

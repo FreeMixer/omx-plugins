@@ -178,6 +178,36 @@ export const isWhole = (decl) => decl.variants !== undefined || decl.binding ===
 const SAID = ['name', 'vendor', 'version', 'params', 'description'];
 
 /**
+ * A whole single-kernel declaration as its two files, the inverse of viewOf: `{ descriptor, extras }`,
+ * `descriptor` rendered from `prepared` (the declaration tools/gen.mjs resolved from `raw`), `extras`
+ * `raw` without what the descriptor says, each parameter's own words (CONTROL_EXTRAS) under `controls`
+ * by symbol. A travel the contract's control `ratio` reads with no unit states `ratio` (n:1), as every
+ * described ratio of ours does.
+ */
+export function describedOf(raw, prepared) {
+  const descriptor = descriptorOf(prepared).descriptor;
+  descriptor.controls.forEach((c, i) => {
+    if (c.travel && c.travel.unit === '' && prepared.controls?.[i]?.name === 'ratio') c.travel.unit = RATIO;
+  });
+  const extras = {};
+  for (const [k, v] of Object.entries(raw)) {
+    if (SAID.includes(k) || k === 'clap') continue;
+    if (k === 'lv2') {
+      const { uri, class: cls, ...rest } = v;
+      if (Object.keys(rest).length) extras.lv2 = rest;
+      continue;
+    }
+    extras[k] = v;
+  }
+  const controls = Object.fromEntries(raw.params.flatMap((p) => {
+    const x = Object.fromEntries(CONTROL_EXTRAS.filter((k) => k in p).map((k) => [k, p[k]]));
+    return Object.keys(x).length ? [[p.symbol, x]] : [];
+  }));
+  if (Object.keys(controls).length) extras.controls = controls;
+  return { descriptor, extras };
+}
+
+/**
  * The declaration `extras` (a <stem>.decl.json beside a descriptor) and `descriptor` make together, as
  * tools/gen.mjs resolves it: identity from the descriptor's plugin block, one parameter per control (its
  * reference read from the control's source link, or its travel typed for a control of the face's own),
