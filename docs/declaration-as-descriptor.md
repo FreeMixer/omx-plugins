@@ -107,8 +107,8 @@ stands in for the installed tables.
 - An LV2 port's `units:unit` is the LV2 row mapping its unit (`units:db` for `dB`, `<urn:openmixer:unit#dBFS>` for
   `dBFS`); a unit no row maps is the declaration's own, defined in the plugin's TTL: `dBu`, `dB/oct` and `ratio`
   (`urn:openmixer:unit#ratio`, gap 4).
-- An LV2 port's `lv2:designation` is the LV2 row mapping its control's `meaning`: 169 ports carry a `param:` term
-  (gain 87, frequency 57, wetDryRatio 10, release 4, threshold 3, ratio 3, attack 3, hold 1, delay 1). A meaning with
+- An LV2 port's `lv2:designation` is the LV2 row mapping its control's `meaning`: 186 ports carry a `param:` term
+  (gain 93, frequency 63, wetDryRatio 11, release 5, threshold 4, ratio 4, attack 4, hold 1, delay 1). A meaning with
   no LV2 term is written nowhere.
 - A CLAP parameter's `module` is its control's `group`, the labels joined by `/` (the inverse of plugin-hostd's
   `group-path`); a plugin with no descriptor writes `""`.
@@ -136,19 +136,21 @@ writes it (a CLAP feature by its macro name, `CLAP_PLUGIN_FEATURE_DELAY`; one va
 
 It passes with no `differs`, every bag equal, and each lost word one the tool's `LOSSES` names, by count:
 
-- OR2's: `meaning` on CLAP (269) and on LV2 (100, those with no LV2 term), the `""` unit on LV2 (76);
-- the `ratio` unit on LV2 (3): plugin-hostd 0.7.0's LV2 table has no row for `urn:openmixer:unit#ratio`;
-- on CLAP, words no row reads: the unit (319), a linear or log scale (218), the step (319), a choice's kind, ids,
-  values, labels and default (158, 82, 82, 82, 158), the symbol (477), the LV2 URI (19), a side-chain's role (1), what
-  an LV2 host may lend (19);
-- on LV2: the step (319), automation (477), the plugin's version and vendor (19 each), the CLAP id (477), our point
-  ids (82), the audio ports' ids and names (39 each).
+- OR2's: `meaning` on CLAP (294) and on LV2 (108, those with no LV2 term), the `""` unit on LV2 (82);
+- the `ratio` unit on LV2 (14) and the `dB/oct` unit (1): plugin-hostd 0.7.0's LV2 table has no row for
+  `urn:openmixer:unit#ratio` nor `urn:openmixer:unit#dBoct`;
+- on CLAP, words no row reads: the unit (404), a linear or log scale (276), the step (404), a choice's kind, ids,
+  values, labels and default (197, 97, 97, 97, 197), the symbol (601), the LV2 URI (21), a side-chain's role (2), what
+  an LV2 host may lend (21);
+- on LV2: the step (404), automation (601), the plugin's version and vendor (21 each), the CLAP id (601), our point
+  ids (97), the audio ports' ids and names (44 each).
 
 A break in plugin-hostd's wave tip is named in `UPSTREAM` and printed with its `differs`, not failing; the run fails
 when one no longer shows, so the entry leaves with the fix. One stands: `describe` keeps a
-word's last value and the LV2 dump lists `lv2:toggled` before `rdf:type lv2:ControlPort`, so the 76 LV2 toggles
+word's last value and the LV2 dump lists `lv2:toggled` before `rdf:type lv2:ControlPort`, so the 100 LV2 toggles
 (omx-delay `pingpong`, omx-drive `autoGain` and `stereoLink`, the band, filter and stage switches of omx-eq8, omx-eq16,
-omx-eq32 and omx-strip) scan as travels and lose their default.
+omx-eq32 and omx-strip, omx-comp's `keyListen` and `duck`, omx-dyneq's band switches and listens, omx-multiband's solos
+and bypasses) scan as travels and lose their default.
 
 The four folders with no descriptor (omx-eq, the base of the three EQ variants, and the three omx-test-*) are
 named as outside the round trip. Its self-test breaks the first described plugin twice, one range in a copy of its
