@@ -262,7 +262,8 @@ package-lists:
 	tools/package-lists-check.sh --self-test
 # Each shipped plugin's descriptor, plugins/<stem>/<stem>.descriptor.json, installed byte for byte into omx-contract's
 # contract directory as $(CONTRACTDIR)/<schema major>/omx-plugins/plugins/<stem>.json, with a MANIFEST.json naming this
-# version (omx-contract docs/contract-dir.md). The directory is omx-contract-devel's, under the same data directory
+# version (omx-contract docs/contract-dir.md); the packages ship it in omx-plugins-contract. The directory is
+# omx-contract-data's, under the same data directory
 # (`pkg-config --variable=contractdir omx-contract`); the install script too, or OMX_CONTRACT_DIR's, an omx-contract
 # checkout, when no package is installed.
 CONTRACTDIR ?= $(DATADIR)/omx-contract/contract.d

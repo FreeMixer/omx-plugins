@@ -178,10 +178,21 @@ jobs:
           for f in /usr/include/omx-plugins/omx_clap_static.h /usr/lib64/libomxplugins.a /usr/lib64/pkgconfig/omxplugins.pc; do
             rpm -qlp "$devel" | grep -qx "$f"
           done
-          # one descriptor per shipped plugin that has one, in omx-contract's contract directory, with its manifest
+          # one descriptor per shipped plugin that has one, in omx-contract's contract directory, with its manifest: in
+          # omx-plugins-contract, a package of their own that the metapackage and the devel package require at their
+          # version, read at run time with no -devel installed
           cdir=/usr/share/omx-contract/contract.d/3/omx-plugins
-          rpm -qlp "$devel" | grep -qx "$cdir/MANIFEST.json"
-          test "$(rpm -qlp "$devel" | grep -c "^$cdir/plugins/.*\.json\$")" = "$(ls plugins/*/*.descriptor.json | wc -l)"
+          rpm -qlp rpms/omx-plugins-contract-[0-9]*.noarch.rpm | sort > files-contract.txt
+          { printf '%s\n' "$cdir" "$cdir/MANIFEST.json" "$cdir/plugins" \
+              /usr/share/licenses/omx-plugins-contract /usr/share/licenses/omx-plugins-contract/LICENSE
+            for d in plugins/*/*.descriptor.json; do echo "$cdir/plugins/$(basename "$d" .descriptor.json).json"; done; } | sort > expected-contract.txt
+          diff -u expected-contract.txt files-contract.txt
+          ! rpm -qlp "$devel" | grep -q '^/usr/share/omx-contract/'
+          version=$(sed -n 's/^Version: *//p' packaging/omx-plugins.spec)
+          for rpm in rpms/omx-plugins-[0-9]*.${{ matrix.arch }}.rpm "$devel"; do
+            rpm -qp --requires "$rpm" | tee requires.txt
+            grep -qx "omx-plugins-contract = $version-.*" requires.txt
+          done
           # a test plugin's generated declaration (the constants and CLAP id a proof predicts from)
           for t in test-note-echo test-sine-voice test-transport-probe; do
             rpm -qlp "$devel" | grep -qx "/usr/include/omx-plugins/omx_${t//-/_}_decl.h"
@@ -196,7 +207,11 @@ jobs:
           set -euo pipefail
           # the metapackage, with both formats beside it as the repository would offer them
           dnf install -y --setopt=install_weak_deps=False rpms/omx-plugins-[0-9]*.${{ matrix.arch }}.rpm \
-            rpms/omx-plugins-clap-[0-9]*.${{ matrix.arch }}.rpm rpms/omx-plugins-lv2-[0-9]*.${{ matrix.arch }}.rpm
+            rpms/omx-plugins-clap-[0-9]*.${{ matrix.arch }}.rpm rpms/omx-plugins-lv2-[0-9]*.${{ matrix.arch }}.rpm \
+            rpms/omx-plugins-contract-[0-9]*.noarch.rpm
+          # the descriptors come with the metapackage, no -devel installed
+          rpm -qf /usr/share/omx-contract/contract.d/3/omx-plugins/MANIFEST.json | grep -q '^omx-plugins-contract-'
+          ! rpm -q omx-plugins-devel
           req=$(rpm -q --requires omx-plugins)
           grep -qE '^omx-plugins-clap\([a-z0-9-]+\) = ' <<<"$req"
           grep -qE '^omx-plugins-lv2\([a-z0-9-]+\) = ' <<<"$req"
@@ -225,7 +240,7 @@ jobs:
         run: |
           set -euo pipefail
           devel=$(find rpms -maxdepth 1 -name "omx-plugins-devel-[0-9]*.rpm" ! -name "*.src.rpm" | head -1)
-          dnf install -y --setopt=install_weak_deps=False "$devel"
+          dnf install -y --setopt=install_weak_deps=False "$devel" rpms/omx-plugins-contract-[0-9]*.noarch.rpm
           # BEGIN GENERATED plugins: tools/gen.mjs, the shipped plugins' short names and kernels, the test plugins' ids
           shorts="chorus comp deesser delay drive eq8 eq16 eq32 flanger geq keyed-gate limiter phaser pitch reverb rotary strip transient tremolo"
           kernels="chorus comp deesser delay drive eq8 eq16 eq32 flanger geq gate limiter phaser pitch reverb rotary strip transient tremolo"
@@ -281,13 +296,26 @@ jobs:
         run: |
           set -euo pipefail
           # the metapackage, with both formats beside it as the repository would offer them
-          apt-get install -y --no-install-recommends ./debs/omx-plugins_*.deb ./debs/omx-plugins-clap_*.deb ./debs/omx-plugins-lv2_*.deb
+          apt-get install -y --no-install-recommends ./debs/omx-plugins_*.deb ./debs/omx-plugins-clap_*.deb ./debs/omx-plugins-lv2_*.deb \
+            ./debs/omx-plugins-contract_*_all.deb
           dev=$(dpkg -c debs/omx-plugins-dev_*.deb); grep -q './usr/include/omx-plugins/omx_delay_core.h' <<<"$dev"
           grep -q './usr/include/omx-plugins/omx_clap_static.h' <<<"$dev"
           grep -qE '\./usr/lib/[^/]+/libomxplugins\.a$' <<<"$dev"
           grep -qE '\./usr/lib/[^/]+/pkgconfig/omxplugins\.pc$' <<<"$dev"
-          grep -q './usr/share/omx-contract/contract.d/3/omx-plugins/MANIFEST.json' <<<"$dev"
-          test "$(grep -cE '\./usr/share/omx-contract/contract\.d/3/omx-plugins/plugins/[^/]+\.json$' <<<"$dev")" = "$(ls plugins/*/*.descriptor.json | wc -l)"
+          ! grep -q '\./usr/share/omx-contract/' <<<"$dev"
+          # the descriptors are omx-plugins-contract's, which the metapackage and the dev package depend on at this
+          # version, installed here with no -dev
+          out=$(dpkg -L omx-plugins-contract)
+          grep -qx /usr/share/omx-contract/contract.d/3/omx-plugins/MANIFEST.json <<<"$out"
+          test "$(grep -cE '^/usr/share/omx-contract/contract\.d/3/omx-plugins/plugins/[^/]+\.json$' <<<"$out")" = "$(ls plugins/*/*.descriptor.json | wc -l)"
+          ! dpkg -s omx-plugins-dev >/dev/null 2>&1
+          info=$(dpkg -I debs/omx-plugins-contract_*_all.deb)
+          grep -qE '^ Architecture: all$' <<<"$info"
+          grep -qE '^ Breaks: omx-plugins-dev \(<< ' <<<"$info"
+          grep -qE '^ Replaces: omx-plugins-dev \(<< ' <<<"$info"
+          for deb in debs/omx-plugins_*.deb debs/omx-plugins-dev_*.deb; do
+            info=$(dpkg -I "$deb"); grep -qE '^ Depends:.*omx-plugins-contract \(= ' <<<"$info"
+          done
           dep=$(dpkg -s omx-plugins); grep -q '^Depends: omx-plugins-clap (= .*), omx-plugins-lv2 (= .*)' <<<"$dep"
           # the metapackage carries the factory presets, one file per preset
           out=$(dpkg -L omx-plugins); grep -qx /usr/share/omx/presets/org.openmixer.drive/amp-tube.json <<<"$out"
