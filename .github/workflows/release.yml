@@ -55,8 +55,8 @@ jobs:
       - name: Install git and dnf plugins
         run: dnf install -y --setopt=install_weak_deps=False git dnf5-plugins nodejs
 
-      - name: Add the FreeMixer channel
-        run: dnf config-manager addrepo --from-repofile=https://freemixer.github.io/rpm/freemixer.repo
+      - name: Add the OpenMixer channel
+        uses: FreeMixer/.github/.github/actions/add-openmixer@v1
 
       - uses: actions/checkout@v4
 
