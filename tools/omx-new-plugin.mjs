@@ -38,7 +38,8 @@ import { fileURLToPath } from 'node:url';
 import { bindFace, instanceHeader, parseFace } from './instance-face.mjs';
 import { controlOf, items, kernelControls, kernelExists, locateContract, resolveParam } from './omx-contract.mjs';
 import { ROOT, checkPlugin, consoleErrors, gapLines, layerOfPath, loadRecipe, loadSchema, panelErrors, pluginFacts, pluginStems, validate } from './plugin-recipe.mjs';
-import { chainBindings, defaultPanel, prepareDecl } from './gen.mjs';
+import { chainBindings, defaultPanel, loadDecl, prepareDecl } from './gen.mjs';
+import { describedOf, descriptorFile } from './descriptor.mjs';
 import { modgui } from './panel-file.mjs';
 import { pinOfTtl } from './port-hints.mjs';
 import { omxdspInclude } from './template.mjs';
@@ -438,12 +439,28 @@ export function writePlugin(plan, { root = ROOT } = {}) {
   }
   // a generated plugin always has its MOD GUI: its declared panel, or gen.mjs's one section of every parameter
   const tools = [[join(root, 'tools', 'gen.mjs')], ...(d.panel || d.binding === 'instance' || d.binding === 'chain' ? [[join(root, 'tools', 'panel-file.mjs'), '--modgui', join(root, 'plugins', d.stem)]] : [])];
-  for (const args of tools) {
-    const r = run('node', args, { cwd: root });
-    if (r.code !== 0) throw new Error(`${relative(root, args[0])}: ${r.out.trim()}`);
-    for (const m of r.out.matchAll(/wrote (\S+)/g)) written.push(relative(root, resolve(root, m[1])));
+  const generate = () => {
+    for (const args of tools) {
+      const r = run('node', args, { cwd: root });
+      if (r.code !== 0) throw new Error(`${relative(root, args[0])}: ${r.out.trim()}`);
+      for (const m of r.out.matchAll(/wrote (\S+)/g)) written.push(relative(root, resolve(root, m[1])));
+    }
+  };
+  generate();
+  let decl = d;
+  if (d.binding === 'instance' && !d.variants) {
+    // described, as every single-kernel plugin of ours is: the descriptor rendered from the settled
+    // declaration, and the declaration's extras beside it; then generated again from the two
+    const dir = join(root, 'plugins', d.stem);
+    const { descriptor, extras } = describedOf(d, loadDecl(dir));
+    extras.$comment = `The extras of ${d.stem}'s declaration: what its descriptor, ${descriptorFile(d.stem)}, has no word for (docs/declaration-as-descriptor.md). The two are the folder's hand-written files; tools/gen.mjs generates the rest and writes the travels the descriptor's links resolve to. Its parameters are by reference to omx-contract's ${d.kernel} kernel and bind by name to omx-dsp's instance face. Control order, the descriptor's, is append-only.`;
+    writeFileSync(join(dir, descriptorFile(d.stem)), `${JSON.stringify(descriptor, null, 2)}\n`);
+    decl = { $comment: extras.$comment, ...extras };
+    writeFileSync(join(root, rel), `${JSON.stringify(decl, null, 2)}\n`);
+    written.push(`plugins/${d.stem}/${descriptorFile(d.stem)}`);
+    generate();
   }
-  pinHints(root, join(root, rel), d, [d.stem]);
+  pinHints(root, join(root, rel), decl, [d.stem]);
   return [...new Set(written)];
 }
 
