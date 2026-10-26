@@ -915,7 +915,11 @@ const heldOf = (d) => d.params.filter((p, i) => d.controls?.[i]?.rearms).map((p)
 export const oracleStretch = (face) => (face.keyed ? 64 : 1);
 
 /** One step of each parameter, the sabotage arm's move: 1 % of a travel, the next value of a choice. */
-const stepOf = (p) => (p.kind === 'toggle' || p.kind === 'integer' ? 1 : (p.max - p.min) / 100);
+// an integer travel by its share too, in whole steps (one at least): +1 ms on a 2 s release moves no float
+// pole; a time travel (ms, s) by 5 %: a slow detector's pole at 176.4 kHz is 1 - 1e-5, and 1 % of a release
+// travel moves it by about two float steps, which can round to none
+const stepShare = (p) => (p.unit === 'ms' || p.unit === 's' ? 0.05 : 0.01);
+const stepOf = (p) => (p.kind === 'toggle' || choicesOf(p) ? 1 : p.kind === 'integer' ? Math.max(1, Math.round((p.max - p.min) * stepShare(p))) : (p.max - p.min) * stepShare(p));
 
 /** The binding of `d` to its kernel's instance face, or a thrown error naming what is missing. */
 export function bindingOf(d) {
