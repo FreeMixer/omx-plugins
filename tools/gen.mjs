@@ -43,7 +43,7 @@ import { faceBinding } from './instance-face.mjs';
 import { descriptorFile, descriptorOf, descriptorText, isWhole, travelUnit, viewOf } from './descriptor.mjs';
 import { lv2Designation, lv2UnitNames, lv2UnitRef } from './format-tables.mjs';
 import { DISPLAY_KINDS, DISPLAY_SOURCES, FAMILIES, PLACEMENTS, WIDGETS, pagesOf, panelDescription, panelFingerprint } from './panel-description.mjs';
-import { CONTRACT_VERSION, contractFingerprint, contractOf } from './param-contract.mjs';
+import { CONTRACT_VERSION, contractFingerprint, contractOf, unitEnumLines } from './param-contract.mjs';
 import { SPEC_FILE, controlOf, eqDefaultBands, findName, kernelControls, locateContract, packagingRange, paramKernel, resolveParam } from './omx-contract.mjs';
 import { bandsMacro, baseOf, expandVariant, variantStems } from './variants.mjs';
 import { omxdspInclude, render } from './template.mjs';
@@ -1159,7 +1159,13 @@ export const SHARED = {
       `tests="${ts.map((d) => d.clap.id).join(' ')}"`,
       `teststems="${ts.map((d) => d.stem).join(' ')}"`,
     ],
-  },  // libomxplugins: each face's entry, defined by omx_<kernel>_clap.c, listed by its CLAP id
+  },
+  // the param-contract extension's units, from their declaration (contract/param-units.json), one source for the
+  // header and the file a runtime reader reads in the contract directory
+  'include/omx_param_contract.h': {
+    'param-units': () => unitEnumLines(),
+  },
+  // libomxplugins: each face's entry, defined by omx_<kernel>_clap.c, listed by its CLAP id
   'include/omx_clap_static.h': {
     'clap-entries': (ds) => ds.map((d) => `extern const clap_plugin_entry_t omx_clap_entry_${d.kernel};`),
     'clap-test-entries': (ds, ts = []) => ts.map((d) => `extern const clap_plugin_entry_t omx_clap_entry_${d.kernel};`),
