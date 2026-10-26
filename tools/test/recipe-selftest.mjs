@@ -726,6 +726,14 @@ static inline void omx_wobble_instance_run(OmxWobbleInstance *s, const float *${
     gate.fixed = { keySource: 'self' };
     gate.params = gate.params.filter((p) => p.symbol !== 'gateKeySource');
     comp.on = true;
+    // omx-dsp 0.26.0's key, hold, link and duck controls are L3 (#179): the chain holds them at their defaults, as
+    // omx-strip's gate and comp do; exposed, each key listen sends the key to the output and the chain has no key
+    const hold = (el, controls) => {
+      el.held = controls;
+      el.params = el.params.filter((p) => !controls.some((c) => p.symbol === `${el.id}${c[0].toUpperCase()}${c.slice(1)}`));
+    };
+    hold(gate, ['keyListen', 'keyTiltDb']);
+    hold(comp, ['keySource', 'keyHpHz', 'keyLpHz', 'keyTiltDb', 'keyListen', 'holdMs', 'detectLink', 'duck', 'rangeDb']);
     // the detector topology's set carries no labels in the contract: the person names them, as omx-comp does
     for (const p of comp.params.filter((x) => x.ref === 'DETECTOR_TOPOLOGY')) p.values = ['Feedforward', 'Feedback'];
     settled.order = 'permutable';

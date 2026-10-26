@@ -12,6 +12,10 @@
     "enabledPort": "first"
   },
   "binding": "instance",
+  "held": [
+    "keyListen",
+    "keyTiltDb"
+  ],
   "controls": {
     "key_external": {
       "values": [
