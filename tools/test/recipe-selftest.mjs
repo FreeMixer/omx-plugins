@@ -731,6 +731,44 @@ static inline float omx_wobble_instance_level_db(const OmxWobbleInstance *s) { r
     const pan = fixedCore({ mode: 'pan' });
     expect(/\/\* mode \*\/ 1\)/.test(pan.core ?? '') && /, 1\);/.test(pan.oracle ?? '') && !/PARAM_MODE/.test(pan.core ?? '') && pan.core?.includes('`mode` is not a parameter of this plugin: it is passed at "pan".'),
       `fixed: a plugin's fixed mode is passed at pan's index to the face and to the reference, and named in the binding's comment (${pan.error ?? 'see the generated core'})`);
+    // a monitor: the mode at its default in the moving blocks and the stepped tails, both values in its own section
+    const monitored = (monitors) => {
+      process.env.OMX_CONTRACT_DIR = moving;
+      process.env.OMXDSP_INCLUDE = inc;
+      try {
+        const oracle = generateInstance({ ...loadDecl(join(tree, P_)), monitors })['test/wobble-oracle.c'];
+        return [...oracle.matchAll(/^ *\{ (\d+), ([-\d.e]+)f, ([012]), \{([^}]*)\}, [01] \},$/gm)].map((x) => x[4].split(',').map((y) => y.trim()));
+      } catch (e) {
+        return e.message;
+      } finally {
+        delete process.env.OMX_CONTRACT_DIR;
+        delete process.env.OMXDSP_INCLUDE;
+      }
+    };
+    const mon = monitored(['mode']);
+    const monModes = Array.isArray(mon) ? mon.map((r) => r[3]) : [];
+    const free = monitored(undefined);
+    expect(monModes.slice(0, 12).every((x) => x === '0.0f') && new Set(monModes).size === 2 && Array.isArray(free) && new Set(free.slice(0, 12).map((r) => r[3])).size === 2,
+      `monitors: the mode is held at its default over the moving blocks and still takes both values in its own section; undeclared, it moves there (${monModes.join(' ') || mon})`);
+    expect(/monitor 'depth' is a travel/.test(String(monitored(['depth']))), `monitors: a travel named a monitor is refused (${String(monitored(['depth'])).split(': ').pop()})`);
+    // engaged: depth held at 80 over the release and choice sections, and a value outside its travel refused
+    const engagedRows = (engaged) => {
+      process.env.OMX_CONTRACT_DIR = moving;
+      process.env.OMXDSP_INCLUDE = inc;
+      try {
+        const oracle = generateInstance({ ...loadDecl(join(tree, P_)), engaged })['test/wobble-oracle.c'];
+        return [...oracle.matchAll(/^ *\{ (\d+), ([-\d.e]+)f, ([012]), \{([^}]*)\}, [01] \},$/gm)].map((x) => x[4].split(',').map((y) => y.trim()));
+      } catch (e) {
+        return e.message;
+      } finally {
+        delete process.env.OMX_CONTRACT_DIR;
+        delete process.env.OMXDSP_INCLUDE;
+      }
+    };
+    const eng = engagedRows({ depth: 80 });
+    expect(Array.isArray(eng) && eng.slice(12).every((r) => r[1] === '80.0f') && new Set(eng.slice(0, 12).map((r) => r[1])).size > 1,
+      `engaged: depth is held at 80 over every release and choice row, and still moves in the moving blocks (${Array.isArray(eng) ? [...new Set(eng.slice(12).map((r) => r[1]))].join(' ') : eng})`);
+    expect(/engaged 'depth' at 120, outside/.test(String(engagedRows({ depth: 120 }))), `engaged: a value outside the travel is refused (${String(engagedRows({ depth: 120 })).split(': ').pop()})`);
     const stray = fixedCore({ speed: 'default' });
     expect(/fixes 'speed', no control of the wobble kernel/.test(stray.error ?? ''), `fixed: a control the kernel does not have is refused (${stray.error ?? 'ACCEPTED'})`);
     const unlisted = join(WORK, 'omx-contract-unlisted');

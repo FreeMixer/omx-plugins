@@ -769,22 +769,27 @@ function stepped(params, v, keep) {
   });
 }
 
-export function oraclePlan(params, controls = [], { engaged = [] } = {}) {
+export function oraclePlan(params, controls = [], { engaged = [], monitors = [] } = {}) {
   const held = new Set(params.map((_, i) => i).filter((i) => controls[i]?.rearms));
   // a chain's element switches: on in the release and choice sections, so each element is heard
-  // there (an EQ switched off by the stepped row would hide every band's Q), and never stepped
-  const on = new Set(engaged);
+  // there (an EQ switched off by the stepped row would hide every band's Q), and never stepped; a
+  // declaration's engaged values ([index, value]) likewise, a band's threshold where every band is driven
+  const at = new Map(engaged.map((e) => (Array.isArray(e) ? e : [e, 1])));
+  const on = new Set(at.keys());
+  // a monitor replaces the output while on (a band's listen): at its default where the others move or
+  // are stepped, so what it would replace stays heard; its own section still holds each of its values
+  const quiet = new Set(monitors);
   const row = (frames, ms, signal, v, bypass) => ({ row: `${frames}, ${cfloat(ms)}, ${signal}, {${v.map(cfloat).join(', ')}}, ${bypass}` });
   const moves = PLAN_FRAMES.map((frames, b) => {
     const v = params.map((p, i) => {
-      if (held.has(i)) return p.def;
+      if (held.has(i) || quiet.has(i)) return p.def;
       if (p.kind === 'toggle') return (b + i) % 2;
       return valueAt(p, PLAN_AT[(b + 2 * i) % PLAN_AT.length]);
     });
     return row(frames, 0, SIGNAL.moves, v, PLAN_BYPASS[b]);
   });
   const tail = tailMs(params);
-  const defaults = params.map((p, i) => (on.has(i) ? 1 : p.def));
+  const defaults = params.map((p, i) => (on.has(i) ? at.get(i) : p.def));
   const release = [row(0, BURST_MS, SIGNAL.burst, defaults, 0), row(0, tail, SIGNAL.tail, defaults, 0)];
   const choices = [];
   params.forEach((p, c) => {
@@ -792,7 +797,7 @@ export function oraclePlan(params, controls = [], { engaged = [] } = {}) {
     if (!vals || held.has(c)) return;
     for (const value of vals) {
       const v = defaults.map((d, i) => (i === c ? value : d));
-      const moved = stepped(params, v, new Set([...held, ...on, c]));
+      const moved = stepped(params, v, new Set([...held, ...on, ...quiet, c]));
       choices.push(row(0, BURST_MS, SIGNAL.burst, v, 0), row(0, tail, SIGNAL.tail, v, 0), row(0, tail, SIGNAL.tail, moved, 0));
     }
   });
@@ -906,6 +911,27 @@ function meterView(d, face) {
   };
 }
 
+/** The indices of the declaration's `monitors`, each a toggle or a choice among its parameters. */
+export function monitorsOf(d) {
+  return (d.monitors ?? []).map((sym) => {
+    const i = d.params.findIndex((p) => p.symbol === sym);
+    if (i < 0) throw new Error(`plugins/${d.stem}: monitors names '${sym}', no parameter`);
+    if (!valuesOf(d.params[i])) throw new Error(`plugins/${d.stem}: monitor '${sym}' is a travel; a monitor is switched, a toggle or a choice`);
+    return i;
+  });
+}
+
+/** The declaration's `engaged` values, `[[index, value]]`, each inside its parameter's travel. */
+export function engagedOf(d) {
+  return Object.entries(d.engaged ?? {}).map(([sym, v]) => {
+    const i = d.params.findIndex((p) => p.symbol === sym);
+    if (i < 0) throw new Error(`plugins/${d.stem}: engaged names '${sym}', no parameter`);
+    const p = d.params[i];
+    if (!(typeof v === 'number' && p.min <= v && v <= p.max)) throw new Error(`plugins/${d.stem}: engaged '${sym}' at ${JSON.stringify(v)}, outside ${p.min}..${p.max}`);
+    return [i, v];
+  });
+}
+
 /** The parameters the plan holds at their default, for the oracle's comment: `[{ symbol }]`. */
 const heldOf = (d) => d.params.filter((p, i) => d.controls?.[i]?.rearms).map((p) => ({ symbol: p.symbol }));
 
@@ -985,7 +1011,8 @@ export function generateInstance(d) {
     latency: lat('&c->inst'), refLatency: lat('&inst'),
     keyed, keyPort: keyed ? macro(d.sidechain.symbol) : '', keySymbol: keyed ? d.sidechain.symbol : '',
     runFn: keyed && !face.keyed ? 'run_keyed' : 'run', keyTail: keyed && !face.keyed ? ', NULL' : '',
-    plan: oraclePlan(d.params, d.controls ?? []), held: heldOf(d), stretch: oracleStretch(face), steps: d.params.map((p) => cfloat(stepOf(p))).join(', '),
+    plan: oraclePlan(d.params, d.controls ?? [], { monitors: monitorsOf(d), engaged: engagedOf(d) }), held: heldOf(d),
+    engaged: engagedOf(d).map(([i, v]) => ({ symbol: d.params[i].symbol, value: v })), monitors: monitorsOf(d).map((i) => ({ symbol: d.params[i].symbol })), stretch: oracleStretch(face), steps: d.params.map((p) => cfloat(stepOf(p))).join(', '),
     chain: false,
     latencyChecks: latencyRows(d), measuresLatency: Boolean(d.latencyChecks),
     ...meterView(d, face),
