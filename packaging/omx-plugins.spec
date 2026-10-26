@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # Copyright (C) 2026 Pau Aliagas <linuxnow@gmail.com>
 Name: omx-plugins
-Version: 0.14.0
+Version: 0.15.0
 Release: 1%{?dist}
 License: GPL-3.0-or-later
 Summary: The OpenMixer console's delay, drive, EQ, channel strip, keyed gate and effects, as plugins for your DAW
@@ -222,6 +222,25 @@ tools/pins-check.sh %{buildroot}%{_datadir}/plugin-hostd/pins.d/omx-plugins.pins
 # END GENERATED lv2-files
 
 %changelog
+* Mon Oct 26 2026 Pau Aliagas <linuxnow@gmail.com> - 0.15.0-1
+- Two new plugins from omx-dsp 0.26.0's kernel files: omx-dyneq, a six-band dynamic EQ whose bands
+  cut above or lift below a threshold, held to a range, each band's gain on a meter; and
+  omx-multiband, a multiband compressor of two to five bands, each band's gain reduction on a meter.
+  Each carries three factory presets.
+- omx-comp takes a key: a mono sidechain input, its source (self or the sidechain), a high-pass, a
+  low-pass and a tilt on what the detector hears, key listen, a hold, the detector's link (linked,
+  mid, side, max) and a ducker with its depth; the compKey meter reads the detector's level. At its
+  defaults the compressor is the one it was, sample for sample.
+- Builds against omx-dsp >= 0.26.0 and omx-panel >= 0.2.5. The delay, the keyed gate, the reverb and
+  the strip hold the controls omx-dsp 0.26.0 adds to their kernels at their defaults until they take
+  them as parameters; their parameters, ports and MOD GUIs do not change.
+- The generator reads a face that may take a key (run_keyed), a plugin's fixed controls, a meter
+  read through the face, a band count a control declares, and a declaration's monitors and engaged
+  values for the identity test; the wizard writes a new plugin as its descriptor and its
+  declaration's extras. The identity test's sabotage step is 1 %% of a travel in whole steps for an
+  integer, 5 %% for a time. clap-probe live tries a toggle on alone and pairs of travels at their
+  ends.
+
 * Thu Oct 22 2026 Pau Aliagas <linuxnow@gmail.com> - 0.14.0-1
 - Our own plugins' pins are known at build time, so they ship with the package instead of being
   recorded by plugin-hostd on first use (plugin-hostd issue #42, pins.d): plugin-qualify --pins runs
