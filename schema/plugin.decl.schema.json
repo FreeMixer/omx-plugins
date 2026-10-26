@@ -474,7 +474,7 @@
         },
         "defaultRef": {
           "type": "string",
-          "pattern": "^[A-Z][A-Z0-9_]*(\\.[A-Za-z][A-Za-z0-9]*)*$",
+          "pattern": "^[A-Z][A-Z0-9_]*(\\.([A-Za-z][A-Za-z0-9]*|[0-9]+))*$",
           "title": "Default reference",
           "description": "Where a fresh plugin comes up when the export names no default of its own: for a list, the scalar export naming the value; for a travel, a number inside a sheet (NAME.field, as EQ_BAND_DEFAULTS.gainDb)."
         },
