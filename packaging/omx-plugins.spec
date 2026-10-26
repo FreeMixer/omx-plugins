@@ -14,7 +14,7 @@ BuildRequires: make
 BuildRequires: pkgconf-pkg-config
 # The releases this tree builds against: a floor each (no ceiling), once here and
 # the same in debian/control (tools/deps-check.sh). The Makefile and tools/gen.mjs read them from here.
-BuildRequires: omx-dsp-devel >= 0.24.0
+BuildRequires: omx-dsp-devel >= 0.26.0
 BuildRequires: omx-contract-devel >= 3.1.0
 BuildRequires: omx-clap-core-devel >= 0.13.0
 # plugin-hostd's format tables, which the generators read backwards (tools/format-tables.mjs)
@@ -103,7 +103,7 @@ own machine.
 
 %package devel
 Summary: Headers and static library of the OpenMixer plugins, for projects that build on them
-Requires: omx-dsp-devel >= 0.24.0
+Requires: omx-dsp-devel >= 0.26.0
 # the contract directory the descriptors install into is omx-contract-devel's
 Requires: omx-contract-devel >= 3.1.0
 Requires: clap-devel
