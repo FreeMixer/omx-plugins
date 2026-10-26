@@ -106,7 +106,10 @@ builds must equal omx-dsp's instance face called directly, bit for bit, at every
 differs from the main signal and with none, each block 64 times in a row so a detector has time to
 release through every threshold; the key must change the output. Two guards keep it honest: the reference must move
 the signal, and a reference rendered with one parameter one step off must differ from the faces
-(the sabotage arm), so a test that could not see a wrong coefficient fails.
+(the sabotage arm), so a test that could not see a wrong coefficient fails. A step is the next value of a
+choice or a toggle, 1 % of a travel, 5 % of a time travel (ms, s: a slow detector's pole at 176.4 kHz lies
+within 1e-5 of 1, where 1 % of a release moves it by about two float steps), an integer travel's share in
+whole steps, one at least.
 
 A parameter whose contract control declares `rearms` is held at its default in every block. Such a
 control re-arms the kernel's state when it changes, so it is not a smooth parameter: the limiter's
