@@ -15,12 +15,13 @@ BuildRequires: pkgconf-pkg-config
 # The releases this tree builds against: a floor each (no ceiling), once here and
 # the same in debian/control (tools/deps-check.sh). The Makefile and tools/gen.mjs read them from here.
 BuildRequires: omx-dsp-devel >= 0.26.0
-BuildRequires: omx-contract-devel >= 3.1.0
+BuildRequires: omx-contract-devel >= 3.3.0
 BuildRequires: omx-clap-core-devel >= 0.13.0
 # plugin-hostd's format tables, which the generators read backwards (tools/format-tables.mjs)
 BuildRequires: plugin-hostd-devel >= 0.7.0
 # the omx-contract command, first packaged in 2.15.0: the generators read the contract directory through it
-BuildRequires: omx-contract >= 3.1.0
+# (3.3.0: the directory and its schema are omx-contract-data's, the definitions each owner's -contract package's)
+BuildRequires: omx-contract >= 3.3.0
 BuildRequires: clap-devel
 BuildRequires: lv2-devel
 # %%check: the generators and checks are Node scripts; the hosts that load the built plugins
@@ -49,6 +50,8 @@ BuildRequires: plugin-qualify >= 0.9.0
 # The name a user installs: both formats.
 Requires: %{name}-clap%{?_isa} = %{version}-%{release}
 Requires: %{name}-lv2%{?_isa} = %{version}-%{release}
+# each plugin's descriptor, which a host and the console read at run time
+Requires: %{name}-contract = %{version}-%{release}
 # the first plugin-hostd release that reads pins.d (plugin-hostd issue #42): a floor only, no ceiling
 Recommends: plugin-hostd >= 0.5.0
 
@@ -104,8 +107,9 @@ own machine.
 %package devel
 Summary: Headers and static library of the OpenMixer plugins, for projects that build on them
 Requires: omx-dsp-devel >= 0.26.0
-# the contract directory the descriptors install into is omx-contract-devel's
-Requires: omx-contract-devel >= 3.1.0
+# the generated parameter headers include omx-contract's C renders, and omxplugins.pc requires omx-contract
+Requires: omx-contract-devel >= 3.3.0
+Requires: %{name}-contract = %{version}-%{release}
 Requires: clap-devel
 
 %description devel
@@ -115,8 +119,20 @@ parameter header, installed in %{_includedir}/omx-plugins, and
 libomxplugins.a (pkg-config omxplugins): every plugin's CLAP face in one
 static library, with the table of their entries in omx_clap_static.h, for a
 host that runs the plugins in its own process without loading .clap files.
-Each plugin's descriptor, its parameters in omx-contract's words, is installed
-in omx-contract's contract directory, where a host reads it.
+
+%package contract
+Summary: The OpenMixer plugins' descriptors in omx-contract's contract directory
+BuildArch: noarch
+# the contract directory, its schema and its reader's own package
+Requires: omx-contract-data >= 3.3.0
+# the files lived in omx-plugins-devel before this package
+Conflicts: %{name}-devel < %{version}-%{release}
+
+%description contract
+Each OpenMixer plugin's descriptor, its parameters in omx-contract's words,
+with the manifest naming this release, as files in omx-contract's contract
+directory, for any program that reads them at run time: a host, the console's
+panels and the omx-contract command.
 
 %prep
 %autosetup
@@ -186,7 +202,10 @@ tools/pins-check.sh %{buildroot}%{_datadir}/plugin-hostd/pins.d/omx-plugins.pins
 %{_includedir}/omx-plugins/
 %{_libdir}/libomxplugins.a
 %{_libdir}/pkgconfig/omxplugins.pc
-# each plugin's descriptor, in omx-contract's contract directory (the directory itself is omx-contract-devel's)
+
+%files contract
+%license LICENSE
+# each plugin's descriptor and the manifest, in omx-contract's contract directory (the directory itself is omx-contract-data's)
 %{_datadir}/omx-contract/contract.d/3/omx-plugins/
 
 %files lv2
