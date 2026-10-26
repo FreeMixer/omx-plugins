@@ -120,6 +120,11 @@ listen: the dynamic EQ's band listens, the compressor's key listen). The plan ho
 the moving blocks and when it steps the other parameters, so what it would replace stays heard; it still
 gets its own section, each of its values over a burst and two tails, and the sabotage arm still moves it.
 
+A declaration's `engaged` names values the plan holds in its release and choice sections instead of the
+defaults, never stepped there, as a chain's element switches are held on: the multiband's band thresholds
+at -40 dB, so every band is driven past its threshold, and its release heard, at every rate (white noise
+at 176.4 kHz puts a thousandth of its power under 200 Hz, below a -20 dB default threshold).
+
 ## A control the plugin does not expose
 
 A kernel release can add controls to a face a plugin already binds (omx-dsp 0.26.0's delay, gate and
