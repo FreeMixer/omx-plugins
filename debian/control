@@ -5,8 +5,8 @@ Maintainer: Pau Aliagas <linuxnow@gmail.com>
 Build-Depends: debhelper-compat (= 13),
                clap-headers,
                libomxdsp-dev (>= 0.26.0),
-               libomx-contract-dev (>= 3.3.0),
-               libomx-clap-core-dev (>= 0.13.0),
+               libomx-contract-dev (>= 3.4.0),
+               libomx-clap-core-dev (>= 0.14.0),
                plugin-hostd-dev (>= 0.7.0),
                lv2-dev,
                pkgconf,
@@ -65,7 +65,7 @@ Description: OpenMixer test instruments, for host tests and plugin measurement
 Package: omx-plugins-dev
 Section: libdevel
 Architecture: any
-Depends: libomxdsp-dev (>= 0.26.0), libomx-contract-dev (>= 3.3.0), omx-plugins-contract (= ${source:Version}), clap-headers, ${misc:Depends}
+Depends: libomxdsp-dev (>= 0.26.0), libomx-contract-dev (>= 3.4.0), omx-plugins-contract (= ${source:Version}), clap-headers, ${misc:Depends}
 Description: Headers and static library of the OpenMixer plugins
  The headers other projects include to use the OpenMixer plugins' parameters
  and instance code, such as omx_delay_core.h and each plugin's generated
@@ -82,7 +82,8 @@ Breaks: omx-plugins-dev (<< ${source:Version})
 Replaces: omx-plugins-dev (<< ${source:Version})
 Description: OpenMixer plugins' descriptors in omx-contract's contract directory
  Each OpenMixer plugin's descriptor, its parameters in omx-contract's words,
- with the manifest naming this release, as files in omx-contract's contract
+ the code of each unit the param-contract extension serves (param-units.json)
+ and the manifest naming this release, as files in omx-contract's contract
  directory, for any program that reads them at run time: a host, the
  console's panels and the omx-contract command.
 

@@ -349,19 +349,14 @@ unit and plain value (a choice also by its label); no value leaves its declared 
 On **Fedora**, from the FreeMixer package channel:
 
 ```sh
-sudo dnf config-manager addrepo --from-repofile=https://freemixer.github.io/rpm/freemixer.repo
+sudo dnf install https://www.openmixer.org/rpm/openmixer-release.noarch.rpm
 sudo dnf install omx-plugins
 ```
 
-On **Debian** bookworm or trixie, **Raspberry Pi OS** and **Zynthian** (replace `trixie` with your
-release):
+On **Debian** bookworm or trixie, **Raspberry Pi OS** and **Zynthian**:
 
 ```sh
-sudo install -d /etc/apt/keyrings
-sudo curl -fsSL -o /etc/apt/keyrings/freemixer.asc https://freemixer.github.io/deb/freemixer.asc
-echo "deb [signed-by=/etc/apt/keyrings/freemixer.asc] https://freemixer.github.io/deb/debian/trixie ./" \
-  | sudo tee /etc/apt/sources.list.d/freemixer.list
-sudo apt update
+curl -fsSLO https://www.openmixer.org/deb/openmixer-release.deb && sudo apt install ./openmixer-release.deb
 sudo apt install omx-plugins
 ```
 
@@ -379,7 +374,8 @@ Projects that build on the plugins' parameters and instance code install the hea
 copying them: `omx-plugins-devel` on Fedora, `omx-plugins-dev` on Debian (they land in
 `/usr/include/omx-plugins`). Each plugin's descriptor, its parameters in omx-contract's words, is in
 `omx-plugins-contract`, which `omx-plugins` and the devel package require: files in omx-contract's
-contract directory (`/usr/share/omx-contract/contract.d/3/omx-plugins/`) that a host reads at run time.
+contract directory (`/usr/share/omx-contract/contract.d/3/omx-plugins/`) that a host reads at run time,
+with `param-units.json`, the code of each unit the param-contract extension serves.
 The devel package carries `libomxplugins.a` (`pkg-config omxplugins`):
 every plugin's CLAP face in one static library, for a host that runs them in its own process
 without loading `.clap` files. `<omx-plugins/omx_clap_static.h>` lists their entries by CLAP id:

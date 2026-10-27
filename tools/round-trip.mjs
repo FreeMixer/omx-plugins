@@ -96,13 +96,13 @@ export const UPSTREAM = {
   // seven EQ frequency ports (omx-eq8 b6, omx-eq16 b6 and b9, omx-eq32 b6, b9, b18 and b19) are authored stepped and
   // scan as log, though their lv2:integer and pprops:logarithmic lines equal those of the neighbours that scan stepped
   // (deesser deessFreq, drive bandFreq). The same seven on the desk and in CI; the cause is not isolated yet. The entry
-  // holds through the newest plugin-hostd release seen still showing them (0.11.0, in CI: the seven EQ ports, with
+  // holds through the newest plugin-hostd release seen still showing them (0.12.0, in CI: the seven EQ ports, with
   // phaser baseHz or the gate key filters from one run to the next): a newer plugin-hostd fails the run until the
   // entry is retired or moved on.
   // The two gate key filters (omx-keyed-gate key_hp and key_lp) flip the same way as the seven EQ ports, under 0.9.1 in CI;
   // so can the other integer Hz ports that state both words (deesser, drive, phaser, reverb): plugin-hostd#142
   'lv2 controls[].travel.scale "stepped" "log"': {
-    through: '0.11.0',
+    through: '0.12.0',
     at: ['omx-eq8 b6_freq', 'omx-eq16 b6_freq', 'omx-eq16 b9_freq', 'omx-eq32 b6_freq', 'omx-eq32 b9_freq', 'omx-eq32 b18_freq', 'omx-eq32 b19_freq', 'omx-keyed-gate key_hp', 'omx-keyed-gate key_lp', 'omx-deesser deessFreq', 'omx-drive bandFreq', 'omx-phaser baseHz', 'omx-reverb lowcut', 'omx-reverb highcut'],
     why: 'the scan reports log where the face says stepped, on seven ports whose lv2:integer and pprops:logarithmic lines equal their passing neighbours\'; cause not isolated; https://github.com/FreeMixer/plugin-hostd/issues/147',
   },

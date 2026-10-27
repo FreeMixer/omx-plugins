@@ -116,8 +116,8 @@ lv2/   copy each .lv2 directory into /zynthian/zynthian-plugins/lv2 (Zynthian's 
        system-wide: /usr/lib/lv2), then rescan the LV2 plugins from Zynthian's admin menu.
 clap/  copy each .clap into /usr/lib/clap (or ~/.clap) for a CLAP host.
 
-On a Debian or Raspberry Pi OS system with apt, the FreeMixer channel's packages are the better way:
-https://freemixer.github.io/deb
+On a Debian or Raspberry Pi OS system with apt, the OpenMixer channel's packages are the better way:
+https://www.openmixer.org/deb
 EOF
 
 mkdir -p "$out"
