@@ -130,7 +130,8 @@ Conflicts: %{name}-devel < %{version}-%{release}
 
 %description contract
 Each OpenMixer plugin's descriptor, its parameters in omx-contract's words,
-with the manifest naming this release, as files in omx-contract's contract
+the code of each unit the param-contract extension serves (param-units.json)
+and the manifest naming this release, as files in omx-contract's contract
 directory, for any program that reads them at run time: a host, the console's
 panels and the omx-contract command.
 
