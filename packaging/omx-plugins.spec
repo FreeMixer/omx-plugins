@@ -16,7 +16,7 @@ BuildRequires: pkgconf-pkg-config
 # the same in debian/control (tools/deps-check.sh). The Makefile and tools/gen.mjs read them from here.
 BuildRequires: omx-dsp-devel >= 0.26.0
 BuildRequires: omx-contract-devel >= 3.3.0
-BuildRequires: omx-clap-core-devel >= 0.13.0
+BuildRequires: omx-clap-core-devel >= 0.14.0
 # plugin-hostd's format tables, which the generators read backwards (tools/format-tables.mjs)
 BuildRequires: plugin-hostd-devel >= 0.7.0
 # the omx-contract command, first packaged in 2.15.0: the generators read the contract directory through it
