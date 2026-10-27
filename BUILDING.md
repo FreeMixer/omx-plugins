@@ -125,6 +125,9 @@ plugins/<name>/
   test/                   the probe and the oracle
 include/                  shared C shapes (no DSP): omx_panel_description.h and omx_param_contract.h,
                           the openmixer extensions and their rows; omx_clap_static.h, libomxplugins' table
+contract/                 the definitions installed beside the descriptors in omx-contract's contract
+                          directory: param-units.json, the param-contract units (the header's enum is
+                          generated from it)
 lib/                      omx_clap_static.c (the table's rows are generated) and omxplugins.pc.in
 tools/                    gen.mjs (header + TTL), descriptor.mjs (a declaration as its plugin
                           descriptor), panel-description.mjs (a panel laid out from any descriptor,
@@ -182,8 +185,8 @@ keeps its generated files fresh.
 
 `packaging/omx-plugins.spec` builds `omx-plugins-clap`, `omx-plugins-lv2`, the `omx-plugins`
 metapackage that requires both, `omx-plugins-devel` (the headers, `libomxplugins.a` and
-`omxplugins.pc`), `omx-plugins-contract` (noarch; each plugin's descriptor and the manifest in
-omx-contract's contract directory, which a host and the console read at run time; `omx-plugins` and
+`omxplugins.pc`), `omx-plugins-contract` (noarch; each plugin's descriptor, the param-contract units
+and the manifest in omx-contract's contract directory, which a host and the console read at run time; `omx-plugins` and
 `omx-plugins-devel` require it at their own version) and `omx-plugins-test` (the test instruments, in `/usr/libexec/omx-plugins/test`,
 outside every CLAP search path, for host tests and for measuring them on a console), and runs `make test` in `%check`; `debian/` builds the same packages for bookworm
 and trixie (`omx-plugins-dev`, with the archive in the multiarch directory, and `omx-plugins-contract`,

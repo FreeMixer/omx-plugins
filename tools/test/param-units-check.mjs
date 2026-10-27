@@ -7,16 +7,24 @@
  * semitone12TET is OMX_CLAP_UNIT_SEMITONE_12TET); the units the declarations shipped with before the table was read
  * keep their token and value; and the vendor block is the one openmixer's CONTRACT_UNITS ends with (dbfs, dbu, ratio,
  * lufs from 0x100, append-only). `make units`, part of `make test`.
+ *
+ * The declaration and the header cannot drift: contract/param-units.json (OMX_PARAM_CONTRACT_UNITS, the file
+ * omx-plugins-contract installs) is the source, the header's enum region is what tools/gen.mjs writes from it byte
+ * for byte, and the enum names the same code for every token and no other.
+ *
+ *   node tools/test/param-units-check.mjs               the check
+ *   node tools/test/param-units-check.mjs --self-test   the check, then the drift check over copies with one unit
+ *                                                       changed in the declaration, one in the header, one added to
+ *                                                       the declaration and one dropped from the header: each red
  */
-import { readFileSync } from 'node:fs';
-import { dirname, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { contractUnits } from '../param-contract.mjs';
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { fillRegions, SHARED } from '../gen.mjs';
+import { contractUnits, declaredUnits, headerUnits, PARAM_CONTRACT_H, PARAM_UNITS_JSON, unitEnumLines } from '../param-contract.mjs';
 
-const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
-const header = readFileSync(process.env.OMX_PARAM_CONTRACT_H ?? join(root, 'include/omx_param_contract.h'), 'utf8');
-const body = header.match(/enum omx_clap_param_unit \{([\s\S]*?)\};/)?.[1] ?? '';
-const enumOf = new Map([...body.matchAll(/OMX_CLAP_UNIT_(\w+)\s*=\s*(0x[0-9a-fA-F]+|\d+)/g)].map((m) => [m[1].replaceAll('_', ''), Number(m[2])]));
+const HEADER = 'include/omx_param_contract.h';
+const headerFile = process.env.OMX_PARAM_CONTRACT_H ?? PARAM_CONTRACT_H;
 const VENDOR = ['dbfs', 'dbu', 'ratio', 'lufs'];
 /** The table tools/param-contract.mjs held before it read plugin-hostd's (FreeMixer/omx-plugins#210): unchanged. */
 const SHIPPED = {
@@ -24,10 +32,34 @@ const SHIPPED = {
   Hz: ['hz', 16], oct: ['oct', 20], cents: ['cent', 21], st: ['semitone12TET', 22], dBFS: ['dbfs', 0x100], dBu: ['dbu', 0x101],
   LUFS: ['lufs', 0x103],
 };
-const UNITS = contractUnits();
 
-const errors = [];
-if (enumOf.size === 0) errors.push('include/omx_param_contract.h: no enum omx_clap_param_unit');
+/** The refusals of a declaration `declFile` and a header `hFile` that drift apart. */
+export function drift(declFile, hFile) {
+  const errors = [];
+  const text = readFileSync(hFile, 'utf8');
+  const units = declaredUnits(declFile);
+  let want;
+  try {
+    want = fillRegions(HEADER, text, { 'param-units': () => unitEnumLines(units) });
+  } catch (e) {
+    return [e.message];
+  }
+  if (Object.keys(SHARED[HEADER]).join() !== 'param-units') errors.push(`tools/gen.mjs fills ${HEADER}'s regions ${Object.keys(SHARED[HEADER]).join(', ')}, not param-units alone`);
+  if (want !== text) errors.push(`${HEADER}: the enum region is not what tools/gen.mjs writes from contract/param-units.json (run \`node tools/gen.mjs\`)`);
+  const declared = new Map(Object.entries(units).map(([t, v]) => [t.toUpperCase(), v]));
+  const header = headerUnits(hFile);
+  for (const [name, v] of declared) if (header.get(name) !== v) errors.push(`unit ${name}: the declaration has ${v}, the header ${header.get(name) ?? 'none'}`);
+  for (const [name, v] of header) if (!declared.has(name)) errors.push(`unit ${name}: the header has ${v}, the declaration none`);
+  return errors;
+}
+
+const errors = drift(PARAM_UNITS_JSON, headerFile);
+// what `node tools/gen.mjs` itself writes into the header, its own producers
+const text = readFileSync(headerFile, 'utf8');
+if (fillRegions(HEADER, text, SHARED[HEADER]) !== text) errors.push(`${HEADER}: tools/gen.mjs writes another enum region (run \`node tools/gen.mjs\`)`);
+const enumOf = headerUnits(headerFile);
+const UNITS = contractUnits();
+if (enumOf.size === 0) errors.push(`${HEADER}: no enum omx_clap_param_unit`);
 for (const [declared, want] of Object.entries(SHIPPED)) if (JSON.stringify(UNITS[declared]) !== JSON.stringify(want)) errors.push(`unit '${declared}' writes ${JSON.stringify(UNITS[declared])}, it shipped as ${JSON.stringify(want)}`);
 for (const [declared, [token, code]] of Object.entries(UNITS)) {
   if (token === 'none') continue;
@@ -43,4 +75,41 @@ if (errors.length) {
   for (const e of errors) console.error(`param-units: ${e}`);
   process.exit(1);
 }
-console.log(`param-units: ${Object.keys(UNITS).length} declared units and the vendor block (${VENDOR.join(', ')}) match the header`);
+console.log(`param-units: ${Object.keys(UNITS).length} declared units and the vendor block (${VENDOR.join(', ')}) match the header, its enum written from contract/param-units.json`);
+
+if (process.argv.includes('--self-test')) {
+  const dir = mkdtempSync(join(tmpdir(), 'param-units-'));
+  const decl = readFileSync(PARAM_UNITS_JSON, 'utf8');
+  const head = readFileSync(headerFile, 'utf8');
+  const arms = {
+    'declaration-changed': [decl.replace('"db": 13,', '"db": 12,'), head],
+    'header-changed': [decl, head.replace('OMX_CLAP_UNIT_DB = 13,', 'OMX_CLAP_UNIT_DB = 12,')],
+    'declaration-added': [decl.replace('"lufs": 259', '"lufs": 259,\n      "phon": 260'), head],
+    'header-dropped': [decl, head.replace(/^ *OMX_CLAP_UNIT_LUFS = 0x103,\n/m, '')],
+  };
+  let fail = 0;
+  for (const [arm, [d, h]] of Object.entries(arms)) {
+    if (d === decl && h === head) {
+      console.error(`SABOTAGE ${arm}: the sabotage did not land`);
+      fail++;
+      continue;
+    }
+    writeFileSync(join(dir, 'param-units.json'), d);
+    writeFileSync(join(dir, 'omx_param_contract.h'), h);
+    const out = drift(join(dir, 'param-units.json'), join(dir, 'omx_param_contract.h'));
+    if (out.length) console.log(`SABOTAGE ${arm}: red (${out[0]})`);
+    else {
+      console.error(`SABOTAGE ${arm}: STAYED GREEN`);
+      fail++;
+    }
+  }
+  writeFileSync(join(dir, 'param-units.json'), decl);
+  writeFileSync(join(dir, 'omx_param_contract.h'), head);
+  if (drift(join(dir, 'param-units.json'), join(dir, 'omx_param_contract.h')).length) {
+    console.error('self-test: the unsabotaged copies are not green');
+    fail++;
+  }
+  rmSync(dir, { recursive: true, force: true });
+  if (fail) process.exit(1);
+  console.log('param-units self-test: every sabotage red');
+}
