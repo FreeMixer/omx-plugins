@@ -31,9 +31,9 @@ A Debian build host has no omx-contract command yet (no .deb ships it yet). Ther
 ...: the generator checks ... are skipped; make test-faces runs`, and runs `make test-faces`: the built faces, the static table, the meters ABI and the test
 roles. Where the command is present, `make test` runs whole.
 
-The channel is FreeMixer's package repository: `https://freemixer.github.io/rpm/freemixer.repo` for
-dnf, `https://freemixer.github.io/deb/debian/<release> ./` (key `https://freemixer.github.io/deb/freemixer.asc`)
-for apt. With it configured, `dnf builddep packaging/omx-plugins.spec` or `apt-get build-dep ./` installs
+The channel is the OpenMixer package repository, added by installing the openmixer-release package
+(`https://www.openmixer.org/rpm/openmixer-release.noarch.rpm` for dnf,
+`https://www.openmixer.org/deb/openmixer-release.deb` for apt). With it installed, `dnf builddep packaging/omx-plugins.spec` or `apt-get build-dep ./` installs
 everything above.
 
 The ranges are written once, in the packaging: `packaging/omx-plugins.spec` (`BuildRequires`, a floor

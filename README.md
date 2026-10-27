@@ -349,19 +349,14 @@ unit and plain value (a choice also by its label); no value leaves its declared 
 On **Fedora**, from the FreeMixer package channel:
 
 ```sh
-sudo dnf config-manager addrepo --from-repofile=https://freemixer.github.io/rpm/freemixer.repo
+sudo dnf install https://www.openmixer.org/rpm/openmixer-release.noarch.rpm
 sudo dnf install omx-plugins
 ```
 
-On **Debian** bookworm or trixie, **Raspberry Pi OS** and **Zynthian** (replace `trixie` with your
-release):
+On **Debian** bookworm or trixie, **Raspberry Pi OS** and **Zynthian**:
 
 ```sh
-sudo install -d /etc/apt/keyrings
-sudo curl -fsSL -o /etc/apt/keyrings/freemixer.asc https://freemixer.github.io/deb/freemixer.asc
-echo "deb [signed-by=/etc/apt/keyrings/freemixer.asc] https://freemixer.github.io/deb/debian/trixie ./" \
-  | sudo tee /etc/apt/sources.list.d/freemixer.list
-sudo apt update
+curl -fsSLO https://www.openmixer.org/deb/openmixer-release.deb && sudo apt install ./openmixer-release.deb
 sudo apt install omx-plugins
 ```
 
