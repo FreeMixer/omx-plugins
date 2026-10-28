@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # Copyright (C) 2026 Pau Aliagas <linuxnow@gmail.com>
 Name: omx-plugins
-Version: 0.15.0
+Version: 0.15.1
 Release: 1%{?dist}
 License: GPL-3.0-or-later
 Summary: The OpenMixer console's delay, drive, EQ, channel strip, keyed gate and effects, as plugins for your DAW
@@ -235,6 +235,12 @@ tools/pins-check.sh %{buildroot}%{_datadir}/plugin-hostd/pins.d/omx-plugins.pins
 # END GENERATED lv2-files
 
 %changelog
+* Wed Oct 28 2026 Pau Aliagas <linuxnow@gmail.com> - 0.15.1-1
+- The sixty band-Q controls of eq8, eq16, eq32 and strip link
+  EQ_NOTCH_Q_RANGE, the range their travel states (0.3..116), so the travel
+  each descriptor states is what its link resolves to; the generator and a
+  check on the descriptors follow (#252).
+
 * Tue Oct 27 2026 Pau Aliagas <linuxnow@gmail.com> - 0.15.0-1
 - The plugins' descriptors ship in a noarch package, omx-plugins-contract, in omx-contract's contract
   directory beside a MANIFEST.json naming the release; omx-plugins and the devel package require it.
