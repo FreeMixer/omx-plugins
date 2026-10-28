@@ -21,10 +21,10 @@
 import { spawnSync } from 'node:child_process';
 import { cpSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { DESCRIPTOR_SCHEMA_FLOOR, descriptorFile, descriptorText } from '../descriptor.mjs';
+import { DESCRIPTOR_SCHEMA_FLOOR, descriptorFile, descriptorOf, descriptorText, parseLink } from '../descriptor.mjs';
 import { clapFeatureValue } from '../format-tables.mjs';
 import { ROOT, loadDecl, pluginDirs } from '../gen.mjs';
-import { OWNERS, compareVersions, installedDataDir, locateContract } from '../omx-contract.mjs';
+import { OWNERS, compareVersions, findName, installedDataDir, items, locateContract } from '../omx-contract.mjs';
 import { validate } from '../schema-validate.mjs';
 
 let bad = 0, n = 0;
@@ -48,6 +48,34 @@ check('at least one plugin is described', described.length > 0, true);
 for (const dir of described) {
   const stem = dir.split('/').pop();
   check(`${stem}: the descriptor is what its declaration renders`, descriptorText(loadDecl(dir)) === readFileSync(join(dir, descriptorFile(stem)), 'utf8'), true);
+}
+
+// a band-Q control states the travel its source link resolves to (tools/descriptor.mjs promises it): eq's q is
+// widened by the notch while the band is one, so the port spans 0.3..116 and its link is EQ_NOTCH_Q_RANGE.
+// Held over the committed descriptor and over what the generator renders now (a generator that names the primary
+// link again is red here even when the committed files were fixed by hand).
+{
+  const contract = locateContract().dir;
+  const travelOf = (c) => {
+    const link = parseLink(c.source?.from?.link);
+    const e = link && contract ? findName(contract, link.kernel, link.ref).entry : undefined;
+    const t = e?.kind === 'travels' ? (link.field ? e.value[link.field] : e.value) : undefined;
+    return t ? { min: t.min, max: t.max } : undefined;
+  };
+  const bandQ = (d) => d.controls.filter((c) => c.kind === 'travel' && /^(b\d+_q|eq\dQ)$/.test(c.symbol));
+  let total = 0;
+  for (const dir of described) {
+    const stem = dir.split('/').pop();
+    const committed = JSON.parse(readFileSync(join(dir, descriptorFile(stem)), 'utf8'));
+    const rendered = descriptorOf(loadDecl(dir)).descriptor;
+    for (const [label, d] of [['committed', committed], ['rendered', rendered]]) {
+      const qs = bandQ(d);
+      const bad = qs.filter((c) => JSON.stringify(travelOf(c)) !== JSON.stringify({ min: c.travel.min, max: c.travel.max })).map((c) => `${c.symbol}: states ${c.travel.min}..${c.travel.max}, ${c.source.from.link} resolves to ${JSON.stringify(travelOf(c))}`);
+      if (label === 'committed') total += qs.length;
+      if (qs.length) check(`${stem}: ${qs.length} band-Q controls (${label}) state the travel their link resolves to`, bad, []);
+    }
+  }
+  if (items(contract).EQ_NOTCH_Q_RANGE) check('the band-Q controls checked are the 60 of eq8, eq16, eq32 and the strip', total, 60);
 }
 
 // the descriptor words: the installed omx-contract's schema
