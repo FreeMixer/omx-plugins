@@ -14,7 +14,7 @@
 <https://github.com/FreeMixer/omx-plugins>
     a doap:Project ;
     doap:name "omx-plugins" ;
-    doap:maintainer [ a foaf:Person ; foaf:name "Pau Aliagas" ] .
+    doap:maintainer [ a foaf:Person ; foaf:name "Pau Aliagas" ; foaf:homepage <https://github.com/linuxnow> ] .
 
 <urn:openmixer:geq>
     a lv2:Plugin , lv2:EQPlugin ;
