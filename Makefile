@@ -11,6 +11,7 @@
 #                   nothing apart, a unit changed on either side red (tools/test/param-units-check.mjs)
 #   make lv2-units  every unit a declaration uses has an LV2 unit, and every port states the unit it declares
 #                   (tools/test/lv2-units-check.mjs, with its sabotage arms; part of `make test`)
+#   make lv2-maintainer  every generated TTL gives its doap:maintainer a foaf:homepage (tools/test/lv2-maintainer-check.mjs; part of `make test`)
 #   make format-tables  the generators read plugin-hostd's installed format tables backwards (tools/format-tables.mjs):
 #                   the units, the 169 lv2:designation lines and the ratio unit, the CLAP modules from the descriptors'
 #                   groups (tools/test/format-tables-test.mjs, with its sabotage arms; part of `make test`)
@@ -131,11 +132,11 @@ LIB_FLAGS  := -fPIC -fvisibility=hidden -DOMX_CLAP_STATIC -Iinclude
 # read only by the targets that build the archive, so `make version` and the rest need no omx-dsp
 lib_cflags = $(call dep_check,omxdsp,$(OMXDSP_MIN))$(call dep_check,omx-contract,$(CONTRACT_MIN))$(shell $(PKG_CONFIG) --cflags omxdsp omx-contract omx-clap-core clap)
 
-.PHONY: presets presets-figures test-role all lib lib-test test test-faces units panel-layout descriptor-view lv2-units resource-hints format-tables contract-union probe-checks eq-probe-race round-trip hints modgui manual install install-pins install-test package-lists install-devel install-contract contract-dir clean version recipe-test completeness selftest private-refs strip-crosscheck meters-abi meter-level dsp-copies meter-ring clap-validate
+.PHONY: presets presets-figures test-role all lib lib-test test test-faces units panel-layout descriptor-view lv2-units lv2-maintainer resource-hints format-tables contract-union probe-checks eq-probe-race round-trip hints modgui manual install install-pins install-test package-lists install-devel install-contract contract-dir clean version recipe-test completeness selftest private-refs strip-crosscheck meters-abi meter-level dsp-copies meter-ring clap-validate
 all: lib
 	@for p in $(PLUGINS); do $(MAKE) -C $$p all || exit 1; done
 lib: $(LIB) $(LIB_PC)
-test: lib units panel-layout descriptor-view lv2-units resource-hints format-tables contract-union contract-dir probe-checks eq-probe-race
+test: lib units panel-layout descriptor-view lv2-units lv2-maintainer resource-hints format-tables contract-union contract-dir probe-checks eq-probe-race
 	@if [ -z "$(PLUGINS)" ]; then echo "no plugins yet"; fi
 	@for p in $(PLUGINS); do $(MAKE) -C $$p test || exit 1; done
 	@$(MAKE) -s round-trip
@@ -166,6 +167,9 @@ descriptor-view:
 # every declared unit is stated by its port in the generated TTL, with its sabotage arms
 lv2-units:
 	node tools/test/lv2-units-check.mjs --self-test
+# every generated maintainer states foaf:homepage (mod-ui segfaults without it, #244), with its sabotage arm
+lv2-maintainer:
+	node tools/test/lv2-maintainer-check.mjs --self-test
 # every plugin states its resource hints, and its TTL (omxres:) and CLAP header say what it states, with its sabotage arms
 resource-hints:
 	node tools/test/resource-hints-check.mjs --self-test
