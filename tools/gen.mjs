@@ -546,7 +546,7 @@ ${presets.length ? '@prefix pset: <http://lv2plug.in/ns/ext/presets#> .\n' : ''}
 <${d.lv2.uri}>
     a lv2:Plugin ;
     lv2:binary <${d.stem}.so> ;
-    rdfs:seeAlso <${d.stem}.ttl>${modgui ? ' , <modgui.ttl>' : ''} .
+    rdfs:seeAlso ${modgui ? '<modgui.ttl> , ' : ''}<${d.stem}.ttl> .
 ${presetsManifest(d.lv2.uri, presets)}`;
 }
 
