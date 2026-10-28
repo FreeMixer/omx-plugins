@@ -19,20 +19,20 @@ drawn from one declaration: its CLAP parameters, its LV2 ports and its MOD GUI c
 | **omx chorus** | `org.openmixer.chorus` | `urn:openmixer:chorus` | The console's chorus: up to four voices read one modulated delay line, the right leg's sweep offset by the spread, mixed with the dry signal. |
 | **omx comp** | `org.openmixer.comp` | `urn:openmixer:comp` | The console's compressor: threshold, ratio and knee set how hard it holds the level down, attack and release how fast, with makeup gain and a dry/wet mix. Kind picks the RMS detector (Compressor) or the peak detector (Limiter), and detector oversampling can run the control path at 4x; detector topology has it hear the input (feedforward) or its own output (feedback). The DSP is omx-dsp's <omxdsp/fx/omx_comp_instance.h>, the console's own compressor. |
 | **omx deesser** | `org.openmixer.deesser` | `urn:openmixer:deesser` | The console's de-esser: a detector on a band around the sibilance drives the compressor's gain computer, and the reduction lands on that band alone or on the whole signal. |
-| **omx delay** | `org.openmixer.delay` | `urn:openmixer:delay` | Stereo delay up to 2 s: feedback through a tone filter that darkens each repeat, ping-pong, wet/dry mix. Zero latency, real-time safe, 44.1 to 192 kHz. |
-| **omx drive** | `org.openmixer.drive` | `urn:openmixer:drive` | The console's drive: one waveshaper (soft, tape, tube or exciter) run inside the console's 4x oversampler, on the full band, the lows, the highs or a tilt, with drive, character, wet/dry mix and trim. Stereo, real-time safe, 44.1 to 192 kHz. |
-| **omx eq8** | `org.openmixer.eq8` | `urn:openmixer:eq8` | The console's channel EQ in its 8-band form: 8 parametric bands (bell, shelves, notch, all-pass) plus high- and low-pass filters at 12 or 24 dB/oct. Stereo, zero latency, 44.1 to 192 kHz. |
-| **omx eq16** | `org.openmixer.eq16` | `urn:openmixer:eq16` | The console's channel EQ in its 16-band form: 16 parametric bands (bell, shelves, notch, all-pass) plus high- and low-pass filters at 12 or 24 dB/oct. Stereo, zero latency, 44.1 to 192 kHz. |
-| **omx eq32** | `org.openmixer.eq32` | `urn:openmixer:eq32` | The console's channel EQ in its 32-band form: 32 parametric bands (bell, shelves, notch, all-pass) plus high- and low-pass filters at 12 or 24 dB/oct. Stereo, zero latency, 44.1 to 192 kHz. |
+| **omx delay** | `org.openmixer.delay` | `urn:openmixer:delay` | Stereo delay up to 2 s: feedback through a tone filter that darkens each repeat, ping-pong, wet/dry mix. Zero latency, real-time safe. |
+| **omx drive** | `org.openmixer.drive` | `urn:openmixer:drive` | The console's drive: one waveshaper (soft, tape, tube or exciter) run inside the console's 4x oversampler, on the full band, the lows, the highs or a tilt, with drive, character, wet/dry mix and trim. Stereo, real-time safe. |
+| **omx eq8** | `org.openmixer.eq8` | `urn:openmixer:eq8` | The console's channel EQ in its 8-band form: 8 parametric bands (bell, shelves, notch, all-pass) plus high- and low-pass filters at 12 or 24 dB/oct. Stereo, zero latency. |
+| **omx eq16** | `org.openmixer.eq16` | `urn:openmixer:eq16` | The console's channel EQ in its 16-band form: 16 parametric bands (bell, shelves, notch, all-pass) plus high- and low-pass filters at 12 or 24 dB/oct. Stereo, zero latency. |
+| **omx eq32** | `org.openmixer.eq32` | `urn:openmixer:eq32` | The console's channel EQ in its 32-band form: 32 parametric bands (bell, shelves, notch, all-pass) plus high- and low-pass filters at 12 or 24 dB/oct. Stereo, zero latency. |
 | **omx flanger** | `org.openmixer.flanger` | `urn:openmixer:flanger` | The console's flanger: one modulated short delay with signed feedback, swept by one oscillator and mixed with the dry signal. |
-| **omx geq** | `org.openmixer.geq` | `urn:openmixer:geq` | The console's 31-band graphic EQ: one fader per ISO third-octave band, 20 Hz to 20 kHz, ±15 dB each, designed in double precision so the lowest bands hold their shape at 192 kHz. Stereo, zero latency, 44.1 to 192 kHz. |
-| **omx keyed-gate** | `org.openmixer.keyed-gate` | `urn:openmixer:keyed-gate` | The console's channel gate with a sidechain key: the detector listens to the key your host routes to it, or to the signal itself. One gain for both legs, so the stereo image never shifts. Real-time safe, 44.1 to 192 kHz. |
+| **omx geq** | `org.openmixer.geq` | `urn:openmixer:geq` | The console's 31-band graphic EQ: one fader per ISO third-octave band, 20 Hz to 20 kHz, ±15 dB each, designed in double precision so the lowest bands hold their shape at 192 kHz. Stereo, zero latency. |
+| **omx keyed-gate** | `org.openmixer.keyed-gate` | `urn:openmixer:keyed-gate` | The console's channel gate with a sidechain key: the detector listens to the key your host routes to it, or to the signal itself. One gain for both legs, so the stereo image never shifts. Real-time safe. |
 | **omx limiter** | `org.openmixer.limiter` | `urn:openmixer:limiter` | The precision limiter: a look-ahead, true-peak, stereo-linked brickwall. |
 | **omx phaser** | `org.openmixer.phaser` | `urn:openmixer:phaser` | The console's phaser: identical all-pass sections swept in octaves by one oscillator, with feedback around the chain and a wet/dry mix. |
 | **omx pitch** | `org.openmixer.pitch` | `urn:openmixer:pitch` | The console's pitch shifter: shifts both channels up or down by semitones and cents, without changing their length, mixed with the dry signal. |
 | **omx reverb** | `org.openmixer.reverb` | `urn:openmixer:reverb` | The console's reverb: room, plate, hall, reverse and gated algorithms with pre-delay, size, damping, width and low and high cuts, mixed with the dry signal. |
 | **omx rotary** | `org.openmixer.rotary` | `urn:openmixer:rotary` | The console's rotary speaker: a drum rotor on the low band and a horn rotor on the high band, with stop, slow and fast speeds, mixed with the dry signal. |
-| **omx strip** | `org.openmixer.strip` | `urn:openmixer:strip` | The console's channel strip in one plugin: input trim, HPF/LPF, gate, four-band EQ and compressor, in the desk's order or any other. Stereo, real-time safe, 44.1 to 192 kHz. |
+| **omx strip** | `org.openmixer.strip` | `urn:openmixer:strip` | The console's channel strip in one plugin: input trim, HPF/LPF, gate, four-band EQ and compressor, in the desk's order or any other. Stereo, real-time safe. |
 | **omx transient** | `org.openmixer.transient` | `urn:openmixer:transient` | The console's transient designer: more or less attack and sustain, from two envelope contrasts, with no threshold to set. |
 | **omx tremolo** | `org.openmixer.tremolo` | `urn:openmixer:tremolo` | The console's tremolo and auto-pan: one oscillator turned into a level change on both legs, or into a left-right pan. |
 
@@ -349,19 +349,14 @@ unit and plain value (a choice also by its label); no value leaves its declared 
 On **Fedora**, from the FreeMixer package channel:
 
 ```sh
-sudo dnf config-manager addrepo --from-repofile=https://freemixer.github.io/rpm/freemixer.repo
+sudo dnf install https://www.openmixer.org/rpm/openmixer-release.noarch.rpm
 sudo dnf install omx-plugins
 ```
 
-On **Debian** bookworm or trixie, **Raspberry Pi OS** and **Zynthian** (replace `trixie` with your
-release):
+On **Debian** bookworm or trixie, **Raspberry Pi OS** and **Zynthian**:
 
 ```sh
-sudo install -d /etc/apt/keyrings
-sudo curl -fsSL -o /etc/apt/keyrings/freemixer.asc https://freemixer.github.io/deb/freemixer.asc
-echo "deb [signed-by=/etc/apt/keyrings/freemixer.asc] https://freemixer.github.io/deb/debian/trixie ./" \
-  | sudo tee /etc/apt/sources.list.d/freemixer.list
-sudo apt update
+curl -fsSLO https://www.openmixer.org/deb/openmixer-release.deb && sudo apt install ./openmixer-release.deb
 sudo apt install omx-plugins
 ```
 
@@ -377,7 +372,11 @@ the apt channel, `omx-plugins-zynthian-<version>-arm64.tar.gz`: copy its `lv2/` 
 
 Projects that build on the plugins' parameters and instance code install the headers instead of
 copying them: `omx-plugins-devel` on Fedora, `omx-plugins-dev` on Debian (they land in
-`/usr/include/omx-plugins`). The same package carries `libomxplugins.a` (`pkg-config omxplugins`):
+`/usr/include/omx-plugins`). Each plugin's descriptor, its parameters in omx-contract's words, is in
+`omx-plugins-contract`, which `omx-plugins` and the devel package require: files in omx-contract's
+contract directory (`/usr/share/omx-contract/contract.d/3/omx-plugins/`) that a host reads at run time,
+with `param-units.json`, the code of each unit the param-contract extension serves.
+The devel package carries `libomxplugins.a` (`pkg-config omxplugins`):
 every plugin's CLAP face in one static library, for a host that runs them in its own process
 without loading `.clap` files. `<omx-plugins/omx_clap_static.h>` lists their entries by CLAP id:
 

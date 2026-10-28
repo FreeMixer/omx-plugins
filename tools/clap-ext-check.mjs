@@ -21,11 +21,15 @@
 import { readFileSync } from 'node:fs';
 import { panelDescription } from './descriptor.mjs';
 import { loadDecl, scaleOf } from './gen.mjs';
-import { CONTRACT_VERSION, SCALES, contractCanonical, contractFingerprint, contractOf } from './param-contract.mjs';
+import { locateContract } from './omx-contract.mjs';
+import { CONTRACT_VERSION, contractCanonical, contractFingerprint, contractOf, scalesOf } from './param-contract.mjs';
 import { PLACEMENTS, pagesOf } from './omx-panel.mjs';
 import { maskOf } from './resource-hints.mjs';
 
 const [dir, dump] = process.argv.slice(2);
+const contract = locateContract();
+if (!contract.dir) throw new Error(`clap-ext-check: the scale words are omx-contract's PARAM_SCALES, and ${contract.why}`);
+const SCALES = scalesOf(contract.dir);
 const d = loadDecl(dir);
 const rows = readFileSync(dump, 'utf8').split('\n').filter(Boolean).map((l) => l.split('\t'));
 const of = (k) => rows.filter((r) => r[0] === k).map((r) => r.slice(1));
