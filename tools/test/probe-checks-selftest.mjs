@@ -154,6 +154,8 @@ const groupArms = [
   ['a parameter out of its group', set('port', 4, 2, '-'), /FAIL port-groups /],
   ['a group relabelled', set('port', 4, 3, 'Other'), /FAIL port-groups /],
   ['a parameter in another section\'s group', set('port', 4, 2, (v) => (v === 'reverb' ? 'plate' : 'reverb')), /FAIL port-groups /],
+  ['a group renamed (lv2:name)', set('port', 4, 4, 'Other'), /FAIL port-groups /],
+  ['a group\'s display priority moved', set('port', 4, 5, plus(1)), /FAIL port-groups /],
   ['a port lost', drop('port', 5), /FAIL port-groups /],
   ['an audio port put in a group', set('port', 0, 2, 'reverb'), /FAIL port-groups in_l/],
 ];

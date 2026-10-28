@@ -40,7 +40,7 @@ import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 
 import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { faceBinding } from './instance-face.mjs';
-import { descriptorFile, descriptorOf, descriptorText, isWhole, panelDescription, travelUnit, viewOf } from './descriptor.mjs';
+import { descriptorFile, descriptorOf, descriptorText, isWhole, panelDescription, portGroupsOf, travelUnit, viewOf } from './descriptor.mjs';
 import { lv2Designation, lv2UnitNames, lv2UnitRef } from './format-tables.mjs';
 import { DISPLAY_KINDS, DISPLAY_SOURCES, FAMILIES, PLACEMENTS, WIDGETS, pagesOf, panelFingerprint } from './omx-panel.mjs';
 import { CONTRACT_VERSION, contractFingerprint, contractOf, unitEnumLines } from './param-contract.mjs';
@@ -90,6 +90,8 @@ export function loadDecl(dir) {
  * resolved for the plugin folder `dir`, whose name is `stem`. */
 export function prepareDecl(file, d, stem, dir = dirname(file)) {
   if (d.variants) throw new Error(`${file}: the base of ${variantStems(d).join(', ')} is no plugin of its own; load one of its variants`);
+  // a variant's sections had their `subgroups` expanded (tools/variants.mjs); a band is a variant's word only
+  for (const s of d.panel?.sections ?? []) if (s.subgroups !== undefined) throw new Error(`${file}: section '${s.key}' says "subgroups", a word of a declaration with variants (its bands)`);
   if (d.stem !== stem) throw new Error(`${file}: stem '${d.stem}' is not the directory's '${stem}'`);
   if (!/^[a-z][a-z0-9_]*$/.test(d.kernel)) throw new Error(`${file}: kernel '${d.kernel}' is not a C identifier`);
   if (d.binding === 'chain') {
@@ -607,10 +609,20 @@ ${hintPrefix(d, (p) => p === 'xsd')}
     lv2:optionalFeature lv2:hardRTCapable ;
 ${hintTriples(d.hintVocabulary, d.hints ?? []).map((l) => `${l}\n`).join('')}    lv2:port
 ${lv2Ports(d).map(port).join(' ,\n')} .
-${(d.panel?.sections ?? []).map((g) => `
+${portGroupsOf(d).length ? `
+# lv2:displayPriority on a port group is the term Zynthian reads to order a plugin's groups (zynthian_lv2.py), and the
+# one FreeMixer/omx-plugins#257 rules; LV2 defines none in lv2core (port-props' pprops:displayPriority is a port's), so
+# it is stated here, for a validator, as what it is.
+lv2:displayPriority
+    a <http://www.w3.org/1999/02/22-rdf-syntax-ns#Property> ;
+    rdfs:label "display priority" ;
+    rdfs:comment "A port group's rank among its plugin's groups, higher first, as Zynthian reads it." .
+` : ''}${portGroupsOf(d).map((g) => `
 <${groupUri(d, g)}>
     a pg:Group ;
     lv2:symbol "${g.key}" ;
+    lv2:name ${ttlStr(g.label)} ;
+    lv2:displayPriority ${g.priority} ;
     rdfs:label ${ttlStr(g.label)} .
 `).join('')}${customUnitsOf(d).map((name) => `
 <urn:openmixer:unit#${name}>
@@ -630,8 +642,9 @@ const customUnitsOf = (d) => Object.keys(LV2_CUSTOM_UNITS).filter((name) => d.pa
 /** A control's group as a CLAP module path (plugin-hostd's group-path, written: the labels joined by "/"). */
 const moduleOf = (d, i) => (d.descriptor?.controls[i]?.group ?? []).join('/');
 
-/** The panel section a parameter is drawn in: its LV2 port group (pg:Group), one per section. */
-const groupOf = (d, symbol) => d.panel?.sections.find((s) => s.controls.includes(symbol));
+/** A parameter's LV2 port group (pg:Group): the panel section it is drawn in, or the section's subgroup holding it
+ * (tools/descriptor.mjs portGroupsOf). */
+const groupOf = (d, symbol) => portGroupsOf(d).find((g) => g.controls.includes(symbol));
 const groupUri = (d, section) => `${d.lv2.uri}#${section.key}`;
 
 // ---- a plugin generated from its instance face (`binding: instance`) ---------------------------

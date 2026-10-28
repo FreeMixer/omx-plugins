@@ -368,6 +368,44 @@
             }
           }
         },
+        "subgroups": {
+          "type": "object",
+          "title": "Subgroups",
+          "description": "Written by tools/variants.mjs for a variant: by section key, the LV2 port groups a section marked `\"subgroups\": \"band\"` is split into, one per band (`band<n>`, `Band <n>`), each with that band's controls of the section in the section's order.",
+          "propertyNames": {
+            "pattern": "^[a-z][a-zA-Z0-9]*$"
+          },
+          "additionalProperties": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "required": [
+                "key",
+                "label",
+                "controls"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "key": {
+                  "type": "string",
+                  "pattern": "^[a-z][a-zA-Z0-9]*$"
+                },
+                "label": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "controls": {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
         "role": {
           "const": "ship",
           "title": "Role",
@@ -614,6 +652,13 @@
         },
         "graph": {
           "$ref": "#/$defs/graph"
+        },
+        "subgroups": {
+          "enum": [
+            "band"
+          ],
+          "title": "Subgroups",
+          "description": "LV2 port groups finer than the section, in a declaration with variants: `band` makes each band's controls of the section a port group of its own, `Band <n>` (symbol `band<n>`), in band order; the section stays as drawn. A control's descriptor `group` is then the path [section label, band label]: the panel section first, the LV2 group last (FreeMixer/omx-plugins#257)."
         }
       },
       "title": "Section",

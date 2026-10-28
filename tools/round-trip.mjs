@@ -82,6 +82,9 @@ export const LOSSES = {
   'lv2 plugin.vendor': 19,
   'lv2 ports[].id': 39,
   'lv2 ports[].name': 39,
+  // LV2 port groups are flat: a control in a section's subgroup (an EQ's band, #257) carries the group, not the
+  // section above it (omx-eq8, omx-eq16 and omx-eq32: five controls a band, 8 + 16 + 32 bands)
+  'lv2 controls[].group (panel section)': 280,
   // the toggles UPSTREAM names, scanned as travels, carry no toggle's default
   'lv2 controls[].default': 76,
 };
@@ -168,6 +171,12 @@ export function compareFace(format, authored, scanned) {
       else if (c.kind === 'choice' && s.kind === 'choice' && path === 'values') emit(where, word, a, s.values);
       else if (c.kind === 'choice' && s.kind === 'choice' && path === 'default') emit(where, word, c.values[c.ids.indexOf(a)], s.values?.[s.ids?.indexOf(s.default)]);
       else if (path === 'ids') emit(where, word, a, undefined, false);
+      // an LV2 port group is one level (pg:group): a path [section, group] is carried as its last element, the LV2
+      // group; the panel section above it is no LV2 word (FreeMixer/omx-plugins#257)
+      else if (format === 'lv2' && path === 'group' && Array.isArray(a) && a.length > 1) {
+        emit(where, word, a.slice(-1), s.group);
+        emit(where, `${word} (panel section)`, a.slice(0, -1), undefined, false);
+      }
       else {
         const v = path.split('.').reduce((o, k) => o?.[k], s);
         const fl = format === 'clap' && path.startsWith('travel.') && typeof a === 'number';

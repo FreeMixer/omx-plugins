@@ -92,8 +92,11 @@ and wants both red ([docs/declaration-as-descriptor.md](docs/declaration-as-desc
 6. **host check**: `omx-clap-scan` loads the CLAP file, `lv2ls`/`lv2info` read the LV2 bundle;
 7. **port groups** (`tools/port-groups-probe.c`, `tools/port-groups-check.mjs`): the LV2 bundle,
    read through lilv, holds one `pg:Group` per panel section (its `lv2:symbol` the section's key, its
-   `rdfs:label` the section's label), and each parameter a section lists carries `pg:group` naming
-   it; no other port is grouped;
+   `lv2:name` and `rdfs:label` the section's label), and each parameter a section lists carries
+   `pg:group` naming it; no other port is grouped. A section a declaration with variants marks
+   `"subgroups": "band"` is a group per band instead (`band<n>`, `Band <n>`: omx-eq8's Band 1 ... Band 8),
+   the panel section drawn as declared. Every group states an `lv2:displayPriority`, counted down in the
+   order its first port comes, so a host showing the higher first (Zynthian) shows them in port order;
 8. **panel description** (`tools/panel-probe.c`, `tools/panel-check.mjs`): each built face is opened
    as a host opens it (the `.clap` through `clap_entry`, the LV2 bundle through lilv) and its
    `org.openmixer.panel-description/1` read back: the family, the sections, every listed parameter as
