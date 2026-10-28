@@ -12,6 +12,7 @@
  * is linked in, `omx_clap_static_find()` opens it by id, and the table of shipped plugins, the one
  * entry's factory listing, the README, the packages and the release gate never see it.
  */
+import { releaseVersion } from './release-version.mjs';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { basename, join, resolve } from 'node:path';
 import { validate } from './schema-validate.mjs';
@@ -46,7 +47,7 @@ export function loadTestDecl(root, dir) {
   if (errs.length) throw new Error(`${file}: ${errs.join('; ')}`);
   if (d.stem !== stem) throw new Error(`${file}: stem '${d.stem}' is not the directory's '${stem}'`);
   if (!existsSync(join(dir, 'Makefile'))) throw new Error(`${file}: a test plugin's Makefile is written by hand, and plugins/${stem}/Makefile is missing`);
-  return { ...d, dir: resolve(dir) };
+  return { ...d, version: releaseVersion(root), dir: resolve(dir) };
 }
 
 const macro = (s) => s.replace(/([a-z0-9])([A-Z])/g, '$1_$2').replace(/[^A-Za-z0-9]/g, '_').toUpperCase();
