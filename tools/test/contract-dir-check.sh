@@ -95,10 +95,17 @@ check() {
     if [ -z "$c" ]; then
       echo "NO-CONTRACT-COMMAND contract-dir: no omx-contract command: the reader step is skipped" >&2
     else
+      # The reader sees the installed owners' definitions with this install in place of the omx-plugins package of
+      # the system: omx-panel requires that package, so a build host holds this release's own, and read beside the
+      # install under test it would answer for the file the install changed.
       sys=$(pkg-config --variable=contractdir omx-contract 2>/dev/null || true)
-      OMX_CONTRACT_PATH="${sys:+$sys:}$dir" $c validate --installed --needs "omx-plugins@>= $VERSION" >/dev/null 2>"$dir.reader" \
+      ov=$(mktemp -d)
+      [ -n "$sys" ] && [ -d "$sys" ] && cp -r "$sys/." "$ov"
+      rm -rf "$ov/${pkg#"$dir"/}"
+      cp -r "$dir/." "$ov"
+      OMX_CONTRACT_PATH="$ov" $c validate --installed --needs "omx-plugins@>= $VERSION" >/dev/null 2>"$dir.reader" \
         || { echo "contract-dir: omx-contract's reader refuses the install: $(head -1 "$dir.reader")"; bad=$((bad + 1)); }
-      rm -f "$dir.reader"
+      rm -rf "$ov" "$dir.reader"
     fi
   fi
   return "$bad"
