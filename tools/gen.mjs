@@ -333,10 +333,19 @@ function resolveParams(file, d) {
     // a control whose travel another choice widens (eq's q, notchQ while the band is a notch): the
     // port spans every travel it may take, and the face clamps by the choice
     const c = generatedBinding(d) ? controlOf(dir, kernel, localParam(p)) : undefined;
+    const widest = [];
     for (const w of c?.when ?? []) {
       const u = resolveParam(dir, kernel, { symbol: p.symbol, ref: w.global });
       out.min = Math.min(out.min, u.min);
       out.max = Math.max(out.max, u.max);
+      widest.push(u);
+    }
+    // the travel the port states is the one its link resolves to (tools/descriptor.mjs): the link is the
+    // widening travel itself, which must be the whole extent the port spans
+    if (widest.length) {
+      const whole = widest.find((u) => u.min === out.min && u.max === out.max);
+      if (!whole) throw new Error(`${file}: '${p.symbol}' spans ${out.min}..${out.max}, which no single travel it may take states; its link could not resolve to it`);
+      out.from = whole.from;
     }
     if (t.kind) out.kind = t.kind;
     if (t.byKind) out.byKind = t.byKind;
