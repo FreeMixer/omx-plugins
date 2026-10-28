@@ -548,7 +548,7 @@ ${presets.length ? '@prefix pset: <http://lv2plug.in/ns/ext/presets#> .\n' : ''}
 <${d.lv2.uri}>
     a lv2:Plugin ;
     lv2:binary <${d.stem}.so> ;
-    rdfs:seeAlso <${d.stem}.ttl>${modgui ? ' , <modgui.ttl>' : ''} .
+    rdfs:seeAlso ${modgui ? '<modgui.ttl> , ' : ''}<${d.stem}.ttl> .
 ${presetsManifest(d.lv2.uri, presets)}`;
 }
 
@@ -596,7 +596,7 @@ ${hintPrefix(d, (p) => p === 'xsd')}
 <${d.url}>
     a doap:Project ;
     doap:name "omx-plugins" ;
-    doap:maintainer [ a foaf:Person ; foaf:name "Pau Aliagas" ] .
+    doap:maintainer [ a foaf:Person ; foaf:name "Pau Aliagas" ; foaf:homepage <https://github.com/linuxnow> ] .
 
 <${d.lv2.uri}>
     a lv2:Plugin , ${d.lv2.class} ;
