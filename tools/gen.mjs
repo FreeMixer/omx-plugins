@@ -594,7 +594,7 @@ ${hintPrefix(d, (p) => p === 'xsd')}
 <${d.url}>
     a doap:Project ;
     doap:name "omx-plugins" ;
-    doap:maintainer [ a foaf:Person ; foaf:name "Pau Aliagas" ] .
+    doap:maintainer [ a foaf:Person ; foaf:name "Pau Aliagas" ; foaf:homepage <https://github.com/linuxnow> ] .
 
 <${d.lv2.uri}>
     a lv2:Plugin , ${d.lv2.class} ;
