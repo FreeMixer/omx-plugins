@@ -8,7 +8,7 @@
 <urn:openmixer:reverb>
     a lv2:Plugin ;
     lv2:binary <omx-reverb.so> ;
-    rdfs:seeAlso <omx-reverb.ttl> , <modgui.ttl> .
+    rdfs:seeAlso <modgui.ttl> , <omx-reverb.ttl> .
 
 <urn:openmixer:reverb#preset-ambience>
     a pset:Preset ;
