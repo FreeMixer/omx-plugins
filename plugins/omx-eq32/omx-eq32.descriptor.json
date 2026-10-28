@@ -272,7 +272,7 @@
       "automatable": true,
       "source": {
         "from": {
-          "link": "data/kernels/eq.json#EQ_Q_RANGE",
+          "link": "data/kernels/eq.json#EQ_NOTCH_Q_RANGE",
           "at": "omx-dsp@0.26.0"
         }
       }
@@ -405,7 +405,7 @@
       "automatable": true,
       "source": {
         "from": {
-          "link": "data/kernels/eq.json#EQ_Q_RANGE",
+          "link": "data/kernels/eq.json#EQ_NOTCH_Q_RANGE",
           "at": "omx-dsp@0.26.0"
         }
       }
@@ -538,7 +538,7 @@
       "automatable": true,
       "source": {
         "from": {
-          "link": "data/kernels/eq.json#EQ_Q_RANGE",
+          "link": "data/kernels/eq.json#EQ_NOTCH_Q_RANGE",
           "at": "omx-dsp@0.26.0"
         }
       }
@@ -671,7 +671,7 @@
       "automatable": true,
       "source": {
         "from": {
-          "link": "data/kernels/eq.json#EQ_Q_RANGE",
+          "link": "data/kernels/eq.json#EQ_NOTCH_Q_RANGE",
           "at": "omx-dsp@0.26.0"
         }
       }
@@ -804,7 +804,7 @@
       "automatable": true,
       "source": {
         "from": {
-          "link": "data/kernels/eq.json#EQ_Q_RANGE",
+          "link": "data/kernels/eq.json#EQ_NOTCH_Q_RANGE",
           "at": "omx-dsp@0.26.0"
         }
       }
@@ -937,7 +937,7 @@
       "automatable": true,
       "source": {
         "from": {
-          "link": "data/kernels/eq.json#EQ_Q_RANGE",
+          "link": "data/kernels/eq.json#EQ_NOTCH_Q_RANGE",
           "at": "omx-dsp@0.26.0"
         }
       }
@@ -1070,7 +1070,7 @@
       "automatable": true,
       "source": {
         "from": {
-          "link": "data/kernels/eq.json#EQ_Q_RANGE",
+          "link": "data/kernels/eq.json#EQ_NOTCH_Q_RANGE",
           "at": "omx-dsp@0.26.0"
         }
       }
@@ -1203,7 +1203,7 @@
       "automatable": true,
       "source": {
         "from": {
-          "link": "data/kernels/eq.json#EQ_Q_RANGE",
+          "link": "data/kernels/eq.json#EQ_NOTCH_Q_RANGE",
           "at": "omx-dsp@0.26.0"
         }
       }
@@ -1336,7 +1336,7 @@
       "automatable": true,
       "source": {
         "from": {
-          "link": "data/kernels/eq.json#EQ_Q_RANGE",
+          "link": "data/kernels/eq.json#EQ_NOTCH_Q_RANGE",
           "at": "omx-dsp@0.26.0"
         }
       }
@@ -1469,7 +1469,7 @@
       "automatable": true,
       "source": {
         "from": {
-          "link": "data/kernels/eq.json#EQ_Q_RANGE",
+          "link": "data/kernels/eq.json#EQ_NOTCH_Q_RANGE",
           "at": "omx-dsp@0.26.0"
         }
       }
@@ -1602,7 +1602,7 @@
       "automatable": true,
       "source": {
         "from": {
-          "link": "data/kernels/eq.json#EQ_Q_RANGE",
+          "link": "data/kernels/eq.json#EQ_NOTCH_Q_RANGE",
           "at": "omx-dsp@0.26.0"
         }
       }
@@ -1735,7 +1735,7 @@
       "automatable": true,
       "source": {
         "from": {
-          "link": "data/kernels/eq.json#EQ_Q_RANGE",
+          "link": "data/kernels/eq.json#EQ_NOTCH_Q_RANGE",
           "at": "omx-dsp@0.26.0"
         }
       }
@@ -1868,7 +1868,7 @@
       "automatable": true,
       "source": {
         "from": {
-          "link": "data/kernels/eq.json#EQ_Q_RANGE",
+          "link": "data/kernels/eq.json#EQ_NOTCH_Q_RANGE",
           "at": "omx-dsp@0.26.0"
         }
       }
@@ -2001,7 +2001,7 @@
       "automatable": true,
       "source": {
         "from": {
-          "link": "data/kernels/eq.json#EQ_Q_RANGE",
+          "link": "data/kernels/eq.json#EQ_NOTCH_Q_RANGE",
           "at": "omx-dsp@0.26.0"
         }
       }
@@ -2134,7 +2134,7 @@
       "automatable": true,
       "source": {
         "from": {
-          "link": "data/kernels/eq.json#EQ_Q_RANGE",
+          "link": "data/kernels/eq.json#EQ_NOTCH_Q_RANGE",
           "at": "omx-dsp@0.26.0"
         }
       }
@@ -2267,7 +2267,7 @@
       "automatable": true,
       "source": {
         "from": {
-          "link": "data/kernels/eq.json#EQ_Q_RANGE",
+          "link": "data/kernels/eq.json#EQ_NOTCH_Q_RANGE",
           "at": "omx-dsp@0.26.0"
         }
       }
@@ -2400,7 +2400,7 @@
       "automatable": true,
       "source": {
         "from": {
-          "link": "data/kernels/eq.json#EQ_Q_RANGE",
+          "link": "data/kernels/eq.json#EQ_NOTCH_Q_RANGE",
           "at": "omx-dsp@0.26.0"
         }
       }
@@ -2533,7 +2533,7 @@
       "automatable": true,
       "source": {
         "from": {
-          "link": "data/kernels/eq.json#EQ_Q_RANGE",
+          "link": "data/kernels/eq.json#EQ_NOTCH_Q_RANGE",
           "at": "omx-dsp@0.26.0"
         }
       }
@@ -2666,7 +2666,7 @@
       "automatable": true,
       "source": {
         "from": {
-          "link": "data/kernels/eq.json#EQ_Q_RANGE",
+          "link": "data/kernels/eq.json#EQ_NOTCH_Q_RANGE",
           "at": "omx-dsp@0.26.0"
         }
       }
@@ -2799,7 +2799,7 @@
       "automatable": true,
       "source": {
         "from": {
-          "link": "data/kernels/eq.json#EQ_Q_RANGE",
+          "link": "data/kernels/eq.json#EQ_NOTCH_Q_RANGE",
           "at": "omx-dsp@0.26.0"
         }
       }
@@ -2932,7 +2932,7 @@
       "automatable": true,
       "source": {
         "from": {
-          "link": "data/kernels/eq.json#EQ_Q_RANGE",
+          "link": "data/kernels/eq.json#EQ_NOTCH_Q_RANGE",
           "at": "omx-dsp@0.26.0"
         }
       }
@@ -3065,7 +3065,7 @@
       "automatable": true,
       "source": {
         "from": {
-          "link": "data/kernels/eq.json#EQ_Q_RANGE",
+          "link": "data/kernels/eq.json#EQ_NOTCH_Q_RANGE",
           "at": "omx-dsp@0.26.0"
         }
       }
@@ -3198,7 +3198,7 @@
       "automatable": true,
       "source": {
         "from": {
-          "link": "data/kernels/eq.json#EQ_Q_RANGE",
+          "link": "data/kernels/eq.json#EQ_NOTCH_Q_RANGE",
           "at": "omx-dsp@0.26.0"
         }
       }
@@ -3331,7 +3331,7 @@
       "automatable": true,
       "source": {
         "from": {
-          "link": "data/kernels/eq.json#EQ_Q_RANGE",
+          "link": "data/kernels/eq.json#EQ_NOTCH_Q_RANGE",
           "at": "omx-dsp@0.26.0"
         }
       }
@@ -3464,7 +3464,7 @@
       "automatable": true,
       "source": {
         "from": {
-          "link": "data/kernels/eq.json#EQ_Q_RANGE",
+          "link": "data/kernels/eq.json#EQ_NOTCH_Q_RANGE",
           "at": "omx-dsp@0.26.0"
         }
       }
@@ -3597,7 +3597,7 @@
       "automatable": true,
       "source": {
         "from": {
-          "link": "data/kernels/eq.json#EQ_Q_RANGE",
+          "link": "data/kernels/eq.json#EQ_NOTCH_Q_RANGE",
           "at": "omx-dsp@0.26.0"
         }
       }
@@ -3730,7 +3730,7 @@
       "automatable": true,
       "source": {
         "from": {
-          "link": "data/kernels/eq.json#EQ_Q_RANGE",
+          "link": "data/kernels/eq.json#EQ_NOTCH_Q_RANGE",
           "at": "omx-dsp@0.26.0"
         }
       }
@@ -3863,7 +3863,7 @@
       "automatable": true,
       "source": {
         "from": {
-          "link": "data/kernels/eq.json#EQ_Q_RANGE",
+          "link": "data/kernels/eq.json#EQ_NOTCH_Q_RANGE",
           "at": "omx-dsp@0.26.0"
         }
       }
@@ -3996,7 +3996,7 @@
       "automatable": true,
       "source": {
         "from": {
-          "link": "data/kernels/eq.json#EQ_Q_RANGE",
+          "link": "data/kernels/eq.json#EQ_NOTCH_Q_RANGE",
           "at": "omx-dsp@0.26.0"
         }
       }
@@ -4129,7 +4129,7 @@
       "automatable": true,
       "source": {
         "from": {
-          "link": "data/kernels/eq.json#EQ_Q_RANGE",
+          "link": "data/kernels/eq.json#EQ_NOTCH_Q_RANGE",
           "at": "omx-dsp@0.26.0"
         }
       }
@@ -4262,7 +4262,7 @@
       "automatable": true,
       "source": {
         "from": {
-          "link": "data/kernels/eq.json#EQ_Q_RANGE",
+          "link": "data/kernels/eq.json#EQ_NOTCH_Q_RANGE",
           "at": "omx-dsp@0.26.0"
         }
       }
@@ -4395,7 +4395,7 @@
       "automatable": true,
       "source": {
         "from": {
-          "link": "data/kernels/eq.json#EQ_Q_RANGE",
+          "link": "data/kernels/eq.json#EQ_NOTCH_Q_RANGE",
           "at": "omx-dsp@0.26.0"
         }
       }
