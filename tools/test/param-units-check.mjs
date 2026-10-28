@@ -17,12 +17,15 @@
  *                                                       changed in the declaration, one in the header, one added to
  *                                                       the declaration and one dropped from the header: each red
  */
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { fillRegions, SHARED } from '../gen.mjs';
-import { contractUnits, declaredUnits, headerUnits, PARAM_CONTRACT_H, PARAM_UNITS_JSON, unitEnumLines } from '../param-contract.mjs';
+import { contractUnits, declaredUnits, headerUnits, PARAM_CONTRACT_H, PARAM_UNITS_JSON, scalesOf, unitEnumLines } from '../param-contract.mjs';
+import { locateContract } from '../omx-contract.mjs';
 
+const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const HEADER = 'include/omx_param_contract.h';
 const headerFile = process.env.OMX_PARAM_CONTRACT_H ?? PARAM_CONTRACT_H;
 const VENDOR = ['dbfs', 'dbu', 'ratio', 'lufs'];
@@ -60,6 +63,20 @@ if (fillRegions(HEADER, text, SHARED[HEADER]) !== text) errors.push(`${HEADER}: 
 const enumOf = headerUnits(headerFile);
 const UNITS = contractUnits();
 if (enumOf.size === 0) errors.push(`${HEADER}: no enum omx_clap_param_unit`);
+// the scale words: the declaration schema offers a travel the contract's PARAM_SCALES but the one a `kind` already says
+const contract = locateContract(root);
+let scales = [];
+if (!contract.dir) errors.push(`PARAM_SCALES: ${contract.why}`);
+else {
+  scales = scalesOf(contract.dir);
+  // a scale's code is its position in PARAM_SCALES: the header's OMX_CLAP_SCALE_<WORD> values say the same
+  const codes = [...text.matchAll(/OMX_CLAP_SCALE_(\w+)\s*=\s*(\d+)/g)].map((m) => [m[1].toLowerCase(), Number(m[2])]);
+  if (JSON.stringify(codes) !== JSON.stringify(scales.map((w, i) => [w, i]))) errors.push(`${HEADER} numbers the scales ${JSON.stringify(codes)}; PARAM_SCALES is ${JSON.stringify(scales)}`);
+  const schema = JSON.parse(readFileSync(join(root, 'schema/plugin.decl.schema.json'), 'utf8'));
+  const offered = schema.$defs.param.properties.scale.enum;
+  const want = scales.filter((w) => w !== 'stepped');
+  if (JSON.stringify(offered) !== JSON.stringify(want)) errors.push(`schema/plugin.decl.schema.json offers scale ${JSON.stringify(offered)}; PARAM_SCALES minus stepped (a \`kind\` says it) is ${JSON.stringify(want)}`);
+}
 for (const [declared, want] of Object.entries(SHIPPED)) if (JSON.stringify(UNITS[declared]) !== JSON.stringify(want)) errors.push(`unit '${declared}' writes ${JSON.stringify(UNITS[declared])}, it shipped as ${JSON.stringify(want)}`);
 for (const [declared, [token, code]] of Object.entries(UNITS)) {
   if (token === 'none') continue;
@@ -71,11 +88,23 @@ const want = VENDOR.map((t, i) => [t.toUpperCase(), 0x100 + i]);
 if (JSON.stringify(vendor) !== JSON.stringify(want)) {
   errors.push(`vendor block is ${vendor.map(([n, v]) => `${n}=0x${v.toString(16)}`).join(', ')}; expected ${want.map(([n, v]) => `${n}=0x${v.toString(16)}`).join(', ')}`);
 }
+// a summary names no sample-rate span: STANDARD_SAMPLE_RATES is omx-contract's, and prose retyped from it goes stale
+const SPAN = /\d+(\.\d+)?\s*(to|-|\u2013)\s*\d+(\.\d+)?\s*kHz/;
+const decls = readdirSync(join(root, 'plugins'), { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => join(root, 'plugins', e.name, `${e.name}.decl.json`));
+let summaries = 0;
+for (const f of decls) {
+  let decl;
+  try { decl = JSON.parse(readFileSync(f, 'utf8')); } catch { continue; }
+  if (typeof decl.summary !== 'string') continue;
+  summaries++;
+  if (SPAN.test(decl.summary)) errors.push(`${f.slice(root.length + 1)}: the summary states a sample-rate span ("${decl.summary.match(SPAN)[0]}"); the rates are omx-contract's STANDARD_SAMPLE_RATES`);
+}
+if (summaries === 0) errors.push('no declaration summary was read: the span check looked at nothing');
 if (errors.length) {
   for (const e of errors) console.error(`param-units: ${e}`);
   process.exit(1);
 }
-console.log(`param-units: ${Object.keys(UNITS).length} declared units and the vendor block (${VENDOR.join(', ')}) match the header, its enum written from contract/param-units.json`);
+console.log(`param-units: ${Object.keys(UNITS).length} declared units and the vendor block (${VENDOR.join(', ')}) match the header, its enum written from contract/param-units.json; the scale words are ${scales.join(', ')}`);
 
 if (process.argv.includes('--self-test')) {
   const dir = mkdtempSync(join(tmpdir(), 'param-units-'));
