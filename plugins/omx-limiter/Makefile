@@ -17,7 +17,7 @@
 #
 # Build deps: omx-dsp (pkg-config omxdsp, >= OMXDSP_MIN, the floor packaging/omx-plugins.spec declares),
 # omx-contract (its resource-hints header), omx-clap-core (the CLAP ABI's openmixer extensions), clap, lv2; for the
-# tests lilv and node.
+# tests lilv and node. The MOD GUI is omx-panel's (the omx-panel command, its tree $(OMX_PANEL_DIR)).
 
 NAME       := omx-limiter
 URI        := urn:openmixer:limiter
@@ -27,6 +27,14 @@ ROOT       := $(abspath ../..)
 GEN        := generated
 B          := build
 BUNDLE     := $(B)/$(NAME).lv2
+
+# The MOD GUI: omx-panel over the plugin's descriptor and its declared panel (tools/panel-file.mjs writes the panel file)
+OMX_PANEL     ?= omx-panel
+OMX_PANEL_DIR ?= /usr/share/omx-panel
+PANEL_FILE    := $(B)/$(NAME).panel.json
+MODGUI_SOURCE := plugins/$(NAME)/$(NAME).decl.json (its panel block) and tools/look.json
+MODGUI        := --descriptor $(NAME).descriptor.json --panel $(PANEL_FILE) --out $(GEN)/$(NAME).lv2 --source '$(MODGUI_SOURCE)'
+
 
 PKG_CONFIG ?= pkg-config
 ifeq ($(shell $(PKG_CONFIG) --atleast-version=$(OMXDSP_MIN) omxdsp && echo y),)
@@ -93,11 +101,13 @@ $(B)/limiter-oracle: test/limiter-oracle.c $(CORE) | $(B)
 
 gen:
 	node $(ROOT)/tools/gen.mjs $(CURDIR)
-	node $(ROOT)/tools/modgui-gen.mjs $(CURDIR)
+	node $(ROOT)/tools/panel-file.mjs $(CURDIR) $(PANEL_FILE)
+	$(OMX_PANEL) modgui $(MODGUI)
 
 check:
 	node $(ROOT)/tools/gen.mjs --check $(CURDIR)
-	node $(ROOT)/tools/modgui-gen.mjs --check $(CURDIR)
+	node $(ROOT)/tools/panel-file.mjs $(CURDIR) $(PANEL_FILE)
+	$(OMX_PANEL) modgui --check $(MODGUI)
 
 # The parameter test: the built CLAP face's parameters are the declaration's, and every one of them
 # reaches the kernel. The state test: a saved state, loaded into a fresh instance, gives back every
@@ -130,7 +140,7 @@ test: all check $(B)/clap-probe $(B)/panel-probe $(B)/clap-ext-probe $(B)/port-g
 	node $(ROOT)/tools/test/resource-hints-check.mjs --binaries $(CURDIR) $(B)/$(NAME).clap $(BUNDLE)/$(NAME).so || fail=1; \
 	$(B)/port-groups-probe $(BUNDLE) $(URI) > $(B)/port-groups.txt && \
 	  node $(ROOT)/tools/port-groups-check.mjs $(CURDIR) $(B)/port-groups.txt || fail=1; \
-	sh $(ROOT)/tools/modgui-test.sh $(CURDIR) || fail=1; \
+	MODGUI_SOURCE='$(MODGUI_SOURCE)' sh $(OMX_PANEL_DIR)/tools/modgui-test.sh $(GEN)/$(NAME).lv2 $(NAME).descriptor.json $(PANEL_FILE) || fail=1; \
 	node $(ROOT)/tools/test/presets-host-check.mjs --self-test $(B)/preset-probe $(CURDIR) || fail=1; \
 	sh $(ROOT)/tools/host-check.sh $(B)/$(NAME).clap $(BUNDLE) $(URI) $(CLAP_ID) || fail=1; \
 	exit $$fail

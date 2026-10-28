@@ -12,8 +12,11 @@ says (the identity, the parameters, the CLAP features, the LV2 class, the descri
 
 `tools/gen.mjs`'s `loadDecl` reads the two and gives every generator the declaration it gave before, so the
 headers, both faces, the panel description, the MOD GUI and its rasters do not change by a byte when a
-plugin moves to a descriptor (`node tools/gen.mjs --check`, `node tools/modgui-gen.mjs --check`,
-`node tools/look.mjs --check`, `make panel-layout`).
+plugin moves to a descriptor (`node tools/gen.mjs --check`, `omx-panel modgui --check`, `make panel-layout`).
+The panel is omx-panel's: it lays a panel out from a descriptor (its `docs/panel-layout.md`) and writes the MOD GUI
+(its `docs/modgui.md`), and reads a descriptor, never a declaration. This repository renders a declaration to its
+descriptor (`panelDescription(d)` lays that descriptor out under the declared panel) and hands omx-panel the
+descriptor and the declared panel as a file.
 
 Two plugins keep a whole declaration: omx-eq, a base of three variants, and omx-strip, a chain. Their declaration is
 no extras file, so their descriptors are rendered from it (`node tools/gen.mjs` writes `omx-eq8`, `omx-eq16`,
@@ -59,7 +62,7 @@ link resolves to. A number edited by hand is stale, never a declaration.
 | `latencyChecks` | `latency.reports: true`; `latency.frames` when every check reports one constant | kept: the checks the oracles run |
 | `oracles`, `portHints`, `meters` | | kept: tests, the LV2 hint pin, the clap.meters/1 rows |
 | `panel.sections[].label` | each listed control's `group` | `panel` (family, roles, section keys, order, widgets, graphs): the panel's hints |
-| `panel.roles` | each bound control's `meaning`, where the role has a meaning word (docs/panel-layout.md) | kept: the roles themselves |
+| `panel.roles` | each bound control's `meaning`, where the role has a meaning word (omx-panel docs/panel-layout.md) | kept: the roles themselves |
 | `console` | | kept: the console's placement, card and chip |
 | `params[i]` | `controls[i]`, `id: i` | |
 | `params[].symbol` | `controls[].symbol` | |

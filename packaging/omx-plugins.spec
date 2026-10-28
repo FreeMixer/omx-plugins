@@ -22,6 +22,11 @@ BuildRequires: plugin-hostd-devel >= 0.7.0
 # the omx-contract command, first packaged in 2.15.0: the generators read the contract directory through it
 # (3.3.0: the directory and its schema are omx-contract-data's, the definitions each owner's -contract package's)
 BuildRequires: omx-contract >= 3.4.0
+# the panel layout and the MOD GUI are omx-panel's, from a descriptor and the declared panel (tools/omx-panel.mjs)
+BuildRequires: omx-panel >= 0.2.0
+# omx-panel recommends omx-plugins-devel: an older one installed beside this build puts its release's contract
+# package where make test reads this one's (tools/test/contract-dir-check.sh), so a build installs none
+BuildConflicts: omx-plugins-devel < %{version}
 BuildRequires: clap-devel
 BuildRequires: lv2-devel
 # %%check: the generators and checks are Node scripts; the hosts that load the built plugins

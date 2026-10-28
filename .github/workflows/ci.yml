@@ -110,7 +110,7 @@ jobs:
         run: |
           set -euo pipefail
           node tools/gen.mjs --check
-          node tools/look.mjs --check
+          make modgui
           node tools/gen-presets.mjs --check
 
       - name: make test, and nothing skipped
@@ -357,8 +357,10 @@ jobs:
       - name: The packages install and their plugins load
         run: |
           set -euo pipefail
-          # the metapackage, with both formats beside it as the repository would offer them
-          apt-get install -y --no-install-recommends ./debs/omx-plugins_*.deb ./debs/omx-plugins-clap_*.deb ./debs/omx-plugins-lv2_*.deb \
+          # the metapackage, with both formats beside it as the repository would offer them. The build host holds the
+          # channel's omx-plugins-contract (omx-panel requires it); a release not yet bumped builds the same version,
+          # so the package under test replaces it, and omx-panel goes with it
+          apt-get install -y --no-install-recommends --allow-downgrades ./debs/omx-plugins_*.deb ./debs/omx-plugins-clap_*.deb ./debs/omx-plugins-lv2_*.deb \
             ./debs/omx-plugins-contract_*_all.deb
           dev=$(dpkg -c debs/omx-plugins-dev_*.deb); grep -q './usr/include/omx-plugins/omx_delay_core.h' <<<"$dev"
           grep -q './usr/include/omx-plugins/omx_clap_static.h' <<<"$dev"

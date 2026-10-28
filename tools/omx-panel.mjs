@@ -1,0 +1,45 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Copyright (C) 2026 Pau Aliagas <linuxnow@gmail.com>
+/*
+ * omx-panel.mjs — where the INSTALLED omx-panel is found, and what this repository reads from it. The panel
+ * is omx-panel's: it lays a panel out from a descriptor and writes a plugin's MOD GUI from a descriptor and a
+ * declared panel, and it reads a descriptor, never a declaration. This repository renders a declaration to its
+ * descriptor (tools/descriptor.mjs) and hands omx-panel that descriptor and the declared panel as a file
+ * (tools/panel-file.mjs). Which releases are acceptable is said once, in the packaging: packaging/omx-plugins.spec's
+ * BuildRequires on omx-panel, the same floor debian/control writes.
+ *
+ * The tree is $OMX_PANEL_DIR, else /usr/share/omx-panel, where the omx-panel package installs it (`tools/`,
+ * `schema/`, `bin/omx-panel.mjs`).
+ *
+ * omx-panel's vocabulary reads the unit values of the param-contract header, which this repository owns: the
+ * header it reads is this tree's include/omx_param_contract.h, never an installed omx-plugins-devel of another
+ * release, unless $OMX_PARAM_CONTRACT_H names one.
+ */
+import { spawnSync } from 'node:child_process';
+import { existsSync, readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+
+export const PANEL_DIR = process.env.OMX_PANEL_DIR || '/usr/share/omx-panel';
+const at = (...p) => join(PANEL_DIR, ...p);
+if (!existsSync(at('bin', 'omx-panel.mjs'))) {
+  throw new Error(`omx-panel is not installed at ${PANEL_DIR}: install omx-panel from the channel, or set OMX_PANEL_DIR to its tree (BUILDING.md)`);
+}
+process.env.OMX_PARAM_CONTRACT_H ||= fileURLToPath(new URL('../include/omx_param_contract.h', import.meta.url));
+
+/** omx-panel's layout module: a descriptor, of any origin, laid out under a declared panel (its docs/panel-layout.md). */
+const layout = await import(pathToFileURL(at('tools', 'panel-description.mjs')).href);
+export const { DISPLAY_KINDS, DISPLAY_SOURCES, FAMILIES, INDEXED_ROLES, PLACEMENTS, ROLES, WIDGETS, pagesOf, panelCanonical, panelFingerprint, panelLayout, servedWidget, unitToken, widgetOf } = layout;
+
+/** omx-panel's reader of the installed vocabulary: the meanings, and the meaning each panel role plays. */
+export const { meaningOfRole } = await import(pathToFileURL(at('tools', 'vocabulary.mjs')).href);
+
+/** omx-panel's declared lists (schema/panel.schema.json): the widgets a control is drawn with and the roles that repeat by
+ * index. A plugin's declaration schema references its `$defs` by this schema's `$id`. */
+export const PANEL_SCHEMA = JSON.parse(readFileSync(at('schema', 'panel.schema.json'), 'utf8'));
+
+/** Runs `omx-panel <args>`: `{ status, stdout, stderr }`. */
+export function omxPanel(args, options = {}) {
+  const r = spawnSync(process.execPath, [at('bin', 'omx-panel.mjs'), ...args], { encoding: 'utf8', ...options });
+  return { status: r.status ?? 1, stdout: r.stdout ?? '', stderr: r.stderr ?? '' };
+}

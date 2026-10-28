@@ -19,10 +19,11 @@
  * Usage: node tools/clap-ext-check.mjs plugins/<stem> <probe output>
  */
 import { readFileSync } from 'node:fs';
+import { panelDescription } from './descriptor.mjs';
 import { loadDecl, scaleOf } from './gen.mjs';
 import { locateContract } from './omx-contract.mjs';
 import { CONTRACT_VERSION, contractCanonical, contractFingerprint, contractOf, scalesOf } from './param-contract.mjs';
-import { PLACEMENTS, pagesOf, panelDescription } from './panel-description.mjs';
+import { PLACEMENTS, pagesOf } from './omx-panel.mjs';
 import { maskOf } from './resource-hints.mjs';
 
 const [dir, dump] = process.argv.slice(2);
