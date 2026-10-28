@@ -1,3 +1,12 @@
+omx-plugins (0.15.1) unstable; urgency=medium
+
+  * The sixty band-Q controls of eq8, eq16, eq32 and strip link
+    EQ_NOTCH_Q_RANGE, the range their travel states (0.3..116), so the
+    travel each descriptor states is what its link resolves to; the
+    generator and a check on the descriptors follow (#252).
+
+ -- Pau Aliagas <linuxnow@gmail.com>  Wed, 28 Oct 2026 13:00:00 +0100
+
 omx-plugins (0.15.0) unstable; urgency=medium
 
   * The plugins' descriptors ship in a noarch package, omx-plugins-contract,
