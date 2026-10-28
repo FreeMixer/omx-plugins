@@ -70,6 +70,8 @@
 #                   and $(LIBDIR)/libomxplugins.a with $(LIBDIR)/pkgconfig/omxplugins.pc
 #   make clap-validate  clap-validator on every built .clap (tools/clap-validate.sh): one JSON report each in build/clap-validator;
 #                   CI runs it and reports a failure without failing the job until every plugin passes
+#   make release-version  every generated header, descriptor and LV2 plugin file carries VERSION, with its sabotage arms
+#                   (tools/test/release-version-check.mjs; part of `make test`)
 #   make version    the release version, the one packaging/omx-plugins.spec and debian/changelog carry
 #   make install-test  DESTDIR, PREFIX, TESTCLAPDIR: each test plugin's .clap in $(TESTCLAPDIR), outside every
 #                   CLAP search path (default $(PREFIX)/libexec/omx-plugins/test), for the omx-plugins-test package:
@@ -137,11 +139,11 @@ LIB_FLAGS  := -fPIC -fvisibility=hidden -DOMX_CLAP_STATIC -Iinclude
 # read only by the targets that build the archive, so `make version` and the rest need no omx-dsp
 lib_cflags = $(call dep_check,omxdsp,$(OMXDSP_MIN))$(call dep_check,omx-contract,$(CONTRACT_MIN))$(shell $(PKG_CONFIG) --cflags omxdsp omx-contract omx-clap-core clap)
 
-.PHONY: presets presets-figures test-role all lib lib-test test test-faces units panel-layout descriptor-view lv2-units lv2-maintainer lv2-manifest resource-hints format-tables contract-union probe-checks eq-probe-race band-groups round-trip hints modgui manual install install-pins install-test package-lists install-devel install-contract contract-dir clean version recipe-test completeness selftest private-refs params-doc check-params-doc strip-crosscheck meters-abi meter-level dsp-copies meter-ring clap-validate
+.PHONY: presets presets-figures test-role all lib lib-test test test-faces units panel-layout descriptor-view lv2-units lv2-maintainer lv2-manifest release-version resource-hints format-tables contract-union probe-checks eq-probe-race band-groups round-trip hints modgui manual install install-pins install-test package-lists install-devel install-contract contract-dir clean version recipe-test completeness selftest private-refs params-doc check-params-doc strip-crosscheck meters-abi meter-level dsp-copies meter-ring clap-validate
 all: lib
 	@for p in $(PLUGINS); do $(MAKE) -C $$p all || exit 1; done
 lib: $(LIB) $(LIB_PC)
-test: lib units panel-layout descriptor-view lv2-units lv2-maintainer lv2-manifest resource-hints format-tables contract-union contract-dir probe-checks eq-probe-race band-groups
+test: lib units panel-layout descriptor-view lv2-units lv2-maintainer lv2-manifest release-version resource-hints format-tables contract-union contract-dir probe-checks eq-probe-race band-groups
 	@if [ -z "$(PLUGINS)" ]; then echo "no plugins yet"; fi
 	@for p in $(PLUGINS); do $(MAKE) -C $$p test || exit 1; done
 	@$(MAKE) -s round-trip
@@ -355,6 +357,9 @@ lib-test: lib
 	$(LIB_B)/static-table-host $(CLAP_IDS) --test $(TEST_IDS)
 version:
 	@echo $(VERSION)
+# every generated header, descriptor and LV2 plugin file states the release's version, the VERSION above
+release-version:
+	node tools/test/release-version-check.mjs --self-test
 
 clap-validate: all
 	tools/clap-validate.sh build/clap-validator
