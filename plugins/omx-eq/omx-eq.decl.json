@@ -234,7 +234,8 @@
           "gain",
           "q"
         ],
-        "graph": "eq-curve"
+        "graph": "eq-curve",
+        "subgroups": "band"
       },
       {
         "key": "hpf",

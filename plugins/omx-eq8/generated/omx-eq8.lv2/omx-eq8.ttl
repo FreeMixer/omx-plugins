@@ -149,7 +149,7 @@
             [ rdfs:label "Notch" ; rdf:value 3 ] ,
             [ rdfs:label "All-pass 1st" ; rdf:value 4 ] ,
             [ rdfs:label "All-pass 2nd" ; rdf:value 5 ] ;
-        pg:group <urn:openmixer:eq8#bands>
+        pg:group <urn:openmixer:eq8#band1>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -163,7 +163,7 @@
         lv2:portProperty pprops:logarithmic ;
         units:unit units:hz ;
         lv2:designation param:frequency ;
-        pg:group <urn:openmixer:eq8#bands>
+        pg:group <urn:openmixer:eq8#band1>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -175,7 +175,7 @@
         lv2:maximum 15 ;
         units:unit units:db ;
         lv2:designation param:gain ;
-        pg:group <urn:openmixer:eq8#bands>
+        pg:group <urn:openmixer:eq8#band1>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -185,7 +185,7 @@
         lv2:default 1 ;
         lv2:minimum 0.3 ;
         lv2:maximum 116 ;
-        pg:group <urn:openmixer:eq8#bands>
+        pg:group <urn:openmixer:eq8#band1>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -196,7 +196,7 @@
         lv2:minimum 0 ;
         lv2:maximum 1 ;
         lv2:portProperty lv2:toggled ;
-        pg:group <urn:openmixer:eq8#bands>
+        pg:group <urn:openmixer:eq8#band1>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -214,7 +214,7 @@
             [ rdfs:label "Notch" ; rdf:value 3 ] ,
             [ rdfs:label "All-pass 1st" ; rdf:value 4 ] ,
             [ rdfs:label "All-pass 2nd" ; rdf:value 5 ] ;
-        pg:group <urn:openmixer:eq8#bands>
+        pg:group <urn:openmixer:eq8#band2>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -228,7 +228,7 @@
         lv2:portProperty pprops:logarithmic ;
         units:unit units:hz ;
         lv2:designation param:frequency ;
-        pg:group <urn:openmixer:eq8#bands>
+        pg:group <urn:openmixer:eq8#band2>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -240,7 +240,7 @@
         lv2:maximum 15 ;
         units:unit units:db ;
         lv2:designation param:gain ;
-        pg:group <urn:openmixer:eq8#bands>
+        pg:group <urn:openmixer:eq8#band2>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -250,7 +250,7 @@
         lv2:default 1 ;
         lv2:minimum 0.3 ;
         lv2:maximum 116 ;
-        pg:group <urn:openmixer:eq8#bands>
+        pg:group <urn:openmixer:eq8#band2>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -261,7 +261,7 @@
         lv2:minimum 0 ;
         lv2:maximum 1 ;
         lv2:portProperty lv2:toggled ;
-        pg:group <urn:openmixer:eq8#bands>
+        pg:group <urn:openmixer:eq8#band2>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -279,7 +279,7 @@
             [ rdfs:label "Notch" ; rdf:value 3 ] ,
             [ rdfs:label "All-pass 1st" ; rdf:value 4 ] ,
             [ rdfs:label "All-pass 2nd" ; rdf:value 5 ] ;
-        pg:group <urn:openmixer:eq8#bands>
+        pg:group <urn:openmixer:eq8#band3>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -293,7 +293,7 @@
         lv2:portProperty pprops:logarithmic ;
         units:unit units:hz ;
         lv2:designation param:frequency ;
-        pg:group <urn:openmixer:eq8#bands>
+        pg:group <urn:openmixer:eq8#band3>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -305,7 +305,7 @@
         lv2:maximum 15 ;
         units:unit units:db ;
         lv2:designation param:gain ;
-        pg:group <urn:openmixer:eq8#bands>
+        pg:group <urn:openmixer:eq8#band3>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -315,7 +315,7 @@
         lv2:default 1 ;
         lv2:minimum 0.3 ;
         lv2:maximum 116 ;
-        pg:group <urn:openmixer:eq8#bands>
+        pg:group <urn:openmixer:eq8#band3>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -326,7 +326,7 @@
         lv2:minimum 0 ;
         lv2:maximum 1 ;
         lv2:portProperty lv2:toggled ;
-        pg:group <urn:openmixer:eq8#bands>
+        pg:group <urn:openmixer:eq8#band3>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -344,7 +344,7 @@
             [ rdfs:label "Notch" ; rdf:value 3 ] ,
             [ rdfs:label "All-pass 1st" ; rdf:value 4 ] ,
             [ rdfs:label "All-pass 2nd" ; rdf:value 5 ] ;
-        pg:group <urn:openmixer:eq8#bands>
+        pg:group <urn:openmixer:eq8#band4>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -358,7 +358,7 @@
         lv2:portProperty pprops:logarithmic ;
         units:unit units:hz ;
         lv2:designation param:frequency ;
-        pg:group <urn:openmixer:eq8#bands>
+        pg:group <urn:openmixer:eq8#band4>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -370,7 +370,7 @@
         lv2:maximum 15 ;
         units:unit units:db ;
         lv2:designation param:gain ;
-        pg:group <urn:openmixer:eq8#bands>
+        pg:group <urn:openmixer:eq8#band4>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -380,7 +380,7 @@
         lv2:default 1 ;
         lv2:minimum 0.3 ;
         lv2:maximum 116 ;
-        pg:group <urn:openmixer:eq8#bands>
+        pg:group <urn:openmixer:eq8#band4>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -391,7 +391,7 @@
         lv2:minimum 0 ;
         lv2:maximum 1 ;
         lv2:portProperty lv2:toggled ;
-        pg:group <urn:openmixer:eq8#bands>
+        pg:group <urn:openmixer:eq8#band4>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -409,7 +409,7 @@
             [ rdfs:label "Notch" ; rdf:value 3 ] ,
             [ rdfs:label "All-pass 1st" ; rdf:value 4 ] ,
             [ rdfs:label "All-pass 2nd" ; rdf:value 5 ] ;
-        pg:group <urn:openmixer:eq8#bands>
+        pg:group <urn:openmixer:eq8#band5>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -423,7 +423,7 @@
         lv2:portProperty pprops:logarithmic ;
         units:unit units:hz ;
         lv2:designation param:frequency ;
-        pg:group <urn:openmixer:eq8#bands>
+        pg:group <urn:openmixer:eq8#band5>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -435,7 +435,7 @@
         lv2:maximum 15 ;
         units:unit units:db ;
         lv2:designation param:gain ;
-        pg:group <urn:openmixer:eq8#bands>
+        pg:group <urn:openmixer:eq8#band5>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -445,7 +445,7 @@
         lv2:default 1 ;
         lv2:minimum 0.3 ;
         lv2:maximum 116 ;
-        pg:group <urn:openmixer:eq8#bands>
+        pg:group <urn:openmixer:eq8#band5>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -456,7 +456,7 @@
         lv2:minimum 0 ;
         lv2:maximum 1 ;
         lv2:portProperty lv2:toggled ;
-        pg:group <urn:openmixer:eq8#bands>
+        pg:group <urn:openmixer:eq8#band5>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -474,7 +474,7 @@
             [ rdfs:label "Notch" ; rdf:value 3 ] ,
             [ rdfs:label "All-pass 1st" ; rdf:value 4 ] ,
             [ rdfs:label "All-pass 2nd" ; rdf:value 5 ] ;
-        pg:group <urn:openmixer:eq8#bands>
+        pg:group <urn:openmixer:eq8#band6>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -488,7 +488,7 @@
         lv2:portProperty pprops:logarithmic ;
         units:unit units:hz ;
         lv2:designation param:frequency ;
-        pg:group <urn:openmixer:eq8#bands>
+        pg:group <urn:openmixer:eq8#band6>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -500,7 +500,7 @@
         lv2:maximum 15 ;
         units:unit units:db ;
         lv2:designation param:gain ;
-        pg:group <urn:openmixer:eq8#bands>
+        pg:group <urn:openmixer:eq8#band6>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -510,7 +510,7 @@
         lv2:default 1 ;
         lv2:minimum 0.3 ;
         lv2:maximum 116 ;
-        pg:group <urn:openmixer:eq8#bands>
+        pg:group <urn:openmixer:eq8#band6>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -521,7 +521,7 @@
         lv2:minimum 0 ;
         lv2:maximum 1 ;
         lv2:portProperty lv2:toggled ;
-        pg:group <urn:openmixer:eq8#bands>
+        pg:group <urn:openmixer:eq8#band6>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -539,7 +539,7 @@
             [ rdfs:label "Notch" ; rdf:value 3 ] ,
             [ rdfs:label "All-pass 1st" ; rdf:value 4 ] ,
             [ rdfs:label "All-pass 2nd" ; rdf:value 5 ] ;
-        pg:group <urn:openmixer:eq8#bands>
+        pg:group <urn:openmixer:eq8#band7>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -553,7 +553,7 @@
         lv2:portProperty pprops:logarithmic ;
         units:unit units:hz ;
         lv2:designation param:frequency ;
-        pg:group <urn:openmixer:eq8#bands>
+        pg:group <urn:openmixer:eq8#band7>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -565,7 +565,7 @@
         lv2:maximum 15 ;
         units:unit units:db ;
         lv2:designation param:gain ;
-        pg:group <urn:openmixer:eq8#bands>
+        pg:group <urn:openmixer:eq8#band7>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -575,7 +575,7 @@
         lv2:default 1 ;
         lv2:minimum 0.3 ;
         lv2:maximum 116 ;
-        pg:group <urn:openmixer:eq8#bands>
+        pg:group <urn:openmixer:eq8#band7>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -586,7 +586,7 @@
         lv2:minimum 0 ;
         lv2:maximum 1 ;
         lv2:portProperty lv2:toggled ;
-        pg:group <urn:openmixer:eq8#bands>
+        pg:group <urn:openmixer:eq8#band7>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -604,7 +604,7 @@
             [ rdfs:label "Notch" ; rdf:value 3 ] ,
             [ rdfs:label "All-pass 1st" ; rdf:value 4 ] ,
             [ rdfs:label "All-pass 2nd" ; rdf:value 5 ] ;
-        pg:group <urn:openmixer:eq8#bands>
+        pg:group <urn:openmixer:eq8#band8>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -618,7 +618,7 @@
         lv2:portProperty pprops:logarithmic ;
         units:unit units:hz ;
         lv2:designation param:frequency ;
-        pg:group <urn:openmixer:eq8#bands>
+        pg:group <urn:openmixer:eq8#band8>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -630,7 +630,7 @@
         lv2:maximum 15 ;
         units:unit units:db ;
         lv2:designation param:gain ;
-        pg:group <urn:openmixer:eq8#bands>
+        pg:group <urn:openmixer:eq8#band8>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -640,7 +640,7 @@
         lv2:default 1 ;
         lv2:minimum 0.3 ;
         lv2:maximum 116 ;
-        pg:group <urn:openmixer:eq8#bands>
+        pg:group <urn:openmixer:eq8#band8>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -651,7 +651,7 @@
         lv2:minimum 0 ;
         lv2:maximum 1 ;
         lv2:portProperty lv2:toggled ;
-        pg:group <urn:openmixer:eq8#bands>
+        pg:group <urn:openmixer:eq8#band8>
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
@@ -674,19 +674,82 @@
         units:unit units:frame
     ] .
 
-<urn:openmixer:eq8#bands>
+# lv2:displayPriority on a port group is the term Zynthian reads to order a plugin's groups (zynthian_lv2.py), and the
+# one FreeMixer/omx-plugins#257 rules; LV2 defines none in lv2core (port-props' pprops:displayPriority is a port's), so
+# it is stated here, for a validator, as what it is.
+lv2:displayPriority
+    a <http://www.w3.org/1999/02/22-rdf-syntax-ns#Property> ;
+    rdfs:label "display priority" ;
+    rdfs:comment "A port group's rank among its plugin's groups, higher first, as Zynthian reads it." .
+
+<urn:openmixer:eq8#band1>
     a pg:Group ;
-    lv2:symbol "bands" ;
-    rdfs:label "Bands" .
+    lv2:symbol "band1" ;
+    lv2:name "Band 1" ;
+    lv2:displayPriority 8 ;
+    rdfs:label "Band 1" .
+
+<urn:openmixer:eq8#band2>
+    a pg:Group ;
+    lv2:symbol "band2" ;
+    lv2:name "Band 2" ;
+    lv2:displayPriority 7 ;
+    rdfs:label "Band 2" .
+
+<urn:openmixer:eq8#band3>
+    a pg:Group ;
+    lv2:symbol "band3" ;
+    lv2:name "Band 3" ;
+    lv2:displayPriority 6 ;
+    rdfs:label "Band 3" .
+
+<urn:openmixer:eq8#band4>
+    a pg:Group ;
+    lv2:symbol "band4" ;
+    lv2:name "Band 4" ;
+    lv2:displayPriority 5 ;
+    rdfs:label "Band 4" .
+
+<urn:openmixer:eq8#band5>
+    a pg:Group ;
+    lv2:symbol "band5" ;
+    lv2:name "Band 5" ;
+    lv2:displayPriority 4 ;
+    rdfs:label "Band 5" .
+
+<urn:openmixer:eq8#band6>
+    a pg:Group ;
+    lv2:symbol "band6" ;
+    lv2:name "Band 6" ;
+    lv2:displayPriority 3 ;
+    rdfs:label "Band 6" .
+
+<urn:openmixer:eq8#band7>
+    a pg:Group ;
+    lv2:symbol "band7" ;
+    lv2:name "Band 7" ;
+    lv2:displayPriority 2 ;
+    rdfs:label "Band 7" .
+
+<urn:openmixer:eq8#band8>
+    a pg:Group ;
+    lv2:symbol "band8" ;
+    lv2:name "Band 8" ;
+    lv2:displayPriority 1 ;
+    rdfs:label "Band 8" .
 
 <urn:openmixer:eq8#hpf>
     a pg:Group ;
     lv2:symbol "hpf" ;
+    lv2:name "HPF" ;
+    lv2:displayPriority 10 ;
     rdfs:label "HPF" .
 
 <urn:openmixer:eq8#lpf>
     a pg:Group ;
     lv2:symbol "lpf" ;
+    lv2:name "LPF" ;
+    lv2:displayPriority 9 ;
     rdfs:label "LPF" .
 
 <urn:openmixer:unit#dBoct>

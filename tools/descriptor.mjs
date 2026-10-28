@@ -78,16 +78,42 @@ export function parseLink(link) {
 export const CONTROL_EXTRAS = ['forKind', 'defaultRef', 'defaultId', 'defaultBand', 'perBand', 'unit', 'values', 'own'];
 
 /**
+ * The LV2 port groups of declaration `d` (as tools/gen.mjs loads it), in panel section order: one per section, or,
+ * for a section the declaration splits (`subgroups`, tools/variants.mjs), one per subgroup and one for the section's
+ * controls no subgroup holds, if any. Each is `{ key, label, path, controls, priority }`: `key` its lv2:symbol, `label`
+ * its lv2:name and rdfs:label, `path` its controls' descriptor `group` (the panel section's label first, the group's
+ * last; a section's own group has a one-element path), `priority` its lv2:displayPriority, the groups counted down
+ * in the order their first port comes (a host that shows the higher first, as Zynthian does, shows them in port
+ * order). A section with no controls left makes no group.
+ */
+export function portGroupsOf(d) {
+  const groups = [];
+  for (const s of d.panel?.sections ?? []) {
+    const subs = d.subgroups?.[s.key] ?? [];
+    const held = new Set(subs.flatMap((g) => g.controls));
+    const own = s.controls.filter((sym) => !held.has(sym));
+    if (own.length) groups.push({ key: s.key, label: s.label, path: [s.label], controls: own });
+    for (const g of subs) groups.push({ key: g.key, label: g.label, path: [s.label, g.label], controls: g.controls });
+  }
+  const indexOf = new Map(d.params.map((p, i) => [p.symbol, i]));
+  const first = (g) => Math.min(...g.controls.map((sym) => indexOf.get(sym) ?? Infinity));
+  const order = [...groups].sort((a, b) => first(a) - first(b));
+  for (const g of groups) g.priority = groups.length - order.indexOf(g);
+  return groups;
+}
+
+/**
  * `{ descriptor, extras }` of declaration `d`, every parameter resolved. Each control's id is the
  * parameter's index; its symbol and name the parameter's; a toggle is a toggle, an integer with labelled
  * values a choice (ids the values, as text), any other parameter a travel with the declared unit and
- * scale; its group the label of the panel section listing it, its meaning the one its declared role
+ * scale; its group the label of the panel section listing it (and of its port group within it, where the
+ * declaration splits the section: portGroupsOf), its meaning the one its declared role
  * plays; its source the link its travel is read from, or the face for a parameter of the face's own.
  * `extras` carries what the descriptor has no word for: a choice's unit and the per-kind come-up values.
  */
 export function descriptorOf(d) {
   const groupOf = new Map();
-  for (const s of d.panel?.sections ?? []) for (const sym of s.controls) groupOf.set(sym, [s.label]);
+  for (const g of portGroupsOf(d)) for (const sym of g.controls) groupOf.set(sym, g.path);
   const meaningOf = new Map();
   for (const [role, syms] of Object.entries(d.panel?.roles ?? {})) {
     const m = meaningOfRole(role);
