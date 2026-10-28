@@ -238,8 +238,8 @@ tools/pins-check.sh %{buildroot}%{_datadir}/plugin-hostd/pins.d/omx-plugins.pins
 * Wed Oct 28 2026 Pau Aliagas <linuxnow@gmail.com> - 0.15.1-1
 - The sixty band-Q controls of eq8, eq16, eq32 and strip link
   EQ_NOTCH_Q_RANGE, the range their travel states (0.3..116), so the travel
-  each descriptor states is what its link resolves to; the generator and a
-  check on the descriptors follow (#252).
+  each descriptor states is what its link resolves to. The generator is fixed
+  and a check holds every one of the sixty to it (#252).
 
 * Tue Oct 27 2026 Pau Aliagas <linuxnow@gmail.com> - 0.15.0-1
 - The plugins' descriptors ship in a noarch package, omx-plugins-contract, in omx-contract's contract
