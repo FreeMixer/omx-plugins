@@ -32,6 +32,8 @@
 #                   `make check` (the generated-fresh step of CI runs it beside `node tools/gen.mjs --check`)
 #   make manual     each declaration's manual follows omx-contract: a travel moved in a copy of the release moves
 #                   the README section's range and default (tools/test/manual-perturb.mjs)
+#   make params-doc  write docs/plugins/: one page of every parameter for each plugin and the index (tools/params-doc.mjs, from the declarations)
+#   make check-params-doc  the committed pages are what the declarations generate, and say what the generated TTLs say (tools/test/params-doc-test.mjs); run by CI beside `node tools/gen.mjs --check`
 #   make private-refs  no tracked file (generated ones included) points into a private repository, issue, branch or path
 #                      (tools/private-refs-check.sh, with its --self-test); run by CI beside `make test`
 #   make recipe-test   the repository's own checks, run by CI beside `make test`:
@@ -135,7 +137,7 @@ LIB_FLAGS  := -fPIC -fvisibility=hidden -DOMX_CLAP_STATIC -Iinclude
 # read only by the targets that build the archive, so `make version` and the rest need no omx-dsp
 lib_cflags = $(call dep_check,omxdsp,$(OMXDSP_MIN))$(call dep_check,omx-contract,$(CONTRACT_MIN))$(shell $(PKG_CONFIG) --cflags omxdsp omx-contract omx-clap-core clap)
 
-.PHONY: presets presets-figures test-role all lib lib-test test test-faces units panel-layout descriptor-view lv2-units lv2-maintainer lv2-manifest resource-hints format-tables contract-union probe-checks eq-probe-race band-groups round-trip hints modgui manual install install-pins install-test package-lists install-devel install-contract contract-dir clean version recipe-test completeness selftest private-refs strip-crosscheck meters-abi meter-level dsp-copies meter-ring clap-validate
+.PHONY: presets presets-figures test-role all lib lib-test test test-faces units panel-layout descriptor-view lv2-units lv2-maintainer lv2-manifest resource-hints format-tables contract-union probe-checks eq-probe-race band-groups round-trip hints modgui manual install install-pins install-test package-lists install-devel install-contract contract-dir clean version recipe-test completeness selftest private-refs params-doc check-params-doc strip-crosscheck meters-abi meter-level dsp-copies meter-ring clap-validate
 all: lib
 	@for p in $(PLUGINS); do $(MAKE) -C $$p all || exit 1; done
 lib: $(LIB) $(LIB_PC)
@@ -194,6 +196,12 @@ eq-probe-race:
 # omx-eq8's generated descriptor and TTL hold a port group per band, HPF and LPF as before (#257)
 band-groups:
 	node tools/test/eq8-band-groups-test.mjs
+# the parameter reference of every plugin, written from the declarations (docs/plugins/)
+params-doc:
+	node tools/params-doc.mjs
+check-params-doc:
+	node tools/params-doc.mjs --check
+	node tools/test/params-doc-test.mjs
 # author, generate both faces, scan them back through plugin-hostd and compare, with its two sabotage arms
 round-trip:
 	tools/round-trip.sh

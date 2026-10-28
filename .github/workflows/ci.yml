@@ -112,6 +112,7 @@ jobs:
           node tools/gen.mjs --check
           make modgui
           node tools/gen-presets.mjs --check
+          make check-params-doc
 
       - name: make test, and nothing skipped
         id: handback-test
