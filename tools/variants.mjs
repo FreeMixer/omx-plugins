@@ -25,6 +25,10 @@
  * (eq8); `face`, the omx-dsp instance face it binds, the base's kernel (eq); `variantOf`, the base,
  * the count sheet entry and the band count, which the parameter header passes to the face as
  * OMX_<FACE>_INSTANCE_BANDS.
+ *
+ * A panel section marked `"subgroups": "band"` is drawn as declared, but its controls are LV2 port groups a band
+ * each: the variant's `subgroups`, by section key, lists `Band <n>` (symbol `band<n>`) with that band's controls of
+ * the section in the section's order (FreeMixer/omx-plugins#257: a touchscreen shows one band per screen).
  */
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { basename, join, resolve } from 'node:path';
@@ -104,7 +108,12 @@ export function expandVariant(contractDir, base, variant) {
     params: [...own, ...bands],
   };
   if (base.portHints) d.portHints = perBandKeys(base.portHints, per, n);
-  const sections = (ss) => ss.map((x) => ({ ...x, controls: perBandList(x.controls, per, n) }));
+  // a section's `subgroups: "band"` is kept beside the panel, not in it: the panel is drawn as declared, and
+  // only the LV2 port groups (and the descriptor's group paths) are a band each (tools/descriptor.mjs portGroupsOf)
+  const sections = (ss) => ss.map(({ subgroups: _subgroups, ...x }) => ({ ...x, controls: perBandList(x.controls, per, n) }));
+  const subgroups = Object.fromEntries((base.panel?.sections ?? []).filter((x) => x.subgroups === 'band').map((x) => [x.key,
+    Array.from({ length: n }, (_x, b) => ({ key: `band${b + 1}`, label: `Band ${b + 1}`, controls: x.controls.filter((s) => per.some((p) => p.symbol === s)).map((s) => `b${b + 1}_${s}`) }))]));
+  if (Object.keys(subgroups).length) d.subgroups = subgroups;
   const panelOf = (pn) => ({
     ...pn,
     ...(pn.roles ? { roles: perBandRoles(pn.roles, per, n) } : {}),
