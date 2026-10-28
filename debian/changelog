@@ -1,3 +1,23 @@
+omx-plugins (0.15.0) unstable; urgency=medium
+
+  * The plugins' descriptors ship in a noarch package, omx-plugins-contract,
+    in omx-contract's contract directory beside a MANIFEST.json naming the
+    release; omx-plugins and the devel package require it. The omx-contract
+    floor is 3.4.0.
+  * The parameter units are a sheet, contract/param-units.json, in that
+    directory, and the unit enum in omx_param_contract.h is generated from it.
+  * The factory kernels' calls follow omx-dsp 0.26.0 (floor 0.26.0): comp,
+    delay, gate and reverb pass its new resolve arguments, and a declaration
+    holds a face argument at its kernel's named default.
+  * The omx-clap-core floor is 0.14.0, the first tag that carries what 0.13.0
+    was meant to.
+  * preset-probe refuses a staged location longer than its buffer instead of
+    truncating it; the round-trip scan entry for stepped-to-log parameters
+    holds through plugin-hostd 0.12.0.
+  * CI installs the OpenMixer repository with the add-openmixer action.
+
+ -- Pau Aliagas <linuxnow@gmail.com>  Tue, 27 Oct 2026 12:00:00 +0000
+
 omx-plugins (0.14.0) unstable; urgency=medium
 
   * Our own plugins' pins are known at build time, so they ship with the
