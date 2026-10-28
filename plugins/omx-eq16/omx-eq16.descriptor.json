@@ -192,7 +192,8 @@
       ],
       "default": "1",
       "group": [
-        "Bands"
+        "Bands",
+        "Band 1"
       ],
       "automatable": true,
       "source": {
@@ -216,7 +217,8 @@
         "scale": "stepped"
       },
       "group": [
-        "Bands"
+        "Bands",
+        "Band 1"
       ],
       "meaning": "frequency",
       "automatable": true,
@@ -241,7 +243,8 @@
         "scale": "linear"
       },
       "group": [
-        "Bands"
+        "Bands",
+        "Band 1"
       ],
       "meaning": "gain",
       "automatable": true,
@@ -266,7 +269,8 @@
         "scale": "linear"
       },
       "group": [
-        "Bands"
+        "Bands",
+        "Band 1"
       ],
       "meaning": "q",
       "automatable": true,
@@ -284,7 +288,8 @@
       "kind": "toggle",
       "default": false,
       "group": [
-        "Bands"
+        "Bands",
+        "Band 1"
       ],
       "automatable": true,
       "source": {
@@ -325,7 +330,8 @@
       ],
       "default": "0",
       "group": [
-        "Bands"
+        "Bands",
+        "Band 2"
       ],
       "automatable": true,
       "source": {
@@ -349,7 +355,8 @@
         "scale": "stepped"
       },
       "group": [
-        "Bands"
+        "Bands",
+        "Band 2"
       ],
       "meaning": "frequency",
       "automatable": true,
@@ -374,7 +381,8 @@
         "scale": "linear"
       },
       "group": [
-        "Bands"
+        "Bands",
+        "Band 2"
       ],
       "meaning": "gain",
       "automatable": true,
@@ -399,7 +407,8 @@
         "scale": "linear"
       },
       "group": [
-        "Bands"
+        "Bands",
+        "Band 2"
       ],
       "meaning": "q",
       "automatable": true,
@@ -417,7 +426,8 @@
       "kind": "toggle",
       "default": false,
       "group": [
-        "Bands"
+        "Bands",
+        "Band 2"
       ],
       "automatable": true,
       "source": {
@@ -458,7 +468,8 @@
       ],
       "default": "0",
       "group": [
-        "Bands"
+        "Bands",
+        "Band 3"
       ],
       "automatable": true,
       "source": {
@@ -482,7 +493,8 @@
         "scale": "stepped"
       },
       "group": [
-        "Bands"
+        "Bands",
+        "Band 3"
       ],
       "meaning": "frequency",
       "automatable": true,
@@ -507,7 +519,8 @@
         "scale": "linear"
       },
       "group": [
-        "Bands"
+        "Bands",
+        "Band 3"
       ],
       "meaning": "gain",
       "automatable": true,
@@ -532,7 +545,8 @@
         "scale": "linear"
       },
       "group": [
-        "Bands"
+        "Bands",
+        "Band 3"
       ],
       "meaning": "q",
       "automatable": true,
@@ -550,7 +564,8 @@
       "kind": "toggle",
       "default": false,
       "group": [
-        "Bands"
+        "Bands",
+        "Band 3"
       ],
       "automatable": true,
       "source": {
@@ -591,7 +606,8 @@
       ],
       "default": "0",
       "group": [
-        "Bands"
+        "Bands",
+        "Band 4"
       ],
       "automatable": true,
       "source": {
@@ -615,7 +631,8 @@
         "scale": "stepped"
       },
       "group": [
-        "Bands"
+        "Bands",
+        "Band 4"
       ],
       "meaning": "frequency",
       "automatable": true,
@@ -640,7 +657,8 @@
         "scale": "linear"
       },
       "group": [
-        "Bands"
+        "Bands",
+        "Band 4"
       ],
       "meaning": "gain",
       "automatable": true,
@@ -665,7 +683,8 @@
         "scale": "linear"
       },
       "group": [
-        "Bands"
+        "Bands",
+        "Band 4"
       ],
       "meaning": "q",
       "automatable": true,
@@ -683,7 +702,8 @@
       "kind": "toggle",
       "default": false,
       "group": [
-        "Bands"
+        "Bands",
+        "Band 4"
       ],
       "automatable": true,
       "source": {
@@ -724,7 +744,8 @@
       ],
       "default": "0",
       "group": [
-        "Bands"
+        "Bands",
+        "Band 5"
       ],
       "automatable": true,
       "source": {
@@ -748,7 +769,8 @@
         "scale": "stepped"
       },
       "group": [
-        "Bands"
+        "Bands",
+        "Band 5"
       ],
       "meaning": "frequency",
       "automatable": true,
@@ -773,7 +795,8 @@
         "scale": "linear"
       },
       "group": [
-        "Bands"
+        "Bands",
+        "Band 5"
       ],
       "meaning": "gain",
       "automatable": true,
@@ -798,7 +821,8 @@
         "scale": "linear"
       },
       "group": [
-        "Bands"
+        "Bands",
+        "Band 5"
       ],
       "meaning": "q",
       "automatable": true,
@@ -816,7 +840,8 @@
       "kind": "toggle",
       "default": false,
       "group": [
-        "Bands"
+        "Bands",
+        "Band 5"
       ],
       "automatable": true,
       "source": {
@@ -857,7 +882,8 @@
       ],
       "default": "0",
       "group": [
-        "Bands"
+        "Bands",
+        "Band 6"
       ],
       "automatable": true,
       "source": {
@@ -881,7 +907,8 @@
         "scale": "stepped"
       },
       "group": [
-        "Bands"
+        "Bands",
+        "Band 6"
       ],
       "meaning": "frequency",
       "automatable": true,
@@ -906,7 +933,8 @@
         "scale": "linear"
       },
       "group": [
-        "Bands"
+        "Bands",
+        "Band 6"
       ],
       "meaning": "gain",
       "automatable": true,
@@ -931,7 +959,8 @@
         "scale": "linear"
       },
       "group": [
-        "Bands"
+        "Bands",
+        "Band 6"
       ],
       "meaning": "q",
       "automatable": true,
@@ -949,7 +978,8 @@
       "kind": "toggle",
       "default": false,
       "group": [
-        "Bands"
+        "Bands",
+        "Band 6"
       ],
       "automatable": true,
       "source": {
@@ -990,7 +1020,8 @@
       ],
       "default": "0",
       "group": [
-        "Bands"
+        "Bands",
+        "Band 7"
       ],
       "automatable": true,
       "source": {
@@ -1014,7 +1045,8 @@
         "scale": "stepped"
       },
       "group": [
-        "Bands"
+        "Bands",
+        "Band 7"
       ],
       "meaning": "frequency",
       "automatable": true,
@@ -1039,7 +1071,8 @@
         "scale": "linear"
       },
       "group": [
-        "Bands"
+        "Bands",
+        "Band 7"
       ],
       "meaning": "gain",
       "automatable": true,
@@ -1064,7 +1097,8 @@
         "scale": "linear"
       },
       "group": [
-        "Bands"
+        "Bands",
+        "Band 7"
       ],
       "meaning": "q",
       "automatable": true,
@@ -1082,7 +1116,8 @@
       "kind": "toggle",
       "default": false,
       "group": [
-        "Bands"
+        "Bands",
+        "Band 7"
       ],
       "automatable": true,
       "source": {
@@ -1123,7 +1158,8 @@
       ],
       "default": "0",
       "group": [
-        "Bands"
+        "Bands",
+        "Band 8"
       ],
       "automatable": true,
       "source": {
@@ -1147,7 +1183,8 @@
         "scale": "stepped"
       },
       "group": [
-        "Bands"
+        "Bands",
+        "Band 8"
       ],
       "meaning": "frequency",
       "automatable": true,
@@ -1172,7 +1209,8 @@
         "scale": "linear"
       },
       "group": [
-        "Bands"
+        "Bands",
+        "Band 8"
       ],
       "meaning": "gain",
       "automatable": true,
@@ -1197,7 +1235,8 @@
         "scale": "linear"
       },
       "group": [
-        "Bands"
+        "Bands",
+        "Band 8"
       ],
       "meaning": "q",
       "automatable": true,
@@ -1215,7 +1254,8 @@
       "kind": "toggle",
       "default": false,
       "group": [
-        "Bands"
+        "Bands",
+        "Band 8"
       ],
       "automatable": true,
       "source": {
@@ -1256,7 +1296,8 @@
       ],
       "default": "0",
       "group": [
-        "Bands"
+        "Bands",
+        "Band 9"
       ],
       "automatable": true,
       "source": {
@@ -1280,7 +1321,8 @@
         "scale": "stepped"
       },
       "group": [
-        "Bands"
+        "Bands",
+        "Band 9"
       ],
       "meaning": "frequency",
       "automatable": true,
@@ -1305,7 +1347,8 @@
         "scale": "linear"
       },
       "group": [
-        "Bands"
+        "Bands",
+        "Band 9"
       ],
       "meaning": "gain",
       "automatable": true,
@@ -1330,7 +1373,8 @@
         "scale": "linear"
       },
       "group": [
-        "Bands"
+        "Bands",
+        "Band 9"
       ],
       "meaning": "q",
       "automatable": true,
@@ -1348,7 +1392,8 @@
       "kind": "toggle",
       "default": false,
       "group": [
-        "Bands"
+        "Bands",
+        "Band 9"
       ],
       "automatable": true,
       "source": {
@@ -1389,7 +1434,8 @@
       ],
       "default": "0",
       "group": [
-        "Bands"
+        "Bands",
+        "Band 10"
       ],
       "automatable": true,
       "source": {
@@ -1413,7 +1459,8 @@
         "scale": "stepped"
       },
       "group": [
-        "Bands"
+        "Bands",
+        "Band 10"
       ],
       "meaning": "frequency",
       "automatable": true,
@@ -1438,7 +1485,8 @@
         "scale": "linear"
       },
       "group": [
-        "Bands"
+        "Bands",
+        "Band 10"
       ],
       "meaning": "gain",
       "automatable": true,
@@ -1463,7 +1511,8 @@
         "scale": "linear"
       },
       "group": [
-        "Bands"
+        "Bands",
+        "Band 10"
       ],
       "meaning": "q",
       "automatable": true,
@@ -1481,7 +1530,8 @@
       "kind": "toggle",
       "default": false,
       "group": [
-        "Bands"
+        "Bands",
+        "Band 10"
       ],
       "automatable": true,
       "source": {
@@ -1522,7 +1572,8 @@
       ],
       "default": "0",
       "group": [
-        "Bands"
+        "Bands",
+        "Band 11"
       ],
       "automatable": true,
       "source": {
@@ -1546,7 +1597,8 @@
         "scale": "stepped"
       },
       "group": [
-        "Bands"
+        "Bands",
+        "Band 11"
       ],
       "meaning": "frequency",
       "automatable": true,
@@ -1571,7 +1623,8 @@
         "scale": "linear"
       },
       "group": [
-        "Bands"
+        "Bands",
+        "Band 11"
       ],
       "meaning": "gain",
       "automatable": true,
@@ -1596,7 +1649,8 @@
         "scale": "linear"
       },
       "group": [
-        "Bands"
+        "Bands",
+        "Band 11"
       ],
       "meaning": "q",
       "automatable": true,
@@ -1614,7 +1668,8 @@
       "kind": "toggle",
       "default": false,
       "group": [
-        "Bands"
+        "Bands",
+        "Band 11"
       ],
       "automatable": true,
       "source": {
@@ -1655,7 +1710,8 @@
       ],
       "default": "0",
       "group": [
-        "Bands"
+        "Bands",
+        "Band 12"
       ],
       "automatable": true,
       "source": {
@@ -1679,7 +1735,8 @@
         "scale": "stepped"
       },
       "group": [
-        "Bands"
+        "Bands",
+        "Band 12"
       ],
       "meaning": "frequency",
       "automatable": true,
@@ -1704,7 +1761,8 @@
         "scale": "linear"
       },
       "group": [
-        "Bands"
+        "Bands",
+        "Band 12"
       ],
       "meaning": "gain",
       "automatable": true,
@@ -1729,7 +1787,8 @@
         "scale": "linear"
       },
       "group": [
-        "Bands"
+        "Bands",
+        "Band 12"
       ],
       "meaning": "q",
       "automatable": true,
@@ -1747,7 +1806,8 @@
       "kind": "toggle",
       "default": false,
       "group": [
-        "Bands"
+        "Bands",
+        "Band 12"
       ],
       "automatable": true,
       "source": {
@@ -1788,7 +1848,8 @@
       ],
       "default": "0",
       "group": [
-        "Bands"
+        "Bands",
+        "Band 13"
       ],
       "automatable": true,
       "source": {
@@ -1812,7 +1873,8 @@
         "scale": "stepped"
       },
       "group": [
-        "Bands"
+        "Bands",
+        "Band 13"
       ],
       "meaning": "frequency",
       "automatable": true,
@@ -1837,7 +1899,8 @@
         "scale": "linear"
       },
       "group": [
-        "Bands"
+        "Bands",
+        "Band 13"
       ],
       "meaning": "gain",
       "automatable": true,
@@ -1862,7 +1925,8 @@
         "scale": "linear"
       },
       "group": [
-        "Bands"
+        "Bands",
+        "Band 13"
       ],
       "meaning": "q",
       "automatable": true,
@@ -1880,7 +1944,8 @@
       "kind": "toggle",
       "default": false,
       "group": [
-        "Bands"
+        "Bands",
+        "Band 13"
       ],
       "automatable": true,
       "source": {
@@ -1921,7 +1986,8 @@
       ],
       "default": "0",
       "group": [
-        "Bands"
+        "Bands",
+        "Band 14"
       ],
       "automatable": true,
       "source": {
@@ -1945,7 +2011,8 @@
         "scale": "stepped"
       },
       "group": [
-        "Bands"
+        "Bands",
+        "Band 14"
       ],
       "meaning": "frequency",
       "automatable": true,
@@ -1970,7 +2037,8 @@
         "scale": "linear"
       },
       "group": [
-        "Bands"
+        "Bands",
+        "Band 14"
       ],
       "meaning": "gain",
       "automatable": true,
@@ -1995,7 +2063,8 @@
         "scale": "linear"
       },
       "group": [
-        "Bands"
+        "Bands",
+        "Band 14"
       ],
       "meaning": "q",
       "automatable": true,
@@ -2013,7 +2082,8 @@
       "kind": "toggle",
       "default": false,
       "group": [
-        "Bands"
+        "Bands",
+        "Band 14"
       ],
       "automatable": true,
       "source": {
@@ -2054,7 +2124,8 @@
       ],
       "default": "0",
       "group": [
-        "Bands"
+        "Bands",
+        "Band 15"
       ],
       "automatable": true,
       "source": {
@@ -2078,7 +2149,8 @@
         "scale": "stepped"
       },
       "group": [
-        "Bands"
+        "Bands",
+        "Band 15"
       ],
       "meaning": "frequency",
       "automatable": true,
@@ -2103,7 +2175,8 @@
         "scale": "linear"
       },
       "group": [
-        "Bands"
+        "Bands",
+        "Band 15"
       ],
       "meaning": "gain",
       "automatable": true,
@@ -2128,7 +2201,8 @@
         "scale": "linear"
       },
       "group": [
-        "Bands"
+        "Bands",
+        "Band 15"
       ],
       "meaning": "q",
       "automatable": true,
@@ -2146,7 +2220,8 @@
       "kind": "toggle",
       "default": false,
       "group": [
-        "Bands"
+        "Bands",
+        "Band 15"
       ],
       "automatable": true,
       "source": {
@@ -2187,7 +2262,8 @@
       ],
       "default": "2",
       "group": [
-        "Bands"
+        "Bands",
+        "Band 16"
       ],
       "automatable": true,
       "source": {
@@ -2211,7 +2287,8 @@
         "scale": "stepped"
       },
       "group": [
-        "Bands"
+        "Bands",
+        "Band 16"
       ],
       "meaning": "frequency",
       "automatable": true,
@@ -2236,7 +2313,8 @@
         "scale": "linear"
       },
       "group": [
-        "Bands"
+        "Bands",
+        "Band 16"
       ],
       "meaning": "gain",
       "automatable": true,
@@ -2261,7 +2339,8 @@
         "scale": "linear"
       },
       "group": [
-        "Bands"
+        "Bands",
+        "Band 16"
       ],
       "meaning": "q",
       "automatable": true,
@@ -2279,7 +2358,8 @@
       "kind": "toggle",
       "default": false,
       "group": [
-        "Bands"
+        "Bands",
+        "Band 16"
       ],
       "automatable": true,
       "source": {

@@ -62,6 +62,7 @@ link resolves to. A number edited by hand is stale, never a declaration.
 | `latencyChecks` | `latency.reports: true`; `latency.frames` when every check reports one constant | kept: the checks the oracles run |
 | `oracles`, `portHints`, `meters` | | kept: tests, the LV2 hint pin, the clap.meters/1 rows |
 | `panel.sections[].label` | each listed control's `group` | `panel` (family, roles, section keys, order, widgets, graphs): the panel's hints |
+| `panel.sections[].subgroups` (`band`, a declaration with variants) | each band's controls' `group`, the path `[<section label>, "Band <n>"]`: the panel section first, the LV2 port group last (#257) | the panel is handed to omx-panel without it: the section is drawn as declared |
 | `panel.roles` | each bound control's `meaning`, where the role has a meaning word (omx-panel docs/panel-layout.md) | kept: the roles themselves |
 | `console` | | kept: the console's placement, card and chip |
 | `params[i]` | `controls[i]`, `id: i` | |
