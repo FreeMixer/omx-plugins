@@ -371,7 +371,7 @@
         "subgroups": {
           "type": "object",
           "title": "Subgroups",
-          "description": "Written by tools/variants.mjs for a variant: by section key, the LV2 port groups a section marked `\"subgroups\": \"band\"` is split into, one per band (`band<n>`, `Band <n>`), each with that band's controls of the section in the section's order.",
+          "description": "Written by tools/variants.mjs for a variant: by section key, the LV2 port groups a section marked `\"subgroups\": \"band\"` is split into, one per band (`band<n>`, `Band <n>`), each with that band's controls of the section in the section's order. tools/gen.mjs refuses it in a declaration without variants.",
           "propertyNames": {
             "pattern": "^[a-z][a-zA-Z0-9]*$"
           },

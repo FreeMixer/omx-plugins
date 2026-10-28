@@ -92,6 +92,7 @@ export function prepareDecl(file, d, stem, dir = dirname(file)) {
   if (d.variants) throw new Error(`${file}: the base of ${variantStems(d).join(', ')} is no plugin of its own; load one of its variants`);
   // a variant's sections had their `subgroups` expanded (tools/variants.mjs); a band is a variant's word only
   for (const s of d.panel?.sections ?? []) if (s.subgroups !== undefined) throw new Error(`${file}: section '${s.key}' says "subgroups", a word of a declaration with variants (its bands)`);
+  if (d.subgroups !== undefined && !d.variantOf) throw new Error(`${file}: "subgroups" is what tools/variants.mjs writes for a variant (its bands); a declaration without variants carries none`);
   if (d.stem !== stem) throw new Error(`${file}: stem '${d.stem}' is not the directory's '${stem}'`);
   if (!/^[a-z][a-z0-9_]*$/.test(d.kernel)) throw new Error(`${file}: kernel '${d.kernel}' is not a C identifier`);
   if (d.binding === 'chain') {

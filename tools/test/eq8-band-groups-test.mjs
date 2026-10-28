@@ -9,11 +9,16 @@
  * in port order; HPF and LPF keep their groups of three; no group named Bands is left in the TTL, while the panel
  * section stays Bands (the descriptor's group path is [section, group]).
  *
- * `make band-groups`, part of `make test`. It reads files only: a stale or hand-edited file is gen.mjs --check's.
+ * Both forms of the word are refused in a declaration without variants (the section's `"subgroups": "band"`, and the
+ * top-level `subgroups` tools/variants.mjs writes), each by an arm on a scratch copy of omx-reverb.
+ *
+ * `make band-groups`, part of `make test`. Its eq8 checks read files only: a stale or hand-edited file is gen.mjs --check's.
  */
-import { readFileSync } from 'node:fs';
+import { cpSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { loadDecl } from '../gen.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const DIR = join(ROOT, 'plugins', 'omx-eq8');
@@ -74,6 +79,36 @@ wantTtl.forEach(([key, label, syms], k) => {
     `read ${JSON.stringify(node)} holding ${members.join(' ') || 'nothing'}`);
 });
 check(portGroup.size === wantTtl.reduce((a, [, , s]) => a + s.length, 0), 'TTL: every control port is in exactly the groups above, no other port grouped', `${portGroup.size} grouped ports`);
+
+// a band is a variant's word: both its forms are refused in a declaration without variants (a scratch copy of
+// omx-reverb under the temporary directory), and the variant loads
+const TMP = mkdtempSync(join(tmpdir(), 'eq8-band-groups-'));
+const scratch = join(TMP, 'plugins', 'omx-reverb');
+try {
+  check(loadDecl(DIR).subgroups?.bands?.length === BANDS, `a variant: loadDecl accepts omx-eq8 with its ${BANDS} band subgroups`);
+  cpSync(join(ROOT, 'plugins', 'omx-reverb'), scratch, { recursive: true, filter: (src) => !src.includes('/build') });
+  const file = join(scratch, 'omx-reverb.decl.json');
+  const raw = readFileSync(file, 'utf8');
+  check((() => { loadDecl(scratch); return true; })(), 'the scratch omx-reverb loads unchanged (the arms below change one thing)');
+  const arms = [
+    ['the section form ("subgroups": "band" on a section)', (d) => { d.panel.sections[0].subgroups = 'band'; }, /section 'reverb' says "subgroups"/],
+    ['the expanded form (a top-level "subgroups")', (d) => { d.subgroups = { [d.panel.sections[0].key]: [{ key: 'band1', label: 'Band 1', controls: [d.panel.sections[0].controls[0]] }] }; }, /"subgroups" is what tools\/variants\.mjs writes for a variant/],
+  ];
+  for (const [what, change, want] of arms) {
+    const d = JSON.parse(raw);
+    change(d);
+    writeFileSync(file, JSON.stringify(d, null, 2));
+    let err;
+    try {
+      loadDecl(scratch);
+    } catch (e) {
+      err = e;
+    }
+    check(err !== undefined && want.test(err.message), `refused without variants: ${what}`, err ? err.message.slice(0, 300) : 'loadDecl accepted it');
+  }
+} finally {
+  rmSync(TMP, { recursive: true, force: true });
+}
 
 console.log(bad ? `eq8-band-groups: ${bad} of ${n} FAILED` : `eq8-band-groups: all ${n} pass`);
 process.exit(bad ? 1 : 0);
