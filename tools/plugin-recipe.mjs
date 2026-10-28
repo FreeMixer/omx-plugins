@@ -27,6 +27,7 @@ import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { descriptorFile, isWhole, viewOf } from './descriptor.mjs';
 import { compareVersions, declKernels, declParams, findName, kernelExists, locateContract, packagingRange, paramKernel } from './omx-contract.mjs';
+import { INDEXED_ROLES, ROLES } from './omx-panel.mjs';
 import { validate } from './schema-validate.mjs';
 import { omxdspInclude, render } from './template.mjs';
 import { baseOf, expandVariant, variantStems } from './variants.mjs';
@@ -185,6 +186,21 @@ export function globRe(glob) {
   return new RegExp(`^${re}$`);
 }
 
+/** Where `$defs.familyRoles` leaves omx-panel's table of roles (its ROLES, the one table): a family it has or lacks,
+ * and a family's roles that are not the table's. The schema lists the names so a declaration is checked with no
+ * omx-panel to read; the units each role accepts stay omx-panel's. */
+export function familyRolesErrors(schema, table = ROLES) {
+  const errs = [];
+  const tables = schema.$defs.familyRoles.properties;
+  const same = (a, b) => [...a].sort().join() === [...b].sort().join();
+  if (!same(Object.keys(tables), Object.keys(table))) errs.push(`schema: $defs.familyRoles families (${Object.keys(tables).join(', ')}) are not omx-panel's (${Object.keys(table).join(', ')})`);
+  for (const [family, roles] of Object.entries(table)) {
+    const own = tables[family]?.enum ?? [];
+    if (tables[family] && !same(own, Object.keys(roles))) errs.push(`schema: $defs.familyRoles.${family} (${own.join(', ')}) is not omx-panel's roles of it (${Object.keys(roles).join(', ')})`);
+  }
+  return errs;
+}
+
 /** Every way the `panel` block leaves the console's vocabulary or names no declared parameter: its
  * family outside `$defs.family`, a role outside its family's (`$defs.familyRoles`), a list of symbols
  * for a role that is not indexed, a family other than none with no role, a section, role or widget
@@ -196,8 +212,9 @@ export function panelErrors(schema, decl, symbols) {
   if (!p) return errs;
   const families = schema.$defs.family.enum;
   const tables = schema.$defs.familyRoles.properties;
-  const indexed = new Set(schema.$defs.indexedRole.enum);
+  const indexed = new Set(INDEXED_ROLES);
   if (families.join() !== Object.keys(tables).join()) errs.push(`schema: $defs.family (${families.join(', ')}) and $defs.familyRoles (${Object.keys(tables).join(', ')}) are not one list`);
+  errs.push(...familyRolesErrors(schema));
   const drawn = new Set();
   for (const s of p.sections ?? []) {
     for (const c of s.controls) {
@@ -288,10 +305,10 @@ export const CHECKERS = {
     return stale.length ? missing(`${stale.join(', ')} (make -C plugins/${facts.stem} gen)`) : ok(files.map((f) => fill(f, facts)).join(', '));
   },
 
-  /** The MOD GUI is what tools/modgui-gen.mjs writes now, and nothing more. */
+  /** The MOD GUI is what omx-panel writes now from the descriptor and the declared panel, and nothing more. */
   async modguiFresh(root, _recipe, facts) {
     const gen = await import(join(root, 'tools', 'gen.mjs'));
-    const mg = await import(join(root, 'tools', 'modgui-gen.mjs'));
+    const pf = await import(join(root, 'tools', 'panel-file.mjs'));
     let d;
     try {
       d = gen.loadDecl(join(root, 'plugins', facts.stem));
@@ -299,11 +316,8 @@ export const CHECKERS = {
       return missing(`cannot generate: ${e.message}`);
     }
     const dir = join('plugins', facts.stem, 'generated', `${facts.stem}.lv2`);
-    const out = mg.generateModgui(d, mg.loadLook());
-    const bad = out.filter(([p, bytes]) => !has(root, join(dir, p)) || !readFileSync(join(root, dir, p)).equals(bytes)).map(([p]) => join(dir, p));
-    const want = new Set(out.map(([p]) => join(dir, p)));
-    const extra = walk(root, join(dir, mg.MODGUI_DIR)).filter((p) => !want.has(p));
-    if (bad.length || extra.length) return missing(`${[...bad.map((p) => `${p} stale or missing`), ...extra.map((p) => `${p} extra`)].join(', ')} (make -C plugins/${facts.stem} gen)`);
+    const r = pf.modgui(d, '--check');
+    if (r.status !== 0) return missing(`${r.stderr.trim().split('\n').map((l) => l.replace(/^modgui: /, '')).join(', ')} (make -C plugins/${facts.stem} gen)`);
     return ok(`${dir}/modgui.ttl and modgui/`);
   },
 

@@ -10,15 +10,16 @@
  *     with the parameter's name, its id the parameter's (CLAP: its declared index; LV2: the port
  *     whose symbol is the parameter's, read from the bundle);
  *   - the family, widgets, label keys, roles, displays and placement defaults are the description
- *     tools/panel-description.mjs derives from the declaration;
+ *     omx-panel's layout derives from the declaration;
  *   - the fingerprint is the SHA-256 of the canonical serialisation of what was served, and that of
  *     the declaration's.
  *
  * Usage: node tools/panel-check.mjs plugins/<stem> clap|lv2 <probe output>
  */
 import { readFileSync } from 'node:fs';
+import { panelDescription } from './descriptor.mjs';
 import { loadDecl } from './gen.mjs';
-import { DISPLAY_KINDS, DISPLAY_SOURCES, FAMILIES, PLACEMENTS, WIDGETS, panelCanonical, panelDescription, panelFingerprint } from './panel-description.mjs';
+import { DISPLAY_KINDS, DISPLAY_SOURCES, FAMILIES, PLACEMENTS, WIDGETS, panelCanonical, panelFingerprint } from './omx-panel.mjs';
 
 const [dir, face, dump] = process.argv.slice(2);
 const d = loadDecl(dir);

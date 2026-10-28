@@ -28,7 +28,7 @@
  * and the hint view tools/test/port-hints.json (git-ignored), assembled from every declaration's
  * `portHints` (the pin of its LV2 port hints) for tools/port-hints.mjs.
  *
- * The MOD GUI of the same bundle is tools/modgui-gen.mjs's, which reads the port list from here.
+ * The MOD GUI of the same bundle is omx-panel's (tools/panel-file.mjs hands it the declared panel).
  *
  * Usage: `node tools/gen.mjs [--check] [plugins/<stem> ...]` — `--check` writes nothing and fails on a
  * stale, missing or changed file. Named plugins are generated alone; with none, every plugin and
@@ -40,9 +40,9 @@ import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 
 import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { faceBinding } from './instance-face.mjs';
-import { descriptorFile, descriptorOf, descriptorText, isWhole, travelUnit, viewOf } from './descriptor.mjs';
+import { descriptorFile, descriptorOf, descriptorText, isWhole, panelDescription, travelUnit, viewOf } from './descriptor.mjs';
 import { lv2Designation, lv2UnitNames, lv2UnitRef } from './format-tables.mjs';
-import { DISPLAY_KINDS, DISPLAY_SOURCES, FAMILIES, PLACEMENTS, WIDGETS, pagesOf, panelDescription, panelFingerprint } from './panel-description.mjs';
+import { DISPLAY_KINDS, DISPLAY_SOURCES, FAMILIES, PLACEMENTS, WIDGETS, pagesOf, panelFingerprint } from './omx-panel.mjs';
 import { CONTRACT_VERSION, contractFingerprint, contractOf, unitEnumLines } from './param-contract.mjs';
 import { SPEC_FILE, controlOf, eqDefaultBands, findName, kernelControls, locateContract, packagingRange, paramKernel, resolveParam } from './omx-contract.mjs';
 import { bandsMacro, baseOf, expandVariant, variantStems } from './variants.mjs';
@@ -419,7 +419,7 @@ const macro = (s) => s.replace(/([a-z0-9])([A-Z])/g, '$1_$2').toUpperCase();
 const cstr = (s) => `"${s.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`;
 
 /** The rows of org.openmixer.panel-description/1 in the parameter header: each table of
- * tools/panel-description.mjs as C, and OMX_<K>_PANEL, the description a face serves. */
+ * omx-panel's layout as C, and OMX_<K>_PANEL, the description a face serves. */
 function emitPanelRows(d) {
   const K = d.kernel.toUpperCase();
   const x = panelDescription(d);

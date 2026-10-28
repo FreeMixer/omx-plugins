@@ -15,6 +15,7 @@
 | C compiler, make, pkg-config | `gcc make pkgconf-pkg-config` | `build-essential pkgconf` | |
 | lilv | `lilv lilv-devel` | `lilv-utils liblilv-dev` | tests: the oracles' LV2 host, `lv2ls`, `lv2info` |
 | Node.js ≥ 18 | `nodejs` | `nodejs` | tests and `make gen`: the generators |
+| omx-panel ≥ 0.2.0 (the `omx-panel` command, `/usr/share/omx-panel`; `$OMX_PANEL_DIR` names another tree, `$OMX_PANEL` another command) | `omx-panel` (channel) | `omx-panel` (channel) | the panels: the layout every face serves and the MOD GUI of each plugin, from its descriptor and its declared panel |
 | sord | `sord` | `sordi` | tests: `sord_validate` on the LV2 bundle |
 | omx-clap-host | `omx-clap-host` (channel) | `omx-clap-host` (channel) | tests: `omx-clap-scan` (the check says SKIP when it is absent; CI and the package builds install it) |
 
@@ -63,9 +64,9 @@ entries by CLAP id that `include/omx_clap_static.h` declares. A host links it th
 CLAP id is in the table once, and each one is created through its factory, activated and run.
 
 Before the plugins, `make test` runs `make units` (the param-contract units are the header's) and
-`make panel-layout` (`tools/test/panel-layout-test.mjs`: the panel rules of
-[docs/panel-layout.md](docs/panel-layout.md) by value, each with an arm that breaks it, over
-omx-contract's example descriptors and our own plugins) and `make descriptor-view`
+`make panel-layout` (`tools/test/panel-layout-test.mjs`: our plugins' descriptors state no unknown word, and
+omx-panel's layout of each finds the declared family and roles; the layout's own rules are omx-panel's
+[docs/panel-layout.md](https://github.com/FreeMixer/omx-panel/blob/main/docs/panel-layout.md)) and `make descriptor-view`
 (`tools/test/descriptor-view-test.mjs`: each described plugin's descriptor fresh and in omx-contract's
 words, and the declaration its view).
 
@@ -86,8 +87,8 @@ and wants both red ([docs/declaration-as-descriptor.md](docs/declaration-as-desc
    directly, at every declared rate, engaged, bypassed and re-activated;
 4. **delay oracle** (`test/delay-oracle.c`): at 44.1, 48, 96 and 192 kHz, on both builds, the
    echoes, ping-pong, mix and bypass computed from the definition of a delay, not from omx-dsp;
-5. **MOD GUI**: fresh, carrying every declared control with its travel and default, valid under
-   `sord_validate`, and stale when the declaration moves;
+5. **MOD GUI** (`omx-panel modgui --check`, `omx-panel`'s `modgui-test.sh`): fresh, carrying every declared control
+   with its travel and default, valid under `sord_validate`, and stale when the declaration moves;
 6. **host check**: `omx-clap-scan` loads the CLAP file, `lv2ls`/`lv2info` read the LV2 bundle;
 7. **port groups** (`tools/port-groups-probe.c`, `tools/port-groups-check.mjs`): the LV2 bundle,
    read through lilv, holds one `pg:Group` per panel section (its `lv2:symbol` the section's key, its
@@ -130,10 +131,10 @@ contract/                 the definitions installed beside the descriptors in om
                           generated from it)
 lib/                      omx_clap_static.c (the table's rows are generated) and omxplugins.pc.in
 tools/                    gen.mjs (header + TTL), descriptor.mjs (a declaration as its plugin
-                          descriptor), panel-description.mjs (a panel laid out from any descriptor,
-                          docs/panel-layout.md) and param-contract.mjs (the extensions' rows),
-                          modgui-gen.mjs (MOD GUI), look.mjs (its look.json, from
-                          look/tokens.css, the omx look's tokens), the test helpers,
+                          descriptor), omx-panel.mjs (where the installed omx-panel is found: its layout of a
+                          descriptor, its lists) and param-contract.mjs (the extensions' rows),
+                          panel-file.mjs (a declaration's panel as the file `omx-panel modgui` reads),
+                          the test helpers,
                           omx-new-plugin.mjs (the wizard), plugin-recipe.mjs (completeness)
 recipes/                  plugin.recipe.json, the templates tools/gen.mjs writes from
 schema/                   plugin.decl.schema.json, the shape of a declaration

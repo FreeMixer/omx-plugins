@@ -11,11 +11,12 @@
  *   - viewOf(descriptor, extras): the declaration tools/gen.mjs resolves, from the descriptor and the
  *     extras its <stem>.decl.json keeps: what the descriptor has no word for.
  *
- * tools/panel-description.mjs lays a panel out from a descriptor of any origin; for ours it reads this one.
+ * omx-panel lays a panel out from a descriptor of any origin (tools/omx-panel.mjs); for ours it reads this one.
  */
 import { choicesOf, scaleOf } from './gen.mjs';
 import { clapFeatureField, clapFeatureValue } from './format-tables.mjs';
 import { installedContractDir, locateContract, ownersOf, packagingRange } from './omx-contract.mjs';
+import { meaningOfRole, panelLayout } from './omx-panel.mjs';
 
 /** The descriptor file of a plugin folder. */
 export const descriptorFile = (stem) => `${stem}.descriptor.json`;
@@ -63,29 +64,6 @@ const RATIO = 'ratio';
 /** An integer travel's scale (PARAM_SCALES): what CLAP_PARAM_IS_STEPPED, lv2:integer and the parameter contract say. */
 const STEPPED = 'stepped';
 export const travelUnit = (unit, authored) => (unit === '' && authored === RATIO ? RATIO : unit);
-
-/** A panel role -> the descriptor meaning it plays, where the two names differ. A role whose name is
- * a meaning plays that meaning; a role in neither has no meaning word and is bound only by a panel. */
-export const MEANING_OF_ROLE = Object.freeze({
-  mix: 'wetDryRatio', time: 'delay', cutoff: 'cutoffFrequency',
-  band_freq: 'frequency', band_gain: 'gain', band_q: 'q',
-  hpf_freq: 'lowCut', low_cut: 'lowCut', lpf_freq: 'highCut', high_cut: 'highCut',
-  hpf_slope: 'slope', lpf_slope: 'slope', key_listen: 'listen',
-});
-
-/** The descriptor's closed list of meanings (omx-contract docs/descriptors.md, Meanings), `unknown` aside. */
-export const MEANINGS = Object.freeze([
-  'gain', 'threshold', 'ratio', 'attack', 'release', 'hold', 'decay', 'frequency', 'cutoffFrequency', 'resonance', 'bypass',
-  'wetDryRatio', 'delay', 'enabled',
-  'range', 'knee', 'hysteresis', 'makeup', 'lookahead', 'ceiling', 'output', 'q', 'slope', 'width', 'drive', 'tone', 'rate',
-  'depth', 'feedback', 'spread', 'predelay', 'size', 'damping', 'lowCut', 'highCut', 'shift', 'fine', 'sync', 'division', 'listen',
-]);
-
-/** The meaning role `role` plays, or undefined when the descriptor has no word for it. */
-export function meaningOfRole(role) {
-  const m = MEANING_OF_ROLE[role] ?? role;
-  return MEANINGS.includes(m) ? m : undefined;
-}
 
 /** A reference link, `<file>#<NAME>[.<field>]`, as its parts. */
 const LINK = /^(data\/[A-Za-z0-9_./-]+\.json)#([A-Za-z0-9_]+)(?:\.([A-Za-z0-9_]+))?$/;
@@ -175,6 +153,18 @@ export function descriptorOf(d) {
 
 /** The descriptor file's text: what `node tools/gen.mjs` writes and `--check` holds equal. */
 export const descriptorText = (d) => `${JSON.stringify(descriptorOf(d).descriptor, null, 2)}\n`;
+
+/**
+ * The description of declaration `d` (as tools/gen.mjs loads it): its descriptor laid out by omx-panel under its
+ * declared panel. Every table in published order, each parameter by its symbol and its declared id.
+ * Throws on what a host would refuse whole.
+ */
+export function panelDescription(d) {
+  // the units the faces serve beside it (the parameter contract, the declaration's): a ratio's descriptor word,
+  // ratio, has no param-contract unit in this release, so its role is judged on the unit the face serves
+  const { descriptor, extras } = descriptorOf({ ...d, descriptor: undefined });
+  return panelLayout(descriptor, { panel: d.panel, ns: `fx.${d.face ?? d.kernel}`, where: `plugins/${d.stem}`, ...extras });
+}
 
 /**
  * Whether declaration `decl` is whole: a base of variants (omx-eq) or a chain (omx-strip) keeps its own
