@@ -196,7 +196,40 @@
           "band31"
         ]
       }
-    ]
+    ],
+    "widgets": {
+      "band01": "fader",
+      "band02": "fader",
+      "band03": "fader",
+      "band04": "fader",
+      "band05": "fader",
+      "band06": "fader",
+      "band07": "fader",
+      "band08": "fader",
+      "band09": "fader",
+      "band10": "fader",
+      "band11": "fader",
+      "band12": "fader",
+      "band13": "fader",
+      "band14": "fader",
+      "band15": "fader",
+      "band16": "fader",
+      "band17": "fader",
+      "band18": "fader",
+      "band19": "fader",
+      "band20": "fader",
+      "band21": "fader",
+      "band22": "fader",
+      "band23": "fader",
+      "band24": "fader",
+      "band25": "fader",
+      "band26": "fader",
+      "band27": "fader",
+      "band28": "fader",
+      "band29": "fader",
+      "band30": "fader",
+      "band31": "fader"
+    }
   },
   "console": {
     "$comment": "The console has the geq stage in its walk, with no contract yet, and draws no panel, chip or card for it today; racked as a plugin it is drawn by the generic plugin editor.",
