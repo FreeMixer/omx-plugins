@@ -103,10 +103,8 @@ static const omx_resource_hints_t OMX_PHASER_RESOURCE_HINTS = {
 };
 
 /* org.openmixer.panel-description/1 (tools/panel-description.mjs): the declaration's panel as the rows
- * include/omx_panel_description.h serves, parameter ids the declaration's. Family modulation.
- * Declared roles not published:
- *   depth (depthOct): the depth role takes none, pc, coef, not oct */
-#define OMX_PHASER_PANEL_FINGERPRINT "cbae1b6c15529485e51aca0951c55deb5bbd0b6744643dac75ededc55b068e94"
+ * include/omx_panel_description.h serves, parameter ids the declaration's. Family modulation. */
+#define OMX_PHASER_PANEL_FINGERPRINT "3a910c99c400fce35b5148f714e5925e0b4a1badf0e24f9fb52534a321309999"
 static const struct omx_panel_section_row OMX_PHASER_PANEL_SECTIONS[] = {
   { "phaser", "fx.phaser.section.phaser", "Phaser" },
 };
@@ -120,6 +118,7 @@ static const struct omx_panel_control_row OMX_PHASER_PANEL_CONTROLS[] = {
 };
 static const struct omx_panel_role_row OMX_PHASER_PANEL_ROLES[] = {
   { "rate", 0u, 0u },
+  { "depth", 0u, 2u },
   { "feedback", 0u, 4u },
   { "mix", 0u, 5u },
 };
@@ -132,7 +131,7 @@ static const struct omx_panel_rows OMX_PHASER_PANEL = {
   OMX_PHASER_PANEL_FINGERPRINT, OMX_CLAP_FAMILY_MODULATION,
   OMX_PHASER_PANEL_SECTIONS, 1u,
   OMX_PHASER_PANEL_CONTROLS, 6u,
-  OMX_PHASER_PANEL_ROLES, 3u,
+  OMX_PHASER_PANEL_ROLES, 4u,
   NULL, 0u,
   NULL, 0u,
 };
