@@ -39,6 +39,7 @@ import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { releaseVersion } from './release-version.mjs';
 import { faceBinding } from './instance-face.mjs';
 import { descriptorFile, descriptorOf, descriptorText, isWhole, panelDescription, portGroupsOf, travelUnit, viewOf } from './descriptor.mjs';
 import { lv2Designation, lv2UnitNames, lv2UnitRef } from './format-tables.mjs';
@@ -80,6 +81,8 @@ export function loadDecl(dir) {
     if (!where.dir) throw new Error(`${file}: its variant ${stem} is expanded from omx-contract and ${where.why}`);
     d = expandVariant(where.dir, base.decl, base.decl.variants.of.find((v) => v.stem === stem));
   }
+  d.version = releaseVersion(treeOf(file));
+  if (d.descriptor) d.descriptor.plugin.version = d.version;
   const prepared = prepareDecl(file, d, stem, dir);
   // a whole declaration (a base of variants, a chain) is rendered as the descriptor its faces are held to, as a
   // described plugin's is read from it: the faces state the designations, units and modules it states
