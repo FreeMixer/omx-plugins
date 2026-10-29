@@ -335,6 +335,13 @@ Plus the host's bypass.
 
 <!-- END GENERATED sections -->
 
+## Parameters
+
+[docs/plugins/README.md](docs/plugins/README.md) lists every plugin with a page of its own: its ids, its audio ports, the
+pages a host shows (LV2 port groups, CLAP modules) and a table of every parameter with its unit, range, default,
+steps or values and flags. The pages are generated from the declarations by `tools/params-doc.mjs` (`make params-doc`),
+and `make check-params-doc` fails when a committed page differs from what they say.
+
 ## Factory presets
 
 Every plugin ships a set of factory presets, one JSON file each, in `presets/<plugin id>/<preset id>.json`
