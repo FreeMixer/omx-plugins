@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # Copyright (C) 2026 Pau Aliagas <linuxnow@gmail.com>
 Name: omx-plugins
-Version: 0.15.1
+Version: 0.16.0
 Release: 1%{?dist}
 License: GPL-3.0-or-later
 Summary: The OpenMixer console's delay, drive, EQ, channel strip, keyed gate and effects, as plugins for your DAW
@@ -240,6 +240,21 @@ tools/pins-check.sh %{buildroot}%{_datadir}/plugin-hostd/pins.d/omx-plugins.pins
 # END GENERATED lv2-files
 
 %changelog
+* Thu Oct 29 2026 Pau Aliagas <linuxnow@gmail.com> - 0.16.0-1
+- The EQs carry one parameter group per band on eq8, eq16 and eq32, so a
+  touchscreen shows one band per screen (#257).
+- The generated headers, LV2 files and descriptors carry the release
+  version, taken from the Makefile VERSION (#260).
+- The parameter reference of every plugin is generated from the
+  declarations and checked.
+- The generated doap:maintainer states foaf:homepage, and the manifests
+  list modgui.ttl first, so omx-panel 0.5.0's check finds it (#244).
+- The panel layout and the MOD GUI are omx-panel's: this repository hands
+  it a descriptor and a declared panel, and a build needs omx-panel >=
+  0.2.0 (#233).
+- The commit-message check runs under the ai-trace-check action and in
+  its own named job.
+
 * Wed Oct 28 2026 Pau Aliagas <linuxnow@gmail.com> - 0.15.1-1
 - The sixty band-Q controls of eq8, eq16, eq32 and strip link
   EQ_NOTCH_Q_RANGE, the range their travel states (0.3..116), so the travel

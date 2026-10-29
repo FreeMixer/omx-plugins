@@ -1,3 +1,21 @@
+omx-plugins (0.16.0) unstable; urgency=medium
+
+  * The EQs carry one parameter group per band on eq8, eq16 and eq32, so a
+    touchscreen shows one band per screen (#257).
+  * The generated headers, LV2 files and descriptors carry the release
+    version, taken from the Makefile VERSION (#260).
+  * The parameter reference of every plugin is generated from the
+    declarations and checked.
+  * The generated doap:maintainer states foaf:homepage, and the manifests
+    list modgui.ttl first, so omx-panel 0.5.0's check finds it (#244).
+  * The panel layout and the MOD GUI are omx-panel's: this repository hands
+    it a descriptor and a declared panel, and a build needs omx-panel >=
+    0.2.0 (#233).
+  * The commit-message check runs under the ai-trace-check action and in
+    its own named job.
+
+ -- Pau Aliagas <linuxnow@gmail.com>  Thu, 29 Oct 2026 03:30:00 +0100
+
 omx-plugins (0.15.1) unstable; urgency=medium
 
   * The sixty band-Q controls of eq8, eq16, eq32 and strip link
