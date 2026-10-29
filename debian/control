@@ -16,6 +16,7 @@ Build-Depends: debhelper-compat (= 13),
                liblilv-dev <!nocheck>,
                lilv-utils <!nocheck>,
                sordi <!nocheck>,
+               serdi <!nocheck>,
                omx-clap-host <!nocheck>,
                plugin-hostd (>= 0.7.0) <!nocheck>,
                plugin-qualify (>= 0.9.0)
