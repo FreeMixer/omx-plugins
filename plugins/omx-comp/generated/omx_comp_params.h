@@ -95,7 +95,7 @@ static const char *const OMX_COMP_PARAM_MODULES[OMX_COMP_PARAM_COUNT] = {
 #define OMX_COMP_NAME "omx comp"
 #define OMX_COMP_VENDOR "openmixer"
 #define OMX_COMP_URL "https://github.com/FreeMixer/omx-plugins"
-#define OMX_COMP_VERSION "0.15.1"
+#define OMX_COMP_VERSION "0.16.0"
 #define OMX_COMP_DESCRIPTION "The console's compressor: threshold, ratio and knee set how hard it holds the level down, attack and release how fast, with makeup gain and a dry/wet mix. Kind picks the RMS detector (Compressor) or the peak detector (Limiter), and detector oversampling can run the control path at 4x; detector topology has it hear the input (feedforward) or its own output (feedback). The DSP is omx-dsp's <omxdsp/fx/omx_comp_instance.h>, the console's own compressor."
 #define OMX_COMP_CLAP_ID "org.openmixer.comp"
 #define OMX_COMP_CLAP_FEATURES "audio-effect", "compressor", "stereo"
