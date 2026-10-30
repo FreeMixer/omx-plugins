@@ -20,7 +20,7 @@
 # Exit: 0 pass, 1 refused, 2 the check could not run.
 set -euo pipefail
 HERE=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)
-VERSION=$(make -s -C "$HERE" version)
+VERSION=$(make -s --no-print-directory -C "$HERE" version)
 
 # the plugins whose descriptor a host reads from the contract directory (FreeMixer/omx-plugins#219): each must ship
 # one, and the install must list it
