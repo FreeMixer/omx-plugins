@@ -34,7 +34,7 @@ CEIL_GLIBC=2.41
 NEEDED_OK=" libc.so.6 libm.so.6 libdl.so.2 libpthread.so.0 libgcc_s.so.1 libstdc++.so.6 ld-linux-aarch64.so.1 ld-linux-x86-64.so.2 "
 
 root=$(cd "$(dirname "$0")/.." && pwd)
-version=$(make -s -C "$root" version)
+version=$(make -s --no-print-directory -C "$root" version)
 name="omx-plugins-zynthian-$version-$arch"
 work=$(mktemp -d)
 trap 'rm -rf "$work"' EXIT

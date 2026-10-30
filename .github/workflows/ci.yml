@@ -340,7 +340,7 @@ jobs:
       - name: Install the build tools
         run: |
           apt-get update -qq
-          apt-get install -y --no-install-recommends ca-certificates curl git dpkg-dev debhelper build-essential lintian
+          apt-get install -y --no-install-recommends ca-certificates curl git dpkg-dev debhelper build-essential lintian python3
 
       - uses: actions/checkout@v4
         with:
