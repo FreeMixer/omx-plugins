@@ -7,6 +7,9 @@
   ],
   "url": "https://github.com/FreeMixer/omx-plugins",
   "binding": "instance",
+  "held": [
+    "releaseMode"
+  ],
   "controls": {
     "detectorTopology": {
       "values": [

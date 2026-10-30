@@ -96,15 +96,6 @@ export const LOSSES = {
  * `at` ports: when a port outside them differs; an entry with a `through` also, when the installed plugin-hostd is past
  * it; an entry with a `through` and no `at` names a class and excuses any number of its differs). */
 export const UPSTREAM = {
-  // A port that states both lv2:integer and pprops:logarithmic (the EQ, gate key, deesser, drive, phaser and reverb
-  // frequency ports) is authored stepped; plugin-hostd's describe keeps the last scale word in the scanner's node order,
-  // which sord sets from the file and the path it reads (plugin-hostd#142, #147). Fedora's sord flips a few of them to
-  // log and Debian's most of them, so the entry names the class, not ports. It holds through plugin-hostd 0.15.1;
-  // plugin-hostd#142 makes logarithmic win in every order, and then these ports are authored log and the entry goes.
-  'lv2 controls[].travel.scale "stepped" "log"': {
-    through: '0.15.1',
-    why: 'describe keeps the last of two scale words in the scanner\'s node order; https://github.com/FreeMixer/plugin-hostd/issues/142',
-  },
 };
 
 /** An UPSTREAM entry excuses a differ when it names no ports (`at`), or names this plugin's port. */
@@ -137,7 +128,10 @@ export function compareFace(format, authored, scanned) {
   const lookupOnly = (word) => Object.values(tableRows(format)).every((r) => r.word?.word !== word || r.word.transform === 'lookup');
   const defaulted = (word, s) => lookupOnly(word) && words.has(word) && !Object.values(lookupValues(format, word)).some((v) => same(v, s));
   const emit = (where, word, a, s, carried = true) => {
-    const verdict = !carried || s === undefined || s === 'unknown' || (!same(a, s) && defaulted(word, s)) ? 'lost' : same(a, s) ? 'equal' : 'differs';
+    // CLAP states an integer travel's step (CLAP_PARAM_IS_STEPPED, scanned stepped) and has no word for its law: the log
+    // of an integer frequency is lost on the CLAP face, as every log and linear scale is there
+    const stepOnly = format === 'clap' && word === 'controls[].travel.scale' && a === 'log' && s === 'stepped';
+    const verdict = !carried || stepOnly || s === undefined || s === 'unknown' || (!same(a, s) && defaulted(word, s)) ? 'lost' : same(a, s) ? 'equal' : 'differs';
     out.push({ verdict, format, where, word, authored: a, scanned: s });
   };
   const read = (word, base = word) => words.has(base) || words.has(base.replace(/^(controls|ports)\[\]\./, '$1[].'));

@@ -388,8 +388,8 @@ export const LV2_CUSTOM_UNITS = {
 export { lv2Designation, lv2UnitNames, lv2UnitRef };
 
 /** How a host draws a travel: as declared, else a frequency logarithmic (the console's every
- * frequency control is), else linear. */
-export const scaleOf = (p) => p.scale ?? (p.unit === 'Hz' ? 'log' : 'linear');
+ * frequency control is) when its travel is positive (a key filter whose 0 is off is not), else linear. */
+export const scaleOf = (p) => p.scale ?? (p.unit === 'Hz' && !(p.min <= 0) ? 'log' : 'linear');
 
 /** The labelled values of an integer travel, `{value, label}` from min up: one per step (`values`)
  * or only the ones it takes (`points`). Either makes the LV2 port an enumeration. */

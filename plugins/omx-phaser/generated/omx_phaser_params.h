@@ -83,10 +83,10 @@ static const char *const OMX_PHASER_PARAM_MODULES[OMX_PHASER_PARAM_COUNT] = {
 /* org.openmixer.param-contract/1 (tools/param-contract.mjs): each parameter's unit, scale and step, in
  * id order; the host's bypass, the last id, is the face's. */
 #define OMX_PHASER_PARAM_CONTRACT_VERSION 1u
-#define OMX_PHASER_PARAM_CONTRACT_FINGERPRINT "f925eca3b9e38384db12fcb338a98f666937a5ddc198c60121e28c17a3a965aa"
+#define OMX_PHASER_PARAM_CONTRACT_FINGERPRINT "ce52de8667a3734d436618dd2a7c57f9a6428f2ae0d80e3ae77159efef05c13e"
 static const struct omx_param_contract_row OMX_PHASER_PARAM_CONTRACT[OMX_PHASER_PARAM_COUNT] = {
   { 16u, OMX_CLAP_SCALE_LOG, 0.0 }, /* rateHz hz */
-  { 16u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* baseHz hz */
+  { 16u, OMX_CLAP_SCALE_LOG, 1.0 }, /* baseHz hz */
   { 20u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* depthOct oct */
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* stages none */
   { 0u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* feedback none */

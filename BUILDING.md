@@ -6,7 +6,11 @@
 
 | What | Fedora | Debian | Used for |
 |---|---|---|---|
+<<<<<<< HEAD
 | omx-dsp ≥ 0.26.0 (`pkg-config omxdsp`) | `omx-dsp-devel` (channel) | `libomxdsp-dev` (channel) | the DSP: every kernel lives there, none here (0.26.0: the dynamic EQ, the multiband's controls and readouts, the compressor's key) |
+=======
+| omx-dsp ≥ 0.27.0 (`pkg-config omxdsp`) | `omx-dsp-devel` (channel) | `libomxdsp-dev` (channel) | the DSP: every kernel lives there, none here |
+>>>>>>> origin/main
 | omx-contract ≥ 3.4.0 (`pkg-config omx-contract`) | `omx-contract-devel` (channel) | `libomx-contract-dev` (channel) | the declarations: every parameter's travel, read from its installed `omx-contract.json`, and the EQ default rule (its C render; the generators build a small probe, so they need the C compiler too) |
 | openmixer CLAP extensions | `omx-clap-core-devel` (channel) | `libomx-clap-core-dev` (channel) | `<omx-clap-host/omx_clap_ext.h>` |
 | the omx-contract command ≥ 3.4.0 | `omx-contract` (channel) | `omx-contract` (channel) | the generators: the union of the contract directory, read through `omx-contract render --installed` |

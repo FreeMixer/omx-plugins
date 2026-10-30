@@ -41,6 +41,7 @@
  * comp: `detect_link` is no parameter: the declaration holds it at its kernel's declared default, OMX_COMP_DETECT_LINKS_DEFAULT.
  * comp: `duck` is no parameter: the declaration holds it at its kernel's declared default, OMX_COMP_DUCKS_DEFAULT.
  * comp: `range_db` is no parameter: the declaration holds it at its kernel's declared default, OMX_COMP_RANGE_DB_RANGE_DEFAULT.
+ * comp: `release_mode` is no parameter: the declaration holds it at its kernel's declared default, OMX_COMP_RELEASE_MODES_DEFAULT.
  */
 #ifndef OMX_STRIP_CORE_H
 #define OMX_STRIP_CORE_H
@@ -279,7 +280,8 @@ static inline void omx_strip_core_resolve(OmxStripCore *c, const float *values, 
                                   /* hold_ms */ (float)OMX_COMP_HOLD_MS_RANGE_DEFAULT,
                                   /* detect_link */ (int)OMX_COMP_DETECT_LINKS_DEFAULT,
                                   /* duck */ (int)OMX_COMP_DUCKS_DEFAULT,
-                                  /* range_db */ (float)OMX_COMP_RANGE_DB_RANGE_DEFAULT);
+                                  /* range_db */ (float)OMX_COMP_RANGE_DB_RANGE_DEFAULT,
+                                  /* release_mode */ (int)OMX_COMP_RELEASE_MODES_DEFAULT);
   const float o = values[OMX_STRIP_PARAM_ORDER];
   const long row = o - o == 0.0f ? lrintf(o) : 0;
   c->order = row >= 0 && row < (long)OMX_STRIP_CHAIN_ORDERS ? (uint32_t)row : 0u;
