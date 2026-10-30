@@ -356,16 +356,16 @@ static const char *const OMX_STRIP_PARAM_MODULES[OMX_STRIP_PARAM_COUNT] = {
 /* org.openmixer.param-contract/1 (tools/param-contract.mjs): each parameter's unit, scale and step, in
  * id order; the host's bypass, the last id, is the face's. */
 #define OMX_STRIP_PARAM_CONTRACT_VERSION 1u
-#define OMX_STRIP_PARAM_CONTRACT_FINGERPRINT "032f9a0d66fb6790b8d94798ae488c7151e6eace152d7543cc7496cc9f864845"
+#define OMX_STRIP_PARAM_CONTRACT_FINGERPRINT "0d05434ffc7760c8075882257b4edac537d15c2f149b26a2a87a0058f8678de1"
 static const struct omx_param_contract_row OMX_STRIP_PARAM_CONTRACT[OMX_STRIP_PARAM_COUNT] = {
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* trimOn none */
   { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* trimDb db */
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* filterOn none */
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* hpfOn none */
-  { 16u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* hpfFreq hz */
+  { 16u, OMX_CLAP_SCALE_LOG, 1.0 }, /* hpfFreq hz */
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* hpfSlope none */
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* lpfOn none */
-  { 16u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* lpfFreq hz */
+  { 16u, OMX_CLAP_SCALE_LOG, 1.0 }, /* lpfFreq hz */
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* lpfSlope none */
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* gateOn none */
   { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* gateThreshold db */
@@ -379,22 +379,22 @@ static const struct omx_param_contract_row OMX_STRIP_PARAM_CONTRACT[OMX_STRIP_PA
   { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* gateHysteresis db */
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* eqOn none */
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* eq1Type none */
-  { 16u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* eq1Freq hz */
+  { 16u, OMX_CLAP_SCALE_LOG, 1.0 }, /* eq1Freq hz */
   { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* eq1Gain db */
   { 0u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* eq1Q none */
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* eq1On none */
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* eq2Type none */
-  { 16u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* eq2Freq hz */
+  { 16u, OMX_CLAP_SCALE_LOG, 1.0 }, /* eq2Freq hz */
   { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* eq2Gain db */
   { 0u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* eq2Q none */
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* eq2On none */
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* eq3Type none */
-  { 16u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* eq3Freq hz */
+  { 16u, OMX_CLAP_SCALE_LOG, 1.0 }, /* eq3Freq hz */
   { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* eq3Gain db */
   { 0u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* eq3Q none */
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* eq3On none */
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* eq4Type none */
-  { 16u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* eq4Freq hz */
+  { 16u, OMX_CLAP_SCALE_LOG, 1.0 }, /* eq4Freq hz */
   { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* eq4Gain db */
   { 0u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* eq4Q none */
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* eq4On none */

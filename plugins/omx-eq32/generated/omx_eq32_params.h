@@ -1046,171 +1046,171 @@ static const char *const OMX_EQ32_PARAM_MODULES[OMX_EQ32_PARAM_COUNT] = {
 /* org.openmixer.param-contract/1 (tools/param-contract.mjs): each parameter's unit, scale and step, in
  * id order; the host's bypass, the last id, is the face's. */
 #define OMX_EQ32_PARAM_CONTRACT_VERSION 1u
-#define OMX_EQ32_PARAM_CONTRACT_FINGERPRINT "e3c558e937ec080a87f289cf3e985d5eb62158e2f1fc99fd2c652f5815187be0"
+#define OMX_EQ32_PARAM_CONTRACT_FINGERPRINT "a480854f026d6a18caa231dfab1e98de1dc23213e28af4a1a08b4d4c13cfefa3"
 static const struct omx_param_contract_row OMX_EQ32_PARAM_CONTRACT[OMX_EQ32_PARAM_COUNT] = {
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* hpf_on none */
-  { 16u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* hpf_freq hz */
+  { 16u, OMX_CLAP_SCALE_LOG, 1.0 }, /* hpf_freq hz */
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* hpf_slope none */
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* lpf_on none */
-  { 16u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* lpf_freq hz */
+  { 16u, OMX_CLAP_SCALE_LOG, 1.0 }, /* lpf_freq hz */
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* lpf_slope none */
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b1_type none */
-  { 16u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b1_freq hz */
+  { 16u, OMX_CLAP_SCALE_LOG, 1.0 }, /* b1_freq hz */
   { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* b1_gain db */
   { 0u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* b1_q none */
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b1_on none */
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b2_type none */
-  { 16u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b2_freq hz */
+  { 16u, OMX_CLAP_SCALE_LOG, 1.0 }, /* b2_freq hz */
   { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* b2_gain db */
   { 0u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* b2_q none */
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b2_on none */
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b3_type none */
-  { 16u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b3_freq hz */
+  { 16u, OMX_CLAP_SCALE_LOG, 1.0 }, /* b3_freq hz */
   { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* b3_gain db */
   { 0u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* b3_q none */
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b3_on none */
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b4_type none */
-  { 16u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b4_freq hz */
+  { 16u, OMX_CLAP_SCALE_LOG, 1.0 }, /* b4_freq hz */
   { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* b4_gain db */
   { 0u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* b4_q none */
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b4_on none */
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b5_type none */
-  { 16u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b5_freq hz */
+  { 16u, OMX_CLAP_SCALE_LOG, 1.0 }, /* b5_freq hz */
   { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* b5_gain db */
   { 0u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* b5_q none */
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b5_on none */
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b6_type none */
-  { 16u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b6_freq hz */
+  { 16u, OMX_CLAP_SCALE_LOG, 1.0 }, /* b6_freq hz */
   { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* b6_gain db */
   { 0u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* b6_q none */
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b6_on none */
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b7_type none */
-  { 16u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b7_freq hz */
+  { 16u, OMX_CLAP_SCALE_LOG, 1.0 }, /* b7_freq hz */
   { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* b7_gain db */
   { 0u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* b7_q none */
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b7_on none */
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b8_type none */
-  { 16u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b8_freq hz */
+  { 16u, OMX_CLAP_SCALE_LOG, 1.0 }, /* b8_freq hz */
   { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* b8_gain db */
   { 0u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* b8_q none */
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b8_on none */
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b9_type none */
-  { 16u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b9_freq hz */
+  { 16u, OMX_CLAP_SCALE_LOG, 1.0 }, /* b9_freq hz */
   { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* b9_gain db */
   { 0u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* b9_q none */
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b9_on none */
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b10_type none */
-  { 16u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b10_freq hz */
+  { 16u, OMX_CLAP_SCALE_LOG, 1.0 }, /* b10_freq hz */
   { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* b10_gain db */
   { 0u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* b10_q none */
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b10_on none */
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b11_type none */
-  { 16u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b11_freq hz */
+  { 16u, OMX_CLAP_SCALE_LOG, 1.0 }, /* b11_freq hz */
   { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* b11_gain db */
   { 0u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* b11_q none */
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b11_on none */
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b12_type none */
-  { 16u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b12_freq hz */
+  { 16u, OMX_CLAP_SCALE_LOG, 1.0 }, /* b12_freq hz */
   { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* b12_gain db */
   { 0u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* b12_q none */
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b12_on none */
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b13_type none */
-  { 16u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b13_freq hz */
+  { 16u, OMX_CLAP_SCALE_LOG, 1.0 }, /* b13_freq hz */
   { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* b13_gain db */
   { 0u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* b13_q none */
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b13_on none */
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b14_type none */
-  { 16u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b14_freq hz */
+  { 16u, OMX_CLAP_SCALE_LOG, 1.0 }, /* b14_freq hz */
   { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* b14_gain db */
   { 0u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* b14_q none */
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b14_on none */
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b15_type none */
-  { 16u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b15_freq hz */
+  { 16u, OMX_CLAP_SCALE_LOG, 1.0 }, /* b15_freq hz */
   { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* b15_gain db */
   { 0u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* b15_q none */
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b15_on none */
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b16_type none */
-  { 16u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b16_freq hz */
+  { 16u, OMX_CLAP_SCALE_LOG, 1.0 }, /* b16_freq hz */
   { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* b16_gain db */
   { 0u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* b16_q none */
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b16_on none */
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b17_type none */
-  { 16u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b17_freq hz */
+  { 16u, OMX_CLAP_SCALE_LOG, 1.0 }, /* b17_freq hz */
   { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* b17_gain db */
   { 0u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* b17_q none */
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b17_on none */
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b18_type none */
-  { 16u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b18_freq hz */
+  { 16u, OMX_CLAP_SCALE_LOG, 1.0 }, /* b18_freq hz */
   { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* b18_gain db */
   { 0u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* b18_q none */
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b18_on none */
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b19_type none */
-  { 16u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b19_freq hz */
+  { 16u, OMX_CLAP_SCALE_LOG, 1.0 }, /* b19_freq hz */
   { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* b19_gain db */
   { 0u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* b19_q none */
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b19_on none */
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b20_type none */
-  { 16u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b20_freq hz */
+  { 16u, OMX_CLAP_SCALE_LOG, 1.0 }, /* b20_freq hz */
   { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* b20_gain db */
   { 0u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* b20_q none */
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b20_on none */
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b21_type none */
-  { 16u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b21_freq hz */
+  { 16u, OMX_CLAP_SCALE_LOG, 1.0 }, /* b21_freq hz */
   { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* b21_gain db */
   { 0u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* b21_q none */
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b21_on none */
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b22_type none */
-  { 16u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b22_freq hz */
+  { 16u, OMX_CLAP_SCALE_LOG, 1.0 }, /* b22_freq hz */
   { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* b22_gain db */
   { 0u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* b22_q none */
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b22_on none */
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b23_type none */
-  { 16u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b23_freq hz */
+  { 16u, OMX_CLAP_SCALE_LOG, 1.0 }, /* b23_freq hz */
   { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* b23_gain db */
   { 0u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* b23_q none */
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b23_on none */
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b24_type none */
-  { 16u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b24_freq hz */
+  { 16u, OMX_CLAP_SCALE_LOG, 1.0 }, /* b24_freq hz */
   { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* b24_gain db */
   { 0u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* b24_q none */
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b24_on none */
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b25_type none */
-  { 16u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b25_freq hz */
+  { 16u, OMX_CLAP_SCALE_LOG, 1.0 }, /* b25_freq hz */
   { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* b25_gain db */
   { 0u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* b25_q none */
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b25_on none */
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b26_type none */
-  { 16u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b26_freq hz */
+  { 16u, OMX_CLAP_SCALE_LOG, 1.0 }, /* b26_freq hz */
   { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* b26_gain db */
   { 0u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* b26_q none */
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b26_on none */
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b27_type none */
-  { 16u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b27_freq hz */
+  { 16u, OMX_CLAP_SCALE_LOG, 1.0 }, /* b27_freq hz */
   { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* b27_gain db */
   { 0u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* b27_q none */
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b27_on none */
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b28_type none */
-  { 16u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b28_freq hz */
+  { 16u, OMX_CLAP_SCALE_LOG, 1.0 }, /* b28_freq hz */
   { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* b28_gain db */
   { 0u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* b28_q none */
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b28_on none */
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b29_type none */
-  { 16u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b29_freq hz */
+  { 16u, OMX_CLAP_SCALE_LOG, 1.0 }, /* b29_freq hz */
   { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* b29_gain db */
   { 0u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* b29_q none */
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b29_on none */
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b30_type none */
-  { 16u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b30_freq hz */
+  { 16u, OMX_CLAP_SCALE_LOG, 1.0 }, /* b30_freq hz */
   { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* b30_gain db */
   { 0u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* b30_q none */
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b30_on none */
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b31_type none */
-  { 16u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b31_freq hz */
+  { 16u, OMX_CLAP_SCALE_LOG, 1.0 }, /* b31_freq hz */
   { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* b31_gain db */
   { 0u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* b31_q none */
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b31_on none */
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b32_type none */
-  { 16u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b32_freq hz */
+  { 16u, OMX_CLAP_SCALE_LOG, 1.0 }, /* b32_freq hz */
   { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* b32_gain db */
   { 0u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* b32_q none */
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* b32_on none */

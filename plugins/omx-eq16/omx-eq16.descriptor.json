@@ -45,7 +45,7 @@
         "step": 1,
         "unit": "Hz",
         "default": 80,
-        "scale": "stepped"
+        "scale": "log"
       },
       "group": [
         "HPF"
@@ -117,7 +117,7 @@
         "step": 1,
         "unit": "Hz",
         "default": 18000,
-        "scale": "stepped"
+        "scale": "log"
       },
       "group": [
         "LPF"
@@ -214,7 +214,7 @@
         "step": 1,
         "unit": "Hz",
         "default": 25,
-        "scale": "stepped"
+        "scale": "log"
       },
       "group": [
         "Bands",
@@ -352,7 +352,7 @@
         "step": 1,
         "unit": "Hz",
         "default": 40,
-        "scale": "stepped"
+        "scale": "log"
       },
       "group": [
         "Bands",
@@ -490,7 +490,7 @@
         "step": 1,
         "unit": "Hz",
         "default": 63,
-        "scale": "stepped"
+        "scale": "log"
       },
       "group": [
         "Bands",
@@ -628,7 +628,7 @@
         "step": 1,
         "unit": "Hz",
         "default": 100,
-        "scale": "stepped"
+        "scale": "log"
       },
       "group": [
         "Bands",
@@ -766,7 +766,7 @@
         "step": 1,
         "unit": "Hz",
         "default": 125,
-        "scale": "stepped"
+        "scale": "log"
       },
       "group": [
         "Bands",
@@ -904,7 +904,7 @@
         "step": 1,
         "unit": "Hz",
         "default": 200,
-        "scale": "stepped"
+        "scale": "log"
       },
       "group": [
         "Bands",
@@ -1042,7 +1042,7 @@
         "step": 1,
         "unit": "Hz",
         "default": 315,
-        "scale": "stepped"
+        "scale": "log"
       },
       "group": [
         "Bands",
@@ -1180,7 +1180,7 @@
         "step": 1,
         "unit": "Hz",
         "default": 500,
-        "scale": "stepped"
+        "scale": "log"
       },
       "group": [
         "Bands",
@@ -1318,7 +1318,7 @@
         "step": 1,
         "unit": "Hz",
         "default": 800,
-        "scale": "stepped"
+        "scale": "log"
       },
       "group": [
         "Bands",
@@ -1456,7 +1456,7 @@
         "step": 1,
         "unit": "Hz",
         "default": 1250,
-        "scale": "stepped"
+        "scale": "log"
       },
       "group": [
         "Bands",
@@ -1594,7 +1594,7 @@
         "step": 1,
         "unit": "Hz",
         "default": 2000,
-        "scale": "stepped"
+        "scale": "log"
       },
       "group": [
         "Bands",
@@ -1732,7 +1732,7 @@
         "step": 1,
         "unit": "Hz",
         "default": 3150,
-        "scale": "stepped"
+        "scale": "log"
       },
       "group": [
         "Bands",
@@ -1870,7 +1870,7 @@
         "step": 1,
         "unit": "Hz",
         "default": 4000,
-        "scale": "stepped"
+        "scale": "log"
       },
       "group": [
         "Bands",
@@ -2008,7 +2008,7 @@
         "step": 1,
         "unit": "Hz",
         "default": 6300,
-        "scale": "stepped"
+        "scale": "log"
       },
       "group": [
         "Bands",
@@ -2146,7 +2146,7 @@
         "step": 1,
         "unit": "Hz",
         "default": 10000,
-        "scale": "stepped"
+        "scale": "log"
       },
       "group": [
         "Bands",
@@ -2284,7 +2284,7 @@
         "step": 1,
         "unit": "Hz",
         "default": 16000,
-        "scale": "stepped"
+        "scale": "log"
       },
       "group": [
         "Bands",

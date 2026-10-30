@@ -61,8 +61,11 @@ function bagOf(descriptor, file) {
  * and a ratio (n:1) states `ratio`, the one word the descriptor says beyond its link (gap 4). */
 const RATIO = 'ratio';
 
-/** An integer travel's scale (PARAM_SCALES): what CLAP_PARAM_IS_STEPPED, lv2:integer and the parameter contract say. */
+/** An integer travel's scale (PARAM_SCALES): stepped, what CLAP_PARAM_IS_STEPPED, lv2:integer and the parameter contract
+ * say; log when its law is logarithmic (an integer frequency), which its LV2 face states with pprops:logarithmic beside
+ * lv2:integer and plugin-hostd's describe reads as log (plugin-hostd#142). */
 const STEPPED = 'stepped';
+const integerScale = (p) => (scaleOf(p) === 'log' ? 'log' : STEPPED);
 export const travelUnit = (unit, authored) => (unit === '' && authored === RATIO ? RATIO : unit);
 
 /** A reference link, `<file>#<NAME>[.<field>]`, as its parts. */
@@ -148,7 +151,7 @@ export function descriptorOf(d) {
       if (p.unit) choiceUnits[p.symbol] = p.unit;
     } else {
       c.kind = 'travel';
-      c.travel = { min: p.min, max: p.max, step: p.kind === 'integer' ? 1 : 0, unit: travelUnit(p.unit, d.descriptor?.controls[i]?.travel?.unit), default: p.def, scale: p.kind === 'integer' ? STEPPED : scaleOf(p) };
+      c.travel = { min: p.min, max: p.max, step: p.kind === 'integer' ? 1 : 0, unit: travelUnit(p.unit, d.descriptor?.controls[i]?.travel?.unit), default: p.def, scale: p.kind === 'integer' ? integerScale(p) : scaleOf(p) };
     }
     if (groupOf.has(p.symbol)) c.group = groupOf.get(p.symbol);
     if (meaningOf.has(p.symbol)) c.meaning = meaningOf.get(p.symbol);
@@ -232,7 +235,7 @@ export function viewOf(descriptor, extras, file) {
       if (link.field) p.field = link.field;
       if (link.kernel && (rest.kernels ?? [rest.kernel]).length > 1) p.kernel = link.kernel;
       // an integer travel is stepped, as both faces and the parameter contract state it; its faces' log hint is its unit's
-      if (c.travel && c.travel.scale !== (c.travel.step === 1 ? STEPPED : scaleOf({ unit: c.travel.unit }))) p.scale = c.travel.scale;
+      if (c.travel && c.travel.scale !== (c.travel.step === 1 ? integerScale({ unit: c.travel.unit }) : scaleOf({ unit: c.travel.unit }))) p.scale = c.travel.scale;
     } else {
       // a control of the face's own: its travel is typed, the reason kept with it
       if (!x.own) throw new Error(`${file}: '${c.symbol}' has no source link and no "own" reason`);

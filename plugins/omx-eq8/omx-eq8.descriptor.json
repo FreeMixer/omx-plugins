@@ -45,7 +45,7 @@
         "step": 1,
         "unit": "Hz",
         "default": 80,
-        "scale": "stepped"
+        "scale": "log"
       },
       "group": [
         "HPF"
@@ -117,7 +117,7 @@
         "step": 1,
         "unit": "Hz",
         "default": 18000,
-        "scale": "stepped"
+        "scale": "log"
       },
       "group": [
         "LPF"
@@ -214,7 +214,7 @@
         "step": 1,
         "unit": "Hz",
         "default": 31.5,
-        "scale": "stepped"
+        "scale": "log"
       },
       "group": [
         "Bands",
@@ -352,7 +352,7 @@
         "step": 1,
         "unit": "Hz",
         "default": 80,
-        "scale": "stepped"
+        "scale": "log"
       },
       "group": [
         "Bands",
@@ -490,7 +490,7 @@
         "step": 1,
         "unit": "Hz",
         "default": 160,
-        "scale": "stepped"
+        "scale": "log"
       },
       "group": [
         "Bands",
@@ -628,7 +628,7 @@
         "step": 1,
         "unit": "Hz",
         "default": 400,
-        "scale": "stepped"
+        "scale": "log"
       },
       "group": [
         "Bands",
@@ -766,7 +766,7 @@
         "step": 1,
         "unit": "Hz",
         "default": 1000,
-        "scale": "stepped"
+        "scale": "log"
       },
       "group": [
         "Bands",
@@ -904,7 +904,7 @@
         "step": 1,
         "unit": "Hz",
         "default": 2500,
-        "scale": "stepped"
+        "scale": "log"
       },
       "group": [
         "Bands",
@@ -1042,7 +1042,7 @@
         "step": 1,
         "unit": "Hz",
         "default": 5000,
-        "scale": "stepped"
+        "scale": "log"
       },
       "group": [
         "Bands",
@@ -1180,7 +1180,7 @@
         "step": 1,
         "unit": "Hz",
         "default": 12500,
-        "scale": "stepped"
+        "scale": "log"
       },
       "group": [
         "Bands",

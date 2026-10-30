@@ -97,7 +97,7 @@
         "step": 1,
         "unit": "Hz",
         "default": 80,
-        "scale": "stepped"
+        "scale": "log"
       },
       "group": [
         "Filters"
@@ -167,7 +167,7 @@
         "step": 1,
         "unit": "Hz",
         "default": 18000,
-        "scale": "stepped"
+        "scale": "log"
       },
       "group": [
         "Filters"
@@ -505,7 +505,7 @@
         "step": 1,
         "unit": "Hz",
         "default": 100,
-        "scale": "stepped"
+        "scale": "log"
       },
       "group": [
         "EQ"
@@ -635,7 +635,7 @@
         "step": 1,
         "unit": "Hz",
         "default": 400,
-        "scale": "stepped"
+        "scale": "log"
       },
       "group": [
         "EQ"
@@ -765,7 +765,7 @@
         "step": 1,
         "unit": "Hz",
         "default": 2000,
-        "scale": "stepped"
+        "scale": "log"
       },
       "group": [
         "EQ"
@@ -895,7 +895,7 @@
         "step": 1,
         "unit": "Hz",
         "default": 8000,
-        "scale": "stepped"
+        "scale": "log"
       },
       "group": [
         "EQ"

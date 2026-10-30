@@ -85,9 +85,11 @@ export function contractOf(d, scaleOf) {
   const where = `plugins/${d.stem}`;
   const rows = d.params.map((p) => {
     const [unit, unitEnum] = contractUnit(p.unit);
-    const scale = p.kind ? 'stepped' : scaleOf(p) === 'log' ? 'log' : 'linear';
+    // an integer travel is stepped, or log when its law is (an integer frequency, plugin-hostd#142); its step is 1 either way
+    const choice = p.values !== undefined || p.points !== undefined;
+    const scale = !choice && scaleOf(p) === 'log' ? 'log' : p.kind ? 'stepped' : 'linear';
     if (scale === 'log' && !(p.min > 0 && p.max > 0)) throw new Error(`${where}: '${p.symbol}' is logarithmic over ${p.min}..${p.max}; a log scale needs a positive travel`);
-    return { symbol: p.symbol, unit, unitEnum, scale, min: Math.fround(p.min), max: Math.fround(p.max), def: Math.fround(p.def), step: scale === 'stepped' ? 1 : 0, flags: p.kind ? STEPPED : 0 };
+    return { symbol: p.symbol, unit, unitEnum, scale, min: Math.fround(p.min), max: Math.fround(p.max), def: Math.fround(p.def), step: p.kind ? 1 : 0, flags: p.kind ? STEPPED : 0 };
   });
   if (rows.some((r) => r.symbol === 'bypass')) throw new Error(`${where}: 'bypass' is the host's bypass parameter's symbol; a declared parameter cannot take it`);
   rows.push({ symbol: 'bypass', unit: 'none', unitEnum: 0, scale: 'stepped', min: 0, max: 1, def: 0, step: 1, flags: STEPPED | BYPASS });
