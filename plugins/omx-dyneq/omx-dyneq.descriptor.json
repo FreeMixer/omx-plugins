@@ -322,7 +322,7 @@
         "step": 1,
         "unit": "Hz",
         "default": 40,
-        "scale": "stepped"
+        "scale": "log"
       },
       "group": [
         "Band 1"
@@ -347,7 +347,7 @@
         "step": 1,
         "unit": "Hz",
         "default": 125,
-        "scale": "stepped"
+        "scale": "log"
       },
       "group": [
         "Band 2"
@@ -372,7 +372,7 @@
         "step": 1,
         "unit": "Hz",
         "default": 400,
-        "scale": "stepped"
+        "scale": "log"
       },
       "group": [
         "Band 3"
@@ -397,7 +397,7 @@
         "step": 1,
         "unit": "Hz",
         "default": 1250,
-        "scale": "stepped"
+        "scale": "log"
       },
       "group": [
         "Band 4"
@@ -422,7 +422,7 @@
         "step": 1,
         "unit": "Hz",
         "default": 4000,
-        "scale": "stepped"
+        "scale": "log"
       },
       "group": [
         "Band 5"
@@ -447,7 +447,7 @@
         "step": 1,
         "unit": "Hz",
         "default": 12500,
-        "scale": "stepped"
+        "scale": "log"
       },
       "group": [
         "Band 6"

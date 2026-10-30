@@ -63,7 +63,7 @@
         "step": 1,
         "unit": "Hz",
         "default": 200,
-        "scale": "stepped"
+        "scale": "log"
       },
       "group": [
         "Split"
@@ -87,7 +87,7 @@
         "step": 1,
         "unit": "Hz",
         "default": 2000,
-        "scale": "stepped"
+        "scale": "log"
       },
       "group": [
         "Split"
@@ -111,7 +111,7 @@
         "step": 1,
         "unit": "Hz",
         "default": 5000,
-        "scale": "stepped"
+        "scale": "log"
       },
       "group": [
         "Split"
@@ -135,7 +135,7 @@
         "step": 1,
         "unit": "Hz",
         "default": 6400,
-        "scale": "stepped"
+        "scale": "log"
       },
       "group": [
         "Split"

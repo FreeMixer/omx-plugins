@@ -485,7 +485,7 @@ static const char *const OMX_DYNEQ_PARAM_MODULES[OMX_DYNEQ_PARAM_COUNT] = {
 /* org.openmixer.param-contract/1 (tools/param-contract.mjs): each parameter's unit, scale and step, in
  * id order; the host's bypass, the last id, is the face's. */
 #define OMX_DYNEQ_PARAM_CONTRACT_VERSION 1u
-#define OMX_DYNEQ_PARAM_CONTRACT_FINGERPRINT "3fca099f9c57a938839ab963a04f80bcf01abb0b31afda29da70835d27440f98"
+#define OMX_DYNEQ_PARAM_CONTRACT_FINGERPRINT "b1c783fb3f786f4b7f74254ece5fb34cff436b49ae4a6f6a07a51448a664395b"
 static const struct omx_param_contract_row OMX_DYNEQ_PARAM_CONTRACT[OMX_DYNEQ_PARAM_COUNT] = {
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* bandOn1 none */
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* bandOn2 none */
@@ -499,12 +499,12 @@ static const struct omx_param_contract_row OMX_DYNEQ_PARAM_CONTRACT[OMX_DYNEQ_PA
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* bandType4 none */
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* bandType5 none */
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* bandType6 none */
-  { 16u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* freq1 hz */
-  { 16u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* freq2 hz */
-  { 16u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* freq3 hz */
-  { 16u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* freq4 hz */
-  { 16u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* freq5 hz */
-  { 16u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* freq6 hz */
+  { 16u, OMX_CLAP_SCALE_LOG, 1.0 }, /* freq1 hz */
+  { 16u, OMX_CLAP_SCALE_LOG, 1.0 }, /* freq2 hz */
+  { 16u, OMX_CLAP_SCALE_LOG, 1.0 }, /* freq3 hz */
+  { 16u, OMX_CLAP_SCALE_LOG, 1.0 }, /* freq4 hz */
+  { 16u, OMX_CLAP_SCALE_LOG, 1.0 }, /* freq5 hz */
+  { 16u, OMX_CLAP_SCALE_LOG, 1.0 }, /* freq6 hz */
   { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* gain1 db */
   { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* gain2 db */
   { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* gain3 db */

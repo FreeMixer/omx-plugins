@@ -299,13 +299,13 @@ static const char *const OMX_MBCOMP_PARAM_MODULES[OMX_MBCOMP_PARAM_COUNT] = {
 /* org.openmixer.param-contract/1 (tools/param-contract.mjs): each parameter's unit, scale and step, in
  * id order; the host's bypass, the last id, is the face's. */
 #define OMX_MBCOMP_PARAM_CONTRACT_VERSION 1u
-#define OMX_MBCOMP_PARAM_CONTRACT_FINGERPRINT "e9ef5d0308e0c006d98b4908b21d49f0071ebe3dc0e5eabb9f72e534b4883168"
+#define OMX_MBCOMP_PARAM_CONTRACT_FINGERPRINT "56d488bf9d3b6bf373e2c762ad4fb08cf54cbfc4fda0d60e07241e3929d32148"
 static const struct omx_param_contract_row OMX_MBCOMP_PARAM_CONTRACT[OMX_MBCOMP_PARAM_COUNT] = {
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* bands none */
-  { 16u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* xoverHz1 hz */
-  { 16u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* xoverHz2 hz */
-  { 16u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* xoverHz3 hz */
-  { 16u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* xoverHz4 hz */
+  { 16u, OMX_CLAP_SCALE_LOG, 1.0 }, /* xoverHz1 hz */
+  { 16u, OMX_CLAP_SCALE_LOG, 1.0 }, /* xoverHz2 hz */
+  { 16u, OMX_CLAP_SCALE_LOG, 1.0 }, /* xoverHz3 hz */
+  { 16u, OMX_CLAP_SCALE_LOG, 1.0 }, /* xoverHz4 hz */
   { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* thresholdDb1 db */
   { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* thresholdDb2 db */
   { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* thresholdDb3 db */

@@ -99,15 +99,13 @@
     },
     "keyHpHz": {
       "props": [
-        "lv2:integer",
-        "pprops:logarithmic"
+        "lv2:integer"
       ],
       "unit": "units:hz"
     },
     "keyLpHz": {
       "props": [
-        "lv2:integer",
-        "pprops:logarithmic"
+        "lv2:integer"
       ],
       "unit": "units:hz"
     },
