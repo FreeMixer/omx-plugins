@@ -91,23 +91,17 @@ export const LOSSES = {
 
 /** A break in plugin-hostd's wave tip, reported, each `differs` it causes printed with it
  * and not failing; the run fails when one no longer shows, so the entry leaves with the fix (an entry that names its
- * `at` ports: when a port outside them differs; an entry with a `through` also, when the installed plugin-hostd is past it). `plugin-hostd-probe
- * describe` keeps a word's last value, and an LV2 dump lists lv2:portProperty lv2:toggled before rdf:type
- * lv2:ControlPort, so a toggle's kind is the control port's travel. */
+ * `at` ports: when a port outside them differs; an entry with a `through` also, when the installed plugin-hostd is past
+ * it; an entry with a `through` and no `at` names a class and excuses any number of its differs). */
 export const UPSTREAM = {
-  'lv2 controls[].kind "toggle" "travel"': { count: 76, why: 'plugin-hostd 83e54db describe: lv2:ControlPort overwrites lv2:toggled (src/describe.c get(), the last value)' },
-  // seven EQ frequency ports (omx-eq8 b6, omx-eq16 b6 and b9, omx-eq32 b6, b9, b18 and b19) are authored stepped and
-  // scan as log, though their lv2:integer and pprops:logarithmic lines equal those of the neighbours that scan stepped
-  // (deesser deessFreq, drive bandFreq). The same seven on the desk and in CI; the cause is not isolated yet. The entry
-  // holds through the newest plugin-hostd release seen still showing them (0.13.1, in CI: the seven EQ ports, with
-  // phaser baseHz or the gate key filters from one run to the next): a newer plugin-hostd fails the run until the
-  // entry is retired or moved on.
-  // The two gate key filters (omx-keyed-gate key_hp and key_lp) flip the same way as the seven EQ ports, under 0.9.1 in CI;
-  // so can the other integer Hz ports that state both words (deesser, drive, phaser, reverb): plugin-hostd#142
+  // A port that states both lv2:integer and pprops:logarithmic (the EQ, gate key, deesser, drive, phaser and reverb
+  // frequency ports) is authored stepped; plugin-hostd's describe keeps the last scale word in the scanner's node order,
+  // which sord sets from the file and the path it reads (plugin-hostd#142, #147). Fedora's sord flips a few of them to
+  // log and Debian's most of them, so the entry names the class, not ports. It holds through plugin-hostd 0.15.1;
+  // plugin-hostd#142 makes logarithmic win in every order, and then these ports are authored log and the entry goes.
   'lv2 controls[].travel.scale "stepped" "log"': {
-    through: '0.13.1',
-    at: ['omx-eq8 b6_freq', 'omx-eq16 b6_freq', 'omx-eq16 b9_freq', 'omx-eq32 b6_freq', 'omx-eq32 b9_freq', 'omx-eq32 b18_freq', 'omx-eq32 b19_freq', 'omx-keyed-gate key_hp', 'omx-keyed-gate key_lp', 'omx-deesser deessFreq', 'omx-drive bandFreq', 'omx-phaser baseHz', 'omx-reverb lowcut', 'omx-reverb highcut'],
-    why: 'the scan reports log where the face says stepped, on seven ports whose lv2:integer and pprops:logarithmic lines equal their passing neighbours\'; cause not isolated; https://github.com/FreeMixer/plugin-hostd/issues/147',
+    through: '0.15.1',
+    why: 'describe keeps the last of two scale words in the scanner\'s node order; https://github.com/FreeMixer/plugin-hostd/issues/142',
   },
 };
 
@@ -264,7 +258,7 @@ export function roundTrip(scansDir, { root = ROOT, authoredFiles = {} } = {}) {
         continue;
       }
     }
-    const ok = through === undefined ? upstream[k] === count : upstream[k] > 0 && upstream[k] <= count;
+    const ok = through === undefined ? upstream[k] === count : upstream[k] > 0 && (count === undefined || upstream[k] <= count);
     lines.push(`${ok ? 'upstream' : 'unnamed upstream'} ${k}: ${upstream[k] ?? 0} word(s)${ok ? '' : `, UPSTREAM names ${count} (fixed upstream? remove the entry)`}`);
     if (!ok) fails++;
   }

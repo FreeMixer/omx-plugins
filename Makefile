@@ -25,6 +25,8 @@
 #                   one change at a time (tools/test/probe-checks-selftest.mjs; part of `make test`)
 #   make eq-probe-race  parallel make targets each build build/eq-default-probe privately and run it whole
 #                   (tools/test/eq-probe-race-test.mjs; part of `make test` and `make test-faces`)
+#   make phaser-depth  omx-phaser's generated panel publishes its depth role on depthOct, in octaves (FreeMixer/omx-plugins#232;
+#                   tools/test/phaser-depth-role-test.mjs and its --self-test; part of `make test`)
 #   make band-groups  omx-eq8's generated descriptor and TTL hold one LV2 port group per band, Band 1 ... Band 8 in band
 #                   order, each its five controls (tools/test/eq8-band-groups-test.mjs; part of `make test`)
 #   make geq-widgets  omx-geq declares the fader for its 31 bands, and its panel description and generated header serve them
@@ -141,11 +143,11 @@ LIB_FLAGS  := -fPIC -fvisibility=hidden -DOMX_CLAP_STATIC -Iinclude
 # read only by the targets that build the archive, so `make version` and the rest need no omx-dsp
 lib_cflags = $(call dep_check,omxdsp,$(OMXDSP_MIN))$(call dep_check,omx-contract,$(CONTRACT_MIN))$(shell $(PKG_CONFIG) --cflags omxdsp omx-contract omx-clap-core clap)
 
-.PHONY: presets presets-figures test-role all lib lib-test test test-faces units panel-layout descriptor-view lv2-units lv2-maintainer lv2-manifest release-version resource-hints format-tables contract-union probe-checks eq-probe-race band-groups geq-widgets round-trip hints modgui manual install install-pins install-test package-lists install-devel install-contract contract-dir clean version recipe-test completeness selftest private-refs params-doc check-params-doc strip-crosscheck meters-abi meter-level dsp-copies meter-ring clap-validate
+.PHONY: presets presets-figures test-role all lib lib-test test test-faces units panel-layout descriptor-view lv2-units lv2-maintainer lv2-manifest release-version resource-hints format-tables contract-union probe-checks eq-probe-race band-groups phaser-depth geq-widgets round-trip hints modgui manual install install-pins install-test package-lists install-devel install-contract contract-dir clean version recipe-test completeness selftest private-refs params-doc check-params-doc strip-crosscheck meters-abi meter-level dsp-copies meter-ring clap-validate
 all: lib
 	@for p in $(PLUGINS); do $(MAKE) -C $$p all || exit 1; done
 lib: $(LIB) $(LIB_PC)
-test: lib units panel-layout descriptor-view lv2-units lv2-maintainer lv2-manifest release-version resource-hints format-tables contract-union contract-dir probe-checks eq-probe-race band-groups geq-widgets
+test: lib units panel-layout descriptor-view lv2-units lv2-maintainer lv2-manifest release-version resource-hints format-tables contract-union contract-dir probe-checks eq-probe-race band-groups phaser-depth geq-widgets
 	@if [ -z "$(PLUGINS)" ]; then echo "no plugins yet"; fi
 	@for p in $(PLUGINS); do $(MAKE) -C $$p test || exit 1; done
 	@$(MAKE) -s round-trip
@@ -198,6 +200,10 @@ probe-checks:
 eq-probe-race:
 	node tools/test/eq-probe-race-test.mjs
 # omx-eq8's generated descriptor and TTL hold a port group per band, HPF and LPF as before (#257)
+phaser-depth:
+	node tools/test/phaser-depth-role-test.mjs
+	node tools/test/phaser-depth-role-test.mjs --self-test
+
 band-groups:
 	node tools/test/eq8-band-groups-test.mjs
 geq-widgets:
