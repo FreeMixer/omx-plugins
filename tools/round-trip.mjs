@@ -76,14 +76,14 @@ export const LOSSES = {
   // LV2: no row reads a step, automation, the plugin's version or vendor (our .ttl writes no doap:maintainer); a
   // control's id is its symbol and a point's id its label, so the CLAP id and our point ids are no LV2 word; the
   // audio ports are one per channel, with the generator's symbols and names
-  'lv2 controls[].travel.step': 319,
-  'lv2 controls[].automatable': 477,
-  'lv2 controls[].id': 477,
-  'lv2 controls[].ids': 82,
-  'lv2 plugin.version': 19,
-  'lv2 plugin.vendor': 19,
-  'lv2 ports[].id': 39,
-  'lv2 ports[].name': 39,
+  'lv2 controls[].travel.step': 404,
+  'lv2 controls[].automatable': 601,
+  'lv2 controls[].id': 601,
+  'lv2 controls[].ids': 97,
+  'lv2 plugin.version': 21,
+  'lv2 plugin.vendor': 21,
+  'lv2 ports[].id': 44,
+  'lv2 ports[].name': 44,
   // LV2 port groups are flat: a control in a section's subgroup (an EQ's band, #257) carries the group, not the
   // section above it (omx-eq8, omx-eq16 and omx-eq32: five controls a band, 8 + 16 + 32 bands)
   'lv2 controls[].group (panel section)': 280,
