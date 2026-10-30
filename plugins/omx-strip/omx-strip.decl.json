@@ -403,7 +403,8 @@
         "holdMs",
         "detectLink",
         "duck",
-        "rangeDb"
+        "rangeDb",
+        "releaseMode"
       ]
     }
   ],
