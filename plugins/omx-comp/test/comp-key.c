@@ -111,7 +111,7 @@ static void reference(const float *v, uint32_t n) {
                               (int)v[OMX_COMP_PARAM_DETECTOR_TOPOLOGY], (int)v[OMX_COMP_PARAM_KEY_SOURCE],
                               v[OMX_COMP_PARAM_KEY_HP_HZ], v[OMX_COMP_PARAM_KEY_LP_HZ], v[OMX_COMP_PARAM_KEY_TILT_DB],
                               (int)v[OMX_COMP_PARAM_KEY_LISTEN], v[OMX_COMP_PARAM_HOLD_MS], (int)v[OMX_COMP_PARAM_DETECT_LINK],
-                              (int)v[OMX_COMP_PARAM_DUCK], v[OMX_COMP_PARAM_RANGE_DB]);
+                              (int)v[OMX_COMP_PARAM_DUCK], v[OMX_COMP_PARAM_RANGE_DB], (int)OMX_COMP_RELEASE_MODES_DEFAULT);
     omx_comp_instance_run(&s, g_il + at, g_ir + at, g_wl + at, g_wr + at, k);
   }
 }
