@@ -18,7 +18,7 @@ BuildRequires: omx-dsp-devel >= 0.26.0
 BuildRequires: omx-contract-devel >= 3.4.0
 BuildRequires: omx-clap-core-devel >= 0.14.0
 # plugin-hostd's format tables, which the generators read backwards (tools/format-tables.mjs)
-BuildRequires: plugin-hostd-devel >= 0.7.0
+BuildRequires: plugin-hostd-devel >= 0.15.2
 # the omx-contract command, first packaged in 2.15.0: the generators read the contract directory through it
 # (3.3.0: the directory and its schema are omx-contract-data's, the definitions each owner's -contract package's)
 BuildRequires: omx-contract >= 3.4.0
@@ -39,7 +39,7 @@ BuildRequires: lilv-devel
 BuildRequires: sord
 BuildRequires: omx-clap-host
 # %%check: make round-trip scans the built faces back with plugin-hostd-probe describe
-BuildRequires: plugin-hostd >= 0.7.0
+BuildRequires: plugin-hostd >= 0.15.2
 # %%install: our own plugins' pins are known at build time (tools/gen-pins.sh); %%check then holds the
 # shipped pins.d file to the shipped binaries' hashes (tools/pins-check.sh)
 BuildRequires: plugin-qualify >= 0.9.0

@@ -44,15 +44,13 @@
     },
     "lowcut": {
       "props": [
-        "lv2:integer",
-        "pprops:logarithmic"
+        "lv2:integer"
       ],
       "unit": "units:hz"
     },
     "highcut": {
       "props": [
-        "lv2:integer",
-        "pprops:logarithmic"
+        "lv2:integer"
       ],
       "unit": "units:hz"
     },
