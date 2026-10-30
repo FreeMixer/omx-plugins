@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Pau Aliagas <linuxnow@gmail.com>
 /*
- * format-tables.mjs — plugin-hostd's format tables, read backwards (FreeMixer/omx-plugins#210, ruling B: one
+ * format-tables.mjs — plugin-hostd's format tables, read backwards (FreeMixer/omx-plugins#210, decision B: one
  * vocabulary, two directions). plugin-hostd installs one mapping table per format into omx-contract's contract
  * directory, <contractdir>/3/plugin-hostd/formats/{clap,lv2}.json (PLUGIN_HOSTD_CLAP_MAP, PLUGIN_HOSTD_LV2_MAP, item
  * kind formatMap; plugin-hostd docs/formats.md): how each field a scan reads becomes a descriptor word. A generator
