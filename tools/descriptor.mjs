@@ -235,7 +235,7 @@ export function viewOf(descriptor, extras, file) {
       if (link.field) p.field = link.field;
       if (link.kernel && (rest.kernels ?? [rest.kernel]).length > 1) p.kernel = link.kernel;
       // an integer travel is stepped, as both faces and the parameter contract state it; its faces' log hint is its unit's
-      if (c.travel && c.travel.scale !== (c.travel.step === 1 ? integerScale({ unit: c.travel.unit }) : scaleOf({ unit: c.travel.unit }))) p.scale = c.travel.scale;
+      if (c.travel && c.travel.scale !== (c.travel.step === 1 ? integerScale({ unit: c.travel.unit, min: c.travel.min }) : scaleOf({ unit: c.travel.unit }))) p.scale = c.travel.scale;
     } else {
       // a control of the face's own: its travel is typed, the reason kept with it
       if (!x.own) throw new Error(`${file}: '${c.symbol}' has no source link and no "own" reason`);
