@@ -336,17 +336,21 @@ lv2:displayPriority
     a pg:Group ;
     lv2:symbol "comp" ;
     lv2:name "Comp" ;
-    lv2:displayPriority 1 ;
+    lv2:displayPriority 3 ;
     rdfs:label "Comp" .
 
 <urn:openmixer:comp#key>
     a pg:Group ;
     lv2:symbol "key" ;
+    lv2:name "Key" ;
+    lv2:displayPriority 2 ;
     rdfs:label "Key" .
 
 <urn:openmixer:comp#duck>
     a pg:Group ;
     lv2:symbol "duck" ;
+    lv2:name "Duck" ;
+    lv2:displayPriority 1 ;
     rdfs:label "Duck" .
 
 <urn:openmixer:unit#dBoct>

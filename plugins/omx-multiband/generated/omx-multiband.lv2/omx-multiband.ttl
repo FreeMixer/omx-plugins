@@ -16,14 +16,14 @@
 <https://github.com/FreeMixer/omx-plugins>
     a doap:Project ;
     doap:name "omx-plugins" ;
-    doap:maintainer [ a foaf:Person ; foaf:name "Pau Aliagas" ] .
+    doap:maintainer [ a foaf:Person ; foaf:name "Pau Aliagas" ; foaf:homepage <https://github.com/linuxnow> ] .
 
 <urn:openmixer:multiband>
     a lv2:Plugin , lv2:CompressorPlugin ;
     doap:name "omx multiband" ;
     doap:license <https://www.gnu.org/licenses/gpl-3.0.html> ;
     lv2:project <https://github.com/FreeMixer/omx-plugins> ;
-    lv2:minorVersion 14 ;
+    lv2:minorVersion 16 ;
     lv2:microVersion 0 ;
     rdfs:comment "A multiband compressor: two to five bands split by Linkwitz-Riley crossovers, each band its own compressor with threshold, ratio, attack, release, make-up, solo and bypass, then a mix and an output gain, for in-ear mixes, vocals and playback buses." ;
     lv2:optionalFeature lv2:hardRTCapable ;
@@ -562,39 +562,61 @@
         units:unit units:frame
     ] .
 
+# lv2:displayPriority on a port group is the term Zynthian reads to order a plugin's groups (zynthian_lv2.py), and the
+# one FreeMixer/omx-plugins#257 rules; LV2 defines none in lv2core (port-props' pprops:displayPriority is a port's), so
+# it is stated here, for a validator, as what it is.
+lv2:displayPriority
+    a <http://www.w3.org/1999/02/22-rdf-syntax-ns#Property> ;
+    rdfs:label "display priority" ;
+    rdfs:comment "A port group's rank among its plugin's groups, higher first, as Zynthian reads it." .
+
 <urn:openmixer:multiband#split>
     a pg:Group ;
     lv2:symbol "split" ;
+    lv2:name "Split" ;
+    lv2:displayPriority 7 ;
     rdfs:label "Split" .
 
 <urn:openmixer:multiband#band1>
     a pg:Group ;
     lv2:symbol "band1" ;
+    lv2:name "Band 1" ;
+    lv2:displayPriority 6 ;
     rdfs:label "Band 1" .
 
 <urn:openmixer:multiband#band2>
     a pg:Group ;
     lv2:symbol "band2" ;
+    lv2:name "Band 2" ;
+    lv2:displayPriority 5 ;
     rdfs:label "Band 2" .
 
 <urn:openmixer:multiband#band3>
     a pg:Group ;
     lv2:symbol "band3" ;
+    lv2:name "Band 3" ;
+    lv2:displayPriority 4 ;
     rdfs:label "Band 3" .
 
 <urn:openmixer:multiband#band4>
     a pg:Group ;
     lv2:symbol "band4" ;
+    lv2:name "Band 4" ;
+    lv2:displayPriority 3 ;
     rdfs:label "Band 4" .
 
 <urn:openmixer:multiband#band5>
     a pg:Group ;
     lv2:symbol "band5" ;
+    lv2:name "Band 5" ;
+    lv2:displayPriority 2 ;
     rdfs:label "Band 5" .
 
 <urn:openmixer:multiband#output>
     a pg:Group ;
     lv2:symbol "output" ;
+    lv2:name "Output" ;
+    lv2:displayPriority 1 ;
     rdfs:label "Output" .
 
 <urn:openmixer:unit#ratio>

@@ -4,17 +4,18 @@
 
 # omx comp
 
-The console's compressor: threshold, ratio and knee set how hard it holds the level down, attack and release how fast, with makeup gain and a dry/wet mix. Kind picks the RMS detector (Compressor) or the peak detector (Limiter), and detector oversampling can run the control path at 4x; detector topology has it hear the input (feedforward) or its own output (feedback). The DSP is omx-dsp's <omxdsp/fx/omx_comp_instance.h>, the console's own compressor.
+The console's compressor: threshold, ratio and knee set how hard it holds the level down, attack and release how fast, with makeup gain and a dry/wet mix. Kind picks the RMS detector (Compressor) or the peak detector (Limiter), and detector oversampling can run the control path at 4x; detector topology has it hear the input (feedforward) or its own output (feedback). Its detector can listen to a key routed to its sidechain input instead, through a high-pass, a low-pass and a tilt, on the louder leg, the mid or the side, with a hold; key listen puts what the detector hears on the output, and duck holds the reduction to a set depth. The DSP is omx-dsp's <omxdsp/fx/omx_comp_instance.h>, the console's own compressor.
 
 - CLAP id: `org.openmixer.comp`
 - LV2 URI: `urn:openmixer:comp`
-- Parameters: 10, plus the host's bypass
+- Parameters: 19, plus the host's bypass
 
 ## Audio ports
 
 | Direction | Name | Role | Channels |
 |---|---|---|---|
 | in | in | main | 2 (stereo) |
+| in | key | sidechain | 1 (mono) |
 | out | out | main | 2 (stereo) |
 
 ## Pages
@@ -23,26 +24,37 @@ A page is where a host shows a parameter. In LV2 each page is a port group, `pg:
 
 | Page | LV2 group symbol | Priority | CLAP module | Parameters |
 |---|---|---|---|---|
-| Comp | `comp` | 1 | `Comp` | 10 |
+| Comp | `comp` | 3 | `Comp` | 11 |
+| Key | `key` | 2 | `Key` | 6 |
+| Duck | `duck` | 1 | `Duck` | 2 |
 
 ## Parameters
 
-Ids are the order below, 0 to 9; the bypass takes the next id.
+Ids are the order below, 0 to 18; the bypass takes the next id.
 
 | Id | Symbol | Name | Unit | Min | Max | Default | Step or values | Flags | Page (priority) |
 |---|---|---|---|---|---|---|---|---|---|
-| 0 | `thresholdDb` | Threshold | dB | -60 | 0 | -18 | whole steps | automatable | Comp (1) |
-| 1 | `ratio` | Ratio | ratio | 1 | 20 | 4 | continuous, linear | automatable | Comp (1) |
-| 2 | `kneeDb` | Knee | dB | 0 | 24 | 6 | continuous, linear | automatable | Comp (1) |
-| 3 | `attackMs` | Attack | ms | 0.1 | 100 | 5 | continuous, linear | automatable | Comp (1) |
-| 4 | `releaseMs` | Release | ms | 5 | 3000 | 200 | whole steps | automatable | Comp (1) |
-| 5 | `makeupDb` | Makeup | dB | 0 | 24 | 0 | continuous, linear | automatable | Comp (1) |
-| 6 | `mixPct` | Mix | % | 0 | 100 | 100 | whole steps | automatable | Comp (1) |
-| 7 | `kind` | Kind |  | 0 | 1 | Compressor (0) | 0 Compressor, 1 Limiter | automatable | Comp (1) |
-| 8 | `detectorOversampling` | Detector Oversampling |  | 0 | 2 | Auto (0) | 0 Auto, 1 Off, 2 4x | automatable | Comp (1) |
-| 9 | `detectorTopology` | Detector Topology |  | 0 | 1 | Feedforward (0) | 0 Feedforward, 1 Feedback | automatable | Comp (1) |
+| 0 | `thresholdDb` | Threshold | dB | -60 | 0 | -18 | whole steps | automatable | Comp (3) |
+| 1 | `ratio` | Ratio | ratio | 1 | 20 | 4 | continuous, linear | automatable | Comp (3) |
+| 2 | `kneeDb` | Knee | dB | 0 | 24 | 6 | continuous, linear | automatable | Comp (3) |
+| 3 | `attackMs` | Attack | ms | 0.1 | 100 | 5 | continuous, linear | automatable | Comp (3) |
+| 4 | `releaseMs` | Release | ms | 5 | 3000 | 200 | whole steps | automatable | Comp (3) |
+| 5 | `makeupDb` | Makeup | dB | 0 | 24 | 0 | continuous, linear | automatable | Comp (3) |
+| 6 | `mixPct` | Mix | % | 0 | 100 | 100 | whole steps | automatable | Comp (3) |
+| 7 | `kind` | Kind |  | 0 | 1 | Compressor (0) | 0 Compressor, 1 Limiter | automatable | Comp (3) |
+| 8 | `detectorOversampling` | Detector Oversampling |  | 0 | 2 | Auto (0) | 0 Auto, 1 Off, 2 4x | automatable | Comp (3) |
+| 9 | `detectorTopology` | Detector Topology |  | 0 | 1 | Feedforward (0) | 0 Feedforward, 1 Feedback | automatable | Comp (3) |
+| 10 | `keySource` | Key Source |  | 0 | 1 | Self (0) | 0 Self, 1 Sidechain | automatable | Key (2) |
+| 11 | `keyHpHz` | Key HP | Hz | 0 | 2000 | 0 | whole steps | automatable | Key (2) |
+| 12 | `keyLpHz` | Key LP | Hz | 0 | 20000 | 0 | whole steps | automatable | Key (2) |
+| 13 | `keyTiltDb` | Key Tilt | dB/oct | -6 | 6 | 0 | continuous, linear | automatable | Key (2) |
+| 14 | `keyListen` | Key Listen |  | off | on | off | toggle | automatable | Key (2) |
+| 15 | `holdMs` | Hold | ms | 0 | 2000 | 0 | whole steps | automatable | Comp (3) |
+| 16 | `detectLink` | Detect Link |  | 0 | 3 | Linked (0) | 0 Linked, 1 Mid, 2 Side, 3 Max | automatable | Key (2) |
+| 17 | `duck` | Duck |  | off | on | off | toggle | automatable | Duck (1) |
+| 18 | `rangeDb` | Duck Range | dB | -40 | 0 | -12 | whole steps | automatable | Duck (1) |
 
 ## Bypass
 
-CLAP: the host's bypass, a parameter named Bypass at id 10, flagged automatable, stepped and bypass; 0 is processing, 1 bypassed.
+CLAP: the host's bypass, a parameter named Bypass at id 19, flagged automatable, stepped and bypass; 0 is processing, 1 bypassed.
 LV2: the port `enabled` (`lv2:designation lv2:enabled`), 1 is processing, 0 is bypassed; it comes after the parameter ports. The output port `latency` reports the latency in frames.
