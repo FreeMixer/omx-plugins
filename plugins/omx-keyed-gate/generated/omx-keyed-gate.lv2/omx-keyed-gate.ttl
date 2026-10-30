@@ -204,7 +204,6 @@
         lv2:minimum 0 ;
         lv2:maximum 20000 ;
         lv2:portProperty lv2:integer ;
-        lv2:portProperty pprops:logarithmic ;
         units:unit units:hz ;
         pg:group <urn:openmixer:keyed-gate#key>
     ] ,
@@ -217,7 +216,6 @@
         lv2:minimum 0 ;
         lv2:maximum 20000 ;
         lv2:portProperty lv2:integer ;
-        lv2:portProperty pprops:logarithmic ;
         units:unit units:hz ;
         pg:group <urn:openmixer:keyed-gate#key>
     ] ,

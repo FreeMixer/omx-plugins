@@ -113,11 +113,11 @@ static const char *const OMX_DRIVE_PARAM_MODULES[OMX_DRIVE_PARAM_COUNT] = {
 /* org.openmixer.param-contract/1 (tools/param-contract.mjs): each parameter's unit, scale and step, in
  * id order; the host's bypass, the last id, is the face's. */
 #define OMX_DRIVE_PARAM_CONTRACT_VERSION 1u
-#define OMX_DRIVE_PARAM_CONTRACT_FINGERPRINT "3065b9d7e8f201797ac8c5a2c59ea85d661238af7683beac0aa97339fd0716fb"
+#define OMX_DRIVE_PARAM_CONTRACT_FINGERPRINT "d7bc8c775efd557f555f597a287da8d8310e73782215f5bbfd025dba56d5df1d"
 static const struct omx_param_contract_row OMX_DRIVE_PARAM_CONTRACT[OMX_DRIVE_PARAM_COUNT] = {
   { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* amount db */
   { 0u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* character none */
-  { 16u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* bandFreq hz */
+  { 16u, OMX_CLAP_SCALE_LOG, 1.0 }, /* bandFreq hz */
   { 14u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* mix pc */
   { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* trim db */
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* curve none */

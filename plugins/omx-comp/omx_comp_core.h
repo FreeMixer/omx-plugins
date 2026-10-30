@@ -18,6 +18,7 @@
  * `detect_link` is no parameter: the declaration holds it at its kernel's declared default, OMX_COMP_DETECT_LINKS_DEFAULT.
  * `duck` is no parameter: the declaration holds it at its kernel's declared default, OMX_COMP_DUCKS_DEFAULT.
  * `range_db` is no parameter: the declaration holds it at its kernel's declared default, OMX_COMP_RANGE_DB_RANGE_DEFAULT.
+ * `release_mode` is no parameter: the declaration holds it at its kernel's declared default, OMX_COMP_RELEASE_MODES_DEFAULT.
  */
 #ifndef OMX_COMP_CORE_H
 #define OMX_COMP_CORE_H
@@ -65,7 +66,8 @@ static inline void omx_comp_core_resolve(OmxCompCore *c, const float *values, in
                                   /* hold_ms */ (float)OMX_COMP_HOLD_MS_RANGE_DEFAULT,
                                   /* detect_link */ (int)OMX_COMP_DETECT_LINKS_DEFAULT,
                                   /* duck */ (int)OMX_COMP_DUCKS_DEFAULT,
-                                  /* range_db */ (float)OMX_COMP_RANGE_DB_RANGE_DEFAULT);
+                                  /* range_db */ (float)OMX_COMP_RANGE_DB_RANGE_DEFAULT,
+                                  /* release_mode */ (int)OMX_COMP_RELEASE_MODES_DEFAULT);
 }
 
 /** The latency the kernel adds, in samples. */
