@@ -3,7 +3,7 @@
 // Copyright (C) 2026 Pau Aliagas <linuxnow@gmail.com>
 /*
  * round-trip.mjs — the authored descriptor against what plugin-hostd scans back from our built faces
- * (docs/declaration-as-descriptor.md, "The round trip"; FreeMixer/omx-plugins#210, ruling B). tools/round-trip.sh
+ * (docs/declaration-as-descriptor.md, "The round trip"; FreeMixer/omx-plugins#210, decision B). tools/round-trip.sh
  * generates and builds each described plugin and writes `plugin-hostd-probe describe` of both faces; this compares
  * each scanned descriptor with the authored one, word by word, one line each:
  *

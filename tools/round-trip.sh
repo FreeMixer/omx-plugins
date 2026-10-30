@@ -3,7 +3,7 @@
 # Copyright (C) 2026 Pau Aliagas <linuxnow@gmail.com>
 #
 # round-trip.sh [--self-test] — author, generate both faces, scan them back through plugin-hostd, compare
-# (docs/declaration-as-descriptor.md, "The round trip"; FreeMixer/omx-plugins#210, ruling B). For every plugin with a
+# (docs/declaration-as-descriptor.md, "The round trip"; FreeMixer/omx-plugins#210, decision B). For every plugin with a
 # descriptor: `node tools/gen.mjs`, build both faces, `plugin-hostd-probe describe` each built face, and
 # tools/round-trip.mjs compares the scanned descriptors with the authored ones word by word (equal, lost <format>
 # <word>, differs). --self-test breaks the first described plugin twice and wants each red: one range changed in a
