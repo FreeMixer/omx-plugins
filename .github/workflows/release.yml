@@ -39,7 +39,7 @@ permissions:
   actions: read
 
 jobs:
-  # The ruling of 2026-10-10: plugin-qualify's real-time-safety verdict runs over every plugin, THEN omx-plugins
+  # The decision of 2026-10-10: plugin-qualify's real-time-safety verdict runs over every plugin, THEN omx-plugins
   # is released. The rpm job below publishes the moment it builds, so this job comes first and the release waits
   # on it: tools/qualify-release.sh builds the tree, qualifies every installed .clap and refuses unless each one's
   # qualification record says suitable. The records and the probe outputs they judged are attached to the run.

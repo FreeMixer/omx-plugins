@@ -3,7 +3,7 @@
 # Copyright (C) 2026 Pau Aliagas <linuxnow@gmail.com>
 #
 # deps-check.sh — the releases this repository builds against are declared only in the packaging, as a
-# FLOOR and nothing above it (operator ruling 2026-10-15: library dependencies carry no ceiling):
+# FLOOR and nothing above it (decided 2026-10-15: library dependencies carry no ceiling):
 # packaging/omx-plugins.spec's BuildRequires (one `>=` line per dependency, no `<`), the -devel package's
 # Requires on omx-dsp and omx-contract, and debian/control's Build-Depends and the -dev package's Depends, written the same.
 # A ceiling anywhere is a failure.
