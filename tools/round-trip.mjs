@@ -60,7 +60,7 @@ export const LOSSES = {
   // CLAP: no row reads a unit, a linear or log scale, a step, a choice (our faces set no CLAP_PARAM_IS_ENUM), the
   // session symbol, the LV2 URI, a side-chain's role or what an LV2 host may lend
   'clap controls[].travel.unit': 319,
-  'clap controls[].travel.scale': 286,
+  'clap controls[].travel.scale': 289,
   'clap controls[].travel.step': 319,
   'clap controls[].kind': 158,
   'clap controls[].ids': 82,

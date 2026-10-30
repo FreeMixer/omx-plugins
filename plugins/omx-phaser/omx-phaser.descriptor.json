@@ -53,7 +53,7 @@
         "step": 1,
         "unit": "Hz",
         "default": 200,
-        "scale": "stepped"
+        "scale": "log"
       },
       "group": [
         "Phaser"

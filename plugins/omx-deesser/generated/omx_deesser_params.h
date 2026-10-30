@@ -95,9 +95,9 @@ static const char *const OMX_DEESSER_PARAM_MODULES[OMX_DEESSER_PARAM_COUNT] = {
 /* org.openmixer.param-contract/1 (tools/param-contract.mjs): each parameter's unit, scale and step, in
  * id order; the host's bypass, the last id, is the face's. */
 #define OMX_DEESSER_PARAM_CONTRACT_VERSION 1u
-#define OMX_DEESSER_PARAM_CONTRACT_FINGERPRINT "c1f4ca18b4f37fe235132c42929577c80979fdae6a0826697fc0e4175b7c7e27"
+#define OMX_DEESSER_PARAM_CONTRACT_FINGERPRINT "762fa5fbcc17e69ff69407b8f46f1192c7d87b40d5c03db82749a35e390bd592"
 static const struct omx_param_contract_row OMX_DEESSER_PARAM_CONTRACT[OMX_DEESSER_PARAM_COUNT] = {
-  { 16u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* deessFreq hz */
+  { 16u, OMX_CLAP_SCALE_LOG, 1.0 }, /* deessFreq hz */
   { 20u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* deessWidth oct */
   { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* deessThreshold db */
   { 0u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* deessRatio none */

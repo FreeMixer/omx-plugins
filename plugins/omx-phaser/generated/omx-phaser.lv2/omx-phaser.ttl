@@ -75,6 +75,7 @@
         lv2:minimum 50 ;
         lv2:maximum 2000 ;
         lv2:portProperty lv2:integer ;
+        lv2:portProperty pprops:logarithmic ;
         units:unit units:hz ;
         pg:group <urn:openmixer:phaser#phaser>
     ] ,
