@@ -1,3 +1,21 @@
+omx-plugins (0.16.1) unstable; urgency=medium
+
+  * omx-dyneq, the six-band dynamic EQ, and omx-multiband, the multiband
+    compressor of two to five bands, from omx-dsp 0.26.0's kernels (#179).
+  * omx-comp takes a key: a sidechain port, the key and duck sections and
+    the compKey meter (#179).
+  * The EQs' and the multiband's band centres, the deesser, drive and
+    phaser frequencies and every integer frequency are authored
+    logarithmic, as their LV2 faces state; a Hz travel from 0 is not (#276).
+  * omx-geq declares the fader for its 31 bands (#231).
+  * The panels are regenerated against omx-panel 0.7.1: the MOD GUI text in
+    Inter and the phaser's depth published (#232).
+  * DEB builds install python3 in CI and read the version without make's
+    directory lines (#278).
+  * The build floors are omx-dsp 0.27.0 and plugin-hostd 0.15.2.
+
+ -- Pau Aliagas <linuxnow@gmail.com>  Sat, 31 Oct 2026 12:00:00 +0100
+
 omx-plugins (0.16.0) unstable; urgency=medium
 
   * The EQs carry one parameter group per band on eq8, eq16 and eq32, so a

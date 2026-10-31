@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # Copyright (C) 2026 Pau Aliagas <linuxnow@gmail.com>
 Name: omx-plugins
-Version: 0.16.0
+Version: 0.16.1
 Release: 1%{?dist}
 License: GPL-3.0-or-later
 Summary: The OpenMixer console's delay, drive, EQ, channel strip, keyed gate and effects, as plugins for your DAW
@@ -245,6 +245,21 @@ tools/pins-check.sh %{buildroot}%{_datadir}/plugin-hostd/pins.d/omx-plugins.pins
 # END GENERATED lv2-files
 
 %changelog
+* Sat Oct 31 2026 Pau Aliagas <linuxnow@gmail.com> - 0.16.1-1
+- omx-dyneq, the six-band dynamic EQ, and omx-multiband, the multiband
+  compressor of two to five bands, from omx-dsp 0.26.0's kernels (#179).
+- omx-comp takes a key: a sidechain port, the key and duck sections and
+  the compKey meter (#179).
+- The EQs' and the multiband's band centres, the deesser, drive and
+  phaser frequencies and every integer frequency are authored
+  logarithmic, as their LV2 faces state; a Hz travel from 0 is not (#276).
+- omx-geq declares the fader for its 31 bands (#231).
+- The panels are regenerated against omx-panel 0.7.1: the MOD GUI text in
+  Inter and the phaser's depth published (#232).
+- DEB builds install python3 in CI and read the version without make's
+  directory lines (#278).
+- The build floors are omx-dsp 0.27.0 and plugin-hostd 0.15.2.
+
 * Thu Oct 29 2026 Pau Aliagas <linuxnow@gmail.com> - 0.16.0-1
 - The EQs carry one parameter group per band on eq8, eq16 and eq32, so a
   touchscreen shows one band per screen (#257).
