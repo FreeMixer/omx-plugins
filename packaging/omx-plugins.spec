@@ -259,6 +259,8 @@ tools/pins-check.sh %{buildroot}%{_datadir}/plugin-hostd/pins.d/omx-plugins.pins
   Inter and the phaser's depth published (#232).
 - DEB builds install python3 in CI and read the version without make's
   directory lines (#278).
+- omx-test-pool-voice, a test instrument that renders its voices as
+  clap.thread-pool tasks (installed by omx-plugins-test only).
 - The build floors are omx-dsp 0.27.0 and plugin-hostd 0.15.2.
 
 * Thu Oct 29 2026 Pau Aliagas <linuxnow@gmail.com> - 0.16.0-1
