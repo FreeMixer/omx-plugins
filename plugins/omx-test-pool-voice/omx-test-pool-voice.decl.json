@@ -1,0 +1,27 @@
+{
+  "$comment": "THE declaration of omx-test-pool-voice, a test plugin: a sine voice per held note that renders each voice as one task of the CLAP thread pool and burns a fixed amount of CPU per frame in every voice, so a host's pool can be measured. Events are taken at the block start. The sum of the voices is the same bits whichever thread rendered which voice.",
+  "stem": "omx-test-pool-voice",
+  "kernel": "test_pool_voice",
+  "role": "test",
+  "name": "omx test-pool-voice",
+  "vendor": "openmixer",
+  "url": "https://github.com/FreeMixer/omx-plugins",
+  "version": "0.13.0",
+  "description": "A test instrument that offers clap.thread-pool: one sine per held note, each voice one pool task with a fixed CPU load per frame.",
+  "clap": {
+    "id": "org.openmixer.test-pool-voice",
+    "features": [
+      "instrument",
+      "synthesizer",
+      "stereo"
+    ]
+  },
+  "constants": {
+    "gain": 0.1,
+    "attackMs": 5,
+    "releaseMs": 50,
+    "voices": 8,
+    "a4Hz": 440,
+    "loadIters": 400
+  }
+}

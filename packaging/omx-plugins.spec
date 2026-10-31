@@ -104,7 +104,7 @@ Summary: The OpenMixer test instruments, for host tests and plugin measurement
 
 %description test
 The test instruments the OpenMixer console's own proofs play: a sine voice, a
-note echo and a transport probe, as CLAP plugins. They are installed in
+pool voice, a note echo and a transport probe, as CLAP plugins. They are installed in
 %{_libexecdir}/omx-plugins/test, outside every CLAP search path, so no host
 lists them; a test or the plugin qualifier opens them there by path. Install
 this package on a console to measure the linked test instruments' cost on its
@@ -202,6 +202,7 @@ tools/pins-check.sh %{buildroot}%{_datadir}/plugin-hostd/pins.d/omx-plugins.pins
 %dir %{_libexecdir}/omx-plugins/test
 # BEGIN GENERATED clap-test-files: tools/gen.mjs, one line per test plugin
 %{_libexecdir}/omx-plugins/test/omx-test-note-echo.clap
+%{_libexecdir}/omx-plugins/test/omx-test-pool-voice.clap
 %{_libexecdir}/omx-plugins/test/omx-test-sine-voice.clap
 %{_libexecdir}/omx-plugins/test/omx-test-transport-probe.clap
 # END GENERATED clap-test-files
