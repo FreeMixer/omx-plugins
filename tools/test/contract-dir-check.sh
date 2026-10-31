@@ -75,6 +75,7 @@ check() {
   done
   [ "$n" -gt 0 ] || { echo "contract-dir: no shipped plugin has a descriptor"; bad=$((bad + 1)); }
   for f in "$HERE"/contract/*.json; do
+    [ -e "$f" ] || continue   # no definition file: the unit codes are omx-contract's since 3.6.0
     rel=$(basename "$f")
     if [ ! -f "$pkg/$rel" ]; then echo "contract-dir: contract/$rel is not installed as $rel"; bad=$((bad + 1)); continue; fi
     cmp -s "$f" "$pkg/$rel" || { echo "contract-dir: $rel is not contract/$rel byte for byte"; bad=$((bad + 1)); }
@@ -129,7 +130,7 @@ if [ "${1:-}" = --self-test ]; then
     node -e 'const fs = require("fs"); const [p, r, h] = process.argv.slice(1); const m = JSON.parse(fs.readFileSync(p, "utf8"));
       m.files[r] = h; fs.writeFileSync(p, JSON.stringify(m, null, 2) + "\n");' "$m" "$2" "$h"
   }
-  for s in left-out missing changed extra hash version units-missing units-changed $(for r in $REQUIRED; do printf 'unlisted-%s ' "$r"; done); do
+  for s in left-out missing changed extra hash version $(for r in $REQUIRED; do printf 'unlisted-%s ' "$r"; done); do
     t=$scratch/$s; rm -rf "$t"
     case $s in
       left-out) install_into "$t" DESCRIPTORS="$rest" ;;
@@ -138,8 +139,6 @@ if [ "${1:-}" = --self-test ]; then
     p=$t/3/omx-plugins
     case $s in
       missing) rm "$p/plugins/$first.json" ;;
-      units-missing) rm "$p/param-units.json" ;;
-      units-changed) sed -i 's/"db": 13/"db": 12/' "$p/param-units.json"; rehash "$t" param-units.json ;;
       changed) sed -i '0,/"name": "/s//"name": "x/' "$p/plugins/$first.json"; rehash "$t" "plugins/$first.json" ;;
       extra) cp "$p/plugins/$first.json" "$p/plugins/omx-test-sine-voice.json"; rehash "$t" plugins/omx-test-sine-voice.json ;;
       hash) sed -i "s|\"plugins/$first.json\": \"[0-9a-f]*\"|\"plugins/$first.json\": \"$(printf '0%.0s' $(seq 64))\"|" "$p/MANIFEST.json" ;;

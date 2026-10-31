@@ -4,53 +4,48 @@
  * param-contract.mjs — org.openmixer.param-contract/1 of a plugin, from its declaration: each
  * parameter's symbol, unit, scale and step, the host's bypass last, and the canonical serialisation
  * whose SHA-256 is the fingerprint. tools/gen.mjs writes the rows a CLAP face serves
- * (include/omx_param_contract.h) and the header's unit enum from contract/param-units.json; tools/clap-ext-check.mjs
+ * (include/omx_param_contract.h); the unit codes are omx-contract's (OMX_PARAM_CONTRACT_UNITS). tools/clap-ext-check.mjs
  * reads what a built face serves back.
  *
  * The contract's version is 1: its first publication, with no migration step. A later change of a
  * symbol, unit, scale, travel or stepping changes the fingerprint and needs the next version.
  */
 import { createHash } from 'node:crypto';
-import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { lv2UnitNames, lv2UnitRef } from './format-tables.mjs';
-import { items } from './omx-contract.mjs';
+import { items, locateContract } from './omx-contract.mjs';
 
 export const CONTRACT_ID = 'org.openmixer.param-contract/1';
 export const CONTRACT_VERSION = 1;
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 
-/** The declaration of the contract's units, installed into omx-plugins' contract directory as param-units.json: the
- * sheet OMX_PARAM_CONTRACT_UNITS, each token's code. tools/gen.mjs writes the header's enum from it. */
-export const PARAM_UNITS_JSON = join(ROOT, 'contract', 'param-units.json');
+/** The declaration of the contract's units is omx-contract's: the sheet OMX_PARAM_CONTRACT_UNITS (data/param-contract.json,
+ * omx-contract >= 3.6.0), each token's code, rendered to omxcontract/omx_param_units.h as OMX_CLAP_UNIT_* defines. */
 export const PARAM_UNITS_ITEM = 'OMX_PARAM_CONTRACT_UNITS';
-/** The header the extension's C structures and the unit enum are in. */
+/** The header the extension's C structures are in; it includes omx-contract's unit codes. */
 export const PARAM_CONTRACT_H = join(ROOT, 'include', 'omx_param_contract.h');
 
-/** The declared units, `{ <token>: <code> }` in code order, of the declaration `file`. */
-export function declaredUnits(file = PARAM_UNITS_JSON) {
-  const item = JSON.parse(readFileSync(file, 'utf8'))[PARAM_UNITS_ITEM];
-  if (item?.kind !== 'sheet' || typeof item.value !== 'object') throw new Error(`${file}: holds no ${PARAM_UNITS_ITEM} sheet`);
+/** The declared units, `{ <token>: <code> }` in code order, of the resolved contract at `dir` (default: the one this tree is
+ * built against, tools/omx-contract.mjs locateContract). */
+export function declaredUnits(dir) {
+  if (dir === undefined) {
+    const found = locateContract(ROOT);
+    if (!found.dir) throw new Error(`${PARAM_UNITS_ITEM}: ${found.why}`);
+    dir = found.dir;
+  }
+  const item = items(dir)[PARAM_UNITS_ITEM];
+  if (item?.kind !== 'sheet' || typeof item.value !== 'object') throw new Error(`${dir}: the resolved contract holds no ${PARAM_UNITS_ITEM} sheet (omx-contract >= 3.6.0)`);
   return Object.fromEntries(Object.entries(item.value).sort((a, b) => a[1] - b[1]));
 }
 
-/** A token's enum name: OMX_CLAP_UNIT_ and the token upper-cased, a word break before a capital that follows a small
- * letter and before digits that follow a letter (midiNote is MIDI_NOTE, semitone12TET SEMITONE_12TET). */
-export const unitEnumName = (token) => `OMX_CLAP_UNIT_${token.replace(/([a-z])([A-Z])/g, '$1_$2').replace(/([A-Za-z])([0-9])/g, '$1_$2').toUpperCase()}`;
-
-/** The enum's lines, one per declared unit, a code past the LV2 block in hex. */
-export const unitEnumLines = (units = declaredUnits()) =>
-  Object.entries(units).map(([t, v]) => `${unitEnumName(t)} = ${v >= 0x100 ? `0x${v.toString(16)}` : v},`);
-
-/** The units by name without underscores (SEMITONE12TET), as `Map<name, code>`: the declaration's, or with `file` the
- * enum omx_clap_param_unit of that header. */
+/** The units by name without underscores (SEMITONE12TET), as `Map<name, code>`: the declaration's, or with `text` the
+ * OMX_CLAP_UNIT_* defines of a rendered omx_param_units.h. */
 let declared;
-export function headerUnits(file) {
-  if (!file) return (declared ??= new Map(Object.entries(declaredUnits()).map(([t, v]) => [t.toUpperCase(), v])));
-  const body = readFileSync(file, 'utf8').match(/enum omx_clap_param_unit \{([\s\S]*?)\};/)?.[1] ?? '';
-  return new Map([...body.matchAll(/OMX_CLAP_UNIT_(\w+)\s*=\s*(0x[0-9a-fA-F]+|\d+)/g)].map((m) => [m[1].replaceAll('_', ''), Number(m[2])]));
+export function headerUnits(text) {
+  if (text === undefined) return (declared ??= new Map(Object.entries(declaredUnits()).map(([t, v]) => [t.toUpperCase(), v])));
+  return new Map([...text.matchAll(/^#define OMX_CLAP_UNIT_(\w+) (\d+)u\b/gm)].map((m) => [m[1].replaceAll('_', ''), Number(m[2])]));
 }
 
 /** A declared unit -> the contract's unit, `[token, enum value]`: the token is the LV2 unit the face writes for it

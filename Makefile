@@ -6,9 +6,9 @@
 #
 #   make            build every plugin
 #   make test       every plugin's tests (what the package builds run), then `make hints` and `make manual`
-#   make units      the declared units' contract codes (tools/param-contract.mjs) are the header's enum, its vendor
-#                   block is dbfs, dbu, ratio, lufs, and the enum is written from contract/param-units.json with
-#                   nothing apart, a unit changed on either side red (tools/test/param-units-check.mjs)
+#   make units      the declared units' contract codes (tools/param-contract.mjs) are omx-contract's header's
+#                   (OMX_PARAM_CONTRACT_UNITS, omx_param_units.h), its vendor block is dbfs, dbu, ratio, lufs, a unit
+#                   changed on either side red (tools/test/param-units-check.mjs)
 #   make lv2-units  every unit a declaration uses has an LV2 unit, and every port states the unit it declares
 #                   (tools/test/lv2-units-check.mjs, with its sabotage arms; part of `make test`)
 #   make lv2-maintainer  every generated TTL gives its doap:maintainer a foaf:homepage (tools/test/lv2-maintainer-check.mjs; part of `make test`)
@@ -297,7 +297,7 @@ package-lists:
 	tools/package-lists-check.sh --self-test
 # Each shipped plugin's descriptor, plugins/<stem>/<stem>.descriptor.json, installed byte for byte into omx-contract's
 # contract directory as $(CONTRACTDIR)/<schema major>/omx-plugins/plugins/<stem>.json, and each definition file of
-# contract/ (param-units.json: the param-contract extension's unit codes) as
+# contract/ (a definition file this tree owns; none today) as
 # $(CONTRACTDIR)/<schema major>/omx-plugins/<file>.json, with a MANIFEST.json naming this
 # version (omx-contract docs/contract-dir.md); the packages ship it in omx-plugins-contract. The directory is
 # omx-contract-data's, under the same data directory
