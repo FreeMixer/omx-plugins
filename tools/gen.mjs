@@ -143,7 +143,7 @@ export function prepareDecl(file, d, stem, dir = dirname(file)) {
  * none of them; a kernel named after a family is that family, any other kernel `none`. */
 export const FAMILY_OF_KERNEL = Object.freeze({
   comp: 'dynamics', transient: 'dynamics', chorus: 'modulation', flanger: 'modulation', phaser: 'modulation',
-  tremolo: 'modulation', rotary: 'modulation', geq: 'eq',
+  tremolo: 'modulation', rotary: 'modulation', geq: 'eq', dyneq: 'eq', mbcomp: 'dynamics',
 });
 
 /** The panel family a kernel's plugin draws as: FAMILY_OF_KERNEL's, else the family of its own name. */
@@ -769,22 +769,27 @@ function stepped(params, v, keep) {
   });
 }
 
-export function oraclePlan(params, controls = [], { engaged = [] } = {}) {
+export function oraclePlan(params, controls = [], { engaged = [], monitors = [] } = {}) {
   const held = new Set(params.map((_, i) => i).filter((i) => controls[i]?.rearms));
   // a chain's element switches: on in the release and choice sections, so each element is heard
-  // there (an EQ switched off by the stepped row would hide every band's Q), and never stepped
-  const on = new Set(engaged);
+  // there (an EQ switched off by the stepped row would hide every band's Q), and never stepped; a
+  // declaration's engaged values ([index, value]) likewise, a band's threshold where every band is driven
+  const at = new Map(engaged.map((e) => (Array.isArray(e) ? e : [e, 1])));
+  const on = new Set(at.keys());
+  // a monitor replaces the output while on (a band's listen): at its default where the others move or
+  // are stepped, so what it would replace stays heard; its own section still holds each of its values
+  const quiet = new Set(monitors);
   const row = (frames, ms, signal, v, bypass) => ({ row: `${frames}, ${cfloat(ms)}, ${signal}, {${v.map(cfloat).join(', ')}}, ${bypass}` });
   const moves = PLAN_FRAMES.map((frames, b) => {
     const v = params.map((p, i) => {
-      if (held.has(i)) return p.def;
+      if (held.has(i) || quiet.has(i)) return p.def;
       if (p.kind === 'toggle') return (b + i) % 2;
       return valueAt(p, PLAN_AT[(b + 2 * i) % PLAN_AT.length]);
     });
     return row(frames, 0, SIGNAL.moves, v, PLAN_BYPASS[b]);
   });
   const tail = tailMs(params);
-  const defaults = params.map((p, i) => (on.has(i) ? 1 : p.def));
+  const defaults = params.map((p, i) => (on.has(i) ? at.get(i) : p.def));
   const release = [row(0, BURST_MS, SIGNAL.burst, defaults, 0), row(0, tail, SIGNAL.tail, defaults, 0)];
   const choices = [];
   params.forEach((p, c) => {
@@ -792,7 +797,7 @@ export function oraclePlan(params, controls = [], { engaged = [] } = {}) {
     if (!vals || held.has(c)) return;
     for (const value of vals) {
       const v = defaults.map((d, i) => (i === c ? value : d));
-      const moved = stepped(params, v, new Set([...held, ...on, c]));
+      const moved = stepped(params, v, new Set([...held, ...on, ...quiet, c]));
       choices.push(row(0, BURST_MS, SIGNAL.burst, v, 0), row(0, tail, SIGNAL.tail, v, 0), row(0, tail, SIGNAL.tail, moved, 0));
     }
   });
@@ -829,8 +834,9 @@ const cdouble = (n) => (typeof n === 'string' || /[.e]/.test(`${n}`) ? `${n}` : 
  * parameter's travel to 0 dB, or over the range omx-contract declares for the kernel's `readout`
  * of that name (OMX_<KERNEL>_READOUT_<readout>_MIN/_MAX, read by the compiler); a level is the stereo pair's peak in dBFS at the plugin's `input` or
  * `output`, its range as declared. */
-export function meterRows(d) {
+export function meterRows(d, face) {
   const taken = new Set([...d.params.map((p) => p.symbol), ...FIXED_PORTS]);
+  const K = (d.face ?? d.kernel);
   let offset = 0;
   const rows = (d.meters ?? []).map((m, k) => {
     const where = `plugins/${d.stem}: meters[${k}]`;
@@ -838,33 +844,53 @@ export function meterRows(d) {
     if (!/^[A-Za-z][A-Za-z0-9_]*$/.test(m.id ?? '')) throw new Error(`${where}: id '${m.id}' is not a symbol`);
     if (taken.has(m.id)) throw new Error(`${where}: id '${m.id}' is taken`);
     taken.add(m.id);
-    const own = m.kind === 'gain_reduction' ? ['field', 'readout' in m ? 'readout' : 'floor'] : ['source', 'min', 'max'];
-    for (const key of ['field', 'floor', 'readout', 'source', 'min', 'max']) {
+    // a reading of the kernel's: a gain reduction, or a level the kernel reads itself (its detector's)
+    const reads = m.kind === 'gain_reduction' || 'read' in m;
+    const at = 'read' in m ? 'read' : 'field';
+    const own = m.kind === 'gain_reduction' ? [at, 'readout' in m ? 'readout' : 'floor'] : reads ? ['read', 'readout'] : ['source', 'min', 'max'];
+    for (const key of ['field', 'read', 'floor', 'readout', 'source', 'min', 'max']) {
       if (own.includes(key) && !(key in m)) throw new Error(`${where}: a ${m.kind} meter names its '${key}'`);
-      if (!own.includes(key) && key in m) throw new Error(`${where}: a ${m.kind} meter takes no '${key}'`);
+      if (!own.includes(key) && key in m) throw new Error(`${where}: a ${m.kind} meter ${reads && m.kind === 'level' ? 'the kernel reads ' : ''}takes no '${key}'`);
     }
     let row;
-    if (m.kind === 'gain_reduction') {
-      if (!/^[a-z_][a-z0-9_]*(\.[a-z_][a-z0-9_]*)*$/.test(m.field)) throw new Error(`${where}: field '${m.field}' is not a member path`);
+    if (reads) {
+      // where the reading is: a member of the instance, or the face's reading function, banded or not
+      let core, ref;
+      if (at === 'field') {
+        if (!/^[a-z_][a-z0-9_]*(\.[a-z_][a-z0-9_]*)*$/.test(m.field)) throw new Error(`${where}: field '${m.field}' is not a member path`);
+        core = `c->inst.${m.field}`;
+        ref = `inst.${m.field}`;
+      } else {
+        const r = m.read.match(/^([a-z][a-z0-9_]*)(?:\(([0-9]+)\))?$/);
+        if (!r) throw new Error(`${where}: read '${m.read}' is not <reading> or <reading>(<band>)`);
+        const reading = face?.readings?.[r[1]];
+        if (face && !reading) throw new Error(`${where}: omx-dsp's <omxdsp/fx/omx_${K}_instance.h> has no float omx_${K}_instance_${r[1]}(const ${face.type} *${r[2] === undefined ? '' : ', uint32_t'})`);
+        if (reading && reading.banded !== (r[2] !== undefined)) throw new Error(`${where}: omx_${K}_instance_${r[1]} ${reading.banded ? 'takes' : 'takes no'} band index`);
+        const call = (self) => `omx_${K}_instance_${r[1]}(${self}${r[2] === undefined ? '' : `, ${r[2]}u`})`;
+        core = call('&c->inst');
+        ref = call('&inst');
+      }
       if ('readout' in m) {
         if (!/^[A-Z][A-Z0-9_]*$/.test(m.readout)) throw new Error(`${where}: readout '${m.readout}' is not a readout name`);
         const r = `OMX_${d.kernel.toUpperCase()}_READOUT_${m.readout}`;
-        row = { channels: 1, min: `(double)${r}_MIN`, max: `(double)${r}_MAX`, meterField: m.field };
+        row = { channels: 1, min: `(double)${r}_MIN`, max: `(double)${r}_MAX`, core, ref };
       } else {
         const p = d.params.find((q) => q.symbol === m.floor);
         if (!p) throw new Error(`${where}: floor '${m.floor}' is no parameter`);
         if (!(p.min < 0)) throw new Error(`${where}: floor '${m.floor}' starts at ${p.min}, not below 0 dB`);
-        row = { channels: 1, min: p.min, max: 0, meterField: m.field };
+        row = { channels: 1, min: p.min, max: 0, core, ref };
       }
     } else {
       if (m.source !== 'input' && m.source !== 'output') throw new Error(`${where}: source '${m.source}' is not input or output`);
       if (!(Number.isFinite(m.min) && Number.isFinite(m.max) && m.min < m.max)) throw new Error(`${where}: the range ${m.min}..${m.max} is not a range`);
-      row = { channels: 2, min: m.min, max: m.max, meterField: '' };
+      row = { channels: 2, min: m.min, max: m.max, core: '', ref: '' };
     }
     const out = {
-      meterIndex: k, meterName: m.id, meterKind: METER_KINDS[m.kind], meterField: row.meterField,
+      meterIndex: k, meterName: m.id, meterKind: METER_KINDS[m.kind], meterReadCore: row.core, meterReadRef: row.ref,
       meterChannels: row.channels, meterOffset: offset, meterRight: offset + 1, meterMin: cdouble(row.min), meterMax: cdouble(row.max),
-      isGr: m.kind === 'gain_reduction', isIn: m.source === 'input', isOut: m.source === 'output',
+      isGr: m.kind === 'gain_reduction', isRead: reads, isIn: m.source === 'input', isOut: m.source === 'output',
+      // what a bypassed kernel's stale reading publishes: no reduction, or a level's display minimum
+      meterBypass: m.kind === 'gain_reduction' ? '0.0' : `G_METER_INFO[${k}].min`, meterBypassRef: m.kind === 'gain_reduction' ? '0.0' : `METERS[${k}].min`,
     };
     offset += row.channels;
     return out;
@@ -874,14 +900,36 @@ export function meterRows(d) {
 }
 
 /** The template's view of the meters: the rows, how many, how many values, which levels are read. */
-function meterView(d) {
-  const meters = meterRows(d);
+function meterView(d, face) {
+  const meters = meterRows(d, face);
   return {
     meters, metered: meters.length > 0, meterCount: meters.length,
     meterValues: meters.reduce((n, m) => n + m.meterChannels, 0),
     meterGr: meters.some((m) => m.isGr), meterIn: meters.some((m) => m.isIn), meterOut: meters.some((m) => m.isOut),
     meterLevel: meters.some((m) => m.isIn || m.isOut),
+    meterRead: meters.some((m) => m.isRead), meterKernelLevel: meters.some((m) => m.isRead && !m.isGr),
   };
+}
+
+/** The indices of the declaration's `monitors`, each a toggle or a choice among its parameters. */
+export function monitorsOf(d) {
+  return (d.monitors ?? []).map((sym) => {
+    const i = d.params.findIndex((p) => p.symbol === sym);
+    if (i < 0) throw new Error(`plugins/${d.stem}: monitors names '${sym}', no parameter`);
+    if (!valuesOf(d.params[i])) throw new Error(`plugins/${d.stem}: monitor '${sym}' is a travel; a monitor is switched, a toggle or a choice`);
+    return i;
+  });
+}
+
+/** The declaration's `engaged` values, `[[index, value]]`, each inside its parameter's travel. */
+export function engagedOf(d) {
+  return Object.entries(d.engaged ?? {}).map(([sym, v]) => {
+    const i = d.params.findIndex((p) => p.symbol === sym);
+    if (i < 0) throw new Error(`plugins/${d.stem}: engaged names '${sym}', no parameter`);
+    const p = d.params[i];
+    if (!(typeof v === 'number' && p.min <= v && v <= p.max)) throw new Error(`plugins/${d.stem}: engaged '${sym}' at ${JSON.stringify(v)}, outside ${p.min}..${p.max}`);
+    return [i, v];
+  });
 }
 
 /** The parameters the plan holds at their default, for the oracle's comment: `[{ symbol }]`. */
@@ -893,7 +941,11 @@ const heldOf = (d) => d.params.filter((p, i) => d.controls?.[i]?.rearms).map((p)
 export const oracleStretch = (face) => (face.keyed ? 64 : 1);
 
 /** One step of each parameter, the sabotage arm's move: 1 % of a travel, the next value of a choice. */
-const stepOf = (p) => (p.kind === 'toggle' || p.kind === 'integer' ? 1 : (p.max - p.min) / 100);
+// an integer travel by its share too, in whole steps (one at least): +1 ms on a 2 s release moves no float
+// pole; a time travel (ms, s) by 5 %: a slow detector's pole at 176.4 kHz is 1 - 1e-5, and 1 % of a release
+// travel moves it by about two float steps, which can round to none
+const stepShare = (p) => (p.unit === 'ms' || p.unit === 's' ? 0.05 : 0.01);
+const stepOf = (p) => (p.kind === 'toggle' || choicesOf(p) ? 1 : p.kind === 'integer' ? Math.max(1, Math.round((p.max - p.min) * stepShare(p))) : (p.max - p.min) * stepShare(p));
 
 /**
  * The controls of `kernel` a declaration (or a chain element) `holds`: no parameter, no port, each
@@ -925,7 +977,10 @@ function heldControls(d, kernel, names, prefix, who, errors) {
 export function bindingOf(d) {
   const errors = [];
   const held = heldControls(d, d.face ?? d.kernel, d.held, d.stem, d.stem, errors);
-  const b = faceBinding(omxdspInclude(), d.face ?? d.kernel, [...d.params, ...held.map((h) => h.p)], [...(d.controls ?? []), ...held.map((h) => h.c)]);
+  // the controls of the face this plugin does not expose: each passed at its `fixed` value, or held at its kernel's default
+  const fixed = fixedArgs(d, { id: d.kernel, kernel: d.face ?? d.kernel, fixed: d.fixed }, d.controls ?? [], errors);
+  const extra = [...fixed, ...held];
+  const b = faceBinding(omxdspInclude(), d.face ?? d.kernel, [...d.params, ...extra.map((f) => f.p)], [...(d.controls ?? []), ...extra.map((f) => f.c)]);
   errors.push(...b.errors);
   if (errors.length) throw new Error(`plugins/${d.stem}: binding: instance, but ${errors.join('; ')}`);
   return b;
@@ -938,12 +993,16 @@ const heldValue = (type, p) => `(${type})${p.held}`;
 export function generateInstance(d) {
   const { face, binding, renames } = bindingOf(d);
   if (face.keyed && !d.sidechain) throw new Error(`plugins/${d.stem}: omx_${d.kernel}_instance_run takes a key; the declaration names its port in "sidechain"`);
-  if (!face.keyed && d.sidechain) throw new Error(`plugins/${d.stem}: declares a "sidechain", and omx_${d.kernel}_instance_run takes no key`);
+  if (!face.keyed && !face.keyable && d.sidechain) throw new Error(`plugins/${d.stem}: declares a "sidechain", and omx_${d.kernel}_instance_run takes no key (nor has it a run_keyed)`);
+  // keyed: the plugin's key port reaches the face, through run (the key first) or run_keyed (the
+  // mono key on key_l, key_r NULL)
+  const keyed = face.keyed || (face.keyable && Boolean(d.sidechain));
   const K = d.kernel.toUpperCase();
   const macro_ = (sym) => `OMX_${K}_PARAM_${macro(sym)}`;
-  const one = (type, sym) => (type === 'int' ? `(int)lrintf(values[${macro_(sym)}])` : `values[${macro_(sym)}]`);
+  // a fixed control is its value, a parameter its port's
+  const one = (type, p) => (p.fixed !== undefined ? (type === 'int' ? `${p.fixed}` : cfloat(p.fixed)) : type === 'int' ? `(int)lrintf(values[${macro_(p.symbol)}])` : `values[${macro_(p.symbol)}]`);
   // a per-band array: a compound literal of its parameters, in declaration order
-  const value = (b) => (b.extent ? `(const ${b.elem}[${b.extent}]){${b.params.map((p) => one(b.elem, p.symbol)).join(', ')}}` : b.param.held ? heldValue(b.type, b.param) : one(b.type, b.param.symbol));
+  const value = (b) => (b.extent ? `(const ${b.elem}[${b.extent}]){${b.params.map((p) => one(b.elem, p)).join(', ')}}` : b.param.held ? heldValue(b.type, b.param) : one(b.type, b.param));
   const lat = (self) => (face.latency.fn ? `${face.latency.fn}(${self})` : face.latency.macro);
   const view = {
     ...templateView(d),
@@ -952,12 +1011,15 @@ export function generateInstance(d) {
     arrays: binding.filter((b) => b.extent).map((b) => ({ arg: b.arg, count: b.params.length, extent: b.extent })),
     renames: renames.map((b) => ({ arg: b.arg, rename: b.rename })),
     heldArgs: binding.filter((b) => b.param.held).map((b) => ({ arg: b.arg, at: b.param.held })),
+    fixed: Object.entries(d.fixed ?? {}).map(([name, v]) => ({ control: name, at: JSON.stringify(v) })),
     latency: lat('&c->inst'), refLatency: lat('&inst'),
-    keyed: face.keyed, keyPort: face.keyed ? macro(d.sidechain.symbol) : '', keySymbol: face.keyed ? d.sidechain.symbol : '',
-    plan: oraclePlan(d.params, d.controls ?? []), held: heldOf(d), stretch: oracleStretch(face), steps: d.params.map((p) => cfloat(stepOf(p))).join(', '),
+    keyed, keyPort: keyed ? macro(d.sidechain.symbol) : '', keySymbol: keyed ? d.sidechain.symbol : '',
+    runFn: keyed && !face.keyed ? 'run_keyed' : 'run', keyTail: keyed && !face.keyed ? ', NULL' : '',
+    plan: oraclePlan(d.params, d.controls ?? [], { monitors: monitorsOf(d), engaged: engagedOf(d) }), held: heldOf(d),
+    engaged: engagedOf(d).map(([i, v]) => ({ symbol: d.params[i].symbol, value: v })), monitors: monitorsOf(d).map((i) => ({ symbol: d.params[i].symbol })), stretch: oracleStretch(face), steps: d.params.map((p) => cfloat(stepOf(p))).join(', '),
     chain: false,
     latencyChecks: latencyRows(d), measuresLatency: Boolean(d.latencyChecks),
-    ...meterView(d),
+    ...meterView(d, face),
   };
   return {
     Makefile: withBanner(render(template('Makefile.tmpl'), view), d, '#'),
@@ -1018,6 +1080,34 @@ function fixedBands(d, el, control, v, exposed) {
 }
 
 /**
+ * The controls a face is handed at a fixed value, never a port: a chain element's `fixed`, or an
+ * instance plugin's own (`el` is then the plugin, its id its kernel): `[{ p, c }]`, each bound like a
+ * parameter (`p.fixed` the value) to its control `c`. `controls` are the exposed parameters' controls;
+ * a refusal is pushed to `errors`.
+ */
+function fixedArgs(d, el, controls, errors) {
+  const where = locateContract(d.tree ?? ROOT);
+  return Object.entries(el.fixed ?? {}).flatMap(([name, v]) => {
+    const c = where.dir ? kernelControls(where.dir, el.kernel).find((x) => x.name === name) : undefined;
+    if (!c) {
+      errors.push(`element '${el.id}' fixes '${name}', no control of the ${el.kernel} kernel`);
+      return [];
+    }
+    try {
+      // a per-band control: one fixed value per band, bound as the face's array argument
+      if (c.count) {
+        const exposed = controls.filter((x) => x?.name === name).length;
+        return fixedBands(d, el, c, v, exposed).map((x, k) => ({ p: { symbol: `${el.id}.${name}[${exposed + k}]`, fixed: x }, c: { name } }));
+      }
+      return [{ p: { symbol: `${el.id}.${name}`, fixed: fixedValue(d, el, c, v) }, c: { name } }];
+    } catch (e) {
+      errors.push(e.message);
+      return [];
+    }
+  });
+}
+
+/**
  * Each element of a chain bound to its own kernel's instance face, exactly as a single plugin's
  * parameters are (bindFace, by name): `[{ el, face, binding, renames, fixed }]`, or a thrown error
  * naming every element that does not bind. An element's `fixed` controls (`{ control: id | number }`)
@@ -1042,24 +1132,7 @@ export function chainBindings(d) {
         if (have && have !== want) errors.push(`element '${el.id}' exposes ${have} '${c.name}' parameters, and its "bands" '${el.bands}' counts ${want}`);
       }
     }
-    const fixed = Object.entries(el.fixed ?? {}).flatMap(([name, v]) => {
-      const c = where.dir ? kernelControls(where.dir, el.kernel).find((x) => x.name === name) : undefined;
-      if (!c) {
-        errors.push(`element '${el.id}' fixes '${name}', no control of the ${el.kernel} kernel`);
-        return [];
-      }
-      try {
-        // a per-band control: one fixed value per band, bound as the face's array argument
-        if (c.count) {
-          const exposed = controls.filter((x) => x?.name === name).length;
-          return fixedBands(d, el, c, v, exposed).map((x, k) => ({ p: { symbol: `${el.id}.${name}[${exposed + k}]`, fixed: x }, c: { name } }));
-        }
-        return [{ p: { symbol: `${el.id}.${name}`, fixed: fixedValue(d, el, c, v) }, c: { name } }];
-      } catch (e) {
-        errors.push(e.message);
-        return [];
-      }
-    });
+    const fixed = fixedArgs(d, el, controls, errors);
     const held = heldControls(d, el.kernel, el.held, el.id, `element '${el.id}'`, errors);
     const extra = [...fixed, ...held];
     const b = faceBinding(inc, el.kernel, [...params, ...extra.map((f) => f.p)], [...controls, ...extra.map((f) => f.c)]);
@@ -1091,8 +1164,11 @@ export function generateChain(d) {
     renames: b.renames.map((x) => ({ arg: x.arg, rename: x.rename })),
     fixed: (b.el.fixed ? Object.entries(b.el.fixed) : []).map(([name, v]) => ({ control: name, at: JSON.stringify(v) })),
     heldArgs: b.binding.filter((x) => x.param.held).map((x) => ({ arg: x.arg, at: x.param.held })),
-    keyedFace: b.face.keyed, keyArg: b.face.keyed ? (d.key === b.el.id ? 'key' : 'NULL') : '',
-    keyRef: b.face.keyed && d.key === b.el.id ? 'key ? key + at : NULL' : 'NULL',
+    // a keyable face (the compressor's) runs keyed with no key, so its key filter, tilt and link act on its
+    // own legs; idle, run_keyed is run bit for bit
+    runFn: b.face.keyable ? 'run_keyed' : 'run',
+    keyedFace: b.face.keyed || b.face.keyable, keyArg: b.face.keyable ? 'NULL, NULL' : b.face.keyed ? (d.key === b.el.id ? 'key' : 'NULL') : '',
+    keyRef: b.face.keyable ? 'NULL, NULL' : b.face.keyed && d.key === b.el.id ? 'key ? key + at : NULL' : 'NULL',
     latency: lat(b, `&c->${b.el.id}`), refLatency: lat(b, `&${b.el.id}`),
   }));
   const rows = d.order === 'permutable' ? permutations(d.chain.length) : [[...d.chain.keys()]];

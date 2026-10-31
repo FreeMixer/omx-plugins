@@ -11,7 +11,8 @@
  * the face's resolve() prototype: each argument takes the parameter whose contract control it names.
 {{#renames}} * RENAME OWED by omx-dsp's name conformance: resolve argument `{{arg}}` is the contract's `{{rename}}`.
 {{/renames}}{{#heldArgs}} * `{{arg}}` is no parameter: the declaration holds it at its kernel's declared default, {{at}}.
-{{/heldArgs}} */
+{{/heldArgs}}{{#fixed}} * `{{control}}` is not a parameter of this plugin: it is passed at {{at}}.
+{{/fixed}} */
 #ifndef OMX_{{K}}_CORE_H
 #define OMX_{{K}}_CORE_H
 
@@ -51,18 +52,18 @@ static inline uint32_t omx_{{kernel}}_core_latency(const Omx{{Kernel}}Core *c) {
   return (uint32_t)lrintf((float)({{latency}}));
 }
 
-{{#meterGr}}/** Gain-reduction meter `i`'s reading (the declaration's `meters`, in order): the kernel's own, after the
+{{#meterRead}}/** {{^meterKernelLevel}}Gain-reduction meter{{/meterKernelLevel}}{{#meterKernelLevel}}Kernel-read meter (a gain reduction, or a level the kernel reads){{/meterKernelLevel}} `i`'s reading (the declaration's `meters`, in order): the kernel's own, after the
  * last block. */
 static inline float omx_{{kernel}}_core_meter(const Omx{{Kernel}}Core *c, uint32_t i) {
   switch (i) {
-{{#meters}}{{#isGr}}  case {{meterIndex}}:
-    return c->inst.{{meterField}};
-{{/isGr}}{{/meters}}  default:
+{{#meters}}{{#isRead}}  case {{meterIndex}}:
+    return {{meterReadCore}};
+{{/isRead}}{{/meters}}  default:
     return 0.0f;
   }
 }
 
-{{/meterGr}}{{^keyed}}/** One block, stereo; the outputs may alias the inputs. */
+{{/meterRead}}{{^keyed}}/** One block, stereo; the outputs may alias the inputs. */
 static inline void omx_{{kernel}}_core_run(Omx{{Kernel}}Core *c, const float *in_l, const float *in_r, float *out_l,
                                          float *out_r, uint32_t frames) {
   omx_{{face}}_instance_run(&c->inst, in_l, in_r, out_l, out_r, frames);
@@ -71,7 +72,7 @@ static inline void omx_{{kernel}}_core_run(Omx{{Kernel}}Core *c, const float *in
  * the outputs may alias the inputs or the key. */
 static inline void omx_{{kernel}}_core_run(Omx{{Kernel}}Core *c, const float *key, const float *in_l, const float *in_r,
                                          float *out_l, float *out_r, uint32_t frames) {
-  omx_{{kernel}}_instance_run(&c->inst, key, in_l, in_r, out_l, out_r, frames);
+  omx_{{face}}_instance_{{runFn}}(&c->inst, key{{keyTail}}, in_l, in_r, out_l, out_r, frames);
 }
 {{/keyed}}
 #endif /* OMX_{{K}}_CORE_H */

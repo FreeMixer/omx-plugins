@@ -9,15 +9,6 @@
  *
  * GENERATED — DO NOT EDIT BY HAND. Produced by tools/gen.mjs from plugins/omx-comp/omx-comp.decl.json and
  * the face's resolve() prototype: each argument takes the parameter whose contract control it names.
- * `key_source` is no parameter: the declaration holds it at its kernel's declared default, OMX_COMP_KEY_SOURCES_DEFAULT.
- * `key_hp_hz` is no parameter: the declaration holds it at its kernel's declared default, OMX_COMP_KEY_HP_HZ_RANGE_DEFAULT.
- * `key_lp_hz` is no parameter: the declaration holds it at its kernel's declared default, OMX_COMP_KEY_LP_HZ_RANGE_DEFAULT.
- * `key_tilt_db` is no parameter: the declaration holds it at its kernel's declared default, OMX_COMP_KEY_TILT_DB_RANGE_DEFAULT.
- * `key_listen` is no parameter: the declaration holds it at its kernel's declared default, OMX_COMP_KEY_LISTENS_DEFAULT.
- * `hold_ms` is no parameter: the declaration holds it at its kernel's declared default, OMX_COMP_HOLD_MS_RANGE_DEFAULT.
- * `detect_link` is no parameter: the declaration holds it at its kernel's declared default, OMX_COMP_DETECT_LINKS_DEFAULT.
- * `duck` is no parameter: the declaration holds it at its kernel's declared default, OMX_COMP_DUCKS_DEFAULT.
- * `range_db` is no parameter: the declaration holds it at its kernel's declared default, OMX_COMP_RANGE_DB_RANGE_DEFAULT.
  * `release_mode` is no parameter: the declaration holds it at its kernel's declared default, OMX_COMP_RELEASE_MODES_DEFAULT.
  */
 #ifndef OMX_COMP_CORE_H
@@ -58,15 +49,15 @@ static inline void omx_comp_core_resolve(OmxCompCore *c, const float *values, in
                                   /* kind */ (int)lrintf(values[OMX_COMP_PARAM_KIND]),
                                   /* detector_oversampling */ (int)lrintf(values[OMX_COMP_PARAM_DETECTOR_OVERSAMPLING]),
                                   /* detector_topology */ (int)lrintf(values[OMX_COMP_PARAM_DETECTOR_TOPOLOGY]),
-                                  /* key_source */ (int)OMX_COMP_KEY_SOURCES_DEFAULT,
-                                  /* key_hp_hz */ (float)OMX_COMP_KEY_HP_HZ_RANGE_DEFAULT,
-                                  /* key_lp_hz */ (float)OMX_COMP_KEY_LP_HZ_RANGE_DEFAULT,
-                                  /* key_tilt_db */ (float)OMX_COMP_KEY_TILT_DB_RANGE_DEFAULT,
-                                  /* key_listen */ (int)OMX_COMP_KEY_LISTENS_DEFAULT,
-                                  /* hold_ms */ (float)OMX_COMP_HOLD_MS_RANGE_DEFAULT,
-                                  /* detect_link */ (int)OMX_COMP_DETECT_LINKS_DEFAULT,
-                                  /* duck */ (int)OMX_COMP_DUCKS_DEFAULT,
-                                  /* range_db */ (float)OMX_COMP_RANGE_DB_RANGE_DEFAULT,
+                                  /* key_source */ (int)lrintf(values[OMX_COMP_PARAM_KEY_SOURCE]),
+                                  /* key_hp_hz */ values[OMX_COMP_PARAM_KEY_HP_HZ],
+                                  /* key_lp_hz */ values[OMX_COMP_PARAM_KEY_LP_HZ],
+                                  /* key_tilt_db */ values[OMX_COMP_PARAM_KEY_TILT_DB],
+                                  /* key_listen */ (int)lrintf(values[OMX_COMP_PARAM_KEY_LISTEN]),
+                                  /* hold_ms */ values[OMX_COMP_PARAM_HOLD_MS],
+                                  /* detect_link */ (int)lrintf(values[OMX_COMP_PARAM_DETECT_LINK]),
+                                  /* duck */ (int)lrintf(values[OMX_COMP_PARAM_DUCK]),
+                                  /* range_db */ values[OMX_COMP_PARAM_RANGE_DB],
                                   /* release_mode */ (int)OMX_COMP_RELEASE_MODES_DEFAULT);
 }
 
@@ -76,21 +67,24 @@ static inline uint32_t omx_comp_core_latency(const OmxCompCore *c) {
   return (uint32_t)lrintf((float)(omx_comp_instance_latency(&c->inst)));
 }
 
-/** Gain-reduction meter `i`'s reading (the declaration's `meters`, in order): the kernel's own, after the
+/** Kernel-read meter (a gain reduction, or a level the kernel reads) `i`'s reading (the declaration's `meters`, in order): the kernel's own, after the
  * last block. */
 static inline float omx_comp_core_meter(const OmxCompCore *c, uint32_t i) {
   switch (i) {
   case 0:
     return c->inst.st.gr_min_db;
+  case 3:
+    return omx_comp_instance_key_level_db(&c->inst);
   default:
     return 0.0f;
   }
 }
 
-/** One block, stereo; the outputs may alias the inputs. */
-static inline void omx_comp_core_run(OmxCompCore *c, const float *in_l, const float *in_r, float *out_l,
-                                         float *out_r, uint32_t frames) {
-  omx_comp_instance_run(&c->inst, in_l, in_r, out_l, out_r, frames);
+/** One block, stereo, keyed by `key` (NULL: nothing routed to the key, the kernel's own detector);
+ * the outputs may alias the inputs or the key. */
+static inline void omx_comp_core_run(OmxCompCore *c, const float *key, const float *in_l, const float *in_r,
+                                         float *out_l, float *out_r, uint32_t frames) {
+  omx_comp_instance_run_keyed(&c->inst, key, NULL, in_l, in_r, out_l, out_r, frames);
 }
 
 #endif /* OMX_COMP_CORE_H */

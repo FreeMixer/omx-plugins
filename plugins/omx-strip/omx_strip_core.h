@@ -311,7 +311,7 @@ static inline void omx_strip_core_element(OmxStripCore *c, uint32_t e, const flo
     omx_eq_instance_run(&c->eq, out_l, out_r, out_l, out_r, frames);
     return;
   case OMX_STRIP_CHAIN_4_comp:
-    omx_comp_instance_run(&c->comp, out_l, out_r, out_l, out_r, frames);
+    omx_comp_instance_run_keyed(&c->comp, NULL, NULL, out_l, out_r, out_l, out_r, frames);
     return;
   }
 }

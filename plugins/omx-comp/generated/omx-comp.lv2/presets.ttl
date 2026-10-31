@@ -19,7 +19,15 @@
         [ lv2:symbol "mixPct" ; pset:value 100.0 ] ,
         [ lv2:symbol "kind" ; pset:value 0.0 ] ,
         [ lv2:symbol "detectorOversampling" ; pset:value 0.0 ] ,
-        [ lv2:symbol "detectorTopology" ; pset:value 0.0 ] .
+        [ lv2:symbol "detectorTopology" ; pset:value 0.0 ] ,
+        [ lv2:symbol "keyHpHz" ; pset:value 0.0 ] ,
+        [ lv2:symbol "keyLpHz" ; pset:value 0.0 ] ,
+        [ lv2:symbol "keyTiltDb" ; pset:value 0.0 ] ,
+        [ lv2:symbol "keyListen" ; pset:value 0.0 ] ,
+        [ lv2:symbol "holdMs" ; pset:value 0.0 ] ,
+        [ lv2:symbol "detectLink" ; pset:value 0.0 ] ,
+        [ lv2:symbol "duck" ; pset:value 0.0 ] ,
+        [ lv2:symbol "rangeDb" ; pset:value -12.0 ] .
 
 <urn:openmixer:comp#preset-bus-glue>
     a pset:Preset ;
@@ -35,7 +43,15 @@
         [ lv2:symbol "mixPct" ; pset:value 100.0 ] ,
         [ lv2:symbol "kind" ; pset:value 0.0 ] ,
         [ lv2:symbol "detectorOversampling" ; pset:value 0.0 ] ,
-        [ lv2:symbol "detectorTopology" ; pset:value 0.0 ] .
+        [ lv2:symbol "detectorTopology" ; pset:value 0.0 ] ,
+        [ lv2:symbol "keyHpHz" ; pset:value 0.0 ] ,
+        [ lv2:symbol "keyLpHz" ; pset:value 0.0 ] ,
+        [ lv2:symbol "keyTiltDb" ; pset:value 0.0 ] ,
+        [ lv2:symbol "keyListen" ; pset:value 0.0 ] ,
+        [ lv2:symbol "holdMs" ; pset:value 0.0 ] ,
+        [ lv2:symbol "detectLink" ; pset:value 0.0 ] ,
+        [ lv2:symbol "duck" ; pset:value 0.0 ] ,
+        [ lv2:symbol "rangeDb" ; pset:value -12.0 ] .
 
 <urn:openmixer:comp#preset-comp-276>
     a pset:Preset ;
@@ -51,7 +67,15 @@
         [ lv2:symbol "mixPct" ; pset:value 100.0 ] ,
         [ lv2:symbol "kind" ; pset:value 1.0 ] ,
         [ lv2:symbol "detectorOversampling" ; pset:value 0.0 ] ,
-        [ lv2:symbol "detectorTopology" ; pset:value 0.0 ] .
+        [ lv2:symbol "detectorTopology" ; pset:value 0.0 ] ,
+        [ lv2:symbol "keyHpHz" ; pset:value 0.0 ] ,
+        [ lv2:symbol "keyLpHz" ; pset:value 0.0 ] ,
+        [ lv2:symbol "keyTiltDb" ; pset:value 0.0 ] ,
+        [ lv2:symbol "keyListen" ; pset:value 0.0 ] ,
+        [ lv2:symbol "holdMs" ; pset:value 0.0 ] ,
+        [ lv2:symbol "detectLink" ; pset:value 0.0 ] ,
+        [ lv2:symbol "duck" ; pset:value 0.0 ] ,
+        [ lv2:symbol "rangeDb" ; pset:value -12.0 ] .
 
 <urn:openmixer:comp#preset-fet-20>
     a pset:Preset ;
@@ -67,7 +91,15 @@
         [ lv2:symbol "mixPct" ; pset:value 100.0 ] ,
         [ lv2:symbol "kind" ; pset:value 1.0 ] ,
         [ lv2:symbol "detectorOversampling" ; pset:value 0.0 ] ,
-        [ lv2:symbol "detectorTopology" ; pset:value 0.0 ] .
+        [ lv2:symbol "detectorTopology" ; pset:value 0.0 ] ,
+        [ lv2:symbol "keyHpHz" ; pset:value 0.0 ] ,
+        [ lv2:symbol "keyLpHz" ; pset:value 0.0 ] ,
+        [ lv2:symbol "keyTiltDb" ; pset:value 0.0 ] ,
+        [ lv2:symbol "keyListen" ; pset:value 0.0 ] ,
+        [ lv2:symbol "holdMs" ; pset:value 0.0 ] ,
+        [ lv2:symbol "detectLink" ; pset:value 0.0 ] ,
+        [ lv2:symbol "duck" ; pset:value 0.0 ] ,
+        [ lv2:symbol "rangeDb" ; pset:value -12.0 ] .
 
 <urn:openmixer:comp#preset-fet-4>
     a pset:Preset ;
@@ -83,7 +115,15 @@
         [ lv2:symbol "mixPct" ; pset:value 100.0 ] ,
         [ lv2:symbol "kind" ; pset:value 1.0 ] ,
         [ lv2:symbol "detectorOversampling" ; pset:value 0.0 ] ,
-        [ lv2:symbol "detectorTopology" ; pset:value 0.0 ] .
+        [ lv2:symbol "detectorTopology" ; pset:value 0.0 ] ,
+        [ lv2:symbol "keyHpHz" ; pset:value 0.0 ] ,
+        [ lv2:symbol "keyLpHz" ; pset:value 0.0 ] ,
+        [ lv2:symbol "keyTiltDb" ; pset:value 0.0 ] ,
+        [ lv2:symbol "keyListen" ; pset:value 0.0 ] ,
+        [ lv2:symbol "holdMs" ; pset:value 0.0 ] ,
+        [ lv2:symbol "detectLink" ; pset:value 0.0 ] ,
+        [ lv2:symbol "duck" ; pset:value 0.0 ] ,
+        [ lv2:symbol "rangeDb" ; pset:value -12.0 ] .
 
 <urn:openmixer:comp#preset-kick>
     a pset:Preset ;
@@ -99,7 +139,15 @@
         [ lv2:symbol "mixPct" ; pset:value 100.0 ] ,
         [ lv2:symbol "kind" ; pset:value 0.0 ] ,
         [ lv2:symbol "detectorOversampling" ; pset:value 0.0 ] ,
-        [ lv2:symbol "detectorTopology" ; pset:value 0.0 ] .
+        [ lv2:symbol "detectorTopology" ; pset:value 0.0 ] ,
+        [ lv2:symbol "keyHpHz" ; pset:value 0.0 ] ,
+        [ lv2:symbol "keyLpHz" ; pset:value 0.0 ] ,
+        [ lv2:symbol "keyTiltDb" ; pset:value 0.0 ] ,
+        [ lv2:symbol "keyListen" ; pset:value 0.0 ] ,
+        [ lv2:symbol "holdMs" ; pset:value 0.0 ] ,
+        [ lv2:symbol "detectLink" ; pset:value 0.0 ] ,
+        [ lv2:symbol "duck" ; pset:value 0.0 ] ,
+        [ lv2:symbol "rangeDb" ; pset:value -12.0 ] .
 
 <urn:openmixer:comp#preset-limiter-ish>
     a pset:Preset ;
@@ -115,7 +163,15 @@
         [ lv2:symbol "mixPct" ; pset:value 100.0 ] ,
         [ lv2:symbol "kind" ; pset:value 1.0 ] ,
         [ lv2:symbol "detectorOversampling" ; pset:value 0.0 ] ,
-        [ lv2:symbol "detectorTopology" ; pset:value 0.0 ] .
+        [ lv2:symbol "detectorTopology" ; pset:value 0.0 ] ,
+        [ lv2:symbol "keyHpHz" ; pset:value 0.0 ] ,
+        [ lv2:symbol "keyLpHz" ; pset:value 0.0 ] ,
+        [ lv2:symbol "keyTiltDb" ; pset:value 0.0 ] ,
+        [ lv2:symbol "keyListen" ; pset:value 0.0 ] ,
+        [ lv2:symbol "holdMs" ; pset:value 0.0 ] ,
+        [ lv2:symbol "detectLink" ; pset:value 0.0 ] ,
+        [ lv2:symbol "duck" ; pset:value 0.0 ] ,
+        [ lv2:symbol "rangeDb" ; pset:value -12.0 ] .
 
 <urn:openmixer:comp#preset-mustard-a>
     a pset:Preset ;
@@ -131,7 +187,15 @@
         [ lv2:symbol "mixPct" ; pset:value 100.0 ] ,
         [ lv2:symbol "kind" ; pset:value 1.0 ] ,
         [ lv2:symbol "detectorOversampling" ; pset:value 0.0 ] ,
-        [ lv2:symbol "detectorTopology" ; pset:value 0.0 ] .
+        [ lv2:symbol "detectorTopology" ; pset:value 0.0 ] ,
+        [ lv2:symbol "keyHpHz" ; pset:value 0.0 ] ,
+        [ lv2:symbol "keyLpHz" ; pset:value 0.0 ] ,
+        [ lv2:symbol "keyTiltDb" ; pset:value 0.0 ] ,
+        [ lv2:symbol "keyListen" ; pset:value 0.0 ] ,
+        [ lv2:symbol "holdMs" ; pset:value 0.0 ] ,
+        [ lv2:symbol "detectLink" ; pset:value 0.0 ] ,
+        [ lv2:symbol "duck" ; pset:value 0.0 ] ,
+        [ lv2:symbol "rangeDb" ; pset:value -12.0 ] .
 
 <urn:openmixer:comp#preset-mustard-b>
     a pset:Preset ;
@@ -147,7 +211,15 @@
         [ lv2:symbol "mixPct" ; pset:value 100.0 ] ,
         [ lv2:symbol "kind" ; pset:value 1.0 ] ,
         [ lv2:symbol "detectorOversampling" ; pset:value 0.0 ] ,
-        [ lv2:symbol "detectorTopology" ; pset:value 0.0 ] .
+        [ lv2:symbol "detectorTopology" ; pset:value 0.0 ] ,
+        [ lv2:symbol "keyHpHz" ; pset:value 0.0 ] ,
+        [ lv2:symbol "keyLpHz" ; pset:value 0.0 ] ,
+        [ lv2:symbol "keyTiltDb" ; pset:value 0.0 ] ,
+        [ lv2:symbol "keyListen" ; pset:value 0.0 ] ,
+        [ lv2:symbol "holdMs" ; pset:value 0.0 ] ,
+        [ lv2:symbol "detectLink" ; pset:value 0.0 ] ,
+        [ lv2:symbol "duck" ; pset:value 0.0 ] ,
+        [ lv2:symbol "rangeDb" ; pset:value -12.0 ] .
 
 <urn:openmixer:comp#preset-mustard-c>
     a pset:Preset ;
@@ -163,7 +235,15 @@
         [ lv2:symbol "mixPct" ; pset:value 100.0 ] ,
         [ lv2:symbol "kind" ; pset:value 0.0 ] ,
         [ lv2:symbol "detectorOversampling" ; pset:value 0.0 ] ,
-        [ lv2:symbol "detectorTopology" ; pset:value 0.0 ] .
+        [ lv2:symbol "detectorTopology" ; pset:value 0.0 ] ,
+        [ lv2:symbol "keyHpHz" ; pset:value 0.0 ] ,
+        [ lv2:symbol "keyLpHz" ; pset:value 0.0 ] ,
+        [ lv2:symbol "keyTiltDb" ; pset:value 0.0 ] ,
+        [ lv2:symbol "keyListen" ; pset:value 0.0 ] ,
+        [ lv2:symbol "holdMs" ; pset:value 0.0 ] ,
+        [ lv2:symbol "detectLink" ; pset:value 0.0 ] ,
+        [ lv2:symbol "duck" ; pset:value 0.0 ] ,
+        [ lv2:symbol "rangeDb" ; pset:value -12.0 ] .
 
 <urn:openmixer:comp#preset-mustard-d>
     a pset:Preset ;
@@ -179,7 +259,15 @@
         [ lv2:symbol "mixPct" ; pset:value 100.0 ] ,
         [ lv2:symbol "kind" ; pset:value 0.0 ] ,
         [ lv2:symbol "detectorOversampling" ; pset:value 0.0 ] ,
-        [ lv2:symbol "detectorTopology" ; pset:value 0.0 ] .
+        [ lv2:symbol "detectorTopology" ; pset:value 0.0 ] ,
+        [ lv2:symbol "keyHpHz" ; pset:value 0.0 ] ,
+        [ lv2:symbol "keyLpHz" ; pset:value 0.0 ] ,
+        [ lv2:symbol "keyTiltDb" ; pset:value 0.0 ] ,
+        [ lv2:symbol "keyListen" ; pset:value 0.0 ] ,
+        [ lv2:symbol "holdMs" ; pset:value 0.0 ] ,
+        [ lv2:symbol "detectLink" ; pset:value 0.0 ] ,
+        [ lv2:symbol "duck" ; pset:value 0.0 ] ,
+        [ lv2:symbol "rangeDb" ; pset:value -12.0 ] .
 
 <urn:openmixer:comp#preset-rms-160-crush>
     a pset:Preset ;
@@ -195,7 +283,15 @@
         [ lv2:symbol "mixPct" ; pset:value 100.0 ] ,
         [ lv2:symbol "kind" ; pset:value 0.0 ] ,
         [ lv2:symbol "detectorOversampling" ; pset:value 0.0 ] ,
-        [ lv2:symbol "detectorTopology" ; pset:value 0.0 ] .
+        [ lv2:symbol "detectorTopology" ; pset:value 0.0 ] ,
+        [ lv2:symbol "keyHpHz" ; pset:value 0.0 ] ,
+        [ lv2:symbol "keyLpHz" ; pset:value 0.0 ] ,
+        [ lv2:symbol "keyTiltDb" ; pset:value 0.0 ] ,
+        [ lv2:symbol "keyListen" ; pset:value 0.0 ] ,
+        [ lv2:symbol "holdMs" ; pset:value 0.0 ] ,
+        [ lv2:symbol "detectLink" ; pset:value 0.0 ] ,
+        [ lv2:symbol "duck" ; pset:value 0.0 ] ,
+        [ lv2:symbol "rangeDb" ; pset:value -12.0 ] .
 
 <urn:openmixer:comp#preset-rms-160>
     a pset:Preset ;
@@ -211,7 +307,15 @@
         [ lv2:symbol "mixPct" ; pset:value 100.0 ] ,
         [ lv2:symbol "kind" ; pset:value 0.0 ] ,
         [ lv2:symbol "detectorOversampling" ; pset:value 0.0 ] ,
-        [ lv2:symbol "detectorTopology" ; pset:value 0.0 ] .
+        [ lv2:symbol "detectorTopology" ; pset:value 0.0 ] ,
+        [ lv2:symbol "keyHpHz" ; pset:value 0.0 ] ,
+        [ lv2:symbol "keyLpHz" ; pset:value 0.0 ] ,
+        [ lv2:symbol "keyTiltDb" ; pset:value 0.0 ] ,
+        [ lv2:symbol "keyListen" ; pset:value 0.0 ] ,
+        [ lv2:symbol "holdMs" ; pset:value 0.0 ] ,
+        [ lv2:symbol "detectLink" ; pset:value 0.0 ] ,
+        [ lv2:symbol "duck" ; pset:value 0.0 ] ,
+        [ lv2:symbol "rangeDb" ; pset:value -12.0 ] .
 
 <urn:openmixer:comp#preset-snare>
     a pset:Preset ;
@@ -227,7 +331,15 @@
         [ lv2:symbol "mixPct" ; pset:value 100.0 ] ,
         [ lv2:symbol "kind" ; pset:value 0.0 ] ,
         [ lv2:symbol "detectorOversampling" ; pset:value 0.0 ] ,
-        [ lv2:symbol "detectorTopology" ; pset:value 0.0 ] .
+        [ lv2:symbol "detectorTopology" ; pset:value 0.0 ] ,
+        [ lv2:symbol "keyHpHz" ; pset:value 0.0 ] ,
+        [ lv2:symbol "keyLpHz" ; pset:value 0.0 ] ,
+        [ lv2:symbol "keyTiltDb" ; pset:value 0.0 ] ,
+        [ lv2:symbol "keyListen" ; pset:value 0.0 ] ,
+        [ lv2:symbol "holdMs" ; pset:value 0.0 ] ,
+        [ lv2:symbol "detectLink" ; pset:value 0.0 ] ,
+        [ lv2:symbol "duck" ; pset:value 0.0 ] ,
+        [ lv2:symbol "rangeDb" ; pset:value -12.0 ] .
 
 <urn:openmixer:comp#preset-ssl-bus-glue>
     a pset:Preset ;
@@ -243,7 +355,15 @@
         [ lv2:symbol "mixPct" ; pset:value 100.0 ] ,
         [ lv2:symbol "kind" ; pset:value 0.0 ] ,
         [ lv2:symbol "detectorOversampling" ; pset:value 0.0 ] ,
-        [ lv2:symbol "detectorTopology" ; pset:value 0.0 ] .
+        [ lv2:symbol "detectorTopology" ; pset:value 0.0 ] ,
+        [ lv2:symbol "keyHpHz" ; pset:value 0.0 ] ,
+        [ lv2:symbol "keyLpHz" ; pset:value 0.0 ] ,
+        [ lv2:symbol "keyTiltDb" ; pset:value 0.0 ] ,
+        [ lv2:symbol "keyListen" ; pset:value 0.0 ] ,
+        [ lv2:symbol "holdMs" ; pset:value 0.0 ] ,
+        [ lv2:symbol "detectLink" ; pset:value 0.0 ] ,
+        [ lv2:symbol "duck" ; pset:value 0.0 ] ,
+        [ lv2:symbol "rangeDb" ; pset:value -12.0 ] .
 
 <urn:openmixer:comp#preset-vocal>
     a pset:Preset ;
@@ -259,4 +379,12 @@
         [ lv2:symbol "mixPct" ; pset:value 100.0 ] ,
         [ lv2:symbol "kind" ; pset:value 0.0 ] ,
         [ lv2:symbol "detectorOversampling" ; pset:value 0.0 ] ,
-        [ lv2:symbol "detectorTopology" ; pset:value 0.0 ] .
+        [ lv2:symbol "detectorTopology" ; pset:value 0.0 ] ,
+        [ lv2:symbol "keyHpHz" ; pset:value 0.0 ] ,
+        [ lv2:symbol "keyLpHz" ; pset:value 0.0 ] ,
+        [ lv2:symbol "keyTiltDb" ; pset:value 0.0 ] ,
+        [ lv2:symbol "keyListen" ; pset:value 0.0 ] ,
+        [ lv2:symbol "holdMs" ; pset:value 0.0 ] ,
+        [ lv2:symbol "detectLink" ; pset:value 0.0 ] ,
+        [ lv2:symbol "duck" ; pset:value 0.0 ] ,
+        [ lv2:symbol "rangeDb" ; pset:value -12.0 ] .

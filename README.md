@@ -17,10 +17,11 @@ drawn from one declaration: its CLAP parameters, its LV2 ports and its MOD GUI c
 | Plugin | CLAP id | LV2 URI | What it does |
 |---|---|---|---|
 | **omx chorus** | `org.openmixer.chorus` | `urn:openmixer:chorus` | The console's chorus: up to four voices read one modulated delay line, the right leg's sweep offset by the spread, mixed with the dry signal. |
-| **omx comp** | `org.openmixer.comp` | `urn:openmixer:comp` | The console's compressor: threshold, ratio and knee set how hard it holds the level down, attack and release how fast, with makeup gain and a dry/wet mix. Kind picks the RMS detector (Compressor) or the peak detector (Limiter), and detector oversampling can run the control path at 4x; detector topology has it hear the input (feedforward) or its own output (feedback). The DSP is omx-dsp's <omxdsp/fx/omx_comp_instance.h>, the console's own compressor. |
+| **omx comp** | `org.openmixer.comp` | `urn:openmixer:comp` | The console's compressor: threshold, ratio and knee set how hard it holds the level down, attack and release how fast, with makeup gain and a dry/wet mix. Kind picks the RMS detector (Compressor) or the peak detector (Limiter), and detector oversampling can run the control path at 4x; detector topology has it hear the input (feedforward) or its own output (feedback). Its detector can listen to a key routed to its sidechain input instead, through a high-pass, a low-pass and a tilt, on the louder leg, the mid or the side, with a hold; key listen puts what the detector hears on the output, and duck holds the reduction to a set depth. The DSP is omx-dsp's <omxdsp/fx/omx_comp_instance.h>, the console's own compressor. |
 | **omx deesser** | `org.openmixer.deesser` | `urn:openmixer:deesser` | The console's de-esser: a detector on a band around the sibilance drives the compressor's gain computer, and the reduction lands on that band alone or on the whole signal. |
 | **omx delay** | `org.openmixer.delay` | `urn:openmixer:delay` | Stereo delay up to 2 s: feedback through a tone filter that darkens each repeat, ping-pong, wet/dry mix. Zero latency, real-time safe. |
 | **omx drive** | `org.openmixer.drive` | `urn:openmixer:drive` | The console's drive: one waveshaper (soft, tape, tube or exciter) run inside the console's 4x oversampler, on the full band, the lows, the highs or a tilt, with drive, character, wet/dry mix and trim. Stereo, real-time safe. |
+| **omx dyneq** | `org.openmixer.dyneq` | `urn:openmixer:dyneq` | A six-band dynamic EQ: each band is an EQ bell or shelf whose gain also moves with the level of its own band, cutting above a threshold (down) or lifting below it (up), held to a range, so a harsh or boomy band is tamed only while it is too loud. |
 | **omx eq8** | `org.openmixer.eq8` | `urn:openmixer:eq8` | The console's channel EQ in its 8-band form: 8 parametric bands (bell, shelves, notch, all-pass) plus high- and low-pass filters at 12 or 24 dB/oct. Stereo, zero latency. |
 | **omx eq16** | `org.openmixer.eq16` | `urn:openmixer:eq16` | The console's channel EQ in its 16-band form: 16 parametric bands (bell, shelves, notch, all-pass) plus high- and low-pass filters at 12 or 24 dB/oct. Stereo, zero latency. |
 | **omx eq32** | `org.openmixer.eq32` | `urn:openmixer:eq32` | The console's channel EQ in its 32-band form: 32 parametric bands (bell, shelves, notch, all-pass) plus high- and low-pass filters at 12 or 24 dB/oct. Stereo, zero latency. |
@@ -28,6 +29,7 @@ drawn from one declaration: its CLAP parameters, its LV2 ports and its MOD GUI c
 | **omx geq** | `org.openmixer.geq` | `urn:openmixer:geq` | The console's 31-band graphic EQ: one fader per ISO third-octave band, 20 Hz to 20 kHz, ±15 dB each, designed in double precision so the lowest bands hold their shape at 192 kHz. Stereo, zero latency. |
 | **omx keyed-gate** | `org.openmixer.keyed-gate` | `urn:openmixer:keyed-gate` | The console's channel gate with a sidechain key: the detector listens to the key your host routes to it, or to the signal itself. One gain for both legs, so the stereo image never shifts. Real-time safe. |
 | **omx limiter** | `org.openmixer.limiter` | `urn:openmixer:limiter` | The precision limiter: a look-ahead, true-peak, stereo-linked brickwall. |
+| **omx multiband** | `org.openmixer.multiband` | `urn:openmixer:multiband` | A multiband compressor: two to five bands split by Linkwitz-Riley crossovers, each band its own compressor with threshold, ratio, attack, release, make-up, solo and bypass, then a mix and an output gain, for in-ear mixes, vocals and playback buses. |
 | **omx phaser** | `org.openmixer.phaser` | `urn:openmixer:phaser` | The console's phaser: identical all-pass sections swept in octaves by one oscillator, with feedback around the chain and a wet/dry mix. |
 | **omx pitch** | `org.openmixer.pitch` | `urn:openmixer:pitch` | The console's pitch shifter: shifts both channels up or down by semitones and cents, without changing their length, mixed with the dry signal. |
 | **omx reverb** | `org.openmixer.reverb` | `urn:openmixer:reverb` | The console's reverb: room, plate, hall, reverse and gated algorithms with pre-delay, size, damping, width and low and high cuts, mixed with the dry signal. |
@@ -66,6 +68,15 @@ Plus the host's bypass.
 | Kind | Compressor / Limiter | Compressor |
 | Detector Oversampling | Auto / Off / 4x | Auto |
 | Detector Topology | Feedforward / Feedback | Feedforward |
+| Key Source | Self / Sidechain | Self |
+| Key HP | 0 to 2000 Hz, whole steps | 0 Hz |
+| Key LP | 0 to 20000 Hz, whole steps | 0 Hz |
+| Key Tilt | -6 to 6 dB/oct | 0 dB/oct |
+| Key Listen | off / on | off |
+| Hold | 0 to 2000 ms, whole steps | 0 ms |
+| Detect Link | Linked / Mid / Side / Max | Linked |
+| Duck | off / on | off |
+| Duck Range | -40 to 0 dB, whole steps | -12 dB |
 
 Plus the host's bypass.
 
@@ -112,6 +123,86 @@ moved from 48 to 96 kHz sounds the same.
 | Stereo Link | off / on | on |
 | HF Roll-off | Off / 12 kHz / 16 kHz | Off |
 | Oversampling | 1 / 2 / 4 | 4 |
+
+Plus the host's bypass.
+
+### omx dyneq
+
+| Parameter | Range | Default |
+|---|---|---|
+| Band 1 On | off / on | off |
+| Band 2 On | off / on | off |
+| Band 3 On | off / on | off |
+| Band 4 On | off / on | off |
+| Band 5 On | off / on | off |
+| Band 6 On | off / on | off |
+| Band 1 Type | Bell / Low Shelf / High Shelf | Bell |
+| Band 2 Type | Bell / Low Shelf / High Shelf | Bell |
+| Band 3 Type | Bell / Low Shelf / High Shelf | Bell |
+| Band 4 Type | Bell / Low Shelf / High Shelf | Bell |
+| Band 5 Type | Bell / Low Shelf / High Shelf | Bell |
+| Band 6 Type | Bell / Low Shelf / High Shelf | Bell |
+| Band 1 Freq | 20 to 20000 Hz, whole steps | 40 Hz |
+| Band 2 Freq | 20 to 20000 Hz, whole steps | 125 Hz |
+| Band 3 Freq | 20 to 20000 Hz, whole steps | 400 Hz |
+| Band 4 Freq | 20 to 20000 Hz, whole steps | 1250 Hz |
+| Band 5 Freq | 20 to 20000 Hz, whole steps | 4000 Hz |
+| Band 6 Freq | 20 to 20000 Hz, whole steps | 12500 Hz |
+| Band 1 Gain | -15 to 15 dB | 0 dB |
+| Band 2 Gain | -15 to 15 dB | 0 dB |
+| Band 3 Gain | -15 to 15 dB | 0 dB |
+| Band 4 Gain | -15 to 15 dB | 0 dB |
+| Band 5 Gain | -15 to 15 dB | 0 dB |
+| Band 6 Gain | -15 to 15 dB | 0 dB |
+| Band 1 Q | 0.3 to 8 | 1 |
+| Band 2 Q | 0.3 to 8 | 1 |
+| Band 3 Q | 0.3 to 8 | 1 |
+| Band 4 Q | 0.3 to 8 | 1 |
+| Band 5 Q | 0.3 to 8 | 1 |
+| Band 6 Q | 0.3 to 8 | 1 |
+| Band 1 Dynamics | Off / Down / Up | Off |
+| Band 2 Dynamics | Off / Down / Up | Off |
+| Band 3 Dynamics | Off / Down / Up | Off |
+| Band 4 Dynamics | Off / Down / Up | Off |
+| Band 5 Dynamics | Off / Down / Up | Off |
+| Band 6 Dynamics | Off / Down / Up | Off |
+| Band 1 Threshold | -60 to 0 dB | -30 dB |
+| Band 2 Threshold | -60 to 0 dB | -30 dB |
+| Band 3 Threshold | -60 to 0 dB | -30 dB |
+| Band 4 Threshold | -60 to 0 dB | -30 dB |
+| Band 5 Threshold | -60 to 0 dB | -30 dB |
+| Band 6 Threshold | -60 to 0 dB | -30 dB |
+| Band 1 Ratio | 1 to 20 | 2 |
+| Band 2 Ratio | 1 to 20 | 2 |
+| Band 3 Ratio | 1 to 20 | 2 |
+| Band 4 Ratio | 1 to 20 | 2 |
+| Band 5 Ratio | 1 to 20 | 2 |
+| Band 6 Ratio | 1 to 20 | 2 |
+| Band 1 Range | -24 to 12 dB | -6 dB |
+| Band 2 Range | -24 to 12 dB | -6 dB |
+| Band 3 Range | -24 to 12 dB | -6 dB |
+| Band 4 Range | -24 to 12 dB | -6 dB |
+| Band 5 Range | -24 to 12 dB | -6 dB |
+| Band 6 Range | -24 to 12 dB | -6 dB |
+| Band 1 Attack | 0.5 to 100 ms | 5 ms |
+| Band 2 Attack | 0.5 to 100 ms | 5 ms |
+| Band 3 Attack | 0.5 to 100 ms | 5 ms |
+| Band 4 Attack | 0.5 to 100 ms | 5 ms |
+| Band 5 Attack | 0.5 to 100 ms | 5 ms |
+| Band 6 Attack | 0.5 to 100 ms | 5 ms |
+| Band 1 Release | 5 to 3000 ms, whole steps | 100 ms |
+| Band 2 Release | 5 to 3000 ms, whole steps | 100 ms |
+| Band 3 Release | 5 to 3000 ms, whole steps | 100 ms |
+| Band 4 Release | 5 to 3000 ms, whole steps | 100 ms |
+| Band 5 Release | 5 to 3000 ms, whole steps | 100 ms |
+| Band 6 Release | 5 to 3000 ms, whole steps | 100 ms |
+| Band 1 Listen | off / on | off |
+| Band 2 Listen | off / on | off |
+| Band 3 Listen | off / on | off |
+| Band 4 Listen | off / on | off |
+| Band 5 Listen | off / on | off |
+| Band 6 Listen | off / on | off |
+| Mix | 0 to 100 %, whole steps | 100 % |
 
 Plus the host's bypass.
 
@@ -230,6 +321,55 @@ bundle loads this one.
 | Ceiling | -12 to 0 dBFS | -1 dBFS |
 | Lookahead | 0.5 to 5 ms | 1.5 ms |
 | Release | 1 to 1000 ms, whole steps | 50 ms |
+
+Plus the host's bypass.
+
+### omx multiband
+
+| Parameter | Range | Default |
+|---|---|---|
+| Bands | 2 / 3 / 4 / 5 | 3 |
+| Crossover 1 | 40 to 16000 Hz, whole steps | 200 Hz |
+| Crossover 2 | 40 to 16000 Hz, whole steps | 2000 Hz |
+| Crossover 3 | 40 to 16000 Hz, whole steps | 5000 Hz |
+| Crossover 4 | 40 to 16000 Hz, whole steps | 6400 Hz |
+| Band 1 Threshold | -60 to 0 dB | -20 dB |
+| Band 2 Threshold | -60 to 0 dB | -20 dB |
+| Band 3 Threshold | -60 to 0 dB | -20 dB |
+| Band 4 Threshold | -60 to 0 dB | -20 dB |
+| Band 5 Threshold | -60 to 0 dB | -20 dB |
+| Band 1 Ratio | 1 to 20 | 2 |
+| Band 2 Ratio | 1 to 20 | 2 |
+| Band 3 Ratio | 1 to 20 | 2 |
+| Band 4 Ratio | 1 to 20 | 2 |
+| Band 5 Ratio | 1 to 20 | 2 |
+| Band 1 Attack | 0.1 to 200 ms | 10 ms |
+| Band 2 Attack | 0.1 to 200 ms | 10 ms |
+| Band 3 Attack | 0.1 to 200 ms | 10 ms |
+| Band 4 Attack | 0.1 to 200 ms | 10 ms |
+| Band 5 Attack | 0.1 to 200 ms | 10 ms |
+| Band 1 Release | 10 to 2000 ms, whole steps | 150 ms |
+| Band 2 Release | 10 to 2000 ms, whole steps | 150 ms |
+| Band 3 Release | 10 to 2000 ms, whole steps | 150 ms |
+| Band 4 Release | 10 to 2000 ms, whole steps | 150 ms |
+| Band 5 Release | 10 to 2000 ms, whole steps | 150 ms |
+| Band 1 Makeup | 0 to 24 dB | 0 dB |
+| Band 2 Makeup | 0 to 24 dB | 0 dB |
+| Band 3 Makeup | 0 to 24 dB | 0 dB |
+| Band 4 Makeup | 0 to 24 dB | 0 dB |
+| Band 5 Makeup | 0 to 24 dB | 0 dB |
+| Band 1 Solo | off / on | off |
+| Band 2 Solo | off / on | off |
+| Band 3 Solo | off / on | off |
+| Band 4 Solo | off / on | off |
+| Band 5 Solo | off / on | off |
+| Band 1 Bypass | off / on | off |
+| Band 2 Bypass | off / on | off |
+| Band 3 Bypass | off / on | off |
+| Band 4 Bypass | off / on | off |
+| Band 5 Bypass | off / on | off |
+| Mix | 0 to 100 %, whole steps | 100 % |
+| Output | -24 to 24 dB | 0 dB |
 
 Plus the host's bypass.
 

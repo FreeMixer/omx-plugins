@@ -16,9 +16,15 @@
  * clap.meters/1: the declaration's meters, every one coherent: after each block the face publishes all
  * their values at once through include/omx_meter_ring.h, and a read copies one block's (docs/meters.md).
  * A gain reduction is the kernel's own reading after the block, 0 while bypassed.
+ * A level the kernel reads (its detector's) is its own reading after the block, the display minimum while
+ * bypassed.
  * An input level is the block's peak at the inputs, in dBFS, measured here before the kernel runs (the
  * kernel keeps no level of its own).
  * An output level is the block's peak at the outputs, in dBFS, measured here after the kernel ran.
+ *
+ * Audio ports: the main stereo pair in and out, and a second, mono, non-main input, the sidechain
+ * key. A host that routes nothing to the key (no second port in the process call, no channel, or
+ * no buffer) gets the kernel's own detector, as the face's NULL key is.
  */
 #include <stdatomic.h>
 #include <stdbool.h>
@@ -61,8 +67,8 @@ static const char G_DIGEST[] = OMX_COMP_DECL_DIGEST;
 
 /* The declaration's meters, in order: the index is the CLAP meter id; each one's channels sit at `at` among
  * the G_METER_VALUES values the face publishes after a block. */
-#define G_METERS 3u
-#define G_METER_VALUES 5u
+#define G_METERS 4u
+#define G_METER_VALUES 6u
 _Static_assert(G_METER_VALUES <= OMX_METER_RING_MAX, "one publication holds every meter's values");
 static const struct {
   const char *name;
@@ -72,6 +78,7 @@ static const struct {
     {"compGr", CLAP_METER_KIND_GAIN_REDUCTION, 1u, 0u, (double)OMX_COMP_READOUT_GAIN_REDUCTION_DB_MIN, (double)OMX_COMP_READOUT_GAIN_REDUCTION_DB_MAX},
     {"compIn", CLAP_METER_KIND_LEVEL, 2u, 1u, -60.0, 6.0},
     {"compOut", CLAP_METER_KIND_LEVEL, 2u, 3u, -60.0, 6.0},
+    {"compKey", CLAP_METER_KIND_LEVEL, 1u, 5u, (double)OMX_COMP_READOUT_KEY_LEVEL_DB_MIN, (double)OMX_COMP_READOUT_KEY_LEVEL_DB_MAX},
 };
 
 typedef struct {
@@ -221,13 +228,17 @@ static clap_process_status g_process(const clap_plugin_t *p, const clap_process_
   /* meter 1: the inputs' peak, before the kernel runs (the outputs may be the inputs) */
   mv[1] = omx_meter_level_db(ai->data32[0], pr->frames_count, G_METER_INFO[1].min);
   mv[2] = omx_meter_level_db(ai->data32[1], pr->frames_count, G_METER_INFO[1].min);
-  omx_comp_core_run(&g->core, ai->data32[0], ai->data32[1], ao->data32[0], ao->data32[1], pr->frames_count);
+  const clap_audio_buffer_t *ak = pr->audio_inputs_count > 1 ? &pr->audio_inputs[1] : NULL;
+  const float *key = ak && ak->channel_count > 0 && ak->data32 ? ak->data32[0] : NULL;
+  omx_comp_core_run(&g->core, key, ai->data32[0], ai->data32[1], ao->data32[0], ao->data32[1], pr->frames_count);
   g_publish(g);
-  /* The kernel's readings of this block; a bypassed kernel's state is stale, and reads 0. */
+  /* The kernel's readings of this block; a bypassed kernel's state is stale, and reads 0 (a level the
+   * kernel reads, its display minimum). */
   const int bypassed = g->values[G_BYPASS] > 0.5f;
   mv[0] = bypassed ? 0.0 : (double)omx_comp_core_meter(&g->core, 0u);
   mv[3] = omx_meter_level_db(ao->data32[0], pr->frames_count, G_METER_INFO[2].min);
   mv[4] = omx_meter_level_db(ao->data32[1], pr->frames_count, G_METER_INFO[2].min);
+  mv[5] = bypassed ? G_METER_INFO[3].min : (double)omx_comp_core_meter(&g->core, 3u);
   omx_meter_ring_publish(&g->meters, mv, G_METER_VALUES);
   /* A parameter that moves the kernel's latency (as the pitch shifter's mix crossing 100 % does):
    * the reported latency holds until the next activation, and the host is asked, once, for the
@@ -305,17 +316,24 @@ static uint32_t g_latency(const clap_plugin_t *p) { return atomic_load(&((G *)p-
 
 static const clap_plugin_latency_t G_LATENCY_EXT = {g_latency};
 
+/* Inputs: the main pair, then the key. Outputs: the main pair. */
 static uint32_t g_ports_count(const clap_plugin_t *p, bool is_input) {
   (void)p;
-  (void)is_input;
-  return 1;
+  return is_input ? 2 : 1;
 }
 
 static bool g_ports_get(const clap_plugin_t *p, uint32_t index, bool is_input, clap_audio_port_info_t *info) {
-  (void)p;
-  if (index != 0) return false;
+  if (index >= g_ports_count(p, is_input)) return false;
   memset(info, 0, sizeof *info);
-  info->id = 0;
+  info->id = index;
+  if (index == 1) {
+    snprintf(info->name, sizeof info->name, "%s", "key");
+    info->flags = 0;
+    info->channel_count = 1;
+    info->port_type = CLAP_PORT_MONO;
+    info->in_place_pair = CLAP_INVALID_ID;
+    return true;
+  }
 
   snprintf(info->name, sizeof info->name, "%s", is_input ? "in" : "out");
   info->flags = CLAP_AUDIO_PORT_IS_MAIN;

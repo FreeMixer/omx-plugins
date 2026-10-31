@@ -9,10 +9,11 @@ One page for each plugin: its ids, its audio ports, its pages (the LV2 port grou
 | Plugin | CLAP id | LV2 URI | Parameters | Pages |
 |---|---|---|---|---|
 | [omx chorus](omx-chorus.md) | `org.openmixer.chorus` | `urn:openmixer:chorus` | 5 | 1 |
-| [omx comp](omx-comp.md) | `org.openmixer.comp` | `urn:openmixer:comp` | 10 | 1 |
+| [omx comp](omx-comp.md) | `org.openmixer.comp` | `urn:openmixer:comp` | 19 | 3 |
 | [omx deesser](omx-deesser.md) | `org.openmixer.deesser` | `urn:openmixer:deesser` | 8 | 1 |
 | [omx delay](omx-delay.md) | `org.openmixer.delay` | `urn:openmixer:delay` | 5 | 1 |
 | [omx drive](omx-drive.md) | `org.openmixer.drive` | `urn:openmixer:drive` | 11 | 1 |
+| [omx dyneq](omx-dyneq.md) | `org.openmixer.dyneq` | `urn:openmixer:dyneq` | 73 | 7 |
 | [omx eq16](omx-eq16.md) | `org.openmixer.eq16` | `urn:openmixer:eq16` | 86 | 18 |
 | [omx eq32](omx-eq32.md) | `org.openmixer.eq32` | `urn:openmixer:eq32` | 166 | 34 |
 | [omx eq8](omx-eq8.md) | `org.openmixer.eq8` | `urn:openmixer:eq8` | 46 | 10 |
@@ -20,6 +21,7 @@ One page for each plugin: its ids, its audio ports, its pages (the LV2 port grou
 | [omx geq](omx-geq.md) | `org.openmixer.geq` | `urn:openmixer:geq` | 31 | 1 |
 | [omx keyed-gate](omx-keyed-gate.md) | `org.openmixer.keyed-gate` | `urn:openmixer:keyed-gate` | 12 | 2 |
 | [omx limiter](omx-limiter.md) | `org.openmixer.limiter` | `urn:openmixer:limiter` | 3 | 1 |
+| [omx multiband](omx-multiband.md) | `org.openmixer.multiband` | `urn:openmixer:multiband` | 42 | 7 |
 | [omx phaser](omx-phaser.md) | `org.openmixer.phaser` | `urn:openmixer:phaser` | 6 | 1 |
 | [omx pitch](omx-pitch.md) | `org.openmixer.pitch` | `urn:openmixer:pitch` | 3 | 1 |
 | [omx reverb](omx-reverb.md) | `org.openmixer.reverb` | `urn:openmixer:reverb` | 13 | 4 |

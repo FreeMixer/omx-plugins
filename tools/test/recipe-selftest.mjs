@@ -57,9 +57,9 @@ import { fileURLToPath } from 'node:url';
 import { checkCommits, rangeCommits } from '../commit-plan-check.mjs';
 import { chainSources, commitPlan, draftChain, draftDeclaration, kernelSources, planChain, planPlugin, reviewMarks, writePlugin } from '../omx-new-plugin.mjs';
 import { bindFace, parseFace } from '../instance-face.mjs';
-import { kernelControls, locateContract } from '../omx-contract.mjs';
+import { eqDefaultBands, kernelControls, locateContract, resolveParam } from '../omx-contract.mjs';
 import { omxdspInclude } from '../template.mjs';
-import { defaultPanel, emitPluginTtl, generateInstance, loadDecl } from '../gen.mjs';
+import { defaultPanel, emitPluginTtl, generateInstance, loadDecl, meterRows } from '../gen.mjs';
 import { hintErrors } from '../port-hints.mjs';
 import { expandVariant, variantBands } from '../variants.mjs';
 import { checkPlugin, debtGrowth, debtVerdict, gapLines, loadDebt, loadRecipe, pluginStems, recipeErrors } from '../plugin-recipe.mjs';
@@ -232,7 +232,8 @@ async function main() {
   };
   sabotageGen('a hand edit to the generated binding', `${P_}/omx_wobble_core.h`, (t) => t.replace('/* depth */', '/* depth (tuned) */'), `STALE ${P_}/omx_wobble_core.h`);
   sabotageGen('a hand edit to the generated identity test', `${P_}/test/wobble-oracle.c`, (t) => t.replace('no tolerance', 'a little tolerance'), `STALE ${P_}/test/wobble-oracle.c`);
-  sabotageGen('a declaration that moved a parameter\'s name', `${P_}/omx-wobble.decl.json`, (t) => t.replace('"name": "Depth"', '"name": "Depth Amount"'), `STALE ${P_}/generated/omx_wobble_params.h`);
+  // the wizard writes the plugin described: a control's name is its descriptor's
+  sabotageGen('a descriptor that moved a control\'s name', `${P_}/omx-wobble.descriptor.json`, (t) => t.replace('"name": "Depth"', '"name": "Depth Amount"'), `STALE ${P_}/generated/omx_wobble_params.h`);
   sabotageGen('a face whose argument no contract control names', face, (t) => t.replace('float depth,', 'float intensity,'), "resolve argument 'intensity'");
   sabotageGen('a hand edit to a shared file', 'README.md', (t) => t.replace('| **omx wobble** |', '| **omx wobble (beta)** |'), 'STALE README.md');
   {
@@ -518,10 +519,63 @@ static inline void omx_wobble_instance_run(OmxWobbleInstance *s, const float *${
     const keyed = parseFace(face('key'), 'wobble'), odd = parseFace(face('side'), 'wobble');
     expect(keyed.keyed === true && /nor a key first/.test(odd.error ?? ''), `a key first is a keyed face, another block first is refused (${keyed.error ?? keyed.keyed}; ${odd.error ?? 'ACCEPTED'})`);
   }
+  {
+    // a keyable face: an unkeyed run and a run_keyed beside it, the two key legs first, by name
+    const face = (legs) => `static inline int omx_wobble_instance_init(OmxWobbleInstance *s, float sr) { return 1; }
+static inline void omx_wobble_instance_resolve(OmxWobbleInstance *s, int bypass, float depth) { }
+static inline void omx_wobble_instance_run(OmxWobbleInstance *s, const float *in_l, const float *in_r, float *out_l, float *out_r, uint32_t n) { }
+static inline void omx_wobble_instance_run_keyed(OmxWobbleInstance *s, ${legs}, const float *in_l, const float *in_r, float *out_l, float *out_r, uint32_t n) { }
+#define OMX_WOBBLE_INSTANCE_LATENCY_FRAMES 0.0f`;
+    const keyable = parseFace(face('const float *key_l, const float *key_r'), 'wobble');
+    const one = parseFace(face('const float *key_l'), 'wobble'), named = parseFace(face('const float *side_l, const float *side_r'), 'wobble');
+    expect(keyable.keyable === true && keyable.keyed === false, `a run_keyed beside an unkeyed run is a keyable face (${keyable.error ?? `keyable ${keyable.keyable}, keyed ${keyable.keyed}`})`);
+    expect(/run_keyed takes/.test(one.error ?? '') && /run_keyed takes/.test(named.error ?? ''),
+      `a run_keyed of one key leg, or of legs not named key_l and key_r, is refused (${one.error ?? 'ACCEPTED'}; ${named.error ?? 'ACCEPTED'})`);
+  }
+  {
+    // a meter read through the face: its readings are the face's float functions of the instance, a band index or none
+    const face = parseFace(`static inline int omx_wobble_instance_init(OmxWobbleInstance *s, float sr) { return 1; }
+static inline void omx_wobble_instance_resolve(OmxWobbleInstance *s, int bypass, float depth) { }
+static inline void omx_wobble_instance_run(OmxWobbleInstance *s, const float *in_l, const float *in_r, float *out_l, float *out_r, uint32_t n) { }
+static inline float omx_wobble_instance_band_gr_db(const OmxWobbleInstance *s, uint32_t k) { return 0.0f; }
+static inline float omx_wobble_instance_level_db(const OmxWobbleInstance *s) { return 0.0f; }
+#define OMX_WOBBLE_INSTANCE_LATENCY_FRAMES 0.0f`, 'wobble');
+    const rows = (meters) => {
+      try {
+        return meterRows({ stem: 'omx-wobble', kernel: 'wobble', params: [], meters }, face);
+      } catch (e) {
+        return e.message;
+      }
+    };
+    const ok = rows([{ id: 'gr2', kind: 'gain_reduction', read: 'band_gr_db(1)', readout: 'BAND2_GR_DB' }, { id: 'lvl', kind: 'level', read: 'level_db', readout: 'LEVEL_DB' }]);
+    expect(Array.isArray(ok) && ok[0].meterReadCore === 'omx_wobble_instance_band_gr_db(&c->inst, 1u)' && ok[0].meterReadRef === 'omx_wobble_instance_band_gr_db(&inst, 1u)' &&
+      ok[1].meterChannels === 1 && ok[1].isRead && !ok[1].isGr && ok[1].meterBypass === 'G_METER_INFO[1].min' && ok[1].meterMin === '(double)OMX_WOBBLE_READOUT_LEVEL_DB_MIN',
+      `meters: a band's reading and a level the kernel reads are called on the instance, the level one channel over its readout (${Array.isArray(ok) ? ok.map((r) => r.meterReadCore).join(', ') : ok})`);
+    const missing = rows([{ id: 'gr', kind: 'gain_reduction', read: 'gr_db', readout: 'GR_DB' }]);
+    const unbanded = rows([{ id: 'gr', kind: 'gain_reduction', read: 'band_gr_db', readout: 'GR_DB' }]);
+    const both = rows([{ id: 'gr', kind: 'gain_reduction', read: 'band_gr_db(0)', field: 'st.gr_min_db', readout: 'GR_DB' }]);
+    expect(/has no float omx_wobble_instance_gr_db/.test(missing) && /takes band index/.test(unbanded) && /takes no 'field'/.test(both),
+      `meters: a reading the face lacks, a band index left out, and a field beside a read are refused (${[missing, unbanded, both].map((x) => (typeof x === 'string' ? x.split(': ').pop() : 'ACCEPTED')).join('; ')})`);
+  }
 
   // ---- 6. the port hints ---------------------------------------------------------------------
   delete process.env.OMX_CONTRACT_DIR; // the real tree reads the installed release
   delete process.env.OMXDSP_INCLUDE;
+  {
+    // a band's centre at a contract count: the dynamic EQ's bands come up by the EQ rule for DYNEQ_BANDS
+    const real = locateContract(ROOT).dir;
+    const centre = (k, count) => {
+      try {
+        return resolveParam(real, 'dyneq', { symbol: `freq${k + 1}`, ref: 'DYNEQ_FREQ_RANGE', defaultBand: { count, index: k, of: 'centre' } }).def;
+      } catch (e) {
+        return e.message;
+      }
+    };
+    const rule = eqDefaultBands(real, 6).map((b) => b.freqHz);
+    const got = [0, 1, 2, 3, 4, 5].map((k) => centre(k, 'DYNEQ_BANDS'));
+    expect(JSON.stringify(got) === JSON.stringify(rule) && rule[3] !== rule[0], `defaultBand: the dynamic EQ's six centres are the EQ rule's for DYNEQ_BANDS (${got.join(' ')})`);
+    expect(/no count omx-contract declares/.test(String(centre(0, 'DYNEQ_FREQ_RANGE'))), `defaultBand: a count that is no count is refused (${centre(0, 'DYNEQ_FREQ_RANGE')})`);
+  }
   // ---- 5b. variants: one declaration, several band counts (tools/variants.mjs) ------------------
   {
     const real = locateContract(ROOT).dir;
@@ -658,6 +712,65 @@ static inline void omx_wobble_instance_run(OmxWobbleInstance *s, const float *${
     fakeContract(moving, { wobble: WOBBLE }, wobbleControls(false));
     const m = planOf(moving);
     expect(varies(m.cols[1] ?? []) && !/Held at its default/.test(m.oracle), 'sabotage oracle: without rearms, depth moves again and nothing is named held');
+    // a plugin's own `fixed`: the mode is no parameter, the binding and the oracle's reference pass its value
+    const fixedCore = (fixed) => {
+      process.env.OMX_CONTRACT_DIR = moving;
+      process.env.OMXDSP_INCLUDE = inc;
+      try {
+        const d = loadDecl(join(tree, P_));
+        const k = d.params.findIndex((p) => p.symbol === 'mode');
+        const files = generateInstance({ ...d, params: d.params.filter((_, i) => i !== k), controls: d.controls.filter((_, i) => i !== k), fixed });
+        return { core: files['omx_wobble_core.h'], oracle: files['test/wobble-oracle.c'] };
+      } catch (e) {
+        return { error: e.message };
+      } finally {
+        delete process.env.OMX_CONTRACT_DIR;
+        delete process.env.OMXDSP_INCLUDE;
+      }
+    };
+    const pan = fixedCore({ mode: 'pan' });
+    expect(/\/\* mode \*\/ 1\)/.test(pan.core ?? '') && /, 1\);/.test(pan.oracle ?? '') && !/PARAM_MODE/.test(pan.core ?? '') && pan.core?.includes('`mode` is not a parameter of this plugin: it is passed at "pan".'),
+      `fixed: a plugin's fixed mode is passed at pan's index to the face and to the reference, and named in the binding's comment (${pan.error ?? 'see the generated core'})`);
+    // a monitor: the mode at its default in the moving blocks and the stepped tails, both values in its own section
+    const monitored = (monitors) => {
+      process.env.OMX_CONTRACT_DIR = moving;
+      process.env.OMXDSP_INCLUDE = inc;
+      try {
+        const oracle = generateInstance({ ...loadDecl(join(tree, P_)), monitors })['test/wobble-oracle.c'];
+        return [...oracle.matchAll(/^ *\{ (\d+), ([-\d.e]+)f, ([012]), \{([^}]*)\}, [01] \},$/gm)].map((x) => x[4].split(',').map((y) => y.trim()));
+      } catch (e) {
+        return e.message;
+      } finally {
+        delete process.env.OMX_CONTRACT_DIR;
+        delete process.env.OMXDSP_INCLUDE;
+      }
+    };
+    const mon = monitored(['mode']);
+    const monModes = Array.isArray(mon) ? mon.map((r) => r[3]) : [];
+    const free = monitored(undefined);
+    expect(monModes.slice(0, 12).every((x) => x === '0.0f') && new Set(monModes).size === 2 && Array.isArray(free) && new Set(free.slice(0, 12).map((r) => r[3])).size === 2,
+      `monitors: the mode is held at its default over the moving blocks and still takes both values in its own section; undeclared, it moves there (${monModes.join(' ') || mon})`);
+    expect(/monitor 'depth' is a travel/.test(String(monitored(['depth']))), `monitors: a travel named a monitor is refused (${String(monitored(['depth'])).split(': ').pop()})`);
+    // engaged: depth held at 80 over the release and choice sections, and a value outside its travel refused
+    const engagedRows = (engaged) => {
+      process.env.OMX_CONTRACT_DIR = moving;
+      process.env.OMXDSP_INCLUDE = inc;
+      try {
+        const oracle = generateInstance({ ...loadDecl(join(tree, P_)), engaged })['test/wobble-oracle.c'];
+        return [...oracle.matchAll(/^ *\{ (\d+), ([-\d.e]+)f, ([012]), \{([^}]*)\}, [01] \},$/gm)].map((x) => x[4].split(',').map((y) => y.trim()));
+      } catch (e) {
+        return e.message;
+      } finally {
+        delete process.env.OMX_CONTRACT_DIR;
+        delete process.env.OMXDSP_INCLUDE;
+      }
+    };
+    const eng = engagedRows({ depth: 80 });
+    expect(Array.isArray(eng) && eng.slice(12).every((r) => r[1] === '80.0f') && new Set(eng.slice(0, 12).map((r) => r[1])).size > 1,
+      `engaged: depth is held at 80 over every release and choice row, and still moves in the moving blocks (${Array.isArray(eng) ? [...new Set(eng.slice(12).map((r) => r[1]))].join(' ') : eng})`);
+    expect(/engaged 'depth' at 120, outside/.test(String(engagedRows({ depth: 120 }))), `engaged: a value outside the travel is refused (${String(engagedRows({ depth: 120 })).split(': ').pop()})`);
+    const stray = fixedCore({ speed: 'default' });
+    expect(/fixes 'speed', no control of the wobble kernel/.test(stray.error ?? ''), `fixed: a control the kernel does not have is refused (${stray.error ?? 'ACCEPTED'})`);
     const unlisted = join(WORK, 'omx-contract-unlisted');
     fakeContract(unlisted, { wobble: WOBBLE });
     let why = '';

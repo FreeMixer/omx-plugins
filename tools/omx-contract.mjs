@@ -332,7 +332,14 @@ export function resolveParam(dir, kernel, p) {
   if (where.error) throw new Error(`param '${p.symbol}': ${where.error}`);
   const e = where.entry;
   const at = `${where.file}#${p.ref}${p.field ? `.${p.field}` : ''}`;
-  const band = p.defaultBand ? eqDefaultBands(dir, bandCount(dir, p.defaultBand.strip, p.symbol))[p.defaultBand.index] : undefined;
+  // the bank's count: a strip type's default, or a count the contract declares (DYNEQ_BANDS)
+  const count = (b) => {
+    if (b.count === undefined) return bandCount(dir, b.strip, p.symbol);
+    const n = items(dir)[b.count]?.value;
+    if (!Number.isInteger(n) || n < 1) throw new Error(`param '${p.symbol}': defaultBand's count ${b.count} is no count omx-contract declares`);
+    return n;
+  };
+  const band = p.defaultBand ? eqDefaultBands(dir, count(p.defaultBand))[p.defaultBand.index] : undefined;
   if (p.defaultBand && !band) throw new Error(`param '${p.symbol}': ${p.defaultBand.strip} has no band ${p.defaultBand.index}`);
   if (e.kind === 'travels') {
     let t = e.value;

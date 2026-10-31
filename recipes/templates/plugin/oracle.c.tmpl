@@ -28,14 +28,18 @@
  * every declared rate, every channel of every meter is held bit for bit to a reference computed here
  * from the same block: a gain reduction to what the reference's instance holds at its declared field
  * (0 while bypassed), a level to the peak of the block's input or of the reference's output, in dBFS,
- * floored at the meter's display minimum. The meters are listed as declared, every one coherent;
+ * floored at the meter's display minimum.{{#meterKernelLevel}} A level the kernel reads is the reference instance's own
+ * reading (the display minimum while bypassed).{{/meterKernelLevel}} The meters are listed as declared, every one coherent;
  * nothing is read before the first block (docs/meters.md).
 {{#meterGr}} * The plan must make the kernel reduce gain.
 {{/meterGr}}{{#meterLevel}} * The plan must move the levels: the two legs differ in some block{{#meterIn}}{{#meterOut}}, and the input and the
  * output differ in some block{{/meterOut}}{{/meterIn}}.
 {{/meterLevel}}{{/metered}}{{#held}} * Held at its default in every block, because changing it re-arms the kernel's state (omx-contract
  * `rearms`): {{symbol}}.
-{{/held}}{{#keyed}} *
+{{/held}}{{#monitors}} * Held at its default where the others move or are stepped, a monitor (it replaces the output while on),
+ * with its own section still: {{symbol}}.
+{{/monitors}}{{#engaged}} * Held at {{value}} in the release and choice sections, never stepped there (engaged): {{symbol}}.
+{{/engaged}}{{#keyed}} *
  * KEYED: the face listens to a sidechain. The plan runs twice per rate: with a key that differs from
  * the main signal (the sabotage arm runs here), and with no key routed (NULL: the kernel's own
  * detector). A reference keyed by that key must differ from the unkeyed one, or the key is ignored.
@@ -200,15 +204,15 @@ static void reference(double sr, int off, const float *key, const float *il, con
     for (uint32_t r = 0; r < STRETCH; r++) {
       omx_{{face}}_instance_resolve(&inst, k->bypass{{#binding}}, {{value}}{{/binding}});
 #if KEYED
-      omx_{{face}}_instance_run(&inst, key ? key + at : NULL, il + at, ir + at, ol + at, orr + at, frames);
+      omx_{{face}}_instance_{{runFn}}(&inst, key ? key + at : NULL{{keyTail}}, il + at, ir + at, ol + at, orr + at, frames);
 #else
       (void)key;
       omx_{{face}}_instance_run(&inst, il + at, ir + at, ol + at, orr + at, frames);
 #endif
 {{#metered}}      if (meters_want) {
         double *mw = meters_want + (b * STRETCH + r) * NV;
-{{#meters}}{{#isGr}}        mw[{{meterOffset}}] = k->bypass ? 0.0 : (double)inst.{{meterField}};
-{{/isGr}}{{#isIn}}        mw[{{meterOffset}}] = ref_level(il + at, frames, METERS[{{meterIndex}}].min);
+{{#meters}}{{#isRead}}        mw[{{meterOffset}}] = k->bypass ? {{meterBypassRef}} : (double){{meterReadRef}};
+{{/isRead}}{{#isIn}}        mw[{{meterOffset}}] = ref_level(il + at, frames, METERS[{{meterIndex}}].min);
         mw[{{meterRight}}] = ref_level(ir + at, frames, METERS[{{meterIndex}}].min);
 {{/isIn}}{{#isOut}}        mw[{{meterOffset}}] = ref_level(ol + at, frames, METERS[{{meterIndex}}].min);
         mw[{{meterRight}}] = ref_level(orr + at, frames, METERS[{{meterIndex}}].min);
@@ -259,7 +263,7 @@ static void reference(double sr, int off, const float *key, const float *il, con
       for (uint32_t s = 0; s < LENGTH; s++) {
         switch (element_at(row, s)) {
 {{#elements}}        case {{index}}:
-          omx_{{face}}_instance_run(&{{id}}, {{#keyedFace}}{{keyRef}}, {{/keyedFace}}ol + at, orr + at, ol + at, orr + at, frames);
+          omx_{{face}}_instance_{{runFn}}(&{{id}}, {{#keyedFace}}{{keyRef}}, {{/keyedFace}}ol + at, orr + at, ol + at, orr + at, frames);
           break;
 {{/elements}}        }
       }
@@ -342,9 +346,10 @@ static void run_checks(const char *face, Driver *d, double sr, bool keyed, bool 
       for (uint32_t m = 0; m < NM; m++) {
         const double *v = mwant + b * NV + METERS[m].at;
         if (METERS[m].kind == CLAP_METER_KIND_GAIN_REDUCTION) reduces = reduces || v[0] < 0.0;
-        if (METERS[m].kind == CLAP_METER_KIND_LEVEL) legs = legs || v[0] != v[1];
+        if (METERS[m].kind == CLAP_METER_KIND_LEVEL{{#meterKernelLevel}} && METERS[m].channels == 2u{{/meterKernelLevel}}) legs = legs || v[0] != v[1];
         for (uint32_t o = 0; o < NM; o++)
-          if (o != m && METERS[o].kind == CLAP_METER_KIND_LEVEL && METERS[m].kind == CLAP_METER_KIND_LEVEL)
+          if (o != m && METERS[o].kind == CLAP_METER_KIND_LEVEL && METERS[m].kind == CLAP_METER_KIND_LEVEL{{#meterKernelLevel}} &&
+              METERS[o].channels == 2u && METERS[m].channels == 2u{{/meterKernelLevel}})
             shaped = shaped || memcmp(v, mwant + b * NV + METERS[o].at, 2 * sizeof(double)) != 0;
       }
     (void)reduces, (void)legs, (void)shaped;

@@ -14,6 +14,10 @@
  *                             float *out_l, float *out_r, uint32_t n);
  *        or, for a keyed face, (Omx<K>Instance *s, const float *key, <the same>), key NULL = self
  *        (the declaration's `sidechain` then names the key port)
+ *   void omx_<k>_instance_run_keyed(Omx<K>Instance *s, const float *key_l, const float *key_r, <the same>);
+ *        optional, beside an unkeyed run: the face may take a key (keyable). A plugin that declares a
+ *        `sidechain` runs it with its mono key as key_l and key_r NULL (one leg read on both); one that
+ *        declares none runs the unkeyed run
  *   latency: omx_<k>_instance_latency(const Omx<K>Instance *s), else OMX_<K>_INSTANCE_LATENCY_FRAMES
  *
  * A face of another shape (ring buffers handed to init, a ports struct) is not refused as wrong: it
@@ -48,7 +52,8 @@ const argsOf = (list) =>
 
 /**
  * The face's prototypes in the generated binding's shape: `{ type, srType, args: [{type, name}],
- * latency: { fn } | { macro }, keyed }`, or `{ error }` naming what does not fit.
+ * latency: { fn } | { macro }, keyed, keyable }`, or `{ error }` naming what does not fit. `keyed`: its
+ * run takes the key first; `keyable`: an unkeyed run with a run_keyed beside it.
  */
 export function parseFace(text, kernel) {
   const src = stripC(text);
@@ -79,11 +84,22 @@ export function parseFace(text, kernel) {
   const keyed = runTypes === runKeyed.join('|') && run[1].name === 'key';
   if (!keyed && runTypes !== runWant.join('|'))
     return { error: `omx_${kernel}_instance_run takes (${run.map((a) => a.type).join(', ')}), not (${runWant.join(', ')}), nor a key first (${runKeyed.join(', ')})` };
+  // a key beside an unkeyed run: the two key legs first, NULL the kernel's own detector
+  const both = fn('run_keyed');
+  const bothWant = [`${T} *`, 'const float *', 'const float *', ...runWant.slice(1)];
+  if (both && (keyed || both.map((a) => a.type).join('|') !== bothWant.join('|') || both[1].name !== 'key_l' || both[2].name !== 'key_r'))
+    return { error: `omx_${kernel}_instance_run_keyed takes (${both.map((a) => `${a.type}${a.name}`).join(', ')}), not (${T} *, const float *key_l, const float *key_r, ${runWant.slice(1).join(', ')}) beside a run that takes no key` };
   let latency;
   if (lat && lat.length === 1 && lat[0].type === `const ${T} *`) latency = { fn: `omx_${kernel}_instance_latency` };
   else if (new RegExp(`#\\s*define\\s+OMX_${K}_INSTANCE_LATENCY_FRAMES\\b`).test(src)) latency = { macro: `OMX_${K}_INSTANCE_LATENCY_FRAMES` };
   else return { error: `the face publishes no latency (omx_${kernel}_instance_latency or OMX_${K}_INSTANCE_LATENCY_FRAMES)` };
-  return { type: T, srType: init[1].type, args: scalar, latency, keyed };
+  // the readings a meter may name (`read`): float omx_<k>_instance_<name>(const T *s[, uint32_t band])
+  const readings = {};
+  for (const m of src.matchAll(new RegExp(`static\\s+inline\\s+float\\s+omx_${kernel}_instance_(\\w+)\\s*\\(([^)]*)\\)\\s*\\{`, 'g'))) {
+    const a = argsOf(m[2]);
+    if (a[0]?.type === `const ${T} *` && (a.length === 1 || (a.length === 2 && a[1].type === 'uint32_t'))) readings[m[1]] = { banded: a.length === 2 };
+  }
+  return { type: T, srType: init[1].type, args: scalar, latency, keyed, keyable: Boolean(both), readings };
 }
 
 /** A control name in snake case: attackTimeMs -> attack_time_ms. */

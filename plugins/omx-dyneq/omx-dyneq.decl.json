@@ -1,0 +1,650 @@
+{
+  "$comment": "The extras of omx-dyneq's declaration: what its descriptor, omx-dyneq.descriptor.json, has no word for (docs/declaration-as-descriptor.md). The two are the folder's hand-written files; tools/gen.mjs generates the rest and writes the travels the descriptor's links resolve to. Its parameters are by reference to omx-contract's dyneq kernel and bind by name to omx-dsp's instance face. Control order, the descriptor's, is append-only.",
+  "stem": "omx-dyneq",
+  "kernel": "dyneq",
+  "kernels": [
+    "dyneq"
+  ],
+  "noun": "dynamic EQ",
+  "url": "https://github.com/FreeMixer/omx-plugins",
+  "binding": "instance",
+  "portHints": {
+    "bandOn1": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "bandOn2": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "bandOn3": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "bandOn4": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "bandOn5": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "bandOn6": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "bandType1": {
+      "props": [
+        "lv2:enumeration",
+        "lv2:integer"
+      ],
+      "points": [
+        "0 Bell",
+        "1 Low Shelf",
+        "2 High Shelf"
+      ]
+    },
+    "bandType2": {
+      "props": [
+        "lv2:enumeration",
+        "lv2:integer"
+      ],
+      "points": [
+        "0 Bell",
+        "1 Low Shelf",
+        "2 High Shelf"
+      ]
+    },
+    "bandType3": {
+      "props": [
+        "lv2:enumeration",
+        "lv2:integer"
+      ],
+      "points": [
+        "0 Bell",
+        "1 Low Shelf",
+        "2 High Shelf"
+      ]
+    },
+    "bandType4": {
+      "props": [
+        "lv2:enumeration",
+        "lv2:integer"
+      ],
+      "points": [
+        "0 Bell",
+        "1 Low Shelf",
+        "2 High Shelf"
+      ]
+    },
+    "bandType5": {
+      "props": [
+        "lv2:enumeration",
+        "lv2:integer"
+      ],
+      "points": [
+        "0 Bell",
+        "1 Low Shelf",
+        "2 High Shelf"
+      ]
+    },
+    "bandType6": {
+      "props": [
+        "lv2:enumeration",
+        "lv2:integer"
+      ],
+      "points": [
+        "0 Bell",
+        "1 Low Shelf",
+        "2 High Shelf"
+      ]
+    },
+    "freq1": {
+      "props": [
+        "lv2:integer",
+        "pprops:logarithmic"
+      ],
+      "unit": "units:hz"
+    },
+    "freq2": {
+      "props": [
+        "lv2:integer",
+        "pprops:logarithmic"
+      ],
+      "unit": "units:hz"
+    },
+    "freq3": {
+      "props": [
+        "lv2:integer",
+        "pprops:logarithmic"
+      ],
+      "unit": "units:hz"
+    },
+    "freq4": {
+      "props": [
+        "lv2:integer",
+        "pprops:logarithmic"
+      ],
+      "unit": "units:hz"
+    },
+    "freq5": {
+      "props": [
+        "lv2:integer",
+        "pprops:logarithmic"
+      ],
+      "unit": "units:hz"
+    },
+    "freq6": {
+      "props": [
+        "lv2:integer",
+        "pprops:logarithmic"
+      ],
+      "unit": "units:hz"
+    },
+    "gain1": {
+      "unit": "units:db"
+    },
+    "gain2": {
+      "unit": "units:db"
+    },
+    "gain3": {
+      "unit": "units:db"
+    },
+    "gain4": {
+      "unit": "units:db"
+    },
+    "gain5": {
+      "unit": "units:db"
+    },
+    "gain6": {
+      "unit": "units:db"
+    },
+    "dynMode1": {
+      "props": [
+        "lv2:enumeration",
+        "lv2:integer"
+      ],
+      "points": [
+        "0 Off",
+        "1 Down",
+        "2 Up"
+      ]
+    },
+    "dynMode2": {
+      "props": [
+        "lv2:enumeration",
+        "lv2:integer"
+      ],
+      "points": [
+        "0 Off",
+        "1 Down",
+        "2 Up"
+      ]
+    },
+    "dynMode3": {
+      "props": [
+        "lv2:enumeration",
+        "lv2:integer"
+      ],
+      "points": [
+        "0 Off",
+        "1 Down",
+        "2 Up"
+      ]
+    },
+    "dynMode4": {
+      "props": [
+        "lv2:enumeration",
+        "lv2:integer"
+      ],
+      "points": [
+        "0 Off",
+        "1 Down",
+        "2 Up"
+      ]
+    },
+    "dynMode5": {
+      "props": [
+        "lv2:enumeration",
+        "lv2:integer"
+      ],
+      "points": [
+        "0 Off",
+        "1 Down",
+        "2 Up"
+      ]
+    },
+    "dynMode6": {
+      "props": [
+        "lv2:enumeration",
+        "lv2:integer"
+      ],
+      "points": [
+        "0 Off",
+        "1 Down",
+        "2 Up"
+      ]
+    },
+    "threshold1": {
+      "unit": "units:db"
+    },
+    "threshold2": {
+      "unit": "units:db"
+    },
+    "threshold3": {
+      "unit": "units:db"
+    },
+    "threshold4": {
+      "unit": "units:db"
+    },
+    "threshold5": {
+      "unit": "units:db"
+    },
+    "threshold6": {
+      "unit": "units:db"
+    },
+    "range1": {
+      "unit": "units:db"
+    },
+    "range2": {
+      "unit": "units:db"
+    },
+    "range3": {
+      "unit": "units:db"
+    },
+    "range4": {
+      "unit": "units:db"
+    },
+    "range5": {
+      "unit": "units:db"
+    },
+    "range6": {
+      "unit": "units:db"
+    },
+    "attack1": {
+      "unit": "units:ms"
+    },
+    "attack2": {
+      "unit": "units:ms"
+    },
+    "attack3": {
+      "unit": "units:ms"
+    },
+    "attack4": {
+      "unit": "units:ms"
+    },
+    "attack5": {
+      "unit": "units:ms"
+    },
+    "attack6": {
+      "unit": "units:ms"
+    },
+    "release1": {
+      "props": [
+        "lv2:integer"
+      ],
+      "unit": "units:ms"
+    },
+    "release2": {
+      "props": [
+        "lv2:integer"
+      ],
+      "unit": "units:ms"
+    },
+    "release3": {
+      "props": [
+        "lv2:integer"
+      ],
+      "unit": "units:ms"
+    },
+    "release4": {
+      "props": [
+        "lv2:integer"
+      ],
+      "unit": "units:ms"
+    },
+    "release5": {
+      "props": [
+        "lv2:integer"
+      ],
+      "unit": "units:ms"
+    },
+    "release6": {
+      "props": [
+        "lv2:integer"
+      ],
+      "unit": "units:ms"
+    },
+    "listen1": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "listen2": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "listen3": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "listen4": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "listen5": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "listen6": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "mixPct": {
+      "props": [
+        "lv2:integer"
+      ],
+      "unit": "units:pc"
+    },
+    "enabled": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "latency": {
+      "props": [
+        "lv2:integer",
+        "lv2:reportsLatency"
+      ],
+      "unit": "units:frame"
+    }
+  },
+  "resourceHints": {
+    "threads-spawned": 0,
+    "streams-from-disk": false,
+    "opens-sockets": false
+  },
+  "monitors": [
+    "listen1",
+    "listen2",
+    "listen3",
+    "listen4",
+    "listen5",
+    "listen6"
+  ],
+  "meters": [
+    {
+      "id": "band1Gain",
+      "kind": "gain_reduction",
+      "read": "band_gain_db(0)",
+      "readout": "BAND1_GAIN_DB"
+    },
+    {
+      "id": "band2Gain",
+      "kind": "gain_reduction",
+      "read": "band_gain_db(1)",
+      "readout": "BAND2_GAIN_DB"
+    },
+    {
+      "id": "band3Gain",
+      "kind": "gain_reduction",
+      "read": "band_gain_db(2)",
+      "readout": "BAND3_GAIN_DB"
+    },
+    {
+      "id": "band4Gain",
+      "kind": "gain_reduction",
+      "read": "band_gain_db(3)",
+      "readout": "BAND4_GAIN_DB"
+    },
+    {
+      "id": "band5Gain",
+      "kind": "gain_reduction",
+      "read": "band_gain_db(4)",
+      "readout": "BAND5_GAIN_DB"
+    },
+    {
+      "id": "band6Gain",
+      "kind": "gain_reduction",
+      "read": "band_gain_db(5)",
+      "readout": "BAND6_GAIN_DB"
+    }
+  ],
+  "panel": {
+    "family": "eq",
+    "roles": {
+      "band_on": [
+        "bandOn1",
+        "bandOn2",
+        "bandOn3",
+        "bandOn4",
+        "bandOn5",
+        "bandOn6"
+      ],
+      "band_type": [
+        "bandType1",
+        "bandType2",
+        "bandType3",
+        "bandType4",
+        "bandType5",
+        "bandType6"
+      ],
+      "band_freq": [
+        "freq1",
+        "freq2",
+        "freq3",
+        "freq4",
+        "freq5",
+        "freq6"
+      ],
+      "band_gain": [
+        "gain1",
+        "gain2",
+        "gain3",
+        "gain4",
+        "gain5",
+        "gain6"
+      ],
+      "band_q": [
+        "q1",
+        "q2",
+        "q3",
+        "q4",
+        "q5",
+        "q6"
+      ]
+    },
+    "sections": [
+      {
+        "key": "band1",
+        "label": "Band 1",
+        "controls": [
+          "bandOn1",
+          "bandType1",
+          "freq1",
+          "gain1",
+          "q1",
+          "dynMode1",
+          "threshold1",
+          "ratio1",
+          "range1",
+          "attack1",
+          "release1",
+          "listen1"
+        ],
+        "graph": "eq-curve"
+      },
+      {
+        "key": "band2",
+        "label": "Band 2",
+        "controls": [
+          "bandOn2",
+          "bandType2",
+          "freq2",
+          "gain2",
+          "q2",
+          "dynMode2",
+          "threshold2",
+          "ratio2",
+          "range2",
+          "attack2",
+          "release2",
+          "listen2"
+        ],
+        "graph": "eq-curve"
+      },
+      {
+        "key": "band3",
+        "label": "Band 3",
+        "controls": [
+          "bandOn3",
+          "bandType3",
+          "freq3",
+          "gain3",
+          "q3",
+          "dynMode3",
+          "threshold3",
+          "ratio3",
+          "range3",
+          "attack3",
+          "release3",
+          "listen3"
+        ],
+        "graph": "eq-curve"
+      },
+      {
+        "key": "band4",
+        "label": "Band 4",
+        "controls": [
+          "bandOn4",
+          "bandType4",
+          "freq4",
+          "gain4",
+          "q4",
+          "dynMode4",
+          "threshold4",
+          "ratio4",
+          "range4",
+          "attack4",
+          "release4",
+          "listen4"
+        ],
+        "graph": "eq-curve"
+      },
+      {
+        "key": "band5",
+        "label": "Band 5",
+        "controls": [
+          "bandOn5",
+          "bandType5",
+          "freq5",
+          "gain5",
+          "q5",
+          "dynMode5",
+          "threshold5",
+          "ratio5",
+          "range5",
+          "attack5",
+          "release5",
+          "listen5"
+        ],
+        "graph": "eq-curve"
+      },
+      {
+        "key": "band6",
+        "label": "Band 6",
+        "controls": [
+          "bandOn6",
+          "bandType6",
+          "freq6",
+          "gain6",
+          "q6",
+          "dynMode6",
+          "threshold6",
+          "ratio6",
+          "range6",
+          "attack6",
+          "release6",
+          "listen6"
+        ],
+        "graph": "eq-curve"
+      },
+      {
+        "key": "output",
+        "label": "Output",
+        "controls": [
+          "mixPct"
+        ]
+      }
+    ]
+  },
+  "console": {
+    "$comment": "The OpenMixer console has no dynamic EQ stage yet: racked as a plugin in a channel's insert rack, it is drawn by the generic plugin editor until the console's card, its EQ curve with each band's live excursion, lands (the remaining-FX wave's console lane).",
+    "placement": {
+      "strips": [
+        "input",
+        "fxReturn",
+        "aux",
+        "mix",
+        "matrix",
+        "main"
+      ],
+      "group": "plugins"
+    }
+  },
+  "controls": {
+    "freq1": {
+      "defaultBand": {
+        "count": "DYNEQ_BANDS",
+        "index": 0,
+        "of": "centre"
+      }
+    },
+    "freq2": {
+      "defaultBand": {
+        "count": "DYNEQ_BANDS",
+        "index": 1,
+        "of": "centre"
+      }
+    },
+    "freq3": {
+      "defaultBand": {
+        "count": "DYNEQ_BANDS",
+        "index": 2,
+        "of": "centre"
+      }
+    },
+    "freq4": {
+      "defaultBand": {
+        "count": "DYNEQ_BANDS",
+        "index": 3,
+        "of": "centre"
+      }
+    },
+    "freq5": {
+      "defaultBand": {
+        "count": "DYNEQ_BANDS",
+        "index": 4,
+        "of": "centre"
+      }
+    },
+    "freq6": {
+      "defaultBand": {
+        "count": "DYNEQ_BANDS",
+        "index": 5,
+        "of": "centre"
+      }
+    }
+  }
+}

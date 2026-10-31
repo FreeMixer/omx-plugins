@@ -23,11 +23,18 @@
  * every declared rate, every channel of every meter is held bit for bit to a reference computed here
  * from the same block: a gain reduction to what the reference's instance holds at its declared field
  * (0 while bypassed), a level to the peak of the block's input or of the reference's output, in dBFS,
- * floored at the meter's display minimum. The meters are listed as declared, every one coherent;
+ * floored at the meter's display minimum. A level the kernel reads is the reference instance's own
+ * reading (the display minimum while bypassed). The meters are listed as declared, every one coherent;
  * nothing is read before the first block (docs/meters.md).
  * The plan must make the kernel reduce gain.
  * The plan must move the levels: the two legs differ in some block, and the input and the
  * output differ in some block.
+ * Held at its default where the others move or are stepped, a monitor (it replaces the output while on),
+ * with its own section still: keyListen.
+ *
+ * KEYED: the face listens to a sidechain. The plan runs twice per rate: with a key that differs from
+ * the main signal (the sabotage arm runs here), and with no key routed (NULL: the kernel's own
+ * detector). A reference keyed by that key must differ from the unkeyed one, or the key is ignored.
  */
 #include <dlfcn.h>
 #include <math.h>
@@ -48,7 +55,7 @@
 
 #define NP OMX_COMP_PARAM_COUNT
 /* 1 when the face takes a sidechain key. */
-#define KEYED 0
+#define KEYED 1
 /* Each block of the plan is processed this many times in a row, the same values each time. */
 #define STRETCH 1u
 
@@ -64,46 +71,76 @@ typedef struct {
 } Block;
 
 static const Block PLAN[] = {
-    { 64, 0.0f, 0, {-18.0f, 20.0f, 18.0f, 50.05f, 305.0f, 8.4f, 100.0f, 1.0f, 2.0f, 1.0f}, 0 },
-    { 1, 0.0f, 0, {-45.0f, 1.0f, 6.0f, 90.01f, 1802.0f, 0.0f, 25.0f, 0.0f, 0.0f, 1.0f}, 0 },
-    { 333, 0.0f, 0, {0.0f, 15.25f, 12.0f, 10.09f, 1053.0f, 0.0f, 100.0f, 1.0f, 1.0f, 0.0f}, 0 },
-    { 512, 0.0f, 0, {-60.0f, 4.0f, 21.6f, 60.04f, 200.0f, 6.0f, 0.0f, 0.0f, 2.0f, 1.0f}, 0 },
-    { 17, 0.0f, 0, {-15.0f, 10.5f, 2.4f, 35.065f, 200.0f, 24.0f, 75.0f, 1.0f, 0.0f, 0.0f}, 1 },
-    { 480, 0.0f, 0, {-18.0f, 18.1f, 14.4f, 5.0f, 754.0f, 0.0f, 100.0f, 1.0f, 1.0f, 0.0f}, 1 },
-    { 129, 0.0f, 0, {-30.0f, 2.9f, 8.4f, 5.0f, 3000.0f, 18.0f, 50.0f, 0.0f, 1.0f, 0.0f}, 0 },
-    { 1024, 0.0f, 0, {-6.0f, 12.4f, 6.0f, 25.075f, 5.0f, 0.0f, 90.0f, 1.0f, 0.0f, 0.0f}, 0 },
-    { 7, 0.0f, 0, {-54.0f, 7.65f, 6.0f, 100.0f, 2251.0f, 12.0f, 10.0f, 0.0f, 0.0f, 1.0f}, 0 },
-    { 2500, 0.0f, 0, {-24.0f, 4.0f, 6.0f, 0.1f, 200.0f, 21.6f, 60.0f, 0.0f, 1.0f, 0.0f}, 0 },
-    { 600, 0.0f, 0, {-39.0f, 4.0f, 24.0f, 75.025f, 1503.0f, 2.4f, 35.0f, 0.0f, 2.0f, 1.0f}, 0 },
-    { 3000, 0.0f, 0, {-18.0f, 5.75f, 0.0f, 5.0f, 2701.0f, 14.4f, 100.0f, 0.0f, 0.0f, 0.0f}, 0 },
-    { 0, 10.0f, 1, {-18.0f, 4.0f, 6.0f, 5.0f, 200.0f, 0.0f, 100.0f, 0.0f, 0.0f, 0.0f}, 0 },
-    { 0, 205.0f, 2, {-18.0f, 4.0f, 6.0f, 5.0f, 200.0f, 0.0f, 100.0f, 0.0f, 0.0f, 0.0f}, 0 },
-    { 0, 10.0f, 1, {-18.0f, 4.0f, 6.0f, 5.0f, 200.0f, 0.0f, 100.0f, 0.0f, 0.0f, 0.0f}, 0 },
-    { 0, 205.0f, 2, {-18.0f, 4.0f, 6.0f, 5.0f, 200.0f, 0.0f, 100.0f, 0.0f, 0.0f, 0.0f}, 0 },
-    { 0, 205.0f, 2, {-15.0f, 15.25f, 18.0f, 75.025f, 2251.0f, 18.0f, 75.0f, 0.0f, 1.0f, 1.0f}, 0 },
-    { 0, 10.0f, 1, {-18.0f, 4.0f, 6.0f, 5.0f, 200.0f, 0.0f, 100.0f, 1.0f, 0.0f, 0.0f}, 0 },
-    { 0, 205.0f, 2, {-18.0f, 4.0f, 6.0f, 5.0f, 200.0f, 0.0f, 100.0f, 1.0f, 0.0f, 0.0f}, 0 },
-    { 0, 205.0f, 2, {-15.0f, 15.25f, 18.0f, 75.025f, 2251.0f, 18.0f, 75.0f, 1.0f, 1.0f, 1.0f}, 0 },
-    { 0, 10.0f, 1, {-18.0f, 4.0f, 6.0f, 5.0f, 200.0f, 0.0f, 100.0f, 0.0f, 0.0f, 0.0f}, 0 },
-    { 0, 205.0f, 2, {-18.0f, 4.0f, 6.0f, 5.0f, 200.0f, 0.0f, 100.0f, 0.0f, 0.0f, 0.0f}, 0 },
-    { 0, 205.0f, 2, {-15.0f, 15.25f, 18.0f, 75.025f, 2251.0f, 18.0f, 75.0f, 1.0f, 0.0f, 1.0f}, 0 },
-    { 0, 10.0f, 1, {-18.0f, 4.0f, 6.0f, 5.0f, 200.0f, 0.0f, 100.0f, 0.0f, 1.0f, 0.0f}, 0 },
-    { 0, 205.0f, 2, {-18.0f, 4.0f, 6.0f, 5.0f, 200.0f, 0.0f, 100.0f, 0.0f, 1.0f, 0.0f}, 0 },
-    { 0, 205.0f, 2, {-15.0f, 15.25f, 18.0f, 75.025f, 2251.0f, 18.0f, 75.0f, 1.0f, 1.0f, 1.0f}, 0 },
-    { 0, 10.0f, 1, {-18.0f, 4.0f, 6.0f, 5.0f, 200.0f, 0.0f, 100.0f, 0.0f, 2.0f, 0.0f}, 0 },
-    { 0, 205.0f, 2, {-18.0f, 4.0f, 6.0f, 5.0f, 200.0f, 0.0f, 100.0f, 0.0f, 2.0f, 0.0f}, 0 },
-    { 0, 205.0f, 2, {-15.0f, 15.25f, 18.0f, 75.025f, 2251.0f, 18.0f, 75.0f, 1.0f, 2.0f, 1.0f}, 0 },
-    { 0, 10.0f, 1, {-18.0f, 4.0f, 6.0f, 5.0f, 200.0f, 0.0f, 100.0f, 0.0f, 0.0f, 0.0f}, 0 },
-    { 0, 205.0f, 2, {-18.0f, 4.0f, 6.0f, 5.0f, 200.0f, 0.0f, 100.0f, 0.0f, 0.0f, 0.0f}, 0 },
-    { 0, 205.0f, 2, {-15.0f, 15.25f, 18.0f, 75.025f, 2251.0f, 18.0f, 75.0f, 1.0f, 1.0f, 0.0f}, 0 },
-    { 0, 10.0f, 1, {-18.0f, 4.0f, 6.0f, 5.0f, 200.0f, 0.0f, 100.0f, 0.0f, 0.0f, 1.0f}, 0 },
-    { 0, 205.0f, 2, {-18.0f, 4.0f, 6.0f, 5.0f, 200.0f, 0.0f, 100.0f, 0.0f, 0.0f, 1.0f}, 0 },
-    { 0, 205.0f, 2, {-15.0f, 15.25f, 18.0f, 75.025f, 2251.0f, 18.0f, 75.0f, 1.0f, 1.0f, 1.0f}, 0 },
+    { 64, 0.0f, 0, {-18.0f, 20.0f, 18.0f, 50.05f, 305.0f, 8.4f, 100.0f, 1.0f, 2.0f, 1.0f, 0.0f, 700.0f, 0.0f, 6.0f, 0.0f, 1000.0f, 0.0f, 1.0f, -12.0f}, 0 },
+    { 1, 0.0f, 0, {-45.0f, 1.0f, 6.0f, 90.01f, 1802.0f, 0.0f, 25.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 5000.0f, -6.0f, 0.0f, 1800.0f, 2.0f, 0.0f, -30.0f}, 0 },
+    { 333, 0.0f, 0, {0.0f, 15.25f, 12.0f, 10.09f, 1053.0f, 0.0f, 100.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 20000.0f, 3.0f, 0.0f, 200.0f, 1.0f, 1.0f, 0.0f}, 0 },
+    { 512, 0.0f, 0, {-60.0f, 4.0f, 21.6f, 60.04f, 200.0f, 6.0f, 0.0f, 0.0f, 2.0f, 1.0f, 0.0f, 500.0f, 0.0f, 0.0f, 0.0f, 1200.0f, 0.0f, 0.0f, -40.0f}, 0 },
+    { 17, 0.0f, 0, {-15.0f, 10.5f, 2.4f, 35.065f, 200.0f, 24.0f, 75.0f, 1.0f, 0.0f, 0.0f, 0.0f, 2000.0f, 15000.0f, 0.0f, 0.0f, 700.0f, 0.0f, 1.0f, -10.0f}, 1 },
+    { 480, 0.0f, 0, {-18.0f, 18.1f, 14.4f, 5.0f, 754.0f, 0.0f, 100.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 4.8f, 0.0f, 0.0f, 1.0f, 0.0f, -12.0f}, 1 },
+    { 129, 0.0f, 0, {-30.0f, 2.9f, 8.4f, 5.0f, 3000.0f, 18.0f, 50.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1500.0f, 10000.0f, -4.8f, 0.0f, 0.0f, 3.0f, 1.0f, -20.0f}, 0 },
+    { 1024, 0.0f, 0, {-6.0f, 12.4f, 6.0f, 25.075f, 5.0f, 0.0f, 90.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 18000.0f, 1.2f, 0.0f, 500.0f, 0.0f, 0.0f, -4.0f}, 0 },
+    { 7, 0.0f, 0, {-54.0f, 7.65f, 6.0f, 100.0f, 2251.0f, 12.0f, 10.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1000.0f, 2000.0f, -1.8f, 0.0f, 2000.0f, 2.0f, 1.0f, -36.0f}, 0 },
+    { 2500, 0.0f, 0, {-24.0f, 4.0f, 6.0f, 0.1f, 200.0f, 21.6f, 60.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1800.0f, 12000.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, -16.0f}, 0 },
+    { 600, 0.0f, 0, {-39.0f, 4.0f, 24.0f, 75.025f, 1503.0f, 2.4f, 35.0f, 0.0f, 2.0f, 1.0f, 1.0f, 200.0f, 7000.0f, 0.0f, 0.0f, 1500.0f, 2.0f, 1.0f, -26.0f}, 0 },
+    { 3000, 0.0f, 0, {-18.0f, 5.75f, 0.0f, 5.0f, 2701.0f, 14.4f, 100.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1200.0f, 0.0f, -3.0f, 0.0f, 0.0f, 3.0f, 0.0f, -12.0f}, 0 },
+    { 0, 10.0f, 1, {-18.0f, 4.0f, 6.0f, 5.0f, 200.0f, 0.0f, 100.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, -12.0f}, 0 },
+    { 0, 205.0f, 2, {-18.0f, 4.0f, 6.0f, 5.0f, 200.0f, 0.0f, 100.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, -12.0f}, 0 },
+    { 0, 10.0f, 1, {-18.0f, 4.0f, 6.0f, 5.0f, 200.0f, 0.0f, 100.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, -12.0f}, 0 },
+    { 0, 205.0f, 2, {-18.0f, 4.0f, 6.0f, 5.0f, 200.0f, 0.0f, 100.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, -12.0f}, 0 },
+    { 0, 205.0f, 2, {-15.0f, 15.25f, 18.0f, 75.025f, 2251.0f, 18.0f, 75.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1500.0f, 15000.0f, 3.0f, 0.0f, 1500.0f, 1.0f, 1.0f, -10.0f}, 0 },
+    { 0, 10.0f, 1, {-18.0f, 4.0f, 6.0f, 5.0f, 200.0f, 0.0f, 100.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, -12.0f}, 0 },
+    { 0, 205.0f, 2, {-18.0f, 4.0f, 6.0f, 5.0f, 200.0f, 0.0f, 100.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, -12.0f}, 0 },
+    { 0, 205.0f, 2, {-15.0f, 15.25f, 18.0f, 75.025f, 2251.0f, 18.0f, 75.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1500.0f, 15000.0f, 3.0f, 0.0f, 1500.0f, 1.0f, 1.0f, -10.0f}, 0 },
+    { 0, 10.0f, 1, {-18.0f, 4.0f, 6.0f, 5.0f, 200.0f, 0.0f, 100.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, -12.0f}, 0 },
+    { 0, 205.0f, 2, {-18.0f, 4.0f, 6.0f, 5.0f, 200.0f, 0.0f, 100.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, -12.0f}, 0 },
+    { 0, 205.0f, 2, {-15.0f, 15.25f, 18.0f, 75.025f, 2251.0f, 18.0f, 75.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1500.0f, 15000.0f, 3.0f, 0.0f, 1500.0f, 1.0f, 1.0f, -10.0f}, 0 },
+    { 0, 10.0f, 1, {-18.0f, 4.0f, 6.0f, 5.0f, 200.0f, 0.0f, 100.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, -12.0f}, 0 },
+    { 0, 205.0f, 2, {-18.0f, 4.0f, 6.0f, 5.0f, 200.0f, 0.0f, 100.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, -12.0f}, 0 },
+    { 0, 205.0f, 2, {-15.0f, 15.25f, 18.0f, 75.025f, 2251.0f, 18.0f, 75.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1500.0f, 15000.0f, 3.0f, 0.0f, 1500.0f, 1.0f, 1.0f, -10.0f}, 0 },
+    { 0, 10.0f, 1, {-18.0f, 4.0f, 6.0f, 5.0f, 200.0f, 0.0f, 100.0f, 0.0f, 2.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, -12.0f}, 0 },
+    { 0, 205.0f, 2, {-18.0f, 4.0f, 6.0f, 5.0f, 200.0f, 0.0f, 100.0f, 0.0f, 2.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, -12.0f}, 0 },
+    { 0, 205.0f, 2, {-15.0f, 15.25f, 18.0f, 75.025f, 2251.0f, 18.0f, 75.0f, 1.0f, 2.0f, 1.0f, 1.0f, 1500.0f, 15000.0f, 3.0f, 0.0f, 1500.0f, 1.0f, 1.0f, -10.0f}, 0 },
+    { 0, 10.0f, 1, {-18.0f, 4.0f, 6.0f, 5.0f, 200.0f, 0.0f, 100.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, -12.0f}, 0 },
+    { 0, 205.0f, 2, {-18.0f, 4.0f, 6.0f, 5.0f, 200.0f, 0.0f, 100.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, -12.0f}, 0 },
+    { 0, 205.0f, 2, {-15.0f, 15.25f, 18.0f, 75.025f, 2251.0f, 18.0f, 75.0f, 1.0f, 1.0f, 0.0f, 1.0f, 1500.0f, 15000.0f, 3.0f, 0.0f, 1500.0f, 1.0f, 1.0f, -10.0f}, 0 },
+    { 0, 10.0f, 1, {-18.0f, 4.0f, 6.0f, 5.0f, 200.0f, 0.0f, 100.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, -12.0f}, 0 },
+    { 0, 205.0f, 2, {-18.0f, 4.0f, 6.0f, 5.0f, 200.0f, 0.0f, 100.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, -12.0f}, 0 },
+    { 0, 205.0f, 2, {-15.0f, 15.25f, 18.0f, 75.025f, 2251.0f, 18.0f, 75.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1500.0f, 15000.0f, 3.0f, 0.0f, 1500.0f, 1.0f, 1.0f, -10.0f}, 0 },
+    { 0, 10.0f, 1, {-18.0f, 4.0f, 6.0f, 5.0f, 200.0f, 0.0f, 100.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, -12.0f}, 0 },
+    { 0, 205.0f, 2, {-18.0f, 4.0f, 6.0f, 5.0f, 200.0f, 0.0f, 100.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, -12.0f}, 0 },
+    { 0, 205.0f, 2, {-15.0f, 15.25f, 18.0f, 75.025f, 2251.0f, 18.0f, 75.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1500.0f, 15000.0f, 3.0f, 0.0f, 1500.0f, 1.0f, 1.0f, -10.0f}, 0 },
+    { 0, 10.0f, 1, {-18.0f, 4.0f, 6.0f, 5.0f, 200.0f, 0.0f, 100.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, -12.0f}, 0 },
+    { 0, 205.0f, 2, {-18.0f, 4.0f, 6.0f, 5.0f, 200.0f, 0.0f, 100.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, -12.0f}, 0 },
+    { 0, 205.0f, 2, {-15.0f, 15.25f, 18.0f, 75.025f, 2251.0f, 18.0f, 75.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1500.0f, 15000.0f, 3.0f, 0.0f, 1500.0f, 1.0f, 1.0f, -10.0f}, 0 },
+    { 0, 10.0f, 1, {-18.0f, 4.0f, 6.0f, 5.0f, 200.0f, 0.0f, 100.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, -12.0f}, 0 },
+    { 0, 205.0f, 2, {-18.0f, 4.0f, 6.0f, 5.0f, 200.0f, 0.0f, 100.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, -12.0f}, 0 },
+    { 0, 205.0f, 2, {-15.0f, 15.25f, 18.0f, 75.025f, 2251.0f, 18.0f, 75.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1500.0f, 15000.0f, 3.0f, 0.0f, 1500.0f, 1.0f, 1.0f, -10.0f}, 0 },
+    { 0, 10.0f, 1, {-18.0f, 4.0f, 6.0f, 5.0f, 200.0f, 0.0f, 100.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, -12.0f}, 0 },
+    { 0, 205.0f, 2, {-18.0f, 4.0f, 6.0f, 5.0f, 200.0f, 0.0f, 100.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, -12.0f}, 0 },
+    { 0, 205.0f, 2, {-15.0f, 15.25f, 18.0f, 75.025f, 2251.0f, 18.0f, 75.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1500.0f, 15000.0f, 3.0f, 1.0f, 1500.0f, 1.0f, 1.0f, -10.0f}, 0 },
+    { 0, 10.0f, 1, {-18.0f, 4.0f, 6.0f, 5.0f, 200.0f, 0.0f, 100.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, -12.0f}, 0 },
+    { 0, 205.0f, 2, {-18.0f, 4.0f, 6.0f, 5.0f, 200.0f, 0.0f, 100.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, -12.0f}, 0 },
+    { 0, 205.0f, 2, {-15.0f, 15.25f, 18.0f, 75.025f, 2251.0f, 18.0f, 75.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1500.0f, 15000.0f, 3.0f, 0.0f, 1500.0f, 0.0f, 1.0f, -10.0f}, 0 },
+    { 0, 10.0f, 1, {-18.0f, 4.0f, 6.0f, 5.0f, 200.0f, 0.0f, 100.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, -12.0f}, 0 },
+    { 0, 205.0f, 2, {-18.0f, 4.0f, 6.0f, 5.0f, 200.0f, 0.0f, 100.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, -12.0f}, 0 },
+    { 0, 205.0f, 2, {-15.0f, 15.25f, 18.0f, 75.025f, 2251.0f, 18.0f, 75.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1500.0f, 15000.0f, 3.0f, 0.0f, 1500.0f, 1.0f, 1.0f, -10.0f}, 0 },
+    { 0, 10.0f, 1, {-18.0f, 4.0f, 6.0f, 5.0f, 200.0f, 0.0f, 100.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 2.0f, 0.0f, -12.0f}, 0 },
+    { 0, 205.0f, 2, {-18.0f, 4.0f, 6.0f, 5.0f, 200.0f, 0.0f, 100.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 2.0f, 0.0f, -12.0f}, 0 },
+    { 0, 205.0f, 2, {-15.0f, 15.25f, 18.0f, 75.025f, 2251.0f, 18.0f, 75.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1500.0f, 15000.0f, 3.0f, 0.0f, 1500.0f, 2.0f, 1.0f, -10.0f}, 0 },
+    { 0, 10.0f, 1, {-18.0f, 4.0f, 6.0f, 5.0f, 200.0f, 0.0f, 100.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 3.0f, 0.0f, -12.0f}, 0 },
+    { 0, 205.0f, 2, {-18.0f, 4.0f, 6.0f, 5.0f, 200.0f, 0.0f, 100.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 3.0f, 0.0f, -12.0f}, 0 },
+    { 0, 205.0f, 2, {-15.0f, 15.25f, 18.0f, 75.025f, 2251.0f, 18.0f, 75.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1500.0f, 15000.0f, 3.0f, 0.0f, 1500.0f, 3.0f, 1.0f, -10.0f}, 0 },
+    { 0, 10.0f, 1, {-18.0f, 4.0f, 6.0f, 5.0f, 200.0f, 0.0f, 100.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, -12.0f}, 0 },
+    { 0, 205.0f, 2, {-18.0f, 4.0f, 6.0f, 5.0f, 200.0f, 0.0f, 100.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, -12.0f}, 0 },
+    { 0, 205.0f, 2, {-15.0f, 15.25f, 18.0f, 75.025f, 2251.0f, 18.0f, 75.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1500.0f, 15000.0f, 3.0f, 0.0f, 1500.0f, 1.0f, 0.0f, -10.0f}, 0 },
+    { 0, 10.0f, 1, {-18.0f, 4.0f, 6.0f, 5.0f, 200.0f, 0.0f, 100.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, -12.0f}, 0 },
+    { 0, 205.0f, 2, {-18.0f, 4.0f, 6.0f, 5.0f, 200.0f, 0.0f, 100.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, -12.0f}, 0 },
+    { 0, 205.0f, 2, {-15.0f, 15.25f, 18.0f, 75.025f, 2251.0f, 18.0f, 75.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1500.0f, 15000.0f, 3.0f, 0.0f, 1500.0f, 1.0f, 1.0f, -10.0f}, 0 },
 };
 #define NBLOCKS (sizeof PLAN / sizeof PLAN[0])
 
 /* One step of each parameter: what the sabotage arm moves it by. */
-static const float STEP[NP] = { 1.0f, 0.19f, 0.24f, 0.999f, 1.0f, 0.24f, 1.0f, 1.0f, 1.0f, 1.0f };
+static const float STEP[NP] = { 1.0f, 0.19f, 0.24f, 4.995f, 150.0f, 0.24f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 20.0f, 200.0f, 0.12f, 1.0f, 100.0f, 1.0f, 1.0f, 1.0f };
 
 static int failures;
 
@@ -111,8 +148,8 @@ static int failures;
  * among the NV values of a block, and display range; the reference's values after every block of the
  * plan, and what the CLAP face's clap.meters/1 reported then (NaN: nothing). Set for the CLAP run of
  * the plan only. */
-#define NM 3u
-#define NV 5u
+#define NM 4u
+#define NV 6u
 static const struct {
   const char *name;
   uint32_t kind, channels, at;
@@ -121,6 +158,7 @@ static const struct {
     {"compGr", CLAP_METER_KIND_GAIN_REDUCTION, 1u, 0u, (double)OMX_COMP_READOUT_GAIN_REDUCTION_DB_MIN, (double)OMX_COMP_READOUT_GAIN_REDUCTION_DB_MAX},
     {"compIn", CLAP_METER_KIND_LEVEL, 2u, 1u, -60.0, 6.0},
     {"compOut", CLAP_METER_KIND_LEVEL, 2u, 3u, -60.0, 6.0},
+    {"compKey", CLAP_METER_KIND_LEVEL, 1u, 5u, (double)OMX_COMP_READOUT_KEY_LEVEL_DB_MIN, (double)OMX_COMP_READOUT_KEY_LEVEL_DB_MAX},
 };
 static double *meters_want, *meters_got;
 static bool meters_early, meters_listed;
@@ -220,9 +258,9 @@ static void reference(double sr, int off, const float *key, const float *il, con
     values_of(k, off, values);
     const uint32_t frames = frames_of(k, sr);
     for (uint32_t r = 0; r < STRETCH; r++) {
-      omx_comp_instance_resolve(&inst, k->bypass, values[OMX_COMP_PARAM_THRESHOLD_DB], values[OMX_COMP_PARAM_RATIO], values[OMX_COMP_PARAM_KNEE_DB], values[OMX_COMP_PARAM_ATTACK_MS], values[OMX_COMP_PARAM_RELEASE_MS], values[OMX_COMP_PARAM_MAKEUP_DB], values[OMX_COMP_PARAM_MIX_PCT], (int)lrintf(values[OMX_COMP_PARAM_KIND]), (int)lrintf(values[OMX_COMP_PARAM_DETECTOR_OVERSAMPLING]), (int)lrintf(values[OMX_COMP_PARAM_DETECTOR_TOPOLOGY]), (int)OMX_COMP_KEY_SOURCES_DEFAULT, (float)OMX_COMP_KEY_HP_HZ_RANGE_DEFAULT, (float)OMX_COMP_KEY_LP_HZ_RANGE_DEFAULT, (float)OMX_COMP_KEY_TILT_DB_RANGE_DEFAULT, (int)OMX_COMP_KEY_LISTENS_DEFAULT, (float)OMX_COMP_HOLD_MS_RANGE_DEFAULT, (int)OMX_COMP_DETECT_LINKS_DEFAULT, (int)OMX_COMP_DUCKS_DEFAULT, (float)OMX_COMP_RANGE_DB_RANGE_DEFAULT, (int)OMX_COMP_RELEASE_MODES_DEFAULT);
+      omx_comp_instance_resolve(&inst, k->bypass, values[OMX_COMP_PARAM_THRESHOLD_DB], values[OMX_COMP_PARAM_RATIO], values[OMX_COMP_PARAM_KNEE_DB], values[OMX_COMP_PARAM_ATTACK_MS], values[OMX_COMP_PARAM_RELEASE_MS], values[OMX_COMP_PARAM_MAKEUP_DB], values[OMX_COMP_PARAM_MIX_PCT], (int)lrintf(values[OMX_COMP_PARAM_KIND]), (int)lrintf(values[OMX_COMP_PARAM_DETECTOR_OVERSAMPLING]), (int)lrintf(values[OMX_COMP_PARAM_DETECTOR_TOPOLOGY]), (int)lrintf(values[OMX_COMP_PARAM_KEY_SOURCE]), values[OMX_COMP_PARAM_KEY_HP_HZ], values[OMX_COMP_PARAM_KEY_LP_HZ], values[OMX_COMP_PARAM_KEY_TILT_DB], (int)lrintf(values[OMX_COMP_PARAM_KEY_LISTEN]), values[OMX_COMP_PARAM_HOLD_MS], (int)lrintf(values[OMX_COMP_PARAM_DETECT_LINK]), (int)lrintf(values[OMX_COMP_PARAM_DUCK]), values[OMX_COMP_PARAM_RANGE_DB], (int)OMX_COMP_RELEASE_MODES_DEFAULT);
 #if KEYED
-      omx_comp_instance_run(&inst, key ? key + at : NULL, il + at, ir + at, ol + at, orr + at, frames);
+      omx_comp_instance_run_keyed(&inst, key ? key + at : NULL, NULL, il + at, ir + at, ol + at, orr + at, frames);
 #else
       (void)key;
       omx_comp_instance_run(&inst, il + at, ir + at, ol + at, orr + at, frames);
@@ -234,6 +272,7 @@ static void reference(double sr, int off, const float *key, const float *il, con
         mw[2] = ref_level(ir + at, frames, METERS[1].min);
         mw[3] = ref_level(ol + at, frames, METERS[2].min);
         mw[4] = ref_level(orr + at, frames, METERS[2].min);
+        mw[5] = k->bypass ? METERS[3].min : (double)omx_comp_instance_key_level_db(&inst);
       }
       at += frames;
     }
@@ -314,9 +353,10 @@ static void run_checks(const char *face, Driver *d, double sr, bool keyed, bool 
       for (uint32_t m = 0; m < NM; m++) {
         const double *v = mwant + b * NV + METERS[m].at;
         if (METERS[m].kind == CLAP_METER_KIND_GAIN_REDUCTION) reduces = reduces || v[0] < 0.0;
-        if (METERS[m].kind == CLAP_METER_KIND_LEVEL) legs = legs || v[0] != v[1];
+        if (METERS[m].kind == CLAP_METER_KIND_LEVEL && METERS[m].channels == 2u) legs = legs || v[0] != v[1];
         for (uint32_t o = 0; o < NM; o++)
-          if (o != m && METERS[o].kind == CLAP_METER_KIND_LEVEL && METERS[m].kind == CLAP_METER_KIND_LEVEL)
+          if (o != m && METERS[o].kind == CLAP_METER_KIND_LEVEL && METERS[m].kind == CLAP_METER_KIND_LEVEL &&
+              METERS[o].channels == 2u && METERS[m].channels == 2u)
             shaped = shaped || memcmp(v, mwant + b * NV + METERS[o].at, 2 * sizeof(double)) != 0;
       }
     (void)reduces, (void)legs, (void)shaped;
@@ -521,7 +561,7 @@ static bool lv2_run(void *face, const Block *plan, size_t nblocks, double sr, co
   bool ok = true;
   for (int i = 0; i < 4; i++) ok = (ap[i] = port_of(l, audio[i])) >= 0 && ok;
 #if KEYED
-  const int32_t kp = port_of(l, "");
+  const int32_t kp = port_of(l, "key");
   ok = kp >= 0 && ok;
 #else
   (void)key;

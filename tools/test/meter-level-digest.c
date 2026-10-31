@@ -4,11 +4,11 @@
  * meter-level-digest.c — the clap.meters/1 values of a built face: a minimal CLAP host runs the face over
  * a fixed stimulus (silence, dc and noise at levels from 0 dBFS to far below any meter's minimum, sines,
  * impulses, a NaN and an infinite sample, blocks of 1 to 300 frames) and, after every block, writes the
- * bit pattern of every value of every LEVEL meter to stdout. `meter-level-digest <x.clap> | sha256sum`
+ * bit pattern of every value of every LEVEL meter the face measures (two channels) to stdout. `meter-level-digest <x.clap> | sha256sum`
  * is the digest tools/test/meter-level.sha256 holds: a change to how a level meter reads moves it. A
  * level meter is a peak and a log10 in double, which every toolchain rounds alike.
  *
- * `--others <file>` writes every other meter's values (a gain reduction: the kernel's own reading, in
+ * `--others <file>` writes every other meter's values (a gain reduction or a level the kernel reads: its own reading, in
  * float through libm's float functions, whose last bit differs between C libraries) to <file> as text,
  * one line per value, `<block> <meter> <value>`, %.9g. tools/test/meter-values-check.mjs compares that
  * file against tools/test/<face>.meter-others.txt within a tolerance. Used by `make meter-level`.
@@ -96,7 +96,9 @@ int main(int argc, char **argv) {
   for (uint32_t k = 0; k < nm; k++) {
     clap_meter_info_t info;
     if (!m->get_info(p, k, &info)) return fprintf(stderr, "get_info %u\n", k), 1;
-    is_level[k] = info.kind == CLAP_METER_KIND_LEVEL;
+    /* a level the face measures, its two legs' peaks; a level the kernel reads (one channel, a detector's) is
+     * the kernel's float through libm, an other */
+    is_level[k] = info.kind == CLAP_METER_KIND_LEVEL && info.channel_count == 2u;
     if (is_level[k]) levels++;
   }
   if (levels == 0) return fprintf(stderr, "no level meter: nothing to digest\n"), 1;

@@ -99,6 +99,10 @@ $(B)/preset-probe: $(ROOT)/tools/preset-probe.c | $(B)
 $(B)/comp-oracle: test/comp-oracle.c $(CORE) | $(B)
 	$(CC) $(CFLAGS) $(WARN) -I$(GEN) -I$(ROOT)/include $(DSP_CFLAGS) $(ABI_CFLAGS) -o $@ $< $(LILV) -ldl $(LDLIBS)
 
+# Hand-written (the declaration's `oracles`): moved from the console engine with the effect.
+$(B)/comp-key: test/comp-key.c $(CORE) | $(B)
+	$(CC) $(CFLAGS) $(WARN) -I$(GEN) -I$(ROOT)/include $(DSP_CFLAGS) $(ABI_CFLAGS) -o $@ $< $(LILV) -ldl -lpthread $(LDLIBS)
+
 gen:
 	node $(ROOT)/tools/gen.mjs $(CURDIR)
 	node $(ROOT)/tools/panel-file.mjs $(CURDIR) $(PANEL_FILE)
@@ -123,7 +127,8 @@ check:
 # clap.preset-load, exactly the preset files' (docs/presets.md), each sabotaged red by --self-test.
 # Every test runs, and the target fails if any failed, so a new plugin shows all its red tests at
 # once.
-test: all check $(B)/clap-probe $(B)/panel-probe $(B)/clap-ext-probe $(B)/port-groups-probe $(B)/preset-probe $(B)/comp-oracle
+# comp-key: the hand-written oracle the declaration names, on both faces.
+test: all check $(B)/clap-probe $(B)/panel-probe $(B)/clap-ext-probe $(B)/port-groups-probe $(B)/preset-probe $(B)/comp-oracle $(B)/comp-key
 	@fail=0; \
 	$(B)/clap-probe params $(B)/$(NAME).clap > $(B)/clap-params.txt && \
 	  node $(ROOT)/tools/clap-params-check.mjs $(CURDIR) $(B)/clap-params.txt || fail=1; \
@@ -131,6 +136,8 @@ test: all check $(B)/clap-probe $(B)/panel-probe $(B)/clap-ext-probe $(B)/port-g
 	$(B)/clap-probe state $(B)/$(NAME).clap || fail=1; \
 	$(B)/comp-oracle clap $(B)/$(NAME).clap || fail=1; \
 	$(B)/comp-oracle lv2 $(BUNDLE) $(URI) || fail=1; \
+	$(B)/comp-key clap $(B)/$(NAME).clap || fail=1; \
+	$(B)/comp-key lv2 $(BUNDLE) $(URI) || fail=1; \
 	$(B)/panel-probe clap $(B)/$(NAME).clap > $(B)/panel-clap.txt && \
 	  node $(ROOT)/tools/panel-check.mjs $(CURDIR) clap $(B)/panel-clap.txt || fail=1; \
 	$(B)/panel-probe lv2 $(BUNDLE) $(URI) > $(B)/panel-lv2.txt && \

@@ -33,9 +33,17 @@ Step 1 checks before it writes:
   with the omx-dsp work named. A control the kernel takes once per band is one array argument,
   `const float band[OMX_GEQ_BANDS]`, sized by a count the contract renders: the draft gives it one
   parameter per band (`band01` … `band31`), the binding passes them in declaration order, and the
-  generated code asserts their count is the extent. A keyed face takes the sidechain block first,
+  generated code asserts their count is the extent. Where the extent is the face's own macro
+  (`OMX_DYNEQ_INSTANCE_BANDS`), the count is the one the control declares (`DYNEQ_BANDS`), and the same
+  assertion holds the two equal. A band's centre whose travel names no default (the dynamic EQ's: its
+  bands come up spread, as an EQ's do) is settled by a person with `defaultBand` `{ "count": "DYNEQ_BANDS",
+  "index": <band>, "of": "centre" }`: the centre omx-contract's EQ default rule gives that band in a bank
+  of that count, the one the face comes up at. A keyed face takes the sidechain block first,
   `run(s, key, in_l, in_r, out_l, out_r, n)` (`NULL`: nothing routed, the kernel's own detector); its
-  declaration names the key port in `sidechain`, and the faces and the identity test carry the key;
+  declaration names the key port in `sidechain`, and the faces and the identity test carry the key.
+  A keyable face keeps an unkeyed `run` and adds `run_keyed(s, key_l, key_r, in_l, in_r, out_l, out_r, n)`
+  (the compressor's): a declaration that names a `sidechain` runs it with the mono key on `key_l` and
+  `key_r` `NULL` (one leg read on both), one that names none runs `run`;
 - every `resolve` argument binds to exactly one contract control BY NAME: the argument is the
   control's name in snake case (`attackDb` → `attack_db`). An argument that still carries an older
   short name (`attack_ms` for `attackTimeMs`) binds when its words are, in order, a unique subset
@@ -68,6 +76,14 @@ settled it fills the derived fields and runs `tools/gen.mjs`, which writes:
 - across plugins, from the folders: the README's catalogue and sections, the RPM `%files` lists and
   CI's installed-file lists, each between `BEGIN GENERATED` and `END GENERATED` lines.
 
+The settled declaration is then written as the plugin's two hand-written files, as every
+single-kernel plugin of ours is described (docs/declaration-as-descriptor.md): `<stem>.descriptor.json`,
+its `authored` descriptor, rendered from the declaration, and `<stem>.decl.json`, the declaration's
+extras (each parameter's own words, such as a set's `values` or a band's `defaultBand`, kept under
+`controls` by symbol). The faces and every generated file are the same bytes from either form; the
+plugin's Makefile hands omx-panel the descriptor. From then on the two files are the plugin: the wizard
+drafts a new plugin only.
+
 `node tools/gen.mjs --check` holds every one of them; CI runs it. Then the wizard runs the plugin's
 `make test` and `make completeness` for it, and prints the commit plan in the recipe's layer order.
 
@@ -90,7 +106,10 @@ builds must equal omx-dsp's instance face called directly, bit for bit, at every
 differs from the main signal and with none, each block 64 times in a row so a detector has time to
 release through every threshold; the key must change the output. Two guards keep it honest: the reference must move
 the signal, and a reference rendered with one parameter one step off must differ from the faces
-(the sabotage arm), so a test that could not see a wrong coefficient fails.
+(the sabotage arm), so a test that could not see a wrong coefficient fails. A step is the next value of a
+choice or a toggle, 1 % of a travel, 5 % of a time travel (ms, s: a slow detector's pole at 176.4 kHz lies
+within 1e-5 of 1, where 1 % of a release moves it by about two float steps), an integer travel's share in
+whole steps, one at least.
 
 A parameter whose contract control declares `rearms` is held at its default in every block. Such a
 control re-arms the kernel's state when it changes, so it is not a smooth parameter: the limiter's
@@ -98,6 +117,25 @@ look-ahead, for example, rebuilds the rings and restarts the gain at unity. Movi
 would test the re-arm, not the identity. The flag is read from omx-contract's JSON render, where
 `kernels.<kernel>.controls` lists each kernel's controls in declared order. The oracle's header comment names each held parameter, and the sabotage arm still moves it
 by one step. The other parameters move as before.
+
+A parameter the declaration names in `monitors` replaces the output while it is on (a detector's
+listen: the dynamic EQ's band listens, the compressor's key listen). The plan holds it at its default in
+the moving blocks and when it steps the other parameters, so what it would replace stays heard; it still
+gets its own section, each of its values over a burst and two tails, and the sabotage arm still moves it.
+
+A declaration's `engaged` names values the plan holds in its release and choice sections instead of the
+defaults, never stepped there, as a chain's element switches are held on: the multiband's band thresholds
+at -40 dB, so every band is driven past its threshold, and its release heard, at every rate (white noise
+at 176.4 kHz puts a thousandth of its power under 200 Hz, below a -20 dB default threshold).
+
+## A control the plugin does not expose
+
+A kernel release can add controls to a face a plugin already binds (omx-dsp 0.26.0's delay, gate and
+reverb). Until the plugin takes them as parameters, its declaration names each in `fixed`, as a chain
+element does: a set's id, a travel's number, `"default"` or `{"defaultRef": "<SHEET>.<field>"}`. The
+binding passes the value, the identity test's reference passes the same, and no port, state word or
+descriptor control is added; the binding's header comment names each one. At `"default"` the plugin is
+the one it was: omx-dsp holds every added control's default bit-identical to the kernel without it.
 
 ## Oracles beside the identity test
 
