@@ -198,8 +198,8 @@ jobs:
           # BEGIN GENERATED plugins: tools/gen.mjs, the shipped plugins' short names and kernels, the test plugins' ids
           shorts="chorus comp deesser delay drive dyneq eq8 eq16 eq32 flanger geq keyed-gate limiter multiband phaser pitch reverb rotary strip transient tremolo"
           kernels="chorus comp deesser delay drive dyneq eq8 eq16 eq32 flanger geq gate limiter mbcomp phaser pitch reverb rotary strip transient tremolo"
-          tests="org.openmixer.test-note-echo org.openmixer.test-sine-voice org.openmixer.test-transport-probe"
-          teststems="omx-test-note-echo omx-test-sine-voice omx-test-transport-probe"
+          tests="org.openmixer.test-note-echo org.openmixer.test-pool-voice org.openmixer.test-sine-voice org.openmixer.test-transport-probe"
+          teststems="omx-test-note-echo omx-test-pool-voice omx-test-sine-voice omx-test-transport-probe"
           # END GENERATED plugins
           { printf '%s\n' /usr/lib/clap /usr/share/doc/omx-plugins-clap /usr/share/doc/omx-plugins-clap/README.md \
               /usr/share/licenses/omx-plugins-clap /usr/share/licenses/omx-plugins-clap/LICENSE
@@ -234,7 +234,7 @@ jobs:
             grep -qx "omx-plugins-contract = $version-.*" requires.txt
           done
           # a test plugin's generated declaration (the constants and CLAP id a proof predicts from)
-          for t in test-note-echo test-sine-voice test-transport-probe; do
+          for t in test-note-echo test-pool-voice test-sine-voice test-transport-probe; do
             rpm -qlp "$devel" | grep -qx "/usr/include/omx-plugins/omx_${t//-/_}_decl.h"
           done
           for p in $shorts; do
@@ -272,8 +272,8 @@ jobs:
           # BEGIN GENERATED plugins: tools/gen.mjs, the shipped plugins' short names and kernels, the test plugins' ids
           shorts="chorus comp deesser delay drive dyneq eq8 eq16 eq32 flanger geq keyed-gate limiter multiband phaser pitch reverb rotary strip transient tremolo"
           kernels="chorus comp deesser delay drive dyneq eq8 eq16 eq32 flanger geq gate limiter mbcomp phaser pitch reverb rotary strip transient tremolo"
-          tests="org.openmixer.test-note-echo org.openmixer.test-sine-voice org.openmixer.test-transport-probe"
-          teststems="omx-test-note-echo omx-test-sine-voice omx-test-transport-probe"
+          tests="org.openmixer.test-note-echo org.openmixer.test-pool-voice org.openmixer.test-sine-voice org.openmixer.test-transport-probe"
+          teststems="omx-test-note-echo omx-test-pool-voice omx-test-sine-voice omx-test-transport-probe"
           # END GENERATED plugins
           for p in $shorts; do
             # captured first: grep -q leaving a pipe early would fail the step under pipefail
@@ -305,8 +305,8 @@ jobs:
           # BEGIN GENERATED plugins: tools/gen.mjs, the shipped plugins' short names and kernels, the test plugins' ids
           shorts="chorus comp deesser delay drive dyneq eq8 eq16 eq32 flanger geq keyed-gate limiter multiband phaser pitch reverb rotary strip transient tremolo"
           kernels="chorus comp deesser delay drive dyneq eq8 eq16 eq32 flanger geq gate limiter mbcomp phaser pitch reverb rotary strip transient tremolo"
-          tests="org.openmixer.test-note-echo org.openmixer.test-sine-voice org.openmixer.test-transport-probe"
-          teststems="omx-test-note-echo omx-test-sine-voice omx-test-transport-probe"
+          tests="org.openmixer.test-note-echo org.openmixer.test-pool-voice org.openmixer.test-sine-voice org.openmixer.test-transport-probe"
+          teststems="omx-test-note-echo omx-test-pool-voice omx-test-sine-voice omx-test-transport-probe"
           # END GENERATED plugins
           gcc -o static-table-host tools/test/static-table-host.c $(pkg-config --cflags --libs omxplugins)
           ./static-table-host $(for p in $shorts; do echo "org.openmixer.$p"; done) --test $tests
@@ -390,8 +390,8 @@ jobs:
           # BEGIN GENERATED plugins: tools/gen.mjs, the shipped plugins' short names and kernels, the test plugins' ids
           shorts="chorus comp deesser delay drive dyneq eq8 eq16 eq32 flanger geq keyed-gate limiter multiband phaser pitch reverb rotary strip transient tremolo"
           kernels="chorus comp deesser delay drive dyneq eq8 eq16 eq32 flanger geq gate limiter mbcomp phaser pitch reverb rotary strip transient tremolo"
-          tests="org.openmixer.test-note-echo org.openmixer.test-sine-voice org.openmixer.test-transport-probe"
-          teststems="omx-test-note-echo omx-test-sine-voice omx-test-transport-probe"
+          tests="org.openmixer.test-note-echo org.openmixer.test-pool-voice org.openmixer.test-sine-voice org.openmixer.test-transport-probe"
+          teststems="omx-test-note-echo omx-test-pool-voice omx-test-sine-voice omx-test-transport-probe"
           # END GENERATED plugins
           for p in $shorts; do
             # captured first: grep -q leaving a pipe early would fail the step under pipefail
@@ -417,8 +417,8 @@ jobs:
           # BEGIN GENERATED plugins: tools/gen.mjs, the shipped plugins' short names and kernels, the test plugins' ids
           shorts="chorus comp deesser delay drive dyneq eq8 eq16 eq32 flanger geq keyed-gate limiter multiband phaser pitch reverb rotary strip transient tremolo"
           kernels="chorus comp deesser delay drive dyneq eq8 eq16 eq32 flanger geq gate limiter mbcomp phaser pitch reverb rotary strip transient tremolo"
-          tests="org.openmixer.test-note-echo org.openmixer.test-sine-voice org.openmixer.test-transport-probe"
-          teststems="omx-test-note-echo omx-test-sine-voice omx-test-transport-probe"
+          tests="org.openmixer.test-note-echo org.openmixer.test-pool-voice org.openmixer.test-sine-voice org.openmixer.test-transport-probe"
+          teststems="omx-test-note-echo omx-test-pool-voice omx-test-sine-voice omx-test-transport-probe"
           # END GENERATED plugins
           gcc -o static-table-host tools/test/static-table-host.c $(pkg-config --cflags --libs omxplugins)
           ./static-table-host $(for p in $shorts; do echo "org.openmixer.$p"; done) --test $tests

@@ -47,6 +47,7 @@ const uint32_t OMX_CLAP_STATIC_COUNT = (uint32_t)(sizeof OMX_CLAP_STATIC_PLUGINS
 const struct omx_clap_static_plugin OMX_CLAP_STATIC_TEST_PLUGINS[] = {
     /* BEGIN GENERATED clap-test-table: tools/gen.mjs, one row per test plugin */
     {"org.openmixer.test-note-echo", &omx_clap_entry_test_note_echo},
+    {"org.openmixer.test-pool-voice", &omx_clap_entry_test_pool_voice},
     {"org.openmixer.test-sine-voice", &omx_clap_entry_test_sine_voice},
     {"org.openmixer.test-transport-probe", &omx_clap_entry_test_transport_probe},
     /* END GENERATED clap-test-table */
