@@ -62,16 +62,17 @@ CLAPDIR ?= $(PREFIX)/lib/clap
 TTL      := $(GEN)/$(NAME).lv2
 TTL_SRCS := $(shell find $(TTL) -type f 2>/dev/null)
 CORE     := omx_eq8_core.h $(GEN)/omx_eq8_params.h $(ROOT)/include/omx_panel_description.h \
-            $(ROOT)/include/omx_param_contract.h $(ROOT)/include/omx_preset_file.h
+            $(ROOT)/include/omx_param_contract.h $(ROOT)/include/omx_preset_file.h $(ROOT)/include/omx_plugin_face.h
 
 all: $(B)/$(NAME).clap $(BUNDLE)/$(NAME).so $(BUNDLE)/manifest.ttl
 
-$(B)/$(NAME).clap: omx_eq8_clap.c $(CORE) | $(B)
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(WARN) $(PLUGIN) $(ABI_CFLAGS) -o $@ $< $(LDFLAGS) $(LDLIBS)
+# Each face is the plugin's descriptor file and the face every plugin shares (lib/).
+$(B)/$(NAME).clap: omx_eq8_clap.c $(ROOT)/lib/omx_clap_face.c $(ROOT)/include/omx_clap_face.h $(CORE) | $(B)
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(WARN) $(PLUGIN) $(ABI_CFLAGS) -o $@ $(filter %.c,$^) $(LDFLAGS) $(LDLIBS)
 
-$(BUNDLE)/$(NAME).so: omx_eq8_lv2.c $(CORE) | $(B)
+$(BUNDLE)/$(NAME).so: omx_eq8_lv2.c $(ROOT)/lib/omx_lv2_face.c $(ROOT)/include/omx_lv2_face.h $(CORE) | $(B)
 	@mkdir -p $(BUNDLE)
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(WARN) $(PLUGIN) $(LV2_CFLAGS) -o $@ $< $(LDFLAGS) $(LDLIBS)
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(WARN) $(PLUGIN) $(LV2_CFLAGS) -o $@ $(filter %.c,$^) $(LDFLAGS) $(LDLIBS)
 
 # The bundle's text and images are generated and committed; the build copies them beside the binary.
 $(BUNDLE)/manifest.ttl: $(TTL_SRCS) | $(B)

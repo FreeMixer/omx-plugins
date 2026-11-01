@@ -23,6 +23,7 @@
 
 /* The generated table FIRST, then the faces. */
 #include "omx_{{kernel}}_params.h"
+#include "omx_plugin_face.h"
 
 {{#faces}}#include <omxdsp/fx/omx_{{face}}_instance.h>
 {{/faces}}{{#elements}}{{#arrays}}_Static_assert({{count}} == {{extent}}, "the declaration names one {{id}} {{arg}} parameter per band of the face");
@@ -88,4 +89,4 @@ static inline void omx_{{kernel}}_core_run(Omx{{Kernel}}Core *c, {{#keyed}}const
 {{/keyed}}  for (uint32_t k = 0; k < OMX_{{K}}_CHAIN_LENGTH; k++) omx_{{kernel}}_core_element(c, OMX_{{K}}_CHAIN_ORDER[c->order][k], key, out_l, out_r, frames);
 }
 
-#endif /* OMX_{{K}}_CORE_H */
+{{vtable}}#endif /* OMX_{{K}}_CORE_H */

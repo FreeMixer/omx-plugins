@@ -889,8 +889,10 @@ export function meterRows(d, face) {
       meterIndex: k, meterName: m.id, meterKind: METER_KINDS[m.kind], meterReadCore: row.core, meterReadRef: row.ref,
       meterChannels: row.channels, meterOffset: offset, meterRight: offset + 1, meterMin: cdouble(row.min), meterMax: cdouble(row.max),
       isGr: m.kind === 'gain_reduction', isRead: reads, isIn: m.source === 'input', isOut: m.source === 'output',
-      // what a bypassed kernel's stale reading publishes: no reduction, or a level's display minimum
-      meterBypass: m.kind === 'gain_reduction' ? '0.0' : `G_METER_INFO[${k}].min`, meterBypassRef: m.kind === 'gain_reduction' ? '0.0' : `METERS[${k}].min`,
+      // where the shared face reads it (include/omx_plugin_face.h); what a bypassed kernel's stale reading
+      // publishes: no reduction, or a level's display minimum
+      meterSource: reads ? 'OMX_FACE_METER_READ' : m.source === 'input' ? 'OMX_FACE_METER_IN' : 'OMX_FACE_METER_OUT',
+      meterBypassRef: m.kind === 'gain_reduction' ? '0.0' : `METERS[${k}].min`,
     };
     offset += row.channels;
     return out;
@@ -1025,7 +1027,7 @@ export function generateInstance(d) {
     Makefile: withBanner(render(template('Makefile.tmpl'), view), d, '#'),
     [`omx_${d.kernel}_clap.c`]: withBanner(render(template('clap.c.tmpl'), view), d, '//'),
     [`omx_${d.kernel}_lv2.c`]: withBanner(render(template('lv2.c.tmpl'), view), d, '//'),
-    [`omx_${d.kernel}_core.h`]: render(template('core.h.tmpl'), view),
+    [`omx_${d.kernel}_core.h`]: render(template('core.h.tmpl'), { ...view, vtable: render(template('core-vtable.h.tmpl'), view) }),
     [`test/${d.kernel}-oracle.c`]: render(template('oracle.c.tmpl'), view),
   };
 }
@@ -1190,7 +1192,7 @@ export function generateChain(d) {
     Makefile: withBanner(render(template('Makefile.tmpl'), view), d, '#'),
     [`omx_${d.kernel}_clap.c`]: withBanner(render(template('clap.c.tmpl'), view), d, '//'),
     [`omx_${d.kernel}_lv2.c`]: withBanner(render(template('lv2.c.tmpl'), view), d, '//'),
-    [`omx_${d.kernel}_core.h`]: render(template('chain-core.h.tmpl'), view),
+    [`omx_${d.kernel}_core.h`]: render(template('chain-core.h.tmpl'), { ...view, vtable: render(template('core-vtable.h.tmpl'), view) }),
     [`test/${d.kernel}-oracle.c`]: render(template('oracle.c.tmpl'), view),
   };
 }

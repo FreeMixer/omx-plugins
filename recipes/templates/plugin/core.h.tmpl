@@ -22,6 +22,7 @@
 
 /* The generated table FIRST: its guard is omx-dsp's own, so the instance header reads this table. */
 #include "omx_{{kernel}}_params.h"
+#include "omx_plugin_face.h"
 
 #include <omxdsp/fx/omx_{{face}}_instance.h>
 {{#arrays}}
@@ -75,4 +76,4 @@ static inline void omx_{{kernel}}_core_run(Omx{{Kernel}}Core *c, const float *ke
   omx_{{face}}_instance_{{runFn}}(&c->inst, key{{keyTail}}, in_l, in_r, out_l, out_r, frames);
 }
 {{/keyed}}
-#endif /* OMX_{{K}}_CORE_H */
+{{vtable}}#endif /* OMX_{{K}}_CORE_H */

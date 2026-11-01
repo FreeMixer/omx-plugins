@@ -19,6 +19,7 @@
 
 /* The generated table FIRST: its guard is omx-dsp's own, so the instance header reads this table. */
 #include "omx_eq8_params.h"
+#include "omx_plugin_face.h"
 
 #include <omxdsp/fx/omx_eq_instance.h>
 
@@ -72,5 +73,21 @@ static inline void omx_eq8_core_run(OmxEq8Core *c, const float *in_l, const floa
                                          float *out_r, uint32_t frames) {
   omx_eq_instance_run(&c->inst, in_l, in_r, out_l, out_r, frames);
 }
+
+/* The core behind the vtable the shared faces call (include/omx_plugin_face.h): the same functions, untyped. */
+static inline void omx_eq8_core_init_v(void *c, uint32_t rate) { omx_eq8_core_init((OmxEq8Core *)c, rate); }
+static inline void omx_eq8_core_resolve_v(void *c, const float *values, int bypass) {
+  omx_eq8_core_resolve((OmxEq8Core *)c, values, bypass);
+}
+static inline uint32_t omx_eq8_core_latency_v(const void *c) { return omx_eq8_core_latency((const OmxEq8Core *)c); }
+static inline void omx_eq8_core_run_v(void *c, const float *key, const float *in_l, const float *in_r, float *out_l,
+                                           float *out_r, uint32_t frames) {
+  (void)key;
+  omx_eq8_core_run((OmxEq8Core *)c, in_l, in_r, out_l, out_r, frames);
+}
+
+static const struct omx_face_core OMX_EQ8_CORE = {sizeof(OmxEq8Core), omx_eq8_core_init_v, omx_eq8_core_resolve_v,
+                                                   omx_eq8_core_latency_v, omx_eq8_core_run_v,
+                                                   NULL};
 
 #endif /* OMX_EQ8_CORE_H */

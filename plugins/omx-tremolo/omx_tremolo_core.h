@@ -19,6 +19,7 @@
 
 /* The generated table FIRST: its guard is omx-dsp's own, so the instance header reads this table. */
 #include "omx_tremolo_params.h"
+#include "omx_plugin_face.h"
 
 #include <omxdsp/fx/omx_tremolo_instance.h>
 
@@ -55,5 +56,21 @@ static inline void omx_tremolo_core_run(OmxTremoloCore *c, const float *in_l, co
                                          float *out_r, uint32_t frames) {
   omx_tremolo_instance_run(&c->inst, in_l, in_r, out_l, out_r, frames);
 }
+
+/* The core behind the vtable the shared faces call (include/omx_plugin_face.h): the same functions, untyped. */
+static inline void omx_tremolo_core_init_v(void *c, uint32_t rate) { omx_tremolo_core_init((OmxTremoloCore *)c, rate); }
+static inline void omx_tremolo_core_resolve_v(void *c, const float *values, int bypass) {
+  omx_tremolo_core_resolve((OmxTremoloCore *)c, values, bypass);
+}
+static inline uint32_t omx_tremolo_core_latency_v(const void *c) { return omx_tremolo_core_latency((const OmxTremoloCore *)c); }
+static inline void omx_tremolo_core_run_v(void *c, const float *key, const float *in_l, const float *in_r, float *out_l,
+                                           float *out_r, uint32_t frames) {
+  (void)key;
+  omx_tremolo_core_run((OmxTremoloCore *)c, in_l, in_r, out_l, out_r, frames);
+}
+
+static const struct omx_face_core OMX_TREMOLO_CORE = {sizeof(OmxTremoloCore), omx_tremolo_core_init_v, omx_tremolo_core_resolve_v,
+                                                   omx_tremolo_core_latency_v, omx_tremolo_core_run_v,
+                                                   NULL};
 
 #endif /* OMX_TREMOLO_CORE_H */

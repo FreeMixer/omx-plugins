@@ -21,6 +21,7 @@
 
 /* The generated table FIRST: its guard is omx-dsp's own, so the instance header reads this table. */
 #include "omx_gate_params.h"
+#include "omx_plugin_face.h"
 
 #include <omxdsp/fx/omx_gate_instance.h>
 
@@ -68,5 +69,20 @@ static inline void omx_gate_core_run(OmxGateCore *c, const float *key, const flo
                                          float *out_l, float *out_r, uint32_t frames) {
   omx_gate_instance_run(&c->inst, key, in_l, in_r, out_l, out_r, frames);
 }
+
+/* The core behind the vtable the shared faces call (include/omx_plugin_face.h): the same functions, untyped. */
+static inline void omx_gate_core_init_v(void *c, uint32_t rate) { omx_gate_core_init((OmxGateCore *)c, rate); }
+static inline void omx_gate_core_resolve_v(void *c, const float *values, int bypass) {
+  omx_gate_core_resolve((OmxGateCore *)c, values, bypass);
+}
+static inline uint32_t omx_gate_core_latency_v(const void *c) { return omx_gate_core_latency((const OmxGateCore *)c); }
+static inline void omx_gate_core_run_v(void *c, const float *key, const float *in_l, const float *in_r, float *out_l,
+                                           float *out_r, uint32_t frames) {
+  omx_gate_core_run((OmxGateCore *)c, key, in_l, in_r, out_l, out_r, frames);
+}
+
+static const struct omx_face_core OMX_GATE_CORE = {sizeof(OmxGateCore), omx_gate_core_init_v, omx_gate_core_resolve_v,
+                                                   omx_gate_core_latency_v, omx_gate_core_run_v,
+                                                   NULL};
 
 #endif /* OMX_GATE_CORE_H */

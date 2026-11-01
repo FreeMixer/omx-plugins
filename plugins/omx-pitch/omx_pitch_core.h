@@ -19,6 +19,7 @@
 
 /* The generated table FIRST: its guard is omx-dsp's own, so the instance header reads this table. */
 #include "omx_pitch_params.h"
+#include "omx_plugin_face.h"
 
 #include <omxdsp/fx/omx_pitch_instance.h>
 
@@ -54,5 +55,21 @@ static inline void omx_pitch_core_run(OmxPitchCore *c, const float *in_l, const 
                                          float *out_r, uint32_t frames) {
   omx_pitch_instance_run(&c->inst, in_l, in_r, out_l, out_r, frames);
 }
+
+/* The core behind the vtable the shared faces call (include/omx_plugin_face.h): the same functions, untyped. */
+static inline void omx_pitch_core_init_v(void *c, uint32_t rate) { omx_pitch_core_init((OmxPitchCore *)c, rate); }
+static inline void omx_pitch_core_resolve_v(void *c, const float *values, int bypass) {
+  omx_pitch_core_resolve((OmxPitchCore *)c, values, bypass);
+}
+static inline uint32_t omx_pitch_core_latency_v(const void *c) { return omx_pitch_core_latency((const OmxPitchCore *)c); }
+static inline void omx_pitch_core_run_v(void *c, const float *key, const float *in_l, const float *in_r, float *out_l,
+                                           float *out_r, uint32_t frames) {
+  (void)key;
+  omx_pitch_core_run((OmxPitchCore *)c, in_l, in_r, out_l, out_r, frames);
+}
+
+static const struct omx_face_core OMX_PITCH_CORE = {sizeof(OmxPitchCore), omx_pitch_core_init_v, omx_pitch_core_resolve_v,
+                                                   omx_pitch_core_latency_v, omx_pitch_core_run_v,
+                                                   NULL};
 
 #endif /* OMX_PITCH_CORE_H */
