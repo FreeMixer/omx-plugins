@@ -1,4 +1,6 @@
 #!/bin/sh
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 Pau Aliagas <linuxnow@gmail.com>
 # A CI bridge, to be deleted with its calls once omx-plugins 0.17.0 and omx-panel 0.8.1 are in the OpenMixer channel.
 #
 # The sheet of the parameter units moved to omx-contract 3.6.0 (OMX_PARAM_CONTRACT_UNITS). The channel's
