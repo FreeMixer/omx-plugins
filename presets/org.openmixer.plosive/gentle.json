@@ -13,7 +13,7 @@
     {
       "symbol": "sensitivityDb",
       "unit": "dB",
-      "value": 10
+      "value": 16
     },
     {
       "symbol": "recoveryMs",

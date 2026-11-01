@@ -1,0 +1,50 @@
+{
+  "format": "org.openmixer.preset/1",
+  "plugin": "org.openmixer.glue",
+  "id": "drum-bus",
+  "name": "Drum Bus",
+  "carries": "params",
+  "params": [
+    {
+      "symbol": "thresholdDb",
+      "unit": "dB",
+      "value": -14
+    },
+    {
+      "symbol": "ratio",
+      "unit": "",
+      "value": 1,
+      "label": "4:1"
+    },
+    {
+      "symbol": "attack",
+      "unit": "",
+      "value": 4,
+      "label": "10 ms"
+    },
+    {
+      "symbol": "release",
+      "unit": "",
+      "value": 1,
+      "label": "0.3 s"
+    },
+    {
+      "symbol": "makeupDb",
+      "unit": "dB",
+      "value": 3
+    },
+    {
+      "symbol": "keyHpHz",
+      "unit": "Hz",
+      "value": 80
+    },
+    {
+      "symbol": "mixPct",
+      "unit": "%",
+      "value": 100
+    }
+  ],
+  "created": "2026-10-17T00:00:00Z",
+  "modified": "2026-10-17T00:00:00Z",
+  "copyOf": null
+}

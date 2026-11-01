@@ -1,0 +1,50 @@
+{
+  "format": "org.openmixer.preset/1",
+  "plugin": "org.openmixer.glue",
+  "id": "parallel",
+  "name": "Parallel Squash",
+  "carries": "params",
+  "params": [
+    {
+      "symbol": "thresholdDb",
+      "unit": "dB",
+      "value": -24
+    },
+    {
+      "symbol": "ratio",
+      "unit": "",
+      "value": 2,
+      "label": "10:1"
+    },
+    {
+      "symbol": "attack",
+      "unit": "",
+      "value": 3,
+      "label": "3 ms"
+    },
+    {
+      "symbol": "release",
+      "unit": "",
+      "value": 0,
+      "label": "0.1 s"
+    },
+    {
+      "symbol": "makeupDb",
+      "unit": "dB",
+      "value": 6
+    },
+    {
+      "symbol": "keyHpHz",
+      "unit": "Hz",
+      "value": 0
+    },
+    {
+      "symbol": "mixPct",
+      "unit": "%",
+      "value": 40
+    }
+  ],
+  "created": "2026-10-17T00:00:00Z",
+  "modified": "2026-10-17T00:00:00Z",
+  "copyOf": null
+}

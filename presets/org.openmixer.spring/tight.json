@@ -1,0 +1,37 @@
+{
+  "format": "org.openmixer.preset/1",
+  "plugin": "org.openmixer.spring",
+  "id": "tight",
+  "name": "Tight Spring",
+  "carries": "params",
+  "params": [
+    {
+      "symbol": "decayS",
+      "unit": "s",
+      "value": 1
+    },
+    {
+      "symbol": "lengthMs",
+      "unit": "ms",
+      "value": 25
+    },
+    {
+      "symbol": "tensionPct",
+      "unit": "%",
+      "value": 30
+    },
+    {
+      "symbol": "dampHz",
+      "unit": "Hz",
+      "value": 6000
+    },
+    {
+      "symbol": "mixPct",
+      "unit": "%",
+      "value": 20
+    }
+  ],
+  "created": "2026-10-17T00:00:00Z",
+  "modified": "2026-10-17T00:00:00Z",
+  "copyOf": null
+}

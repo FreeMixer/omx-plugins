@@ -204,6 +204,36 @@ const DEFINITIONS = {
     ['close-mic', 'Close Mic', { popDb: 18, popHz: 180, consonantDb: 8 }],
     ['gentle', 'Gentle', { popDb: 6, consonantDb: 3, popSensitivityDb: 14 }],
   ],
+  'org.openmixer.clipper': [
+    ['soft-clip', 'Soft Clip', { driveDb: 6, ceilingDb: -1, softnessPct: 60 }],
+    ['hard-ceiling', 'Hard Ceiling', { driveDb: 3, ceilingDb: -0.3, softnessPct: 0 }],
+    ['loud-bus', 'Loud Bus', { driveDb: 9, ceilingDb: -2, softnessPct: 30 }],
+  ],
+  'org.openmixer.upward': [
+    ['room-lift', 'Room Lift', { thresholdDb: -40, ratio: 2, rangeDb: 6 }],
+    ['ambience', 'Ambience Up', { thresholdDb: -50, ratio: 3, rangeDb: 12, releaseMs: 400 }],
+    ['detail', 'Detail', { thresholdDb: -30, ratio: 1.6, rangeDb: 4, attackMs: 10 }],
+  ],
+  'org.openmixer.glue': [
+    ['mix-bus', 'Mix Bus', { thresholdDb: -12, ratio: '2:1', attack: '30 ms', release: 'Auto', makeupDb: 2 }],
+    ['drum-bus', 'Drum Bus', { thresholdDb: -14, ratio: '4:1', attack: '10 ms', release: '0.3 s', makeupDb: 3, keyHpHz: 80 }],
+    ['parallel', 'Parallel Squash', { thresholdDb: -24, ratio: '10:1', attack: '3 ms', release: '0.1 s', makeupDb: 6, mixPct: 40 }],
+  ],
+  'org.openmixer.loudlevel': [
+    ['speech', 'Speech', { targetLufs: -20, rangeDb: 9, speedDbPerS: 1.5, gateLufs: -50, window: 'Short-term' }],
+    ['programme', 'Programme', { targetLufs: -23, rangeDb: 6, speedDbPerS: 0.8, gateLufs: -55, window: 'Short-term' }],
+    ['fast-ride', 'Fast Ride', { targetLufs: -18, rangeDb: 12, speedDbPerS: 3, window: 'Momentary' }],
+  ],
+  'org.openmixer.balancer': [
+    ['gentle', 'Gentle', { amountPct: 40, rangeDb: 3, speedDbPerS: 0.5, slopeDbOct: -3 }],
+    ['full-mix', 'Full Mix', { amountPct: 70, rangeDb: 6, speedDbPerS: 1, slopeDbOct: -3 }],
+    ['brighter', 'Brighter Target', { amountPct: 50, rangeDb: 4, slopeDbOct: -2 }],
+  ],
+  'org.openmixer.spring': [
+    ['guitar-amp', 'Guitar Amp', { decayS: 2, lengthMs: 35, tensionPct: 50, dampHz: 4000, mixPct: 25 }],
+    ['long-drip', 'Long Drip', { decayS: 4, lengthMs: 50, tensionPct: 70, dampHz: 3000, mixPct: 35 }],
+    ['tight', 'Tight Spring', { decayS: 1, lengthMs: 25, tensionPct: 30, dampHz: 6000, mixPct: 20 }],
+  ],
   'org.openmixer.tremolo': [
     ['classic', 'Classic', { rateHz: 5, depth: 60 }],
     ['slow-swell', 'Slow Swell', { rateHz: 0.8, depth: 80 }],

@@ -1,0 +1,37 @@
+{
+  "format": "org.openmixer.preset/1",
+  "plugin": "org.openmixer.upward",
+  "id": "ambience",
+  "name": "Ambience Up",
+  "carries": "params",
+  "params": [
+    {
+      "symbol": "thresholdDb",
+      "unit": "dB",
+      "value": -50
+    },
+    {
+      "symbol": "ratio",
+      "unit": "",
+      "value": 3
+    },
+    {
+      "symbol": "rangeDb",
+      "unit": "dB",
+      "value": 12
+    },
+    {
+      "symbol": "attackMs",
+      "unit": "ms",
+      "value": 5
+    },
+    {
+      "symbol": "releaseMs",
+      "unit": "ms",
+      "value": 400
+    }
+  ],
+  "created": "2026-10-17T00:00:00Z",
+  "modified": "2026-10-17T00:00:00Z",
+  "copyOf": null
+}

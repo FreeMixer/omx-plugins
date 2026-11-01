@@ -24,6 +24,69 @@
       "symbol": "pingpong",
       "unit": "",
       "value": 0
+    },
+    {
+      "symbol": "fxDelayTaps",
+      "unit": "",
+      "value": 1
+    },
+    {
+      "symbol": "tap0Gain",
+      "unit": "",
+      "value": 1
+    },
+    {
+      "symbol": "tap0Pan",
+      "unit": "",
+      "value": 0
+    },
+    {
+      "symbol": "tap1Factor",
+      "unit": "",
+      "value": 3,
+      "label": "1/2"
+    },
+    {
+      "symbol": "tap1Gain",
+      "unit": "",
+      "value": 0.7
+    },
+    {
+      "symbol": "tap1Pan",
+      "unit": "",
+      "value": -0.5
+    },
+    {
+      "symbol": "tap2Factor",
+      "unit": "",
+      "value": 5,
+      "label": "3/4"
+    },
+    {
+      "symbol": "tap2Gain",
+      "unit": "",
+      "value": 0.5
+    },
+    {
+      "symbol": "tap2Pan",
+      "unit": "",
+      "value": 0.5
+    },
+    {
+      "symbol": "tap3Factor",
+      "unit": "",
+      "value": 8,
+      "label": "3/2"
+    },
+    {
+      "symbol": "tap3Gain",
+      "unit": "",
+      "value": 0.35
+    },
+    {
+      "symbol": "tap3Pan",
+      "unit": "",
+      "value": 0
     }
   ],
   "created": "2026-10-17T00:00:00Z",

@@ -1,0 +1,32 @@
+{
+  "format": "org.openmixer.preset/1",
+  "plugin": "org.openmixer.balancer",
+  "id": "full-mix",
+  "name": "Full Mix",
+  "carries": "params",
+  "params": [
+    {
+      "symbol": "amountPct",
+      "unit": "%",
+      "value": 70
+    },
+    {
+      "symbol": "rangeDb",
+      "unit": "dB",
+      "value": 6
+    },
+    {
+      "symbol": "speedDbPerS",
+      "unit": "dB",
+      "value": 1
+    },
+    {
+      "symbol": "slopeDbOct",
+      "unit": "dB/oct",
+      "value": -3
+    }
+  ],
+  "created": "2026-10-17T00:00:00Z",
+  "modified": "2026-10-17T00:00:00Z",
+  "copyOf": null
+}
