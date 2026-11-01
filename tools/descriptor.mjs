@@ -23,7 +23,7 @@ export const descriptorFile = (stem) => `${stem}.descriptor.json`;
 
 /** The schema the descriptor words are in, and the release that added them. */
 export const DESCRIPTOR_SCHEMA = 'https://github.com/FreeMixer/omx-contract/raw/v3/schema/omx-contract.schema.json';
-export const DESCRIPTOR_SCHEMA_FLOOR = '3.0.0';
+export const DESCRIPTOR_SCHEMA_FLOOR = '3.1.0';
 
 /** The plugin features the descriptor names; a declaration's other CLAP features have no word there. */
 export const FEATURES = ['audio-effect', 'instrument', 'note-effect', 'analyzer'];
