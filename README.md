@@ -32,9 +32,11 @@ drawn from one declaration: its CLAP parameters, its LV2 ports and its MOD GUI c
 | **omx multiband** | `org.openmixer.multiband` | `urn:openmixer:multiband` | A multiband compressor: two to five bands split by Linkwitz-Riley crossovers, each band its own compressor with threshold, ratio, attack, release, make-up, solo and bypass, then a mix and an output gain, for in-ear mixes, vocals and playback buses. |
 | **omx phaser** | `org.openmixer.phaser` | `urn:openmixer:phaser` | The console's phaser: identical all-pass sections swept in octaves by one oscillator, with feedback around the chain and a wet/dry mix. |
 | **omx pitch** | `org.openmixer.pitch` | `urn:openmixer:pitch` | The console's pitch shifter: shifts both channels up or down by semitones and cents, without changing their length, mixed with the dry signal. |
+| **omx plosive** | `org.openmixer.plosive` | `urn:openmixer:plosive` | Softens the p pops and hard t and k consonants of a voice, cutting each only while it bursts. |
 | **omx reverb** | `org.openmixer.reverb` | `urn:openmixer:reverb` | The console's reverb: room, plate, hall, reverse and gated algorithms with pre-delay, size, damping, width and low and high cuts, mixed with the dry signal. |
 | **omx rotary** | `org.openmixer.rotary` | `urn:openmixer:rotary` | The console's rotary speaker: a drum rotor on the low band and a horn rotor on the high band, with stop, slow and fast speeds, mixed with the dry signal. |
 | **omx strip** | `org.openmixer.strip` | `urn:openmixer:strip` | The console's channel strip in one plugin: input trim, HPF/LPF, gate, four-band EQ and compressor, in the desk's order or any other. Stereo, real-time safe. |
+| **omx suboct** | `org.openmixer.suboct` | `urn:openmixer:suboct` | Adds a note one or two octaves below a single played line, by dividing its pitch, with a tracking range and a gate for quiet input. |
 | **omx transient** | `org.openmixer.transient` | `urn:openmixer:transient` | The console's transient designer: more or less attack and sustain, from two envelope contrasts, with no threshold to set. |
 | **omx tremolo** | `org.openmixer.tremolo` | `urn:openmixer:tremolo` | The console's tremolo and auto-pan: one oscillator turned into a level change on both legs, or into a left-right pan. |
 
@@ -396,6 +398,22 @@ Plus the host's bypass.
 
 Plus the host's bypass.
 
+### omx plosive
+
+| Parameter | Range | Default |
+|---|---|---|
+| Consonant Cut | 0 to 24 dB | 6 dB |
+| Consonant Sensitivity | 0 to 30 dB | 10 dB |
+| Consonant Recovery | 2 to 50 ms | 8 ms |
+| Consonant Band | 1000 to 12000 Hz, whole steps | 4000 Hz |
+| Consonant Band Width | 0.5 to 4 oct | 2 oct |
+| Pop Cut | 0 to 24 dB | 12 dB |
+| Pop Sensitivity | 0 to 30 dB | 10 dB |
+| Pop Recovery | 10 to 200 ms, whole steps | 40 ms |
+| Pop Corner | 60 to 300 Hz, whole steps | 150 Hz |
+
+Plus the host's bypass.
+
 ### omx reverb
 
 | Parameter | Range | Default |
@@ -449,6 +467,18 @@ comp > EQ > gate > filters > input). Plus the host's bypass. The latency reporte
 stages': the gate's and the compressor's 4x detector paths while they are engaged, else zero.
 
 0.3.0 changed the parameter list (the Input and Filters switches, the gate's knee, hold and hysteresis, the compressor's kind, mix and detector oversampling, five-stage orders): a session saved with 0.2.0 does not load as it was, though at 0.2.0's settings the strip sounds the same, sample for sample.
+
+### omx suboct
+
+| Parameter | Range | Default |
+|---|---|---|
+| Range | Low / Mid / High | Low |
+| Oct1 | 0 to 100 % | 100 % |
+| Oct2 | 0 to 100 % | 0 % |
+| Dry | 0 to 100 % | 100 % |
+| Track Gate | -80 to -20 dBFS | -50 dBFS |
+
+Plus the host's bypass.
 
 ### omx transient
 

@@ -1,0 +1,38 @@
+{
+  "format": "org.openmixer.preset/1",
+  "plugin": "org.openmixer.suboct",
+  "id": "deep-sub",
+  "name": "Deep Sub",
+  "carries": "params",
+  "params": [
+    {
+      "symbol": "range",
+      "unit": "",
+      "value": 0,
+      "label": "Low"
+    },
+    {
+      "symbol": "oct1",
+      "unit": "%",
+      "value": 60
+    },
+    {
+      "symbol": "oct2",
+      "unit": "%",
+      "value": 70
+    },
+    {
+      "symbol": "dry",
+      "unit": "%",
+      "value": 80
+    },
+    {
+      "symbol": "trackGateDb",
+      "unit": "dBFS",
+      "value": -50
+    }
+  ],
+  "created": "2026-10-17T00:00:00Z",
+  "modified": "2026-10-17T00:00:00Z",
+  "copyOf": null
+}

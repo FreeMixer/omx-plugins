@@ -72,9 +72,11 @@ extern const clap_plugin_entry_t omx_clap_entry_limiter;
 extern const clap_plugin_entry_t omx_clap_entry_mbcomp;
 extern const clap_plugin_entry_t omx_clap_entry_phaser;
 extern const clap_plugin_entry_t omx_clap_entry_pitch;
+extern const clap_plugin_entry_t omx_clap_entry_plosive;
 extern const clap_plugin_entry_t omx_clap_entry_reverb;
 extern const clap_plugin_entry_t omx_clap_entry_rotary;
 extern const clap_plugin_entry_t omx_clap_entry_strip;
+extern const clap_plugin_entry_t omx_clap_entry_suboct;
 extern const clap_plugin_entry_t omx_clap_entry_transient;
 extern const clap_plugin_entry_t omx_clap_entry_tremolo;
 /* END GENERATED clap-entries */

@@ -24,8 +24,10 @@ One page for each plugin: its ids, its audio ports, its pages (the LV2 port grou
 | [omx multiband](omx-multiband.md) | `org.openmixer.multiband` | `urn:openmixer:multiband` | 42 | 7 |
 | [omx phaser](omx-phaser.md) | `org.openmixer.phaser` | `urn:openmixer:phaser` | 6 | 1 |
 | [omx pitch](omx-pitch.md) | `org.openmixer.pitch` | `urn:openmixer:pitch` | 3 | 1 |
+| [omx plosive](omx-plosive.md) | `org.openmixer.plosive` | `urn:openmixer:plosive` | 9 | 1 |
 | [omx reverb](omx-reverb.md) | `org.openmixer.reverb` | `urn:openmixer:reverb` | 13 | 4 |
 | [omx rotary](omx-rotary.md) | `org.openmixer.rotary` | `urn:openmixer:rotary` | 8 | 1 |
 | [omx strip](omx-strip.md) | `org.openmixer.strip` | `urn:openmixer:strip` | 51 | 6 |
+| [omx suboct](omx-suboct.md) | `org.openmixer.suboct` | `urn:openmixer:suboct` | 5 | 1 |
 | [omx transient](omx-transient.md) | `org.openmixer.transient` | `urn:openmixer:transient` | 5 | 1 |
 | [omx tremolo](omx-tremolo.md) | `org.openmixer.tremolo` | `urn:openmixer:tremolo` | 4 | 1 |
