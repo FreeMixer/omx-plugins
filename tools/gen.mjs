@@ -1016,7 +1016,7 @@ export function generateInstance(d) {
     keyed, keyPort: keyed ? macro(d.sidechain.symbol) : '', keySymbol: keyed ? d.sidechain.symbol : '',
     runFn: keyed && !face.keyed ? 'run_keyed' : 'run', keyTail: keyed && !face.keyed ? ', NULL' : '',
     plan: oraclePlan(d.params, d.controls ?? [], { monitors: monitorsOf(d), engaged: engagedOf(d) }), held: heldOf(d),
-    engaged: engagedOf(d).map(([i, v]) => ({ symbol: d.params[i].symbol, value: v })), monitors: monitorsOf(d).map((i) => ({ symbol: d.params[i].symbol })), stretch: oracleStretch(face), steps: d.params.map((p) => cfloat(stepOf(p))).join(', '),
+    engaged: engagedOf(d).map(([i, v]) => ({ symbol: d.params[i].symbol, value: v })), monitors: monitorsOf(d).map((i) => ({ symbol: d.params[i].symbol })), stretch: d.stretch ?? oracleStretch(face), liveStretch: d.liveStretch ?? false, spanStretch: d.stretch !== undefined, noSpan: d.stretch === undefined, steps: d.params.map((p) => cfloat(d.sabotageStep?.[p.symbol] ?? stepOf(p))).join(', '),
     chain: false,
     latencyChecks: latencyRows(d), measuresLatency: Boolean(d.latencyChecks),
     ...meterView(d, face),
@@ -1181,7 +1181,7 @@ export function generateChain(d) {
     latency: elements.map((e) => `(float)(${e.latency})`).join(' + '), refLatency: elements.map((e) => `(float)(${e.refLatency})`).join(' + '),
     keyed, keyPort: keyed ? macro(d.sidechain.symbol) : '', keySymbol: keyed ? d.sidechain.symbol : '',
     plan: oraclePlan(d.params, d.controls ?? [], { engaged: d.params.map((p, i) => i).filter((i) => d.params[i].own === 'switch' && d.params[i].element) }),
-    held: heldOf(d), stretch: keyed ? 64 : 1, steps: d.params.map((p) => cfloat(stepOf(p))).join(', '),
+    held: heldOf(d), stretch: keyed ? 64 : 1, steps: d.params.map((p) => cfloat(d.sabotageStep?.[p.symbol] ?? stepOf(p))).join(', '),
     latencyChecks: latencyRows(d), measuresLatency: Boolean(d.latencyChecks),
     // the single-face fields the shared templates read, empty for a chain
     faceType: '', srType: '', binding: [], arrays: [], renames: [], heldArgs: [],

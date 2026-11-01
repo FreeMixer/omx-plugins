@@ -58,7 +58,14 @@
 
 #define RATE 48000.0
 #define BLOCK 256u
-#define FRAMES (282u * BLOCK) /* 1.5 s at 48 kHz in whole blocks: a delay's second repeat */
+/* 1.5 s at 48 kHz in whole blocks: a delay's second repeat. OMX_PROBE_STRETCH=n runs the live test n times that
+ * long, for a kernel that walks its gain or its bands at dB per second (a declaration's "liveStretch"). */
+static uint32_t probe_frames(void) {
+  const char *e = getenv("OMX_PROBE_STRETCH");
+  const long n = e ? strtol(e, NULL, 10) : 1;
+  return 282u * BLOCK * (uint32_t)(n >= 1 && n <= 64 ? n : 1);
+}
+#define FRAMES (probe_frames())
 #define STATE_FRAMES (188u * BLOCK) /* the state test's run: one second at 48 kHz in whole blocks */
 #define MAX_PARAMS 256u
 #define MAX_SIDE 8u /* channels over every input port past the main one */
