@@ -193,6 +193,17 @@ const DEFINITIONS = {
     ['sustain-lift', 'Sustain Lift', { sustainDb: 8, sustainTimeMs: 400 }],
     ['soften', 'Soften', { attackDb: -8, attackTimeMs: 20 }],
   ],
+  'org.openmixer.suboct': [
+    ['bass-octave', 'Bass Octave', { range: 'Low', oct1: 100, oct2: 0, dry: 100 }],
+    ['deep-sub', 'Deep Sub', { range: 'Low', oct1: 60, oct2: 70, dry: 80 }],
+    ['guitar-octave', 'Guitar Octave', { range: 'Mid', oct1: 70, oct2: 0, dry: 100 }],
+    ['sub-only', 'Sub Only', { range: 'Low', oct1: 100, oct2: 0, dry: 0 }],
+  ],
+  'org.openmixer.plosive': [
+    ['spoken-voice', 'Spoken Voice', { consonantDb: 6, popDb: 12 }],
+    ['close-mic', 'Close Mic', { popDb: 18, popHz: 180, consonantDb: 8 }],
+    ['gentle', 'Gentle', { popDb: 6, consonantDb: 3, popSensitivityDb: 14 }],
+  ],
   'org.openmixer.tremolo': [
     ['classic', 'Classic', { rateHz: 5, depth: 60 }],
     ['slow-swell', 'Slow Swell', { rateHz: 0.8, depth: 80 }],

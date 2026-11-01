@@ -1,0 +1,57 @@
+{
+  "format": "org.openmixer.preset/1",
+  "plugin": "org.openmixer.plosive",
+  "id": "gentle",
+  "name": "Gentle",
+  "carries": "params",
+  "params": [
+    {
+      "symbol": "consonantDb",
+      "unit": "dB",
+      "value": 3
+    },
+    {
+      "symbol": "sensitivityDb",
+      "unit": "dB",
+      "value": 10
+    },
+    {
+      "symbol": "recoveryMs",
+      "unit": "ms",
+      "value": 8
+    },
+    {
+      "symbol": "bandHz",
+      "unit": "Hz",
+      "value": 4000
+    },
+    {
+      "symbol": "bandWidthOct",
+      "unit": "oct",
+      "value": 2
+    },
+    {
+      "symbol": "popDb",
+      "unit": "dB",
+      "value": 6
+    },
+    {
+      "symbol": "popSensitivityDb",
+      "unit": "dB",
+      "value": 14
+    },
+    {
+      "symbol": "popRecoveryMs",
+      "unit": "ms",
+      "value": 40
+    },
+    {
+      "symbol": "popHz",
+      "unit": "Hz",
+      "value": 150
+    }
+  ],
+  "created": "2026-10-17T00:00:00Z",
+  "modified": "2026-10-17T00:00:00Z",
+  "copyOf": null
+}
