@@ -65,7 +65,7 @@ static const char *const OMX_DELAY_PARAM_MODULES[OMX_DELAY_PARAM_COUNT] = {
 #define OMX_DELAY_NAME "omx delay"
 #define OMX_DELAY_VENDOR "openmixer"
 #define OMX_DELAY_URL "https://github.com/FreeMixer/omx-plugins"
-#define OMX_DELAY_VERSION "0.16.0"
+#define OMX_DELAY_VERSION "0.16.1"
 #define OMX_DELAY_DESCRIPTION "The OpenMixer console's stereo delay: one time, feedback through a tone filter, ping-pong and a wet/dry mix."
 #define OMX_DELAY_CLAP_ID "org.openmixer.delay"
 #define OMX_DELAY_CLAP_FEATURES "audio-effect", "delay", "stereo"
