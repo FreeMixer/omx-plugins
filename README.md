@@ -12,6 +12,8 @@ drawn from one declaration: its CLAP parameters, its LV2 ports and its MOD GUI c
 
 ## The plugins
 
+The table lists what the repository holds. `omx dyneq` and `omx multiband` are new and not in a release yet; they come with 0.17.0.
+
 <!-- BEGIN GENERATED catalogue: tools/gen.mjs, from each shipped plugin's declaration -->
 
 | Plugin | CLAP id | LV2 URI | What it does |
