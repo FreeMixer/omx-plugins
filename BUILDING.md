@@ -123,16 +123,24 @@ has no MOD GUI yet (its declaration carries no panel).
 ```
 plugins/<name>/
   <name>.decl.json        THE declaration: parameters, identity, panel
-  omx_<kernel>_clap.c     the CLAP face, plain C
-  omx_<kernel>_lv2.c      the LV2 face, plain C
+  omx_<kernel>_core.h     the binding: each parameter to the kernel's resolve(), and the core's vtable
+                          (struct omx_face_core) the shared faces call
+  omx_<kernel>_clap.c     the CLAP face's descriptor: the plugin's struct omx_face (its tables, its
+                          meters, its key, its core vtable) and its entry, omx_clap_entry_<kernel>
+                          (clap_entry in a standalone .clap); the face itself is lib/omx_clap_face.c
+  omx_<kernel>_lv2.c      the LV2 face's descriptor and lv2_descriptor(); the face is lib/omx_lv2_face.c
   generated/              written by `make gen`, committed: the parameter header and the LV2 bundle
   test/                   the probe and the oracle
 include/                  shared C shapes (no DSP): omx_panel_description.h and omx_param_contract.h,
-                          the openmixer extensions and their rows; omx_clap_static.h, libomxplugins' table
+                          the openmixer extensions and their rows; omx_clap_static.h, libomxplugins' table;
+                          omx_plugin_face.h, what a plugin hands the shared faces (struct omx_face), and
+                          omx_clap_face.h and omx_lv2_face.h, the faces' entry points
 contract/                 the definitions installed beside the descriptors in omx-contract's contract
                           directory: param-units.json, the param-contract units (the header's enum is
                           generated from it)
-lib/                      omx_clap_static.c (the table's rows are generated) and omxplugins.pc.in
+lib/                      omx_clap_static.c (the table's rows are generated), omxplugins.pc.in, and the
+                          two faces every plugin shares: omx_clap_face.c (one object in libomxplugins.a)
+                          and omx_lv2_face.c, each built beside the plugin's descriptor file
 tools/                    gen.mjs (header + TTL), descriptor.mjs (a declaration as its plugin
                           descriptor), omx-panel.mjs (where the installed omx-panel is found: its layout of a
                           descriptor, its lists) and param-contract.mjs (the extensions' rows),
