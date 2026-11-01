@@ -32,12 +32,12 @@ enum {
 
 static const omx_plugin_param OMX_PLOSIVE_PARAMS[OMX_PLOSIVE_PARAM_COUNT] = {
   { "consonantDb", "Consonant Cut", "dB", 0.0f, 24.0f, 6.0f, 0u },
-  { "sensitivityDb", "Consonant Sensitivity", "dB", 0.0f, 30.0f, 10.0f, 0u },
+  { "sensitivityDb", "Consonant Sensitivity", "dB", 0.0f, 30.0f, 16.0f, 0u },
   { "recoveryMs", "Consonant Recovery", "ms", 2.0f, 50.0f, 8.0f, 0u },
   { "bandHz", "Consonant Band", "Hz", 1000.0f, 12000.0f, 4000.0f, OMX_PLUGIN_PARAM_INTEGER },
   { "bandWidthOct", "Consonant Band Width", "oct", 0.5f, 4.0f, 2.0f, 0u },
   { "popDb", "Pop Cut", "dB", 0.0f, 24.0f, 12.0f, 0u },
-  { "popSensitivityDb", "Pop Sensitivity", "dB", 0.0f, 30.0f, 10.0f, 0u },
+  { "popSensitivityDb", "Pop Sensitivity", "dB", 0.0f, 30.0f, 16.0f, 0u },
   { "popRecoveryMs", "Pop Recovery", "ms", 10.0f, 200.0f, 40.0f, OMX_PLUGIN_PARAM_INTEGER },
   { "popHz", "Pop Corner", "Hz", 60.0f, 300.0f, 150.0f, OMX_PLUGIN_PARAM_INTEGER },
 };
@@ -62,7 +62,7 @@ static const char *const OMX_PLOSIVE_PARAM_MODULES[OMX_PLOSIVE_PARAM_COUNT] = {
 #define OMX_PLOSIVE_PARAM_CONSONANT_DB_DEFAULT 6.0f
 #define OMX_PLOSIVE_PARAM_SENSITIVITY_DB_MIN 0.0f
 #define OMX_PLOSIVE_PARAM_SENSITIVITY_DB_MAX 30.0f
-#define OMX_PLOSIVE_PARAM_SENSITIVITY_DB_DEFAULT 10.0f
+#define OMX_PLOSIVE_PARAM_SENSITIVITY_DB_DEFAULT 16.0f
 #define OMX_PLOSIVE_PARAM_RECOVERY_MS_MIN 2.0f
 #define OMX_PLOSIVE_PARAM_RECOVERY_MS_MAX 50.0f
 #define OMX_PLOSIVE_PARAM_RECOVERY_MS_DEFAULT 8.0f
@@ -77,7 +77,7 @@ static const char *const OMX_PLOSIVE_PARAM_MODULES[OMX_PLOSIVE_PARAM_COUNT] = {
 #define OMX_PLOSIVE_PARAM_POP_DB_DEFAULT 12.0f
 #define OMX_PLOSIVE_PARAM_POP_SENSITIVITY_DB_MIN 0.0f
 #define OMX_PLOSIVE_PARAM_POP_SENSITIVITY_DB_MAX 30.0f
-#define OMX_PLOSIVE_PARAM_POP_SENSITIVITY_DB_DEFAULT 10.0f
+#define OMX_PLOSIVE_PARAM_POP_SENSITIVITY_DB_DEFAULT 16.0f
 #define OMX_PLOSIVE_PARAM_POP_RECOVERY_MS_MIN 10.0f
 #define OMX_PLOSIVE_PARAM_POP_RECOVERY_MS_MAX 200.0f
 #define OMX_PLOSIVE_PARAM_POP_RECOVERY_MS_DEFAULT 40.0f
@@ -89,19 +89,19 @@ static const char *const OMX_PLOSIVE_PARAM_MODULES[OMX_PLOSIVE_PARAM_COUNT] = {
 #define OMX_PLOSIVE_NAME "omx plosive"
 #define OMX_PLOSIVE_VENDOR "openmixer"
 #define OMX_PLOSIVE_URL "https://github.com/FreeMixer/omx-plugins"
-#define OMX_PLOSIVE_VERSION "0.16.0"
+#define OMX_PLOSIVE_VERSION "0.16.1"
 #define OMX_PLOSIVE_DESCRIPTION "Softens the p pops and hard t and k consonants of a voice, cutting each only while it bursts."
 #define OMX_PLOSIVE_CLAP_ID "org.openmixer.plosive"
 #define OMX_PLOSIVE_CLAP_FEATURES "audio-effect", "de-esser", "stereo"
 #define OMX_PLOSIVE_LV2_URI "urn:openmixer:plosive"
 /* org.openmixer.declaration/1: the declaration's plain description and the digest of its parameters. */
 #define OMX_PLOSIVE_DECL_SOURCE "omx plosive: Consonant Cut 0 to 24 dB, Consonant Sensitivity 0 to 30 dB, Consonant Recovery 2 to 50 ms, Consonant Band 1000 to 12000 Hz, Consonant Band Width 0.5 to 4 oct, Pop Cut 0 to 24 dB, Pop Sensitivity 0 to 30 dB, Pop Recovery 10 to 200 ms, Pop Corner 60 to 300 Hz"
-#define OMX_PLOSIVE_DECL_DIGEST "13151ea198cb36d8f880ffa3678e95005dbe791fd15d9a1919580e27201ed656"
+#define OMX_PLOSIVE_DECL_DIGEST "1f7aefaa6ad81d242266a7500ef6518bd97654dee392eaa333bd5b82f1144d59"
 
 /* org.openmixer.param-contract/1 (tools/param-contract.mjs): each parameter's unit, scale and step, in
  * id order; the host's bypass, the last id, is the face's. */
 #define OMX_PLOSIVE_PARAM_CONTRACT_VERSION 1u
-#define OMX_PLOSIVE_PARAM_CONTRACT_FINGERPRINT "da7ebd8e0e82a69cde9a5acabcdd12aeabab5927dccae3cf63f8e64605ce983f"
+#define OMX_PLOSIVE_PARAM_CONTRACT_FINGERPRINT "693fcfd3bea6c88ed44fec2e124173aba261e022c3498a57d3eda0b46fd57675"
 static const struct omx_param_contract_row OMX_PLOSIVE_PARAM_CONTRACT[OMX_PLOSIVE_PARAM_COUNT] = {
   { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* consonantDb db */
   { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* sensitivityDb db */
