@@ -8,7 +8,7 @@ The OpenMixer console's stereo delay: one time, feedback through a tone filter, 
 
 - CLAP id: `org.openmixer.delay`
 - LV2 URI: `urn:openmixer:delay`
-- Parameters: 5, plus the host's bypass
+- Parameters: 17, plus the host's bypass
 
 ## Audio ports
 
@@ -23,21 +23,34 @@ A page is where a host shows a parameter. In LV2 each page is a port group, `pg:
 
 | Page | LV2 group symbol | Priority | CLAP module | Parameters |
 |---|---|---|---|---|
-| Delay | `delay` | 1 | `Delay` | 5 |
+| Delay | `delay` | 2 | `Delay` | 5 |
+| Taps | `taps` | 1 | `Taps` | 12 |
 
 ## Parameters
 
-Ids are the order below, 0 to 4; the bypass takes the next id.
+Ids are the order below, 0 to 16; the bypass takes the next id.
 
 | Id | Symbol | Name | Unit | Min | Max | Default | Step or values | Flags | Page (priority) |
 |---|---|---|---|---|---|---|---|---|---|
-| 0 | `fxDelayTime` | Time | ms | 0 | 2000 | 300 | whole steps | automatable | Delay (1) |
-| 1 | `fxDelayFeedback` | Feedback |  | 0 | 0.99 | 0.3 | continuous, linear | automatable | Delay (1) |
-| 2 | `tone` | Tone |  | 0 | 1 | 0.3 | continuous, linear | automatable | Delay (1) |
-| 3 | `mix` | Mix |  | 0 | 1 | 0.3 | continuous, linear | automatable | Delay (1) |
-| 4 | `pingpong` | Pingpong |  | off | on | off | toggle | automatable | Delay (1) |
+| 0 | `fxDelayTime` | Time | ms | 0 | 2000 | 300 | whole steps | automatable | Delay (2) |
+| 1 | `fxDelayFeedback` | Feedback |  | 0 | 0.99 | 0.3 | continuous, linear | automatable | Delay (2) |
+| 2 | `tone` | Tone |  | 0 | 1 | 0.3 | continuous, linear | automatable | Delay (2) |
+| 3 | `mix` | Mix |  | 0 | 1 | 0.3 | continuous, linear | automatable | Delay (2) |
+| 4 | `pingpong` | Pingpong |  | off | on | off | toggle | automatable | Delay (2) |
+| 5 | `fxDelayTaps` | Taps |  | 1 | 4 | 1 | whole steps | automatable | Taps (1) |
+| 6 | `tap0Gain` | Tap 1 Gain |  | 0 | 1 | 1 | continuous, linear | automatable | Taps (1) |
+| 7 | `tap0Pan` | Tap 1 Pan |  | -1 | 1 | 0 | continuous, linear | automatable | Taps (1) |
+| 8 | `tap1Factor` | Tap 2 Time |  | 0 | 10 | 1/2 (3) | 0 1/4, 1 1/3, 2 3/8, 3 1/2, 4 2/3, 5 3/4, 6 1, 7 4/3, 8 3/2, 9 2, 10 3 | automatable | Taps (1) |
+| 9 | `tap1Gain` | Tap 2 Gain |  | 0 | 1 | 0.7 | continuous, linear | automatable | Taps (1) |
+| 10 | `tap1Pan` | Tap 2 Pan |  | -1 | 1 | -0.5 | continuous, linear | automatable | Taps (1) |
+| 11 | `tap2Factor` | Tap 3 Time |  | 0 | 10 | 3/4 (5) | 0 1/4, 1 1/3, 2 3/8, 3 1/2, 4 2/3, 5 3/4, 6 1, 7 4/3, 8 3/2, 9 2, 10 3 | automatable | Taps (1) |
+| 12 | `tap2Gain` | Tap 3 Gain |  | 0 | 1 | 0.5 | continuous, linear | automatable | Taps (1) |
+| 13 | `tap2Pan` | Tap 3 Pan |  | -1 | 1 | 0.5 | continuous, linear | automatable | Taps (1) |
+| 14 | `tap3Factor` | Tap 4 Time |  | 0 | 10 | 3/2 (8) | 0 1/4, 1 1/3, 2 3/8, 3 1/2, 4 2/3, 5 3/4, 6 1, 7 4/3, 8 3/2, 9 2, 10 3 | automatable | Taps (1) |
+| 15 | `tap3Gain` | Tap 4 Gain |  | 0 | 1 | 0.35 | continuous, linear | automatable | Taps (1) |
+| 16 | `tap3Pan` | Tap 4 Pan |  | -1 | 1 | 0 | continuous, linear | automatable | Taps (1) |
 
 ## Bypass
 
-CLAP: the host's bypass, a parameter named Bypass at id 5, flagged automatable, stepped and bypass; 0 is processing, 1 bypassed.
+CLAP: the host's bypass, a parameter named Bypass at id 17, flagged automatable, stepped and bypass; 0 is processing, 1 bypassed.
 LV2: the port `enabled` (`lv2:designation lv2:enabled`), 1 is processing, 0 is bypassed; it comes after the parameter ports. The output port `latency` reports the latency in frames.

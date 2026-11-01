@@ -32,12 +32,12 @@ Ids are the order below, 0 to 8; the bypass takes the next id.
 | Id | Symbol | Name | Unit | Min | Max | Default | Step or values | Flags | Page (priority) |
 |---|---|---|---|---|---|---|---|---|---|
 | 0 | `consonantDb` | Consonant Cut | dB | 0 | 24 | 6 | continuous, linear | automatable | Plosive (1) |
-| 1 | `sensitivityDb` | Consonant Sensitivity | dB | 0 | 30 | 10 | continuous, linear | automatable | Plosive (1) |
+| 1 | `sensitivityDb` | Consonant Sensitivity | dB | 0 | 30 | 16 | continuous, linear | automatable | Plosive (1) |
 | 2 | `recoveryMs` | Consonant Recovery | ms | 2 | 50 | 8 | continuous, linear | automatable | Plosive (1) |
 | 3 | `bandHz` | Consonant Band | Hz | 1000 | 12000 | 4000 | whole steps | automatable | Plosive (1) |
 | 4 | `bandWidthOct` | Consonant Band Width | oct | 0.5 | 4 | 2 | continuous, linear | automatable | Plosive (1) |
 | 5 | `popDb` | Pop Cut | dB | 0 | 24 | 12 | continuous, linear | automatable | Plosive (1) |
-| 6 | `popSensitivityDb` | Pop Sensitivity | dB | 0 | 30 | 10 | continuous, linear | automatable | Plosive (1) |
+| 6 | `popSensitivityDb` | Pop Sensitivity | dB | 0 | 30 | 16 | continuous, linear | automatable | Plosive (1) |
 | 7 | `popRecoveryMs` | Pop Recovery | ms | 10 | 200 | 40 | whole steps | automatable | Plosive (1) |
 | 8 | `popHz` | Pop Corner | Hz | 60 | 300 | 150 | whole steps | automatable | Plosive (1) |
 

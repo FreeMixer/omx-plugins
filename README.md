@@ -16,7 +16,9 @@ drawn from one declaration: its CLAP parameters, its LV2 ports and its MOD GUI c
 
 | Plugin | CLAP id | LV2 URI | What it does |
 |---|---|---|---|
+| **omx balancer** | `org.openmixer.balancer` | `urn:openmixer:balancer` | Walks four bands slowly toward a target tone, so a mix settles toward a pink-noise balance without chasing notes. |
 | **omx chorus** | `org.openmixer.chorus` | `urn:openmixer:chorus` | The console's chorus: up to four voices read one modulated delay line, the right leg's sweep offset by the spread, mixed with the dry signal. |
+| **omx clipper** | `org.openmixer.clipper` | `urn:openmixer:clipper` | Clips the peaks at a ceiling, with drive in front and an adjustable softness of the bend. |
 | **omx comp** | `org.openmixer.comp` | `urn:openmixer:comp` | The console's compressor: threshold, ratio and knee set how hard it holds the level down, attack and release how fast, with makeup gain and a dry/wet mix. Kind picks the RMS detector (Compressor) or the peak detector (Limiter), and detector oversampling can run the control path at 4x; detector topology has it hear the input (feedforward) or its own output (feedback). Its detector can listen to a key routed to its sidechain input instead, through a high-pass, a low-pass and a tilt, on the louder leg, the mid or the side, with a hold; key listen puts what the detector hears on the output, and duck holds the reduction to a set depth. The DSP is omx-dsp's <omxdsp/fx/omx_comp_instance.h>, the console's own compressor. |
 | **omx deesser** | `org.openmixer.deesser` | `urn:openmixer:deesser` | The console's de-esser: a detector on a band around the sibilance drives the compressor's gain computer, and the reduction lands on that band alone or on the whole signal. |
 | **omx delay** | `org.openmixer.delay` | `urn:openmixer:delay` | Stereo delay up to 2 s: feedback through a tone filter that darkens each repeat, ping-pong, wet/dry mix. Zero latency, real-time safe. |
@@ -27,22 +29,37 @@ drawn from one declaration: its CLAP parameters, its LV2 ports and its MOD GUI c
 | **omx eq32** | `org.openmixer.eq32` | `urn:openmixer:eq32` | The console's channel EQ in its 32-band form: 32 parametric bands (bell, shelves, notch, all-pass) plus high- and low-pass filters at 12 or 24 dB/oct. Stereo, zero latency. |
 | **omx flanger** | `org.openmixer.flanger` | `urn:openmixer:flanger` | The console's flanger: one modulated short delay with signed feedback, swept by one oscillator and mixed with the dry signal. |
 | **omx geq** | `org.openmixer.geq` | `urn:openmixer:geq` | The console's 31-band graphic EQ: one fader per ISO third-octave band, 20 Hz to 20 kHz, ±15 dB each, designed in double precision so the lowest bands hold their shape at 192 kHz. Stereo, zero latency. |
+| **omx glue** | `org.openmixer.glue` | `urn:openmixer:glue` | A bus compressor with the detents of a classic console: stepped ratio, attack and release, a key filter and a dry mix. |
 | **omx keyed-gate** | `org.openmixer.keyed-gate` | `urn:openmixer:keyed-gate` | The console's channel gate with a sidechain key: the detector listens to the key your host routes to it, or to the signal itself. One gain for both legs, so the stereo image never shifts. Real-time safe. |
 | **omx limiter** | `org.openmixer.limiter` | `urn:openmixer:limiter` | The precision limiter: a look-ahead, true-peak, stereo-linked brickwall. |
+| **omx loudlevel** | `org.openmixer.loudlevel` | `urn:openmixer:loudlevel` | Holds a signal at a loudness target by moving its gain slowly, with a gate so pauses are left alone. |
 | **omx multiband** | `org.openmixer.multiband` | `urn:openmixer:multiband` | A multiband compressor: two to five bands split by Linkwitz-Riley crossovers, each band its own compressor with threshold, ratio, attack, release, make-up, solo and bypass, then a mix and an output gain, for in-ear mixes, vocals and playback buses. |
 | **omx phaser** | `org.openmixer.phaser` | `urn:openmixer:phaser` | The console's phaser: identical all-pass sections swept in octaves by one oscillator, with feedback around the chain and a wet/dry mix. |
 | **omx pitch** | `org.openmixer.pitch` | `urn:openmixer:pitch` | The console's pitch shifter: shifts both channels up or down by semitones and cents, without changing their length, mixed with the dry signal. |
 | **omx plosive** | `org.openmixer.plosive` | `urn:openmixer:plosive` | Softens the p pops and hard t and k consonants of a voice, cutting each only while it bursts. |
 | **omx reverb** | `org.openmixer.reverb` | `urn:openmixer:reverb` | The console's reverb: room, plate, hall, reverse and gated algorithms with pre-delay, size, damping, width and low and high cuts, mixed with the dry signal. |
 | **omx rotary** | `org.openmixer.rotary` | `urn:openmixer:rotary` | The console's rotary speaker: a drum rotor on the low band and a horn rotor on the high band, with stop, slow and fast speeds, mixed with the dry signal. |
+| **omx spring** | `org.openmixer.spring` | `urn:openmixer:spring` | A spring reverb: a delay, a chain of all-passes and a darkening loop, with decay, length, tension and damping. |
 | **omx strip** | `org.openmixer.strip` | `urn:openmixer:strip` | The console's channel strip in one plugin: input trim, HPF/LPF, gate, four-band EQ and compressor, in the desk's order or any other. Stereo, real-time safe. |
 | **omx suboct** | `org.openmixer.suboct` | `urn:openmixer:suboct` | Adds a note one or two octaves below a single played line, by dividing its pitch, with a tracking range and a gate for quiet input. |
 | **omx transient** | `org.openmixer.transient` | `urn:openmixer:transient` | The console's transient designer: more or less attack and sustain, from two envelope contrasts, with no threshold to set. |
 | **omx tremolo** | `org.openmixer.tremolo` | `urn:openmixer:tremolo` | The console's tremolo and auto-pan: one oscillator turned into a level change on both legs, or into a left-right pan. |
+| **omx upward** | `org.openmixer.upward` | `urn:openmixer:upward` | Lifts what is quiet toward a threshold, by a ratio and up to a limit, and leaves the loud alone. |
 
 <!-- END GENERATED catalogue -->
 
 <!-- BEGIN GENERATED sections: tools/gen.mjs, from each shipped plugin's declaration (its manual, else its parameters) -->
+
+### omx balancer
+
+| Parameter | Range | Default |
+|---|---|---|
+| Amount | 0 to 100 %, whole steps | 0 % |
+| Range | 1 to 12 dB | 3 dB |
+| Speed | 0.1 to 6 dB | 0.5 dB |
+| Slope | -6 to 0 dB/oct | -3 dB/oct |
+
+Plus the host's bypass.
 
 ### omx chorus
 
@@ -53,6 +70,16 @@ drawn from one declaration: its CLAP parameters, its LV2 ports and its MOD GUI c
 | Depth | 0 to 12 ms | 4 ms |
 | Voices | 1 to 4, whole steps | 3 |
 | Mix | 0 to 100 % | 35 % |
+
+Plus the host's bypass.
+
+### omx clipper
+
+| Parameter | Range | Default |
+|---|---|---|
+| Drive | 0 to 24 dB | 0 dB |
+| Ceiling | -24 to 0 dB | 0 dB |
+| Softness | 0 to 100 %, whole steps | 0 % |
 
 Plus the host's bypass.
 
@@ -106,6 +133,20 @@ Plus the host's bypass.
 | Mix (wet) | 0 to 1 | 0.3 |
 | Tone (0 bright, 1 dark repeats) | 0 to 1 | 0.3 |
 | Ping-pong | off / on | off |
+| Taps (engaged read taps of the one delay line) | 1 to 4, whole steps | 1 |
+| Tap 1 gain | 0 to 1 | 1 |
+| Tap 1 pan (left to right) | -1 to 1 | 0 |
+| Tap 2 time (a share of the delay time) | 1/4 to 3 | 1/2 |
+| Tap 2 gain | 0 to 1 | 0.7 |
+| Tap 2 pan (left to right) | -1 to 1 | -0.5 |
+| Tap 3 time (a share of the delay time) | 1/4 to 3 | 3/4 |
+| Tap 3 gain | 0 to 1 | 0.5 |
+| Tap 3 pan (left to right) | -1 to 1 | 0.5 |
+| Tap 4 time (a share of the delay time) | 1/4 to 3 | 3/2 |
+| Tap 4 gain | 0 to 1 | 0.35 |
+| Tap 4 pan (left to right) | -1 to 1 | 0 |
+
+With one tap the delay is the single-tap echo. Raising Taps adds the second to fourth reads of the same line, each with its own time, gain and pan; the feedback comes from the longest engaged tap, so a pattern repeats as a whole.
 
 Plus the host's bypass. The tone filter holds the same corner at every sample rate, so a session
 moved from 48 to 96 kHz sounds the same.
@@ -290,6 +331,20 @@ Plus the host's bypass.
 
 Plus the host's bypass.
 
+### omx glue
+
+| Parameter | Range | Default |
+|---|---|---|
+| Threshold | -40 to 0 dB | -10 dB |
+| Ratio | 2:1 / 4:1 / 10:1 | 2:1 |
+| Attack | 0.1 ms / 0.3 ms / 1 ms / 3 ms / 10 ms / 30 ms | 10 ms |
+| Release | 0.1 s / 0.3 s / 0.6 s / 1.2 s / Auto | Auto |
+| Makeup | 0 to 24 dB | 0 dB |
+| Key High-pass | 0 to 500 Hz, whole steps | 0 Hz |
+| Mix | 0 to 100 %, whole steps | 100 % |
+
+Plus the host's bypass.
+
 ### omx keyed-gate
 
 The console's gate, keyed: the stereo signal is gated while the detector listens to a second, mono
@@ -323,6 +378,18 @@ bundle loads this one.
 | Ceiling | -12 to 0 dBFS | -1 dBFS |
 | Lookahead | 0.5 to 5 ms | 1.5 ms |
 | Release | 1 to 1000 ms, whole steps | 50 ms |
+
+Plus the host's bypass.
+
+### omx loudlevel
+
+| Parameter | Range | Default |
+|---|---|---|
+| Target | -40 to -6 dB | -23 dB |
+| Range | 0 to 24 dB | 0 dB |
+| Speed | 0.1 to 6 dB | 1 dB |
+| Gate | -70 to -30 dB, whole steps | -50 dB |
+| Window | Momentary / Short-term | Short-term |
 
 Plus the host's bypass.
 
@@ -403,12 +470,12 @@ Plus the host's bypass.
 | Parameter | Range | Default |
 |---|---|---|
 | Consonant Cut | 0 to 24 dB | 6 dB |
-| Consonant Sensitivity | 0 to 30 dB | 10 dB |
+| Consonant Sensitivity | 0 to 30 dB | 16 dB |
 | Consonant Recovery | 2 to 50 ms | 8 ms |
 | Consonant Band | 1000 to 12000 Hz, whole steps | 4000 Hz |
 | Consonant Band Width | 0.5 to 4 oct | 2 oct |
 | Pop Cut | 0 to 24 dB | 12 dB |
-| Pop Sensitivity | 0 to 30 dB | 10 dB |
+| Pop Sensitivity | 0 to 30 dB | 16 dB |
 | Pop Recovery | 10 to 200 ms, whole steps | 40 ms |
 | Pop Corner | 60 to 300 Hz, whole steps | 150 Hz |
 
@@ -446,6 +513,18 @@ Plus the host's bypass.
 | Balance | -100 to 100 %, whole steps | 0 % |
 | Mix | 0 to 100 % | 100 % |
 | Speed | Stop / Slow / Fast | Slow |
+
+Plus the host's bypass.
+
+### omx spring
+
+| Parameter | Range | Default |
+|---|---|---|
+| Decay | 0.5 to 8 s | 2 s |
+| Length | 20 to 60 ms, whole steps | 35 ms |
+| Tension | 0 to 100 %, whole steps | 50 % |
+| Damping | 1000 to 10000 Hz, whole steps | 4000 Hz |
+| Mix | 0 to 100 %, whole steps | 0 % |
 
 Plus the host's bypass.
 
@@ -500,6 +579,18 @@ Plus the host's bypass.
 | Depth | 0 to 100 % | 50 % |
 | Mix | 0 to 100 % | 100 % |
 | Mode | Tremolo / Pan | Tremolo |
+
+Plus the host's bypass.
+
+### omx upward
+
+| Parameter | Range | Default |
+|---|---|---|
+| Threshold | -70 to 0 dB | -40 dB |
+| Ratio | 1 to 10 | 1 |
+| Range | 0 to 24 dB | 6 dB |
+| Attack | 0.1 to 100 ms | 5 ms |
+| Release | 5 to 3000 ms, whole steps | 200 ms |
 
 Plus the host's bypass.
 

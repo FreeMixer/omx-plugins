@@ -8,10 +8,12 @@ One page for each plugin: its ids, its audio ports, its pages (the LV2 port grou
 
 | Plugin | CLAP id | LV2 URI | Parameters | Pages |
 |---|---|---|---|---|
+| [omx balancer](omx-balancer.md) | `org.openmixer.balancer` | `urn:openmixer:balancer` | 4 | 1 |
 | [omx chorus](omx-chorus.md) | `org.openmixer.chorus` | `urn:openmixer:chorus` | 5 | 1 |
+| [omx clipper](omx-clipper.md) | `org.openmixer.clipper` | `urn:openmixer:clipper` | 3 | 1 |
 | [omx comp](omx-comp.md) | `org.openmixer.comp` | `urn:openmixer:comp` | 19 | 3 |
 | [omx deesser](omx-deesser.md) | `org.openmixer.deesser` | `urn:openmixer:deesser` | 8 | 1 |
-| [omx delay](omx-delay.md) | `org.openmixer.delay` | `urn:openmixer:delay` | 5 | 1 |
+| [omx delay](omx-delay.md) | `org.openmixer.delay` | `urn:openmixer:delay` | 17 | 2 |
 | [omx drive](omx-drive.md) | `org.openmixer.drive` | `urn:openmixer:drive` | 11 | 1 |
 | [omx dyneq](omx-dyneq.md) | `org.openmixer.dyneq` | `urn:openmixer:dyneq` | 73 | 7 |
 | [omx eq16](omx-eq16.md) | `org.openmixer.eq16` | `urn:openmixer:eq16` | 86 | 18 |
@@ -19,15 +21,19 @@ One page for each plugin: its ids, its audio ports, its pages (the LV2 port grou
 | [omx eq8](omx-eq8.md) | `org.openmixer.eq8` | `urn:openmixer:eq8` | 46 | 10 |
 | [omx flanger](omx-flanger.md) | `org.openmixer.flanger` | `urn:openmixer:flanger` | 4 | 1 |
 | [omx geq](omx-geq.md) | `org.openmixer.geq` | `urn:openmixer:geq` | 31 | 1 |
+| [omx glue](omx-glue.md) | `org.openmixer.glue` | `urn:openmixer:glue` | 7 | 1 |
 | [omx keyed-gate](omx-keyed-gate.md) | `org.openmixer.keyed-gate` | `urn:openmixer:keyed-gate` | 12 | 2 |
 | [omx limiter](omx-limiter.md) | `org.openmixer.limiter` | `urn:openmixer:limiter` | 3 | 1 |
+| [omx loudlevel](omx-loudlevel.md) | `org.openmixer.loudlevel` | `urn:openmixer:loudlevel` | 5 | 1 |
 | [omx multiband](omx-multiband.md) | `org.openmixer.multiband` | `urn:openmixer:multiband` | 42 | 7 |
 | [omx phaser](omx-phaser.md) | `org.openmixer.phaser` | `urn:openmixer:phaser` | 6 | 1 |
 | [omx pitch](omx-pitch.md) | `org.openmixer.pitch` | `urn:openmixer:pitch` | 3 | 1 |
 | [omx plosive](omx-plosive.md) | `org.openmixer.plosive` | `urn:openmixer:plosive` | 9 | 1 |
 | [omx reverb](omx-reverb.md) | `org.openmixer.reverb` | `urn:openmixer:reverb` | 13 | 4 |
 | [omx rotary](omx-rotary.md) | `org.openmixer.rotary` | `urn:openmixer:rotary` | 8 | 1 |
+| [omx spring](omx-spring.md) | `org.openmixer.spring` | `urn:openmixer:spring` | 5 | 1 |
 | [omx strip](omx-strip.md) | `org.openmixer.strip` | `urn:openmixer:strip` | 51 | 6 |
 | [omx suboct](omx-suboct.md) | `org.openmixer.suboct` | `urn:openmixer:suboct` | 5 | 1 |
 | [omx transient](omx-transient.md) | `org.openmixer.transient` | `urn:openmixer:transient` | 5 | 1 |
 | [omx tremolo](omx-tremolo.md) | `org.openmixer.tremolo` | `urn:openmixer:tremolo` | 4 | 1 |
+| [omx upward](omx-upward.md) | `org.openmixer.upward` | `urn:openmixer:upward` | 5 | 1 |
