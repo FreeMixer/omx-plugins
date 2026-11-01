@@ -1181,7 +1181,7 @@ export function generateChain(d) {
     latency: elements.map((e) => `(float)(${e.latency})`).join(' + '), refLatency: elements.map((e) => `(float)(${e.refLatency})`).join(' + '),
     keyed, keyPort: keyed ? macro(d.sidechain.symbol) : '', keySymbol: keyed ? d.sidechain.symbol : '',
     plan: oraclePlan(d.params, d.controls ?? [], { engaged: d.params.map((p, i) => i).filter((i) => d.params[i].own === 'switch' && d.params[i].element) }),
-    held: heldOf(d), stretch: keyed ? 64 : 1, steps: d.params.map((p) => cfloat(d.sabotageStep?.[p.symbol] ?? stepOf(p))).join(', '),
+    held: heldOf(d), stretch: keyed ? 64 : 1, noSpan: true, steps: d.params.map((p) => cfloat(d.sabotageStep?.[p.symbol] ?? stepOf(p))).join(', '),
     latencyChecks: latencyRows(d), measuresLatency: Boolean(d.latencyChecks),
     // the single-face fields the shared templates read, empty for a chain
     faceType: '', srType: '', binding: [], arrays: [], renames: [], heldArgs: [],

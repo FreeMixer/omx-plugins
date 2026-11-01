@@ -45,6 +45,7 @@
 #define KEYED 0
 /* Each block of the plan is processed this many times in a row, the same values each time. */
 #define STRETCH 1u
+#define SPAN 1u
 
 /* One block: its length (frames, or ms when ms > 0), the stimulus it carries (0 the moving bursts,
  * 1 a full-scale burst, 2 the quiet tail), the declared parameters (declaration order) and the
