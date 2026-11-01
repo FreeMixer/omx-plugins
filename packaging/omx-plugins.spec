@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # Copyright (C) 2026 Pau Aliagas <linuxnow@gmail.com>
 Name: omx-plugins
-Version: 0.16.1
+Version: 0.17.0
 Release: 1%{?dist}
 License: GPL-3.0-or-later
 Summary: The OpenMixer console's delay, drive, EQ, channel strip, keyed gate and effects, as plugins for your DAW
@@ -261,7 +261,7 @@ tools/pins-check.sh %{buildroot}%{_datadir}/plugin-hostd/pins.d/omx-plugins.pins
 # END GENERATED lv2-files
 
 %changelog
-* Sat Oct 31 2026 Pau Aliagas <linuxnow@gmail.com> - 0.16.1-1
+* Sat Oct 31 2026 Pau Aliagas <linuxnow@gmail.com> - 0.17.0-1
 - omx-dyneq, the six-band dynamic EQ, and omx-multiband, the multiband
   compressor of two to five bands, from omx-dsp 0.26.0's kernels (#179).
 - omx-comp takes a key: a sidechain port, the key and duck sections and
@@ -276,7 +276,15 @@ tools/pins-check.sh %{buildroot}%{_datadir}/plugin-hostd/pins.d/omx-plugins.pins
   directory lines (#278).
 - omx-test-pool-voice, a test instrument that renders its voices as
   clap.thread-pool tasks (installed by omx-plugins-test only).
-- The build floors are omx-dsp 0.27.0 and plugin-hostd 0.15.2.
+- omx-suboct (sub-octaver), omx-plosive (plosive tamer), omx-clipper,
+  omx-upward (upward compressor), omx-glue (bus compressor), omx-loudlevel
+  (loudness leveler), omx-balancer (spectral balancer) and omx-spring
+  (spring reverb), each with its factory presets.
+- omx-delay takes up to four read taps of its one line: the number of taps
+  and, for each, its time, gain and pan.
+- The unit codes come from omx-contract 3.6.0 (omx_param_units.h); the copy in
+  omx-plugins-contract is gone, and the build floors are omx-dsp 0.28.0,
+  omx-contract 3.6.0 and plugin-hostd 0.15.2.
 
 * Thu Oct 29 2026 Pau Aliagas <linuxnow@gmail.com> - 0.16.0-1
 - The EQs carry one parameter group per band on eq8, eq16 and eq32, so a

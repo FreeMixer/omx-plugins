@@ -1,4 +1,4 @@
-omx-plugins (0.16.1) unstable; urgency=medium
+omx-plugins (0.17.0) unstable; urgency=medium
 
   * omx-dyneq, the six-band dynamic EQ, and omx-multiband, the multiband
     compressor of two to five bands, from omx-dsp 0.26.0's kernels (#179).
@@ -14,7 +14,15 @@ omx-plugins (0.16.1) unstable; urgency=medium
     directory lines (#278).
   * omx-test-pool-voice, a test instrument that renders its voices as
     clap.thread-pool tasks (installed by omx-plugins-test only).
-  * The build floors are omx-dsp 0.27.0 and plugin-hostd 0.15.2.
+  * omx-suboct (sub-octaver), omx-plosive (plosive tamer), omx-clipper,
+    omx-upward (upward compressor), omx-glue (bus compressor), omx-loudlevel
+    (loudness leveler), omx-balancer (spectral balancer) and omx-spring
+    (spring reverb), each with its factory presets.
+  * omx-delay takes up to four read taps of its one line: the number of
+    taps and, for each, its time, gain and pan.
+  * The unit codes come from omx-contract 3.6.0 (omx_param_units.h); the
+    copy in omx-plugins-contract is gone, and the build floors are omx-dsp
+    0.28.0, omx-contract 3.6.0 and plugin-hostd 0.15.2.
 
  -- Pau Aliagas <linuxnow@gmail.com>  Sat, 31 Oct 2026 12:00:00 +0100
 
