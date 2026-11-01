@@ -19,7 +19,7 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { contractUnits, declaredUnits, headerUnits, PARAM_CONTRACT_H, scalesOf } from '../param-contract.mjs';
-import { locateContract } from '../omx-contract.mjs';
+import { installedDataDir, locateContract } from '../omx-contract.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const HEADER = 'include/omx_param_contract.h';
@@ -48,7 +48,10 @@ if (!contract.dir) {
   process.exit(1);
 }
 /** The header omx-contract renders beside its data: <prefix>/share/omx-contract/.. and <prefix>/include/omxcontract/. */
-const renderedHeader = [join(contract.dir, '..', '..', 'include', 'omxcontract', 'omx_param_units.h'), join(contract.dir, '..', '..', '..', 'include', 'omxcontract', 'omx_param_units.h')].find((p) => existsSync(p));
+// contract.dir is a union render under build/ when omx-contract keeps its kernels in the contract directory, so the installed
+// data directory is looked at as well
+const beside = [contract.dir, installedDataDir()].filter(Boolean);
+const renderedHeader = beside.flatMap((d) => [join(d, '..', '..', 'include', 'omxcontract', 'omx_param_units.h'), join(d, '..', '..', '..', 'include', 'omxcontract', 'omx_param_units.h')]).find((p) => existsSync(p));
 const errors = [];
 const units = declaredUnits(contract.dir);
 if (!renderedHeader) errors.push(`omxcontract/omx_param_units.h: not found beside ${contract.dir}; install omx-contract-devel >= 3.6.0`);
