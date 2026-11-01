@@ -26,7 +26,7 @@
     lv2:microVersion 0 ;
     rdfs:comment "The console's flanger: one modulated short delay with signed feedback, swept by one oscillator and mixed with the dry signal." ;
     lv2:optionalFeature lv2:hardRTCapable ;
-    omxres:threadsSpawned "0"^^xsd:unsignedInt ;
+    omxres:threadsSpawned "0"^^xsd:integer ;
     omxres:streamsFromDisk false ;
     omxres:opensSockets false ;
     lv2:port

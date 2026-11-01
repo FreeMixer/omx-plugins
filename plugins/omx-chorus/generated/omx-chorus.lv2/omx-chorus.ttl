@@ -26,7 +26,7 @@
     lv2:microVersion 0 ;
     rdfs:comment "The console's chorus: up to four voices read one modulated delay line, the right leg's sweep offset by the spread, mixed with the dry signal." ;
     lv2:optionalFeature lv2:hardRTCapable ;
-    omxres:threadsSpawned "0"^^xsd:unsignedInt ;
+    omxres:threadsSpawned "0"^^xsd:integer ;
     omxres:streamsFromDisk false ;
     omxres:opensSockets false ;
     lv2:port

@@ -27,7 +27,7 @@
     lv2:microVersion 0 ;
     rdfs:comment "The console's tremolo and auto-pan: one oscillator turned into a level change on both legs, or into a left-right pan." ;
     lv2:optionalFeature lv2:hardRTCapable ;
-    omxres:threadsSpawned "0"^^xsd:unsignedInt ;
+    omxres:threadsSpawned "0"^^xsd:integer ;
     omxres:streamsFromDisk false ;
     omxres:opensSockets false ;
     lv2:port
