@@ -27,9 +27,9 @@ export const REQUIRED_HINTS = Object.freeze(['threads-spawned', 'streams-from-di
 
 /** The C type, XSD datatype and the largest figure of a hint, by the word of RESOURCE_UNITS it is given in. */
 export const HINT_UNITS = Object.freeze({
-  bytes: { c: 'uint64_t', xsd: 'unsignedLong', max: Number.MAX_SAFE_INTEGER },
-  count: { c: 'uint32_t', xsd: 'unsignedInt', max: 0xffffffff },
-  ms: { c: 'uint32_t', xsd: 'unsignedInt', max: 0xffffffff },
+  bytes: { c: 'uint64_t', xsd: 'integer', max: Number.MAX_SAFE_INTEGER },
+  count: { c: 'uint32_t', xsd: 'integer', max: 0xffffffff },
+  ms: { c: 'uint32_t', xsd: 'integer', max: 0xffffffff },
   flag: { c: 'bool', xsd: 'boolean' },
 });
 
