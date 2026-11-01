@@ -4,7 +4,7 @@ Priority: optional
 Maintainer: Pau Aliagas <linuxnow@gmail.com>
 Build-Depends: debhelper-compat (= 13),
                clap-headers,
-               libomxdsp-dev (>= 0.27.0),
+               libomxdsp-dev (>= 0.28.0),
                libomx-contract-dev (>= 3.6.0),
                libomx-clap-core-dev (>= 0.14.0),
                plugin-hostd-dev (>= 0.15.2),
@@ -36,6 +36,8 @@ Description: OpenMixer delay, drive, EQ, strip, gate and effects (CLAP, LV2)
  sidechain input, and the console's effects: chorus, flanger, phaser,
  tremolo, rotary speaker, reverb, pitch shifter, transient shaper, de-esser,
  sub-octaver, plosive tamer,
+ clipper, upward compressor, bus compressor, loudness leveler,
+ spectral balancer, spring reverb,
  limiter, compressor with its sidechain key, multiband compressor and dynamic
  EQ. They come as CLAP plugins for Bitwig, REAPER and Carla, and as LV2
  plugins for Ardour, Carla, MOD and Zynthian. Each one runs the same DSP as the
@@ -54,6 +56,8 @@ Description: OpenMixer delay, drive, EQ, strip, gate and effects as CLAP plugins
  graphic EQ, channel strip, keyed gate and effects (chorus, flanger, phaser,
  tremolo, rotary speaker, reverb, pitch shifter, transient shaper, de-esser,
  sub-octaver, plosive tamer,
+ clipper, upward compressor, bus compressor, loudness leveler,
+ spectral balancer, spring reverb,
  limiter, compressor) as CLAP plugins, installed in /usr/lib/clap where Bitwig,
  REAPER, Carla and other CLAP hosts find them. They run the console's own DSP,
  so they sound like the desk, sample for sample.
@@ -70,7 +74,7 @@ Description: OpenMixer test instruments, for host tests and plugin measurement
 Package: omx-plugins-dev
 Section: libdevel
 Architecture: any
-Depends: libomxdsp-dev (>= 0.27.0), libomx-contract-dev (>= 3.6.0), omx-plugins-contract (= ${source:Version}), clap-headers, ${misc:Depends}
+Depends: libomxdsp-dev (>= 0.28.0), libomx-contract-dev (>= 3.6.0), omx-plugins-contract (= ${source:Version}), clap-headers, ${misc:Depends}
 Description: Headers and static library of the OpenMixer plugins
  The headers other projects include to use the OpenMixer plugins' parameters
  and instance code, such as omx_delay_core.h and each plugin's generated
@@ -99,6 +103,8 @@ Description: OpenMixer delay, drive, EQ, strip, gate and effects as LV2 plugins
  graphic EQ, channel strip, keyed gate and effects (chorus, flanger, phaser,
  tremolo, rotary speaker, reverb, pitch shifter, transient shaper, de-esser,
  sub-octaver, plosive tamer,
+ clipper, upward compressor, bus compressor, loudness leveler,
+ spectral balancer, spring reverb,
  limiter, compressor) as LV2 plugins, installed in /usr/lib/lv2 where Ardour,
  Carla, MOD and Zynthian find them, with a MOD GUI where the plugin has one.
  They run the console's own DSP, so they sound like the desk, sample for
