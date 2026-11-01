@@ -41,6 +41,7 @@
 #define KEYED 0
 /* Each block of the plan is processed this many times in a row, the same values each time. */
 #define STRETCH 1u
+#define SPAN 1u
 
 /* One block: its length (frames, or ms when ms > 0), the stimulus it carries (0 the moving bursts,
  * 1 a full-scale burst, 2 the quiet tail), the declared parameters (declaration order) and the
@@ -54,20 +55,20 @@ typedef struct {
 } Block;
 
 static const Block PLAN[] = {
-    { 64, 0.0f, 0, {6.0f, 30.0f, 38.0f, 6500.0f, 0.85f, 8.4f, 10.0f, 200.0f, 240.0f}, 0 },
+    { 64, 0.0f, 0, {6.0f, 30.0f, 38.0f, 6500.0f, 0.85f, 8.4f, 16.0f, 200.0f, 240.0f}, 0 },
     { 1, 0.0f, 0, {6.0f, 0.0f, 8.0f, 10900.0f, 2.6f, 12.0f, 7.5f, 10.0f, 150.0f}, 0 },
     { 333, 0.0f, 0, {24.0f, 22.5f, 26.0f, 2100.0f, 1.725f, 12.0f, 30.0f, 153.0f, 180.0f}, 0 },
-    { 512, 0.0f, 0, {0.0f, 10.0f, 45.2f, 7600.0f, 2.0f, 6.0f, 0.0f, 40.0f, 276.0f}, 0 },
+    { 512, 0.0f, 0, {0.0f, 16.0f, 45.2f, 7600.0f, 2.0f, 6.0f, 0.0f, 40.0f, 276.0f}, 0 },
     { 17, 0.0f, 0, {18.0f, 15.0f, 6.8f, 4850.0f, 2.0f, 24.0f, 22.5f, 105.0f, 84.0f}, 1 },
-    { 480, 0.0f, 0, {6.0f, 27.0f, 30.8f, 4000.0f, 1.375f, 0.0f, 10.0f, 181.0f, 204.0f}, 1 },
+    { 480, 0.0f, 0, {6.0f, 27.0f, 30.8f, 4000.0f, 1.375f, 0.0f, 16.0f, 181.0f, 204.0f}, 1 },
     { 129, 0.0f, 0, {12.0f, 3.0f, 18.8f, 4000.0f, 4.0f, 18.0f, 15.0f, 29.0f, 144.0f}, 0 },
     { 1024, 0.0f, 0, {21.6f, 18.0f, 8.0f, 3750.0f, 0.5f, 12.0f, 27.0f, 124.0f, 150.0f}, 0 },
     { 7, 0.0f, 0, {2.4f, 10.5f, 8.0f, 12000.0f, 3.125f, 12.0f, 3.0f, 77.0f, 150.0f}, 0 },
-    { 2500, 0.0f, 0, {14.4f, 10.0f, 14.0f, 1000.0f, 2.0f, 21.6f, 18.0f, 40.0f, 120.0f}, 0 },
-    { 600, 0.0f, 0, {8.4f, 10.0f, 50.0f, 9250.0f, 2.25f, 2.4f, 10.5f, 40.0f, 300.0f}, 0 },
-    { 3000, 0.0f, 0, {6.0f, 7.5f, 2.0f, 4000.0f, 3.65f, 14.4f, 10.0f, 58.0f, 60.0f}, 0 },
-    { 0, 10.0f, 1, {6.0f, 10.0f, 8.0f, 4000.0f, 2.0f, 12.0f, 10.0f, 40.0f, 150.0f}, 0 },
-    { 0, 100.0f, 2, {6.0f, 10.0f, 8.0f, 4000.0f, 2.0f, 12.0f, 10.0f, 40.0f, 150.0f}, 0 },
+    { 2500, 0.0f, 0, {14.4f, 16.0f, 14.0f, 1000.0f, 2.0f, 21.6f, 18.0f, 40.0f, 120.0f}, 0 },
+    { 600, 0.0f, 0, {8.4f, 16.0f, 50.0f, 9250.0f, 2.25f, 2.4f, 10.5f, 40.0f, 300.0f}, 0 },
+    { 3000, 0.0f, 0, {6.0f, 7.5f, 2.0f, 4000.0f, 3.65f, 14.4f, 16.0f, 58.0f, 60.0f}, 0 },
+    { 0, 10.0f, 1, {6.0f, 16.0f, 8.0f, 4000.0f, 2.0f, 12.0f, 16.0f, 40.0f, 150.0f}, 0 },
+    { 0, 100.0f, 2, {6.0f, 16.0f, 8.0f, 4000.0f, 2.0f, 12.0f, 16.0f, 40.0f, 150.0f}, 0 },
 };
 #define NBLOCKS (sizeof PLAN / sizeof PLAN[0])
 
@@ -107,7 +108,7 @@ static void signal_make(float *l, float *r, uint32_t n, double sr) {
   uint32_t start = 0, end = 0;
   size_t b = 0;
   for (uint32_t i = 0; i < n; i++) {
-    while (i >= end && b < NBLOCKS) start = end, end += frames_of(&PLAN[b++], sr);
+    while (i >= end && b < NBLOCKS) start = end, end += frames_of(&PLAN[b++], sr) * SPAN;
     const int sig = PLAN[b - 1].signal;
     seed = seed * 1664525u + 1013904223u;
     const float a = (float)(seed >> 8) / 16777216.0f - 0.5f;

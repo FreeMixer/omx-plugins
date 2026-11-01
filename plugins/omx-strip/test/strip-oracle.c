@@ -276,7 +276,7 @@ static void signal_make(float *l, float *r, uint32_t n, double sr) {
   uint32_t start = 0, end = 0;
   size_t b = 0;
   for (uint32_t i = 0; i < n; i++) {
-    while (i >= end && b < NBLOCKS) start = end, end += frames_of(&PLAN[b++], sr);
+    while (i >= end && b < NBLOCKS) start = end, end += frames_of(&PLAN[b++], sr) * SPAN;
     const int sig = PLAN[b - 1].signal;
     seed = seed * 1664525u + 1013904223u;
     const float a = (float)(seed >> 8) / 16777216.0f - 0.5f;
