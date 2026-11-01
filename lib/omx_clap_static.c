@@ -32,9 +32,11 @@ const struct omx_clap_static_plugin OMX_CLAP_STATIC_PLUGINS[] = {
     {"org.openmixer.multiband", &omx_clap_entry_mbcomp},
     {"org.openmixer.phaser", &omx_clap_entry_phaser},
     {"org.openmixer.pitch", &omx_clap_entry_pitch},
+    {"org.openmixer.plosive", &omx_clap_entry_plosive},
     {"org.openmixer.reverb", &omx_clap_entry_reverb},
     {"org.openmixer.rotary", &omx_clap_entry_rotary},
     {"org.openmixer.strip", &omx_clap_entry_strip},
+    {"org.openmixer.suboct", &omx_clap_entry_suboct},
     {"org.openmixer.transient", &omx_clap_entry_transient},
     {"org.openmixer.tremolo", &omx_clap_entry_tremolo},
     /* END GENERATED clap-table */
