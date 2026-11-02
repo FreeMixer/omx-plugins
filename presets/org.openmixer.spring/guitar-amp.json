@@ -1,0 +1,37 @@
+{
+  "format": "org.openmixer.preset/1",
+  "plugin": "org.openmixer.spring",
+  "id": "guitar-amp",
+  "name": "Guitar Amp",
+  "carries": "params",
+  "params": [
+    {
+      "symbol": "decayS",
+      "unit": "s",
+      "value": 2
+    },
+    {
+      "symbol": "lengthMs",
+      "unit": "ms",
+      "value": 35
+    },
+    {
+      "symbol": "tensionPct",
+      "unit": "%",
+      "value": 50
+    },
+    {
+      "symbol": "dampHz",
+      "unit": "Hz",
+      "value": 4000
+    },
+    {
+      "symbol": "mixPct",
+      "unit": "%",
+      "value": 25
+    }
+  ],
+  "created": "2026-10-17T00:00:00Z",
+  "modified": "2026-10-17T00:00:00Z",
+  "copyOf": null
+}

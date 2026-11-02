@@ -132,7 +132,7 @@ test: all check $(B)/clap-probe $(B)/panel-probe $(B)/clap-ext-probe $(B)/port-g
 	@fail=0; \
 	$(B)/clap-probe params $(B)/$(NAME).clap > $(B)/clap-params.txt && \
 	  node $(ROOT)/tools/clap-params-check.mjs $(CURDIR) $(B)/clap-params.txt || fail=1; \
-	$(B)/clap-probe live $(B)/$(NAME).clap || fail=1; \
+	{{#liveStretch}}OMX_PROBE_STRETCH={{liveStretch}} {{/liveStretch}}$(B)/clap-probe live $(B)/$(NAME).clap || fail=1; \
 	$(B)/clap-probe state $(B)/$(NAME).clap || fail=1; \
 	$(B)/{{kernel}}-oracle clap $(B)/$(NAME).clap || fail=1; \
 	$(B)/{{kernel}}-oracle lv2 $(BUNDLE) $(URI) || fail=1; \

@@ -1,0 +1,27 @@
+{
+  "format": "org.openmixer.preset/1",
+  "plugin": "org.openmixer.clipper",
+  "id": "loud-bus",
+  "name": "Loud Bus",
+  "carries": "params",
+  "params": [
+    {
+      "symbol": "driveDb",
+      "unit": "dB",
+      "value": 9
+    },
+    {
+      "symbol": "ceilingDb",
+      "unit": "dB",
+      "value": -2
+    },
+    {
+      "symbol": "softnessPct",
+      "unit": "%",
+      "value": 30
+    }
+  ],
+  "created": "2026-10-17T00:00:00Z",
+  "modified": "2026-10-17T00:00:00Z",
+  "copyOf": null
+}

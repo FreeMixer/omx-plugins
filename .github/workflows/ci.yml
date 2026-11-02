@@ -76,7 +76,9 @@ jobs:
         run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
 
       - name: Install what the spec builds and tests with
-        run: dnf builddep -y --setopt=install_weak_deps=False packaging/omx-plugins.spec
+        run: |
+          dnf builddep -y --setopt=install_weak_deps=False packaging/omx-plugins.spec
+          tools/ci-stale-units.sh
 
       - name: The version agrees everywhere it is written
         id: handback-version
@@ -156,7 +158,9 @@ jobs:
         run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
 
       - name: Install what the spec builds and tests with
-        run: dnf builddep -y --setopt=install_weak_deps=False packaging/omx-plugins.spec
+        run: |
+          dnf builddep -y --setopt=install_weak_deps=False packaging/omx-plugins.spec
+          tools/ci-stale-units.sh
 
       - name: The recipe machinery, sabotaged arm by arm
         id: handback-selftest
@@ -196,8 +200,8 @@ jobs:
             rpm -qlp "$rpm" | grep -v '^/usr/lib/.build-id' | sort > files-$sub.txt
           done
           # BEGIN GENERATED plugins: tools/gen.mjs, the shipped plugins' short names and kernels, the test plugins' ids
-          shorts="chorus comp deesser delay drive dyneq eq8 eq16 eq32 flanger geq keyed-gate limiter multiband phaser pitch reverb rotary strip transient tremolo"
-          kernels="chorus comp deesser delay drive dyneq eq8 eq16 eq32 flanger geq gate limiter mbcomp phaser pitch reverb rotary strip transient tremolo"
+          shorts="balancer chorus clipper comp deesser delay drive dyneq eq8 eq16 eq32 flanger geq glue keyed-gate limiter loudlevel multiband phaser pitch plosive reverb rotary spring strip suboct transient tremolo upward"
+          kernels="balancer chorus clipper comp deesser delay drive dyneq eq8 eq16 eq32 flanger geq glue gate limiter loudlevel mbcomp phaser pitch plosive reverb rotary spring strip suboct transient tremolo upward"
           tests="org.openmixer.test-note-echo org.openmixer.test-pool-voice org.openmixer.test-sine-voice org.openmixer.test-transport-probe"
           teststems="omx-test-note-echo omx-test-pool-voice omx-test-sine-voice omx-test-transport-probe"
           # END GENERATED plugins
@@ -223,7 +227,7 @@ jobs:
           # version, read at run time with no -devel installed
           cdir=/usr/share/omx-contract/contract.d/3/omx-plugins
           rpm -qlp rpms/omx-plugins-contract-[0-9]*.noarch.rpm | sort > files-contract.txt
-          { printf '%s\n' "$cdir" "$cdir/MANIFEST.json" "$cdir/param-units.json" "$cdir/plugins" \
+          { printf '%s\n' "$cdir" "$cdir/MANIFEST.json" "$cdir/plugins" \
               /usr/share/licenses/omx-plugins-contract /usr/share/licenses/omx-plugins-contract/LICENSE
             for d in plugins/*/*.descriptor.json; do echo "$cdir/plugins/$(basename "$d" .descriptor.json).json"; done; } | sort > expected-contract.txt
           diff -u expected-contract.txt files-contract.txt
@@ -261,7 +265,8 @@ jobs:
             rpms/omx-plugins-contract-[0-9]*.noarch.rpm
           # the descriptors come with the metapackage, no -devel installed
           rpm -qf /usr/share/omx-contract/contract.d/3/omx-plugins/MANIFEST.json | grep -q '^omx-plugins-contract-'
-          rpm -qf /usr/share/omx-contract/contract.d/3/omx-plugins/param-units.json | grep -q '^omx-plugins-contract-'
+          # the unit codes are omx-contract's sheet (3.6.0), not this package's
+          ! rpm -ql omx-plugins-contract | grep -q '/param-units\.json$'
           ! rpm -q omx-plugins-devel
           req=$(rpm -q --requires omx-plugins)
           grep -qE '^omx-plugins-clap\([a-z0-9-]+\) = ' <<<"$req"
@@ -270,8 +275,8 @@ jobs:
           out=$(rpm -ql omx-plugins); grep -qx /usr/share/omx/presets/org.openmixer.drive/amp-tube.json <<<"$out"
           test "$(grep -c '^/usr/share/omx/presets/.*\.json$' <<<"$out")" = "$(find presets -name '*.json' | wc -l)"
           # BEGIN GENERATED plugins: tools/gen.mjs, the shipped plugins' short names and kernels, the test plugins' ids
-          shorts="chorus comp deesser delay drive dyneq eq8 eq16 eq32 flanger geq keyed-gate limiter multiband phaser pitch reverb rotary strip transient tremolo"
-          kernels="chorus comp deesser delay drive dyneq eq8 eq16 eq32 flanger geq gate limiter mbcomp phaser pitch reverb rotary strip transient tremolo"
+          shorts="balancer chorus clipper comp deesser delay drive dyneq eq8 eq16 eq32 flanger geq glue keyed-gate limiter loudlevel multiband phaser pitch plosive reverb rotary spring strip suboct transient tremolo upward"
+          kernels="balancer chorus clipper comp deesser delay drive dyneq eq8 eq16 eq32 flanger geq glue gate limiter loudlevel mbcomp phaser pitch plosive reverb rotary spring strip suboct transient tremolo upward"
           tests="org.openmixer.test-note-echo org.openmixer.test-pool-voice org.openmixer.test-sine-voice org.openmixer.test-transport-probe"
           teststems="omx-test-note-echo omx-test-pool-voice omx-test-sine-voice omx-test-transport-probe"
           # END GENERATED plugins
@@ -303,8 +308,8 @@ jobs:
           devel=$(find rpms -maxdepth 1 -name "omx-plugins-devel-[0-9]*.rpm" ! -name "*.src.rpm" | head -1)
           dnf_retry --setopt=install_weak_deps=False "$devel" rpms/omx-plugins-contract-[0-9]*.noarch.rpm
           # BEGIN GENERATED plugins: tools/gen.mjs, the shipped plugins' short names and kernels, the test plugins' ids
-          shorts="chorus comp deesser delay drive dyneq eq8 eq16 eq32 flanger geq keyed-gate limiter multiband phaser pitch reverb rotary strip transient tremolo"
-          kernels="chorus comp deesser delay drive dyneq eq8 eq16 eq32 flanger geq gate limiter mbcomp phaser pitch reverb rotary strip transient tremolo"
+          shorts="balancer chorus clipper comp deesser delay drive dyneq eq8 eq16 eq32 flanger geq glue keyed-gate limiter loudlevel multiband phaser pitch plosive reverb rotary spring strip suboct transient tremolo upward"
+          kernels="balancer chorus clipper comp deesser delay drive dyneq eq8 eq16 eq32 flanger geq glue gate limiter loudlevel mbcomp phaser pitch plosive reverb rotary spring strip suboct transient tremolo upward"
           tests="org.openmixer.test-note-echo org.openmixer.test-pool-voice org.openmixer.test-sine-voice org.openmixer.test-transport-probe"
           teststems="omx-test-note-echo omx-test-pool-voice omx-test-sine-voice omx-test-transport-probe"
           # END GENERATED plugins
@@ -372,8 +377,8 @@ jobs:
           # version, installed here with no -dev
           out=$(dpkg -L omx-plugins-contract)
           grep -qx /usr/share/omx-contract/contract.d/3/omx-plugins/MANIFEST.json <<<"$out"
-          # the param-contract extension's unit codes, which a runtime reader reads in place of the header
-          grep -qx /usr/share/omx-contract/contract.d/3/omx-plugins/param-units.json <<<"$out"
+          # the unit codes are omx-contract's sheet (3.6.0), not this package's
+          ! grep -q '/param-units\.json$' <<<"$out"
           test "$(grep -cE '^/usr/share/omx-contract/contract\.d/3/omx-plugins/plugins/[^/]+\.json$' <<<"$out")" = "$(ls plugins/*/*.descriptor.json | wc -l)"
           ! dpkg -s omx-plugins-dev >/dev/null 2>&1
           info=$(dpkg -I debs/omx-plugins-contract_*_all.deb)
@@ -388,8 +393,8 @@ jobs:
           out=$(dpkg -L omx-plugins); grep -qx /usr/share/omx/presets/org.openmixer.drive/amp-tube.json <<<"$out"
           test "$(grep -c '^/usr/share/omx/presets/.*\.json$' <<<"$out")" = "$(find presets -name '*.json' | wc -l)"
           # BEGIN GENERATED plugins: tools/gen.mjs, the shipped plugins' short names and kernels, the test plugins' ids
-          shorts="chorus comp deesser delay drive dyneq eq8 eq16 eq32 flanger geq keyed-gate limiter multiband phaser pitch reverb rotary strip transient tremolo"
-          kernels="chorus comp deesser delay drive dyneq eq8 eq16 eq32 flanger geq gate limiter mbcomp phaser pitch reverb rotary strip transient tremolo"
+          shorts="balancer chorus clipper comp deesser delay drive dyneq eq8 eq16 eq32 flanger geq glue keyed-gate limiter loudlevel multiband phaser pitch plosive reverb rotary spring strip suboct transient tremolo upward"
+          kernels="balancer chorus clipper comp deesser delay drive dyneq eq8 eq16 eq32 flanger geq glue gate limiter loudlevel mbcomp phaser pitch plosive reverb rotary spring strip suboct transient tremolo upward"
           tests="org.openmixer.test-note-echo org.openmixer.test-pool-voice org.openmixer.test-sine-voice org.openmixer.test-transport-probe"
           teststems="omx-test-note-echo omx-test-pool-voice omx-test-sine-voice omx-test-transport-probe"
           # END GENERATED plugins
@@ -415,8 +420,8 @@ jobs:
           set -euo pipefail
           apt-get install -y --no-install-recommends ./debs/omx-plugins-dev_*.deb
           # BEGIN GENERATED plugins: tools/gen.mjs, the shipped plugins' short names and kernels, the test plugins' ids
-          shorts="chorus comp deesser delay drive dyneq eq8 eq16 eq32 flanger geq keyed-gate limiter multiband phaser pitch reverb rotary strip transient tremolo"
-          kernels="chorus comp deesser delay drive dyneq eq8 eq16 eq32 flanger geq gate limiter mbcomp phaser pitch reverb rotary strip transient tremolo"
+          shorts="balancer chorus clipper comp deesser delay drive dyneq eq8 eq16 eq32 flanger geq glue keyed-gate limiter loudlevel multiband phaser pitch plosive reverb rotary spring strip suboct transient tremolo upward"
+          kernels="balancer chorus clipper comp deesser delay drive dyneq eq8 eq16 eq32 flanger geq glue gate limiter loudlevel mbcomp phaser pitch plosive reverb rotary spring strip suboct transient tremolo upward"
           tests="org.openmixer.test-note-echo org.openmixer.test-pool-voice org.openmixer.test-sine-voice org.openmixer.test-transport-probe"
           teststems="omx-test-note-echo omx-test-pool-voice omx-test-sine-voice omx-test-transport-probe"
           # END GENERATED plugins
@@ -448,6 +453,7 @@ jobs:
         run: |
           set -euo pipefail
           dnf builddep -y --setopt=install_weak_deps=False packaging/omx-plugins.spec
+          tools/ci-stale-units.sh
           dnf copr enable -y ycollet/audinux
           dnf install -y --setopt=install_weak_deps=False clap-validator nodejs
 

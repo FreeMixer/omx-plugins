@@ -1,0 +1,38 @@
+{
+  "format": "org.openmixer.preset/1",
+  "plugin": "org.openmixer.loudlevel",
+  "id": "programme",
+  "name": "Programme",
+  "carries": "params",
+  "params": [
+    {
+      "symbol": "targetLufs",
+      "unit": "dB",
+      "value": -23
+    },
+    {
+      "symbol": "rangeDb",
+      "unit": "dB",
+      "value": 6
+    },
+    {
+      "symbol": "speedDbPerS",
+      "unit": "dB",
+      "value": 0.8
+    },
+    {
+      "symbol": "gateLufs",
+      "unit": "dB",
+      "value": -55
+    },
+    {
+      "symbol": "window",
+      "unit": "",
+      "value": 1,
+      "label": "Short-term"
+    }
+  ],
+  "created": "2026-10-17T00:00:00Z",
+  "modified": "2026-10-17T00:00:00Z",
+  "copyOf": null
+}

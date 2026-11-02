@@ -1,0 +1,37 @@
+{
+  "format": "org.openmixer.preset/1",
+  "plugin": "org.openmixer.upward",
+  "id": "room-lift",
+  "name": "Room Lift",
+  "carries": "params",
+  "params": [
+    {
+      "symbol": "thresholdDb",
+      "unit": "dB",
+      "value": -40
+    },
+    {
+      "symbol": "ratio",
+      "unit": "",
+      "value": 2
+    },
+    {
+      "symbol": "rangeDb",
+      "unit": "dB",
+      "value": 6
+    },
+    {
+      "symbol": "attackMs",
+      "unit": "ms",
+      "value": 5
+    },
+    {
+      "symbol": "releaseMs",
+      "unit": "ms",
+      "value": 200
+    }
+  ],
+  "created": "2026-10-17T00:00:00Z",
+  "modified": "2026-10-17T00:00:00Z",
+  "copyOf": null
+}

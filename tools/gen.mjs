@@ -44,7 +44,7 @@ import { faceBinding } from './instance-face.mjs';
 import { descriptorFile, descriptorOf, descriptorText, isWhole, panelDescription, portGroupsOf, travelUnit, viewOf } from './descriptor.mjs';
 import { lv2Designation, lv2UnitNames, lv2UnitRef } from './format-tables.mjs';
 import { DISPLAY_KINDS, DISPLAY_SOURCES, FAMILIES, PLACEMENTS, WIDGETS, pagesOf, panelFingerprint } from './omx-panel.mjs';
-import { CONTRACT_VERSION, contractFingerprint, contractOf, unitEnumLines } from './param-contract.mjs';
+import { CONTRACT_VERSION, contractFingerprint, contractOf } from './param-contract.mjs';
 import { SPEC_FILE, controlOf, eqDefaultBands, findName, kernelControls, locateContract, packagingRange, paramKernel, resolveParam } from './omx-contract.mjs';
 import { bandsMacro, baseOf, expandVariant, variantStems } from './variants.mjs';
 import { omxdspInclude, render } from './template.mjs';
@@ -1018,7 +1018,7 @@ export function generateInstance(d) {
     keyed, keyPort: keyed ? macro(d.sidechain.symbol) : '', keySymbol: keyed ? d.sidechain.symbol : '',
     runFn: keyed && !face.keyed ? 'run_keyed' : 'run', keyTail: keyed && !face.keyed ? ', NULL' : '',
     plan: oraclePlan(d.params, d.controls ?? [], { monitors: monitorsOf(d), engaged: engagedOf(d) }), held: heldOf(d),
-    engaged: engagedOf(d).map(([i, v]) => ({ symbol: d.params[i].symbol, value: v })), monitors: monitorsOf(d).map((i) => ({ symbol: d.params[i].symbol })), stretch: oracleStretch(face), steps: d.params.map((p) => cfloat(stepOf(p))).join(', '),
+    engaged: engagedOf(d).map(([i, v]) => ({ symbol: d.params[i].symbol, value: v })), monitors: monitorsOf(d).map((i) => ({ symbol: d.params[i].symbol })), stretch: d.stretch ?? oracleStretch(face), liveStretch: d.liveStretch ?? false, spanStretch: d.stretch !== undefined, noSpan: d.stretch === undefined, steps: d.params.map((p) => cfloat(d.sabotageStep?.[p.symbol] ?? stepOf(p))).join(', '),
     chain: false,
     latencyChecks: latencyRows(d), measuresLatency: Boolean(d.latencyChecks),
     ...meterView(d, face),
@@ -1183,7 +1183,7 @@ export function generateChain(d) {
     latency: elements.map((e) => `(float)(${e.latency})`).join(' + '), refLatency: elements.map((e) => `(float)(${e.refLatency})`).join(' + '),
     keyed, keyPort: keyed ? macro(d.sidechain.symbol) : '', keySymbol: keyed ? d.sidechain.symbol : '',
     plan: oraclePlan(d.params, d.controls ?? [], { engaged: d.params.map((p, i) => i).filter((i) => d.params[i].own === 'switch' && d.params[i].element) }),
-    held: heldOf(d), stretch: keyed ? 64 : 1, steps: d.params.map((p) => cfloat(stepOf(p))).join(', '),
+    held: heldOf(d), stretch: keyed ? 64 : 1, noSpan: true, steps: d.params.map((p) => cfloat(d.sabotageStep?.[p.symbol] ?? stepOf(p))).join(', '),
     latencyChecks: latencyRows(d), measuresLatency: Boolean(d.latencyChecks),
     // the single-face fields the shared templates read, empty for a chain
     faceType: '', srType: '', binding: [], arrays: [], renames: [], heldArgs: [],
@@ -1263,11 +1263,6 @@ export const SHARED = {
       `tests="${ts.map((d) => d.clap.id).join(' ')}"`,
       `teststems="${ts.map((d) => d.stem).join(' ')}"`,
     ],
-  },
-  // the param-contract extension's units, from their declaration (contract/param-units.json), one source for the
-  // header and the file a runtime reader reads in the contract directory
-  'include/omx_param_contract.h': {
-    'param-units': () => unitEnumLines(),
   },
   // libomxplugins: each face's entry, defined by omx_<kernel>_clap.c, listed by its CLAP id
   'include/omx_clap_static.h': {

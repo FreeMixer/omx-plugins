@@ -22,7 +22,7 @@
 NAME       := omx-comp
 URI        := urn:openmixer:comp
 CLAP_ID    := org.openmixer.comp
-OMXDSP_MIN ?= 0.27.0
+OMXDSP_MIN ?= 0.28.0
 ROOT       := $(abspath ../..)
 GEN        := generated
 B          := build

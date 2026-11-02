@@ -41,6 +41,7 @@
 #define KEYED 0
 /* Each block of the plan is processed this many times in a row, the same values each time. */
 #define STRETCH 1u
+#define SPAN 1u
 
 /* One block: its length (frames, or ms when ms > 0), the stimulus it carries (0 the moving bursts,
  * 1 a full-scale burst, 2 the quiet tail), the declared parameters (declaration order) and the
@@ -161,7 +162,7 @@ static void signal_make(float *l, float *r, uint32_t n, double sr) {
   uint32_t start = 0, end = 0;
   size_t b = 0;
   for (uint32_t i = 0; i < n; i++) {
-    while (i >= end && b < NBLOCKS) start = end, end += frames_of(&PLAN[b++], sr);
+    while (i >= end && b < NBLOCKS) start = end, end += frames_of(&PLAN[b++], sr) * SPAN;
     const int sig = PLAN[b - 1].signal;
     seed = seed * 1664525u + 1013904223u;
     const float a = (float)(seed >> 8) / 16777216.0f - 0.5f;

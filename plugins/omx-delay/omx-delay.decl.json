@@ -16,6 +16,9 @@
     "duckThresholdDb",
     "duckReleaseMs"
   ],
+  "engaged": {
+    "fxDelayTaps": 4
+  },
   "portHints": {
     "fxDelayTime": {
       "props": [
@@ -67,6 +70,24 @@
           "tone"
         ],
         "graph": "delay-taps"
+      },
+      {
+        "key": "taps",
+        "label": "Taps",
+        "controls": [
+          "fxDelayTaps",
+          "tap0Gain",
+          "tap0Pan",
+          "tap1Factor",
+          "tap1Gain",
+          "tap1Pan",
+          "tap2Factor",
+          "tap2Gain",
+          "tap2Pan",
+          "tap3Factor",
+          "tap3Gain",
+          "tap3Pan"
+        ]
       }
     ]
   },
@@ -78,6 +99,20 @@
     "| Mix (wet) | {range:mix} | {default:mix} |",
     "| Tone (0 bright, 1 dark repeats) | {range:tone} | {default:tone} |",
     "| Ping-pong | {range:pingpong} | {default:pingpong} |",
+    "| Taps (engaged read taps of the one delay line) | {range:fxDelayTaps} | {default:fxDelayTaps} |",
+    "| Tap 1 gain | {range:tap0Gain} | {default:tap0Gain} |",
+    "| Tap 1 pan (left to right) | {range:tap0Pan} | {default:tap0Pan} |",
+    "| Tap 2 time (a share of the delay time) | 1/4 to 3 | {default:tap1Factor} |",
+    "| Tap 2 gain | {range:tap1Gain} | {default:tap1Gain} |",
+    "| Tap 2 pan (left to right) | {range:tap1Pan} | {default:tap1Pan} |",
+    "| Tap 3 time (a share of the delay time) | 1/4 to 3 | {default:tap2Factor} |",
+    "| Tap 3 gain | {range:tap2Gain} | {default:tap2Gain} |",
+    "| Tap 3 pan (left to right) | {range:tap2Pan} | {default:tap2Pan} |",
+    "| Tap 4 time (a share of the delay time) | 1/4 to 3 | {default:tap3Factor} |",
+    "| Tap 4 gain | {range:tap3Gain} | {default:tap3Gain} |",
+    "| Tap 4 pan (left to right) | {range:tap3Pan} | {default:tap3Pan} |",
+    "",
+    "With one tap the delay is the single-tap echo. Raising Taps adds the second to fourth reads of the same line, each with its own time, gain and pan; the feedback comes from the longest engaged tap, so a pattern repeats as a whole.",
     "",
     "Plus the host's bypass. The tone filter holds the same corner at every sample rate, so a session",
     "moved from 48 to 96 kHz sounds the same."

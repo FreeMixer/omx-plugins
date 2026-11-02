@@ -1,0 +1,81 @@
+{
+  "$comment": "The extras of omx-suboct's declaration: what its descriptor, omx-suboct.descriptor.json, has no word for (docs/declaration-as-descriptor.md). The two are the folder's hand-written files; tools/gen.mjs generates the rest and writes the travels the descriptor's links resolve to. Its parameters are by reference to omx-contract's suboct kernel and bind by name to omx-dsp's instance face. Control order, the descriptor's, is append-only.",
+  "stem": "omx-suboct",
+  "kernel": "suboct",
+  "kernels": [
+    "suboct"
+  ],
+  "noun": "sub-octaver",
+  "url": "https://github.com/FreeMixer/omx-plugins",
+  "binding": "instance",
+  "resourceHints": {
+    "threads-spawned": 0,
+    "streams-from-disk": false,
+    "opens-sockets": false
+  },
+  "panel": {
+    "family": "none",
+    "roles": {},
+    "sections": [
+      {
+        "key": "suboct",
+        "label": "Suboct",
+        "controls": [
+          "range",
+          "oct1",
+          "oct2",
+          "dry",
+          "trackGateDb"
+        ]
+      }
+    ]
+  },
+  "console": {
+    "$comment": "The OpenMixer console has no sub-octaver stage. Racked as a plugin in a channel's insert rack, it is drawn by the generic plugin editor.",
+    "placement": {
+      "strips": [
+        "input",
+        "fxReturn",
+        "aux",
+        "mix",
+        "matrix",
+        "main"
+      ],
+      "group": "plugins"
+    }
+  },
+  "portHints": {
+    "range": {
+      "props": [
+        "lv2:enumeration",
+        "lv2:integer"
+      ],
+      "points": [
+        "0 Low",
+        "1 Mid",
+        "2 High"
+      ]
+    },
+    "oct1": {
+      "unit": "units:pc"
+    },
+    "oct2": {
+      "unit": "units:pc"
+    },
+    "dry": {
+      "unit": "units:pc"
+    },
+    "enabled": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "latency": {
+      "props": [
+        "lv2:integer",
+        "lv2:reportsLatency"
+      ],
+      "unit": "units:frame"
+    }
+  }
+}

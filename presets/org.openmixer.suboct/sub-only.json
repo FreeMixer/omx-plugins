@@ -1,0 +1,38 @@
+{
+  "format": "org.openmixer.preset/1",
+  "plugin": "org.openmixer.suboct",
+  "id": "sub-only",
+  "name": "Sub Only",
+  "carries": "params",
+  "params": [
+    {
+      "symbol": "range",
+      "unit": "",
+      "value": 0,
+      "label": "Low"
+    },
+    {
+      "symbol": "oct1",
+      "unit": "%",
+      "value": 100
+    },
+    {
+      "symbol": "oct2",
+      "unit": "%",
+      "value": 0
+    },
+    {
+      "symbol": "dry",
+      "unit": "%",
+      "value": 0
+    },
+    {
+      "symbol": "trackGateDb",
+      "unit": "dBFS",
+      "value": -50
+    }
+  ],
+  "created": "2026-10-17T00:00:00Z",
+  "modified": "2026-10-17T00:00:00Z",
+  "copyOf": null
+}
