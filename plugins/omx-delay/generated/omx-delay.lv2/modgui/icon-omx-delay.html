@@ -1,4 +1,4 @@
-<div class="omx-pedal{{{cns}}} omx-family-delay" style="width:408px;height:166px">
+<div class="omx-pedal{{{cns}}} omx-family-delay" style="width:624px;height:350px">
     <!-- SPDX-License-Identifier: GPL-3.0-or-later -->
     <!-- Copyright (C) 2026 Pau Aliagas <linuxnow@gmail.com> -->
     <!-- GENERATED — DO NOT EDIT BY HAND. Produced by tools/modgui-gen.mjs from -->
@@ -13,7 +13,7 @@
         <span class="omx-label">{{label}}</span>
         <div class="omx-bypass" mod-role="bypass"><div class="omx-bypass-light" mod-role="bypass-light"></div></div>
     </div>
-        <div class="omx-section" data-section="delay" style="left:16px;top:52px;width:376px;height:98px">
+        <div class="omx-section" data-section="delay" style="left:16px;top:52px;width:592px;height:98px">
             <h2 class="omx-section-title">Delay</h2>
             <div class="omx-control omx-switch" style="left:8px;top:18px" title="Pingpong" data-symbol="pingpong" data-min="0" data-max="1" data-default="0">
                 <div class="omx-switch-image" mod-role="input-control-port" mod-port-symbol="pingpong" mod-widget="switch"></div>
@@ -34,6 +34,110 @@
             <div class="omx-control omx-knob" style="left:296px;top:18px" title="Tone" data-symbol="tone" data-min="0" data-max="1" data-default="0.3">
                 <div class="omx-knob-image" mod-role="input-control-port" mod-port-symbol="tone"></div>
                 <span class="omx-control-title">Tone</span>
+            </div>
+        </div>
+        <div class="omx-section" data-section="taps" style="left:16px;top:160px;width:592px;height:174px">
+            <h2 class="omx-section-title">Taps</h2>
+            <div class="omx-control omx-selector" style="left:8px;top:18px" title="Taps" data-symbol="fxDelayTaps" data-min="1" data-max="4" data-default="1">
+                <div class="omx-selector-image" mod-role="input-control-port" mod-port-symbol="fxDelayTaps" mod-widget="custom-select">
+                    <div class="omx-selector-value" mod-role="input-control-value" mod-port-symbol="fxDelayTaps"></div>
+                    <div class="omx-selector-list">
+                    <div class="omx-selector-option" mod-role="enumeration-option" mod-port-value="1">1</div>
+                    <div class="omx-selector-option" mod-role="enumeration-option" mod-port-value="2">2</div>
+                    <div class="omx-selector-option" mod-role="enumeration-option" mod-port-value="3">3</div>
+                    <div class="omx-selector-option" mod-role="enumeration-option" mod-port-value="4">4</div>
+                    </div>
+                </div>
+                <span class="omx-control-title">Taps</span>
+            </div>
+            <div class="omx-control omx-knob" style="left:80px;top:18px" title="Tap 1 Gain" data-symbol="tap0Gain" data-min="0" data-max="1" data-default="1">
+                <div class="omx-knob-image" mod-role="input-control-port" mod-port-symbol="tap0Gain"></div>
+                <span class="omx-control-title">Tap 1 Gain</span>
+            </div>
+            <div class="omx-control omx-knob" style="left:152px;top:18px" title="Tap 1 Pan" data-symbol="tap0Pan" data-min="-1" data-max="1" data-default="0">
+                <div class="omx-knob-image" mod-role="input-control-port" mod-port-symbol="tap0Pan"></div>
+                <span class="omx-control-title">Tap 1 Pan</span>
+            </div>
+            <div class="omx-control omx-selector" style="left:224px;top:18px" title="Tap 2 Time" data-symbol="tap1Factor" data-min="0" data-max="10" data-default="3">
+                <div class="omx-selector-image" mod-role="input-control-port" mod-port-symbol="tap1Factor" mod-widget="custom-select">
+                    <div class="omx-selector-value" mod-role="input-control-value" mod-port-symbol="tap1Factor"></div>
+                    <div class="omx-selector-list">
+                    <div class="omx-selector-option" mod-role="enumeration-option" mod-port-value="0">1/4</div>
+                    <div class="omx-selector-option" mod-role="enumeration-option" mod-port-value="1">1/3</div>
+                    <div class="omx-selector-option" mod-role="enumeration-option" mod-port-value="2">3/8</div>
+                    <div class="omx-selector-option" mod-role="enumeration-option" mod-port-value="3">1/2</div>
+                    <div class="omx-selector-option" mod-role="enumeration-option" mod-port-value="4">2/3</div>
+                    <div class="omx-selector-option" mod-role="enumeration-option" mod-port-value="5">3/4</div>
+                    <div class="omx-selector-option" mod-role="enumeration-option" mod-port-value="6">1</div>
+                    <div class="omx-selector-option" mod-role="enumeration-option" mod-port-value="7">4/3</div>
+                    <div class="omx-selector-option" mod-role="enumeration-option" mod-port-value="8">3/2</div>
+                    <div class="omx-selector-option" mod-role="enumeration-option" mod-port-value="9">2</div>
+                    <div class="omx-selector-option" mod-role="enumeration-option" mod-port-value="10">3</div>
+                    </div>
+                </div>
+                <span class="omx-control-title">Tap 2 Time</span>
+            </div>
+            <div class="omx-control omx-knob" style="left:296px;top:18px" title="Tap 2 Gain" data-symbol="tap1Gain" data-min="0" data-max="1" data-default="0.7">
+                <div class="omx-knob-image" mod-role="input-control-port" mod-port-symbol="tap1Gain"></div>
+                <span class="omx-control-title">Tap 2 Gain</span>
+            </div>
+            <div class="omx-control omx-knob" style="left:368px;top:18px" title="Tap 2 Pan" data-symbol="tap1Pan" data-min="-1" data-max="1" data-default="-0.5">
+                <div class="omx-knob-image" mod-role="input-control-port" mod-port-symbol="tap1Pan"></div>
+                <span class="omx-control-title">Tap 2 Pan</span>
+            </div>
+            <div class="omx-control omx-selector" style="left:440px;top:18px" title="Tap 3 Time" data-symbol="tap2Factor" data-min="0" data-max="10" data-default="5">
+                <div class="omx-selector-image" mod-role="input-control-port" mod-port-symbol="tap2Factor" mod-widget="custom-select">
+                    <div class="omx-selector-value" mod-role="input-control-value" mod-port-symbol="tap2Factor"></div>
+                    <div class="omx-selector-list">
+                    <div class="omx-selector-option" mod-role="enumeration-option" mod-port-value="0">1/4</div>
+                    <div class="omx-selector-option" mod-role="enumeration-option" mod-port-value="1">1/3</div>
+                    <div class="omx-selector-option" mod-role="enumeration-option" mod-port-value="2">3/8</div>
+                    <div class="omx-selector-option" mod-role="enumeration-option" mod-port-value="3">1/2</div>
+                    <div class="omx-selector-option" mod-role="enumeration-option" mod-port-value="4">2/3</div>
+                    <div class="omx-selector-option" mod-role="enumeration-option" mod-port-value="5">3/4</div>
+                    <div class="omx-selector-option" mod-role="enumeration-option" mod-port-value="6">1</div>
+                    <div class="omx-selector-option" mod-role="enumeration-option" mod-port-value="7">4/3</div>
+                    <div class="omx-selector-option" mod-role="enumeration-option" mod-port-value="8">3/2</div>
+                    <div class="omx-selector-option" mod-role="enumeration-option" mod-port-value="9">2</div>
+                    <div class="omx-selector-option" mod-role="enumeration-option" mod-port-value="10">3</div>
+                    </div>
+                </div>
+                <span class="omx-control-title">Tap 3 Time</span>
+            </div>
+            <div class="omx-control omx-knob" style="left:512px;top:18px" title="Tap 3 Gain" data-symbol="tap2Gain" data-min="0" data-max="1" data-default="0.5">
+                <div class="omx-knob-image" mod-role="input-control-port" mod-port-symbol="tap2Gain"></div>
+                <span class="omx-control-title">Tap 3 Gain</span>
+            </div>
+            <div class="omx-control omx-knob" style="left:8px;top:94px" title="Tap 3 Pan" data-symbol="tap2Pan" data-min="-1" data-max="1" data-default="0.5">
+                <div class="omx-knob-image" mod-role="input-control-port" mod-port-symbol="tap2Pan"></div>
+                <span class="omx-control-title">Tap 3 Pan</span>
+            </div>
+            <div class="omx-control omx-selector" style="left:80px;top:94px" title="Tap 4 Time" data-symbol="tap3Factor" data-min="0" data-max="10" data-default="8">
+                <div class="omx-selector-image" mod-role="input-control-port" mod-port-symbol="tap3Factor" mod-widget="custom-select">
+                    <div class="omx-selector-value" mod-role="input-control-value" mod-port-symbol="tap3Factor"></div>
+                    <div class="omx-selector-list">
+                    <div class="omx-selector-option" mod-role="enumeration-option" mod-port-value="0">1/4</div>
+                    <div class="omx-selector-option" mod-role="enumeration-option" mod-port-value="1">1/3</div>
+                    <div class="omx-selector-option" mod-role="enumeration-option" mod-port-value="2">3/8</div>
+                    <div class="omx-selector-option" mod-role="enumeration-option" mod-port-value="3">1/2</div>
+                    <div class="omx-selector-option" mod-role="enumeration-option" mod-port-value="4">2/3</div>
+                    <div class="omx-selector-option" mod-role="enumeration-option" mod-port-value="5">3/4</div>
+                    <div class="omx-selector-option" mod-role="enumeration-option" mod-port-value="6">1</div>
+                    <div class="omx-selector-option" mod-role="enumeration-option" mod-port-value="7">4/3</div>
+                    <div class="omx-selector-option" mod-role="enumeration-option" mod-port-value="8">3/2</div>
+                    <div class="omx-selector-option" mod-role="enumeration-option" mod-port-value="9">2</div>
+                    <div class="omx-selector-option" mod-role="enumeration-option" mod-port-value="10">3</div>
+                    </div>
+                </div>
+                <span class="omx-control-title">Tap 4 Time</span>
+            </div>
+            <div class="omx-control omx-knob" style="left:152px;top:94px" title="Tap 4 Gain" data-symbol="tap3Gain" data-min="0" data-max="1" data-default="0.35">
+                <div class="omx-knob-image" mod-role="input-control-port" mod-port-symbol="tap3Gain"></div>
+                <span class="omx-control-title">Tap 4 Gain</span>
+            </div>
+            <div class="omx-control omx-knob" style="left:224px;top:94px" title="Tap 4 Pan" data-symbol="tap3Pan" data-min="-1" data-max="1" data-default="0">
+                <div class="omx-knob-image" mod-role="input-control-port" mod-port-symbol="tap3Pan"></div>
+                <span class="omx-control-title">Tap 4 Pan</span>
             </div>
         </div>
     <div class="mod-pedal-input">

@@ -77,7 +77,7 @@ for (const dir of described) {
   for (const [sym, p] of Object.entries(ports)) if (p.unit === '<urn:openmixer:unit#ratio>') ratios.push(`${stem}.${sym}${ttl.includes('<urn:openmixer:unit#ratio>\n    a units:Unit') ? '' : ' (undefined)'}`);
 }
 check('the ratio controls state urn:openmixer:unit#ratio, defined in their TTL', ratios, [
-  'omx-comp.ratio', 'omx-deesser.deessRatio', ...[1, 2, 3, 4, 5, 6].map((n) => `omx-dyneq.ratio${n}`), 'omx-keyed-gate.ratio', ...[1, 2, 3, 4, 5].map((n) => `omx-multiband.ratio${n}`),
+  'omx-comp.ratio', 'omx-deesser.deessRatio', ...[1, 2, 3, 4, 5, 6].map((n) => `omx-dyneq.ratio${n}`), 'omx-keyed-gate.ratio', ...[1, 2, 3, 4, 5].map((n) => `omx-multiband.ratio${n}`), 'omx-upward.ratio',
 ]);
 
 // 4. the CLAP modules

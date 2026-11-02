@@ -128,6 +128,13 @@ defaults, never stepped there, as a chain's element switches are held on: the mu
 at -40 dB, so every band is driven past its threshold, and its release heard, at every rate (white noise
 at 176.4 kHz puts a thousandth of its power under 200 Hz, below a -20 dB default threshold).
 
+A declaration's `stretch` runs each block of the plan that many times in a row, for a kernel that walks its gain or
+its bands at dB per second (the loudness leveler, the spectral balancer): the test then has seconds of signal in which a
+control is heard. Without it a block runs once, and a keyed face 64 times.
+A declaration's `liveStretch` likewise lengthens the liveness test (1.5 s, times that number).
+A declaration's `sabotageStep` gives the sabotage arm a larger step for a named parameter (the loudness leveler's gate, which its
+meter decides on in blocks, is moved by 15 dB rather than its 1 % of travel).
+
 ## A control the plugin does not expose
 
 A kernel release can add controls to a face a plugin already binds (omx-dsp 0.26.0's delay, gate and

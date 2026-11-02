@@ -1,0 +1,37 @@
+{
+  "format": "org.openmixer.preset/1",
+  "plugin": "org.openmixer.upward",
+  "id": "detail",
+  "name": "Detail",
+  "carries": "params",
+  "params": [
+    {
+      "symbol": "thresholdDb",
+      "unit": "dB",
+      "value": -30
+    },
+    {
+      "symbol": "ratio",
+      "unit": "",
+      "value": 1.6
+    },
+    {
+      "symbol": "rangeDb",
+      "unit": "dB",
+      "value": 4
+    },
+    {
+      "symbol": "attackMs",
+      "unit": "ms",
+      "value": 10
+    },
+    {
+      "symbol": "releaseMs",
+      "unit": "ms",
+      "value": 200
+    }
+  ],
+  "created": "2026-10-17T00:00:00Z",
+  "modified": "2026-10-17T00:00:00Z",
+  "copyOf": null
+}

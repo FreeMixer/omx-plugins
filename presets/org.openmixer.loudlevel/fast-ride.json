@@ -1,0 +1,38 @@
+{
+  "format": "org.openmixer.preset/1",
+  "plugin": "org.openmixer.loudlevel",
+  "id": "fast-ride",
+  "name": "Fast Ride",
+  "carries": "params",
+  "params": [
+    {
+      "symbol": "targetLufs",
+      "unit": "dB",
+      "value": -18
+    },
+    {
+      "symbol": "rangeDb",
+      "unit": "dB",
+      "value": 12
+    },
+    {
+      "symbol": "speedDbPerS",
+      "unit": "dB",
+      "value": 3
+    },
+    {
+      "symbol": "gateLufs",
+      "unit": "dB",
+      "value": -50
+    },
+    {
+      "symbol": "window",
+      "unit": "",
+      "value": 0,
+      "label": "Momentary"
+    }
+  ],
+  "created": "2026-10-17T00:00:00Z",
+  "modified": "2026-10-17T00:00:00Z",
+  "copyOf": null
+}

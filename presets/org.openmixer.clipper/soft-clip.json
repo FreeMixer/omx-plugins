@@ -1,0 +1,27 @@
+{
+  "format": "org.openmixer.preset/1",
+  "plugin": "org.openmixer.clipper",
+  "id": "soft-clip",
+  "name": "Soft Clip",
+  "carries": "params",
+  "params": [
+    {
+      "symbol": "driveDb",
+      "unit": "dB",
+      "value": 6
+    },
+    {
+      "symbol": "ceilingDb",
+      "unit": "dB",
+      "value": -1
+    },
+    {
+      "symbol": "softnessPct",
+      "unit": "%",
+      "value": 60
+    }
+  ],
+  "created": "2026-10-17T00:00:00Z",
+  "modified": "2026-10-17T00:00:00Z",
+  "copyOf": null
+}

@@ -186,7 +186,7 @@ if (process.argv[1] && import.meta.url === new URL(`file://${process.argv[1]}`).
       [`${delay.stem}'s TTL in another namespace (http, not https)`]: () => ttlErrors(c.v, delay, one.ttl.replace(`<${LV2_NAMESPACE}>`, `<${LV2_NAMESPACE.replace('https:', 'http:')}>`)),
       [`${delay.stem}'s TTL in the retired namespace`]: () => ttlErrors(c.v, delay, one.ttl.replace(`<${LV2_NAMESPACE}>`, '<https://freemixer.github.io/ns/resource-hints#>')),
       [`${delay.stem}'s TTL with a hint's value flipped`]: () => ttlErrors(c.v, delay, one.ttl.replace(`${LV2_PREFIX}:opensSockets false`, `${LV2_PREFIX}:opensSockets true`)),
-      [`${delay.stem}'s TTL with a figure written as a string`]: () => ttlErrors(c.v, delay, one.ttl.replace(`${LV2_PREFIX}:threadsSpawned "0"^^xsd:integer`, `${LV2_PREFIX}:threadsSpawned "0"`)),
+      [`${delay.stem}'s TTL with a figure left a plain string`]: () => ttlErrors(c.v, delay, one.ttl.replace(`${LV2_PREFIX}:threadsSpawned "0"^^xsd:integer`, `${LV2_PREFIX}:threadsSpawned "0"`)),
       [`${delay.stem}'s TTL without a stated hint`]: () => ttlErrors(c.v, delay, one.ttl.replace(/^ {4}omxres:streamsFromDisk .*\n/m, '')),
       [`${delay.stem}'s TTL with a hint the declaration leaves unknown`]: () => ttlErrors(c.v, delay, one.ttl.replace(`${LV2_PREFIX}:opensSockets false ;`, `${LV2_PREFIX}:opensSockets false ;\n    ${LV2_PREFIX}:activateTime "0"^^xsd:integer ;`)),
       [`${delay.stem}'s header with a bit dropped`]: () => headerErrors(c.v, delay, one.header.replace(' | OMX_RESOURCE_HINT_OPENS_SOCKETS', '')),

@@ -48,10 +48,10 @@ if (!contract.dir) {
   process.exit(1);
 }
 /** The header omx-contract renders beside its data: <prefix>/share/omx-contract/.. and <prefix>/include/omxcontract/. */
-// contract.dir is a union render under build/ when omx-contract keeps its kernels in the contract directory, so the installed
-// data directory is looked at as well
-const beside = [contract.dir, installedDataDir()].filter(Boolean);
-const renderedHeader = beside.flatMap((d) => [join(d, '..', '..', 'include', 'omxcontract', 'omx_param_units.h'), join(d, '..', '..', '..', 'include', 'omxcontract', 'omx_param_units.h')]).find((p) => existsSync(p));
+const renderedHeader = [contract.dir, installedDataDir()]
+  .filter(Boolean)
+  .flatMap((d) => [join(d, '..', '..', 'include', 'omxcontract', 'omx_param_units.h'), join(d, '..', '..', '..', 'include', 'omxcontract', 'omx_param_units.h')])
+  .find((p) => existsSync(p));
 const errors = [];
 const units = declaredUnits(contract.dir);
 if (!renderedHeader) errors.push(`omxcontract/omx_param_units.h: not found beside ${contract.dir}; install omx-contract-devel >= 3.6.0`);

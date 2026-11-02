@@ -10,7 +10,7 @@
     "uri": "urn:openmixer:delay",
     "name": "omx delay",
     "vendor": "openmixer",
-    "version": "0.16.1",
+    "version": "0.17.0",
     "doc": "The OpenMixer console's stereo delay: one time, feedback through a tone filter, ping-pong and a wet/dry mix.",
     "features": [
       "audio-effect"
@@ -130,6 +130,390 @@
       "source": {
         "from": {
           "link": "data/kernels/delay.json#DELAY_PINGPONGS",
+          "at": "omx-dsp@0.28.0"
+        }
+      }
+    },
+    {
+      "id": 5,
+      "symbol": "fxDelayTaps",
+      "name": "Taps",
+      "kind": "travel",
+      "travel": {
+        "min": 1,
+        "max": 4,
+        "step": 1,
+        "unit": "",
+        "default": 1,
+        "scale": "stepped"
+      },
+      "group": [
+        "Taps"
+      ],
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/delay.json#FX_DELAY_TAPS_RANGE",
+          "at": "omx-dsp@0.28.0"
+        }
+      }
+    },
+    {
+      "id": 6,
+      "symbol": "tap0Gain",
+      "name": "Tap 1 Gain",
+      "kind": "travel",
+      "travel": {
+        "min": 0,
+        "max": 1,
+        "step": 0,
+        "unit": "",
+        "default": 1,
+        "scale": "linear"
+      },
+      "group": [
+        "Taps"
+      ],
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/delay.json#DELAY_TAP_LIMITS.tap0Gain",
+          "at": "omx-dsp@0.28.0"
+        }
+      }
+    },
+    {
+      "id": 7,
+      "symbol": "tap0Pan",
+      "name": "Tap 1 Pan",
+      "kind": "travel",
+      "travel": {
+        "min": -1,
+        "max": 1,
+        "step": 0,
+        "unit": "",
+        "default": 0,
+        "scale": "linear"
+      },
+      "group": [
+        "Taps"
+      ],
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/delay.json#DELAY_TAP_LIMITS.tap0Pan",
+          "at": "omx-dsp@0.28.0"
+        }
+      }
+    },
+    {
+      "id": 8,
+      "symbol": "tap1Factor",
+      "name": "Tap 2 Time",
+      "kind": "choice",
+      "ids": [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9",
+        "10"
+      ],
+      "labels": [
+        "1/4",
+        "1/3",
+        "3/8",
+        "1/2",
+        "2/3",
+        "3/4",
+        "1",
+        "4/3",
+        "3/2",
+        "2",
+        "3"
+      ],
+      "values": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "default": "3",
+      "group": [
+        "Taps"
+      ],
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/delay.json#DELAY_TAP1_FACTORS",
+          "at": "omx-dsp@0.28.0"
+        }
+      }
+    },
+    {
+      "id": 9,
+      "symbol": "tap1Gain",
+      "name": "Tap 2 Gain",
+      "kind": "travel",
+      "travel": {
+        "min": 0,
+        "max": 1,
+        "step": 0,
+        "unit": "",
+        "default": 0.7,
+        "scale": "linear"
+      },
+      "group": [
+        "Taps"
+      ],
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/delay.json#DELAY_TAP_LIMITS.tap1Gain",
+          "at": "omx-dsp@0.28.0"
+        }
+      }
+    },
+    {
+      "id": 10,
+      "symbol": "tap1Pan",
+      "name": "Tap 2 Pan",
+      "kind": "travel",
+      "travel": {
+        "min": -1,
+        "max": 1,
+        "step": 0,
+        "unit": "",
+        "default": -0.5,
+        "scale": "linear"
+      },
+      "group": [
+        "Taps"
+      ],
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/delay.json#DELAY_TAP_LIMITS.tap1Pan",
+          "at": "omx-dsp@0.28.0"
+        }
+      }
+    },
+    {
+      "id": 11,
+      "symbol": "tap2Factor",
+      "name": "Tap 3 Time",
+      "kind": "choice",
+      "ids": [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9",
+        "10"
+      ],
+      "labels": [
+        "1/4",
+        "1/3",
+        "3/8",
+        "1/2",
+        "2/3",
+        "3/4",
+        "1",
+        "4/3",
+        "3/2",
+        "2",
+        "3"
+      ],
+      "values": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "default": "5",
+      "group": [
+        "Taps"
+      ],
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/delay.json#DELAY_TAP2_FACTORS",
+          "at": "omx-dsp@0.28.0"
+        }
+      }
+    },
+    {
+      "id": 12,
+      "symbol": "tap2Gain",
+      "name": "Tap 3 Gain",
+      "kind": "travel",
+      "travel": {
+        "min": 0,
+        "max": 1,
+        "step": 0,
+        "unit": "",
+        "default": 0.5,
+        "scale": "linear"
+      },
+      "group": [
+        "Taps"
+      ],
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/delay.json#DELAY_TAP_LIMITS.tap2Gain",
+          "at": "omx-dsp@0.28.0"
+        }
+      }
+    },
+    {
+      "id": 13,
+      "symbol": "tap2Pan",
+      "name": "Tap 3 Pan",
+      "kind": "travel",
+      "travel": {
+        "min": -1,
+        "max": 1,
+        "step": 0,
+        "unit": "",
+        "default": 0.5,
+        "scale": "linear"
+      },
+      "group": [
+        "Taps"
+      ],
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/delay.json#DELAY_TAP_LIMITS.tap2Pan",
+          "at": "omx-dsp@0.28.0"
+        }
+      }
+    },
+    {
+      "id": 14,
+      "symbol": "tap3Factor",
+      "name": "Tap 4 Time",
+      "kind": "choice",
+      "ids": [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9",
+        "10"
+      ],
+      "labels": [
+        "1/4",
+        "1/3",
+        "3/8",
+        "1/2",
+        "2/3",
+        "3/4",
+        "1",
+        "4/3",
+        "3/2",
+        "2",
+        "3"
+      ],
+      "values": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "default": "8",
+      "group": [
+        "Taps"
+      ],
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/delay.json#DELAY_TAP3_FACTORS",
+          "at": "omx-dsp@0.28.0"
+        }
+      }
+    },
+    {
+      "id": 15,
+      "symbol": "tap3Gain",
+      "name": "Tap 4 Gain",
+      "kind": "travel",
+      "travel": {
+        "min": 0,
+        "max": 1,
+        "step": 0,
+        "unit": "",
+        "default": 0.35,
+        "scale": "linear"
+      },
+      "group": [
+        "Taps"
+      ],
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/delay.json#DELAY_TAP_LIMITS.tap3Gain",
+          "at": "omx-dsp@0.28.0"
+        }
+      }
+    },
+    {
+      "id": 16,
+      "symbol": "tap3Pan",
+      "name": "Tap 4 Pan",
+      "kind": "travel",
+      "travel": {
+        "min": -1,
+        "max": 1,
+        "step": 0,
+        "unit": "",
+        "default": 0,
+        "scale": "linear"
+      },
+      "group": [
+        "Taps"
+      ],
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/delay.json#DELAY_TAP_LIMITS.tap3Pan",
           "at": "omx-dsp@0.28.0"
         }
       }
