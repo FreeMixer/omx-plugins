@@ -130,8 +130,7 @@ plugins/<name>/
 include/                  shared C shapes (no DSP): omx_panel_description.h and omx_param_contract.h,
                           the openmixer extensions and their rows; omx_clap_static.h, libomxplugins' table
 contract/                 the definitions installed beside the descriptors in omx-contract's contract
-                          directory: param-units.json, the param-contract units (the header's enum is
-                          generated from it)
+                          directory
 lib/                      omx_clap_static.c (the table's rows are generated) and omxplugins.pc.in
 tools/                    gen.mjs (header + TTL), descriptor.mjs (a declaration as its plugin
                           descriptor), omx-panel.mjs (where the installed omx-panel is found: its layout of a
