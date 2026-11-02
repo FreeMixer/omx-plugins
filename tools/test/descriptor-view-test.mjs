@@ -150,6 +150,8 @@ check(`arm: ${travelled.symbol}'s max edited by hand is stale`, descriptorText(e
 const other = JSON.parse(readFileSync(join(dir, DESC), 'utf8')).controls.find((c) => c.kind === 'travel' && c.source?.from && c.id !== travelled.id);
 fresh();
 editJson(DESC, (x) => { x.controls[travelled.id].source = other.source; });
+check(`arm: ${travelled.symbol}'s link moved to ${other.symbol}'s is refused while the symbol says otherwise`, /must be its control's words/.test(refusal(() => loadDecl(copy))), true);
+editJson(DECL, (x) => { x.controls = { ...x.controls, [travelled.symbol]: { ...x.controls?.[travelled.symbol], control: other.symbol } }; });
 const moved = loadDecl(copy).params[travelled.id];
 check(`arm: ${travelled.symbol}'s link moved to ${other.symbol}'s reads that travel`, [moved.min, moved.max, moved.def], [loadDecl(dir).params[other.id].min, loadDecl(dir).params[other.id].max, loadDecl(dir).params[other.id].def]);
 
