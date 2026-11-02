@@ -143,11 +143,11 @@ LIB_FLAGS  := -fPIC -fvisibility=hidden -DOMX_CLAP_STATIC -Iinclude
 # read only by the targets that build the archive, so `make version` and the rest need no omx-dsp
 lib_cflags = $(call dep_check,omxdsp,$(OMXDSP_MIN))$(call dep_check,omx-contract,$(CONTRACT_MIN))$(shell $(PKG_CONFIG) --cflags omxdsp omx-contract omx-clap-core clap)
 
-.PHONY: presets presets-figures test-role all lib lib-test test test-faces units panel-layout descriptor-view lv2-units lv2-maintainer lv2-manifest release-version resource-hints format-tables contract-union probe-checks eq-probe-race band-groups phaser-depth geq-widgets round-trip hints modgui manual install install-pins install-test package-lists install-devel install-contract contract-dir clean version recipe-test completeness selftest private-refs params-doc check-params-doc strip-crosscheck meters-abi meter-level dsp-copies meter-ring clap-validate
+.PHONY: presets presets-figures test-role all lib lib-test test test-faces units panel-layout descriptor-view lv2-units lv2-deprecated lv2-maintainer lv2-manifest release-version resource-hints format-tables contract-union probe-checks eq-probe-race band-groups phaser-depth geq-widgets round-trip hints modgui manual install install-pins install-test package-lists install-devel install-contract contract-dir clean version recipe-test completeness selftest private-refs params-doc check-params-doc strip-crosscheck meters-abi meter-level dsp-copies meter-ring clap-validate
 all: lib
 	@for p in $(PLUGINS); do $(MAKE) -C $$p all || exit 1; done
 lib: $(LIB) $(LIB_PC)
-test: lib units panel-layout descriptor-view lv2-units lv2-maintainer lv2-manifest release-version resource-hints format-tables contract-union contract-dir probe-checks eq-probe-race band-groups phaser-depth geq-widgets
+test: lib units panel-layout descriptor-view lv2-units lv2-deprecated lv2-maintainer lv2-manifest release-version resource-hints format-tables contract-union contract-dir probe-checks eq-probe-race band-groups phaser-depth geq-widgets
 	@if [ -z "$(PLUGINS)" ]; then echo "no plugins yet"; fi
 	@for p in $(PLUGINS); do $(MAKE) -C $$p test || exit 1; done
 	@$(MAKE) -s round-trip
@@ -178,6 +178,9 @@ descriptor-view:
 # every declared unit is stated by its port in the generated TTL, with its sabotage arms
 lv2-units:
 	node tools/test/lv2-units-check.mjs --self-test
+# no generated TTL states a term LV2 has deprecated (lv2:reportsLatency), with its sabotage arm
+lv2-deprecated:
+	node tools/test/lv2-deprecated-check.mjs --self-test
 # every generated maintainer states foaf:homepage (mod-ui segfaults without it, #244), with its sabotage arm
 lv2-maintainer:
 	node tools/test/lv2-maintainer-check.mjs --self-test

@@ -586,7 +586,7 @@ export function emitPluginTtl(d) {
     } else if (p.enabled) {
       lines.push('        lv2:default 1 ;', '        lv2:minimum 0 ;', '        lv2:maximum 1 ;', '        lv2:designation lv2:enabled ;', '        lv2:portProperty lv2:toggled ;');
     } else if (p.latency) {
-      lines.push('        lv2:designation lv2:latency ;', '        lv2:portProperty lv2:reportsLatency , lv2:integer ;', '        units:unit units:frame ;');
+      lines.push('        lv2:designation lv2:latency ;', '        lv2:portProperty lv2:integer ;', '        units:unit units:frame ;');
     }
     return `    [\n${lines.join('\n').replace(/ ;$/, '')}\n    ]`;
   };
