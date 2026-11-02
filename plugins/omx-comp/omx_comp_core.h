@@ -88,6 +88,8 @@ static inline void omx_comp_core_run(OmxCompCore *c, const float *key, const flo
   omx_comp_instance_run_keyed(&c->inst, key, NULL, in_l, in_r, out_l, out_r, frames);
 }
 
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Copyright (C) 2026 Pau Aliagas <linuxnow@gmail.com>
 /* The core behind the vtable the shared faces call (include/omx_plugin_face.h): the same functions, untyped. */
 static inline void omx_comp_core_init_v(void *c, uint32_t rate) { omx_comp_core_init((OmxCompCore *)c, rate); }
 static inline void omx_comp_core_resolve_v(void *c, const float *values, int bypass) {

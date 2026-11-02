@@ -328,6 +328,8 @@ static inline void omx_strip_core_run(OmxStripCore *c, const float *in_l, const 
   for (uint32_t k = 0; k < OMX_STRIP_CHAIN_LENGTH; k++) omx_strip_core_element(c, OMX_STRIP_CHAIN_ORDER[c->order][k], key, out_l, out_r, frames);
 }
 
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Copyright (C) 2026 Pau Aliagas <linuxnow@gmail.com>
 /* The core behind the vtable the shared faces call (include/omx_plugin_face.h): the same functions, untyped. */
 static inline void omx_strip_core_init_v(void *c, uint32_t rate) { omx_strip_core_init((OmxStripCore *)c, rate); }
 static inline void omx_strip_core_resolve_v(void *c, const float *values, int bypass) {

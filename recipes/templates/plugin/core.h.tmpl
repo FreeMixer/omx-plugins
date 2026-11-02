@@ -25,7 +25,8 @@
 #include "omx_plugin_face.h"
 
 #include <omxdsp/fx/omx_{{face}}_instance.h>
-{{#arrays}}
+{{#meterLinear}}#include <omxdsp/omx_dyn.h>
+{{/meterLinear}}{{#arrays}}
 _Static_assert({{count}} == {{extent}}, "the declaration names one {{arg}} parameter per band of the face");
 {{/arrays}}
 /** The kernel's state and what a block runs with. */

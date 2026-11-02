@@ -22,6 +22,7 @@
 #include "omx_plugin_face.h"
 
 #include <omxdsp/fx/omx_limiter_instance.h>
+#include <omxdsp/omx_dyn.h>
 
 /** The kernel's state and what a block runs with. */
 typedef struct {
@@ -50,12 +51,25 @@ static inline uint32_t omx_limiter_core_latency(const OmxLimiterCore *c) {
   return (uint32_t)lrintf((float)(omx_limiter_instance_latency(&c->inst)));
 }
 
+/** Gain-reduction meter `i`'s reading (the declaration's `meters`, in order): the kernel's own, after the
+ * last block. */
+static inline float omx_limiter_core_meter(const OmxLimiterCore *c, uint32_t i) {
+  switch (i) {
+  case 0:
+    return omx_gr_block_db(c->inst.state.blk_gain);
+  default:
+    return 0.0f;
+  }
+}
+
 /** One block, stereo; the outputs may alias the inputs. */
 static inline void omx_limiter_core_run(OmxLimiterCore *c, const float *in_l, const float *in_r, float *out_l,
                                          float *out_r, uint32_t frames) {
   omx_limiter_instance_run(&c->inst, in_l, in_r, out_l, out_r, frames);
 }
 
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Copyright (C) 2026 Pau Aliagas <linuxnow@gmail.com>
 /* The core behind the vtable the shared faces call (include/omx_plugin_face.h): the same functions, untyped. */
 static inline void omx_limiter_core_init_v(void *c, uint32_t rate) { omx_limiter_core_init((OmxLimiterCore *)c, rate); }
 static inline void omx_limiter_core_resolve_v(void *c, const float *values, int bypass) {
@@ -67,9 +81,10 @@ static inline void omx_limiter_core_run_v(void *c, const float *key, const float
   (void)key;
   omx_limiter_core_run((OmxLimiterCore *)c, in_l, in_r, out_l, out_r, frames);
 }
+static inline float omx_limiter_core_meter_v(const void *c, uint32_t i) { return omx_limiter_core_meter((const OmxLimiterCore *)c, i); }
 
 static const struct omx_face_core OMX_LIMITER_CORE = {sizeof(OmxLimiterCore), omx_limiter_core_init_v, omx_limiter_core_resolve_v,
                                                    omx_limiter_core_latency_v, omx_limiter_core_run_v,
-                                                   NULL};
+                                                   omx_limiter_core_meter_v};
 
 #endif /* OMX_LIMITER_CORE_H */

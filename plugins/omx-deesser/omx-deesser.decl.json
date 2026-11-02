@@ -74,7 +74,7 @@
       "id": "deessGr",
       "kind": "gain_reduction",
       "field": "state.band.gr_min_db",
-      "floor": "deessRange"
+      "readout": "GAIN_REDUCTION_DB"
     },
     {
       "id": "deessIn",

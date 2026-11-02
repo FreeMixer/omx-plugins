@@ -11,11 +11,21 @@
 /* The generated table FIRST: its guard is omx-dsp's own, so the instance header reads this table. */
 #include "omx_limiter_params.h"
 #include "omx_limiter_core.h"
+#include <omx-clap-host/clap_meters.h>
+#include "omx_meter_ring.h"
 
 static const char *G_FEATURES[] = {OMX_LIMITER_CLAP_FEATURES, NULL};
 
+/* The declaration's meters, in order: the index is the CLAP meter id; each one's channels sit at `at` among
+ * the 1 values the face publishes after a block. */
+_Static_assert(1u <= OMX_METER_RING_MAX, "one publication holds every meter's values");
+static const struct omx_face_meter G_METERS[] = {
+    {"limiterGr", CLAP_METER_KIND_GAIN_REDUCTION, 1u, 0u, (double)OMX_LIMITER_READOUT_GAIN_REDUCTION_DB_MIN, (double)OMX_LIMITER_READOUT_GAIN_REDUCTION_DB_MAX, OMX_FACE_METER_READ},
+};
+
 static const struct omx_face G_FACE = {
     OMX_FACE_TABLES(LIMITER), .features = G_FEATURES, .core = &OMX_LIMITER_CORE,
+    .meters = G_METERS, .meter_count = 1u, .meter_values = 1u,
 };
 
 static const struct omx_clap_face G_CLAP = OMX_CLAP_FACE(&G_FACE, G_FEATURES, OMX_LIMITER_CLAP_ID, OMX_LIMITER_NAME, OMX_LIMITER_VENDOR,

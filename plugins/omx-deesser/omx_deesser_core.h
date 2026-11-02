@@ -72,6 +72,8 @@ static inline void omx_deesser_core_run(OmxDeesserCore *c, const float *in_l, co
   omx_deesser_instance_run(&c->inst, in_l, in_r, out_l, out_r, frames);
 }
 
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Copyright (C) 2026 Pau Aliagas <linuxnow@gmail.com>
 /* The core behind the vtable the shared faces call (include/omx_plugin_face.h): the same functions, untyped. */
 static inline void omx_deesser_core_init_v(void *c, uint32_t rate) { omx_deesser_core_init((OmxDeesserCore *)c, rate); }
 static inline void omx_deesser_core_resolve_v(void *c, const float *values, int bypass) {

@@ -113,6 +113,14 @@
     "streams-from-disk": false,
     "opens-sockets": false
   },
+  "meters": [
+    {
+      "id": "gateGr",
+      "kind": "gain_reduction",
+      "field": "gate.st.gr_min_db",
+      "readout": "GAIN_REDUCTION_DB"
+    }
+  ],
   "panel": {
     "family": "gate",
     "roles": {

@@ -19,6 +19,7 @@
 
 /* The generated table FIRST: its guard is omx-dsp's own, so the instance header reads this table. */
 #include "omx_plosive_params.h"
+#include "omx_plugin_face.h"
 
 #include <omxdsp/fx/omx_plosive_instance.h>
 
@@ -60,5 +61,23 @@ static inline void omx_plosive_core_run(OmxPlosiveCore *c, const float *in_l, co
                                          float *out_r, uint32_t frames) {
   omx_plosive_instance_run(&c->inst, in_l, in_r, out_l, out_r, frames);
 }
+
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Copyright (C) 2026 Pau Aliagas <linuxnow@gmail.com>
+/* The core behind the vtable the shared faces call (include/omx_plugin_face.h): the same functions, untyped. */
+static inline void omx_plosive_core_init_v(void *c, uint32_t rate) { omx_plosive_core_init((OmxPlosiveCore *)c, rate); }
+static inline void omx_plosive_core_resolve_v(void *c, const float *values, int bypass) {
+  omx_plosive_core_resolve((OmxPlosiveCore *)c, values, bypass);
+}
+static inline uint32_t omx_plosive_core_latency_v(const void *c) { return omx_plosive_core_latency((const OmxPlosiveCore *)c); }
+static inline void omx_plosive_core_run_v(void *c, const float *key, const float *in_l, const float *in_r, float *out_l,
+                                           float *out_r, uint32_t frames) {
+  (void)key;
+  omx_plosive_core_run((OmxPlosiveCore *)c, in_l, in_r, out_l, out_r, frames);
+}
+
+static const struct omx_face_core OMX_PLOSIVE_CORE = {sizeof(OmxPlosiveCore), omx_plosive_core_init_v, omx_plosive_core_resolve_v,
+                                                   omx_plosive_core_latency_v, omx_plosive_core_run_v,
+                                                   NULL};
 
 #endif /* OMX_PLOSIVE_CORE_H */

@@ -19,6 +19,7 @@
 
 /* The generated table FIRST: its guard is omx-dsp's own, so the instance header reads this table. */
 #include "omx_clipper_params.h"
+#include "omx_plugin_face.h"
 
 #include <omxdsp/fx/omx_clipper_instance.h>
 
@@ -54,5 +55,23 @@ static inline void omx_clipper_core_run(OmxClipperCore *c, const float *in_l, co
                                          float *out_r, uint32_t frames) {
   omx_clipper_instance_run(&c->inst, in_l, in_r, out_l, out_r, frames);
 }
+
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Copyright (C) 2026 Pau Aliagas <linuxnow@gmail.com>
+/* The core behind the vtable the shared faces call (include/omx_plugin_face.h): the same functions, untyped. */
+static inline void omx_clipper_core_init_v(void *c, uint32_t rate) { omx_clipper_core_init((OmxClipperCore *)c, rate); }
+static inline void omx_clipper_core_resolve_v(void *c, const float *values, int bypass) {
+  omx_clipper_core_resolve((OmxClipperCore *)c, values, bypass);
+}
+static inline uint32_t omx_clipper_core_latency_v(const void *c) { return omx_clipper_core_latency((const OmxClipperCore *)c); }
+static inline void omx_clipper_core_run_v(void *c, const float *key, const float *in_l, const float *in_r, float *out_l,
+                                           float *out_r, uint32_t frames) {
+  (void)key;
+  omx_clipper_core_run((OmxClipperCore *)c, in_l, in_r, out_l, out_r, frames);
+}
+
+static const struct omx_face_core OMX_CLIPPER_CORE = {sizeof(OmxClipperCore), omx_clipper_core_init_v, omx_clipper_core_resolve_v,
+                                                   omx_clipper_core_latency_v, omx_clipper_core_run_v,
+                                                   NULL};
 
 #endif /* OMX_CLIPPER_CORE_H */
