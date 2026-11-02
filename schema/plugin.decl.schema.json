@@ -529,6 +529,12 @@
           "title": "Field",
           "description": "For a reference whose travels are per field (GATE_LIMITS and the like): which field."
         },
+        "control": {
+          "type": "string",
+          "pattern": "^[a-z][A-Za-z0-9]*$",
+          "title": "Control",
+          "description": "For a parameter whose symbol is frozen from before the wizard drafted symbols from control names (saved sessions keep it) and so is not the control's words (key_external reads keySource): the name of the control the reference names. The generator refuses a parameter whose symbol is neither the words of its control nor this."
+        },
         "forKind": {
           "type": "string",
           "pattern": "^[a-z][A-Za-z0-9]*$",

@@ -359,7 +359,48 @@ function resolveParams(file, d) {
     if (t.values) out.values = t.values;
     return out;
   });
+  // a chain's element parameters are named from their control; every other by-reference parameter's symbol must be its control's
+  if (!d.chain) {
+    const dir = contract();
+    const errs = d.params.flatMap((p, i) => {
+      const c = controls()[i];
+      return c ? symbolTie(localParam(p), c, kernelControls(dir, paramKernel(d, p, dir))) : [];
+    });
+    if (errs.length) throw new Error(`${file}: a parameter's symbol must be its control's words, or say the control (\`control\`):\n  ${errs.join('\n  ')}`);
+  }
+  for (const q of params) delete q.control;
   return { params, controls };
+}
+
+/** A name's words with its digits dropped: `key_hp` and `keyHp` -> key, hp; `b3_gain` -> b, gain is read by the caller. */
+const wordsOf = (x) => x.replace(/([a-z0-9])([A-Z])/g, '$1_$2').toLowerCase().split('_').map((w) => w.replace(/[0-9]+/g, '')).filter(Boolean);
+const inOrder = (small, big) => {
+  let i = 0;
+  for (const w of big) if (w === small[i]) i++;
+  return i === small.length;
+};
+
+/**
+ * What ties a parameter's symbol to the control its `ref` names (FreeMixer/omx-plugins#58): without it two refs can
+ * be swapped and every generated check follows the swap. The symbol, a band's `b<n>_` prefix and an element's prefix
+ * off, digits dropped, is the control's words (`rateHz` for rate_hz) or an in-order part of them (`threshold` of
+ * thresholdDb) that is not exactly the words of another control; a symbol frozen from before the wizard drafted
+ * it from the control (`key_external`) says `control` and the control must be the one the ref names. Returns the
+ * refusals.
+ */
+export function symbolTie(p, control, controls) {
+  if (p.control !== undefined) {
+    return p.control === control.name ? [] : [`'${p.symbol}' says its control is '${p.control}', and its ref (${p.ref}) names '${control.name}'`];
+  }
+  const sym = wordsOf(p.symbol.replace(/^b[0-9]+_/, ''));
+  const own = wordsOf(control.name);
+  if (sym.join('_') === own.join('_')) return [];
+  // a part of the words may fit several controls (`on` of bandOn and hpfOn); the other side of any swap is caught, but a
+  // symbol that is exactly another control's words is that control's
+  const exact = controls.filter((c) => c.name !== control.name && wordsOf(c.name).join('_') === sym.join('_'));
+  if (exact.length) return [`'${p.symbol}' is the words of '${exact[0].name}', but its ref (${p.ref}) names '${control.name}'`];
+  if (!inOrder(sym, own)) return [`'${p.symbol}' is not the words of '${control.name}', the control its ref (${p.ref}) names`];
+  return [];
 }
 
 /** SHA-256 of the resolved parameter list: the org.openmixer.declaration/1 digest, the formula the
