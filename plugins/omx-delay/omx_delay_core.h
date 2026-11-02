@@ -9,12 +9,24 @@
  *
  * GENERATED — DO NOT EDIT BY HAND. Produced by tools/gen.mjs from plugins/omx-delay/omx-delay.decl.json and
  * the face's resolve() prototype: each argument takes the parameter whose contract control it names.
+ * `fx_delay_taps` is no parameter: the declaration holds it at its kernel's declared default, OMX_FX_DELAY_TAPS_RANGE_DEFAULT.
+ * `tap1_factor` is no parameter: the declaration holds it at its kernel's declared default, OMX_DELAY_TAP1_FACTORS_DEFAULT.
+ * `tap2_factor` is no parameter: the declaration holds it at its kernel's declared default, OMX_DELAY_TAP2_FACTORS_DEFAULT.
+ * `tap3_factor` is no parameter: the declaration holds it at its kernel's declared default, OMX_DELAY_TAP3_FACTORS_DEFAULT.
  * `sync` is no parameter: the declaration holds it at its kernel's declared default, OMX_DELAY_SYNCS_DEFAULT.
  * `division` is no parameter: the declaration holds it at its kernel's declared default, OMX_DELAY_DIVISIONS_DEFAULT.
  * `mode` is no parameter: the declaration holds it at its kernel's declared default, OMX_DELAY_MODES_DEFAULT.
  * `duck_db` is no parameter: the declaration holds it at its kernel's declared default, OMX_DELAY_DUCK_DB_RANGE_DEFAULT.
  * `duck_threshold_db` is no parameter: the declaration holds it at its kernel's declared default, OMX_DELAY_DUCK_THRESHOLD_DB_RANGE_DEFAULT.
  * `duck_release_ms` is no parameter: the declaration holds it at its kernel's declared default, OMX_DELAY_DUCK_RELEASE_MS_RANGE_DEFAULT.
+ * `tap0Gain` is not a parameter of this plugin: it is passed at "default".
+ * `tap0Pan` is not a parameter of this plugin: it is passed at "default".
+ * `tap1Gain` is not a parameter of this plugin: it is passed at "default".
+ * `tap1Pan` is not a parameter of this plugin: it is passed at "default".
+ * `tap2Gain` is not a parameter of this plugin: it is passed at "default".
+ * `tap2Pan` is not a parameter of this plugin: it is passed at "default".
+ * `tap3Gain` is not a parameter of this plugin: it is passed at "default".
+ * `tap3Pan` is not a parameter of this plugin: it is passed at "default".
  */
 #ifndef OMX_DELAY_CORE_H
 #define OMX_DELAY_CORE_H
@@ -49,6 +61,18 @@ static inline void omx_delay_core_resolve(OmxDelayCore *c, const float *values, 
                                   /* tone */ values[OMX_DELAY_PARAM_TONE],
                                   /* mix */ values[OMX_DELAY_PARAM_MIX],
                                   /* pingpong */ (int)lrintf(values[OMX_DELAY_PARAM_PINGPONG]),
+                                  /* fx_delay_taps */ (float)OMX_FX_DELAY_TAPS_RANGE_DEFAULT,
+                                  /* tap0_gain */ 1.0f,
+                                  /* tap0_pan */ 0.0f,
+                                  /* tap1_factor */ (int)OMX_DELAY_TAP1_FACTORS_DEFAULT,
+                                  /* tap1_gain */ 0.7f,
+                                  /* tap1_pan */ -0.5f,
+                                  /* tap2_factor */ (int)OMX_DELAY_TAP2_FACTORS_DEFAULT,
+                                  /* tap2_gain */ 0.5f,
+                                  /* tap2_pan */ 0.5f,
+                                  /* tap3_factor */ (int)OMX_DELAY_TAP3_FACTORS_DEFAULT,
+                                  /* tap3_gain */ 0.35f,
+                                  /* tap3_pan */ 0.0f,
                                   /* sync */ (int)OMX_DELAY_SYNCS_DEFAULT,
                                   /* division */ (int)OMX_DELAY_DIVISIONS_DEFAULT,
                                   /* mode */ (int)OMX_DELAY_MODES_DEFAULT,

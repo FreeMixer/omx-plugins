@@ -27,7 +27,7 @@
     lv2:microVersion 1 ;
     rdfs:comment "The console's de-esser: a detector on a band around the sibilance drives the compressor's gain computer, and the reduction lands on that band alone or on the whole signal." ;
     lv2:optionalFeature lv2:hardRTCapable ;
-    omxres:threadsSpawned "0"^^xsd:unsignedInt ;
+    omxres:threadsSpawned "0"^^xsd:integer ;
     omxres:streamsFromDisk false ;
     omxres:opensSockets false ;
     lv2:port

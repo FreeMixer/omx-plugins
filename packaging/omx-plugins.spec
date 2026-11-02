@@ -14,14 +14,14 @@ BuildRequires: make
 BuildRequires: pkgconf-pkg-config
 # The releases this tree builds against: a floor each (no ceiling), once here and
 # the same in debian/control (tools/deps-check.sh). The Makefile and tools/gen.mjs read them from here.
-BuildRequires: omx-dsp-devel >= 0.27.0
-BuildRequires: omx-contract-devel >= 3.4.0
+BuildRequires: omx-dsp-devel >= 0.28.0
+BuildRequires: omx-contract-devel >= 3.6.0
 BuildRequires: omx-clap-core-devel >= 0.14.0
 # plugin-hostd's format tables, which the generators read backwards (tools/format-tables.mjs)
 BuildRequires: plugin-hostd-devel >= 0.15.2
 # the omx-contract command, first packaged in 2.15.0: the generators read the contract directory through it
 # (3.3.0: the directory and its schema are omx-contract-data's, the definitions each owner's -contract package's)
-BuildRequires: omx-contract >= 3.4.0
+BuildRequires: omx-contract >= 3.6.0
 # the panel layout and the MOD GUI are omx-panel's, from a descriptor and the declared panel (tools/omx-panel.mjs)
 BuildRequires: omx-panel >= 0.2.0
 # omx-panel recommends omx-plugins-devel: an older one installed beside this build puts its release's contract
@@ -112,9 +112,9 @@ own machine.
 
 %package devel
 Summary: Headers and static library of the OpenMixer plugins, for projects that build on them
-Requires: omx-dsp-devel >= 0.27.0
+Requires: omx-dsp-devel >= 0.28.0
 # the generated parameter headers include omx-contract's C renders, and omxplugins.pc requires omx-contract
-Requires: omx-contract-devel >= 3.4.0
+Requires: omx-contract-devel >= 3.6.0
 Requires: %{name}-contract = %{version}-%{release}
 Requires: clap-devel
 
@@ -136,7 +136,6 @@ Conflicts: %{name}-devel < %{version}-%{release}
 
 %description contract
 Each OpenMixer plugin's descriptor, its parameters in omx-contract's words,
-the code of each unit the param-contract extension serves (param-units.json)
 and the manifest naming this release, as files in omx-contract's contract
 directory, for any program that reads them at run time: a host, the console's
 panels and the omx-contract command.
@@ -154,6 +153,9 @@ panels and the omx-contract command.
 %{__make} install-test DESTDIR=%{buildroot} PREFIX=%{_prefix} TESTCLAPDIR=%{_libexecdir}/omx-plugins/test
 
 %check
+# a CI build host holds the channel's omx-plugins-contract before 0.17.0, whose units sheet omx-contract 3.6.0 now
+# declares: tools/ci-stale-units.sh drops it there (only under CI, never on a user's system), until 0.17.0 is out
+[ -z "${CI:-}${GITHUB_ACTIONS:-}" ] || [ "$(id -u)" != 0 ] || tools/ci-stale-units.sh
 %make_build test
 # the shipped pins.d file still names the shipped binaries' own hashes (sabotage: a changed binary goes red)
 tools/pins-check.sh %{buildroot}%{_datadir}/plugin-hostd/pins.d/omx-plugins.pins %{buildroot}/usr/lib/clap

@@ -26,7 +26,7 @@
     lv2:microVersion 1 ;
     rdfs:comment "The console's phaser: identical all-pass sections swept in octaves by one oscillator, with feedback around the chain and a wet/dry mix." ;
     lv2:optionalFeature lv2:hardRTCapable ;
-    omxres:threadsSpawned "0"^^xsd:unsignedInt ;
+    omxres:threadsSpawned "0"^^xsd:integer ;
     omxres:streamsFromDisk false ;
     omxres:opensSockets false ;
     lv2:port

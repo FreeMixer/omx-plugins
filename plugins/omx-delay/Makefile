@@ -22,7 +22,7 @@
 NAME       := omx-delay
 URI        := urn:openmixer:delay
 CLAP_ID    := org.openmixer.delay
-OMXDSP_MIN ?= 0.27.0
+OMXDSP_MIN ?= 0.28.0
 ROOT       := $(abspath ../..)
 GEN        := generated
 B          := build
