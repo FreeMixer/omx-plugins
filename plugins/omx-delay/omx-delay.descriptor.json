@@ -126,6 +126,7 @@
       "group": [
         "Delay"
       ],
+      "meaning": "pingpong",
       "automatable": true,
       "source": {
         "from": {

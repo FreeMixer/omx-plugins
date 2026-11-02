@@ -342,6 +342,7 @@
       "group": [
         "Reverb"
       ],
+      "meaning": "algorithm",
       "automatable": true,
       "source": {
         "from": {

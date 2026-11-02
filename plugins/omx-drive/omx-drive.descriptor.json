@@ -168,6 +168,7 @@
       "group": [
         "Drive"
       ],
+      "meaning": "model",
       "automatable": true,
       "source": {
         "from": {
