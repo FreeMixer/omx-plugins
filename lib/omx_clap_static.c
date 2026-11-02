@@ -16,7 +16,9 @@
 
 const struct omx_clap_static_plugin OMX_CLAP_STATIC_PLUGINS[] = {
     /* BEGIN GENERATED clap-table: tools/gen.mjs, one row per shipped plugin */
+    {"org.openmixer.balancer", &omx_clap_entry_balancer},
     {"org.openmixer.chorus", &omx_clap_entry_chorus},
+    {"org.openmixer.clipper", &omx_clap_entry_clipper},
     {"org.openmixer.comp", &omx_clap_entry_comp},
     {"org.openmixer.deesser", &omx_clap_entry_deesser},
     {"org.openmixer.delay", &omx_clap_entry_delay},
@@ -27,16 +29,22 @@ const struct omx_clap_static_plugin OMX_CLAP_STATIC_PLUGINS[] = {
     {"org.openmixer.eq32", &omx_clap_entry_eq32},
     {"org.openmixer.flanger", &omx_clap_entry_flanger},
     {"org.openmixer.geq", &omx_clap_entry_geq},
+    {"org.openmixer.glue", &omx_clap_entry_glue},
     {"org.openmixer.keyed-gate", &omx_clap_entry_gate},
     {"org.openmixer.limiter", &omx_clap_entry_limiter},
+    {"org.openmixer.loudlevel", &omx_clap_entry_loudlevel},
     {"org.openmixer.multiband", &omx_clap_entry_mbcomp},
     {"org.openmixer.phaser", &omx_clap_entry_phaser},
     {"org.openmixer.pitch", &omx_clap_entry_pitch},
+    {"org.openmixer.plosive", &omx_clap_entry_plosive},
     {"org.openmixer.reverb", &omx_clap_entry_reverb},
     {"org.openmixer.rotary", &omx_clap_entry_rotary},
+    {"org.openmixer.spring", &omx_clap_entry_spring},
     {"org.openmixer.strip", &omx_clap_entry_strip},
+    {"org.openmixer.suboct", &omx_clap_entry_suboct},
     {"org.openmixer.transient", &omx_clap_entry_transient},
     {"org.openmixer.tremolo", &omx_clap_entry_tremolo},
+    {"org.openmixer.upward", &omx_clap_entry_upward},
     /* END GENERATED clap-table */
 };
 

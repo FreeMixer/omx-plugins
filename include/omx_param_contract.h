@@ -24,6 +24,10 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+/* The unit of a parameter's plain value: the OMX_CLAP_UNIT_* codes, 0..24 the LV2 units one to one, 0x100.. the vendor
+ * block. Declared in omx-contract (OMX_PARAM_CONTRACT_UNITS, data/param-contract.json) and rendered there. */
+#include <omxcontract/omx_param_units.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -33,43 +37,6 @@ extern "C" {
 
 /** A symbol: [A-Za-z_][A-Za-z0-9_]*, at most 63 bytes and the NUL. */
 #define OMX_CLAP_PARAM_SYMBOL_SIZE 64
-
-/** The unit of a parameter's plain value: 0..24 the LV2 units one to one, 0x100.. the vendor block. Declared in
- * contract/param-units.json (OMX_PARAM_CONTRACT_UNITS), which omx-plugins-contract installs as
- * <contractdir>/3/omx-plugins/param-units.json for a reader with no header. */
-enum omx_clap_param_unit {
-  /* BEGIN GENERATED param-units: tools/gen.mjs, one line per declared unit */
-  OMX_CLAP_UNIT_NONE = 0,
-  OMX_CLAP_UNIT_S = 1,
-  OMX_CLAP_UNIT_MS = 2,
-  OMX_CLAP_UNIT_MIN = 3,
-  OMX_CLAP_UNIT_BAR = 4,
-  OMX_CLAP_UNIT_BEAT = 5,
-  OMX_CLAP_UNIT_FRAME = 6,
-  OMX_CLAP_UNIT_M = 7,
-  OMX_CLAP_UNIT_CM = 8,
-  OMX_CLAP_UNIT_MM = 9,
-  OMX_CLAP_UNIT_KM = 10,
-  OMX_CLAP_UNIT_INCH = 11,
-  OMX_CLAP_UNIT_MILE = 12,
-  OMX_CLAP_UNIT_DB = 13,
-  OMX_CLAP_UNIT_PC = 14,
-  OMX_CLAP_UNIT_COEF = 15,
-  OMX_CLAP_UNIT_HZ = 16,
-  OMX_CLAP_UNIT_KHZ = 17,
-  OMX_CLAP_UNIT_MHZ = 18,
-  OMX_CLAP_UNIT_BPM = 19,
-  OMX_CLAP_UNIT_OCT = 20,
-  OMX_CLAP_UNIT_CENT = 21,
-  OMX_CLAP_UNIT_SEMITONE_12TET = 22,
-  OMX_CLAP_UNIT_DEGREE = 23,
-  OMX_CLAP_UNIT_MIDI_NOTE = 24,
-  OMX_CLAP_UNIT_DBFS = 0x100,
-  OMX_CLAP_UNIT_DBU = 0x101,
-  OMX_CLAP_UNIT_RATIO = 0x102,
-  OMX_CLAP_UNIT_LUFS = 0x103,
-  /* END GENERATED param-units */
-};
 
 /** How the plain value maps to a control's travel. */
 enum omx_clap_param_scale {
@@ -81,7 +48,7 @@ enum omx_clap_param_scale {
 typedef struct omx_clap_param_contract_info {
   uint32_t param_id;
   char symbol[OMX_CLAP_PARAM_SYMBOL_SIZE];
-  uint32_t unit;  /* enum omx_clap_param_unit */
+  uint32_t unit;  /* an OMX_CLAP_UNIT_ code */
   uint32_t scale; /* enum omx_clap_param_scale */
   double step;    /* the plain-unit quantum the plugin resolves; 0 continuous, 1 stepped */
 } omx_clap_param_contract_info_t;

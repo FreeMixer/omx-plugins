@@ -33,6 +33,9 @@ override_dh_strip:
 # make test runs whole.
 override_dh_auto_test:
 ifeq (,$(filter nocheck,$(DEB_BUILD_OPTIONS)))
+	@# a CI build host holds the channel's omx-plugins-contract before 0.17.0, whose units sheet omx-contract 3.6.0 now
+	@# declares: tools/ci-stale-units.sh drops it there (only under CI, never on a user's system), until 0.17.0 is out
+	@[ -z "$$CI$$GITHUB_ACTIONS" ] || [ "$$(id -u)" != 0 ] || tools/ci-stale-units.sh
 	@if [ -n "$$OMX_CONTRACT_CLI" ] || command -v omx-contract >/dev/null 2>&1; then \
 	  $(MAKE) test OMX_LV2_SPEC_DIR=/usr/lib/lv2; \
 	else \
