@@ -655,6 +655,8 @@ const groupUri = (d, section) => `${d.lv2.uri}#${section.key}`;
 
 const TEMPLATES = join(ROOT, 'recipes', 'templates', 'plugin');
 const template = (name) => readFileSync(join(TEMPLATES, name), 'utf8');
+/** A template rendered INTO another file: its own SPDX header dropped, the host file already carries one. */
+const partial = (name) => template(name).replace(BANNER, '');
 
 /** The C float literal of a number: always with a point, never an exponent a float cannot hold. */
 const cfloat = (n) => {
@@ -1027,7 +1029,7 @@ export function generateInstance(d) {
     Makefile: withBanner(render(template('Makefile.tmpl'), view), d, '#'),
     [`omx_${d.kernel}_clap.c`]: withBanner(render(template('clap.c.tmpl'), view), d, '//'),
     [`omx_${d.kernel}_lv2.c`]: withBanner(render(template('lv2.c.tmpl'), view), d, '//'),
-    [`omx_${d.kernel}_core.h`]: render(template('core.h.tmpl'), { ...view, vtable: render(template('core-vtable.h.tmpl'), view) }),
+    [`omx_${d.kernel}_core.h`]: render(template('core.h.tmpl'), { ...view, vtable: render(partial('core-vtable.h.tmpl'), view) }),
     [`test/${d.kernel}-oracle.c`]: render(template('oracle.c.tmpl'), view),
   };
 }
@@ -1192,7 +1194,7 @@ export function generateChain(d) {
     Makefile: withBanner(render(template('Makefile.tmpl'), view), d, '#'),
     [`omx_${d.kernel}_clap.c`]: withBanner(render(template('clap.c.tmpl'), view), d, '//'),
     [`omx_${d.kernel}_lv2.c`]: withBanner(render(template('lv2.c.tmpl'), view), d, '//'),
-    [`omx_${d.kernel}_core.h`]: render(template('chain-core.h.tmpl'), { ...view, vtable: render(template('core-vtable.h.tmpl'), view) }),
+    [`omx_${d.kernel}_core.h`]: render(template('chain-core.h.tmpl'), { ...view, vtable: render(partial('core-vtable.h.tmpl'), view) }),
     [`test/${d.kernel}-oracle.c`]: render(template('oracle.c.tmpl'), view),
   };
 }

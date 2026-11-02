@@ -19,6 +19,7 @@
 
 /* The generated table FIRST: its guard is omx-dsp's own, so the instance header reads this table. */
 #include "omx_suboct_params.h"
+#include "omx_plugin_face.h"
 
 #include <omxdsp/fx/omx_suboct_instance.h>
 
@@ -56,5 +57,21 @@ static inline void omx_suboct_core_run(OmxSuboctCore *c, const float *in_l, cons
                                          float *out_r, uint32_t frames) {
   omx_suboct_instance_run(&c->inst, in_l, in_r, out_l, out_r, frames);
 }
+
+/* The core behind the vtable the shared faces call (include/omx_plugin_face.h): the same functions, untyped. */
+static inline void omx_suboct_core_init_v(void *c, uint32_t rate) { omx_suboct_core_init((OmxSuboctCore *)c, rate); }
+static inline void omx_suboct_core_resolve_v(void *c, const float *values, int bypass) {
+  omx_suboct_core_resolve((OmxSuboctCore *)c, values, bypass);
+}
+static inline uint32_t omx_suboct_core_latency_v(const void *c) { return omx_suboct_core_latency((const OmxSuboctCore *)c); }
+static inline void omx_suboct_core_run_v(void *c, const float *key, const float *in_l, const float *in_r, float *out_l,
+                                           float *out_r, uint32_t frames) {
+  (void)key;
+  omx_suboct_core_run((OmxSuboctCore *)c, in_l, in_r, out_l, out_r, frames);
+}
+
+static const struct omx_face_core OMX_SUBOCT_CORE = {sizeof(OmxSuboctCore), omx_suboct_core_init_v, omx_suboct_core_resolve_v,
+                                                   omx_suboct_core_latency_v, omx_suboct_core_run_v,
+                                                   NULL};
 
 #endif /* OMX_SUBOCT_CORE_H */
