@@ -13,7 +13,8 @@ The JSON files are the one source. `tools/gen-presets.mjs` writes them and, from
 bundle's `presets.ttl`; `tools/gen.mjs` lists the same presets in the bundle's `manifest.ttl`.
 Nothing about a preset is kept by hand, and `make presets` fails on a stale or missing file.
 
-A preset carries parameters only (`"carries": "params"`): no plugin here needs a state body.
+A preset carries parameters only (`"carries": "params"`): no plugin here needs a state body. The files hold to
+plugin-hostd's `preset.schema.json` (`plugin: {id}`, `createdAt`, `modifiedAt`); `make presets` checks each against it.
 
 ## CLAP
 

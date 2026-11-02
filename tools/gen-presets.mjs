@@ -297,7 +297,7 @@ export function build() {
     const presets = [];
     for (const [pid, name, def] of list) {
       const values = def.points ? geqValues(plugin, def) : def;
-      const preset = { format: FORMAT, plugin: id, id: pid, name, carries: 'params', params: paramsOf(plugin, values), created: WHEN, modified: WHEN, copyOf: null };
+      const preset = { format: FORMAT, plugin: { id }, id: pid, name, carries: 'params', params: paramsOf(plugin, values), createdAt: WHEN, modifiedAt: WHEN, copyOf: null };
       files.set(`${PRESET_DIR}/${id}/${pid}.json`, `${JSON.stringify(preset, null, 2)}\n`);
       presets.push(preset);
     }

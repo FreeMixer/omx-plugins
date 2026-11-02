@@ -1,6 +1,8 @@
 {
   "format": "org.openmixer.preset/1",
-  "plugin": "org.openmixer.strip",
+  "plugin": {
+    "id": "org.openmixer.strip"
+  },
   "id": "bass",
   "name": "Bass",
   "carries": "params",
@@ -269,7 +271,7 @@
       "value": 0
     }
   ],
-  "created": "2026-10-17T00:00:00Z",
-  "modified": "2026-10-17T00:00:00Z",
+  "createdAt": "2026-10-17T00:00:00Z",
+  "modifiedAt": "2026-10-17T00:00:00Z",
   "copyOf": null
 }

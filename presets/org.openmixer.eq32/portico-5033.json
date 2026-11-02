@@ -1,6 +1,8 @@
 {
   "format": "org.openmixer.preset/1",
-  "plugin": "org.openmixer.eq32",
+  "plugin": {
+    "id": "org.openmixer.eq32"
+  },
   "id": "portico-5033",
   "name": "Five Band Polish",
   "carries": "params",
@@ -870,7 +872,7 @@
       "value": 0
     }
   ],
-  "created": "2026-10-17T00:00:00Z",
-  "modified": "2026-10-17T00:00:00Z",
+  "createdAt": "2026-10-17T00:00:00Z",
+  "modifiedAt": "2026-10-17T00:00:00Z",
   "copyOf": null
 }

@@ -1,6 +1,8 @@
 {
   "format": "org.openmixer.preset/1",
-  "plugin": "org.openmixer.spring",
+  "plugin": {
+    "id": "org.openmixer.spring"
+  },
   "id": "guitar-amp",
   "name": "Guitar Amp",
   "carries": "params",
@@ -31,7 +33,7 @@
       "value": 25
     }
   ],
-  "created": "2026-10-17T00:00:00Z",
-  "modified": "2026-10-17T00:00:00Z",
+  "createdAt": "2026-10-17T00:00:00Z",
+  "modifiedAt": "2026-10-17T00:00:00Z",
   "copyOf": null
 }

@@ -1,6 +1,8 @@
 {
   "format": "org.openmixer.preset/1",
-  "plugin": "org.openmixer.rotary",
+  "plugin": {
+    "id": "org.openmixer.rotary"
+  },
   "id": "quick-accel",
   "name": "Quick Acceleration",
   "carries": "params",
@@ -47,7 +49,7 @@
       "label": "Fast"
     }
   ],
-  "created": "2026-10-17T00:00:00Z",
-  "modified": "2026-10-17T00:00:00Z",
+  "createdAt": "2026-10-17T00:00:00Z",
+  "modifiedAt": "2026-10-17T00:00:00Z",
   "copyOf": null
 }
