@@ -78,6 +78,7 @@ typedef struct {
   unsigned char *touched;                   /* set by the host or a state: a placement default leaves it */
   _Atomic uint32_t placed;                  /* a placement for the audio thread to apply, plus one; 0 none */
   struct omx_meter_ring meters;             /* every meter's values after the last block; none since activation */
+  _Atomic int dirty;                        /* the values moved since the core last resolved them: resolve before the next block */
 } G;
 
 #define G_OF(p) ((G *)(p)->plugin_data)
@@ -112,18 +113,19 @@ static void g_place(G *g, uint32_t placement) {
 }
 
 /** Frame 0: a placement the host changed while active, then every value event in the block, are
- * applied before the kernel runs. */
+ * applied before the kernel runs. A value that moved marks the values dirty; a block with no event leaves
+ * them, and the core, as they are. */
 static void g_drain(G *g, const clap_input_events_t *in) {
   const uint32_t placed = atomic_exchange_explicit(&g->placed, 0, memory_order_acquire);
-  if (placed) g_place(g, placed - 1);
-  if (!in) return;
-  const uint32_t n = in->size(in);
+  if (placed) g_place(g, placed - 1), atomic_store_explicit(&g->dirty, 1, memory_order_relaxed);
+  const uint32_t n = in ? in->size(in) : 0u;
   for (uint32_t k = 0; k < n; ++k) {
     const clap_event_header_t *h = in->get(in, k);
     if (!h || h->space_id != CLAP_CORE_EVENT_SPACE_ID || h->type != CLAP_EVENT_PARAM_VALUE) continue;
     const clap_event_param_value_t *e = (const clap_event_param_value_t *)h;
     if (e->param_id < G_PARAMS(g)) {
-      g->values[e->param_id] = g_clamp(g, e->param_id, e->value);
+      const float v = g_clamp(g, e->param_id, e->value);
+      if (v != g->values[e->param_id]) g->values[e->param_id] = v, atomic_store_explicit(&g->dirty, 1, memory_order_relaxed);
       g->touched[e->param_id] = 1;
     }
   }
@@ -178,6 +180,7 @@ static bool g_activate(const clap_plugin_t *p, double sample_rate, uint32_t min_
   if (atomic_exchange(&g->latency, lat) != lat && g->host_latency && g->host_latency->changed)
     g->host_latency->changed(g->host);
   atomic_store(&g->restart_asked, 0);
+  atomic_store(&g->dirty, 1); /* a fresh core resolves before its first block */
   if (g->face->meter_count) omx_meter_ring_clear(&g->meters);
   g->active = 1;
   return true;
@@ -199,6 +202,7 @@ static void g_stop_processing(const clap_plugin_t *p) { G_OF(p)->processing = 0;
 static void g_reset(const clap_plugin_t *p) {
   G *g = G_OF(p);
   g->face->core->init(g->core, g->rate);
+  atomic_store(&g->dirty, 1);
 }
 
 /** The meters of `source` (the inputs' or the outputs' peak), each leg's level of `buf`. */
@@ -221,7 +225,9 @@ static clap_process_status g_process(const clap_plugin_t *p, const clap_process_
   const clap_audio_buffer_t *ao = &pr->audio_outputs[0];
   if (ai->channel_count < 2 || ao->channel_count < 2 || !ai->data32 || !ao->data32) return CLAP_PROCESS_ERROR;
   const int bypassed = g->values[G_BYPASS(g)] > 0.5f;
-  f->core->resolve(g->core, g->values, bypassed);
+  /* A quiet block (no value moved) skips the resolve: the core keeps its smoothing as it is, which is what
+   * resolving the same values again gives, bit for bit (each plugin's oracle, its quiet arm). */
+  if (atomic_exchange_explicit(&g->dirty, 0, memory_order_relaxed)) f->core->resolve(g->core, g->values, bypassed);
   double mv[OMX_METER_RING_MAX];
   /* the inputs' peak, before the kernel runs (the outputs may be the inputs) */
   if (f->meter_count) g_levels(g, OMX_FACE_METER_IN, ai, pr->frames_count, mv);
@@ -402,6 +408,7 @@ static bool g_state_load(const clap_plugin_t *p, const clap_istream_t *s) {
   if (!any) return false;
   for (uint32_t i = 0; i < n; ++i)
     if (set[i]) g->values[i] = v[i], g->touched[i] = 1;
+  atomic_store(&g->dirty, 1);
   g_publish(g);
   /* The values a state set are new to the host: it reads them again (clap.params rescan). */
   if (g->host_params && g->host_params->rescan) g->host_params->rescan(g->host, CLAP_PARAM_RESCAN_VALUES);
@@ -418,6 +425,7 @@ static void g_preset_param(const char *symbol, double value, void *ctx) {
     if (strcmp(symbol, g->face->params[i].symbol) == 0) {
       g->values[i] = g_clamp(g, i, value);
       g->touched[i] = 1;
+      atomic_store(&g->dirty, 1);
     }
   }
 }
