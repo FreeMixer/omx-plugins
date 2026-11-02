@@ -27,6 +27,8 @@
 #                   (tools/test/eq-probe-race-test.mjs; part of `make test` and `make test-faces`)
 #   make param-tie   every by-reference parameter's symbol is its control's words or says its `control`: swapped refs are refused
 #                   (FreeMixer/omx-plugins#58; tools/test/param-tie-test.mjs; part of `make test`)
+#   make summary-numbers  a plugin summary reads its numbers from the declaration: none types a limit or default of its parameters,
+#                   and a moved contract moves the README row (FreeMixer/omx-plugins#174; tools/test/summary-numbers-test.mjs; part of `make test`)
 #   make phaser-depth  omx-phaser's generated panel publishes its depth role on depthOct, in octaves (FreeMixer/omx-plugins#232;
 #                   tools/test/phaser-depth-role-test.mjs and its --self-test; part of `make test`)
 #   make band-groups  omx-eq8's generated descriptor and TTL hold one LV2 port group per band, Band 1 ... Band 8 in band
@@ -145,11 +147,11 @@ LIB_FLAGS  := -fPIC -fvisibility=hidden -DOMX_CLAP_STATIC -Iinclude
 # read only by the targets that build the archive, so `make version` and the rest need no omx-dsp
 lib_cflags = $(call dep_check,omxdsp,$(OMXDSP_MIN))$(call dep_check,omx-contract,$(CONTRACT_MIN))$(shell $(PKG_CONFIG) --cflags omxdsp omx-contract omx-clap-core clap)
 
-.PHONY: param-tie presets presets-figures test-role all lib lib-test test test-faces units panel-layout descriptor-view lv2-units lv2-deprecated lv2-maintainer lv2-manifest release-version resource-hints format-tables contract-union probe-checks eq-probe-race band-groups phaser-depth geq-widgets round-trip hints modgui manual install install-pins install-test package-lists install-devel install-contract contract-dir lv2bench-ran clean version recipe-test completeness selftest private-refs params-doc check-params-doc strip-crosscheck meters-abi meter-level dsp-copies meter-ring clap-validate
+.PHONY: summary-numbers param-tie presets presets-figures test-role all lib lib-test test test-faces units panel-layout descriptor-view lv2-units lv2-deprecated lv2-maintainer lv2-manifest release-version resource-hints format-tables contract-union probe-checks eq-probe-race band-groups phaser-depth geq-widgets round-trip hints modgui manual install install-pins install-test package-lists install-devel install-contract contract-dir lv2bench-ran clean version recipe-test completeness selftest private-refs params-doc check-params-doc strip-crosscheck meters-abi meter-level dsp-copies meter-ring clap-validate
 all: lib
 	@for p in $(PLUGINS); do $(MAKE) -C $$p all || exit 1; done
 lib: $(LIB) $(LIB_PC)
-test: lib units panel-layout descriptor-view lv2-units lv2-deprecated lv2-maintainer lv2-manifest release-version resource-hints format-tables contract-union contract-dir lv2bench-ran probe-checks eq-probe-race band-groups phaser-depth geq-widgets param-tie
+test: lib units panel-layout descriptor-view lv2-units lv2-deprecated lv2-maintainer lv2-manifest release-version resource-hints format-tables contract-union contract-dir lv2bench-ran probe-checks eq-probe-race band-groups phaser-depth geq-widgets summary-numbers param-tie
 	@if [ -z "$(PLUGINS)" ]; then echo "no plugins yet"; fi
 	@for p in $(PLUGINS); do $(MAKE) -C $$p test || exit 1; done
 	@$(MAKE) -s round-trip
@@ -207,6 +209,8 @@ eq-probe-race:
 # omx-eq8's generated descriptor and TTL hold a port group per band, HPF and LPF as before (#257)
 param-tie:
 	node tools/test/param-tie-test.mjs
+summary-numbers:
+	node tools/test/summary-numbers-test.mjs --self-test
 phaser-depth:
 	node tools/test/phaser-depth-role-test.mjs
 	node tools/test/phaser-depth-role-test.mjs --self-test
