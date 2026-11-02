@@ -27,10 +27,8 @@ only the shared facts. The generators then read the union of that directory thro
 RPM installs. A descriptor's links name the
 package that owns each definition, from the directory's manifests.
 
-A Debian build host has no omx-contract command yet (no .deb ships it yet). There
-`debian/rules` prints one line, `NO-CONTRACT-COMMAND omx-plugins: no omx-contract command on this build host
-...: the generator checks ... are skipped; make test-faces runs`, and runs `make test-faces`: the built faces, the static table, the meters ABI and the test
-roles. Where the command is present, `make test` runs whole.
+A Debian build host gets the omx-contract command from the `omx-contract` package (a Build-Depends), so
+`debian/rules` runs `make test` whole, as the RPM build does; `tools/deps-check.sh` holds both.
 
 The channel is the OpenMixer package repository, added by installing the openmixer-release package
 (`https://www.openmixer.org/rpm/openmixer-release.noarch.rpm` for dnf,
