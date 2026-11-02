@@ -1,0 +1,20 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Copyright (C) 2026 Pau Aliagas <linuxnow@gmail.com>
+/* The core behind the vtable the shared faces call (include/omx_plugin_face.h): the same functions, untyped. */
+static inline void omx_{{kernel}}_core_init_v(void *c, uint32_t rate) { omx_{{kernel}}_core_init((Omx{{Kernel}}Core *)c, rate); }
+static inline void omx_{{kernel}}_core_resolve_v(void *c, const float *values, int bypass) {
+  omx_{{kernel}}_core_resolve((Omx{{Kernel}}Core *)c, values, bypass);
+}
+static inline uint32_t omx_{{kernel}}_core_latency_v(const void *c) { return omx_{{kernel}}_core_latency((const Omx{{Kernel}}Core *)c); }
+static inline void omx_{{kernel}}_core_run_v(void *c, const float *key, const float *in_l, const float *in_r, float *out_l,
+                                           float *out_r, uint32_t frames) {
+{{^keyed}}  (void)key;
+  omx_{{kernel}}_core_run((Omx{{Kernel}}Core *)c, in_l, in_r, out_l, out_r, frames);
+{{/keyed}}{{#keyed}}  omx_{{kernel}}_core_run((Omx{{Kernel}}Core *)c, key, in_l, in_r, out_l, out_r, frames);
+{{/keyed}}}
+{{#meterRead}}static inline float omx_{{kernel}}_core_meter_v(const void *c, uint32_t i) { return omx_{{kernel}}_core_meter((const Omx{{Kernel}}Core *)c, i); }
+{{/meterRead}}
+static const struct omx_face_core OMX_{{K}}_CORE = {sizeof(Omx{{Kernel}}Core), omx_{{kernel}}_core_init_v, omx_{{kernel}}_core_resolve_v,
+                                                   omx_{{kernel}}_core_latency_v, omx_{{kernel}}_core_run_v,
+                                                   {{#meterRead}}omx_{{kernel}}_core_meter_v{{/meterRead}}{{^meterRead}}NULL{{/meterRead}}};
+
