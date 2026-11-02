@@ -114,9 +114,9 @@ stands in for the installed tables.
 - A CLAP parameter's `module` is its control's `group`, the labels joined by `/` (the inverse of plugin-hostd's
   `group-path`); a plugin with no descriptor writes `""`.
 - param-contract's unit tokens (`tools/param-contract.mjs`) are the LV2 units a face writes, their values those
-  `contract/param-units.json` declares (the sheet `OMX_PARAM_CONTRACT_UNITS`, `{ <token>: <code> }`), installed as
-  `<contractdir>/3/omx-plugins/param-units.json` for a reader with no header; `tools/gen.mjs` writes
-  `include/omx_param_contract.h`'s enum from it, and `make units` refuses the two apart.
+  omx-contract declares (the sheet `OMX_PARAM_CONTRACT_UNITS`, `{ <token>: <code> }`, in its `param-contract.json`) and
+  renders to `omxcontract/omx_param_units.h`, which `include/omx_param_contract.h` includes; `make units` refuses a
+  drift between them and a unit code defined in this tree.
 
 `make format-tables` (part of `make test`) holds the faces to the tables, with its sabotage arms.
 

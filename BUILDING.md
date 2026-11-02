@@ -136,8 +136,7 @@ include/                  shared C shapes (no DSP): omx_panel_description.h and 
                           omx_plugin_face.h, what a plugin hands the shared faces (struct omx_face), and
                           omx_clap_face.h and omx_lv2_face.h, the faces' entry points
 contract/                 the definitions installed beside the descriptors in omx-contract's contract
-                          directory: param-units.json, the param-contract units (the header's enum is
-                          generated from it)
+                          directory
 lib/                      omx_clap_static.c (the table's rows are generated), omxplugins.pc.in, and the
                           two faces every plugin shares: omx_clap_face.c (one object in libomxplugins.a)
                           and omx_lv2_face.c, each built beside the plugin's descriptor file
