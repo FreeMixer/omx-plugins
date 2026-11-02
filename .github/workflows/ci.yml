@@ -476,10 +476,14 @@ jobs:
             echo "::warning::clap-validator reported failures (not yet required); see the job summary and the report artifact"
           fi
 
-      - name: The state tests are required
+      - name: The state and event-ordering tests are required
         # every plugin's state round trip (state-reproducibility-*, state-invalid-*) must pass; the
-        # repo's own test of it is `clap-probe state`, in every plugin's make test
-        run: node tools/clap-validate-required.mjs build/clap-validator state-
+        # repo's own test of it is `clap-probe state`, in every plugin's make test. The event-ordering
+        # tests (process-sleep-process-status, process-varying-block-sizes, process-random-block-sizes,
+        # transport-fuzz) must pass too: they catch an output event reported out of sample order.
+        run: |
+          node tools/clap-validate-required.mjs build/clap-validator state- \
+            process-sleep-process-status process-varying-block-sizes process-random-block-sizes transport-fuzz
 
       - uses: actions/upload-artifact@v4
         if: always()
