@@ -675,16 +675,22 @@ export function paramRow(p) {
  * `{min:<symbol>}` and `{max:<symbol>}` in a line of `manual` reads that resolved parameter (its
  * range and default as the parameter table words them, or its bare limit), so the README never
  * retypes a number omx-contract or the declaration holds. A symbol no parameter has, or any other
- * `{word:...}`, is refused. */
-export function fillManual(d, line) {
+ * `{word:...}`, is refused. A `summary` reads the same words (`summaryOf`). */
+export function fillManual(d, line, what = 'manual') {
   const out = line.replace(/\{(range|default|min|max):([A-Za-z][A-Za-z0-9_]*)\}/g, (_m, what, symbol) => {
     const p = d.params.find((q) => q.symbol === symbol);
-    if (!p) throw new Error(`plugins/${d.stem}: its manual reads '${symbol}', which is none of its parameters`);
+    if (!p) throw new Error(`plugins/${d.stem}: its ${what} reads '${symbol}', which is none of its parameters`);
     return what === 'min' || what === 'max' ? `${p[what]}` : paramRow(p)[what];
   });
   const left = out.match(/\{[a-z]+:[^}]*\}/);
-  if (left) throw new Error(`plugins/${d.stem}: its manual's ${left[0]} is none of {range|default|min|max:<symbol>}`);
+  if (left) throw new Error(`plugins/${d.stem}: its ${what}'s ${left[0]} is none of {range|default|min|max:<symbol>}`);
   return out;
+}
+
+/** The README catalogue's words for a plugin: its `summary` with the numbers it reads from the declaration filled in
+ * (`up to {max:fxDelayTime} ms`), else its description as the descriptor states it. */
+export function summaryOf(d) {
+  return d.summary === undefined ? d.description : fillManual(d, d.summary, 'summary');
 }
 
 /** The view every plugin template renders from. */
@@ -1236,7 +1242,7 @@ export const SHARED = {
       '',
       '| Plugin | CLAP id | LV2 URI | What it does |',
       '|---|---|---|---|',
-      ...ds.map((d) => `| **${d.name}** | \`${d.clap.id}\` | \`${d.lv2.uri}\` | ${d.summary ?? d.description} |`),
+      ...ds.map((d) => `| **${d.name}** | \`${d.clap.id}\` | \`${d.lv2.uri}\` | ${summaryOf(d)} |`),
       '',
     ],
     sections: (ds) => ds.flatMap((d) => [
