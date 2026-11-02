@@ -8,21 +8,7 @@
   "url": "https://github.com/FreeMixer/omx-plugins",
   "summary": "Stereo delay up to 2 s: feedback through a tone filter that darkens each repeat, ping-pong, wet/dry mix. Zero latency, real-time safe.",
   "binding": "instance",
-  "fixed": {
-    "tap0Gain": "default",
-    "tap0Pan": "default",
-    "tap1Gain": "default",
-    "tap1Pan": "default",
-    "tap2Gain": "default",
-    "tap2Pan": "default",
-    "tap3Gain": "default",
-    "tap3Pan": "default"
-  },
   "held": [
-    "fxDelayTaps",
-    "tap1Factor",
-    "tap2Factor",
-    "tap3Factor",
     "sync",
     "division",
     "mode",
