@@ -98,11 +98,11 @@ for b in "$stage"/lv2/*.lv2; do
   lv2s=$((lv2s + 1))
 done
 # and every plugin instantiated and run on this architecture: lv2bench loads each binary and processes
-# audio through it, so a plugin that cannot load on the target is refused here, not on the Zynthian
+# audio through it (either shape of its output: tools/lv2bench-ran.sh), so a plugin that cannot load on the target is refused here, not on the Zynthian
 bench=$(LV2_PATH="$stage/lv2" lv2bench)
 for b in "$stage"/lv2/*.lv2; do
   uri=$(sed -n 's/^<\(urn:openmixer:[^>]*\)>.*/\1/p' "$b/manifest.ttl" | head -1)
-  grep -qE "^[0-9.]+ $uri\$" <<<"$bench" || die "lv2bench did not run $uri"
+  "$root/tools/lv2bench-ran.sh" "$uri" <<<"$bench" || die "lv2bench did not run $uri"
 done
 claps=$(find "$stage/clap" -name '*.clap' | wc -l)
 
