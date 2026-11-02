@@ -3,10 +3,11 @@
 /*
  * preset-lib.mjs — what a preset file is checked against: each shipped plugin's parameters as its
  * generated header declares them (symbol, unit, travel, integer steps) and the labels of its choices,
- * read from the generated LV2 description. Shared by tools/gen-presets.mjs (which writes the files)
+ * read from the generated LV2 description, and plugin-hostd's preset schema. Shared by tools/gen-presets.mjs (which writes the files)
  * and tools/test/presets-check.mjs (which holds them to the travels).
  */
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -55,19 +56,65 @@ export function presetFiles(root = ROOT) {
   return readdirSync(base).sort().flatMap((dir) => readdirSync(join(base, dir)).filter((f) => f.endsWith('.json')).sort().map((f) => ({ file: `${PRESET_DIR}/${dir}/${f}`, dir, preset: JSON.parse(readFileSync(join(base, dir, f), 'utf8')) })));
 }
 
+/** The path of plugin-hostd's preset schema: PLUGIN_HOSTD_PRESET_SCHEMA, else under the installed package's prefix. */
+function schemaPath() {
+  if (process.env.PLUGIN_HOSTD_PRESET_SCHEMA) return process.env.PLUGIN_HOSTD_PRESET_SCHEMA;
+  const prefix = execFileSync('pkg-config', ['--variable=prefix', 'plugin-hostd'], { encoding: 'utf8' }).trim();
+  return join(prefix, 'share/plugin-hostd/preset.schema.json');
+}
+
+let schemaRead;
+/** plugin-hostd's preset schema, the one its daemon checks a preset file against. */
+export function presetSchema() {
+  return (schemaRead ??= JSON.parse(readFileSync(schemaPath(), 'utf8')));
+}
+
+const SCHEMA_WORDS = new Set(['$schema', '$id', '$defs', 'title', 'description', 'type', 'enum', 'const', 'required', 'properties', 'items', 'minLength', 'maxLength', 'pattern', 'allOf', 'if', 'then', 'not', '$ref']);
+const isObject = (v) => typeof v === 'object' && v !== null && !Array.isArray(v);
+const TYPES = { object: isObject, array: Array.isArray, string: (v) => typeof v === 'string', number: (v) => typeof v === 'number' };
+
+/**
+ * Where `value` breaks `schema`, as JSON Schema reads the words the preset schema uses; an empty list is valid.
+ * Throws on a word it does not know, so a schema that grows one is never half read.
+ */
+export function schemaProblems(value, schema, root = schema, at = '') {
+  const out = [];
+  const name = at || '(the file)';
+  for (const word of Object.keys(schema)) if (!SCHEMA_WORDS.has(word)) throw new Error(`preset schema: '${word}' is not read here`);
+  if (schema.$ref) out.push(...schemaProblems(value, root.$defs[schema.$ref.replace('#/$defs/', '')], root, at));
+  if (schema.type && !TYPES[schema.type](value)) out.push(`${name} is not of type ${schema.type}`);
+  if (schema.enum && !schema.enum.includes(value)) out.push(`${name} is none of ${schema.enum.join(', ')}`);
+  if ('const' in schema && value !== schema.const) out.push(`${name} is not ${schema.const}`);
+  if (typeof value === 'string') {
+    if (schema.minLength !== undefined && value.length < schema.minLength) out.push(`${name} is shorter than ${schema.minLength}`);
+    if (schema.maxLength !== undefined && value.length > schema.maxLength) out.push(`${name} is longer than ${schema.maxLength}`);
+    if (schema.pattern && !new RegExp(schema.pattern).test(value)) out.push(`${name} does not match ${schema.pattern}`);
+  }
+  if (isObject(value)) {
+    for (const key of schema.required ?? []) if (!(key in value)) out.push(`${name} has no ${key}`);
+    for (const [key, sub] of Object.entries(schema.properties ?? {})) if (key in value) out.push(...schemaProblems(value[key], sub, root, at ? `${at}.${key}` : key));
+  }
+  if (Array.isArray(value) && schema.items) value.forEach((v, k) => out.push(...schemaProblems(v, schema.items, root, `${at}[${k}]`)));
+  for (const sub of schema.allOf ?? []) out.push(...schemaProblems(value, sub, root, at));
+  if (schema.if && schema.then && schemaProblems(value, schema.if, root, at).length === 0) out.push(...schemaProblems(value, schema.then, root, at));
+  if (schema.not && schemaProblems(value, schema.not, root, at).length === 0) out.push(`${name} is what the schema refuses`);
+  return out;
+}
+
 /** The problems with one preset against its plugin; an empty list is a clean file. */
 export function problems(file, dir, preset, plugin) {
   const bad = [];
   const at = (m) => bad.push(`${file}: ${m}`);
+  for (const m of schemaProblems(preset, presetSchema())) at(m);
   if (preset.format !== FORMAT) at(`format is ${JSON.stringify(preset.format)}, expected ${FORMAT}`);
   if (!plugin) return [...bad, `${file}: no shipped plugin has id ${dir}`];
-  if (preset.plugin !== plugin.id) at(`plugin is ${preset.plugin}, the directory is ${plugin.id}`);
+  if (preset.plugin?.id !== plugin.id) at(`plugin.id is ${preset.plugin?.id}, the directory is ${plugin.id}`);
   if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(preset.id ?? '')) at(`id ${JSON.stringify(preset.id)} is not a lower-case dash id`);
   if (file.split('/').pop() !== `${preset.id}.json`) at(`the file name is not ${preset.id}.json`);
   if (typeof preset.name !== 'string' || !preset.name) at('no name');
   if (preset.carries !== 'params') at(`carries is ${JSON.stringify(preset.carries)}, a factory preset carries params`);
   if (!('copyOf' in preset)) at('no copyOf');
-  for (const k of ['created', 'modified']) if (Number.isNaN(Date.parse(preset[k]))) at(`${k} is not a date`);
+  for (const k of ['createdAt', 'modifiedAt']) if (Number.isNaN(Date.parse(preset[k]))) at(`${k} is not a date`);
   if (!Array.isArray(preset.params) || preset.params.length === 0) return [...bad, `${file}: no params`];
   const seen = new Set();
   for (const p of preset.params) {
