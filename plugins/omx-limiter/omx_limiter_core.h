@@ -21,6 +21,7 @@
 #include "omx_limiter_params.h"
 
 #include <omxdsp/fx/omx_limiter_instance.h>
+#include <omxdsp/omx_dyn.h>
 
 /** The kernel's state and what a block runs with. */
 typedef struct {
@@ -47,6 +48,17 @@ static inline void omx_limiter_core_resolve(OmxLimiterCore *c, const float *valu
 static inline uint32_t omx_limiter_core_latency(const OmxLimiterCore *c) {
   (void)c;
   return (uint32_t)lrintf((float)(omx_limiter_instance_latency(&c->inst)));
+}
+
+/** Gain-reduction meter `i`'s reading (the declaration's `meters`, in order): the kernel's own, after the
+ * last block. */
+static inline float omx_limiter_core_meter(const OmxLimiterCore *c, uint32_t i) {
+  switch (i) {
+  case 0:
+    return omx_gr_block_db(c->inst.state.blk_gain);
+  default:
+    return 0.0f;
+  }
 }
 
 /** One block, stereo; the outputs may alias the inputs. */

@@ -35,6 +35,15 @@
     "streams-from-disk": false,
     "opens-sockets": false
   },
+  "meters": [
+    {
+      "id": "limiterGr",
+      "kind": "gain_reduction",
+      "field": "state.blk_gain",
+      "linear": true,
+      "readout": "GAIN_REDUCTION_DB"
+    }
+  ],
   "panel": {
     "family": "limiter",
     "roles": {
@@ -55,7 +64,7 @@
     ]
   },
   "console": {
-    "$comment": "The OpenMixer console draws its precision limiter on buses and mains only, as the chain's fixed tail after the plugin rack: the limiter panel (ceilingDb, lookaheadMs, releaseMs, then GR and true-peak readouts the contract does not declare yet). Its chip is an engage lamp with no text; it has no overview card.",
+    "$comment": "The OpenMixer console draws its precision limiter on buses and mains only, as the chain's fixed tail after the plugin rack: the limiter panel (ceilingDb, lookaheadMs, releaseMs, then its gain-reduction readout, which the plugin publishes as its limiterGr meter). Its chip is an engage lamp with no text; it has no overview card.",
     "placement": {
       "strips": [
         "aux",

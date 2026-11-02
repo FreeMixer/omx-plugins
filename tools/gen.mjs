@@ -830,8 +830,7 @@ const cdouble = (n) => (typeof n === 'string' || /[.e]/.test(`${n}`) ? `${n}` : 
 /** The declaration's meters in the faces' shape (`meters` in the schema, docs/meters.md): each its CLAP
  * id (its index), its name, its kind, its channels and where they start among the plugin's meter
  * values (the order the face publishes them in, one block at a time), and its display range. A
- * gain reduction reads the instance field it names, one channel, from the low end of its `floor`
- * parameter's travel to 0 dB, or over the range omx-contract declares for the kernel's `readout`
+ * gain reduction reads the instance field it names, one channel, over the range omx-contract declares for the kernel's `readout`
  * of that name (OMX_<KERNEL>_READOUT_<readout>_MIN/_MAX, read by the compiler); a level is the stereo pair's peak in dBFS at the plugin's `input` or
  * `output`, its range as declared. */
 export function meterRows(d, face) {
@@ -847,8 +846,9 @@ export function meterRows(d, face) {
     // a reading of the kernel's: a gain reduction, or a level the kernel reads itself (its detector's)
     const reads = m.kind === 'gain_reduction' || 'read' in m;
     const at = 'read' in m ? 'read' : 'field';
-    const own = m.kind === 'gain_reduction' ? [at, 'readout' in m ? 'readout' : 'floor'] : reads ? ['read', 'readout'] : ['source', 'min', 'max'];
-    for (const key of ['field', 'read', 'floor', 'readout', 'source', 'min', 'max']) {
+    const own = m.kind === 'gain_reduction' ? [at, 'readout'] : reads ? ['read', 'readout'] : ['source', 'min', 'max'];
+    if ('linear' in m && !(m.kind === 'gain_reduction' && at === 'field' && m.linear === true)) throw new Error(`${where}: 'linear' is true on a gain reduction read from a 'field'`);
+    for (const key of ['field', 'read', 'readout', 'source', 'min', 'max']) {
       if (own.includes(key) && !(key in m)) throw new Error(`${where}: a ${m.kind} meter names its '${key}'`);
       if (!own.includes(key) && key in m) throw new Error(`${where}: a ${m.kind} meter ${reads && m.kind === 'level' ? 'the kernel reads ' : ''}takes no '${key}'`);
     }
@@ -858,8 +858,10 @@ export function meterRows(d, face) {
       let core, ref;
       if (at === 'field') {
         if (!/^[a-z_][a-z0-9_]*(\.[a-z_][a-z0-9_]*)*$/.test(m.field)) throw new Error(`${where}: field '${m.field}' is not a member path`);
-        core = `c->inst.${m.field}`;
-        ref = `inst.${m.field}`;
+        // a kernel that keeps its block's deepest gain as a linear factor (the limiter's blk_gain) is read through omx-dsp's
+        // own omx_gr_block_db(), the conversion every dynamics state's gr_min_db is made with
+        core = m.linear ? `omx_gr_block_db(c->inst.${m.field})` : `c->inst.${m.field}`;
+        ref = m.linear ? `omx_gr_block_db(inst.${m.field})` : `inst.${m.field}`;
       } else {
         const r = m.read.match(/^([a-z][a-z0-9_]*)(?:\(([0-9]+)\))?$/);
         if (!r) throw new Error(`${where}: read '${m.read}' is not <reading> or <reading>(<band>)`);
@@ -870,16 +872,9 @@ export function meterRows(d, face) {
         core = call('&c->inst');
         ref = call('&inst');
       }
-      if ('readout' in m) {
-        if (!/^[A-Z][A-Z0-9_]*$/.test(m.readout)) throw new Error(`${where}: readout '${m.readout}' is not a readout name`);
-        const r = `OMX_${d.kernel.toUpperCase()}_READOUT_${m.readout}`;
-        row = { channels: 1, min: `(double)${r}_MIN`, max: `(double)${r}_MAX`, core, ref };
-      } else {
-        const p = d.params.find((q) => q.symbol === m.floor);
-        if (!p) throw new Error(`${where}: floor '${m.floor}' is no parameter`);
-        if (!(p.min < 0)) throw new Error(`${where}: floor '${m.floor}' starts at ${p.min}, not below 0 dB`);
-        row = { channels: 1, min: p.min, max: 0, core, ref };
-      }
+      if (!/^[A-Z][A-Z0-9_]*$/.test(m.readout)) throw new Error(`${where}: readout '${m.readout}' is not a readout name`);
+      const r = `OMX_${d.kernel.toUpperCase()}_READOUT_${m.readout}`;
+      row = { channels: 1, min: `(double)${r}_MIN`, max: `(double)${r}_MAX`, core, ref };
     } else {
       if (m.source !== 'input' && m.source !== 'output') throw new Error(`${where}: source '${m.source}' is not input or output`);
       if (!(Number.isFinite(m.min) && Number.isFinite(m.max) && m.min < m.max)) throw new Error(`${where}: the range ${m.min}..${m.max} is not a range`);
@@ -888,7 +883,7 @@ export function meterRows(d, face) {
     const out = {
       meterIndex: k, meterName: m.id, meterKind: METER_KINDS[m.kind], meterReadCore: row.core, meterReadRef: row.ref,
       meterChannels: row.channels, meterOffset: offset, meterRight: offset + 1, meterMin: cdouble(row.min), meterMax: cdouble(row.max),
-      isGr: m.kind === 'gain_reduction', isRead: reads, isIn: m.source === 'input', isOut: m.source === 'output',
+      isGr: m.kind === 'gain_reduction', isLinear: m.linear === true, isRead: reads, isIn: m.source === 'input', isOut: m.source === 'output',
       // what a bypassed kernel's stale reading publishes: no reduction, or a level's display minimum
       meterBypass: m.kind === 'gain_reduction' ? '0.0' : `G_METER_INFO[${k}].min`, meterBypassRef: m.kind === 'gain_reduction' ? '0.0' : `METERS[${k}].min`,
     };
@@ -907,7 +902,7 @@ function meterView(d, face) {
     meterValues: meters.reduce((n, m) => n + m.meterChannels, 0),
     meterGr: meters.some((m) => m.isGr), meterIn: meters.some((m) => m.isIn), meterOut: meters.some((m) => m.isOut),
     meterLevel: meters.some((m) => m.isIn || m.isOut),
-    meterRead: meters.some((m) => m.isRead), meterKernelLevel: meters.some((m) => m.isRead && !m.isGr),
+    meterLinear: meters.some((m) => m.isLinear), meterRead: meters.some((m) => m.isRead), meterKernelLevel: meters.some((m) => m.isRead && !m.isGr),
   };
 }
 

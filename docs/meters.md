@@ -35,10 +35,11 @@ A `gain_reduction` (one channel: one detector drives both legs) names:
 - `read`: the face's reading, `omx_<kernel>_instance_<read>`, with its band index when it takes one
   (`band_gr_db(0)` for the multiband's first band). The generator refuses a reading the face's header
   does not declare as `float omx_<kernel>_instance_<read>(const <Instance> *[, uint32_t])`.
-- `floor`: the parameter whose travel's low end is the deepest reduction the kernel can apply; it
-  is the display range's minimum, and 0 dB its maximum. Or, for a kernel with no such parameter,
+- `linear`: `true` when the `field` holds the block's deepest gain as a linear factor, not in dB (the
+  limiter's `state.blk_gain`): the face reads it through omx-dsp's `omx_gr_block_db()`, the conversion
+  every dynamics state's own `gr_min_db` is made with.
 - `readout`: the kernel's readout in omx-contract (`GAIN_REDUCTION_DB`), whose declared range is
-  the display range: the face reads `OMX_<KERNEL>_READOUT_<readout>_MIN` and `_MAX`, so the
+  the display range (a gain reduction always names one): the face reads `OMX_<KERNEL>_READOUT_<readout>_MIN` and `_MAX`, so the
   number is never typed here.
 
 A `level` (two channels, left and right, in dBFS) names:
@@ -59,7 +60,10 @@ reduction, over the readout's declared range, and publishes the range's minimum 
 The de-esser declares its gain reduction (`deessGr`, id 0), its input level (`deessIn`, id 1) and
 its output level (`deessOut`, id 2); the compressor its gain reduction (`compGr`, over the comp
 kernel's `GAIN_REDUCTION_DB` readout), `compIn` and `compOut`. Every level runs from -60 to +6
-dBFS.
+dBFS. The keyed gate declares its gain reduction (`gateGr`) and the limiter its own (`limiterGr`, read
+from the block's smallest linear gain); neither declares a level. The graphic EQ declares no meter:
+its kernel's one readout, `DESIGN_CLAMPED`, is 1 only in the `true` design mode, which the plugin
+does not expose yet (FX-14, #148), so today it would read 0 for ever.
 
 ## What the face reports
 
