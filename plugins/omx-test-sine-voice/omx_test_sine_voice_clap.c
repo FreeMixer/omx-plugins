@@ -131,15 +131,17 @@ static void g_event(G *g, const clap_event_header_t *h, const clap_output_events
 
 /* Frames [from, to) of every sounding voice into both legs. A voice whose release has run its R frames
  * ends at the first frame it would have written (frame 0 of the next block when the release ran out
- * on a block's last frame). */
+ * on a block's last frame). Frame-major so two voices ending in the same block report NOTE_END in
+ * non-decreasing sample order, as the host requires. */
 static void g_render(G *g, float *l, float *r, uint32_t from, uint32_t to, const clap_output_events_t *out) {
-  for (uint32_t f = from; f < to; f++) l[f] = 0.0f;
-  for (uint32_t i = 0; i < VOICES; i++) {
-    Voice *v = &g->v[i];
-    for (uint32_t f = from; f < to && v->on; f++) {
+  for (uint32_t f = from; f < to; f++) {
+    l[f] = 0.0f;
+    for (uint32_t i = 0; i < VOICES; i++) {
+      Voice *v = &g->v[i];
+      if (!v->on) continue;
       if (v->released && v->k - v->k1 >= g->release) {
         g_end(g, v, f, out);
-        break;
+        continue;
       }
       const double ph = fmod(v->inc * (double)v->k, 1.0);
       l[f] += (float)(v->level * g_env(g, v) * sin(2.0 * M_PI * ph));
