@@ -73,11 +73,15 @@ $(BUNDLE)/$(NAME).so: omx_{{kernel}}_lv2.c $(ROOT)/lib/omx_lv2_face.c $(ROOT)/in
 	@mkdir -p $(BUNDLE)
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(WARN) $(PLUGIN) $(LV2_CFLAGS) -o $@ $(filter %.c,$^) $(LDFLAGS) $(LDLIBS)
 
-# The bundle's text{{#panel}} and images{{/panel}} are generated and committed; the build copies them beside the binary.
+# The bundle's text{{#panel}} and images{{/panel}} are generated and committed; the build copies them beside the binary.{{#panel}}
+# The film strips are omx-panel's render of its look, the same in every bundle: never committed, omx-panel writes them
+# into the built bundle.{{/panel}}
 $(BUNDLE)/manifest.ttl: $(TTL_SRCS) | $(B)
 	@mkdir -p $(BUNDLE)
 	cp -r $(TTL)/. $(BUNDLE)/
-
+{{#panel}}	node $(ROOT)/tools/panel-file.mjs $(CURDIR) $(PANEL_FILE)
+	$(OMX_PANEL) modgui --films-only --descriptor $(NAME).descriptor.json --panel $(PANEL_FILE) --out $(BUNDLE)
+{{/panel}}
 $(B):
 	@mkdir -p $@
 
@@ -106,12 +110,12 @@ $(B)/{{oracle}}: test/{{oracle}}.c $(CORE) | $(B)
 gen:
 	node $(ROOT)/tools/gen.mjs $(CURDIR)
 {{#panel}}	node $(ROOT)/tools/panel-file.mjs $(CURDIR) $(PANEL_FILE)
-	$(OMX_PANEL) modgui $(MODGUI)
+	$(OMX_PANEL) modgui --no-films $(MODGUI)
 {{/panel}}
 check:
 	node $(ROOT)/tools/gen.mjs --check $(CURDIR)
 {{#panel}}	node $(ROOT)/tools/panel-file.mjs $(CURDIR) $(PANEL_FILE)
-	$(OMX_PANEL) modgui --check $(MODGUI)
+	$(OMX_PANEL) modgui --check --no-films $(MODGUI)
 {{/panel}}
 # The parameter test: the built CLAP face's parameters are the declaration's, and every one of them
 # reaches the kernel. The state test: a saved state, loaded into a fresh instance, gives back every
@@ -147,7 +151,7 @@ test: all check $(B)/clap-probe $(B)/panel-probe $(B)/clap-ext-probe $(B)/port-g
 	node $(ROOT)/tools/test/resource-hints-check.mjs --binaries $(CURDIR) $(B)/$(NAME).clap $(BUNDLE)/$(NAME).so || fail=1; \
 {{#panel}}	$(B)/port-groups-probe $(BUNDLE) $(URI) > $(B)/port-groups.txt && \
 	  node $(ROOT)/tools/port-groups-check.mjs $(CURDIR) $(B)/port-groups.txt || fail=1; \
-	MODGUI_SOURCE='$(MODGUI_SOURCE)' sh $(OMX_PANEL_DIR)/tools/modgui-test.sh $(GEN)/$(NAME).lv2 $(NAME).descriptor.json $(PANEL_FILE) || fail=1; \
+	MODGUI_SOURCE='$(MODGUI_SOURCE)' sh $(OMX_PANEL_DIR)/tools/modgui-test.sh $(BUNDLE) $(NAME).descriptor.json $(PANEL_FILE) || fail=1; \
 {{/panel}}	node $(ROOT)/tools/test/presets-host-check.mjs --self-test $(B)/preset-probe $(CURDIR) || fail=1; \
 	sh $(ROOT)/tools/host-check.sh $(B)/$(NAME).clap $(BUNDLE) $(URI) $(CLAP_ID) || fail=1; \
 	exit $$fail
