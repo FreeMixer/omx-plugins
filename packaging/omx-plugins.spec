@@ -71,6 +71,7 @@ as CLAP plugins for Bitwig, REAPER and Carla, and as LV2 plugins for Ardour,
 Carla, MOD and Zynthian. Each one runs the same DSP as the console, so a track sounds the same
 in a session as it does on the desk, sample for sample. Every plugin comes in
 both formats with the same controls, MOD GUI included.
+Its documentation is on openmixer.org.
 
 This package installs both formats; omx-plugins-clap and omx-plugins-lv2
 install one each. It also carries the factory presets of every plugin, as
@@ -86,6 +87,7 @@ rotary speaker, reverb, pitch shifter, transient shaper, de-esser, sub-octaver, 
 CLAP plugins, installed in /usr/lib/clap where Bitwig, REAPER,
 Carla and other CLAP hosts find them. They run the console's own DSP, so they
 sound like the desk.
+Its documentation is on openmixer.org.
 
 %package lv2
 Summary: OpenMixer delay, drive, EQ, strip, gate and effects as LV2 plugins
@@ -98,6 +100,7 @@ rotary speaker, reverb, pitch shifter, transient shaper, de-esser, sub-octaver, 
 LV2 plugins, installed in %{_libdir}/lv2 where Ardour, Carla, MOD
 and Zynthian find them, with a MOD GUI where the plugin has one. They run the
 console's own DSP, so they sound like the desk.
+Its documentation is on openmixer.org.
 
 %package test
 Summary: The OpenMixer test instruments, for host tests and plugin measurement
@@ -109,6 +112,7 @@ pool voice, a note echo and a transport probe, as CLAP plugins. They are install
 lists them; a test or the plugin qualifier opens them there by path. Install
 this package on a console to measure the linked test instruments' cost on its
 own machine.
+Its documentation is on openmixer.org.
 
 %package devel
 Summary: Headers and static library of the OpenMixer plugins, for projects that build on them
@@ -125,6 +129,7 @@ parameter header, installed in %{_includedir}/omx-plugins, and
 libomxplugins.a (pkg-config omxplugins): every plugin's CLAP face in one
 static library, with the table of their entries in omx_clap_static.h, for a
 host that runs the plugins in its own process without loading .clap files.
+Its documentation is on openmixer.org.
 
 %package contract
 Summary: The OpenMixer plugins' descriptors in omx-contract's contract directory
@@ -139,6 +144,7 @@ Each OpenMixer plugin's descriptor, its parameters in omx-contract's words,
 and the manifest naming this release, as files in omx-contract's contract
 directory, for any program that reads them at run time: a host, the console's
 panels and the omx-contract command.
+Its documentation is on openmixer.org.
 
 %prep
 %autosetup
@@ -162,7 +168,6 @@ tools/pins-check.sh %{buildroot}%{_datadir}/plugin-hostd/pins.d/omx-plugins.pins
 
 %files
 %license LICENSE
-%doc README.md
 # the factory presets of every plugin, read only data the console's preset library lists (presets/)
 %{_datadir}/omx/presets/
 # our own plugins' pins, known at build time (plugin-hostd issue #42's pins.d, a floor-only Recommends above);
@@ -172,7 +177,6 @@ tools/pins-check.sh %{buildroot}%{_datadir}/plugin-hostd/pins.d/omx-plugins.pins
 
 %files clap
 %license LICENSE
-%doc README.md
 %dir /usr/lib/clap
 # BEGIN GENERATED clap-files: tools/gen.mjs, one line per shipped plugin
 /usr/lib/clap/omx-balancer.clap
@@ -230,7 +234,6 @@ tools/pins-check.sh %{buildroot}%{_datadir}/plugin-hostd/pins.d/omx-plugins.pins
 
 %files lv2
 %license LICENSE
-%doc README.md
 # BEGIN GENERATED lv2-files: tools/gen.mjs, one line per shipped plugin
 %{_libdir}/lv2/omx-balancer.lv2/
 %{_libdir}/lv2/omx-chorus.lv2/
