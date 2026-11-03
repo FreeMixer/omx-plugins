@@ -85,8 +85,7 @@
     },
     "latency": {
       "props": [
-        "lv2:integer",
-        "lv2:reportsLatency"
+        "lv2:integer"
       ],
       "unit": "units:frame"
     }

@@ -52,6 +52,7 @@
 
 /* The generated table FIRST, then the faces. */
 #include "omx_strip_params.h"
+#include "omx_plugin_face.h"
 
 #include <omxdsp/fx/omx_trim_instance.h>
 #include <omxdsp/fx/omx_eq_instance.h>
@@ -326,5 +327,21 @@ static inline void omx_strip_core_run(OmxStripCore *c, const float *in_l, const 
   const float *key = NULL;
   for (uint32_t k = 0; k < OMX_STRIP_CHAIN_LENGTH; k++) omx_strip_core_element(c, OMX_STRIP_CHAIN_ORDER[c->order][k], key, out_l, out_r, frames);
 }
+
+/* The core behind the vtable the shared faces call (include/omx_plugin_face.h): the same functions, untyped. */
+static inline void omx_strip_core_init_v(void *c, uint32_t rate) { omx_strip_core_init((OmxStripCore *)c, rate); }
+static inline void omx_strip_core_resolve_v(void *c, const float *values, int bypass) {
+  omx_strip_core_resolve((OmxStripCore *)c, values, bypass);
+}
+static inline uint32_t omx_strip_core_latency_v(const void *c) { return omx_strip_core_latency((const OmxStripCore *)c); }
+static inline void omx_strip_core_run_v(void *c, const float *key, const float *in_l, const float *in_r, float *out_l,
+                                           float *out_r, uint32_t frames) {
+  (void)key;
+  omx_strip_core_run((OmxStripCore *)c, in_l, in_r, out_l, out_r, frames);
+}
+
+static const struct omx_face_core OMX_STRIP_CORE = {sizeof(OmxStripCore), omx_strip_core_init_v, omx_strip_core_resolve_v,
+                                                   omx_strip_core_latency_v, omx_strip_core_run_v,
+                                                   NULL};
 
 #endif /* OMX_STRIP_CORE_H */

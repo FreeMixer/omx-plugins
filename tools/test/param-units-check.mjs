@@ -13,7 +13,8 @@
  *   node tools/test/param-units-check.mjs               the check
  *   node tools/test/param-units-check.mjs --self-test   the check, then the drift check over copies with one unit
  *                                                       changed in the declaration, one in the header, one added to
- *                                                       the declaration and one dropped from the header: each red
+ *                                                       the declaration and one dropped from the header: each red; and
+ *                                                       the same over a parameter-contract header with its own code
  */
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
@@ -42,6 +43,11 @@ export function drift(units, headerText) {
   return errors;
 }
 
+/** The unit codes a header of this tree defines itself: none, they are omx-contract's rendered header's alone. */
+export function ownCodes(text) {
+  return [...text.matchAll(/^\s*#\s*define\s+(OMX_CLAP_UNIT_\w+)|^\s*(OMX_CLAP_UNIT_\w+)\s*=/gm)].map((m) => m[1] ?? m[2]);
+}
+
 const contract = locateContract(root);
 if (!contract.dir) {
   console.error(`param-units: ${contract.why}`);
@@ -59,6 +65,7 @@ const headerText = renderedHeader ? readFileSync(renderedHeader, 'utf8') : '';
 errors.push(...(renderedHeader ? drift(units, headerText) : []));
 const text = readFileSync(headerFile, 'utf8');
 if (!/#include <omxcontract\/omx_param_units\.h>/.test(text)) errors.push(`${HEADER}: does not include <omxcontract/omx_param_units.h>`);
+for (const name of ownCodes(text)) errors.push(`${HEADER}: defines ${name} itself; the codes are omx-contract's rendered header's`);
 const enumOf = headerUnits(headerText);
 const UNITS = contractUnits();
 if (enumOf.size === 0) errors.push('omx_param_units.h: no OMX_CLAP_UNIT_ define');
@@ -124,6 +131,18 @@ if (process.argv.includes('--self-test')) {
       console.error(`SABOTAGE ${arm}: STAYED GREEN`);
       fail++;
     }
+  }
+  for (const [arm, own] of Object.entries({ 'own-define': '#define OMX_CLAP_UNIT_DB 13u\n', 'own-enumerator': 'enum omx_clap_unit {\n  OMX_CLAP_UNIT_DB = 13,\n};\n' })) {
+    const out = ownCodes(text + own);
+    if (out.length === 1 && out[0] === 'OMX_CLAP_UNIT_DB') console.log(`SABOTAGE ${arm}: red (${out[0]})`);
+    else {
+      console.error(`SABOTAGE ${arm}: read ${JSON.stringify(out)}`);
+      fail++;
+    }
+  }
+  if (ownCodes(text).length) {
+    console.error('self-test: the unsabotaged header defines a code');
+    fail++;
   }
   if (drift(units, head).length) {
     console.error('self-test: the unsabotaged copies are not green');

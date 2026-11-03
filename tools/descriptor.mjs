@@ -78,7 +78,7 @@ export function parseLink(link) {
 }
 
 /** The per-control extras a declaration keeps: how a value is read, not the value. */
-export const CONTROL_EXTRAS = ['forKind', 'defaultRef', 'defaultId', 'defaultBand', 'perBand', 'unit', 'values', 'own'];
+export const CONTROL_EXTRAS = ['forKind', 'defaultRef', 'defaultId', 'defaultBand', 'perBand', 'unit', 'values', 'own', 'control'];
 
 /**
  * The LV2 port groups of declaration `d` (as tools/gen.mjs loads it), in panel section order: one per section, or,

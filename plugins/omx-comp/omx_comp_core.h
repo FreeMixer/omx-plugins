@@ -20,6 +20,7 @@
 
 /* The generated table FIRST: its guard is omx-dsp's own, so the instance header reads this table. */
 #include "omx_comp_params.h"
+#include "omx_plugin_face.h"
 
 #include <omxdsp/fx/omx_comp_instance.h>
 
@@ -86,5 +87,21 @@ static inline void omx_comp_core_run(OmxCompCore *c, const float *key, const flo
                                          float *out_l, float *out_r, uint32_t frames) {
   omx_comp_instance_run_keyed(&c->inst, key, NULL, in_l, in_r, out_l, out_r, frames);
 }
+
+/* The core behind the vtable the shared faces call (include/omx_plugin_face.h): the same functions, untyped. */
+static inline void omx_comp_core_init_v(void *c, uint32_t rate) { omx_comp_core_init((OmxCompCore *)c, rate); }
+static inline void omx_comp_core_resolve_v(void *c, const float *values, int bypass) {
+  omx_comp_core_resolve((OmxCompCore *)c, values, bypass);
+}
+static inline uint32_t omx_comp_core_latency_v(const void *c) { return omx_comp_core_latency((const OmxCompCore *)c); }
+static inline void omx_comp_core_run_v(void *c, const float *key, const float *in_l, const float *in_r, float *out_l,
+                                           float *out_r, uint32_t frames) {
+  omx_comp_core_run((OmxCompCore *)c, key, in_l, in_r, out_l, out_r, frames);
+}
+static inline float omx_comp_core_meter_v(const void *c, uint32_t i) { return omx_comp_core_meter((const OmxCompCore *)c, i); }
+
+static const struct omx_face_core OMX_COMP_CORE = {sizeof(OmxCompCore), omx_comp_core_init_v, omx_comp_core_resolve_v,
+                                                   omx_comp_core_latency_v, omx_comp_core_run_v,
+                                                   omx_comp_core_meter_v};
 
 #endif /* OMX_COMP_CORE_H */

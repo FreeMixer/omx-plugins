@@ -25,6 +25,10 @@
 #                   one change at a time (tools/test/probe-checks-selftest.mjs; part of `make test`)
 #   make eq-probe-race  parallel make targets each build build/eq-default-probe privately and run it whole
 #                   (tools/test/eq-probe-race-test.mjs; part of `make test` and `make test-faces`)
+#   make param-tie   every by-reference parameter's symbol is its control's words or says its `control`: swapped refs are refused
+#                   (FreeMixer/omx-plugins#58; tools/test/param-tie-test.mjs; part of `make test`)
+#   make summary-numbers  a plugin summary reads its numbers from the declaration: none types a limit or default of its parameters,
+#                   and a moved contract moves the README row (FreeMixer/omx-plugins#174; tools/test/summary-numbers-test.mjs; part of `make test`)
 #   make phaser-depth  omx-phaser's generated panel publishes its depth role on depthOct, in octaves (FreeMixer/omx-plugins#232;
 #                   tools/test/phaser-depth-role-test.mjs and its --self-test; part of `make test`)
 #   make band-groups  omx-eq8's generated descriptor and TTL hold one LV2 port group per band, Band 1 ... Band 8 in band
@@ -112,7 +116,7 @@ PINS_FILE  := omx-plugins.pins
 # is installed with them, and so is its generated generated/omx_<kernel>_decl.h: the constants a
 # proof predicts from (and the CLAP id) have one home, the declaration, not a hardcoded second copy
 # in the host that reads it. Neither declares anything a picker lists: macros only.
-HEADERS := include/omx_plugin_param.h include/omx_panel_description.h include/omx_param_contract.h include/omx_preset_file.h include/omx_clap_static.h $(foreach p,$(SHIP_PLUGINS),$(wildcard $(p)*.h) $(wildcard $(p)generated/*.h)) $(foreach p,$(TEST_PLUGINS),$(wildcard $(p)*.h) $(wildcard $(p)generated/*.h))
+HEADERS := include/omx_plugin_param.h include/omx_panel_description.h include/omx_param_contract.h include/omx_preset_file.h include/omx_clap_static.h include/omx_plugin_face.h $(foreach p,$(SHIP_PLUGINS),$(wildcard $(p)*.h) $(wildcard $(p)generated/*.h)) $(foreach p,$(TEST_PLUGINS),$(wildcard $(p)*.h) $(wildcard $(p)generated/*.h))
 
 # libomxplugins.a: each shipped plugin's CLAP face built with -DOMX_CLAP_STATIC (no `clap_entry`;
 # its `omx_clap_entry_<kernel>` stays) and lib/omx_clap_static.c, the table of those entries by CLAP
@@ -123,7 +127,7 @@ LIB_B      := $(B)/lib
 LIB        := $(LIB_B)/libomxplugins.a
 LIB_PC     := $(LIB_B)/omxplugins.pc
 CLAP_FACES := $(foreach p,$(PLUGINS),$(wildcard $(p)omx_*_clap.c))
-LIB_OBJS   := $(LIB_B)/omx_clap_static.o $(patsubst %.c,$(LIB_B)/%.o,$(notdir $(CLAP_FACES)))
+LIB_OBJS   := $(LIB_B)/omx_clap_static.o $(LIB_B)/omx_clap_face.o $(patsubst %.c,$(LIB_B)/%.o,$(notdir $(CLAP_FACES)))
 # The releases this tree builds against are declared once, in the packaging: packaging/omx-plugins.spec's
 # BuildRequires, a floor (>=) per dependency, no ceiling; debian/control says the same
 # (tools/deps-check.sh). Building the archive stops first, naming the dependency, the range and what is
@@ -143,11 +147,11 @@ LIB_FLAGS  := -fPIC -fvisibility=hidden -DOMX_CLAP_STATIC -Iinclude
 # read only by the targets that build the archive, so `make version` and the rest need no omx-dsp
 lib_cflags = $(call dep_check,omxdsp,$(OMXDSP_MIN))$(call dep_check,omx-contract,$(CONTRACT_MIN))$(shell $(PKG_CONFIG) --cflags omxdsp omx-contract omx-clap-core clap)
 
-.PHONY: presets presets-figures test-role all lib lib-test test test-faces units panel-layout descriptor-view lv2-units lv2-maintainer lv2-manifest release-version resource-hints format-tables contract-union probe-checks eq-probe-race band-groups phaser-depth geq-widgets round-trip hints modgui manual install install-pins install-test package-lists install-devel install-contract contract-dir clean version recipe-test completeness selftest private-refs params-doc check-params-doc strip-crosscheck meters-abi meter-level dsp-copies meter-ring clap-validate
+.PHONY: summary-numbers param-tie presets presets-figures test-role all lib lib-test test test-faces units panel-layout descriptor-view lv2-units lv2-deprecated lv2-maintainer lv2-manifest release-version resource-hints format-tables contract-union probe-checks eq-probe-race band-groups phaser-depth geq-widgets round-trip hints modgui manual install install-pins install-test package-lists install-devel install-contract contract-dir lv2bench-ran clean version recipe-test completeness selftest private-refs params-doc check-params-doc strip-crosscheck meters-abi meter-level dsp-copies meter-ring clap-validate
 all: lib
 	@for p in $(PLUGINS); do $(MAKE) -C $$p all || exit 1; done
 lib: $(LIB) $(LIB_PC)
-test: lib units panel-layout descriptor-view lv2-units lv2-maintainer lv2-manifest release-version resource-hints format-tables contract-union contract-dir probe-checks eq-probe-race band-groups phaser-depth geq-widgets
+test: lib units panel-layout descriptor-view lv2-units lv2-deprecated lv2-maintainer lv2-manifest release-version resource-hints format-tables contract-union contract-dir lv2bench-ran probe-checks eq-probe-race band-groups phaser-depth geq-widgets summary-numbers param-tie
 	@if [ -z "$(PLUGINS)" ]; then echo "no plugins yet"; fi
 	@for p in $(PLUGINS); do $(MAKE) -C $$p test || exit 1; done
 	@$(MAKE) -s round-trip
@@ -178,6 +182,9 @@ descriptor-view:
 # every declared unit is stated by its port in the generated TTL, with its sabotage arms
 lv2-units:
 	node tools/test/lv2-units-check.mjs --self-test
+# no generated TTL states a term LV2 has deprecated (lv2:reportsLatency), with its sabotage arm
+lv2-deprecated:
+	node tools/test/lv2-deprecated-check.mjs --self-test
 # every generated maintainer states foaf:homepage (mod-ui segfaults without it, #244), with its sabotage arm
 lv2-maintainer:
 	node tools/test/lv2-maintainer-check.mjs --self-test
@@ -200,6 +207,10 @@ probe-checks:
 eq-probe-race:
 	node tools/test/eq-probe-race-test.mjs
 # omx-eq8's generated descriptor and TTL hold a port group per band, HPF and LPF as before (#257)
+param-tie:
+	node tools/test/param-tie-test.mjs
+summary-numbers:
+	node tools/test/summary-numbers-test.mjs --self-test
 phaser-depth:
 	node tools/test/phaser-depth-role-test.mjs
 	node tools/test/phaser-depth-role-test.mjs --self-test
@@ -255,9 +266,11 @@ meters-abi:
 # every level meter of the metered faces reads bit for bit what tools/test/meter-level.sha256 holds, and every
 # other meter (a gain reduction, float through libm) reads within a tolerance what tools/test/<face>.meter-others.txt holds
 METER_LEVEL_FACES := omx-comp omx-deesser
+# faces whose meters are all gain reductions: no level to digest, only the values within the tolerance
+METER_GR_FACES := omx-keyed-gate omx-limiter
 meter-level:
 	@mkdir -p build
-	@for f in $(METER_LEVEL_FACES); do $(MAKE) -s -C plugins/$$f all || exit 1; done
+	@for f in $(METER_LEVEL_FACES) $(METER_GR_FACES); do $(MAKE) -s -C plugins/$$f all || exit 1; done
 	$(CC) -std=gnu11 -Wall -Wextra -Werror $(shell $(PKG_CONFIG) --cflags omx-clap-core clap) -o build/meter-level-digest tools/test/meter-level-digest.c -ldl -lm
 	node tools/test/meter-values-check.mjs --self-test
 	@for f in $(METER_LEVEL_FACES); do \
@@ -265,6 +278,10 @@ meter-level:
 	  want=$$(sed -n "s/^\([0-9a-f]*\)  $$f\$$/\1/p" tools/test/meter-level.sha256); \
 	  if [ "$$got" != "$$want" ] || [ -z "$$want" ]; then echo "FAIL meter-level $$f: $$got, expected $$want" >&2; exit 1; fi; \
 	  echo "ok   meter-level $$f: the level meters read $$got"; \
+	  node tools/test/meter-values-check.mjs build/$$f.meter-others.txt tools/test/$$f.meter-others.txt || exit 1; \
+	done
+	@for f in $(METER_GR_FACES); do \
+	  build/meter-level-digest plugins/$$f/build/$$f.clap --others build/$$f.meter-others.txt >/dev/null || exit 1; \
 	  node tools/test/meter-values-check.mjs build/$$f.meter-others.txt tools/test/$$f.meter-others.txt || exit 1; \
 	done
 # no source, hand-written or generated, carries a copy of a function omx-dsp exports (omx-dsp-copy-check --enforce)
@@ -314,6 +331,9 @@ install-contract:
 	  for f in $(DESCRIPTORS); do cp "$$f" "$$stage/plugins/$$(basename "$$f" .descriptor.json).json" || exit 1; done && \
 	  for f in $(CONTRACT_FILES); do cp "$$f" "$$stage/" || exit 1; done && \
 	  sh $(INSTALL_CONTRACT_DIR) omx-plugins $(VERSION) $(CONTRACT_SCHEMA_MAJOR) "$$stage" $(DESTDIR)$(CONTRACTDIR)
+# lv2bench's two output shapes (Debian, Fedora lilv 0.26.4) are both read by the Zynthian bundle probe, with its refusals
+lv2bench-ran:
+	tools/test/lv2bench-ran-check.sh
 contract-dir:
 	tools/test/contract-dir-check.sh
 	tools/test/contract-dir-check.sh --self-test
@@ -335,9 +355,13 @@ $(LIB): $(LIB_OBJS)
 $(LIB_B)/omx_clap_static.o: lib/omx_clap_static.c include/omx_clap_static.h | $(LIB_B)
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(LIB_WARN) $(LIB_FLAGS) $(lib_cflags) -c -o $@ $<
 
+# The CLAP face every plugin's descriptor file names, once in the archive.
+$(LIB_B)/omx_clap_face.o: lib/omx_clap_face.c include/omx_clap_face.h include/omx_plugin_face.h include/omx_meter_ring.h include/omx_preset_file.h | $(LIB_B)
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(LIB_WARN) $(LIB_FLAGS) $(lib_cflags) -c -o $@ $<
+
 # One rule per face: its generated headers sit in its own folder.
 define face_rule
-$(LIB_B)/$(notdir $(1:.c=.o)): $(1) $(wildcard $(dir $(1))*.h $(dir $(1))generated/*.h) include/omx_panel_description.h include/omx_param_contract.h include/omx_preset_file.h | $(LIB_B)
+$(LIB_B)/$(notdir $(1:.c=.o)): $(1) $(wildcard $(dir $(1))*.h $(dir $(1))generated/*.h) include/omx_panel_description.h include/omx_param_contract.h include/omx_preset_file.h include/omx_plugin_face.h include/omx_clap_face.h | $(LIB_B)
 	$$(CC) $$(CPPFLAGS) $$(CFLAGS) $$(LIB_WARN) $$(LIB_FLAGS) -I$(dir $(1))generated $$(lib_cflags) -c -o $$@ $$<
 endef
 $(foreach f,$(CLAP_FACES),$(eval $(call face_rule,$(f))))

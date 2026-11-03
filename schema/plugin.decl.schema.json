@@ -529,6 +529,12 @@
           "title": "Field",
           "description": "For a reference whose travels are per field (GATE_LIMITS and the like): which field."
         },
+        "control": {
+          "type": "string",
+          "pattern": "^[a-z][A-Za-z0-9]*$",
+          "title": "Control",
+          "description": "For a parameter whose symbol is frozen from before the wizard drafted symbols from control names (saved sessions keep it) and so is not the control's words (key_external reads keySource): the name of the control the reference names. The generator refuses a parameter whose symbol is neither the words of its control nor this."
+        },
         "forKind": {
           "type": "string",
           "pattern": "^[a-z][A-Za-z0-9]*$",
@@ -1027,15 +1033,14 @@
           "pattern": "^[a-z][a-z0-9_]*(\\([0-9]+\\))?$",
           "description": "Instead of `field`: the instance face's reading function, `omx_<kernel>_instance_<read>`, called on the instance after each block, with its band index when one is given (`band_gr_db(0)`): the kernel's readout as omx-dsp computes it, nothing computed here."
         },
-        "floor": {
-          "type": "string",
-          "pattern": "^[A-Za-z][A-Za-z0-9_]*$",
-          "description": "The parameter whose travel's low end is the deepest reduction the kernel applies: the meter's display minimum (its maximum is 0 dB)."
+        "linear": {
+          "const": true,
+          "description": "A gain reduction's, with `field`: the field holds the block's deepest gain as a linear factor (the limiter's blk_gain), and the face reads it through omx-dsp's omx_gr_block_db(), the conversion every dynamics state's own reading is made with."
         },
         "readout": {
           "type": "string",
           "pattern": "^[A-Z][A-Z0-9_]*$",
-          "description": "A gain reduction's, instead of `floor`, and a level the kernel reads: the kernel's readout in omx-contract (`GAIN_REDUCTION_DB`), whose declared range is the meter's display range."
+          "description": "A gain reduction's, and a level the kernel reads: the kernel's readout in omx-contract (`GAIN_REDUCTION_DB`), whose declared range is the meter's display range."
         },
         "source": {
           "enum": [
@@ -1079,17 +1084,8 @@
                 ]
               },
               {
-                "oneOf": [
-                  {
-                    "required": [
-                      "floor"
-                    ]
-                  },
-                  {
-                    "required": [
-                      "readout"
-                    ]
-                  }
+                "required": [
+                  "readout"
                 ]
               }
             ],
@@ -1139,11 +1135,6 @@
                     },
                     {
                       "required": [
-                        "floor"
-                      ]
-                    },
-                    {
-                      "required": [
                         "readout"
                       ]
                     },
@@ -1165,11 +1156,6 @@
                     {
                       "required": [
                         "field"
-                      ]
-                    },
-                    {
-                      "required": [
-                        "floor"
                       ]
                     },
                     {

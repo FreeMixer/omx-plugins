@@ -7,7 +7,7 @@
   ],
   "noun": "31-band graphic EQ",
   "url": "https://github.com/FreeMixer/omx-plugins",
-  "summary": "The console's 31-band graphic EQ: one fader per ISO third-octave band, 20 Hz to 20 kHz, ±15 dB each, designed in double precision so the lowest bands hold their shape at 192 kHz. Stereo, zero latency.",
+  "summary": "The console's 31-band graphic EQ: one fader per ISO third-octave band, 20 Hz to 20 kHz, ±{max:band01} dB each, designed in double precision so the lowest bands hold their shape at 192 kHz. Stereo, zero latency.",
   "binding": "instance",
   "portHints": {
     "band01": {
@@ -110,8 +110,7 @@
     },
     "latency": {
       "props": [
-        "lv2:integer",
-        "lv2:reportsLatency"
+        "lv2:integer"
       ],
       "unit": "units:frame"
     }

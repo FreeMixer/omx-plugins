@@ -19,6 +19,7 @@
 
 /* The generated table FIRST: its guard is omx-dsp's own, so the instance header reads this table. */
 #include "omx_deesser_params.h"
+#include "omx_plugin_face.h"
 
 #include <omxdsp/fx/omx_deesser_instance.h>
 
@@ -70,5 +71,22 @@ static inline void omx_deesser_core_run(OmxDeesserCore *c, const float *in_l, co
                                          float *out_r, uint32_t frames) {
   omx_deesser_instance_run(&c->inst, in_l, in_r, out_l, out_r, frames);
 }
+
+/* The core behind the vtable the shared faces call (include/omx_plugin_face.h): the same functions, untyped. */
+static inline void omx_deesser_core_init_v(void *c, uint32_t rate) { omx_deesser_core_init((OmxDeesserCore *)c, rate); }
+static inline void omx_deesser_core_resolve_v(void *c, const float *values, int bypass) {
+  omx_deesser_core_resolve((OmxDeesserCore *)c, values, bypass);
+}
+static inline uint32_t omx_deesser_core_latency_v(const void *c) { return omx_deesser_core_latency((const OmxDeesserCore *)c); }
+static inline void omx_deesser_core_run_v(void *c, const float *key, const float *in_l, const float *in_r, float *out_l,
+                                           float *out_r, uint32_t frames) {
+  (void)key;
+  omx_deesser_core_run((OmxDeesserCore *)c, in_l, in_r, out_l, out_r, frames);
+}
+static inline float omx_deesser_core_meter_v(const void *c, uint32_t i) { return omx_deesser_core_meter((const OmxDeesserCore *)c, i); }
+
+static const struct omx_face_core OMX_DEESSER_CORE = {sizeof(OmxDeesserCore), omx_deesser_core_init_v, omx_deesser_core_resolve_v,
+                                                   omx_deesser_core_latency_v, omx_deesser_core_run_v,
+                                                   omx_deesser_core_meter_v};
 
 #endif /* OMX_DEESSER_CORE_H */

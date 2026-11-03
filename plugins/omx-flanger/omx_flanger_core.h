@@ -19,6 +19,7 @@
 
 /* The generated table FIRST: its guard is omx-dsp's own, so the instance header reads this table. */
 #include "omx_flanger_params.h"
+#include "omx_plugin_face.h"
 
 #include <omxdsp/fx/omx_flanger_instance.h>
 
@@ -55,5 +56,21 @@ static inline void omx_flanger_core_run(OmxFlangerCore *c, const float *in_l, co
                                          float *out_r, uint32_t frames) {
   omx_flanger_instance_run(&c->inst, in_l, in_r, out_l, out_r, frames);
 }
+
+/* The core behind the vtable the shared faces call (include/omx_plugin_face.h): the same functions, untyped. */
+static inline void omx_flanger_core_init_v(void *c, uint32_t rate) { omx_flanger_core_init((OmxFlangerCore *)c, rate); }
+static inline void omx_flanger_core_resolve_v(void *c, const float *values, int bypass) {
+  omx_flanger_core_resolve((OmxFlangerCore *)c, values, bypass);
+}
+static inline uint32_t omx_flanger_core_latency_v(const void *c) { return omx_flanger_core_latency((const OmxFlangerCore *)c); }
+static inline void omx_flanger_core_run_v(void *c, const float *key, const float *in_l, const float *in_r, float *out_l,
+                                           float *out_r, uint32_t frames) {
+  (void)key;
+  omx_flanger_core_run((OmxFlangerCore *)c, in_l, in_r, out_l, out_r, frames);
+}
+
+static const struct omx_face_core OMX_FLANGER_CORE = {sizeof(OmxFlangerCore), omx_flanger_core_init_v, omx_flanger_core_resolve_v,
+                                                   omx_flanger_core_latency_v, omx_flanger_core_run_v,
+                                                   NULL};
 
 #endif /* OMX_FLANGER_CORE_H */

@@ -21,6 +21,7 @@
 
 /* The generated table FIRST: its guard is omx-dsp's own, so the instance header reads this table. */
 #include "omx_gate_params.h"
+#include "omx_plugin_face.h"
 
 #include <omxdsp/fx/omx_gate_instance.h>
 
@@ -62,11 +63,38 @@ static inline uint32_t omx_gate_core_latency(const OmxGateCore *c) {
   return (uint32_t)lrintf((float)(omx_gate_instance_latency(&c->inst)));
 }
 
+/** Gain-reduction meter `i`'s reading (the declaration's `meters`, in order): the kernel's own, after the
+ * last block. */
+static inline float omx_gate_core_meter(const OmxGateCore *c, uint32_t i) {
+  switch (i) {
+  case 0:
+    return c->inst.gate.st.gr_min_db;
+  default:
+    return 0.0f;
+  }
+}
+
 /** One block, stereo, keyed by `key` (NULL: nothing routed to the key, the kernel's own detector);
  * the outputs may alias the inputs or the key. */
 static inline void omx_gate_core_run(OmxGateCore *c, const float *key, const float *in_l, const float *in_r,
                                          float *out_l, float *out_r, uint32_t frames) {
   omx_gate_instance_run(&c->inst, key, in_l, in_r, out_l, out_r, frames);
 }
+
+/* The core behind the vtable the shared faces call (include/omx_plugin_face.h): the same functions, untyped. */
+static inline void omx_gate_core_init_v(void *c, uint32_t rate) { omx_gate_core_init((OmxGateCore *)c, rate); }
+static inline void omx_gate_core_resolve_v(void *c, const float *values, int bypass) {
+  omx_gate_core_resolve((OmxGateCore *)c, values, bypass);
+}
+static inline uint32_t omx_gate_core_latency_v(const void *c) { return omx_gate_core_latency((const OmxGateCore *)c); }
+static inline void omx_gate_core_run_v(void *c, const float *key, const float *in_l, const float *in_r, float *out_l,
+                                           float *out_r, uint32_t frames) {
+  omx_gate_core_run((OmxGateCore *)c, key, in_l, in_r, out_l, out_r, frames);
+}
+static inline float omx_gate_core_meter_v(const void *c, uint32_t i) { return omx_gate_core_meter((const OmxGateCore *)c, i); }
+
+static const struct omx_face_core OMX_GATE_CORE = {sizeof(OmxGateCore), omx_gate_core_init_v, omx_gate_core_resolve_v,
+                                                   omx_gate_core_latency_v, omx_gate_core_run_v,
+                                                   omx_gate_core_meter_v};
 
 #endif /* OMX_GATE_CORE_H */

@@ -11,7 +11,8 @@
  * `--others <file>` writes every other meter's values (a gain reduction or a level the kernel reads: its own reading, in
  * float through libm's float functions, whose last bit differs between C libraries) to <file> as text,
  * one line per value, `<block> <meter> <value>`, %.9g. tools/test/meter-values-check.mjs compares that
- * file against tools/test/<face>.meter-others.txt within a tolerance. Used by `make meter-level`.
+ * file against tools/test/<face>.meter-others.txt within a tolerance. A face with no level meter (a limiter's, a
+ * gate's: a gain reduction only) is read with --others alone. Used by `make meter-level`.
  */
 #include <dlfcn.h>
 #include <math.h>
@@ -101,7 +102,7 @@ int main(int argc, char **argv) {
     is_level[k] = info.kind == CLAP_METER_KIND_LEVEL && info.channel_count == 2u;
     if (is_level[k]) levels++;
   }
-  if (levels == 0) return fprintf(stderr, "no level meter: nothing to digest\n"), 1;
+  if (levels == 0 && !others) return fprintf(stderr, "no level meter: nothing to digest\n"), 1;
 
   static float il[MAXBLOCK], ir[MAXBLOCK], ol[MAXBLOCK], or_[MAXBLOCK];
   float *in[2] = {il, ir}, *out[2] = {ol, or_};

@@ -18,11 +18,18 @@
   ],
   "controls": {
     "key_external": {
+      "control": "keySource",
       "values": [
         "Self",
         "Sidechain"
       ],
       "defaultId": "sidechain"
+    },
+    "key_hp": {
+      "control": "hpHz"
+    },
+    "key_lp": {
+      "control": "lpHz"
     }
   },
   "sidechain": {
@@ -103,8 +110,7 @@
     },
     "latency": {
       "props": [
-        "lv2:integer",
-        "lv2:reportsLatency"
+        "lv2:integer"
       ],
       "unit": "units:frame"
     }
@@ -114,6 +120,14 @@
     "streams-from-disk": false,
     "opens-sockets": false
   },
+  "meters": [
+    {
+      "id": "gateGr",
+      "kind": "gain_reduction",
+      "field": "gate.st.gr_min_db",
+      "readout": "GAIN_REDUCTION_DB"
+    }
+  ],
   "panel": {
     "family": "gate",
     "roles": {

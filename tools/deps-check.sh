@@ -18,7 +18,7 @@ count() { { grep -oF -- "$1" "$2" || true; } | wc -l; }
 check() {
   local root="$1" fail=0 spec="$1/packaging/omx-plugins.spec" control="$1/debian/control"
   # rpm name, deb name, how many times debian/control must carry the deb floor, does -devel require it
-  for row in "omx-dsp-devel libomxdsp-dev 2 yes" "omx-contract-devel libomx-contract-dev 2 yes" "omx-clap-core-devel libomx-clap-core-dev 1 no" "plugin-hostd-devel plugin-hostd-dev 1 no" "omx-panel omx-panel 1 no"; do
+  for row in "omx-dsp-devel libomxdsp-dev 2 yes" "omx-contract-devel libomx-contract-dev 2 yes" "omx-clap-core-devel libomx-clap-core-dev 1 no" "plugin-hostd-devel plugin-hostd-dev 1 no" "omx-contract omx-contract 1 no" "omx-panel omx-panel 1 no"; do
     read -r rpm deb times devel <<<"$row"
     local floor
     floor="$(sed -n "s/^BuildRequires: $rpm >= \([0-9.]*\)\$/\1/p" "$spec")"
@@ -38,15 +38,19 @@ check() {
     [ "$fail" = 1 ] || echo "deps-check: $rpm / $deb >= $floor, no ceiling, in the spec and debian/control"
   done
   if grep -qE '^Requires:.*omxdsp *<' "$root/lib/omxplugins.pc.in"; then echo "deps-check: omxplugins.pc.in bounds omxdsp from above" >&2; fail=1; fi
+  # the DEB build runs the generator checks as the RPM build does: the omx-contract command is a build dependency
+  # (above), so debian/rules has no branch that skips them
+  if grep -q 'NO-CONTRACT-COMMAND\|make test-faces' "$root/debian/rules"; then echo "deps-check: debian/rules skips the generator checks where the omx-contract command is absent: it is a Build-Depends, run make test" >&2; fail=1; fi
+  grep -q 'make test\b\|\$(MAKE) test OMX_LV2_SPEC_DIR' "$root/debian/rules" || { echo "deps-check: debian/rules does not run make test" >&2; fail=1; }
   return "$fail"
 }
 
 if [ "${1:-}" = --self-test ]; then
   scratch="$(mktemp -d)"; trap 'rm -rf "$scratch"' EXIT
   fail=0
-  for s in dsp-floor dsp-ceiling-spec devel-ceiling control-dsp control-ceiling pc-ceiling contract-missing; do
+  for s in dsp-floor dsp-ceiling-spec devel-ceiling control-dsp control-ceiling pc-ceiling contract-missing control-no-command rules-skip; do
     rm -rf "$scratch/t"; mkdir -p "$scratch/t/packaging" "$scratch/t/debian"
-    mkdir -p "$scratch/t/lib"; cp "$HERE/lib/omxplugins.pc.in" "$scratch/t/lib/"
+    mkdir -p "$scratch/t/lib"; cp "$HERE/lib/omxplugins.pc.in" "$scratch/t/lib/"; cp "$HERE/debian/rules" "$scratch/t/debian/"
     cp "$HERE/packaging/omx-plugins.spec" "$scratch/t/packaging/"; cp "$HERE/debian/control" "$scratch/t/debian/"
     case "$s" in
       dsp-floor) sed -i 's/^BuildRequires: omx-dsp-devel >= .*/BuildRequires: omx-dsp-devel >= 0.0.1/' "$scratch/t/packaging/omx-plugins.spec" ;;
@@ -55,6 +59,8 @@ if [ "${1:-}" = --self-test ]; then
       control-dsp) sed -i '0,/libomxdsp-dev (>= [0-9.]*)/s//libomxdsp-dev (>= 0.0.1)/' "$scratch/t/debian/control" ;;
       control-ceiling) sed -i 's/^\( *\)libomx-contract-dev (>= [0-9.]*),/&\n\1libomx-contract-dev (<< 3),/' "$scratch/t/debian/control" ;;
       pc-ceiling) sed -i 's/^Requires: omxdsp >= @OMXDSP_MIN@/&, omxdsp < 1/' "$scratch/t/lib/omxplugins.pc.in" ;;
+      control-no-command) sed -i '/^ *omx-contract (>=/d' "$scratch/t/debian/control" ;;
+      rules-skip) sed -i 's/^override_dh_auto_test:/&\n\t@echo NO-CONTRACT-COMMAND; $(MAKE) test-faces; exit 0/' "$scratch/t/debian/rules" ;;
       contract-missing) sed -i '/^BuildRequires: omx-contract-devel /d' "$scratch/t/packaging/omx-plugins.spec" ;;
     esac
     if check "$scratch/t" >/dev/null 2>&1; then echo "SABOTAGE $s: STAYED GREEN"; fail=1; else echo "SABOTAGE $s: red"; fi

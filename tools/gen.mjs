@@ -359,7 +359,48 @@ function resolveParams(file, d) {
     if (t.values) out.values = t.values;
     return out;
   });
+  // a chain's element parameters are named from their control; every other by-reference parameter's symbol must be its control's
+  if (!d.chain) {
+    const dir = contract();
+    const errs = d.params.flatMap((p, i) => {
+      const c = controls()[i];
+      return c ? symbolTie(localParam(p), c, kernelControls(dir, paramKernel(d, p, dir))) : [];
+    });
+    if (errs.length) throw new Error(`${file}: a parameter's symbol must be its control's words, or say the control (\`control\`):\n  ${errs.join('\n  ')}`);
+  }
+  for (const q of params) delete q.control;
   return { params, controls };
+}
+
+/** A name's words with its digits dropped: `key_hp` and `keyHp` -> key, hp; `b3_gain` -> b, gain is read by the caller. */
+const wordsOf = (x) => x.replace(/([a-z0-9])([A-Z])/g, '$1_$2').toLowerCase().split('_').map((w) => w.replace(/[0-9]+/g, '')).filter(Boolean);
+const inOrder = (small, big) => {
+  let i = 0;
+  for (const w of big) if (w === small[i]) i++;
+  return i === small.length;
+};
+
+/**
+ * What ties a parameter's symbol to the control its `ref` names (FreeMixer/omx-plugins#58): without it two refs can
+ * be swapped and every generated check follows the swap. The symbol, a band's `b<n>_` prefix and an element's prefix
+ * off, digits dropped, is the control's words (`rateHz` for rate_hz) or an in-order part of them (`threshold` of
+ * thresholdDb) that is not exactly the words of another control; a symbol frozen from before the wizard drafted
+ * it from the control (`key_external`) says `control` and the control must be the one the ref names. Returns the
+ * refusals.
+ */
+export function symbolTie(p, control, controls) {
+  if (p.control !== undefined) {
+    return p.control === control.name ? [] : [`'${p.symbol}' says its control is '${p.control}', and its ref (${p.ref}) names '${control.name}'`];
+  }
+  const sym = wordsOf(p.symbol.replace(/^b[0-9]+_/, ''));
+  const own = wordsOf(control.name);
+  if (sym.join('_') === own.join('_')) return [];
+  // a part of the words may fit several controls (`on` of bandOn and hpfOn); the other side of any swap is caught, but a
+  // symbol that is exactly another control's words is that control's
+  const exact = controls.filter((c) => c.name !== control.name && wordsOf(c.name).join('_') === sym.join('_'));
+  if (exact.length) return [`'${p.symbol}' is the words of '${exact[0].name}', but its ref (${p.ref}) names '${control.name}'`];
+  if (!inOrder(sym, own)) return [`'${p.symbol}' is not the words of '${control.name}', the control its ref (${p.ref}) names`];
+  return [];
 }
 
 /** SHA-256 of the resolved parameter list: the org.openmixer.declaration/1 digest, the formula the
@@ -586,7 +627,7 @@ export function emitPluginTtl(d) {
     } else if (p.enabled) {
       lines.push('        lv2:default 1 ;', '        lv2:minimum 0 ;', '        lv2:maximum 1 ;', '        lv2:designation lv2:enabled ;', '        lv2:portProperty lv2:toggled ;');
     } else if (p.latency) {
-      lines.push('        lv2:designation lv2:latency ;', '        lv2:portProperty lv2:reportsLatency , lv2:integer ;', '        units:unit units:frame ;');
+      lines.push('        lv2:designation lv2:latency ;', '        lv2:portProperty lv2:integer ;', '        units:unit units:frame ;');
     }
     return `    [\n${lines.join('\n').replace(/ ;$/, '')}\n    ]`;
   };
@@ -655,6 +696,8 @@ const groupUri = (d, section) => `${d.lv2.uri}#${section.key}`;
 
 const TEMPLATES = join(ROOT, 'recipes', 'templates', 'plugin');
 const template = (name) => readFileSync(join(TEMPLATES, name), 'utf8');
+/** A template rendered INTO another file: its own SPDX header dropped, the host file already carries one. */
+const partial = (name) => template(name).replace(BANNER, '');
 
 /** The C float literal of a number: always with a point, never an exponent a float cannot hold. */
 const cfloat = (n) => {
@@ -675,16 +718,22 @@ export function paramRow(p) {
  * `{min:<symbol>}` and `{max:<symbol>}` in a line of `manual` reads that resolved parameter (its
  * range and default as the parameter table words them, or its bare limit), so the README never
  * retypes a number omx-contract or the declaration holds. A symbol no parameter has, or any other
- * `{word:...}`, is refused. */
-export function fillManual(d, line) {
+ * `{word:...}`, is refused. A `summary` reads the same words (`summaryOf`). */
+export function fillManual(d, line, what = 'manual') {
   const out = line.replace(/\{(range|default|min|max):([A-Za-z][A-Za-z0-9_]*)\}/g, (_m, what, symbol) => {
     const p = d.params.find((q) => q.symbol === symbol);
-    if (!p) throw new Error(`plugins/${d.stem}: its manual reads '${symbol}', which is none of its parameters`);
+    if (!p) throw new Error(`plugins/${d.stem}: its ${what} reads '${symbol}', which is none of its parameters`);
     return what === 'min' || what === 'max' ? `${p[what]}` : paramRow(p)[what];
   });
   const left = out.match(/\{[a-z]+:[^}]*\}/);
-  if (left) throw new Error(`plugins/${d.stem}: its manual's ${left[0]} is none of {range|default|min|max:<symbol>}`);
+  if (left) throw new Error(`plugins/${d.stem}: its ${what}'s ${left[0]} is none of {range|default|min|max:<symbol>}`);
   return out;
+}
+
+/** The README catalogue's words for a plugin: its `summary` with the numbers it reads from the declaration filled in
+ * (`up to {max:fxDelayTime} ms`), else its description as the descriptor states it. */
+export function summaryOf(d) {
+  return d.summary === undefined ? d.description : fillManual(d, d.summary, 'summary');
 }
 
 /** The view every plugin template renders from. */
@@ -830,8 +879,7 @@ const cdouble = (n) => (typeof n === 'string' || /[.e]/.test(`${n}`) ? `${n}` : 
 /** The declaration's meters in the faces' shape (`meters` in the schema, docs/meters.md): each its CLAP
  * id (its index), its name, its kind, its channels and where they start among the plugin's meter
  * values (the order the face publishes them in, one block at a time), and its display range. A
- * gain reduction reads the instance field it names, one channel, from the low end of its `floor`
- * parameter's travel to 0 dB, or over the range omx-contract declares for the kernel's `readout`
+ * gain reduction reads the instance field it names, one channel, over the range omx-contract declares for the kernel's `readout`
  * of that name (OMX_<KERNEL>_READOUT_<readout>_MIN/_MAX, read by the compiler); a level is the stereo pair's peak in dBFS at the plugin's `input` or
  * `output`, its range as declared. */
 export function meterRows(d, face) {
@@ -847,8 +895,9 @@ export function meterRows(d, face) {
     // a reading of the kernel's: a gain reduction, or a level the kernel reads itself (its detector's)
     const reads = m.kind === 'gain_reduction' || 'read' in m;
     const at = 'read' in m ? 'read' : 'field';
-    const own = m.kind === 'gain_reduction' ? [at, 'readout' in m ? 'readout' : 'floor'] : reads ? ['read', 'readout'] : ['source', 'min', 'max'];
-    for (const key of ['field', 'read', 'floor', 'readout', 'source', 'min', 'max']) {
+    const own = m.kind === 'gain_reduction' ? [at, 'readout'] : reads ? ['read', 'readout'] : ['source', 'min', 'max'];
+    if ('linear' in m && !(m.kind === 'gain_reduction' && at === 'field' && m.linear === true)) throw new Error(`${where}: 'linear' is true on a gain reduction read from a 'field'`);
+    for (const key of ['field', 'read', 'readout', 'source', 'min', 'max']) {
       if (own.includes(key) && !(key in m)) throw new Error(`${where}: a ${m.kind} meter names its '${key}'`);
       if (!own.includes(key) && key in m) throw new Error(`${where}: a ${m.kind} meter ${reads && m.kind === 'level' ? 'the kernel reads ' : ''}takes no '${key}'`);
     }
@@ -858,8 +907,10 @@ export function meterRows(d, face) {
       let core, ref;
       if (at === 'field') {
         if (!/^[a-z_][a-z0-9_]*(\.[a-z_][a-z0-9_]*)*$/.test(m.field)) throw new Error(`${where}: field '${m.field}' is not a member path`);
-        core = `c->inst.${m.field}`;
-        ref = `inst.${m.field}`;
+        // a kernel that keeps its block's deepest gain as a linear factor (the limiter's blk_gain) is read through omx-dsp's
+        // own omx_gr_block_db(), the conversion every dynamics state's gr_min_db is made with
+        core = m.linear ? `omx_gr_block_db(c->inst.${m.field})` : `c->inst.${m.field}`;
+        ref = m.linear ? `omx_gr_block_db(inst.${m.field})` : `inst.${m.field}`;
       } else {
         const r = m.read.match(/^([a-z][a-z0-9_]*)(?:\(([0-9]+)\))?$/);
         if (!r) throw new Error(`${where}: read '${m.read}' is not <reading> or <reading>(<band>)`);
@@ -870,16 +921,9 @@ export function meterRows(d, face) {
         core = call('&c->inst');
         ref = call('&inst');
       }
-      if ('readout' in m) {
-        if (!/^[A-Z][A-Z0-9_]*$/.test(m.readout)) throw new Error(`${where}: readout '${m.readout}' is not a readout name`);
-        const r = `OMX_${d.kernel.toUpperCase()}_READOUT_${m.readout}`;
-        row = { channels: 1, min: `(double)${r}_MIN`, max: `(double)${r}_MAX`, core, ref };
-      } else {
-        const p = d.params.find((q) => q.symbol === m.floor);
-        if (!p) throw new Error(`${where}: floor '${m.floor}' is no parameter`);
-        if (!(p.min < 0)) throw new Error(`${where}: floor '${m.floor}' starts at ${p.min}, not below 0 dB`);
-        row = { channels: 1, min: p.min, max: 0, core, ref };
-      }
+      if (!/^[A-Z][A-Z0-9_]*$/.test(m.readout)) throw new Error(`${where}: readout '${m.readout}' is not a readout name`);
+      const r = `OMX_${d.kernel.toUpperCase()}_READOUT_${m.readout}`;
+      row = { channels: 1, min: `(double)${r}_MIN`, max: `(double)${r}_MAX`, core, ref };
     } else {
       if (m.source !== 'input' && m.source !== 'output') throw new Error(`${where}: source '${m.source}' is not input or output`);
       if (!(Number.isFinite(m.min) && Number.isFinite(m.max) && m.min < m.max)) throw new Error(`${where}: the range ${m.min}..${m.max} is not a range`);
@@ -888,9 +932,11 @@ export function meterRows(d, face) {
     const out = {
       meterIndex: k, meterName: m.id, meterKind: METER_KINDS[m.kind], meterReadCore: row.core, meterReadRef: row.ref,
       meterChannels: row.channels, meterOffset: offset, meterRight: offset + 1, meterMin: cdouble(row.min), meterMax: cdouble(row.max),
-      isGr: m.kind === 'gain_reduction', isRead: reads, isIn: m.source === 'input', isOut: m.source === 'output',
-      // what a bypassed kernel's stale reading publishes: no reduction, or a level's display minimum
-      meterBypass: m.kind === 'gain_reduction' ? '0.0' : `G_METER_INFO[${k}].min`, meterBypassRef: m.kind === 'gain_reduction' ? '0.0' : `METERS[${k}].min`,
+      isGr: m.kind === 'gain_reduction', isLinear: m.linear === true, isRead: reads, isIn: m.source === 'input', isOut: m.source === 'output',
+      // where the shared face reads it (include/omx_plugin_face.h); what a bypassed kernel's stale reading
+      // publishes: no reduction, or a level's display minimum
+      meterSource: reads ? 'OMX_FACE_METER_READ' : m.source === 'input' ? 'OMX_FACE_METER_IN' : 'OMX_FACE_METER_OUT',
+      meterBypassRef: m.kind === 'gain_reduction' ? '0.0' : `METERS[${k}].min`,
     };
     offset += row.channels;
     return out;
@@ -907,7 +953,7 @@ function meterView(d, face) {
     meterValues: meters.reduce((n, m) => n + m.meterChannels, 0),
     meterGr: meters.some((m) => m.isGr), meterIn: meters.some((m) => m.isIn), meterOut: meters.some((m) => m.isOut),
     meterLevel: meters.some((m) => m.isIn || m.isOut),
-    meterRead: meters.some((m) => m.isRead), meterKernelLevel: meters.some((m) => m.isRead && !m.isGr),
+    meterLinear: meters.some((m) => m.isLinear), meterRead: meters.some((m) => m.isRead), meterKernelLevel: meters.some((m) => m.isRead && !m.isGr),
   };
 }
 
@@ -1025,7 +1071,7 @@ export function generateInstance(d) {
     Makefile: withBanner(render(template('Makefile.tmpl'), view), d, '#'),
     [`omx_${d.kernel}_clap.c`]: withBanner(render(template('clap.c.tmpl'), view), d, '//'),
     [`omx_${d.kernel}_lv2.c`]: withBanner(render(template('lv2.c.tmpl'), view), d, '//'),
-    [`omx_${d.kernel}_core.h`]: render(template('core.h.tmpl'), view),
+    [`omx_${d.kernel}_core.h`]: render(template('core.h.tmpl'), { ...view, vtable: render(partial('core-vtable.h.tmpl'), view) }),
     [`test/${d.kernel}-oracle.c`]: render(template('oracle.c.tmpl'), view),
   };
 }
@@ -1190,7 +1236,7 @@ export function generateChain(d) {
     Makefile: withBanner(render(template('Makefile.tmpl'), view), d, '#'),
     [`omx_${d.kernel}_clap.c`]: withBanner(render(template('clap.c.tmpl'), view), d, '//'),
     [`omx_${d.kernel}_lv2.c`]: withBanner(render(template('lv2.c.tmpl'), view), d, '//'),
-    [`omx_${d.kernel}_core.h`]: render(template('chain-core.h.tmpl'), view),
+    [`omx_${d.kernel}_core.h`]: render(template('chain-core.h.tmpl'), { ...view, vtable: render(partial('core-vtable.h.tmpl'), view) }),
     [`test/${d.kernel}-oracle.c`]: render(template('oracle.c.tmpl'), view),
   };
 }
@@ -1236,7 +1282,7 @@ export const SHARED = {
       '',
       '| Plugin | CLAP id | LV2 URI | What it does |',
       '|---|---|---|---|',
-      ...ds.map((d) => `| **${d.name}** | \`${d.clap.id}\` | \`${d.lv2.uri}\` | ${d.summary ?? d.description} |`),
+      ...ds.map((d) => `| **${d.name}** | \`${d.clap.id}\` | \`${d.lv2.uri}\` | ${summaryOf(d)} |`),
       '',
     ],
     sections: (ds) => ds.flatMap((d) => [

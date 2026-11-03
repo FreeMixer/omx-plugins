@@ -104,7 +104,7 @@ static const struct {
   uint32_t kind, channels, at;
   double min, max;
 } METERS[NM] = {
-    {"deessGr", CLAP_METER_KIND_GAIN_REDUCTION, 1u, 0u, -24.0, 0.0},
+    {"deessGr", CLAP_METER_KIND_GAIN_REDUCTION, 1u, 0u, (double)OMX_DEESSER_READOUT_GAIN_REDUCTION_DB_MIN, (double)OMX_DEESSER_READOUT_GAIN_REDUCTION_DB_MAX},
     {"deessIn", CLAP_METER_KIND_LEVEL, 2u, 1u, -60.0, 6.0},
     {"deessOut", CLAP_METER_KIND_LEVEL, 2u, 3u, -60.0, 6.0},
 };
