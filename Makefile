@@ -42,6 +42,8 @@
 #                   the README section's range and default (tools/test/manual-perturb.mjs)
 #   make params-doc  write docs/plugins/: one page of every parameter for each plugin and the index (tools/params-doc.mjs, from the declarations)
 #   make check-params-doc  the committed pages are what the declarations generate, and say what the generated TTLs say (tools/test/params-doc-test.mjs); run by CI beside `node tools/gen.mjs --check`
+#   make panel-copies  no tracked file is a film strip or a fixture omx-panel renders or ships: `omx-panel copies`
+#                      over the tree, with its --self-test; run by CI beside `make test`
 #   make private-refs  no tracked file (generated ones included) points into a private repository, issue, branch or path
 #                      (tools/private-refs-check.sh, with its --self-test); run by CI beside `make test`
 #   make recipe-test   the repository's own checks, run by CI beside `make test`:
@@ -147,7 +149,7 @@ LIB_FLAGS  := -fPIC -fvisibility=hidden -DOMX_CLAP_STATIC -Iinclude
 # read only by the targets that build the archive, so `make version` and the rest need no omx-dsp
 lib_cflags = $(call dep_check,omxdsp,$(OMXDSP_MIN))$(call dep_check,omx-contract,$(CONTRACT_MIN))$(shell $(PKG_CONFIG) --cflags omxdsp omx-contract omx-clap-core clap)
 
-.PHONY: summary-numbers param-tie presets presets-figures test-role all lib lib-test test test-faces units panel-layout descriptor-view lv2-units lv2-deprecated lv2-maintainer lv2-manifest release-version resource-hints format-tables contract-union probe-checks eq-probe-race band-groups phaser-depth geq-widgets round-trip hints modgui manual install install-pins install-test package-lists install-devel install-contract contract-dir lv2bench-ran clean version recipe-test completeness selftest private-refs params-doc check-params-doc strip-crosscheck meters-abi meter-level dsp-copies meter-ring clap-validate
+.PHONY: summary-numbers param-tie presets presets-figures test-role all lib lib-test test test-faces units panel-layout descriptor-view lv2-units lv2-deprecated lv2-maintainer lv2-manifest release-version resource-hints format-tables contract-union probe-checks eq-probe-race band-groups phaser-depth geq-widgets round-trip hints modgui manual install install-pins install-test package-lists install-devel install-contract contract-dir lv2bench-ran clean version recipe-test completeness selftest private-refs params-doc check-params-doc strip-crosscheck meters-abi meter-level dsp-copies panel-copies meter-ring clap-validate
 all: lib
 	@for p in $(PLUGINS); do $(MAKE) -C $$p all || exit 1; done
 lib: $(LIB) $(LIB_PC)
@@ -255,6 +257,10 @@ selftest:
 	tools/qualify-release.sh --self-test
 	tools/gen-pins.sh --self-test
 	tools/pins-check.sh --self-test
+OMX_PANEL ?= omx-panel
+panel-copies:
+	$(OMX_PANEL) copies --self-test
+	$(OMX_PANEL) copies .
 private-refs:
 	tools/private-refs-check.sh
 	tools/private-refs-check.sh --self-test

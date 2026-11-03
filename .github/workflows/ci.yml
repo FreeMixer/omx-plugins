@@ -107,6 +107,10 @@ jobs:
         id: handback-dsp-copies
         run: make dsp-copies
 
+      - name: No tracked file is a film strip or a fixture omx-panel ships, and a planted one goes red
+        id: handback-panel-copies
+        run: make panel-copies
+
       - name: Every generated file is fresh, built or not
         id: handback-gen
         run: |
