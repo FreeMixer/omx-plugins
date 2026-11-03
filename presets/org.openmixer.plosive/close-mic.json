@@ -1,6 +1,8 @@
 {
   "format": "org.openmixer.preset/1",
-  "plugin": "org.openmixer.plosive",
+  "plugin": {
+    "id": "org.openmixer.plosive"
+  },
   "id": "close-mic",
   "name": "Close Mic",
   "carries": "params",
@@ -51,7 +53,7 @@
       "value": 180
     }
   ],
-  "created": "2026-10-17T00:00:00Z",
-  "modified": "2026-10-17T00:00:00Z",
+  "createdAt": "2026-10-17T00:00:00Z",
+  "modifiedAt": "2026-10-17T00:00:00Z",
   "copyOf": null
 }

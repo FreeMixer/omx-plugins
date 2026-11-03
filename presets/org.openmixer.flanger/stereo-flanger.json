@@ -1,6 +1,8 @@
 {
   "format": "org.openmixer.preset/1",
-  "plugin": "org.openmixer.flanger",
+  "plugin": {
+    "id": "org.openmixer.flanger"
+  },
   "id": "stereo-flanger",
   "name": "Stereo Flanger",
   "carries": "params",
@@ -26,7 +28,7 @@
       "value": 50
     }
   ],
-  "created": "2026-10-17T00:00:00Z",
-  "modified": "2026-10-17T00:00:00Z",
+  "createdAt": "2026-10-17T00:00:00Z",
+  "modifiedAt": "2026-10-17T00:00:00Z",
   "copyOf": null
 }

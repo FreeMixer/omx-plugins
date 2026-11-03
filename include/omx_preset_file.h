@@ -2,8 +2,8 @@
  * Copyright (C) 2026 Pau Aliagas <linuxnow@gmail.com>
  *
  * omx_preset_file.h — what a face reads of a factory preset file (org.openmixer.preset/1,
- * presets/<plugin id>/<preset id>.json, docs/presets.md): the top-level strings `format`, `plugin`
- * and `name`, and each `params` entry's `symbol` and `value`. Everything else of the file is
+ * presets/<plugin id>/<preset id>.json, docs/presets.md): the top-level strings `format` and
+ * `name`, `plugin.id`, and each `params` entry's `symbol` and `value`. Everything else of the file is
  * skipped. The CLAP faces' clap.preset-discovery provider and clap.preset-load read files through
  * it; the files are tools/gen-presets.mjs's.
  *
@@ -115,10 +115,16 @@ struct omx_preset_head {
   const char *params; /* the `params` array, NULL if none */
 };
 
+static inline bool omx_preset_plugin_member(const char *key, const char *v, void *ctx) {
+  struct omx_preset_head *h = (struct omx_preset_head *)ctx;
+  if (strcmp(key, "id") == 0) omx_preset_string(v, h->plugin, sizeof h->plugin);
+  return true;
+}
+
 static inline bool omx_preset_head_member(const char *key, const char *v, void *ctx) {
   struct omx_preset_head *h = (struct omx_preset_head *)ctx;
   if (strcmp(key, "format") == 0) omx_preset_string(v, h->format, sizeof h->format);
-  else if (strcmp(key, "plugin") == 0) omx_preset_string(v, h->plugin, sizeof h->plugin);
+  else if (strcmp(key, "plugin") == 0) omx_preset_members(v, omx_preset_plugin_member, h);
   else if (strcmp(key, "name") == 0) omx_preset_string(v, h->name, sizeof h->name);
   else if (strcmp(key, "params") == 0 && *v == '[') h->params = v;
   return true;

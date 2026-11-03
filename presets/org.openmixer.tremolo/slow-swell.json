@@ -1,6 +1,8 @@
 {
   "format": "org.openmixer.preset/1",
-  "plugin": "org.openmixer.tremolo",
+  "plugin": {
+    "id": "org.openmixer.tremolo"
+  },
   "id": "slow-swell",
   "name": "Slow Swell",
   "carries": "params",
@@ -27,7 +29,7 @@
       "label": "Tremolo"
     }
   ],
-  "created": "2026-10-17T00:00:00Z",
-  "modified": "2026-10-17T00:00:00Z",
+  "createdAt": "2026-10-17T00:00:00Z",
+  "modifiedAt": "2026-10-17T00:00:00Z",
   "copyOf": null
 }

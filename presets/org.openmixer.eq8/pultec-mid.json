@@ -1,6 +1,8 @@
 {
   "format": "org.openmixer.preset/1",
-  "plugin": "org.openmixer.eq8",
+  "plugin": {
+    "id": "org.openmixer.eq8"
+  },
   "id": "pultec-mid",
   "name": "Mid Presence",
   "carries": "params",
@@ -246,7 +248,7 @@
       "value": 0
     }
   ],
-  "created": "2026-10-17T00:00:00Z",
-  "modified": "2026-10-17T00:00:00Z",
+  "createdAt": "2026-10-17T00:00:00Z",
+  "modifiedAt": "2026-10-17T00:00:00Z",
   "copyOf": null
 }
