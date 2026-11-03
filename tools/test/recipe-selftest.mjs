@@ -549,7 +549,7 @@ static inline float omx_wobble_instance_level_db(const OmxWobbleInstance *s) { r
     };
     const ok = rows([{ id: 'gr2', kind: 'gain_reduction', read: 'band_gr_db(1)', readout: 'BAND2_GR_DB' }, { id: 'lvl', kind: 'level', read: 'level_db', readout: 'LEVEL_DB' }]);
     expect(Array.isArray(ok) && ok[0].meterReadCore === 'omx_wobble_instance_band_gr_db(&c->inst, 1u)' && ok[0].meterReadRef === 'omx_wobble_instance_band_gr_db(&inst, 1u)' &&
-      ok[1].meterChannels === 1 && ok[1].isRead && !ok[1].isGr && ok[1].meterBypass === 'G_METER_INFO[1].min' && ok[1].meterMin === '(double)OMX_WOBBLE_READOUT_LEVEL_DB_MIN',
+      ok[1].meterChannels === 1 && ok[1].isRead && !ok[1].isGr && ok[1].meterBypassRef === 'METERS[1].min' && ok[1].meterMin === '(double)OMX_WOBBLE_READOUT_LEVEL_DB_MIN',
       `meters: a band's reading and a level the kernel reads are called on the instance, the level one channel over its readout (${Array.isArray(ok) ? ok.map((r) => r.meterReadCore).join(', ') : ok})`);
     const missing = rows([{ id: 'gr', kind: 'gain_reduction', read: 'gr_db', readout: 'GR_DB' }]);
     const unbanded = rows([{ id: 'gr', kind: 'gain_reduction', read: 'band_gr_db', readout: 'GR_DB' }]);
