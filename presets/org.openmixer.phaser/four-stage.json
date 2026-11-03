@@ -1,6 +1,8 @@
 {
   "format": "org.openmixer.preset/1",
-  "plugin": "org.openmixer.phaser",
+  "plugin": {
+    "id": "org.openmixer.phaser"
+  },
   "id": "four-stage",
   "name": "Four Stage",
   "carries": "params",
@@ -36,7 +38,7 @@
       "value": 50
     }
   ],
-  "created": "2026-10-17T00:00:00Z",
-  "modified": "2026-10-17T00:00:00Z",
+  "createdAt": "2026-10-17T00:00:00Z",
+  "modifiedAt": "2026-10-17T00:00:00Z",
   "copyOf": null
 }
