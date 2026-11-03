@@ -50,6 +50,8 @@
 #     make selftest      the recipe's checkers, wizard and commit protocol, each sabotaged (needs git)
 #   make meters-abi  the clap.meters/1 header omx-clap-core installs has the id, enums, sizeof and offsetof the
 #                    plugins are built for (tools/test/meters-abi-test.c, compile and run; part of `make test`)
+#   make param-contract-abi  include/omx_param_contract.h's extension table and entry are the layout omx-clap-core's
+#                    omx_clap_ext.h reads (tools/test/param-contract-abi-test.c, compile and run; part of `make test`)
 #   make strip-crosscheck   omx-strip, a chain, against the hand-ported strip it replaced, bit for bit at
 #                    the old plugin's settings (tools/test/strip-crosscheck.sh; needs the git history, and builds the
 #                    omx-contract and omx-dsp releases the old commit pinned, from sibling checkouts' tags or GitHub).
@@ -147,7 +149,7 @@ LIB_FLAGS  := -fPIC -fvisibility=hidden -DOMX_CLAP_STATIC -Iinclude
 # read only by the targets that build the archive, so `make version` and the rest need no omx-dsp
 lib_cflags = $(call dep_check,omxdsp,$(OMXDSP_MIN))$(call dep_check,omx-contract,$(CONTRACT_MIN))$(shell $(PKG_CONFIG) --cflags omxdsp omx-contract omx-clap-core clap)
 
-.PHONY: summary-numbers param-tie face-dirty-order presets presets-figures test-role all lib lib-test test test-faces units panel-layout descriptor-view lv2-units lv2-deprecated lv2-maintainer lv2-manifest release-version resource-hints format-tables contract-union probe-checks eq-probe-race band-groups phaser-depth geq-widgets round-trip hints modgui manual install install-pins install-test package-lists install-devel install-contract contract-dir lv2bench-ran clean version recipe-test completeness selftest private-refs params-doc check-params-doc strip-crosscheck meters-abi meter-level dsp-copies meter-ring clap-validate
+.PHONY: summary-numbers param-tie face-dirty-order presets presets-figures test-role all lib lib-test test test-faces units panel-layout descriptor-view lv2-units lv2-deprecated lv2-maintainer lv2-manifest release-version resource-hints format-tables contract-union probe-checks eq-probe-race band-groups phaser-depth geq-widgets round-trip hints modgui manual install install-pins install-test package-lists install-devel install-contract contract-dir lv2bench-ran clean version recipe-test completeness selftest private-refs params-doc check-params-doc strip-crosscheck meters-abi meter-level dsp-copies meter-ring clap-validate param-contract-abi
 all: lib
 	@for p in $(PLUGINS); do $(MAKE) -C $$p all || exit 1; done
 lib: $(LIB) $(LIB_PC)
@@ -162,6 +164,7 @@ test: lib units panel-layout descriptor-view lv2-units lv2-deprecated lv2-mainta
 	@$(MAKE) -s presets
 	@$(MAKE) -s presets-figures
 	@$(MAKE) -s meters-abi
+	@$(MAKE) -s param-contract-abi
 	@$(MAKE) -s meter-level
 	@$(MAKE) -s test-role
 	@$(MAKE) -s package-lists
@@ -170,6 +173,7 @@ test: lib units panel-layout descriptor-view lv2-units lv2-deprecated lv2-mainta
 test-faces: all lib contract-union eq-probe-race
 	@$(MAKE) -s lib-test
 	@$(MAKE) -s meters-abi
+	@$(MAKE) -s param-contract-abi
 	@$(MAKE) -s meter-level
 	@$(MAKE) -s test-role
 	@$(MAKE) -s package-lists
@@ -267,6 +271,11 @@ meters-abi:
 	$(CC) -std=gnu11 -Wall -Wextra -Werror $(shell $(PKG_CONFIG) --cflags omx-clap-core clap) -o build/meters-abi-test tools/test/meters-abi-test.c
 	build/meters-abi-test
 	@echo "ok   clap.meters/1 as omx-clap-core installs it: id, enums, sizeof and offsetof"
+param-contract-abi:
+	@mkdir -p build
+	$(CC) -std=gnu11 -Wall -Wextra -Werror -Iinclude $(shell $(PKG_CONFIG) --cflags omx-contract omx-clap-core clap) -o build/param-contract-abi-test tools/test/param-contract-abi-test.c
+	build/param-contract-abi-test
+	@echo "ok   org.openmixer.param-contract/1 as omx-clap-core reads it: id, sizeof and offsetof"
 # every level meter of the metered faces reads bit for bit what tools/test/meter-level.sha256 holds, and every
 # other meter (a gain reduction, float through libm) reads within a tolerance what tools/test/<face>.meter-others.txt holds
 METER_LEVEL_FACES := omx-comp omx-deesser

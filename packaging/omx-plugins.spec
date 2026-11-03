@@ -16,7 +16,7 @@ BuildRequires: pkgconf-pkg-config
 # the same in debian/control (tools/deps-check.sh). The Makefile and tools/gen.mjs read them from here.
 BuildRequires: omx-dsp-devel >= 0.29.0
 BuildRequires: omx-contract-devel >= 3.7.1
-BuildRequires: omx-clap-core-devel >= 0.14.0
+BuildRequires: omx-clap-core-devel >= 0.23.0
 # plugin-hostd's format tables, which the generators read backwards (tools/format-tables.mjs)
 BuildRequires: plugin-hostd-devel >= 0.15.2
 # the omx-contract command, first packaged in 2.15.0: the generators read the contract directory through it
@@ -78,6 +78,7 @@ files in %{_datadir}/omx/presets.
 
 %package clap
 Summary: OpenMixer delay, drive, EQ, strip, gate and effects as CLAP plugins
+Conflicts: omx-clap-host < 0.23.0
 
 %description clap
 The OpenMixer console's delay, drive, 8-, 16- and 32-band EQ, 31-band graphic
@@ -275,6 +276,10 @@ tools/pins-check.sh %{buildroot}%{_datadir}/plugin-hostd/pins.d/omx-plugins.pins
   release store.
 - Built on omx-dsp 0.29.0's fast maths (libmvec where the toolchain has it); the
   build floor is omx-dsp 0.29.0.
+- The CLAP plugins no longer carry the parameter-contract migration members,
+  which no plugin ever filled (zero steps everywhere); a host older than omx-
+  clap-host 0.23.0 read past the shorter table, so the package declares the
+  conflict (#184).
 
 * Sat Oct 31 2026 Pau Aliagas <linuxnow@gmail.com> - 0.17.0-1
 - omx-dyneq, the six-band dynamic EQ, and omx-multiband, the multiband
