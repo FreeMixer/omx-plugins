@@ -60,8 +60,6 @@ static inline void omx_glue_core_run(OmxGlueCore *c, const float *in_l, const fl
   omx_glue_instance_run(&c->inst, in_l, in_r, out_l, out_r, frames);
 }
 
-// SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2026 Pau Aliagas <linuxnow@gmail.com>
 /* The core behind the vtable the shared faces call (include/omx_plugin_face.h): the same functions, untyped. */
 static inline void omx_glue_core_init_v(void *c, uint32_t rate) { omx_glue_core_init((OmxGlueCore *)c, rate); }
 static inline void omx_glue_core_resolve_v(void *c, const float *values, int bypass) {

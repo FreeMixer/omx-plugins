@@ -81,8 +81,6 @@ static inline void omx_gate_core_run(OmxGateCore *c, const float *key, const flo
   omx_gate_instance_run(&c->inst, key, in_l, in_r, out_l, out_r, frames);
 }
 
-// SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2026 Pau Aliagas <linuxnow@gmail.com>
 /* The core behind the vtable the shared faces call (include/omx_plugin_face.h): the same functions, untyped. */
 static inline void omx_gate_core_init_v(void *c, uint32_t rate) { omx_gate_core_init((OmxGateCore *)c, rate); }
 static inline void omx_gate_core_resolve_v(void *c, const float *values, int bypass) {

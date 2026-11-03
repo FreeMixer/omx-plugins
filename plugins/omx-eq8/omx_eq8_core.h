@@ -74,8 +74,6 @@ static inline void omx_eq8_core_run(OmxEq8Core *c, const float *in_l, const floa
   omx_eq_instance_run(&c->inst, in_l, in_r, out_l, out_r, frames);
 }
 
-// SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2026 Pau Aliagas <linuxnow@gmail.com>
 /* The core behind the vtable the shared faces call (include/omx_plugin_face.h): the same functions, untyped. */
 static inline void omx_eq8_core_init_v(void *c, uint32_t rate) { omx_eq8_core_init((OmxEq8Core *)c, rate); }
 static inline void omx_eq8_core_resolve_v(void *c, const float *values, int bypass) {
