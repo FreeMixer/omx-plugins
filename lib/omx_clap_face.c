@@ -227,7 +227,7 @@ static clap_process_status g_process(const clap_plugin_t *p, const clap_process_
   const int bypassed = g->values[G_BYPASS(g)] > 0.5f;
   /* A quiet block (no value moved) skips the resolve: the core keeps its smoothing as it is, which is what
    * resolving the same values again gives, bit for bit (each plugin's oracle, its quiet arm). */
-  if (atomic_exchange_explicit(&g->dirty, 0, memory_order_relaxed)) f->core->resolve(g->core, g->values, bypassed);
+  if (atomic_exchange_explicit(&g->dirty, 0, memory_order_acquire)) f->core->resolve(g->core, g->values, bypassed);
   double mv[OMX_METER_RING_MAX];
   /* the inputs' peak, before the kernel runs (the outputs may be the inputs) */
   if (f->meter_count) g_levels(g, OMX_FACE_METER_IN, ai, pr->frames_count, mv);
