@@ -1,3 +1,18 @@
+omx-plugins (0.18.0) unstable; urgency=medium
+
+  * Each plugin runs in place where it is proven to: a host that hands an
+    output the buffer of its input (CLAP's in_place_pair, an LV2 host that
+    connects both ports to one buffer) gets the same result as with two
+    buffers, held by a test per plugin.
+  * A quiet block skips the resolve: when no parameter moved since the last
+    block, the plugin runs on the coefficients it holds.
+  * The CLAP face reads its dirty flag with acquire, against the main
+    thread's release store.
+  * Built on omx-dsp 0.29.0's fast maths (libmvec where the toolchain has
+    it); the build floor is omx-dsp 0.29.0.
+
+ -- Pau Aliagas <linuxnow@gmail.com>  Tue, 03 Nov 2026 20:00:00 +0100
+
 omx-plugins (0.17.0) unstable; urgency=medium
 
   * omx-dyneq, the six-band dynamic EQ, and omx-multiband, the multiband
