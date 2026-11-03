@@ -39,7 +39,7 @@
 #include "omx_test_pool_voice_decl.h"
 
 #define VOICES ((uint32_t)OMX_TEST_POOL_VOICE_VOICES)
-#define MAXFRAMES 4096u
+#define MAXFRAMES 16384u /* clap-validator activates up to 16384 frames; the buffers live in the calloc'd instance */
 
 typedef struct {
   bool on;        /* sounding */
