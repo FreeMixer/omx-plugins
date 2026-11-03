@@ -480,20 +480,7 @@ static bool g_contract_get(const clap_plugin_t *p, uint32_t id, omx_clap_param_c
                                 info);
 }
 
-static uint32_t g_contract_migrations(const clap_plugin_t *p) {
-  (void)p;
-  return 0;
-}
-
-static bool g_contract_migration(const clap_plugin_t *p, uint32_t index, omx_clap_param_migration_t *step) {
-  (void)p;
-  (void)index;
-  (void)step;
-  return false;
-}
-
-static const omx_clap_plugin_param_contract_t G_CONTRACT_EXT = {g_contract_version, g_contract_fingerprint, g_contract_get,
-                                                                g_contract_migrations, g_contract_migration};
+static const omx_clap_plugin_param_contract_t G_CONTRACT_EXT = {g_contract_version, g_contract_fingerprint, g_contract_get};
 
 /* ---- org.openmixer.resource-hints.draft/0: the declaration's hints -------------------------- */
 
