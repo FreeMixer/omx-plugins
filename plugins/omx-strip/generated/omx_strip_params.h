@@ -354,7 +354,7 @@ static const char *const OMX_STRIP_PARAM_MODULES[OMX_STRIP_PARAM_COUNT] = {
 #define OMX_STRIP_DECL_DIGEST "7bc2f63aae815b41303644971f60fdc441e2c9407e093d98200c1c9e1ae0ea2d"
 
 /* org.openmixer.param-contract/1 (tools/param-contract.mjs): each parameter's unit, scale and step, in
- * id order; the host's bypass, the last id, is the face's. */
+ * id order; the host's bypass, CLAP id OMX_PLUGIN_FACE_BYPASS_CLAP_ID (omx-contract), is the face's. */
 #define OMX_STRIP_PARAM_CONTRACT_VERSION 1u
 #define OMX_STRIP_PARAM_CONTRACT_FINGERPRINT "0d05434ffc7760c8075882257b4edac537d15c2f149b26a2a87a0058f8678de1"
 static const struct omx_param_contract_row OMX_STRIP_PARAM_CONTRACT[OMX_STRIP_PARAM_COUNT] = {
@@ -507,14 +507,15 @@ static const struct omx_panel_rows OMX_STRIP_PANEL = {
   NULL, 0u,
 };
 
-/* LV2 port indices (tools/gen.mjs lv2Ports): audio, then parameter i at FIRST_PARAM + i, then these. */
-#define OMX_STRIP_LV2_PORT_IN_L 0u
-#define OMX_STRIP_LV2_PORT_IN_R 1u
-#define OMX_STRIP_LV2_PORT_OUT_L 2u
-#define OMX_STRIP_LV2_PORT_OUT_R 3u
-#define OMX_STRIP_LV2_PORT_ENABLED 55u
-#define OMX_STRIP_LV2_PORT_LATENCY 56u
-#define OMX_STRIP_LV2_PORT_FIRST_PARAM 4u
+/* LV2 port indices (tools/gen.mjs lv2Ports): enabled and latency at omx-contract's permanent indices, the audio ports,
+ * then parameter i at FIRST_PARAM + i. */
+#define OMX_STRIP_LV2_PORT_ENABLED 0u
+#define OMX_STRIP_LV2_PORT_LATENCY 1u
+#define OMX_STRIP_LV2_PORT_IN_L 2u
+#define OMX_STRIP_LV2_PORT_IN_R 3u
+#define OMX_STRIP_LV2_PORT_OUT_L 4u
+#define OMX_STRIP_LV2_PORT_OUT_R 5u
+#define OMX_STRIP_LV2_PORT_FIRST_PARAM 6u
 #define OMX_STRIP_LV2_PORT_COUNT 57u
 
 #endif /* OMX_STRIP_PARAMS_H */

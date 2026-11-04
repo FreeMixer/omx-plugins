@@ -87,7 +87,7 @@ static const char *const OMX_GLUE_PARAM_MODULES[OMX_GLUE_PARAM_COUNT] = {
 #define OMX_GLUE_DECL_DIGEST "2b34f80caf284bc29dc277f25bde3b1da1b641fb4b97a750f55d0c3291ef971c"
 
 /* org.openmixer.param-contract/1 (tools/param-contract.mjs): each parameter's unit, scale and step, in
- * id order; the host's bypass, the last id, is the face's. */
+ * id order; the host's bypass, CLAP id OMX_PLUGIN_FACE_BYPASS_CLAP_ID (omx-contract), is the face's. */
 #define OMX_GLUE_PARAM_CONTRACT_VERSION 1u
 #define OMX_GLUE_PARAM_CONTRACT_FINGERPRINT "db6c45228672c2e249ed50cef56f8e74d13da53734c1929b1a481036be729371"
 static const struct omx_param_contract_row OMX_GLUE_PARAM_CONTRACT[OMX_GLUE_PARAM_COUNT] = {
@@ -138,14 +138,15 @@ static const struct omx_panel_rows OMX_GLUE_PANEL = {
   NULL, 0u,
 };
 
-/* LV2 port indices (tools/gen.mjs lv2Ports): audio, then parameter i at FIRST_PARAM + i, then these. */
-#define OMX_GLUE_LV2_PORT_IN_L 0u
-#define OMX_GLUE_LV2_PORT_IN_R 1u
-#define OMX_GLUE_LV2_PORT_OUT_L 2u
-#define OMX_GLUE_LV2_PORT_OUT_R 3u
-#define OMX_GLUE_LV2_PORT_ENABLED 11u
-#define OMX_GLUE_LV2_PORT_LATENCY 12u
-#define OMX_GLUE_LV2_PORT_FIRST_PARAM 4u
+/* LV2 port indices (tools/gen.mjs lv2Ports): enabled and latency at omx-contract's permanent indices, the audio ports,
+ * then parameter i at FIRST_PARAM + i. */
+#define OMX_GLUE_LV2_PORT_ENABLED 0u
+#define OMX_GLUE_LV2_PORT_LATENCY 1u
+#define OMX_GLUE_LV2_PORT_IN_L 2u
+#define OMX_GLUE_LV2_PORT_IN_R 3u
+#define OMX_GLUE_LV2_PORT_OUT_L 4u
+#define OMX_GLUE_LV2_PORT_OUT_R 5u
+#define OMX_GLUE_LV2_PORT_FIRST_PARAM 6u
 #define OMX_GLUE_LV2_PORT_COUNT 13u
 
 #endif /* OMX_GLUE_PARAMS_H */
