@@ -35,6 +35,8 @@
 #                   tools/test/phaser-depth-role-test.mjs and its --self-test; part of `make test`)
 #   make strip-visible-when  omx-strip's panel follows its band count: at eqBands 4 bands 1..4 are shown and 5..32
 #                   hidden, and no page holds a hidden band (tools/test/strip-visible-when-test.mjs; part of `make test`)
+#   make strip-pages-follow  omx-strip's CLAP remote-control pages follow Bands: 4, 32, 9 and 4 bands read back through the
+#                   extension from the built face, the host told by changed() (tools/test/strip-pages-follow-test.mjs; part of `make test`)
 #   make band-groups  omx-eq8's generated descriptor and TTL hold one LV2 port group per band, Band 1 ... Band 8 in band
 #                   order, each its five controls (tools/test/eq8-band-groups-test.mjs; part of `make test`)
 #   make geq-widgets  omx-geq declares the fader for its 31 bands, and its panel description and generated header serve them
@@ -162,7 +164,7 @@ LIB_FLAGS  := -fPIC -fvisibility=hidden -DOMX_CLAP_STATIC -Iinclude
 # read only by the targets that build the archive, so `make version` and the rest need no omx-dsp
 lib_cflags = $(call dep_check,omxdsp,$(OMXDSP_MIN))$(call dep_check,omx-contract,$(CONTRACT_MIN))$(shell $(PKG_CONFIG) --cflags omxdsp omx-contract omx-clap-core clap)
 
-.PHONY: summary-numbers param-tie presets presets-figures test-role all lib lib-test test test-faces units panel-layout descriptor-view lv2-units lv2-deprecated lv2-maintainer lv2-manifest release-version resource-hints format-tables contract-union probe-checks face-ids eq-probe-race band-groups strip-visible-when phaser-depth geq-widgets round-trip hints modgui manual install install-pins install-test package-lists install-devel install-contract contract-dir lv2bench-ran clean version recipe-test completeness selftest private-refs params-doc check-params-doc strip-crosscheck strip-bands strip-bands-bench meters-abi meter-level dsp-copies panel-copies meter-ring clap-validate
+.PHONY: summary-numbers param-tie presets presets-figures test-role all lib lib-test test test-faces units panel-layout descriptor-view lv2-units lv2-deprecated lv2-maintainer lv2-manifest release-version resource-hints format-tables contract-union probe-checks face-ids eq-probe-race band-groups strip-visible-when strip-pages-follow phaser-depth geq-widgets round-trip hints modgui manual install install-pins install-test package-lists install-devel install-contract contract-dir lv2bench-ran clean version recipe-test completeness selftest private-refs params-doc check-params-doc strip-crosscheck strip-bands strip-bands-bench meters-abi meter-level dsp-copies panel-copies meter-ring clap-validate
 all: lib
 	@for p in $(PLUGINS); do $(MAKE) -C $$p all || exit 1; done
 lib: $(LIB) $(LIB_PC)
@@ -240,6 +242,15 @@ band-groups:
 	node tools/test/eq8-band-groups-test.mjs
 strip-visible-when:
 	node tools/test/strip-visible-when-test.mjs
+# the strip's CLAP remote-control pages follow Bands: the built face and a host that offers clap.remote-controls,
+# read back through the extension at 4, 32, 9, 9 and 4 bands (tools/test/clap-pages-follow-probe.c)
+strip-pages-follow:
+	@mkdir -p build
+	@$(MAKE) -s -C plugins/omx-strip all
+	$(CC) -std=gnu11 -Wall -Wextra -Werror $(shell $(PKG_CONFIG) --cflags omx-clap-core clap) -o build/clap-pages-follow-probe tools/test/clap-pages-follow-probe.c -ldl
+	@id=$$(node -e "import('./tools/gen.mjs').then(m=>{const d=m.loadDecl('plugins/omx-strip');console.log(d.params.findIndex(p=>p.symbol==='eqBands'))})"); \
+	  build/clap-pages-follow-probe plugins/omx-strip/build/omx-strip.clap $$id 4 32 9 9 4 > build/strip-pages-follow.txt && \
+	  node tools/test/strip-pages-follow-test.mjs build/strip-pages-follow.txt
 geq-widgets:
 	node tools/test/geq-widgets-test.mjs
 # the parameter reference of every plugin, written from the declarations (docs/plugins/)
