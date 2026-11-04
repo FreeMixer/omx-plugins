@@ -8,8 +8,8 @@
 #   tools/clap-validate.sh [OUTDIR]     reports to OUTDIR (default build/clap-validator)
 #
 # Exit status: 0 when every plugin passed, 1 when any test failed or a plugin could not be run,
-# 2 when the validator or the built plugins are missing (nothing was judged). CI reports a 1 without
-# failing the job until every plugin is clean (.github/workflows/ci.yml).
+# 2 when the validator or the built plugins are missing (nothing was judged). The plugins' factory
+# presets must be installed (make install-presets) or the preset-discovery tests find no location to crawl.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 out=${1:-build/clap-validator}
