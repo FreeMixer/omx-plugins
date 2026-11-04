@@ -28,7 +28,7 @@
 #   make param-tie   every by-reference parameter's symbol is its control's words or says its `control`: swapped refs are refused
 #                   (FreeMixer/omx-plugins#58; tools/test/param-tie-test.mjs; part of `make test`)
 #   make summary-numbers  a plugin summary reads its numbers from the declaration: none types a limit or default of its parameters,
-#                   and a moved contract moves the README row (FreeMixer/omx-plugins#174; tools/test/summary-numbers-test.mjs; part of `make test`)
+#                   and a moved contract moves the catalogue row (FreeMixer/omx-plugins#174; tools/test/summary-numbers-test.mjs; part of `make test`)
 #   make phaser-depth  omx-phaser's generated panel publishes its depth role on depthOct, in octaves (FreeMixer/omx-plugins#232;
 #                   tools/test/phaser-depth-role-test.mjs and its --self-test; part of `make test`)
 #   make band-groups  omx-eq8's generated descriptor and TTL hold one LV2 port group per band, Band 1 ... Band 8 in band
@@ -39,7 +39,7 @@
 #   make modgui     every plugin's MOD GUI is what omx-panel writes from its descriptor and its declared panel: each plugin's
 #                   `make check` (the generated-fresh step of CI runs it beside `node tools/gen.mjs --check`)
 #   make manual     each declaration's manual follows omx-contract: a travel moved in a copy of the release moves
-#                   the README section's range and default (tools/test/manual-perturb.mjs)
+#                   the catalogue section's range and default (tools/test/manual-perturb.mjs)
 #   make params-doc  write docs/plugins/: one page of every parameter for each plugin and the index (tools/params-doc.mjs, from the declarations)
 #   make check-params-doc  the committed pages are what the declarations generate, and say what the generated TTLs say (tools/test/params-doc-test.mjs); run by CI beside `node tools/gen.mjs --check`
 #   make panel-copies  no tracked file is a film strip or a fixture omx-panel renders or ships: `omx-panel copies`

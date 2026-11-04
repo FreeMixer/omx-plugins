@@ -20,7 +20,7 @@
  *   plugins/<stem>/Makefile                          the build and `make test`
  *
  * and, from every plugin folder at once, the regions of the shared files between a `BEGIN
- * GENERATED <name>` line and its `END GENERATED <name>` line (SHARED below): the README's catalogue
+ * GENERATED <name>` line and its `END GENERATED <name>` line (SHARED below): the catalogue's
  * and sections, the RPM %files lists, CI's installed-file lists and libomxplugins' table of CLAP
  * entries (include/omx_clap_static.h, lib/omx_clap_static.c). Adding a plugin touches only its
  * folder; two plugins' changes merge in either order.
@@ -773,7 +773,7 @@ const cfloat = (n) => {
   return `${/[.e]/.test(t) ? t : `${t}.0`}f`;
 };
 
-/** How a README row and section read a resolved parameter: its range and its default, in words. */
+/** How a catalogue row and section read a resolved parameter: its range and its default, in words. */
 export function paramRow(p) {
   const unit = p.unit ? ` ${p.unit}` : '';
   if (p.kind === 'toggle') return { name: p.name, range: 'off / on', default: p.def ? 'on' : 'off' };
@@ -784,7 +784,7 @@ export function paramRow(p) {
 
 /** The manual's own words around the numbers: each `{range:<symbol>}`, `{default:<symbol>}`,
  * `{min:<symbol>}` and `{max:<symbol>}` in a line of `manual` reads that resolved parameter (its
- * range and default as the parameter table words them, or its bare limit), so the README never
+ * range and default as the parameter table words them, or its bare limit), so the catalogue never
  * retypes a number omx-contract or the declaration holds. A symbol no parameter has, or any other
  * `{word:...}`, is refused. A `summary` reads the same words (`summaryOf`). */
 export function fillManual(d, line, what = 'manual') {
@@ -798,7 +798,7 @@ export function fillManual(d, line, what = 'manual') {
   return out;
 }
 
-/** The README catalogue's words for a plugin: its `summary` with the numbers it reads from the declaration filled in
+/** The catalogue's words for a plugin: its `summary` with the numbers it reads from the declaration filled in
  * (`up to {max:fxDelayTime} ms`), else its description as the descriptor states it. */
 export function summaryOf(d) {
   return d.summary === undefined ? d.description : fillManual(d, d.summary, 'summary');
@@ -1362,7 +1362,7 @@ const byStem = (a, b) => a.stem.localeCompare(b.stem, 'en', { numeric: true });
 
 /** Each region's lines, from the shipped plugins' declarations. */
 export const SHARED = {
-  'README.md': {
+  'docs/catalogue.md': {
     catalogue: (ds) => [
       '',
       '| Plugin | CLAP id | LV2 URI | What it does |',
