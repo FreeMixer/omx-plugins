@@ -768,6 +768,10 @@
             "$ref": "#/$defs/section"
           }
         },
+        "visibleWhen": {
+          "$ref": "https://github.com/FreeMixer/omx-panel/schema/panel.schema.json#/$defs/visibleWhen",
+          "description": "Each control shown only while another control holds certain values, by symbol: `{ param, values }`, or for a count `{ param, atLeast: n }` (a band's controls follow a band count). The rule is omx-panel's (schema/panel.schema.json), which carries it into the description's visible and mask."
+        },
         "widgets": {
           "type": "object",
           "title": "Widgets",

@@ -2983,7 +2983,649 @@
           "order"
         ]
       }
-    ]
+    ],
+    "visibleWhen": {
+      "eq1Type": {
+        "param": "eqBands",
+        "atLeast": 1
+      },
+      "eq1Freq": {
+        "param": "eqBands",
+        "atLeast": 1
+      },
+      "eq1Gain": {
+        "param": "eqBands",
+        "atLeast": 1
+      },
+      "eq1Q": {
+        "param": "eqBands",
+        "atLeast": 1
+      },
+      "eq1On": {
+        "param": "eqBands",
+        "atLeast": 1
+      },
+      "eq2Type": {
+        "param": "eqBands",
+        "atLeast": 2
+      },
+      "eq2Freq": {
+        "param": "eqBands",
+        "atLeast": 2
+      },
+      "eq2Gain": {
+        "param": "eqBands",
+        "atLeast": 2
+      },
+      "eq2Q": {
+        "param": "eqBands",
+        "atLeast": 2
+      },
+      "eq2On": {
+        "param": "eqBands",
+        "atLeast": 2
+      },
+      "eq3Type": {
+        "param": "eqBands",
+        "atLeast": 3
+      },
+      "eq3Freq": {
+        "param": "eqBands",
+        "atLeast": 3
+      },
+      "eq3Gain": {
+        "param": "eqBands",
+        "atLeast": 3
+      },
+      "eq3Q": {
+        "param": "eqBands",
+        "atLeast": 3
+      },
+      "eq3On": {
+        "param": "eqBands",
+        "atLeast": 3
+      },
+      "eq4Type": {
+        "param": "eqBands",
+        "atLeast": 4
+      },
+      "eq4Freq": {
+        "param": "eqBands",
+        "atLeast": 4
+      },
+      "eq4Gain": {
+        "param": "eqBands",
+        "atLeast": 4
+      },
+      "eq4Q": {
+        "param": "eqBands",
+        "atLeast": 4
+      },
+      "eq4On": {
+        "param": "eqBands",
+        "atLeast": 4
+      },
+      "eq5Type": {
+        "param": "eqBands",
+        "atLeast": 5
+      },
+      "eq5Freq": {
+        "param": "eqBands",
+        "atLeast": 5
+      },
+      "eq5Gain": {
+        "param": "eqBands",
+        "atLeast": 5
+      },
+      "eq5Q": {
+        "param": "eqBands",
+        "atLeast": 5
+      },
+      "eq5On": {
+        "param": "eqBands",
+        "atLeast": 5
+      },
+      "eq6Type": {
+        "param": "eqBands",
+        "atLeast": 6
+      },
+      "eq6Freq": {
+        "param": "eqBands",
+        "atLeast": 6
+      },
+      "eq6Gain": {
+        "param": "eqBands",
+        "atLeast": 6
+      },
+      "eq6Q": {
+        "param": "eqBands",
+        "atLeast": 6
+      },
+      "eq6On": {
+        "param": "eqBands",
+        "atLeast": 6
+      },
+      "eq7Type": {
+        "param": "eqBands",
+        "atLeast": 7
+      },
+      "eq7Freq": {
+        "param": "eqBands",
+        "atLeast": 7
+      },
+      "eq7Gain": {
+        "param": "eqBands",
+        "atLeast": 7
+      },
+      "eq7Q": {
+        "param": "eqBands",
+        "atLeast": 7
+      },
+      "eq7On": {
+        "param": "eqBands",
+        "atLeast": 7
+      },
+      "eq8Type": {
+        "param": "eqBands",
+        "atLeast": 8
+      },
+      "eq8Freq": {
+        "param": "eqBands",
+        "atLeast": 8
+      },
+      "eq8Gain": {
+        "param": "eqBands",
+        "atLeast": 8
+      },
+      "eq8Q": {
+        "param": "eqBands",
+        "atLeast": 8
+      },
+      "eq8On": {
+        "param": "eqBands",
+        "atLeast": 8
+      },
+      "eq9Type": {
+        "param": "eqBands",
+        "atLeast": 9
+      },
+      "eq9Freq": {
+        "param": "eqBands",
+        "atLeast": 9
+      },
+      "eq9Gain": {
+        "param": "eqBands",
+        "atLeast": 9
+      },
+      "eq9Q": {
+        "param": "eqBands",
+        "atLeast": 9
+      },
+      "eq9On": {
+        "param": "eqBands",
+        "atLeast": 9
+      },
+      "eq10Type": {
+        "param": "eqBands",
+        "atLeast": 10
+      },
+      "eq10Freq": {
+        "param": "eqBands",
+        "atLeast": 10
+      },
+      "eq10Gain": {
+        "param": "eqBands",
+        "atLeast": 10
+      },
+      "eq10Q": {
+        "param": "eqBands",
+        "atLeast": 10
+      },
+      "eq10On": {
+        "param": "eqBands",
+        "atLeast": 10
+      },
+      "eq11Type": {
+        "param": "eqBands",
+        "atLeast": 11
+      },
+      "eq11Freq": {
+        "param": "eqBands",
+        "atLeast": 11
+      },
+      "eq11Gain": {
+        "param": "eqBands",
+        "atLeast": 11
+      },
+      "eq11Q": {
+        "param": "eqBands",
+        "atLeast": 11
+      },
+      "eq11On": {
+        "param": "eqBands",
+        "atLeast": 11
+      },
+      "eq12Type": {
+        "param": "eqBands",
+        "atLeast": 12
+      },
+      "eq12Freq": {
+        "param": "eqBands",
+        "atLeast": 12
+      },
+      "eq12Gain": {
+        "param": "eqBands",
+        "atLeast": 12
+      },
+      "eq12Q": {
+        "param": "eqBands",
+        "atLeast": 12
+      },
+      "eq12On": {
+        "param": "eqBands",
+        "atLeast": 12
+      },
+      "eq13Type": {
+        "param": "eqBands",
+        "atLeast": 13
+      },
+      "eq13Freq": {
+        "param": "eqBands",
+        "atLeast": 13
+      },
+      "eq13Gain": {
+        "param": "eqBands",
+        "atLeast": 13
+      },
+      "eq13Q": {
+        "param": "eqBands",
+        "atLeast": 13
+      },
+      "eq13On": {
+        "param": "eqBands",
+        "atLeast": 13
+      },
+      "eq14Type": {
+        "param": "eqBands",
+        "atLeast": 14
+      },
+      "eq14Freq": {
+        "param": "eqBands",
+        "atLeast": 14
+      },
+      "eq14Gain": {
+        "param": "eqBands",
+        "atLeast": 14
+      },
+      "eq14Q": {
+        "param": "eqBands",
+        "atLeast": 14
+      },
+      "eq14On": {
+        "param": "eqBands",
+        "atLeast": 14
+      },
+      "eq15Type": {
+        "param": "eqBands",
+        "atLeast": 15
+      },
+      "eq15Freq": {
+        "param": "eqBands",
+        "atLeast": 15
+      },
+      "eq15Gain": {
+        "param": "eqBands",
+        "atLeast": 15
+      },
+      "eq15Q": {
+        "param": "eqBands",
+        "atLeast": 15
+      },
+      "eq15On": {
+        "param": "eqBands",
+        "atLeast": 15
+      },
+      "eq16Type": {
+        "param": "eqBands",
+        "atLeast": 16
+      },
+      "eq16Freq": {
+        "param": "eqBands",
+        "atLeast": 16
+      },
+      "eq16Gain": {
+        "param": "eqBands",
+        "atLeast": 16
+      },
+      "eq16Q": {
+        "param": "eqBands",
+        "atLeast": 16
+      },
+      "eq16On": {
+        "param": "eqBands",
+        "atLeast": 16
+      },
+      "eq17Type": {
+        "param": "eqBands",
+        "atLeast": 17
+      },
+      "eq17Freq": {
+        "param": "eqBands",
+        "atLeast": 17
+      },
+      "eq17Gain": {
+        "param": "eqBands",
+        "atLeast": 17
+      },
+      "eq17Q": {
+        "param": "eqBands",
+        "atLeast": 17
+      },
+      "eq17On": {
+        "param": "eqBands",
+        "atLeast": 17
+      },
+      "eq18Type": {
+        "param": "eqBands",
+        "atLeast": 18
+      },
+      "eq18Freq": {
+        "param": "eqBands",
+        "atLeast": 18
+      },
+      "eq18Gain": {
+        "param": "eqBands",
+        "atLeast": 18
+      },
+      "eq18Q": {
+        "param": "eqBands",
+        "atLeast": 18
+      },
+      "eq18On": {
+        "param": "eqBands",
+        "atLeast": 18
+      },
+      "eq19Type": {
+        "param": "eqBands",
+        "atLeast": 19
+      },
+      "eq19Freq": {
+        "param": "eqBands",
+        "atLeast": 19
+      },
+      "eq19Gain": {
+        "param": "eqBands",
+        "atLeast": 19
+      },
+      "eq19Q": {
+        "param": "eqBands",
+        "atLeast": 19
+      },
+      "eq19On": {
+        "param": "eqBands",
+        "atLeast": 19
+      },
+      "eq20Type": {
+        "param": "eqBands",
+        "atLeast": 20
+      },
+      "eq20Freq": {
+        "param": "eqBands",
+        "atLeast": 20
+      },
+      "eq20Gain": {
+        "param": "eqBands",
+        "atLeast": 20
+      },
+      "eq20Q": {
+        "param": "eqBands",
+        "atLeast": 20
+      },
+      "eq20On": {
+        "param": "eqBands",
+        "atLeast": 20
+      },
+      "eq21Type": {
+        "param": "eqBands",
+        "atLeast": 21
+      },
+      "eq21Freq": {
+        "param": "eqBands",
+        "atLeast": 21
+      },
+      "eq21Gain": {
+        "param": "eqBands",
+        "atLeast": 21
+      },
+      "eq21Q": {
+        "param": "eqBands",
+        "atLeast": 21
+      },
+      "eq21On": {
+        "param": "eqBands",
+        "atLeast": 21
+      },
+      "eq22Type": {
+        "param": "eqBands",
+        "atLeast": 22
+      },
+      "eq22Freq": {
+        "param": "eqBands",
+        "atLeast": 22
+      },
+      "eq22Gain": {
+        "param": "eqBands",
+        "atLeast": 22
+      },
+      "eq22Q": {
+        "param": "eqBands",
+        "atLeast": 22
+      },
+      "eq22On": {
+        "param": "eqBands",
+        "atLeast": 22
+      },
+      "eq23Type": {
+        "param": "eqBands",
+        "atLeast": 23
+      },
+      "eq23Freq": {
+        "param": "eqBands",
+        "atLeast": 23
+      },
+      "eq23Gain": {
+        "param": "eqBands",
+        "atLeast": 23
+      },
+      "eq23Q": {
+        "param": "eqBands",
+        "atLeast": 23
+      },
+      "eq23On": {
+        "param": "eqBands",
+        "atLeast": 23
+      },
+      "eq24Type": {
+        "param": "eqBands",
+        "atLeast": 24
+      },
+      "eq24Freq": {
+        "param": "eqBands",
+        "atLeast": 24
+      },
+      "eq24Gain": {
+        "param": "eqBands",
+        "atLeast": 24
+      },
+      "eq24Q": {
+        "param": "eqBands",
+        "atLeast": 24
+      },
+      "eq24On": {
+        "param": "eqBands",
+        "atLeast": 24
+      },
+      "eq25Type": {
+        "param": "eqBands",
+        "atLeast": 25
+      },
+      "eq25Freq": {
+        "param": "eqBands",
+        "atLeast": 25
+      },
+      "eq25Gain": {
+        "param": "eqBands",
+        "atLeast": 25
+      },
+      "eq25Q": {
+        "param": "eqBands",
+        "atLeast": 25
+      },
+      "eq25On": {
+        "param": "eqBands",
+        "atLeast": 25
+      },
+      "eq26Type": {
+        "param": "eqBands",
+        "atLeast": 26
+      },
+      "eq26Freq": {
+        "param": "eqBands",
+        "atLeast": 26
+      },
+      "eq26Gain": {
+        "param": "eqBands",
+        "atLeast": 26
+      },
+      "eq26Q": {
+        "param": "eqBands",
+        "atLeast": 26
+      },
+      "eq26On": {
+        "param": "eqBands",
+        "atLeast": 26
+      },
+      "eq27Type": {
+        "param": "eqBands",
+        "atLeast": 27
+      },
+      "eq27Freq": {
+        "param": "eqBands",
+        "atLeast": 27
+      },
+      "eq27Gain": {
+        "param": "eqBands",
+        "atLeast": 27
+      },
+      "eq27Q": {
+        "param": "eqBands",
+        "atLeast": 27
+      },
+      "eq27On": {
+        "param": "eqBands",
+        "atLeast": 27
+      },
+      "eq28Type": {
+        "param": "eqBands",
+        "atLeast": 28
+      },
+      "eq28Freq": {
+        "param": "eqBands",
+        "atLeast": 28
+      },
+      "eq28Gain": {
+        "param": "eqBands",
+        "atLeast": 28
+      },
+      "eq28Q": {
+        "param": "eqBands",
+        "atLeast": 28
+      },
+      "eq28On": {
+        "param": "eqBands",
+        "atLeast": 28
+      },
+      "eq29Type": {
+        "param": "eqBands",
+        "atLeast": 29
+      },
+      "eq29Freq": {
+        "param": "eqBands",
+        "atLeast": 29
+      },
+      "eq29Gain": {
+        "param": "eqBands",
+        "atLeast": 29
+      },
+      "eq29Q": {
+        "param": "eqBands",
+        "atLeast": 29
+      },
+      "eq29On": {
+        "param": "eqBands",
+        "atLeast": 29
+      },
+      "eq30Type": {
+        "param": "eqBands",
+        "atLeast": 30
+      },
+      "eq30Freq": {
+        "param": "eqBands",
+        "atLeast": 30
+      },
+      "eq30Gain": {
+        "param": "eqBands",
+        "atLeast": 30
+      },
+      "eq30Q": {
+        "param": "eqBands",
+        "atLeast": 30
+      },
+      "eq30On": {
+        "param": "eqBands",
+        "atLeast": 30
+      },
+      "eq31Type": {
+        "param": "eqBands",
+        "atLeast": 31
+      },
+      "eq31Freq": {
+        "param": "eqBands",
+        "atLeast": 31
+      },
+      "eq31Gain": {
+        "param": "eqBands",
+        "atLeast": 31
+      },
+      "eq31Q": {
+        "param": "eqBands",
+        "atLeast": 31
+      },
+      "eq31On": {
+        "param": "eqBands",
+        "atLeast": 31
+      },
+      "eq32Type": {
+        "param": "eqBands",
+        "atLeast": 32
+      },
+      "eq32Freq": {
+        "param": "eqBands",
+        "atLeast": 32
+      },
+      "eq32Gain": {
+        "param": "eqBands",
+        "atLeast": 32
+      },
+      "eq32Q": {
+        "param": "eqBands",
+        "atLeast": 32
+      },
+      "eq32On": {
+        "param": "eqBands",
+        "atLeast": 32
+      }
+    }
   },
   "manual": [
     "Five stages, each omx-dsp's instance face of the console's own kernel, run one after the other; each has its own switch:",
