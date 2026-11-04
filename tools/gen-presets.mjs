@@ -117,6 +117,9 @@ const DEFINITIONS = {
     ['mustard-c', 'Slow RMS', COMP(-22, 2.5, 20, 300, 3)],
     ['mustard-d', 'Firm RMS', COMP(-14, 6, 8, 150, 4)],
     ['ssl-bus-glue', 'Bus Glue 4:1', COMP(-10, 4, 30, 300, 1.5)],
+    // the ducker (openmixer ducker spec §3 item 4): ratio 20 held at a -12 dB range, a fast duck and a slow return;
+    // the key is the host's (keySource is left out), and the threshold and the rest come up at their defaults
+    ['ducker', 'Ducker', { ratio: 20, attackMs: 1, releaseMs: 300, duck: 1, rangeDb: -12 }],
   ],
   // the card's uses (the remaining-FX wave, FX-1): a vocal harsh only when pushed, proximity boom, a
   // monitor ring that appears at level; one band each, cutting while the band is loud
