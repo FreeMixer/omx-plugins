@@ -216,6 +216,7 @@ jobs:
           # the test instruments: omx-plugins-test, outside every CLAP search path
           rpm -qlp rpms/omx-plugins-test-[0-9]*.${{ matrix.arch }}.rpm | grep -v '^/usr/lib/.build-id' | sort > files-test.txt
           { printf '%s\n' /usr/libexec/omx-plugins /usr/libexec/omx-plugins/test \
+              /usr/share/doc/omx-plugins-test /usr/share/doc/omx-plugins-test/README.md \
               /usr/share/licenses/omx-plugins-test /usr/share/licenses/omx-plugins-test/LICENSE
             for t in $teststems; do echo "/usr/libexec/omx-plugins/test/$t.clap"; done; } | sort > expected-test.txt
           diff -u expected-test.txt files-test.txt
@@ -232,6 +233,7 @@ jobs:
           cdir=/usr/share/omx-contract/contract.d/3/omx-plugins
           rpm -qlp rpms/omx-plugins-contract-[0-9]*.noarch.rpm | sort > files-contract.txt
           { printf '%s\n' "$cdir" "$cdir/MANIFEST.json" "$cdir/plugins" \
+              /usr/share/doc/omx-plugins-contract /usr/share/doc/omx-plugins-contract/README.md \
               /usr/share/licenses/omx-plugins-contract /usr/share/licenses/omx-plugins-contract/LICENSE
             for d in plugins/*/*.descriptor.json; do echo "$cdir/plugins/$(basename "$d" .descriptor.json).json"; done; } | sort > expected-contract.txt
           diff -u expected-contract.txt files-contract.txt

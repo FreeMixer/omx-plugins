@@ -21,6 +21,8 @@
 #                   (tools/round-trip.{sh,mjs}, with its two sabotage arms; part of `make test`)
 #   make contract-union  parallel make targets render omx-contract's union into private directories and read it whole
 #                   (tools/test/contract-union-race-test.mjs; part of `make test` and `make test-faces`)
+#   make face-ids   the host's bypass and LV2 enabled and latency sit at omx-contract's permanent ids (OMX_PLUGIN_FACE_IDS), none
+#                   moved by an appended parameter (tools/test/face-ids-test.mjs, with its self-test; part of `make test`)
 #   make probe-checks  clap-params-check, panel-check, clap-ext-check and port-groups-check each fail on a built face that is wrong,
 #                   one change at a time (tools/test/probe-checks-selftest.mjs; part of `make test`)
 #   make eq-probe-race  parallel make targets each build build/eq-default-probe privately and run it whole
@@ -28,7 +30,7 @@
 #   make param-tie   every by-reference parameter's symbol is its control's words or says its `control`: swapped refs are refused
 #                   (FreeMixer/omx-plugins#58; tools/test/param-tie-test.mjs; part of `make test`)
 #   make summary-numbers  a plugin summary reads its numbers from the declaration: none types a limit or default of its parameters,
-#                   and a moved contract moves the README row (FreeMixer/omx-plugins#174; tools/test/summary-numbers-test.mjs; part of `make test`)
+#                   and a moved contract moves the catalogue row (FreeMixer/omx-plugins#174; tools/test/summary-numbers-test.mjs; part of `make test`)
 #   make phaser-depth  omx-phaser's generated panel publishes its depth role on depthOct, in octaves (FreeMixer/omx-plugins#232;
 #                   tools/test/phaser-depth-role-test.mjs and its --self-test; part of `make test`)
 #   make band-groups  omx-eq8's generated descriptor and TTL hold one LV2 port group per band, Band 1 ... Band 8 in band
@@ -39,7 +41,7 @@
 #   make modgui     every plugin's MOD GUI is what omx-panel writes from its descriptor and its declared panel: each plugin's
 #                   `make check` (the generated-fresh step of CI runs it beside `node tools/gen.mjs --check`)
 #   make manual     each declaration's manual follows omx-contract: a travel moved in a copy of the release moves
-#                   the README section's range and default (tools/test/manual-perturb.mjs)
+#                   the catalogue section's range and default (tools/test/manual-perturb.mjs)
 #   make params-doc  write docs/plugins/: one page of every parameter for each plugin and the index (tools/params-doc.mjs, from the declarations)
 #   make check-params-doc  the committed pages are what the declarations generate, and say what the generated TTLs say (tools/test/params-doc-test.mjs); run by CI beside `node tools/gen.mjs --check`
 #   make panel-copies  no tracked file is a film strip or a fixture omx-panel renders or ships: `omx-panel copies`
@@ -158,11 +160,11 @@ LIB_FLAGS  := -fPIC -fvisibility=hidden -DOMX_CLAP_STATIC -Iinclude
 # read only by the targets that build the archive, so `make version` and the rest need no omx-dsp
 lib_cflags = $(call dep_check,omxdsp,$(OMXDSP_MIN))$(call dep_check,omx-contract,$(CONTRACT_MIN))$(shell $(PKG_CONFIG) --cflags omxdsp omx-contract omx-clap-core clap)
 
-.PHONY: summary-numbers param-tie presets presets-figures test-role all lib lib-test test test-faces units panel-layout descriptor-view lv2-units lv2-deprecated lv2-maintainer lv2-manifest release-version resource-hints format-tables contract-union probe-checks eq-probe-race band-groups phaser-depth geq-widgets round-trip hints modgui manual install install-pins install-test package-lists install-devel install-contract contract-dir lv2bench-ran clean version recipe-test completeness selftest private-refs params-doc check-params-doc strip-crosscheck strip-bands strip-bands-bench meters-abi meter-level dsp-copies panel-copies meter-ring clap-validate
+.PHONY: summary-numbers param-tie presets presets-figures test-role all lib lib-test test test-faces units panel-layout descriptor-view lv2-units lv2-deprecated lv2-maintainer lv2-manifest release-version resource-hints format-tables contract-union probe-checks face-ids eq-probe-race band-groups phaser-depth geq-widgets round-trip hints modgui manual install install-pins install-test package-lists install-devel install-contract contract-dir lv2bench-ran clean version recipe-test completeness selftest private-refs params-doc check-params-doc strip-crosscheck strip-bands strip-bands-bench meters-abi meter-level dsp-copies panel-copies meter-ring clap-validate
 all: lib
 	@for p in $(PLUGINS); do $(MAKE) -C $$p all || exit 1; done
 lib: $(LIB) $(LIB_PC)
-test: lib units panel-layout descriptor-view lv2-units lv2-deprecated lv2-maintainer lv2-manifest release-version resource-hints format-tables contract-union contract-dir lv2bench-ran probe-checks eq-probe-race band-groups phaser-depth geq-widgets summary-numbers param-tie
+test: lib units panel-layout descriptor-view lv2-units lv2-deprecated lv2-maintainer lv2-manifest release-version resource-hints format-tables contract-union contract-dir lv2bench-ran probe-checks eq-probe-race band-groups phaser-depth geq-widgets summary-numbers param-tie face-ids
 	@if [ -z "$(PLUGINS)" ]; then echo "no plugins yet"; fi
 	@for p in $(PLUGINS); do $(MAKE) -C $$p test || exit 1; done
 	@$(MAKE) -s round-trip
@@ -215,6 +217,11 @@ contract-union:
 # the four probe checkers (params, panel, CLAP extensions, port groups) each go red on a face that is wrong, one change at a time
 probe-checks:
 	node tools/test/probe-checks-selftest.mjs
+# the host's bypass (CLAP) and enabled and latency (LV2) at omx-contract's permanent ids in every plugin, none moved by an
+# appended parameter or an added sidechain; the self-test holds the rule it replaced red
+face-ids:
+	node tools/test/face-ids-test.mjs
+	node tools/test/face-ids-test.mjs --self-test
 # the EQ default probe is run whole while other processes build it (make -j): a fake compiler, readers a little apart
 eq-probe-race:
 	node tools/test/eq-probe-race-test.mjs

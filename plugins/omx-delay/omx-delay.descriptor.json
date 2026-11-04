@@ -11,7 +11,7 @@
     "name": "omx delay",
     "vendor": "openmixer",
     "version": "0.17.0",
-    "doc": "The OpenMixer console's stereo delay: one time, feedback through a tone filter, ping-pong and a wet/dry mix.",
+    "doc": "The OpenMixer console's stereo delay: one time, free or synced to the host's tempo, feedback through a tone filter, ping-pong, read taps, a tape or analog colour, a wet/dry mix and a duck under the input.",
     "features": [
       "audio-effect"
     ]
@@ -518,6 +518,217 @@
           "at": "omx-dsp@0.28.0"
         }
       }
+    },
+    {
+      "id": 17,
+      "symbol": "sync",
+      "name": "Sync",
+      "doc": "Free: the Time control. Tempo: the Division at the host's tempo (the CLAP transport's tempo, the LV2 time:Position's time:beatsPerMinute on the Control port). While the host hands no tempo the delay keeps the Time control, as at Free.",
+      "kind": "choice",
+      "ids": [
+        "0",
+        "1"
+      ],
+      "labels": [
+        "Free",
+        "Tempo"
+      ],
+      "values": [
+        0,
+        1
+      ],
+      "default": "0",
+      "group": [
+        "Tempo"
+      ],
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/delay.json#DELAY_SYNCS",
+          "at": "omx-dsp@0.28.0"
+        }
+      }
+    },
+    {
+      "id": 18,
+      "symbol": "division",
+      "name": "Division",
+      "kind": "choice",
+      "ids": [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9",
+        "10",
+        "11",
+        "12",
+        "13",
+        "14",
+        "15",
+        "16",
+        "17"
+      ],
+      "labels": [
+        "1/1",
+        "1/1 dotted",
+        "1/1 triplet",
+        "1/2",
+        "1/2 dotted",
+        "1/2 triplet",
+        "1/4",
+        "1/4 dotted",
+        "1/4 triplet",
+        "1/8",
+        "1/8 dotted",
+        "1/8 triplet",
+        "1/16",
+        "1/16 dotted",
+        "1/16 triplet",
+        "1/32",
+        "1/32 dotted",
+        "1/32 triplet"
+      ],
+      "values": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17
+      ],
+      "default": "6",
+      "group": [
+        "Tempo"
+      ],
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/delay.json#DELAY_DIVISIONS",
+          "at": "omx-dsp@0.28.0"
+        }
+      }
+    },
+    {
+      "id": 19,
+      "symbol": "mode",
+      "name": "Mode",
+      "kind": "choice",
+      "ids": [
+        "0",
+        "1",
+        "2"
+      ],
+      "labels": [
+        "Digital",
+        "Tape",
+        "Analog"
+      ],
+      "values": [
+        0,
+        1,
+        2
+      ],
+      "default": "0",
+      "group": [
+        "Delay"
+      ],
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/delay.json#DELAY_MODES",
+          "at": "omx-dsp@0.28.0"
+        }
+      }
+    },
+    {
+      "id": 20,
+      "symbol": "duckDb",
+      "name": "Duck",
+      "kind": "travel",
+      "travel": {
+        "min": -24,
+        "max": 0,
+        "step": 0,
+        "unit": "dB",
+        "default": 0,
+        "scale": "linear"
+      },
+      "group": [
+        "Duck"
+      ],
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/delay.json#DELAY_DUCK_DB_RANGE",
+          "at": "omx-dsp@0.28.0"
+        }
+      }
+    },
+    {
+      "id": 21,
+      "symbol": "duckThresholdDb",
+      "name": "Duck Threshold",
+      "kind": "travel",
+      "travel": {
+        "min": -60,
+        "max": 0,
+        "step": 1,
+        "unit": "dB",
+        "default": -30,
+        "scale": "stepped"
+      },
+      "group": [
+        "Duck"
+      ],
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/delay.json#DELAY_DUCK_THRESHOLD_DB_RANGE",
+          "at": "omx-dsp@0.28.0"
+        }
+      }
+    },
+    {
+      "id": 22,
+      "symbol": "duckReleaseMs",
+      "name": "Duck Release",
+      "kind": "travel",
+      "travel": {
+        "min": 20,
+        "max": 2000,
+        "step": 1,
+        "unit": "ms",
+        "default": 250,
+        "scale": "stepped"
+      },
+      "group": [
+        "Duck"
+      ],
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/delay.json#DELAY_DUCK_RELEASE_MS_RANGE",
+          "at": "omx-dsp@0.28.0"
+        }
+      }
     }
   ],
   "ports": [
@@ -541,8 +752,10 @@
     }
   ],
   "needs": {
+    "tempo": true,
     "extensions": {
       "optional": [
+        "urid:map",
         "lv2:hardRTCapable"
       ]
     }

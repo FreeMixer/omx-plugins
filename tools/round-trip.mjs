@@ -61,25 +61,25 @@ export const LOSSES = {
   'lv2 controls[].travel.unit "dB/oct"': 2,
   // CLAP: no row reads a unit, a linear or log scale, a step, a choice (our faces set no CLAP_PARAM_IS_ENUM), the
   // session symbol, the LV2 URI, a side-chain's role or what an LV2 host may lend
-  'clap controls[].travel.unit': 536,
-  'clap controls[].travel.scale': 477,
-  'clap controls[].travel.step': 536,
-  'clap controls[].kind': 261,
-  'clap controls[].ids': 133,
-  'clap controls[].values': 133,
-  'clap controls[].labels': 133,
-  'clap controls[].default': 261,
-  'clap controls[].symbol': 797,
+  'clap controls[].travel.unit': 539,
+  'clap controls[].travel.scale': 478,
+  'clap controls[].travel.step': 539,
+  'clap controls[].kind': 264,
+  'clap controls[].ids': 136,
+  'clap controls[].values': 136,
+  'clap controls[].labels': 136,
+  'clap controls[].default': 264,
+  'clap controls[].symbol': 803,
   'clap plugin.uri': 29,
   'clap ports[].role': 2,
   'clap needs.extensions.optional': 29,
   // LV2: no row reads a step, automation, the plugin's version or vendor (our .ttl writes no doap:maintainer); a
   // control's id is its symbol and a point's id its label, so the CLAP id and our point ids are no LV2 word; the
   // audio ports are one per channel, with the generator's symbols and names
-  'lv2 controls[].travel.step': 536,
-  'lv2 controls[].automatable': 797,
-  'lv2 controls[].id': 797,
-  'lv2 controls[].ids': 133,
+  'lv2 controls[].travel.step': 539,
+  'lv2 controls[].automatable': 803,
+  'lv2 controls[].id': 803,
+  'lv2 controls[].ids': 136,
   'lv2 plugin.version': 29,
   'lv2 plugin.vendor': 29,
   'lv2 ports[].id': 60,
@@ -89,6 +89,12 @@ export const LOSSES = {
   'lv2 controls[].group (panel section)': 280,
   // the toggles UPSTREAM names, scanned as travels, carry no toggle's default
   'lv2 controls[].default': 128,
+  // neither face carries a control's prose (omx-delay's sync), nor states that it reads the tempo: CLAP has no static
+  // word for it, and the LV2 face's control port supports time:Position, which a scan reads as no tempo word
+  'clap controls[].doc': 1,
+  'lv2 controls[].doc': 1,
+  'clap needs.tempo': 1,
+  'lv2 needs.tempo': 1,
 };
 
 /** A break in plugin-hostd's wave tip, reported, each `differs` it causes printed with it

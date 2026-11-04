@@ -25,6 +25,11 @@
     lv2:appliesTo <urn:openmixer:comp> ;
     rdfs:seeAlso <presets.ttl> .
 
+<urn:openmixer:comp#preset-ducker>
+    a pset:Preset ;
+    lv2:appliesTo <urn:openmixer:comp> ;
+    rdfs:seeAlso <presets.ttl> .
+
 <urn:openmixer:comp#preset-fet-20>
     a pset:Preset ;
     lv2:appliesTo <urn:openmixer:comp> ;

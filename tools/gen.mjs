@@ -20,7 +20,7 @@
  *   plugins/<stem>/Makefile                          the build and `make test`
  *
  * and, from every plugin folder at once, the regions of the shared files between a `BEGIN
- * GENERATED <name>` line and its `END GENERATED <name>` line (SHARED below): the README's catalogue
+ * GENERATED <name>` line and its `END GENERATED <name>` line (SHARED below): the catalogue's
  * and sections, the RPM %files lists, CI's installed-file lists and libomxplugins' table of CLAP
  * entries (include/omx_clap_static.h, lib/omx_clap_static.c). Adding a plugin touches only its
  * folder; two plugins' changes merge in either order.
@@ -44,7 +44,7 @@ import { faceBinding } from './instance-face.mjs';
 import { descriptorFile, descriptorOf, descriptorText, isWhole, panelDescription, portGroupsOf, travelUnit, viewOf } from './descriptor.mjs';
 import { lv2Designation, lv2UnitNames, lv2UnitRef } from './format-tables.mjs';
 import { DISPLAY_KINDS, DISPLAY_SOURCES, FAMILIES, PLACEMENTS, WIDGETS, pagesOf, panelFingerprint } from './omx-panel.mjs';
-import { CONTRACT_VERSION, contractFingerprint, contractOf } from './param-contract.mjs';
+import { CONTRACT_VERSION, contractFingerprint, contractOf, faceIds } from './param-contract.mjs';
 import { SPEC_FILE, controlOf, eqDefaultBands, findName, kernelControls, locateContract, packagingRange, paramKernel, resolveParam } from './omx-contract.mjs';
 import { bandsMacro, baseOf, expandVariant, variantStems } from './variants.mjs';
 import { omxdspInclude, render } from './template.mjs';
@@ -496,10 +496,16 @@ export const choicesOf = (p) => p.points ?? p.values?.map((label, k) => ({ value
 /** The port symbols every plugin has, which no parameter or key may take. */
 const FIXED_PORTS = ['in_l', 'in_r', 'out_l', 'out_r', 'enabled', 'latency'];
 
-/** The LV2 port list, in index order: audio in (and the sidechain key, when declared), audio out,
- * the declared parameters, enabled, latency; `lv2.enabledPort: "first"` puts enabled before the
- * parameters. One rule, read by the TTL, the MOD GUI and (as macros) the LV2 C face. */
-export function lv2Ports(d) {
+/** Whether the plugin reads the host's tempo: its descriptor's needs.tempo. Its LV2 face then has a `control` atom
+ * input, the port right after the face's own (enabled, latency), so an appended parameter moves it no more than them. */
+export const tempoOf = (d) => Boolean(d.descriptor?.needs?.tempo);
+
+/** The LV2 port list, in index order: the face's own ports at omx-contract's permanent indices (OMX_PLUGIN_FACE_IDS:
+ * enabled 0, latency 1), then (a plugin that reads the host's tempo) the `control` atom input, then audio in (and the
+ * sidechain key, when declared), audio out, then the declared parameters. Appending a parameter moves no port; adding
+ * a port moves neither enabled, latency nor control. `face` is the ids (default: this tree's contract).
+ * One rule, read by the TTL, the MOD GUI and (as macros) the LV2 C face. */
+export function lv2Ports(d, face = faceIds()) {
   const IN = 'lv2:AudioPort , lv2:InputPort', OUT = 'lv2:AudioPort , lv2:OutputPort';
   const audio = [
     { symbol: 'in_l', name: 'In L', a: IN }, { symbol: 'in_r', name: 'In R', a: IN },
@@ -507,15 +513,17 @@ export function lv2Ports(d) {
     { symbol: 'out_l', name: 'Out L', a: OUT }, { symbol: 'out_r', name: 'Out R', a: OUT },
   ];
   const params = d.params.map((p) => ({ symbol: p.symbol, name: p.name, a: 'lv2:ControlPort , lv2:InputPort', param: p }));
-  const enabled = { symbol: 'enabled', name: 'Enabled', a: 'lv2:ControlPort , lv2:InputPort', enabled: true };
-  const first = d.lv2.enabledPort === 'first';
-  return [
-    ...audio,
-    ...(first ? [enabled] : []),
-    ...params,
-    ...(first ? [] : [enabled]),
-    { symbol: 'latency', name: 'Latency', a: 'lv2:ControlPort , lv2:OutputPort', latency: true },
-  ].map((p, index) => ({ ...p, index }));
+  const fixed = new Map([
+    [face.enabledLv2Index, { symbol: 'enabled', name: 'Enabled', a: 'lv2:ControlPort , lv2:InputPort', enabled: true }],
+    [face.latencyLv2Index, { symbol: 'latency', name: 'Latency', a: 'lv2:ControlPort , lv2:OutputPort', latency: true }],
+  ]);
+  const rest = [...(tempoOf(d) ? [{ symbol: 'control', name: 'Control', a: 'atom:AtomPort , lv2:InputPort', time: true }] : []),
+    ...audio, ...params];
+  const n = rest.length + fixed.size;
+  if (fixed.size !== 2 || [...fixed.keys()].some((i) => !(i >= 0 && i < n))) throw new Error(`${d.stem}: the face's LV2 indices ${[...fixed.keys()]} do not fit ${n} ports`);
+  const out = [];
+  for (let index = 0, k = 0; index < n; index++) out.push({ ...(fixed.get(index) ?? rest[k++]), index });
+  return out;
 }
 
 const cf = (n) => `${Number.isInteger(n) ? `${n}.0` : `${n}`}f`;
@@ -629,7 +637,7 @@ static inline uint32_t ${bandCountFn(d, el)}(const float *values) {
 #define OMX_${K}_DECL_DIGEST "${digestOf(d.params)}"
 
 /* org.openmixer.param-contract/1 (tools/param-contract.mjs): each parameter's unit, scale and step, in
- * id order; the host's bypass, the last id, is the face's. */
+ * id order; the host's bypass, CLAP id OMX_PLUGIN_FACE_BYPASS_CLAP_ID (omx-contract), is the face's. */
 #define OMX_${K}_PARAM_CONTRACT_VERSION ${CONTRACT_VERSION}u
 #define OMX_${K}_PARAM_CONTRACT_FINGERPRINT "${contractFingerprint(contractOf(d, scaleOf))}"
 static const struct omx_param_contract_row OMX_${K}_PARAM_CONTRACT[${P}_COUNT] = {
@@ -638,7 +646,8 @@ ${contractOf(d, scaleOf).slice(0, -1).map((r) => `  { ${r.unitEnum}u, OMX_CLAP_S
 
 ${emitHintsC(K, d.hints ?? [])}
 ${emitPanelRows(d)}
-/* LV2 port indices (tools/gen.mjs lv2Ports): audio, then parameter i at FIRST_PARAM + i, then these. */
+/* LV2 port indices (tools/gen.mjs lv2Ports): enabled and latency at omx-contract's permanent indices, the audio ports,
+ * then parameter i at FIRST_PARAM + i. */
 ${ports.filter((p) => !p.param).map((p) => `#define OMX_${K}_LV2_PORT_${macro(p.symbol)} ${p.index}u`).join('\n')}
 #define OMX_${K}_LV2_PORT_FIRST_PARAM ${firstParam}u
 #define OMX_${K}_LV2_PORT_COUNT ${ports.length}u
@@ -696,16 +705,19 @@ export function emitPluginTtl(d) {
       lines.push('        lv2:default 1 ;', '        lv2:minimum 0 ;', '        lv2:maximum 1 ;', '        lv2:designation lv2:enabled ;', '        lv2:portProperty lv2:toggled ;');
     } else if (p.latency) {
       lines.push('        lv2:designation lv2:latency ;', '        lv2:portProperty lv2:integer ;', '        units:unit units:frame ;');
+    } else if (p.time) {
+      // the host's transport: time:Position objects, read for their time:beatsPerMinute; optional, no tempo without it
+      lines.push('        atom:bufferType atom:Sequence ;', '        atom:supports time:Position ;', '        lv2:designation lv2:control ;', '        lv2:portProperty lv2:connectionOptional ;');
     }
     return `    [\n${lines.join('\n').replace(/ ;$/, '')}\n    ]`;
   };
   return `${TTL_BANNER}# GENERATED by tools/gen.mjs from plugins/${d.stem}/${d.stem}.decl.json — DO NOT EDIT BY HAND.
-@prefix doap:  <http://usefulinc.com/ns/doap#> .
+${tempoOf(d) ? '@prefix atom:  <http://lv2plug.in/ns/ext/atom#> .\n' : ''}@prefix doap:  <http://usefulinc.com/ns/doap#> .
 @prefix foaf:  <http://xmlns.com/foaf/0.1/> .
 @prefix lv2:   <http://lv2plug.in/ns/lv2core#> .
 ${hintPrefix(d, (p) => p !== 'xsd')}${d.params.some((q, i) => faceDesignation(d, i)?.startsWith('param:')) ? '@prefix param: <http://lv2plug.in/ns/ext/parameters#> .\n' : ''}${d.panel ? '@prefix pg:    <http://lv2plug.in/ns/ext/port-groups#> .\n' : ''}${d.params.some((q) => scaleOf(q) === 'log') ? '@prefix pprops: <http://lv2plug.in/ns/ext/port-props#> .\n' : ''}${d.params.some((q) => choicesOf(q)) ? '@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .\n' : ''}@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
-@prefix units: <http://lv2plug.in/ns/extensions/units#> .
-${hintPrefix(d, (p) => p === 'xsd')}
+${tempoOf(d) ? '@prefix time:  <http://lv2plug.in/ns/ext/time#> .\n' : ''}@prefix units: <http://lv2plug.in/ns/extensions/units#> .
+${tempoOf(d) ? '@prefix urid:  <http://lv2plug.in/ns/ext/urid#> .\n' : ''}${hintPrefix(d, (p) => p === 'xsd')}
 <${d.url}>
     a doap:Project ;
     doap:name "omx-plugins" ;
@@ -720,7 +732,7 @@ ${hintPrefix(d, (p) => p === 'xsd')}
     lv2:microVersion ${d.version.split('.')[2]} ;
     rdfs:comment ${ttlStr(d.description)} ;
     lv2:optionalFeature lv2:hardRTCapable ;
-${hintTriples(d.hintVocabulary, d.hints ?? []).map((l) => `${l}\n`).join('')}    lv2:port
+${tempoOf(d) ? '    lv2:optionalFeature urid:map ;\n' : ''}${hintTriples(d.hintVocabulary, d.hints ?? []).map((l) => `${l}\n`).join('')}    lv2:port
 ${lv2Ports(d).map(port).join(' ,\n')} .
 ${portGroupsOf(d).length ? `
 # lv2:displayPriority on a port group is the term Zynthian reads to order a plugin's groups (zynthian_lv2.py), and the
@@ -773,7 +785,7 @@ const cfloat = (n) => {
   return `${/[.e]/.test(t) ? t : `${t}.0`}f`;
 };
 
-/** How a README row and section read a resolved parameter: its range and its default, in words. */
+/** How a catalogue row and section read a resolved parameter: its range and its default, in words. */
 export function paramRow(p) {
   const unit = p.unit ? ` ${p.unit}` : '';
   if (p.kind === 'toggle') return { name: p.name, range: 'off / on', default: p.def ? 'on' : 'off' };
@@ -784,7 +796,7 @@ export function paramRow(p) {
 
 /** The manual's own words around the numbers: each `{range:<symbol>}`, `{default:<symbol>}`,
  * `{min:<symbol>}` and `{max:<symbol>}` in a line of `manual` reads that resolved parameter (its
- * range and default as the parameter table words them, or its bare limit), so the README never
+ * range and default as the parameter table words them, or its bare limit), so the catalogue never
  * retypes a number omx-contract or the declaration holds. A symbol no parameter has, or any other
  * `{word:...}`, is refused. A `summary` reads the same words (`summaryOf`). */
 export function fillManual(d, line, what = 'manual') {
@@ -798,7 +810,7 @@ export function fillManual(d, line, what = 'manual') {
   return out;
 }
 
-/** The README catalogue's words for a plugin: its `summary` with the numbers it reads from the declaration filled in
+/** The catalogue's words for a plugin: its `summary` with the numbers it reads from the declaration filled in
  * (`up to {max:fxDelayTime} ms`), else its description as the descriptor states it. */
 export function summaryOf(d) {
   return d.summary === undefined ? d.description : fillManual(d, d.summary, 'summary');
@@ -1117,6 +1129,7 @@ export function generateInstance(d) {
   // keyed: the plugin's key port reaches the face, through run (the key first) or run_keyed (the
   // mono key on key_l, key_r NULL)
   const keyed = face.keyed || (face.keyable && Boolean(d.sidechain));
+  if (tempoOf(d) && !face.tempo) throw new Error(`plugins/${d.stem}: its descriptor needs.tempo, and omx-dsp's face defines no omx_${d.face ?? d.kernel}_instance_set_tempo(${face.type} *, float bpm)`);
   const K = d.kernel.toUpperCase();
   const macro_ = (sym) => `OMX_${K}_PARAM_${macro(sym)}`;
   // a fixed control is its value, a parameter its port's
@@ -1137,7 +1150,7 @@ export function generateInstance(d) {
     runFn: keyed && !face.keyed ? 'run_keyed' : 'run', keyTail: keyed && !face.keyed ? ', NULL' : '',
     plan: oraclePlan(d.params, d.controls ?? [], { monitors: monitorsOf(d), engaged: engagedOf(d) }), held: heldOf(d),
     engaged: engagedOf(d).map(([i, v]) => ({ symbol: d.params[i].symbol, value: v })), monitors: monitorsOf(d).map((i) => ({ symbol: d.params[i].symbol })), stretch: d.stretch ?? oracleStretch(face), liveStretch: d.liveStretch ?? false, spanStretch: d.stretch !== undefined, noSpan: d.stretch === undefined, steps: d.params.map((p) => cfloat(d.sabotageStep?.[p.symbol] ?? stepOf(p))).join(', '),
-    chain: false,
+    chain: false, tempo: tempoOf(d),
     latencyChecks: latencyRows(d), measuresLatency: Boolean(d.latencyChecks),
     ...meterView(d, face),
   };
@@ -1362,7 +1375,7 @@ const byStem = (a, b) => a.stem.localeCompare(b.stem, 'en', { numeric: true });
 
 /** Each region's lines, from the shipped plugins' declarations. */
 export const SHARED = {
-  'README.md': {
+  'docs/catalogue.md': {
     catalogue: (ds) => [
       '',
       '| Plugin | CLAP id | LV2 URI | What it does |',
