@@ -60,6 +60,9 @@ jobs:
 
       - uses: actions/checkout@v4
 
+      # a dedupe/all run builds on its siblings' dedupe/all (.github/wave-deps); @main until FreeMixer/.github moves v1 past it
+      - uses: FreeMixer/.github/.github/actions/wave-deps@main
+
       - name: Install the build dependencies and the prober
         run: |
           dnf builddep -y --setopt=install_weak_deps=False packaging/omx-plugins.spec
