@@ -18,6 +18,9 @@
  * the block's peak at the inputs, in dBFS, measured here before the kernel runs (the kernel keeps no level of
  * its own); an output level the block's peak at the outputs, measured here after the kernel ran.
  *
+ * Tempo: a plugin whose descriptor says needs.tempo is handed each block's tempo from clap_process.transport
+ * (its `tempo` when CLAP_TRANSPORT_HAS_TEMPO is set), and none (0) when the host hands no transport or no tempo.
+ *
  * Audio ports: the main stereo pair in and out; a keyed plugin's second, mono, non-main input is the
  * sidechain key. A host that routes nothing to the key (no second port in the process call, no channel,
  * or no buffer) gets the kernel's own detector, as the face's NULL key is.
@@ -234,6 +237,11 @@ static clap_process_status g_process(const clap_plugin_t *p, const clap_process_
   const clap_audio_buffer_t *ao = &pr->audio_outputs[0];
   if (ai->channel_count < 2 || ao->channel_count < 2 || !ai->data32 || !ao->data32) return CLAP_PROCESS_ERROR;
   const int bypassed = g->values[G_BYPASS(g)] > 0.5f;
+  /* the block's tempo, for a plugin that reads one: the transport's when it carries a tempo, else none (0) */
+  if (f->tempo) {
+    const clap_event_transport_t *t = pr->transport;
+    f->tempo(g->core, t && (t->flags & CLAP_TRANSPORT_HAS_TEMPO) ? t->tempo : 0.0);
+  }
   f->core->resolve(g->core, g->values, bypassed);
   double mv[OMX_METER_RING_MAX];
   /* the inputs' peak, before the kernel runs (the outputs may be the inputs) */

@@ -21,7 +21,7 @@
  */
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { ROOT, loadDecl, lv2Ports, pluginDirs } from '../gen.mjs';
+import { ROOT, loadDecl, lv2Ports, pluginDirs, tempoOf } from '../gen.mjs';
 import { faceIds } from '../param-contract.mjs';
 
 const ids = faceIds();
@@ -31,10 +31,12 @@ const say = (ok, m) => {
   console.log(`${ok ? 'PASS' : 'FAIL'} face-ids ${m}`);
 };
 
-/** The rule this replaced: audio, the controls, enabled, latency; the bypass the CLAP id after the last control. */
+/** The rule this replaced: audio, the controls, enabled, latency, then the tempo's `control` input of a plugin that
+ * reads one; the bypass the CLAP id after the last control. */
 function oldLv2Ports(d) {
   const audio = ['in_l', 'in_r', ...(d.sidechain ? [d.sidechain.symbol] : []), 'out_l', 'out_r'].map((symbol) => ({ symbol }));
-  return [...audio, ...d.params.map((p) => ({ symbol: p.symbol, param: p })), { symbol: 'enabled', enabled: true }, { symbol: 'latency', latency: true }]
+  return [...audio, ...d.params.map((p) => ({ symbol: p.symbol, param: p })), { symbol: 'enabled', enabled: true }, { symbol: 'latency', latency: true },
+    ...(tempoOf(d) ? [{ symbol: 'control' }] : [])]
     .map((p, index) => ({ ...p, index }));
 }
 const oldBypassId = (d) => d.params.length;

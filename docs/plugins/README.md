@@ -13,7 +13,7 @@ One page for each plugin: its ids, its audio ports, its pages (the LV2 port grou
 | [omx clipper](omx-clipper.md) | `org.openmixer.clipper` | `urn:openmixer:clipper` | 3 | 1 |
 | [omx comp](omx-comp.md) | `org.openmixer.comp` | `urn:openmixer:comp` | 19 | 3 |
 | [omx deesser](omx-deesser.md) | `org.openmixer.deesser` | `urn:openmixer:deesser` | 8 | 1 |
-| [omx delay](omx-delay.md) | `org.openmixer.delay` | `urn:openmixer:delay` | 17 | 2 |
+| [omx delay](omx-delay.md) | `org.openmixer.delay` | `urn:openmixer:delay` | 23 | 4 |
 | [omx drive](omx-drive.md) | `org.openmixer.drive` | `urn:openmixer:drive` | 11 | 1 |
 | [omx dyneq](omx-dyneq.md) | `org.openmixer.dyneq` | `urn:openmixer:dyneq` | 73 | 7 |
 | [omx eq16](omx-eq16.md) | `org.openmixer.eq16` | `urn:openmixer:eq16` | 86 | 18 |

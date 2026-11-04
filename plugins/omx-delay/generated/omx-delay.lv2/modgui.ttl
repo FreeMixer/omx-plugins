@@ -35,5 +35,9 @@
             lv2:index 4 ;
             lv2:symbol "tone" ;
             lv2:name "Tone" ;
+        ] , [
+            lv2:index 5 ;
+            lv2:symbol "mode" ;
+            lv2:name "Mode" ;
         ] ;
     ] .
