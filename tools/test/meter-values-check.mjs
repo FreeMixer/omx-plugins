@@ -2,16 +2,19 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Pau Aliagas <linuxnow@gmail.com>
 /*
- * meter-values-check.mjs <got> <want> — the meters that are not level meters (a gain reduction), read
- * by tools/test/meter-level-digest.c --others, against the values committed in
- * tools/test/<face>.meter-others.txt. Each line is `<block> <meter> <value>`. The same lines must be
- * there in the same order, and each value must be within TOLERANCE_DB of the committed one: a gain
- * reduction is computed in float through libm's float functions, and C libraries round those last bits
- * differently (glibc 2.36 and 2.41 give readings 2e-6 dB apart), so the check tests the value, not its
- * bits. A NaN must stay a NaN, an infinity the same infinity, and `none` (no value that block) `none`.
+ * meter-values-check.mjs [--tolerance-db <x>] <got> <want> — the meter readings tools/test/meter-level-digest.c
+ * writes against the values committed in tools/test/<face>.meter-level.txt (the level meters, within the bound
+ * `meter-level-digest --tolerance` derives from omx-dsp's fast-maths bound, passed as --tolerance-db) or
+ * tools/test/<face>.meter-others.txt (the other meters, a gain reduction, within TOLERANCE_DB). Each line is
+ * `<block> <meter> <value>`. The same lines must be there in the same order, and each value must be within the
+ * tolerance of the committed one: a gain reduction is computed in float through libm's float functions, and C
+ * libraries round those last bits differently (glibc 2.36 and 2.41 give readings 2e-6 dB apart), and a level
+ * went through a gain curve omx-dsp may run through libmvec, so the check tests the value, not its bits. A NaN
+ * must stay a NaN, an infinity the same infinity, and `none` (no value that block) `none`.
  *
  *   meter-values-check.mjs --self-test   a copy passes, a move under the tolerance passes, and a move
- *                                        over it, a missing line, a NaN and a moved block each go red
+ *                                        over it, a missing line, a NaN and a moved block each go red, at
+ *                                        TOLERANCE_DB and at a tolerance given
  * Exit: 0 the values agree, 1 they do not, 2 a file could not be read.
  */
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
@@ -73,12 +76,14 @@ function selfTest() {
       ["a value where none was is red", ["0 0 0", "1 0 -2.96562195", "2 0 nan", "3 0 0", "4 0 -inf"], false],
       ["+inf where -inf was is red", ["0 0 0", "1 0 -2.96562195", "2 0 nan", "3 0 none", "4 0 inf"], false],
       ["a moved block is red", ["0 0 0", "2 0 -2.96562195", "2 0 nan", "3 0 none", "4 0 -inf"], false],
+      ["at a tolerance given, a move under it passes", ["0 0 0", "1 0 -2.96562193", "2 0 nan", "3 0 none", "4 0 -inf"], true, 6e-8],
+      ["at a tolerance given, a move over it is red", ["0 0 0", "1 0 -2.96562187", "2 0 nan", "3 0 none", "4 0 -inf"], false, 6e-8],
     ];
     let fail = 0;
-    for (const [what, got, pass] of cases) {
+    for (const [what, got, pass, tol] of cases) {
       writeFileSync(join(dir, "got"), `${got.join("\n")}\n`);
       writeFileSync(join(dir, "want"), `${want.join("\n")}\n`);
-      const r = compare(lines(join(dir, "got")), lines(join(dir, "want")));
+      const r = compare(lines(join(dir, "got")), lines(join(dir, "want")), tol);
       if ((r === null) === pass) console.log(`ok   ${what}`);
       else { console.log(`FAIL ${what}: ${r ?? "passed"}`); fail = 1; }
     }
@@ -91,8 +96,13 @@ function selfTest() {
 
 const args = process.argv.slice(2);
 if (args[0] === "--self-test") process.exit(selfTest());
-if (args.length !== 2) {
-  console.error("usage: meter-values-check.mjs <got> <want> | --self-test");
+let tolerance = TOLERANCE_DB;
+if (args[0] === "--tolerance-db") {
+  tolerance = Number(args[1]);
+  args.splice(0, 2);
+}
+if (args.length !== 2 || !(tolerance > 0)) {
+  console.error("usage: meter-values-check.mjs [--tolerance-db <x>] <got> <want> | --self-test");
   process.exit(2);
 }
 let got, want;
@@ -103,9 +113,9 @@ try {
   console.error(`meter-values-check: ${e.message}`);
   process.exit(2);
 }
-const r = compare(got, want);
+const r = compare(got, want, tolerance);
 if (r !== null) {
   console.error(`FAIL meter-values ${args[1]}: ${r}`);
   process.exit(1);
 }
-console.log(`ok   meter-values ${args[1]}: ${want.length} values within ${TOLERANCE_DB} dB`);
+console.log(`ok   meter-values ${args[1]}: ${want.length} values within ${tolerance} dB`);
