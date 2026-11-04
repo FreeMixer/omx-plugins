@@ -1352,6 +1352,45 @@
           "title": "Face bands",
           "description": "The count sheet key the element's face is compiled at, where it differs from `bands` (omx-dsp's eq face takes eq8, eq16 or eq32 only): the bands past `bands` are passed as `fixed` says, never exposed. Elements over one face share it. Left out, `bands`."
         },
+        "bandCount": {
+          "type": "object",
+          "required": [
+            "symbol",
+            "name",
+            "default",
+            "gates"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "symbol": {
+              "type": "string",
+              "pattern": "^[a-z][A-Za-z0-9]*$"
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1
+            },
+            "default": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9]*$"
+            },
+            "gates": {
+              "type": "string",
+              "pattern": "^[a-z][A-Za-z0-9]*$"
+            }
+          },
+          "title": "Band count",
+          "description": "How many of the element's `bands` run: the plugin's own integer parameter `symbol`, from one band to the `max` of `bands` in the kernel's count sheet, coming up at the `default` of the sheet key `default` names (eq's EQ_BAND_COUNTS: strip). Each band from the count on is passed to the face with its per-band control `gates` (eq's bandOn) off, so the face leaves it out of its bank: it costs no processing and the output is the output without it. The parameter comes after every parameter the plugin had (see `appended`), first among the element's additions."
+        },
+        "appended": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/param"
+          },
+          "title": "Appended parameters",
+          "description": "Parameters the element gained after its plugin shipped, by reference to its kernel as `params` are: flattened after every element's `params`, the order and the element's `bandCount`, element by element, so the ids and LV2 parameter ports a shipped plugin had do not move. A per-band control's parameters bind in `params` then `appended` order."
+        },
         "fixed": {
           "type": "object",
           "additionalProperties": {
