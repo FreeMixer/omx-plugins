@@ -336,6 +336,7 @@ Plus the host's bypass.
 | Makeup | 0 to 24 dB | 0 dB |
 | Key High-pass | 0 to 500 Hz, whole steps | 0 Hz |
 | Mix | 0 to 100 %, whole steps | 100 % |
+| Detector Topology | Feedforward / Feedback | Feedforward |
 
 Plus the host's bypass.
 

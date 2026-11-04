@@ -168,6 +168,20 @@
         lv2:portProperty lv2:integer ;
         units:unit units:pc ;
         pg:group <urn:openmixer:glue#glue>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 13 ;
+        lv2:symbol "detectorTopology" ;
+        lv2:name "Detector Topology" ;
+        lv2:default 0 ;
+        lv2:minimum 0 ;
+        lv2:maximum 1 ;
+        lv2:portProperty lv2:integer , lv2:enumeration ;
+        lv2:scalePoint
+            [ rdfs:label "Feedforward" ; rdf:value 0 ] ,
+            [ rdfs:label "Feedback" ; rdf:value 1 ] ;
+        pg:group <urn:openmixer:glue#glue>
     ] .
 
 # lv2:displayPriority on a port group is the term Zynthian reads to order a plugin's groups (zynthian_lv2.py), and the

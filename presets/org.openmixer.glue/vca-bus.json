@@ -1,0 +1,58 @@
+{
+  "format": "org.openmixer.preset/1",
+  "plugin": {
+    "id": "org.openmixer.glue"
+  },
+  "id": "vca-bus",
+  "name": "VCA Bus 4:1",
+  "carries": "params",
+  "params": [
+    {
+      "symbol": "thresholdDb",
+      "unit": "dB",
+      "value": -10
+    },
+    {
+      "symbol": "ratio",
+      "unit": "",
+      "value": 1,
+      "label": "4:1"
+    },
+    {
+      "symbol": "attack",
+      "unit": "",
+      "value": 0,
+      "label": "0.1 ms"
+    },
+    {
+      "symbol": "release",
+      "unit": "",
+      "value": 4,
+      "label": "Auto"
+    },
+    {
+      "symbol": "makeupDb",
+      "unit": "dB",
+      "value": 2
+    },
+    {
+      "symbol": "keyHpHz",
+      "unit": "Hz",
+      "value": 0
+    },
+    {
+      "symbol": "mixPct",
+      "unit": "%",
+      "value": 100
+    },
+    {
+      "symbol": "detectorTopology",
+      "unit": "",
+      "value": 1,
+      "label": "Feedback"
+    }
+  ],
+  "createdAt": "2026-10-17T00:00:00Z",
+  "modifiedAt": "2026-10-17T00:00:00Z",
+  "copyOf": null
+}

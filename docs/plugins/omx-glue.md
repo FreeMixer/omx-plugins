@@ -8,7 +8,7 @@ A bus compressor with the detents of a classic console: stepped ratio, attack an
 
 - CLAP id: `org.openmixer.glue`
 - LV2 URI: `urn:openmixer:glue`
-- Parameters: 7, plus the host's bypass
+- Parameters: 8, plus the host's bypass
 
 ## Audio ports
 
@@ -23,11 +23,11 @@ A page is where a host shows a parameter. In LV2 each page is a port group, `pg:
 
 | Page | LV2 group symbol | Priority | CLAP module | Parameters |
 |---|---|---|---|---|
-| Glue | `glue` | 1 | `Glue` | 7 |
+| Glue | `glue` | 1 | `Glue` | 8 |
 
 ## Parameters
 
-Ids are the order below, 0 to 6; a parameter appended later takes the next id. The bypass's id is its own (below).
+Ids are the order below, 0 to 7; a parameter appended later takes the next id. The bypass's id is its own (below).
 
 | Id | Symbol | Name | Unit | Min | Max | Default | Step or values | Flags | Page (priority) |
 |---|---|---|---|---|---|---|---|---|---|
@@ -38,6 +38,7 @@ Ids are the order below, 0 to 6; a parameter appended later takes the next id. T
 | 4 | `makeupDb` | Makeup | dB | 0 | 24 | 0 | continuous, linear | automatable | Glue (1) |
 | 5 | `keyHpHz` | Key High-pass | Hz | 0 | 500 | 0 | whole steps | automatable | Glue (1) |
 | 6 | `mixPct` | Mix | % | 0 | 100 | 100 | whole steps | automatable | Glue (1) |
+| 7 | `detectorTopology` | Detector Topology |  | 0 | 1 | Feedforward (0) | 0 Feedforward, 1 Feedback | automatable | Glue (1) |
 
 ## Bypass
 
