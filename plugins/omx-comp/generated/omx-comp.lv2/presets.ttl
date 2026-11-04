@@ -77,6 +77,30 @@
         [ lv2:symbol "duck" ; pset:value 0.0 ] ,
         [ lv2:symbol "rangeDb" ; pset:value -12.0 ] .
 
+<urn:openmixer:comp#preset-ducker>
+    a pset:Preset ;
+    lv2:appliesTo <urn:openmixer:comp> ;
+    rdfs:label "Ducker" ;
+    lv2:port
+        [ lv2:symbol "thresholdDb" ; pset:value -18.0 ] ,
+        [ lv2:symbol "ratio" ; pset:value 20.0 ] ,
+        [ lv2:symbol "kneeDb" ; pset:value 6.0 ] ,
+        [ lv2:symbol "attackMs" ; pset:value 1.0 ] ,
+        [ lv2:symbol "releaseMs" ; pset:value 300.0 ] ,
+        [ lv2:symbol "makeupDb" ; pset:value 0.0 ] ,
+        [ lv2:symbol "mixPct" ; pset:value 100.0 ] ,
+        [ lv2:symbol "kind" ; pset:value 0.0 ] ,
+        [ lv2:symbol "detectorOversampling" ; pset:value 0.0 ] ,
+        [ lv2:symbol "detectorTopology" ; pset:value 0.0 ] ,
+        [ lv2:symbol "keyHpHz" ; pset:value 0.0 ] ,
+        [ lv2:symbol "keyLpHz" ; pset:value 0.0 ] ,
+        [ lv2:symbol "keyTiltDb" ; pset:value 0.0 ] ,
+        [ lv2:symbol "keyListen" ; pset:value 0.0 ] ,
+        [ lv2:symbol "holdMs" ; pset:value 0.0 ] ,
+        [ lv2:symbol "detectLink" ; pset:value 0.0 ] ,
+        [ lv2:symbol "duck" ; pset:value 1.0 ] ,
+        [ lv2:symbol "rangeDb" ; pset:value -12.0 ] .
+
 <urn:openmixer:comp#preset-fet-20>
     a pset:Preset ;
     lv2:appliesTo <urn:openmixer:comp> ;
@@ -355,7 +379,7 @@
         [ lv2:symbol "mixPct" ; pset:value 100.0 ] ,
         [ lv2:symbol "kind" ; pset:value 0.0 ] ,
         [ lv2:symbol "detectorOversampling" ; pset:value 0.0 ] ,
-        [ lv2:symbol "detectorTopology" ; pset:value 0.0 ] ,
+        [ lv2:symbol "detectorTopology" ; pset:value 1.0 ] ,
         [ lv2:symbol "keyHpHz" ; pset:value 0.0 ] ,
         [ lv2:symbol "keyLpHz" ; pset:value 0.0 ] ,
         [ lv2:symbol "keyTiltDb" ; pset:value 0.0 ] ,

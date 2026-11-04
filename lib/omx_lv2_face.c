@@ -10,6 +10,12 @@
  *
  * A keyed plugin's sidechain key (lv2:isSideChain, connectionOptional) follows in_l and in_r; an
  * unconnected key is the kernel's own detector.
+ *
+ * A plugin that reads the host's tempo (its descriptor's needs.tempo) has one more input, after
+ * `latency`: `control`, an atom:Sequence that supports time:Position (connectionOptional). Each
+ * time:Position object's time:beatsPerMinute becomes the tempo, held until the next one (a host sends a
+ * position when it changes). With no urid:map, no port connected or no tempo received yet the tempo is
+ * none (0), and the kernel keeps its time control.
  */
 #include <stdalign.h>
 #include <stdbool.h>
@@ -20,8 +26,17 @@
 
 #include "omx_face_meters.h"
 #include "omx_lv2_face.h"
+#include <lv2/atom/atom.h>
+#include <lv2/atom/util.h>
+#include <lv2/time/time.h>
+#include <lv2/urid/urid.h>
 #include "omx_meter_ring.h"
 #include <omxdsp/omx_denormal.h>
+
+/* The URIDs a tempo reader needs, mapped once at instantiate. */
+typedef struct {
+  LV2_URID object, blank, position, bpm, a_float, a_double, a_int, a_long;
+} TimeUrids;
 
 /* One allocation: this, the control ports and the run's values (each param_count long), the meter ports
  * (meter_values long), then the core. */
@@ -37,12 +52,15 @@ typedef struct {
   const float **param;
   float *values;
   float **meter;
+  const LV2_Atom_Sequence *control; /* time:Position in; NULL: not connected */
+  int mapped;                       /* the host gave urid:map */
+  TimeUrids u;
+  double bpm; /* the last time:beatsPerMinute received; 0: none yet */
 } Face;
 
 LV2_Handle omx_lv2_face_instantiate(const LV2_Descriptor *d, double rate, const char *bundle,
                                     const LV2_Feature *const *features) {
   (void)bundle;
-  (void)features;
   if (!(rate > 0.0)) return NULL;
   const struct omx_face *f = ((const struct omx_lv2_face *)d)->face;
   const size_t n = f->param_count;
@@ -58,6 +76,16 @@ LV2_Handle omx_lv2_face_instantiate(const LV2_Descriptor *d, double rate, const 
   s->meter = (float **)(mem + at_meters);
   s->core = mem + at_core;
   s->rate = (uint32_t)rate;
+  if (f->tempo)
+    for (const LV2_Feature *const *x = features; x && *x; ++x)
+      if (strcmp((*x)->URI, LV2_URID__map) == 0 && (*x)->data) {
+        const LV2_URID_Map *m = (const LV2_URID_Map *)(*x)->data;
+        s->u = (TimeUrids){m->map(m->handle, LV2_ATOM__Object), m->map(m->handle, LV2_ATOM__Blank),
+                           m->map(m->handle, LV2_TIME__Position), m->map(m->handle, LV2_TIME__beatsPerMinute),
+                           m->map(m->handle, LV2_ATOM__Float),  m->map(m->handle, LV2_ATOM__Double),
+                           m->map(m->handle, LV2_ATOM__Int),    m->map(m->handle, LV2_ATOM__Long)};
+        s->mapped = 1;
+      }
   f->core->init(s->core, s->rate);
   return s;
 }
@@ -72,6 +100,7 @@ void omx_lv2_face_connect_port(LV2_Handle h, uint32_t port, void *data) {
   else if (port == p->out_r) s->out_r = (float *)data;
   else if (port == p->enabled) s->enabled = (const float *)data;
   else if (port == p->latency) s->latency = (float *)data;
+  else if (s->face->tempo && port == s->face->lv2_control) s->control = (const LV2_Atom_Sequence *)data;
   else if (port >= p->first_param && port < p->first_param + s->face->param_count)
     s->param[port - p->first_param] = (const float *)data;
   else if (port >= p->first_meter && port < p->first_meter + s->face->meter_values)
@@ -85,12 +114,40 @@ void omx_lv2_face_activate(LV2_Handle h) {
 
 static float value(const Face *s, uint32_t i) { return s->param[i] ? *s->param[i] : s->face->params[i].def; }
 
+/** A number atom's value, or -1 when `a` is none of float, double, int, long. */
+static double number(const Face *s, const LV2_Atom *a) {
+  if (!a) return -1.0;
+  if (a->type == s->u.a_float) return ((const LV2_Atom_Float *)a)->body;
+  if (a->type == s->u.a_double) return ((const LV2_Atom_Double *)a)->body;
+  if (a->type == s->u.a_int) return ((const LV2_Atom_Int *)a)->body;
+  if (a->type == s->u.a_long) return (double)((const LV2_Atom_Long *)a)->body;
+  return -1.0;
+}
+
+/** The block's tempo: the last time:Position's time:beatsPerMinute in the control sequence, kept across
+ * blocks; none (0) with no urid:map or nothing connected. */
+static double block_tempo(Face *s) {
+  if (!s->mapped || !s->control) return 0.0;
+  LV2_ATOM_SEQUENCE_FOREACH(s->control, ev) {
+    const LV2_Atom *a = &ev->body;
+    if (a->type != s->u.object && a->type != s->u.blank) continue;
+    const LV2_Atom_Object *o = (const LV2_Atom_Object *)a;
+    if (o->body.otype != s->u.position) continue;
+    const LV2_Atom *bpm = NULL;
+    lv2_atom_object_get(o, s->u.bpm, &bpm, 0);
+    const double v = number(s, bpm);
+    if (v > 0.0) s->bpm = v;
+  }
+  return s->bpm;
+}
+
 void omx_lv2_face_run(LV2_Handle h, uint32_t frames) {
   Face *s = (Face *)h;
   const struct omx_face_core *c = s->face->core;
   omx_denormals_off();
   const int bypass = s->enabled && *s->enabled < 0.5f;
   for (uint32_t i = 0; i < s->face->param_count; ++i) s->values[i] = value(s, i);
+  if (s->face->tempo) s->face->tempo(s->core, block_tempo(s));
   c->resolve(s->core, s->values, bypass);
   if (s->latency) *s->latency = (float)c->latency(s->core);
   const struct omx_face *f = s->face;

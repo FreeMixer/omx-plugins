@@ -17,6 +17,7 @@
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { faceIds } from './param-contract.mjs';
 import { baseOf } from './variants.mjs';
 
 export const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -89,7 +90,7 @@ export function pluginPage(root, stem) {
     '| Page | LV2 group symbol | Priority | CLAP module | Parameters |', '|---|---|---|---|---|',
     ...pages.map((p) => `| ${cell(p.path.join(' / '))} | \`${p.key}\` | ${p.priority} | \`${p.path.join('/')}\` | ${p.controls.length} |`), '',
     '## Parameters', '',
-    `Ids are the order below, 0 to ${n - 1}; the bypass takes the next id.`, '',
+    `Ids are the order below, 0 to ${n - 1}; a parameter appended later takes the next id. The bypass's id is its own (below).`, '',
     '| Id | Symbol | Name | Unit | Min | Max | Default | Step or values | Flags | Page (priority) |', '|---|---|---|---|---|---|---|---|---|---|'];
   for (const c of descriptor.controls) {
     const v = valueOf(c);
@@ -99,8 +100,8 @@ export function pluginPage(root, stem) {
     out.push(`| ${c.id} | \`${c.symbol}\` | ${cell(c.name)} | ${cell(unit)} | ${cell(v.min)} | ${cell(v.max)} | ${cell(v.def)} | ${cell(v.step)} | ${flags} | ${cell(page)} |`);
   }
   out.push('', '## Bypass', '',
-    `CLAP: the host's bypass, a parameter named Bypass at id ${n}, flagged automatable, stepped and bypass; 0 is processing, 1 bypassed.`,
-    `LV2: the port \`enabled\` (\`lv2:designation lv2:enabled\`), 1 is processing, 0 is bypassed${decl.lv2?.enabledPort === 'first' ? '; it comes before the parameter ports' : '; it comes after the parameter ports'}. The output port \`latency\` reports the latency in frames.`, '');
+    `CLAP: the host's bypass, a parameter named Bypass at id ${faceIds().bypassClapId} (0x${faceIds().bypassClapId.toString(16).toUpperCase()}) in every plugin, flagged automatable, stepped and bypass; 0 is processing, 1 bypassed. The id never moves when a parameter is appended.`,
+    `LV2: the port \`enabled\` (\`lv2:designation lv2:enabled\`) at index ${faceIds().enabledLv2Index}, 1 is processing, 0 is bypassed; the output port \`latency\` at index ${faceIds().latencyLv2Index} reports the latency in frames. Both come before the audio and parameter ports in every plugin, so neither moves; a preset or a session names a port by its symbol.`, '');
   return { text: `${out.join('\n')}`, name: pl.name, id: pl.id, uri: pl.uri, doc: pl.doc, controls: n, pages: pages.length };
 }
 

@@ -44,6 +44,12 @@
       "symbol": "mixPct",
       "unit": "%",
       "value": 100
+    },
+    {
+      "symbol": "detectorTopology",
+      "unit": "",
+      "value": 0,
+      "label": "Feedforward"
     }
   ],
   "createdAt": "2026-10-17T00:00:00Z",

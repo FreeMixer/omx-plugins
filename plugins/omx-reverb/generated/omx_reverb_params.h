@@ -123,7 +123,7 @@ static const char *const OMX_REVERB_PARAM_MODULES[OMX_REVERB_PARAM_COUNT] = {
 #define OMX_REVERB_DECL_DIGEST "a42c6e20426afd868f08938af4dfb54b487bdf4d8a5d9b13f75a967319df7009"
 
 /* org.openmixer.param-contract/1 (tools/param-contract.mjs): each parameter's unit, scale and step, in
- * id order; the host's bypass, the last id, is the face's. */
+ * id order; the host's bypass, CLAP id OMX_PLUGIN_FACE_BYPASS_CLAP_ID (omx-contract), is the face's. */
 #define OMX_REVERB_PARAM_CONTRACT_VERSION 1u
 #define OMX_REVERB_PARAM_CONTRACT_FINGERPRINT "3c6d0c052481f1fbafefc5f64bb8f16b76d00dfea1598888d5c90129a2e4a99d"
 static const struct omx_param_contract_row OMX_REVERB_PARAM_CONTRACT[OMX_REVERB_PARAM_COUNT] = {
@@ -205,14 +205,15 @@ static const struct omx_panel_rows OMX_REVERB_PANEL = {
   OMX_REVERB_PANEL_DEFAULTS, 1u,
 };
 
-/* LV2 port indices (tools/gen.mjs lv2Ports): audio, then parameter i at FIRST_PARAM + i, then these. */
-#define OMX_REVERB_LV2_PORT_IN_L 0u
-#define OMX_REVERB_LV2_PORT_IN_R 1u
-#define OMX_REVERB_LV2_PORT_OUT_L 2u
-#define OMX_REVERB_LV2_PORT_OUT_R 3u
-#define OMX_REVERB_LV2_PORT_ENABLED 17u
-#define OMX_REVERB_LV2_PORT_LATENCY 18u
-#define OMX_REVERB_LV2_PORT_FIRST_PARAM 4u
+/* LV2 port indices (tools/gen.mjs lv2Ports): enabled and latency at omx-contract's permanent indices, the tempo's control,
+ * the meters' outputs, the audio ports, then parameter i at FIRST_PARAM + i. */
+#define OMX_REVERB_LV2_PORT_ENABLED 0u
+#define OMX_REVERB_LV2_PORT_LATENCY 1u
+#define OMX_REVERB_LV2_PORT_IN_L 2u
+#define OMX_REVERB_LV2_PORT_IN_R 3u
+#define OMX_REVERB_LV2_PORT_OUT_L 4u
+#define OMX_REVERB_LV2_PORT_OUT_R 5u
+#define OMX_REVERB_LV2_PORT_FIRST_PARAM 6u
 /* The meters' output control ports, one per channel in the order their values are published, from here on. */
 #define OMX_REVERB_LV2_PORT_FIRST_METER 19u
 #define OMX_REVERB_LV2_PORT_COUNT 19u

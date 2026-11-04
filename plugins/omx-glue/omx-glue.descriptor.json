@@ -223,6 +223,35 @@
           "at": "omx-dsp@0.28.0"
         }
       }
+    },
+    {
+      "id": 7,
+      "symbol": "detectorTopology",
+      "name": "Detector Topology",
+      "kind": "choice",
+      "ids": [
+        "0",
+        "1"
+      ],
+      "labels": [
+        "Feedforward",
+        "Feedback"
+      ],
+      "values": [
+        0,
+        1
+      ],
+      "default": "0",
+      "group": [
+        "Glue"
+      ],
+      "automatable": true,
+      "source": {
+        "from": {
+          "link": "data/kernels/comp.json#DETECTOR_TOPOLOGY",
+          "at": "omx-dsp@0.28.0"
+        }
+      }
     }
   ],
   "ports": [

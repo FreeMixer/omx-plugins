@@ -1,4 +1,4 @@
-<div class="omx-pedal{{{cns}}} omx-family-delay" style="width:624px;height:350px">
+<div class="omx-pedal{{{cns}}} omx-family-delay" style="width:624px;height:566px">
     <!-- SPDX-License-Identifier: GPL-3.0-or-later -->
     <!-- Copyright (C) 2026 Pau Aliagas <linuxnow@gmail.com> -->
     <!-- GENERATED — DO NOT EDIT BY HAND. Produced by tools/modgui-gen.mjs from -->
@@ -35,8 +35,58 @@
                 <div class="omx-knob-image" mod-role="input-control-port" mod-port-symbol="tone"></div>
                 <span class="omx-control-title">Tone</span>
             </div>
+            <div class="omx-control omx-selector" style="left:368px;top:18px" title="Mode" data-symbol="mode" data-min="0" data-max="2" data-default="0">
+                <div class="omx-selector-image" mod-role="input-control-port" mod-port-symbol="mode" mod-widget="custom-select">
+                    <div class="omx-selector-value" mod-role="input-control-value" mod-port-symbol="mode"></div>
+                    <div class="omx-selector-list">
+                    <div class="omx-selector-option" mod-role="enumeration-option" mod-port-value="0">Digital</div>
+                    <div class="omx-selector-option" mod-role="enumeration-option" mod-port-value="1">Tape</div>
+                    <div class="omx-selector-option" mod-role="enumeration-option" mod-port-value="2">Analog</div>
+                    </div>
+                </div>
+                <span class="omx-control-title">Mode</span>
+            </div>
         </div>
-        <div class="omx-section" data-section="taps" style="left:16px;top:160px;width:592px;height:174px">
+        <div class="omx-section" data-section="tempo" style="left:16px;top:160px;width:592px;height:98px">
+            <h2 class="omx-section-title">Tempo</h2>
+            <div class="omx-control omx-selector" style="left:8px;top:18px" title="Sync" data-symbol="sync" data-min="0" data-max="1" data-default="0">
+                <div class="omx-selector-image" mod-role="input-control-port" mod-port-symbol="sync" mod-widget="custom-select">
+                    <div class="omx-selector-value" mod-role="input-control-value" mod-port-symbol="sync"></div>
+                    <div class="omx-selector-list">
+                    <div class="omx-selector-option" mod-role="enumeration-option" mod-port-value="0">Free</div>
+                    <div class="omx-selector-option" mod-role="enumeration-option" mod-port-value="1">Tempo</div>
+                    </div>
+                </div>
+                <span class="omx-control-title">Sync</span>
+            </div>
+            <div class="omx-control omx-selector" style="left:80px;top:18px" title="Division" data-symbol="division" data-min="0" data-max="17" data-default="6">
+                <div class="omx-selector-image" mod-role="input-control-port" mod-port-symbol="division" mod-widget="custom-select">
+                    <div class="omx-selector-value" mod-role="input-control-value" mod-port-symbol="division"></div>
+                    <div class="omx-selector-list">
+                    <div class="omx-selector-option" mod-role="enumeration-option" mod-port-value="0">1/1</div>
+                    <div class="omx-selector-option" mod-role="enumeration-option" mod-port-value="1">1/1 dotted</div>
+                    <div class="omx-selector-option" mod-role="enumeration-option" mod-port-value="2">1/1 triplet</div>
+                    <div class="omx-selector-option" mod-role="enumeration-option" mod-port-value="3">1/2</div>
+                    <div class="omx-selector-option" mod-role="enumeration-option" mod-port-value="4">1/2 dotted</div>
+                    <div class="omx-selector-option" mod-role="enumeration-option" mod-port-value="5">1/2 triplet</div>
+                    <div class="omx-selector-option" mod-role="enumeration-option" mod-port-value="6">1/4</div>
+                    <div class="omx-selector-option" mod-role="enumeration-option" mod-port-value="7">1/4 dotted</div>
+                    <div class="omx-selector-option" mod-role="enumeration-option" mod-port-value="8">1/4 triplet</div>
+                    <div class="omx-selector-option" mod-role="enumeration-option" mod-port-value="9">1/8</div>
+                    <div class="omx-selector-option" mod-role="enumeration-option" mod-port-value="10">1/8 dotted</div>
+                    <div class="omx-selector-option" mod-role="enumeration-option" mod-port-value="11">1/8 triplet</div>
+                    <div class="omx-selector-option" mod-role="enumeration-option" mod-port-value="12">1/16</div>
+                    <div class="omx-selector-option" mod-role="enumeration-option" mod-port-value="13">1/16 dotted</div>
+                    <div class="omx-selector-option" mod-role="enumeration-option" mod-port-value="14">1/16 triplet</div>
+                    <div class="omx-selector-option" mod-role="enumeration-option" mod-port-value="15">1/32</div>
+                    <div class="omx-selector-option" mod-role="enumeration-option" mod-port-value="16">1/32 dotted</div>
+                    <div class="omx-selector-option" mod-role="enumeration-option" mod-port-value="17">1/32 triplet</div>
+                    </div>
+                </div>
+                <span class="omx-control-title">Division</span>
+            </div>
+        </div>
+        <div class="omx-section" data-section="taps" style="left:16px;top:268px;width:592px;height:174px">
             <h2 class="omx-section-title">Taps</h2>
             <div class="omx-control omx-selector" style="left:8px;top:18px" title="Taps" data-symbol="fxDelayTaps" data-min="1" data-max="4" data-default="1">
                 <div class="omx-selector-image" mod-role="input-control-port" mod-port-symbol="fxDelayTaps" mod-widget="custom-select">
@@ -138,6 +188,21 @@
             <div class="omx-control omx-knob" style="left:224px;top:94px" title="Tap 4 Pan" data-symbol="tap3Pan" data-min="-1" data-max="1" data-default="0">
                 <div class="omx-knob-image" mod-role="input-control-port" mod-port-symbol="tap3Pan"></div>
                 <span class="omx-control-title">Tap 4 Pan</span>
+            </div>
+        </div>
+        <div class="omx-section" data-section="duck" style="left:16px;top:452px;width:592px;height:98px">
+            <h2 class="omx-section-title">Duck</h2>
+            <div class="omx-control omx-knob" style="left:8px;top:18px" title="Duck" data-symbol="duckDb" data-min="-24" data-max="0" data-default="0">
+                <div class="omx-knob-image" mod-role="input-control-port" mod-port-symbol="duckDb"></div>
+                <span class="omx-control-title">Duck</span>
+            </div>
+            <div class="omx-control omx-knob" style="left:80px;top:18px" title="Duck Threshold" data-symbol="duckThresholdDb" data-min="-60" data-max="0" data-default="-30">
+                <div class="omx-knob-image" mod-role="input-control-port" mod-port-symbol="duckThresholdDb"></div>
+                <span class="omx-control-title">Duck Threshold</span>
+            </div>
+            <div class="omx-control omx-knob" style="left:152px;top:18px" title="Duck Release" data-symbol="duckReleaseMs" data-min="20" data-max="2000" data-default="250">
+                <div class="omx-knob-image" mod-role="input-control-port" mod-port-symbol="duckReleaseMs"></div>
+                <span class="omx-control-title">Duck Release</span>
             </div>
         </div>
     <div class="mod-pedal-input">

@@ -15,7 +15,7 @@ Every plugin, what it does, and its controls; the parameter pages, the factory p
 | **omx clipper** | `org.openmixer.clipper` | `urn:openmixer:clipper` | Clips the peaks at a ceiling, with drive in front and an adjustable softness of the bend. |
 | **omx comp** | `org.openmixer.comp` | `urn:openmixer:comp` | The console's compressor: threshold, ratio and knee set how hard it holds the level down, attack and release how fast, with makeup gain and a dry/wet mix. Kind picks the RMS detector (Compressor) or the peak detector (Limiter), and detector oversampling can run the control path at 4x; detector topology has it hear the input (feedforward) or its own output (feedback). Its detector can listen to a key routed to its sidechain input instead, through a high-pass, a low-pass and a tilt, on the louder leg, the mid or the side, with a hold; key listen puts what the detector hears on the output, and duck holds the reduction to a set depth. The DSP is omx-dsp's <omxdsp/fx/omx_comp_instance.h>, the console's own compressor. |
 | **omx deesser** | `org.openmixer.deesser` | `urn:openmixer:deesser` | The console's de-esser: a detector on a band around the sibilance drives the compressor's gain computer, and the reduction lands on that band alone or on the whole signal. |
-| **omx delay** | `org.openmixer.delay` | `urn:openmixer:delay` | Stereo delay up to 2000 ms: feedback through a tone filter that darkens each repeat, ping-pong, wet/dry mix. Zero latency, real-time safe. |
+| **omx delay** | `org.openmixer.delay` | `urn:openmixer:delay` | Stereo delay up to 2000 ms, free or synced to the host's tempo: feedback through a tone filter that darkens each repeat, ping-pong, up to four read taps, a tape or analog colour, wet/dry mix and a duck under the input. Zero latency, real-time safe. |
 | **omx drive** | `org.openmixer.drive` | `urn:openmixer:drive` | The console's drive: one waveshaper (soft, tape, tube or exciter) run inside the console's 4x oversampler, on the full band, the lows, the highs or a tilt, with drive, character, wet/dry mix and trim. Stereo, real-time safe. |
 | **omx dyneq** | `org.openmixer.dyneq` | `urn:openmixer:dyneq` | A six-band dynamic EQ: each band is an EQ bell or shelf whose gain also moves with the level of its own band, cutting above a threshold (down) or lifting below it (up), held to a range, so a harsh or boomy band is tamed only while it is too loud. |
 | **omx eq8** | `org.openmixer.eq8` | `urn:openmixer:eq8` | The console's channel EQ in its 8-band form: 8 parametric bands (bell, shelves, notch, all-pass) plus high- and low-pass filters at 12 or 24 dB/oct. Stereo, zero latency. |
@@ -34,7 +34,7 @@ Every plugin, what it does, and its controls; the parameter pages, the factory p
 | **omx reverb** | `org.openmixer.reverb` | `urn:openmixer:reverb` | The console's reverb: room, plate, hall, reverse and gated algorithms with pre-delay, size, damping, width and low and high cuts, mixed with the dry signal. |
 | **omx rotary** | `org.openmixer.rotary` | `urn:openmixer:rotary` | The console's rotary speaker: a drum rotor on the low band and a horn rotor on the high band, with stop, slow and fast speeds, mixed with the dry signal. |
 | **omx spring** | `org.openmixer.spring` | `urn:openmixer:spring` | A spring reverb: a delay, a chain of all-passes and a darkening loop, with decay, length, tension and damping. |
-| **omx strip** | `org.openmixer.strip` | `urn:openmixer:strip` | The console's channel strip in one plugin: input trim, HPF/LPF, gate, four-band EQ and compressor, in the desk's order or any other. Stereo, real-time safe. |
+| **omx strip** | `org.openmixer.strip` | `urn:openmixer:strip` | The console's channel strip in one plugin: input trim, HPF/LPF, gate, EQ of 1 to 32 bands (4 at first) and compressor, in the desk's order or any other. Stereo, real-time safe. |
 | **omx suboct** | `org.openmixer.suboct` | `urn:openmixer:suboct` | Adds a note one or two octaves below a single played line, by dividing its pitch, with a tracking range and a gate for quiet input. |
 | **omx transient** | `org.openmixer.transient` | `urn:openmixer:transient` | The console's transient designer: more or less attack and sustain, from two envelope contrasts, with no threshold to set. |
 | **omx tremolo** | `org.openmixer.tremolo` | `urn:openmixer:tremolo` | The console's tremolo and auto-pan: one oscillator turned into a level change on both legs, or into a left-right pan. |
@@ -127,6 +127,9 @@ Plus the host's bypass.
 | Mix (wet) | 0 to 1 | 0.3 |
 | Tone (0 bright, 1 dark repeats) | 0 to 1 | 0.3 |
 | Ping-pong | off / on | off |
+| Sync (free: the Time control; tempo: the Division at the host's tempo) | Free, Tempo | Free |
+| Division (while synced) | 1/1 to 1/32, each straight, dotted and triplet | 1/4 |
+| Mode (the repeats' colour) | Digital, Tape, Analog | Digital |
 | Taps (engaged read taps of the one delay line) | 1 to 4, whole steps | 1 |
 | Tap 1 gain | 0 to 1 | 1 |
 | Tap 1 pan (left to right) | -1 to 1 | 0 |
@@ -139,8 +142,15 @@ Plus the host's bypass.
 | Tap 4 time (a share of the delay time) | 1/4 to 3 | 3/2 |
 | Tap 4 gain | 0 to 1 | 0.35 |
 | Tap 4 pan (left to right) | -1 to 1 | 0 |
+| Duck (how far the repeats drop while the input is loud) | -24 to 0 dB | 0 dB |
+| Duck threshold | -60 to 0 dB, whole steps | -30 dB |
+| Duck release | 20 to 2000 ms, whole steps | 250 ms |
 
 With one tap the delay is the single-tap echo. Raising Taps adds the second to fourth reads of the same line, each with its own time, gain and pan; the feedback comes from the longest engaged tap, so a pattern repeats as a whole.
+
+With Sync at Tempo the time is the Division at the host's tempo: 60000 / BPM x the division's beats (a quarter note is one beat), held to the Time control's top. The tempo is the CLAP host's transport tempo, or the LV2 host's time:Position time:beatsPerMinute on the plugin's Control port. While the host hands no tempo the delay keeps the Time control, exactly as at Free.
+
+Mode colours the repeats: Digital is the delay as it shipped; Tape puts a low pass and a slow wow in the loop; Analog a lower low pass and a soft saturation. Duck lowers the repeats while the input is above the threshold, by up to the Duck depth, and lets them back up over the release.
 
 Plus the host's bypass. The tone filter holds the same corner at every sample rate, so a session
 moved from 48 to 96 kHz sounds the same.
@@ -336,6 +346,7 @@ Plus the host's bypass.
 | Makeup | 0 to 24 dB | 0 dB |
 | Key High-pass | 0 to 500 Hz, whole steps | 0 Hz |
 | Mix | 0 to 100 %, whole steps | 100 % |
+| Detector Topology | Feedforward / Feedback | Feedforward |
 
 Plus the host's bypass.
 
@@ -531,7 +542,7 @@ Five stages, each omx-dsp's instance face of the console's own kernel, run one a
 | Input | on/off; Trim, a click-free ramp to each new gain |
 | Filters | on/off; HPF and LPF, each on/off, its frequency, 12 or 24 dB/oct |
 | Gate | on/off, threshold, ratio, range, attack, release, knee start and end, hold, hysteresis |
-| EQ | on/off; four bands, each on/off, type (bell, low or high shelf, notch, all-pass 1st or 2nd order), frequency, gain, Q |
+| EQ | on/off; Bands, how many bands run (1 to 32, whole steps); each band on/off, type (bell, low or high shelf, notch, all-pass 1st or 2nd order), frequency, gain, Q |
 | Comp | on/off, threshold, ratio, knee, attack, release, make-up, kind (compressor: RMS detector; limiter: peak), mix, detector oversampling (auto, off, 4x) |
 
 **Order** (0 to 119) picks the order of the five stages: 0 is the desk's input > filters > gate > EQ >
@@ -540,6 +551,8 @@ comp > EQ > gate > filters > input). Plus the host's bypass. The latency reporte
 stages': the gate's and the compressor's 4x detector paths while they are engaged, else zero.
 
 0.3.0 changed the parameter list (the Input and Filters switches, the gate's knee, hold and hysteresis, the compressor's kind, mix and detector oversampling, five-stage orders): a session saved with 0.2.0 does not load as it was, though at 0.2.0's settings the strip sounds the same, sample for sample.
+
+**Bands** sets how many of the EQ's band slots run, from the first: a band past it is not processed at all (it costs nothing, and the strip sounds as if it were not there), and keeps its settings for when Bands reaches it again. The bands past the fourth and Bands itself came after the strip's other parameters, so their ids and ports follow all of those: a session or preset saved before them loads with its four bands as they were and Bands at its default.
 
 ### omx suboct
 

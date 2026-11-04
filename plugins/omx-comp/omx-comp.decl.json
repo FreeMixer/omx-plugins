@@ -10,14 +10,6 @@
   "held": [
     "releaseMode"
   ],
-  "controls": {
-    "detectorTopology": {
-      "values": [
-        "Feedforward",
-        "Feedback"
-      ]
-    }
-  },
   "sidechain": {
     "symbol": "key",
     "name": "Key (Sidechain)"

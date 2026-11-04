@@ -69,7 +69,7 @@ static const char *const OMX_TREMOLO_PARAM_MODULES[OMX_TREMOLO_PARAM_COUNT] = {
 #define OMX_TREMOLO_DECL_DIGEST "b57991962924d939b9966fa18b44ce86bb73f3c940611aaf165dd227ec9b6d1a"
 
 /* org.openmixer.param-contract/1 (tools/param-contract.mjs): each parameter's unit, scale and step, in
- * id order; the host's bypass, the last id, is the face's. */
+ * id order; the host's bypass, CLAP id OMX_PLUGIN_FACE_BYPASS_CLAP_ID (omx-contract), is the face's. */
 #define OMX_TREMOLO_PARAM_CONTRACT_VERSION 1u
 #define OMX_TREMOLO_PARAM_CONTRACT_FINGERPRINT "7eda7f36d4553d98706b108002422d309b187291a28efb210a2d3c6369dee62f"
 static const struct omx_param_contract_row OMX_TREMOLO_PARAM_CONTRACT[OMX_TREMOLO_PARAM_COUNT] = {
@@ -119,14 +119,15 @@ static const struct omx_panel_rows OMX_TREMOLO_PANEL = {
   NULL, 0u,
 };
 
-/* LV2 port indices (tools/gen.mjs lv2Ports): audio, then parameter i at FIRST_PARAM + i, then these. */
-#define OMX_TREMOLO_LV2_PORT_IN_L 0u
-#define OMX_TREMOLO_LV2_PORT_IN_R 1u
-#define OMX_TREMOLO_LV2_PORT_OUT_L 2u
-#define OMX_TREMOLO_LV2_PORT_OUT_R 3u
-#define OMX_TREMOLO_LV2_PORT_ENABLED 8u
-#define OMX_TREMOLO_LV2_PORT_LATENCY 9u
-#define OMX_TREMOLO_LV2_PORT_FIRST_PARAM 4u
+/* LV2 port indices (tools/gen.mjs lv2Ports): enabled and latency at omx-contract's permanent indices, the tempo's control,
+ * the meters' outputs, the audio ports, then parameter i at FIRST_PARAM + i. */
+#define OMX_TREMOLO_LV2_PORT_ENABLED 0u
+#define OMX_TREMOLO_LV2_PORT_LATENCY 1u
+#define OMX_TREMOLO_LV2_PORT_IN_L 2u
+#define OMX_TREMOLO_LV2_PORT_IN_R 3u
+#define OMX_TREMOLO_LV2_PORT_OUT_L 4u
+#define OMX_TREMOLO_LV2_PORT_OUT_R 5u
+#define OMX_TREMOLO_LV2_PORT_FIRST_PARAM 6u
 /* The meters' output control ports, one per channel in the order their values are published, from here on. */
 #define OMX_TREMOLO_LV2_PORT_FIRST_METER 10u
 #define OMX_TREMOLO_LV2_PORT_COUNT 10u
