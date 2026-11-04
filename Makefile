@@ -57,6 +57,15 @@
 #                    omx-contract and omx-dsp releases the old commit pinned, from sibling checkouts' tags or GitHub).
 #                    Known gap: the low-pass above 0.6 of Nyquist at 44.1 and 48 kHz is not compared (omx-dsp's hand-over,
 #                    omx-dsp#105/#116/#119, removed a passband lift the hand-ported strip had); the map's @cap line says so
+#   make strip-bands  omx-strip's band count (#308) against the strip before it had one, bit for bit at every declared
+#                   rate: at its default count with every band past it boosted, and with the extra bands flat, it is
+#                   that strip; with the count reaching a boosted band it is not; built to process every band
+#                   whatever the count it is not (the sabotage); and that strip's factory presets, as presets and as the
+#                   sessions it saves, load into this one with the same values and output (tools/test/strip-bands-check.sh,
+#                   tools/test/clap-session-crosscheck.c; needs the git history; part of `make test`)
+#   make strip-bands-bench  omx-strip's CPU cost by band count (4, 8, 16, 32, and its EQ off) through the built CLAP
+#                   face, at BENCH_RATES (default 48000 96000): microseconds per 128-frame block and the share of a core
+#                   (tools/test/strip-bands-bench.c; a figure for one machine, not part of `make test`)
 #   make presets    the factory presets: fresh against tools/gen-presets.mjs, each value inside its declared travel (part of `make test`)
 #   make presets-figures  the measured figures of the console's two catalogue presets, through omx-dsp's instance faces: the
 #                   amp-input bell (+4.00 dB at 2.5 kHz), the amp-tube harmonics (H2/H3 on the closed form), the dimension's
@@ -149,7 +158,7 @@ LIB_FLAGS  := -fPIC -fvisibility=hidden -DOMX_CLAP_STATIC -Iinclude
 # read only by the targets that build the archive, so `make version` and the rest need no omx-dsp
 lib_cflags = $(call dep_check,omxdsp,$(OMXDSP_MIN))$(call dep_check,omx-contract,$(CONTRACT_MIN))$(shell $(PKG_CONFIG) --cflags omxdsp omx-contract omx-clap-core clap)
 
-.PHONY: summary-numbers param-tie presets presets-figures test-role all lib lib-test test test-faces units panel-layout descriptor-view lv2-units lv2-deprecated lv2-maintainer lv2-manifest release-version resource-hints format-tables contract-union probe-checks eq-probe-race band-groups phaser-depth geq-widgets round-trip hints modgui manual install install-pins install-test package-lists install-devel install-contract contract-dir lv2bench-ran clean version recipe-test completeness selftest private-refs params-doc check-params-doc strip-crosscheck meters-abi meter-level dsp-copies panel-copies meter-ring clap-validate
+.PHONY: summary-numbers param-tie presets presets-figures test-role all lib lib-test test test-faces units panel-layout descriptor-view lv2-units lv2-deprecated lv2-maintainer lv2-manifest release-version resource-hints format-tables contract-union probe-checks eq-probe-race band-groups phaser-depth geq-widgets round-trip hints modgui manual install install-pins install-test package-lists install-devel install-contract contract-dir lv2bench-ran clean version recipe-test completeness selftest private-refs params-doc check-params-doc strip-crosscheck strip-bands strip-bands-bench meters-abi meter-level dsp-copies panel-copies meter-ring clap-validate
 all: lib
 	@for p in $(PLUGINS); do $(MAKE) -C $$p all || exit 1; done
 lib: $(LIB) $(LIB_PC)
@@ -165,6 +174,7 @@ test: lib units panel-layout descriptor-view lv2-units lv2-deprecated lv2-mainta
 	@$(MAKE) -s presets-figures
 	@$(MAKE) -s meters-abi
 	@$(MAKE) -s meter-level
+	@$(MAKE) -s strip-bands
 	@$(MAKE) -s test-role
 	@$(MAKE) -s package-lists
 # what runs with no omx-contract command (debian/rules: no .deb ships the command yet): the built faces, the static
@@ -299,6 +309,13 @@ meter-ring:
 	tools/meter-ring-check.sh --self-test
 strip-crosscheck:
 	sh tools/test/strip-crosscheck.sh
+strip-bands:
+	sh tools/test/strip-bands-check.sh
+strip-bands-bench:
+	@$(MAKE) -s -C plugins/omx-strip build/omx-strip.clap
+	@mkdir -p build
+	$(CC) -O2 -std=gnu11 -Wall -Wextra -Werror $(shell $(PKG_CONFIG) --cflags clap) -o build/strip-bands-bench tools/test/strip-bands-bench.c -ldl -lm
+	build/strip-bands-bench plugins/omx-strip/build/omx-strip.clap $(BENCH_RATES)
 install:
 	@for p in $(SHIP_PLUGINS); do $(MAKE) -C $$p install || exit 1; done
 	find presets -type f -name '*.json' | while read -r f; do install -D -m644 "$$f" "$(DESTDIR)$(DATADIR)/omx/$$f"; done
