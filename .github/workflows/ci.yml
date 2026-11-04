@@ -105,7 +105,7 @@ jobs:
 
       - name: No tracked file points into a private repository
         id: handback-private-refs
-        run: make private-refs
+        uses: FreeMixer/.github/.github/actions/private-refs-check@v1
 
       - name: No source carries a copy of a function omx-dsp exports, and a planted copy goes red
         id: handback-dsp-copies
