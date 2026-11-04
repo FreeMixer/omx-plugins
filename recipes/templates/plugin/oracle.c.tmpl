@@ -44,7 +44,11 @@
  * KEYED: the face listens to a sidechain. The plan runs twice per rate: with a key that differs from
  * the main signal (the sabotage arm runs here), and with no key routed (NULL: the kernel's own
  * detector). A reference keyed by that key must differ from the unkeyed one, or the key is ignored.
-{{/keyed}} */
+{{/keyed}}{{#tempo}} *
+ * TEMPO: the face reads the host's tempo. Every block hands it ORACLE_BPM, the way a host does (CLAP: the
+ * transport's tempo, CLAP_TRANSPORT_HAS_TEMPO; LV2: a time:Position with time:beatsPerMinute on `control`),
+ * and the reference is handed the same, so a synced time is compared as every other control is.
+{{/tempo}} */
 #include <dlfcn.h>
 #include <math.h>
 #include <stdbool.h>
@@ -55,7 +59,10 @@
 
 #include <clap/clap.h>
 #include <lilv/lilv.h>
-
+{{#tempo}}#include <lv2/atom/forge.h>
+#include <lv2/time/time.h>
+#include <lv2/urid/urid.h>
+{{/tempo}}
 #include "omx_{{kernel}}_params.h"
 
 {{^chain}}#include <omxdsp/fx/omx_{{face}}_instance.h>
@@ -95,7 +102,10 @@ static const Block PLAN[] = {
 static const float STEP[NP] = { {{steps}} };
 
 static int failures;
-{{#metered}}
+{{#tempo}}
+/* The tempo every block hands the faces and the reference, BPM. */
+#define ORACLE_BPM 132.0
+{{/tempo}}{{#metered}}
 /* The meters, the declaration's `meters` in order: each one's name, kind, channels, where they start
  * among the NV values of a block, and display range; the reference's values after every block of the
  * plan, and what the face reported then (NaN: nothing): the CLAP face's clap.meters/1, the LV2 face's
@@ -207,7 +217,8 @@ static void reference(double sr, int off, const float *key, const float *il, con
     values_of(k, off, values);
     const uint32_t frames = frames_of(k, sr);
     for (uint32_t r = 0; r < STRETCH; r++) {
-      omx_{{face}}_instance_resolve(&inst, k->bypass{{#binding}}, {{value}}{{/binding}});
+{{#tempo}}      omx_{{face}}_instance_set_tempo(&inst, (float)ORACLE_BPM);
+{{/tempo}}      omx_{{face}}_instance_resolve(&inst, k->bypass{{#binding}}, {{value}}{{/binding}});
 #if KEYED
       omx_{{face}}_instance_{{runFn}}(&inst, key ? key + at : NULL{{keyTail}}, il + at, ir + at, ol + at, orr + at, frames);
 #else
@@ -570,7 +581,12 @@ static bool meters_listed_ok(const clap_plugin_meters_t *mx, const clap_plugin_t
     float *kb[1] = {key ? (float *)key + at : NULL};
     clap_audio_buffer_t ai[2] = {{ib, NULL, 2, 0, 0}, {kb, NULL, 1, 0, 0}}, ao = {ob, NULL, 2, 0, 0};
     const uint32_t frames = frames_of(k, sr);
-    clap_process_t pr = {.steady_time = at, .frames_count = frames, .audio_inputs = ai, .audio_outputs = &ao,
+{{#tempo}}    clap_event_transport_t tr;
+    memset(&tr, 0, sizeof tr);
+    tr.header = (clap_event_header_t){sizeof tr, 0, CLAP_CORE_EVENT_SPACE_ID, CLAP_EVENT_TRANSPORT, 0};
+    tr.flags = CLAP_TRANSPORT_HAS_TEMPO | CLAP_TRANSPORT_IS_PLAYING;
+    tr.tempo = ORACLE_BPM;
+{{/tempo}}    clap_process_t pr = {.steady_time = at, .frames_count = frames, {{#tempo}}.transport = &tr, {{/tempo}}.audio_inputs = ai, .audio_outputs = &ao,
                          .audio_inputs_count = key ? 2u : 1u, .audio_outputs_count = 1, .in_events = &in,
                          .out_events = &out};
     ok = p->process(p, &pr) != CLAP_PROCESS_ERROR;
@@ -623,10 +639,41 @@ static int32_t port_of(const Lv2Face *l, const char *symbol) {
   return port ? (int32_t)lilv_port_get_index(l->plugin, port) : -1;
 }
 
-static bool lv2_run(void *face, const Block *plan, size_t nblocks, double sr, const float *key, const float *il,
+{{#tempo}}/* urid:map for the time:Position the control port carries. */
+#define MAX_URIS 64
+static char *uris[MAX_URIS];
+static uint32_t nuris = 0;
+static LV2_URID map_uri(LV2_URID_Map_Handle h, const char *uri) {
+  (void)h;
+  for (uint32_t i = 0; i < nuris; i++)
+    if (strcmp(uris[i], uri) == 0) return i + 1;
+  if (nuris == MAX_URIS) abort();
+  uris[nuris] = strdup(uri);
+  return ++nuris;
+}
+static LV2_URID_Map urid_map = {NULL, map_uri};
+static const LV2_Feature map_feature = {LV2_URID__map, &urid_map};
+static const LV2_Feature *const FEATURES[] = {&map_feature, NULL};
+
+/* One block's control sequence: a time:Position at ORACLE_BPM. */
+static void position(uint8_t *buf, uint32_t size) {
+  LV2_Atom_Forge forge;
+  lv2_atom_forge_init(&forge, &urid_map);
+  lv2_atom_forge_set_buffer(&forge, buf, size);
+  LV2_Atom_Forge_Frame seq, obj;
+  lv2_atom_forge_sequence_head(&forge, &seq, 0);
+  lv2_atom_forge_frame_time(&forge, 0);
+  lv2_atom_forge_object(&forge, &obj, 0, map_uri(NULL, LV2_TIME__Position));
+  lv2_atom_forge_key(&forge, map_uri(NULL, LV2_TIME__beatsPerMinute));
+  lv2_atom_forge_float(&forge, (float)ORACLE_BPM);
+  lv2_atom_forge_pop(&forge, &obj);
+  lv2_atom_forge_pop(&forge, &seq);
+}
+
+{{/tempo}}static bool lv2_run(void *face, const Block *plan, size_t nblocks, double sr, const float *key, const float *il,
                     const float *ir, float *ol, float *orr, uint32_t *latency) {
   Lv2Face *l = (Lv2Face *)face;
-  LilvInstance *inst = lilv_plugin_instantiate(l->plugin, sr, NULL);
+  LilvInstance *inst = lilv_plugin_instantiate(l->plugin, sr, {{#tempo}}FEATURES{{/tempo}}{{^tempo}}NULL{{/tempo}});
   if (!inst) return false;
   const char *audio[] = {"in_l", "in_r", "out_l", "out_r"};
   int32_t ap[4], cp[NP + 2];
@@ -643,7 +690,11 @@ static bool lv2_run(void *face, const Block *plan, size_t nblocks, double sr, co
   ok = (cp[NP] = port_of(l, "enabled")) >= 0 && ok;
   ok = (cp[NP + 1] = port_of(l, "latency")) >= 0 && ok;
   for (uint32_t i = 0; ok && i < NP + 2; i++) lilv_instance_connect_port(inst, (uint32_t)cp[i], &cv[i]);
-{{#metered}}  /* each meter's channels at their output control ports: the meter's name for one channel, <name>_<c> for more */
+{{#tempo}}  static uint8_t seq[256];
+  const int32_t ctl = port_of(l, "control");
+  ok = ctl >= 0 && ok;
+  if (ok) lilv_instance_connect_port(inst, (uint32_t)ctl, seq);
+{{/tempo}}{{#metered}}  /* each meter's channels at their output control ports: the meter's name for one channel, <name>_<c> for more */
   float mo[NV];
   bool listed = ok;
   for (uint32_t m = 0; m < NM; m++)
@@ -671,7 +722,8 @@ static bool lv2_run(void *face, const Block *plan, size_t nblocks, double sr, co
     lilv_instance_connect_port(inst, (uint32_t)kp, key ? (void *)(key + at) : NULL);
 #endif
     const uint32_t frames = frames_of(k, sr);
-    lilv_instance_run(inst, frames);
+{{#tempo}}    position(seq, sizeof seq);
+{{/tempo}}    lilv_instance_run(inst, frames);
 {{#metered}}    for (uint32_t i = 0; meters_got && i < NV; i++) meters_got[b * NV + i] = (double)mo[i];
 {{/metered}}    at += frames;
   }

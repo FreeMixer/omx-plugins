@@ -43,5 +43,9 @@
             lv2:index 6 ;
             lv2:symbol "mixPct" ;
             lv2:name "Mix" ;
+        ] , [
+            lv2:index 7 ;
+            lv2:symbol "detectorTopology" ;
+            lv2:name "Detector Topology" ;
         ] ;
     ] .

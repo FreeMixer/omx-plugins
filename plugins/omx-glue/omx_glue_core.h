@@ -45,7 +45,8 @@ static inline void omx_glue_core_resolve(OmxGlueCore *c, const float *values, in
                                   /* release */ (int)lrintf(values[OMX_GLUE_PARAM_RELEASE]),
                                   /* makeup_db */ values[OMX_GLUE_PARAM_MAKEUP_DB],
                                   /* key_hp_hz */ values[OMX_GLUE_PARAM_KEY_HP_HZ],
-                                  /* mix_pct */ values[OMX_GLUE_PARAM_MIX_PCT]);
+                                  /* mix_pct */ values[OMX_GLUE_PARAM_MIX_PCT],
+                                  /* detector_topology */ (int)lrintf(values[OMX_GLUE_PARAM_DETECTOR_TOPOLOGY]));
 }
 
 /** The latency the kernel adds, in samples. */

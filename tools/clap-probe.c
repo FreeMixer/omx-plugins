@@ -28,7 +28,8 @@
  *       defaults (a dynamic band's own switch on and its dynamics in a mode, its listens off), and,
  *       last, with each pair of other travels at their ends, the rest at their defaults (a multiband's
  *       fourth band, heard once the band count includes it and a crossover gives it width), is one
- *       the face does not deliver.
+ *       the face does not deliver. Every block hands a transport with a tempo (PROBE_BPM, CLAP_TRANSPORT_HAS_TEMPO),
+ *       as a host does, so a time synced to the tempo is heard; a face that reads no tempo ignores it.
  *       `PASS live <name>` / `FAIL live <name>` per parameter. A face still on the wizard's stub
  *       binding is red here, by design. Every input port past the main one (a sidechain key) is
  *       connected too, fed a signal of its own: square-wave bursts the main signal does not have, so a
@@ -58,6 +59,8 @@
 
 #define RATE 48000.0
 #define BLOCK 256u
+/* The tempo the live test's transport carries, BPM: a quarter is 454.5 ms, no time travel's default. */
+#define PROBE_BPM 132.0
 /* 1.5 s at 48 kHz in whole blocks: a delay's second repeat. OMX_PROBE_STRETCH=n runs the live test n times that
  * long, for a kernel that walks its gain or its bands at dB per second (a declaration's "liveStretch"). */
 static uint32_t probe_frames(void) {
@@ -214,10 +217,16 @@ static int render(const char *path, const clap_id *ids, const double *vals, uint
     float *outs[2] = {out_l + f, out_r + f};
     ain[0] = (clap_audio_buffer_t){ins, NULL, 2, 0, 0};
     clap_audio_buffer_t aout = {outs, NULL, 2, 0, 0};
+    clap_event_transport_t tr;
+    memset(&tr, 0, sizeof tr);
+    tr.header = (clap_event_header_t){sizeof tr, 0, CLAP_CORE_EVENT_SPACE_ID, CLAP_EVENT_TRANSPORT, 0};
+    tr.flags = CLAP_TRANSPORT_HAS_TEMPO | CLAP_TRANSPORT_IS_PLAYING;
+    tr.tempo = PROBE_BPM;
     clap_process_t pr;
     memset(&pr, 0, sizeof pr);
     pr.steady_time = f;
     pr.frames_count = BLOCK;
+    pr.transport = &tr;
     pr.audio_inputs = ain;
     pr.audio_outputs = &aout;
     pr.audio_inputs_count = nin;
@@ -561,14 +570,19 @@ static int state_empty(const char *path) {
   const clap_plugin_state_t *st = (const clap_plugin_state_t *)c.plugin->get_extension(c.plugin, CLAP_EXT_STATE);
   const uint32_t n = c.params->count(c.plugin);
   static double before[MAX_PARAMS];
-  for (uint32_t i = 0; i < n && i < MAX_PARAMS; i++) c.params->get_value(c.plugin, i, &before[i]);
-  Blob empty = {NULL, 0, 0, 0};
+  static clap_id ids[MAX_PARAMS];
   int fails = 0;
+  /* by each parameter's id, never its index: the bypass's id is not its index */
+  for (uint32_t i = 0; i < n && i < MAX_PARAMS; i++) {
+    clap_param_info_t info;
+    if (!c.params->get_info(c.plugin, i, &info) || !c.params->get_value(c.plugin, ids[i] = info.id, &before[i]))
+      printf("FAIL state: parameter %u has no value\n", i), fails++;
+  }
+  Blob empty = {NULL, 0, 0, 0};
   if (state_load(&c, st, &empty)) printf("FAIL state: an empty state was accepted\n"), fails++;
   for (uint32_t i = 0; i < n && i < MAX_PARAMS; i++) {
-    double v;
-    c.params->get_value(c.plugin, i, &v);
-    if (v != before[i]) printf("FAIL state: a refused empty state moved parameter %u\n", i), fails++;
+    double v = 0.0;
+    if (!c.params->get_value(c.plugin, ids[i], &v) || v != before[i]) printf("FAIL state: a refused empty state moved parameter %u\n", ids[i]), fails++;
   }
   if (!fails) printf("PASS state: an empty state is refused, the values untouched\n");
   clap_close(&c);

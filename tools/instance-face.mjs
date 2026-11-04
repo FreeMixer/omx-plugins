@@ -99,7 +99,10 @@ export function parseFace(text, kernel) {
     const a = argsOf(m[2]);
     if (a[0]?.type === `const ${T} *` && (a.length === 1 || (a.length === 2 && a[1].type === 'uint32_t'))) readings[m[1]] = { banded: a.length === 2 };
   }
-  return { type: T, srType: init[1].type, args: scalar, latency, keyed, keyable: Boolean(both), readings };
+  // the host's tempo a face may read: void omx_<k>_instance_set_tempo(T *s, float bpm), a non-positive bpm none
+  const tempoFn = fn('set_tempo');
+  const tempo = Boolean(tempoFn && tempoFn.length === 2 && tempoFn[0].type === `${T} *` && tempoFn[1].type === 'float');
+  return { type: T, srType: init[1].type, args: scalar, latency, keyed, keyable: Boolean(both), readings, tempo };
 }
 
 /** A control name in snake case: attackTimeMs -> attack_time_ms. */

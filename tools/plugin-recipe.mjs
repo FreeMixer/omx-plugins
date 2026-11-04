@@ -265,8 +265,8 @@ export const CHECKERS = {
       if (o.clapId && o.clapId === facts.clapId) errs.push(`/clap/id: '${facts.clapId}' is also ${other}'s`);
       if (o.uri && o.uri === facts.uri) errs.push(`/lv2/uri: '${facts.uri}' is also ${other}'s`);
     }
-    // a chain's generated switches and `order` are parameters too
-    const generated = [...(facts.decl.chain ?? []).map((el) => `${el.id}On`), ...(facts.decl.order === 'permutable' ? ['order'] : [])];
+    // a chain's generated switches, `order` and band counts are parameters too
+    const generated = [...(facts.decl.chain ?? []).flatMap((el) => [`${el.id}On`, ...(el.bandCount ? [el.bandCount.symbol] : [])]), ...(facts.decl.order === 'permutable' ? ['order'] : [])];
     const symbols = new Set([...declParams(facts.decl).map((p) => p.symbol), ...generated]);
     errs.push(...panelErrors(schema, facts.decl, symbols));
     errs.push(...consoleErrors(facts.decl, symbols));

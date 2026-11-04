@@ -65,7 +65,13 @@ static inline float omx_{{kernel}}_core_meter(const Omx{{Kernel}}Core *c, uint32
   }
 }
 
-{{/meterRead}}{{^keyed}}/** One block, stereo; the outputs may alias the inputs. */
+{{/meterRead}}{{#tempo}}/** The host's tempo for the next resolve, BPM; 0 (or any non-positive value) is none: the kernel keeps its time
+ * control. */
+static inline void omx_{{kernel}}_core_tempo(Omx{{Kernel}}Core *c, double bpm) {
+  omx_{{face}}_instance_set_tempo(&c->inst, (float)bpm);
+}
+
+{{/tempo}}{{^keyed}}/** One block, stereo; the outputs may alias the inputs. */
 static inline void omx_{{kernel}}_core_run(Omx{{Kernel}}Core *c, const float *in_l, const float *in_r, float *out_l,
                                          float *out_r, uint32_t frames) {
   omx_{{face}}_instance_run(&c->inst, in_l, in_r, out_l, out_r, frames);
