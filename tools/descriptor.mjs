@@ -13,9 +13,11 @@
  *
  * omx-panel lays a panel out from a descriptor of any origin (tools/omx-panel.mjs); for ours it reads this one.
  */
+import { existsSync, readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { choicesOf, metersOf, scaleOf } from './gen.mjs';
 import { clapFeatureField, clapFeatureValue } from './format-tables.mjs';
-import { installedContractDir, locateContract, ownersOf, packagingRange } from './omx-contract.mjs';
+import { installedContractDir, installedDataDir, locateContract, ownersOf, packagingRange } from './omx-contract.mjs';
 import { meaningOfRole, panelLayout } from './omx-panel.mjs';
 
 /** The descriptor file of a plugin folder. */
@@ -29,8 +31,29 @@ export const DESCRIPTOR_METERS_FLOOR = '3.9.0';
 /** The descriptor's word for each meter kind a declaration names. */
 const METER_KIND_WORDS = { gain_reduction: 'gain-reduction', level: 'level' };
 
-/** The plugin features the descriptor names; a declaration's other CLAP features have no word there. */
-export const FEATURES = ['audio-effect', 'instrument', 'note-effect', 'analyzer'];
+/** The schema's file in omx-contract's data directory, where the descriptor words are read from. */
+export const DESCRIPTOR_SCHEMA_FILE = 'omx-contract.schema.json';
+
+/** The installed omx-contract's schema: the file $OMX_CONTRACT_SCHEMA names (a moved copy standing in for the install,
+ * as the perturbation proofs set it beside OMX_CONTRACT_DIR), else the one in $OMX_CONTRACT_DIR when that copy carries
+ * it, else the data directory's (`pkg-config --variable=datadir omx-contract`). */
+export function descriptorSchemaFile() {
+  const file = [process.env.OMX_CONTRACT_SCHEMA, ...[process.env.OMX_CONTRACT_DIR, installedDataDir()].filter(Boolean).map((d) => join(d, DESCRIPTOR_SCHEMA_FILE))].filter(Boolean).find((f) => existsSync(f));
+  if (!file) throw new Error(`${DESCRIPTOR_SCHEMA_FILE}: not in the installed omx-contract's data directory; install omx-contract-devel >= ${DESCRIPTOR_SCHEMA_FLOOR} (BUILDING.md)`);
+  return file;
+}
+
+/** The plugin features a descriptor names, the enum of the schema's `$defs.plugin` features (omx-contract
+ * docs/descriptors.md); a declaration's other CLAP features have no word there. */
+export function descriptorFeatures(schema = JSON.parse(readFileSync(descriptorSchemaFile(), 'utf8'))) {
+  const list = schema?.$defs?.plugin?.properties?.features?.items?.enum;
+  if (!Array.isArray(list) || !list.length || list.some((w) => typeof w !== 'string')) throw new Error(`${DESCRIPTOR_SCHEMA_FILE}: $defs.plugin.properties.features.items.enum is not the descriptor's feature words`);
+  return list;
+}
+
+/** The descriptor's feature words, the installed schema's: never spelled here (tools/test/descriptor-features-check.mjs
+ * refuses a list of them in any tool). */
+export const FEATURES = descriptorFeatures();
 
 /** The extension bag's source fields our faces write (omx-contract docs/descriptors.md, The extension bag): CLAP's
  * open features, in the face's order, and the LV2 face's types as its .ttl states them. */
