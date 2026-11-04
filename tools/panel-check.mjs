@@ -46,11 +46,17 @@ const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 // what was served, in the description's shape
 const sections = of('section').map(([key, labelKey, label]) => ({ key, labelKey, label }));
 const keyOf = (i) => sections[Number(i)]?.key ?? `?section${i}`;
+// a governing control as the description names it: the parameter's declared id, the same on both faces
+const declaredId = new Map(want.controls.map((c) => [c.symbol, c.param]));
+const governing = (id) => {
+  const sym = symbolOf(id);
+  return sym === null ? null : declaredId.get(sym) ?? `?${sym}`;
+};
 const served = {
   family: FAMILIES[Number(of('family')[0]?.[0])] ?? '?',
   sections,
   controls: of('control').map(([id, section, widget, labelKey, visible, mask, label]) => ({
-    symbol: symbolOf(id), sectionKey: keyOf(section), widget: WIDGETS[Number(widget)] ?? '?', labelKey, visible: symbolOf(visible), mask: BigInt(`0x${mask}`), label,
+    symbol: symbolOf(id), sectionKey: keyOf(section), widget: WIDGETS[Number(widget)] ?? '?', labelKey, visible: governing(visible), mask: BigInt(`0x${mask}`), label,
   })),
   roles: of('role').map(([role, index, id]) => ({ role, index: Number(index), symbol: symbolOf(id) })),
   displays: of('display').map(([kind, section, source, m0, m1, curve, floorId, floorDb, labelKey, label]) => ({
