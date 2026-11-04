@@ -32,7 +32,7 @@ One page for each plugin: its ids, its audio ports, its pages (the LV2 port grou
 | [omx reverb](omx-reverb.md) | `org.openmixer.reverb` | `urn:openmixer:reverb` | 13 | 4 |
 | [omx rotary](omx-rotary.md) | `org.openmixer.rotary` | `urn:openmixer:rotary` | 8 | 1 |
 | [omx spring](omx-spring.md) | `org.openmixer.spring` | `urn:openmixer:spring` | 5 | 1 |
-| [omx strip](omx-strip.md) | `org.openmixer.strip` | `urn:openmixer:strip` | 51 | 6 |
+| [omx strip](omx-strip.md) | `org.openmixer.strip` | `urn:openmixer:strip` | 192 | 6 |
 | [omx suboct](omx-suboct.md) | `org.openmixer.suboct` | `urn:openmixer:suboct` | 5 | 1 |
 | [omx transient](omx-transient.md) | `org.openmixer.transient` | `urn:openmixer:transient` | 5 | 1 |
 | [omx tremolo](omx-tremolo.md) | `org.openmixer.tremolo` | `urn:openmixer:tremolo` | 4 | 1 |

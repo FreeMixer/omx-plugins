@@ -54,32 +54,32 @@ export const LOSSES = {
   // for "" (a plain number)
   'clap controls[].meaning': 298,
   'lv2 controls[].meaning': 112,
-  'lv2 controls[].travel.unit ""': 91,
+  'lv2 controls[].travel.unit ""': 120,
   // plugin-hostd 0.7.0's LV2 table has no row for urn:openmixer:unit#ratio, the ratio unit our faces write (gap 4)
   'lv2 controls[].travel.unit "ratio"': 15,
   // nor for urn:openmixer:unit#dBoct, the unit of the compressor's key tilt (dB/oct, omx-contract 3.1.0)
   'lv2 controls[].travel.unit "dB/oct"': 2,
   // CLAP: no row reads a unit, a linear or log scale, a step, a choice (our faces set no CLAP_PARAM_IS_ENUM), the
   // session symbol, the LV2 URI, a side-chain's role or what an LV2 host may lend
-  'clap controls[].travel.unit': 451,
-  'clap controls[].travel.scale': 393,
-  'clap controls[].travel.step': 451,
-  'clap controls[].kind': 205,
-  'clap controls[].ids': 105,
-  'clap controls[].values': 105,
-  'clap controls[].labels': 105,
-  'clap controls[].default': 205,
-  'clap controls[].symbol': 656,
+  'clap controls[].travel.unit': 536,
+  'clap controls[].travel.scale': 477,
+  'clap controls[].travel.step': 536,
+  'clap controls[].kind': 261,
+  'clap controls[].ids': 133,
+  'clap controls[].values': 133,
+  'clap controls[].labels': 133,
+  'clap controls[].default': 261,
+  'clap controls[].symbol': 797,
   'clap plugin.uri': 29,
   'clap ports[].role': 2,
   'clap needs.extensions.optional': 29,
   // LV2: no row reads a step, automation, the plugin's version or vendor (our .ttl writes no doap:maintainer); a
   // control's id is its symbol and a point's id its label, so the CLAP id and our point ids are no LV2 word; the
   // audio ports are one per channel, with the generator's symbols and names
-  'lv2 controls[].travel.step': 451,
-  'lv2 controls[].automatable': 656,
-  'lv2 controls[].id': 656,
-  'lv2 controls[].ids': 105,
+  'lv2 controls[].travel.step': 536,
+  'lv2 controls[].automatable': 797,
+  'lv2 controls[].id': 797,
+  'lv2 controls[].ids': 133,
   'lv2 plugin.version': 29,
   'lv2 plugin.vendor': 29,
   'lv2 ports[].id': 60,
@@ -88,7 +88,7 @@ export const LOSSES = {
   // section above it (omx-eq8, omx-eq16 and omx-eq32: five controls a band, 8 + 16 + 32 bands)
   'lv2 controls[].group (panel section)': 280,
   // the toggles UPSTREAM names, scanned as travels, carry no toggle's default
-  'lv2 controls[].default': 100,
+  'lv2 controls[].default': 128,
 };
 
 /** A break in plugin-hostd's wave tip, reported, each `differs` it causes printed with it

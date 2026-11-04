@@ -62,7 +62,7 @@ for (const dir of described) {
     const t = e?.kind === 'travels' ? (link.field ? e.value[link.field] : e.value) : undefined;
     return t ? { min: t.min, max: t.max } : undefined;
   };
-  const bandQ = (d) => d.controls.filter((c) => c.kind === 'travel' && /^(b\d+_q|eq\dQ)$/.test(c.symbol));
+  const bandQ = (d) => d.controls.filter((c) => c.kind === 'travel' && /^(b\d+_q|eq\d+Q)$/.test(c.symbol));
   let total = 0;
   for (const dir of described) {
     const stem = dir.split('/').pop();
@@ -75,7 +75,7 @@ for (const dir of described) {
       if (qs.length) check(`${stem}: ${qs.length} band-Q controls (${label}) state the travel their link resolves to`, bad, []);
     }
   }
-  if (items(contract).EQ_NOTCH_Q_RANGE) check('the band-Q controls checked are the 60 of eq8, eq16, eq32 and the strip', total, 60);
+  if (items(contract).EQ_NOTCH_Q_RANGE) check('the band-Q controls checked are the 88 of eq8, eq16, eq32 and the strip', total, 88);
 }
 
 // the descriptor words: the installed omx-contract's schema
