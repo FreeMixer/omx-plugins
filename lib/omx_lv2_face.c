@@ -5,7 +5,8 @@
  * (include/omx_plugin_face.h), its generated declaration over omx-dsp's kernel, reached through its
  * omx_<kernel>_core.h's vtable. No DSP of its own: flush denormals, read the control ports (an
  * unconnected one is its declared default), resolve, run; the `enabled` port is the host's bypass and
- * `latency` reports the kernel's.
+ * `latency` reports the kernel's. A plugin that declares meters writes each channel's value after every
+ * block to its output control port (docs/meters.md), the values clap.meters/1 publishes on the CLAP face.
  *
  * A keyed plugin's sidechain key (lv2:isSideChain, connectionOptional) follows in_l and in_r; an
  * unconnected key is the kernel's own detector.
@@ -23,11 +24,13 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "omx_face_meters.h"
 #include "omx_lv2_face.h"
 #include <lv2/atom/atom.h>
 #include <lv2/atom/util.h>
 #include <lv2/time/time.h>
 #include <lv2/urid/urid.h>
+#include "omx_meter_ring.h"
 #include <omxdsp/omx_denormal.h>
 
 /* The URIDs a tempo reader needs, mapped once at instantiate. */
@@ -35,7 +38,8 @@ typedef struct {
   LV2_URID object, blank, position, bpm, a_float, a_double, a_int, a_long;
 } TimeUrids;
 
-/* One allocation: this, the control ports and the run's values (each param_count long), then the core. */
+/* One allocation: this, the control ports and the run's values (each param_count long), the meter ports
+ * (meter_values long), then the core. */
 typedef struct {
   const struct omx_face *face;
   void *core;
@@ -47,6 +51,7 @@ typedef struct {
   float *latency;
   const float **param;
   float *values;
+  float **meter;
   const LV2_Atom_Sequence *control; /* time:Position in; NULL: not connected */
   int mapped;                       /* the host gave urid:map */
   TimeUrids u;
@@ -60,13 +65,15 @@ LV2_Handle omx_lv2_face_instantiate(const LV2_Descriptor *d, double rate, const 
   const struct omx_face *f = ((const struct omx_lv2_face *)d)->face;
   const size_t n = f->param_count;
   const size_t at_values = sizeof(Face) + n * sizeof(const float *);
-  const size_t at_core = (at_values + n * sizeof(float) + alignof(max_align_t) - 1u) / alignof(max_align_t) * alignof(max_align_t);
+  const size_t at_meters = (at_values + n * sizeof(float) + alignof(float *) - 1u) / alignof(float *) * alignof(float *);
+  const size_t at_core = (at_meters + f->meter_values * sizeof(float *) + alignof(max_align_t) - 1u) / alignof(max_align_t) * alignof(max_align_t);
   char *mem = (char *)calloc(1, at_core + f->core->size);
   if (!mem) return NULL;
   Face *s = (Face *)mem;
   s->face = f;
   s->param = (const float **)(mem + sizeof(Face));
   s->values = (float *)(mem + at_values);
+  s->meter = (float **)(mem + at_meters);
   s->core = mem + at_core;
   s->rate = (uint32_t)rate;
   if (f->tempo)
@@ -96,6 +103,8 @@ void omx_lv2_face_connect_port(LV2_Handle h, uint32_t port, void *data) {
   else if (s->face->tempo && port == s->face->lv2_control) s->control = (const LV2_Atom_Sequence *)data;
   else if (port >= p->first_param && port < p->first_param + s->face->param_count)
     s->param[port - p->first_param] = (const float *)data;
+  else if (port >= p->first_meter && port < p->first_meter + s->face->meter_values)
+    s->meter[port - p->first_meter] = (float *)data;
 }
 
 void omx_lv2_face_activate(LV2_Handle h) {
@@ -141,7 +150,17 @@ void omx_lv2_face_run(LV2_Handle h, uint32_t frames) {
   if (s->face->tempo) s->face->tempo(s->core, block_tempo(s));
   c->resolve(s->core, s->values, bypass);
   if (s->latency) *s->latency = (float)c->latency(s->core);
+  const struct omx_face *f = s->face;
+  double mv[OMX_METER_RING_MAX];
+  /* the inputs' peak, before the kernel runs (the outputs may be the inputs) */
+  if (f->meter_count) omx_face_meter_levels(f, OMX_FACE_METER_IN, s->in_l, s->in_r, frames, mv);
   c->run(s->core, s->key, s->in_l, s->in_r, s->out_l, s->out_r, frames);
+  if (f->meter_count) {
+    omx_face_meter_readings(f, s->core, bypass, mv);
+    omx_face_meter_levels(f, OMX_FACE_METER_OUT, s->out_l, s->out_r, frames, mv);
+    for (uint32_t i = 0; i < f->meter_values; ++i)
+      if (s->meter[i]) *s->meter[i] = (float)mv[i];
+  }
 }
 
 void omx_lv2_face_cleanup(LV2_Handle h) { free(h); }

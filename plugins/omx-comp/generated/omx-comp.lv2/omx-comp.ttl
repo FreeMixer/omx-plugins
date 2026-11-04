@@ -51,39 +51,93 @@
         units:unit units:frame
     ] ,
     [
-        a lv2:AudioPort , lv2:InputPort ;
+        a lv2:ControlPort , lv2:OutputPort ;
         lv2:index 2 ;
+        lv2:symbol "compGr" ;
+        lv2:name "Gain reduction" ;
+        lv2:minimum -60 ;
+        lv2:maximum 0 ;
+        units:unit units:db
+    ] ,
+    [
+        a lv2:ControlPort , lv2:OutputPort ;
+        lv2:index 3 ;
+        lv2:symbol "compIn_0" ;
+        lv2:name "Input level L" ;
+        lv2:minimum -60 ;
+        lv2:maximum 6 ;
+        units:unit <urn:openmixer:unit#dBFS>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:OutputPort ;
+        lv2:index 4 ;
+        lv2:symbol "compIn_1" ;
+        lv2:name "Input level R" ;
+        lv2:minimum -60 ;
+        lv2:maximum 6 ;
+        units:unit <urn:openmixer:unit#dBFS>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:OutputPort ;
+        lv2:index 5 ;
+        lv2:symbol "compOut_0" ;
+        lv2:name "Output level L" ;
+        lv2:minimum -60 ;
+        lv2:maximum 6 ;
+        units:unit <urn:openmixer:unit#dBFS>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:OutputPort ;
+        lv2:index 6 ;
+        lv2:symbol "compOut_1" ;
+        lv2:name "Output level R" ;
+        lv2:minimum -60 ;
+        lv2:maximum 6 ;
+        units:unit <urn:openmixer:unit#dBFS>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:OutputPort ;
+        lv2:index 7 ;
+        lv2:symbol "compKey" ;
+        lv2:name "Key level" ;
+        lv2:minimum -60 ;
+        lv2:maximum 0 ;
+        units:unit <urn:openmixer:unit#dBFS>
+    ] ,
+    [
+        a lv2:AudioPort , lv2:InputPort ;
+        lv2:index 8 ;
         lv2:symbol "in_l" ;
         lv2:name "In L"
     ] ,
     [
         a lv2:AudioPort , lv2:InputPort ;
-        lv2:index 3 ;
+        lv2:index 9 ;
         lv2:symbol "in_r" ;
         lv2:name "In R"
     ] ,
     [
         a lv2:AudioPort , lv2:InputPort ;
-        lv2:index 4 ;
+        lv2:index 10 ;
         lv2:symbol "key" ;
         lv2:name "Key (Sidechain)" ;
         lv2:portProperty lv2:isSideChain , lv2:connectionOptional
     ] ,
     [
         a lv2:AudioPort , lv2:OutputPort ;
-        lv2:index 5 ;
+        lv2:index 11 ;
         lv2:symbol "out_l" ;
         lv2:name "Out L"
     ] ,
     [
         a lv2:AudioPort , lv2:OutputPort ;
-        lv2:index 6 ;
+        lv2:index 12 ;
         lv2:symbol "out_r" ;
         lv2:name "Out R"
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 7 ;
+        lv2:index 13 ;
         lv2:symbol "thresholdDb" ;
         lv2:name "Threshold" ;
         lv2:default -18 ;
@@ -96,7 +150,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 8 ;
+        lv2:index 14 ;
         lv2:symbol "ratio" ;
         lv2:name "Ratio" ;
         lv2:default 4 ;
@@ -108,7 +162,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 9 ;
+        lv2:index 15 ;
         lv2:symbol "kneeDb" ;
         lv2:name "Knee" ;
         lv2:default 6 ;
@@ -119,7 +173,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 10 ;
+        lv2:index 16 ;
         lv2:symbol "attackMs" ;
         lv2:name "Attack" ;
         lv2:default 5 ;
@@ -131,7 +185,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 11 ;
+        lv2:index 17 ;
         lv2:symbol "releaseMs" ;
         lv2:name "Release" ;
         lv2:default 200 ;
@@ -144,7 +198,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 12 ;
+        lv2:index 18 ;
         lv2:symbol "makeupDb" ;
         lv2:name "Makeup" ;
         lv2:default 0 ;
@@ -155,7 +209,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 13 ;
+        lv2:index 19 ;
         lv2:symbol "mixPct" ;
         lv2:name "Mix" ;
         lv2:default 100 ;
@@ -168,7 +222,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 14 ;
+        lv2:index 20 ;
         lv2:symbol "kind" ;
         lv2:name "Kind" ;
         lv2:default 0 ;
@@ -182,7 +236,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 15 ;
+        lv2:index 21 ;
         lv2:symbol "detectorOversampling" ;
         lv2:name "Detector Oversampling" ;
         lv2:default 0 ;
@@ -197,7 +251,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 16 ;
+        lv2:index 22 ;
         lv2:symbol "detectorTopology" ;
         lv2:name "Detector Topology" ;
         lv2:default 0 ;
@@ -211,7 +265,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 17 ;
+        lv2:index 23 ;
         lv2:symbol "keySource" ;
         lv2:name "Key Source" ;
         lv2:default 0 ;
@@ -225,7 +279,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 18 ;
+        lv2:index 24 ;
         lv2:symbol "keyHpHz" ;
         lv2:name "Key HP" ;
         lv2:default 0 ;
@@ -237,7 +291,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 19 ;
+        lv2:index 25 ;
         lv2:symbol "keyLpHz" ;
         lv2:name "Key LP" ;
         lv2:default 0 ;
@@ -249,7 +303,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 20 ;
+        lv2:index 26 ;
         lv2:symbol "keyTiltDb" ;
         lv2:name "Key Tilt" ;
         lv2:default 0 ;
@@ -260,7 +314,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 21 ;
+        lv2:index 27 ;
         lv2:symbol "keyListen" ;
         lv2:name "Key Listen" ;
         lv2:default 0 ;
@@ -271,7 +325,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 22 ;
+        lv2:index 28 ;
         lv2:symbol "holdMs" ;
         lv2:name "Hold" ;
         lv2:default 0 ;
@@ -283,7 +337,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 23 ;
+        lv2:index 29 ;
         lv2:symbol "detectLink" ;
         lv2:name "Detect Link" ;
         lv2:default 0 ;
@@ -299,7 +353,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 24 ;
+        lv2:index 30 ;
         lv2:symbol "duck" ;
         lv2:name "Duck" ;
         lv2:default 0 ;
@@ -310,7 +364,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 25 ;
+        lv2:index 31 ;
         lv2:symbol "rangeDb" ;
         lv2:name "Duck Range" ;
         lv2:default -12 ;
@@ -349,6 +403,12 @@ lv2:displayPriority
     lv2:name "Duck" ;
     lv2:displayPriority 1 ;
     rdfs:label "Duck" .
+
+<urn:openmixer:unit#dBFS>
+    a units:Unit ;
+    rdfs:label "decibels (full scale)" ;
+    units:render "%f dBFS" ;
+    units:symbol "dBFS" .
 
 <urn:openmixer:unit#dBoct>
     a units:Unit ;

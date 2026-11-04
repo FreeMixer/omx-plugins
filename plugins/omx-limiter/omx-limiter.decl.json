@@ -34,6 +34,24 @@
     "streams-from-disk": false,
     "opens-sockets": false
   },
+  "latencyChecks": [
+    {
+      "values": {},
+      "reports": "impulse"
+    },
+    {
+      "values": {
+        "lookaheadMs": 0.5
+      },
+      "reports": "impulse"
+    },
+    {
+      "values": {
+        "lookaheadMs": 5
+      },
+      "reports": "impulse"
+    }
+  ],
   "meters": [
     {
       "id": "limiterGr",

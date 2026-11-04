@@ -59,7 +59,8 @@ link resolves to. A number edited by hand is stale, never a declaration.
 | `sidechain` (`symbol`, `name`) | a `ports[]` entry: `kind: audio`, `direction: in`, `role: sidechain`, `channels: 1`, `layout: mono`, named as the CLAP face names it (the symbol) | `sidechain`, whole: the LV2 port's symbol and name |
 | the audio pair | `ports[]`: `in` and `out` (the CLAP face's names), `role: main`, `channels: 2`, `layout: stereo` | |
 | `latencyChecks` | `latency.reports: true`; `latency.frames` when every check reports one constant | kept: the checks the oracles run |
-| `oracles`, `portHints`, `meters` | | kept: tests, the LV2 hint pin, the clap.meters/1 rows |
+| `meters` | `meters[]`: `id` its index, `symbol` its id, `name` from it, `kind` (`gain-reduction`, `level`), `channels`, the range, unit and scale (the kernel readout's, linked in `source.from` as `data/kernels/<kernel>.json#readouts[<name>]`; a level's as declared, `dBFS`), the readout's `doc` | kept: where the face reads it (`field`, `read`, `linear`, `source`) |
+| `oracles`, `portHints` | | kept: tests, the LV2 hint pin |
 | `panel.sections[].label` | each listed control's `group` | `panel` (family, roles, section keys, order, widgets, graphs): the panel's hints |
 | `panel.sections[].subgroups` (`band`, a declaration with variants) | each band's controls' `group`, the path `[<section label>, "Band <n>"]`: the panel section first, the LV2 port group last (#257) | the panel is handed to omx-panel without it: the section is drawn as declared |
 | `panel.roles` | each bound control's `meaning`, where the role has a meaning word (omx-panel docs/panel-layout.md) | kept: the roles themselves |
@@ -87,7 +88,7 @@ What the descriptor has no word for, found laying out our panels, and where each
 | 2 | The come-up value per kind of channel (a delay's mix fully wet on a return): the kernel files say it as `byKind` | contract: `travel.byKind`, the kernel word, on a descriptor travel | read through the link at load |
 | 3 | Meanings for a rotor's speeds and speed switch, an LFO's shape, a drive's model, a reverb's algorithm, a de-esser's mode, a filter or band type, a band's on switch, a ping-pong switch | contract: `speed`, `shape`, `model`, `algorithm`, `mode`, `type`, `on`, `pingpong` | the declared roles bind them |
 | 4 | A ratio's unit: LV2 has none, the item list has only `x` | contract: `ratio` (n:1) among the descriptor units (omx-contract 3.0.0); the LV2 face writes it as `urn:openmixer:unit#ratio` | done: omx-comp `ratio`, omx-deesser `deessRatio`, omx-keyed-gate `ratio` state `ratio` |
-| 5 | What a meter measures | contract: `measurement` on a read-only control: `peak`, `rms`, `vu`, `ppm`, `lufs`, `gainReduction` | a LUFS reading is `lufs`, any other `null` |
+| 5 | What a meter measures | contract: `meters[].kind` (`gain-reduction`, `level`, omx-contract 3.9.0); `peak`, `rms`, `vu`, `ppm`, `lufs` have no word yet | a meter is a `meters[]` entry, never a read-only control |
 | 6 | `dBu`, which param-contract serves | contract: `dBu` among the descriptor units | the unit stays on our declarations only |
 | 7 | An xy pad (two controls drawn as one) | omx-plugins: a panel hint, `panel.widgets` naming the pair | none of ours draws one |
 | 8 | A momentary control | none: a `trigger` is momentary | |

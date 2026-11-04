@@ -50,32 +50,41 @@
         units:unit units:frame
     ] ,
     [
-        a lv2:AudioPort , lv2:InputPort ;
+        a lv2:ControlPort , lv2:OutputPort ;
         lv2:index 2 ;
+        lv2:symbol "limiterGr" ;
+        lv2:name "Gain reduction" ;
+        lv2:minimum -12 ;
+        lv2:maximum 0 ;
+        units:unit units:db
+    ] ,
+    [
+        a lv2:AudioPort , lv2:InputPort ;
+        lv2:index 3 ;
         lv2:symbol "in_l" ;
         lv2:name "In L"
     ] ,
     [
         a lv2:AudioPort , lv2:InputPort ;
-        lv2:index 3 ;
+        lv2:index 4 ;
         lv2:symbol "in_r" ;
         lv2:name "In R"
     ] ,
     [
         a lv2:AudioPort , lv2:OutputPort ;
-        lv2:index 4 ;
+        lv2:index 5 ;
         lv2:symbol "out_l" ;
         lv2:name "Out L"
     ] ,
     [
         a lv2:AudioPort , lv2:OutputPort ;
-        lv2:index 5 ;
+        lv2:index 6 ;
         lv2:symbol "out_r" ;
         lv2:name "Out R"
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 6 ;
+        lv2:index 7 ;
         lv2:symbol "ceilingDb" ;
         lv2:name "Ceiling" ;
         lv2:default -1 ;
@@ -86,7 +95,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 7 ;
+        lv2:index 8 ;
         lv2:symbol "lookaheadMs" ;
         lv2:name "Lookahead" ;
         lv2:default 1.5 ;
@@ -97,7 +106,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 8 ;
+        lv2:index 9 ;
         lv2:symbol "releaseMs" ;
         lv2:name "Release" ;
         lv2:default 50 ;

@@ -196,16 +196,18 @@ static const struct omx_panel_rows OMX_GATE_PANEL = {
   NULL, 0u,
 };
 
-/* LV2 port indices (tools/gen.mjs lv2Ports): enabled and latency at omx-contract's permanent indices, the audio ports,
- * then parameter i at FIRST_PARAM + i. */
+/* LV2 port indices (tools/gen.mjs lv2Ports): enabled and latency at omx-contract's permanent indices, the tempo's control,
+ * the meters' outputs, the audio ports, then parameter i at FIRST_PARAM + i. */
 #define OMX_GATE_LV2_PORT_ENABLED 0u
 #define OMX_GATE_LV2_PORT_LATENCY 1u
-#define OMX_GATE_LV2_PORT_IN_L 2u
-#define OMX_GATE_LV2_PORT_IN_R 3u
-#define OMX_GATE_LV2_PORT_KEY 4u
-#define OMX_GATE_LV2_PORT_OUT_L 5u
-#define OMX_GATE_LV2_PORT_OUT_R 6u
-#define OMX_GATE_LV2_PORT_FIRST_PARAM 7u
-#define OMX_GATE_LV2_PORT_COUNT 19u
+#define OMX_GATE_LV2_PORT_IN_L 3u
+#define OMX_GATE_LV2_PORT_IN_R 4u
+#define OMX_GATE_LV2_PORT_KEY 5u
+#define OMX_GATE_LV2_PORT_OUT_L 6u
+#define OMX_GATE_LV2_PORT_OUT_R 7u
+#define OMX_GATE_LV2_PORT_FIRST_PARAM 8u
+/* The meters' output control ports, one per channel in the order their values are published, from here on. */
+#define OMX_GATE_LV2_PORT_FIRST_METER 2u
+#define OMX_GATE_LV2_PORT_COUNT 20u
 
 #endif /* OMX_GATE_PARAMS_H */

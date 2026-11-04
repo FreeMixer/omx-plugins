@@ -52,32 +52,86 @@
         units:unit units:frame
     ] ,
     [
-        a lv2:AudioPort , lv2:InputPort ;
+        a lv2:ControlPort , lv2:OutputPort ;
         lv2:index 2 ;
+        lv2:symbol "band1Gain" ;
+        lv2:name "Band 1 gain" ;
+        lv2:minimum -24 ;
+        lv2:maximum 12 ;
+        units:unit units:db
+    ] ,
+    [
+        a lv2:ControlPort , lv2:OutputPort ;
+        lv2:index 3 ;
+        lv2:symbol "band2Gain" ;
+        lv2:name "Band 2 gain" ;
+        lv2:minimum -24 ;
+        lv2:maximum 12 ;
+        units:unit units:db
+    ] ,
+    [
+        a lv2:ControlPort , lv2:OutputPort ;
+        lv2:index 4 ;
+        lv2:symbol "band3Gain" ;
+        lv2:name "Band 3 gain" ;
+        lv2:minimum -24 ;
+        lv2:maximum 12 ;
+        units:unit units:db
+    ] ,
+    [
+        a lv2:ControlPort , lv2:OutputPort ;
+        lv2:index 5 ;
+        lv2:symbol "band4Gain" ;
+        lv2:name "Band 4 gain" ;
+        lv2:minimum -24 ;
+        lv2:maximum 12 ;
+        units:unit units:db
+    ] ,
+    [
+        a lv2:ControlPort , lv2:OutputPort ;
+        lv2:index 6 ;
+        lv2:symbol "band5Gain" ;
+        lv2:name "Band 5 gain" ;
+        lv2:minimum -24 ;
+        lv2:maximum 12 ;
+        units:unit units:db
+    ] ,
+    [
+        a lv2:ControlPort , lv2:OutputPort ;
+        lv2:index 7 ;
+        lv2:symbol "band6Gain" ;
+        lv2:name "Band 6 gain" ;
+        lv2:minimum -24 ;
+        lv2:maximum 12 ;
+        units:unit units:db
+    ] ,
+    [
+        a lv2:AudioPort , lv2:InputPort ;
+        lv2:index 8 ;
         lv2:symbol "in_l" ;
         lv2:name "In L"
     ] ,
     [
         a lv2:AudioPort , lv2:InputPort ;
-        lv2:index 3 ;
+        lv2:index 9 ;
         lv2:symbol "in_r" ;
         lv2:name "In R"
     ] ,
     [
         a lv2:AudioPort , lv2:OutputPort ;
-        lv2:index 4 ;
+        lv2:index 10 ;
         lv2:symbol "out_l" ;
         lv2:name "Out L"
     ] ,
     [
         a lv2:AudioPort , lv2:OutputPort ;
-        lv2:index 5 ;
+        lv2:index 11 ;
         lv2:symbol "out_r" ;
         lv2:name "Out R"
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 6 ;
+        lv2:index 12 ;
         lv2:symbol "bandOn1" ;
         lv2:name "Band 1 On" ;
         lv2:default 0 ;
@@ -88,7 +142,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 7 ;
+        lv2:index 13 ;
         lv2:symbol "bandOn2" ;
         lv2:name "Band 2 On" ;
         lv2:default 0 ;
@@ -99,7 +153,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 8 ;
+        lv2:index 14 ;
         lv2:symbol "bandOn3" ;
         lv2:name "Band 3 On" ;
         lv2:default 0 ;
@@ -110,7 +164,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 9 ;
+        lv2:index 15 ;
         lv2:symbol "bandOn4" ;
         lv2:name "Band 4 On" ;
         lv2:default 0 ;
@@ -121,7 +175,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 10 ;
+        lv2:index 16 ;
         lv2:symbol "bandOn5" ;
         lv2:name "Band 5 On" ;
         lv2:default 0 ;
@@ -132,7 +186,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 11 ;
+        lv2:index 17 ;
         lv2:symbol "bandOn6" ;
         lv2:name "Band 6 On" ;
         lv2:default 0 ;
@@ -143,7 +197,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 12 ;
+        lv2:index 18 ;
         lv2:symbol "bandType1" ;
         lv2:name "Band 1 Type" ;
         lv2:default 0 ;
@@ -158,7 +212,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 13 ;
+        lv2:index 19 ;
         lv2:symbol "bandType2" ;
         lv2:name "Band 2 Type" ;
         lv2:default 0 ;
@@ -173,7 +227,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 14 ;
+        lv2:index 20 ;
         lv2:symbol "bandType3" ;
         lv2:name "Band 3 Type" ;
         lv2:default 0 ;
@@ -188,7 +242,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 15 ;
+        lv2:index 21 ;
         lv2:symbol "bandType4" ;
         lv2:name "Band 4 Type" ;
         lv2:default 0 ;
@@ -203,7 +257,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 16 ;
+        lv2:index 22 ;
         lv2:symbol "bandType5" ;
         lv2:name "Band 5 Type" ;
         lv2:default 0 ;
@@ -218,7 +272,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 17 ;
+        lv2:index 23 ;
         lv2:symbol "bandType6" ;
         lv2:name "Band 6 Type" ;
         lv2:default 0 ;
@@ -233,7 +287,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 18 ;
+        lv2:index 24 ;
         lv2:symbol "freq1" ;
         lv2:name "Band 1 Freq" ;
         lv2:default 40 ;
@@ -247,7 +301,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 19 ;
+        lv2:index 25 ;
         lv2:symbol "freq2" ;
         lv2:name "Band 2 Freq" ;
         lv2:default 125 ;
@@ -261,7 +315,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 20 ;
+        lv2:index 26 ;
         lv2:symbol "freq3" ;
         lv2:name "Band 3 Freq" ;
         lv2:default 400 ;
@@ -275,7 +329,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 21 ;
+        lv2:index 27 ;
         lv2:symbol "freq4" ;
         lv2:name "Band 4 Freq" ;
         lv2:default 1250 ;
@@ -289,7 +343,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 22 ;
+        lv2:index 28 ;
         lv2:symbol "freq5" ;
         lv2:name "Band 5 Freq" ;
         lv2:default 4000 ;
@@ -303,7 +357,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 23 ;
+        lv2:index 29 ;
         lv2:symbol "freq6" ;
         lv2:name "Band 6 Freq" ;
         lv2:default 12500 ;
@@ -317,7 +371,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 24 ;
+        lv2:index 30 ;
         lv2:symbol "gain1" ;
         lv2:name "Band 1 Gain" ;
         lv2:default 0 ;
@@ -329,7 +383,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 25 ;
+        lv2:index 31 ;
         lv2:symbol "gain2" ;
         lv2:name "Band 2 Gain" ;
         lv2:default 0 ;
@@ -341,7 +395,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 26 ;
+        lv2:index 32 ;
         lv2:symbol "gain3" ;
         lv2:name "Band 3 Gain" ;
         lv2:default 0 ;
@@ -353,7 +407,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 27 ;
+        lv2:index 33 ;
         lv2:symbol "gain4" ;
         lv2:name "Band 4 Gain" ;
         lv2:default 0 ;
@@ -365,7 +419,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 28 ;
+        lv2:index 34 ;
         lv2:symbol "gain5" ;
         lv2:name "Band 5 Gain" ;
         lv2:default 0 ;
@@ -377,7 +431,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 29 ;
+        lv2:index 35 ;
         lv2:symbol "gain6" ;
         lv2:name "Band 6 Gain" ;
         lv2:default 0 ;
@@ -389,7 +443,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 30 ;
+        lv2:index 36 ;
         lv2:symbol "q1" ;
         lv2:name "Band 1 Q" ;
         lv2:default 1 ;
@@ -399,7 +453,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 31 ;
+        lv2:index 37 ;
         lv2:symbol "q2" ;
         lv2:name "Band 2 Q" ;
         lv2:default 1 ;
@@ -409,7 +463,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 32 ;
+        lv2:index 38 ;
         lv2:symbol "q3" ;
         lv2:name "Band 3 Q" ;
         lv2:default 1 ;
@@ -419,7 +473,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 33 ;
+        lv2:index 39 ;
         lv2:symbol "q4" ;
         lv2:name "Band 4 Q" ;
         lv2:default 1 ;
@@ -429,7 +483,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 34 ;
+        lv2:index 40 ;
         lv2:symbol "q5" ;
         lv2:name "Band 5 Q" ;
         lv2:default 1 ;
@@ -439,7 +493,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 35 ;
+        lv2:index 41 ;
         lv2:symbol "q6" ;
         lv2:name "Band 6 Q" ;
         lv2:default 1 ;
@@ -449,7 +503,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 36 ;
+        lv2:index 42 ;
         lv2:symbol "dynMode1" ;
         lv2:name "Band 1 Dynamics" ;
         lv2:default 0 ;
@@ -464,7 +518,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 37 ;
+        lv2:index 43 ;
         lv2:symbol "dynMode2" ;
         lv2:name "Band 2 Dynamics" ;
         lv2:default 0 ;
@@ -479,7 +533,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 38 ;
+        lv2:index 44 ;
         lv2:symbol "dynMode3" ;
         lv2:name "Band 3 Dynamics" ;
         lv2:default 0 ;
@@ -494,7 +548,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 39 ;
+        lv2:index 45 ;
         lv2:symbol "dynMode4" ;
         lv2:name "Band 4 Dynamics" ;
         lv2:default 0 ;
@@ -509,7 +563,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 40 ;
+        lv2:index 46 ;
         lv2:symbol "dynMode5" ;
         lv2:name "Band 5 Dynamics" ;
         lv2:default 0 ;
@@ -524,7 +578,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 41 ;
+        lv2:index 47 ;
         lv2:symbol "dynMode6" ;
         lv2:name "Band 6 Dynamics" ;
         lv2:default 0 ;
@@ -539,7 +593,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 42 ;
+        lv2:index 48 ;
         lv2:symbol "threshold1" ;
         lv2:name "Band 1 Threshold" ;
         lv2:default -30 ;
@@ -550,7 +604,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 43 ;
+        lv2:index 49 ;
         lv2:symbol "threshold2" ;
         lv2:name "Band 2 Threshold" ;
         lv2:default -30 ;
@@ -561,7 +615,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 44 ;
+        lv2:index 50 ;
         lv2:symbol "threshold3" ;
         lv2:name "Band 3 Threshold" ;
         lv2:default -30 ;
@@ -572,7 +626,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 45 ;
+        lv2:index 51 ;
         lv2:symbol "threshold4" ;
         lv2:name "Band 4 Threshold" ;
         lv2:default -30 ;
@@ -583,7 +637,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 46 ;
+        lv2:index 52 ;
         lv2:symbol "threshold5" ;
         lv2:name "Band 5 Threshold" ;
         lv2:default -30 ;
@@ -594,7 +648,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 47 ;
+        lv2:index 53 ;
         lv2:symbol "threshold6" ;
         lv2:name "Band 6 Threshold" ;
         lv2:default -30 ;
@@ -605,7 +659,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 48 ;
+        lv2:index 54 ;
         lv2:symbol "ratio1" ;
         lv2:name "Band 1 Ratio" ;
         lv2:default 2 ;
@@ -616,7 +670,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 49 ;
+        lv2:index 55 ;
         lv2:symbol "ratio2" ;
         lv2:name "Band 2 Ratio" ;
         lv2:default 2 ;
@@ -627,7 +681,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 50 ;
+        lv2:index 56 ;
         lv2:symbol "ratio3" ;
         lv2:name "Band 3 Ratio" ;
         lv2:default 2 ;
@@ -638,7 +692,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 51 ;
+        lv2:index 57 ;
         lv2:symbol "ratio4" ;
         lv2:name "Band 4 Ratio" ;
         lv2:default 2 ;
@@ -649,7 +703,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 52 ;
+        lv2:index 58 ;
         lv2:symbol "ratio5" ;
         lv2:name "Band 5 Ratio" ;
         lv2:default 2 ;
@@ -660,7 +714,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 53 ;
+        lv2:index 59 ;
         lv2:symbol "ratio6" ;
         lv2:name "Band 6 Ratio" ;
         lv2:default 2 ;
@@ -671,7 +725,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 54 ;
+        lv2:index 60 ;
         lv2:symbol "range1" ;
         lv2:name "Band 1 Range" ;
         lv2:default -6 ;
@@ -682,7 +736,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 55 ;
+        lv2:index 61 ;
         lv2:symbol "range2" ;
         lv2:name "Band 2 Range" ;
         lv2:default -6 ;
@@ -693,7 +747,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 56 ;
+        lv2:index 62 ;
         lv2:symbol "range3" ;
         lv2:name "Band 3 Range" ;
         lv2:default -6 ;
@@ -704,7 +758,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 57 ;
+        lv2:index 63 ;
         lv2:symbol "range4" ;
         lv2:name "Band 4 Range" ;
         lv2:default -6 ;
@@ -715,7 +769,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 58 ;
+        lv2:index 64 ;
         lv2:symbol "range5" ;
         lv2:name "Band 5 Range" ;
         lv2:default -6 ;
@@ -726,7 +780,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 59 ;
+        lv2:index 65 ;
         lv2:symbol "range6" ;
         lv2:name "Band 6 Range" ;
         lv2:default -6 ;
@@ -737,7 +791,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 60 ;
+        lv2:index 66 ;
         lv2:symbol "attack1" ;
         lv2:name "Band 1 Attack" ;
         lv2:default 5 ;
@@ -748,7 +802,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 61 ;
+        lv2:index 67 ;
         lv2:symbol "attack2" ;
         lv2:name "Band 2 Attack" ;
         lv2:default 5 ;
@@ -759,7 +813,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 62 ;
+        lv2:index 68 ;
         lv2:symbol "attack3" ;
         lv2:name "Band 3 Attack" ;
         lv2:default 5 ;
@@ -770,7 +824,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 63 ;
+        lv2:index 69 ;
         lv2:symbol "attack4" ;
         lv2:name "Band 4 Attack" ;
         lv2:default 5 ;
@@ -781,7 +835,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 64 ;
+        lv2:index 70 ;
         lv2:symbol "attack5" ;
         lv2:name "Band 5 Attack" ;
         lv2:default 5 ;
@@ -792,7 +846,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 65 ;
+        lv2:index 71 ;
         lv2:symbol "attack6" ;
         lv2:name "Band 6 Attack" ;
         lv2:default 5 ;
@@ -803,7 +857,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 66 ;
+        lv2:index 72 ;
         lv2:symbol "release1" ;
         lv2:name "Band 1 Release" ;
         lv2:default 100 ;
@@ -815,7 +869,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 67 ;
+        lv2:index 73 ;
         lv2:symbol "release2" ;
         lv2:name "Band 2 Release" ;
         lv2:default 100 ;
@@ -827,7 +881,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 68 ;
+        lv2:index 74 ;
         lv2:symbol "release3" ;
         lv2:name "Band 3 Release" ;
         lv2:default 100 ;
@@ -839,7 +893,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 69 ;
+        lv2:index 75 ;
         lv2:symbol "release4" ;
         lv2:name "Band 4 Release" ;
         lv2:default 100 ;
@@ -851,7 +905,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 70 ;
+        lv2:index 76 ;
         lv2:symbol "release5" ;
         lv2:name "Band 5 Release" ;
         lv2:default 100 ;
@@ -863,7 +917,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 71 ;
+        lv2:index 77 ;
         lv2:symbol "release6" ;
         lv2:name "Band 6 Release" ;
         lv2:default 100 ;
@@ -875,7 +929,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 72 ;
+        lv2:index 78 ;
         lv2:symbol "listen1" ;
         lv2:name "Band 1 Listen" ;
         lv2:default 0 ;
@@ -886,7 +940,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 73 ;
+        lv2:index 79 ;
         lv2:symbol "listen2" ;
         lv2:name "Band 2 Listen" ;
         lv2:default 0 ;
@@ -897,7 +951,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 74 ;
+        lv2:index 80 ;
         lv2:symbol "listen3" ;
         lv2:name "Band 3 Listen" ;
         lv2:default 0 ;
@@ -908,7 +962,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 75 ;
+        lv2:index 81 ;
         lv2:symbol "listen4" ;
         lv2:name "Band 4 Listen" ;
         lv2:default 0 ;
@@ -919,7 +973,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 76 ;
+        lv2:index 82 ;
         lv2:symbol "listen5" ;
         lv2:name "Band 5 Listen" ;
         lv2:default 0 ;
@@ -930,7 +984,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 77 ;
+        lv2:index 83 ;
         lv2:symbol "listen6" ;
         lv2:name "Band 6 Listen" ;
         lv2:default 0 ;
@@ -941,7 +995,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 78 ;
+        lv2:index 84 ;
         lv2:symbol "mixPct" ;
         lv2:name "Mix" ;
         lv2:default 100 ;

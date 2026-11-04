@@ -118,7 +118,7 @@ Its documentation is on openmixer.org.
 Summary: Headers and static library of the OpenMixer plugins, for projects that build on them
 Requires: omx-dsp-devel >= 0.28.0
 # the generated parameter headers include omx-contract's C renders, and omxplugins.pc requires omx-contract
-Requires: omx-contract-devel >= 3.7.1
+Requires: omx-contract-devel >= 3.9.0
 Requires: %{name}-contract = %{version}-%{release}
 Requires: clap-devel
 
@@ -135,7 +135,7 @@ Its documentation is on openmixer.org.
 Summary: The OpenMixer plugins' descriptors in omx-contract's contract directory
 BuildArch: noarch
 # the contract directory, its schema and its reader's own package
-Requires: omx-contract-data >= 3.7.1
+Requires: omx-contract-data >= 3.9.0
 # the files lived in omx-plugins-devel before this package
 Conflicts: %{name}-devel < %{version}-%{release}
 

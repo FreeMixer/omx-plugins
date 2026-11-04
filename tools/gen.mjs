@@ -45,7 +45,7 @@ import { descriptorFile, descriptorOf, descriptorText, isWhole, panelDescription
 import { lv2Designation, lv2UnitNames, lv2UnitRef } from './format-tables.mjs';
 import { DISPLAY_KINDS, DISPLAY_SOURCES, FAMILIES, PLACEMENTS, WIDGETS, pagesOf, panelFingerprint } from './omx-panel.mjs';
 import { CONTRACT_VERSION, contractFingerprint, contractOf, faceIds } from './param-contract.mjs';
-import { SPEC_FILE, controlOf, eqDefaultBands, findName, kernelControls, locateContract, packagingRange, paramKernel, resolveParam } from './omx-contract.mjs';
+import { SPEC_FILE, controlOf, eqDefaultBands, findName, kernelControls, locateContract, packagingRange, paramKernel, renderKernels, resolveParam } from './omx-contract.mjs';
 import { bandsMacro, baseOf, expandVariant, variantStems } from './variants.mjs';
 import { omxdspInclude, render } from './template.mjs';
 import { generateTest, isTestDir, loadTestDecl, testPluginDirs } from './test-plugins.mjs';
@@ -132,6 +132,7 @@ export function prepareDecl(file, d, stem, dir = dirname(file)) {
   if (d.sidechain && (seen.has(d.sidechain.symbol) || FIXED_PORTS.includes(d.sidechain.symbol))) throw new Error(`${file}: sidechain symbol '${d.sidechain.symbol}' is taken`);
   if (d.binding === 'chain') checkShipped(file, d);
   if (d.meters && d.binding !== 'instance') throw new Error(`${file}: "meters" are read from an instance face; this declaration's binding is ${d.binding ?? 'its own'}`);
+  d.meterReadouts = meterReadoutsOf(file, d);
   for (const o of d.oracles ?? []) {
     if (o === `${d.kernel}-oracle`) throw new Error(`${file}: oracle '${o}' is the generated identity test's name`);
     if (!existsSync(join(dir, 'test', `${o}.c`))) throw new Error(`${file}: oracle '${o}' names test/${o}.c, which does not exist`);
@@ -496,6 +497,48 @@ export const choicesOf = (p) => p.points ?? p.values?.map((label, k) => ({ value
 /** The port symbols every plugin has, which no parameter or key may take. */
 const FIXED_PORTS = ['in_l', 'in_r', 'out_l', 'out_r', 'enabled', 'latency'];
 
+/** The kernel readout each meter of declaration `d` names (`readout`, the readout's name in macro case), as
+ * omx-contract's render resolves it for the plugin's kernel: `{ name, doc, unit, min, max, scale }`, or null for a
+ * meter the face measures (a level at the input or the output), in the order of `meters`. */
+function meterReadoutsOf(file, d) {
+  if (!d.meters?.some((m) => m.readout)) return (d.meters ?? []).map(() => null);
+  const where = locateContract(treeOf(file));
+  if (!where.dir) throw new Error(`${file}: its "meters" read omx-contract's ${d.kernel} readouts and ${where.why}`);
+  const listed = renderKernels(where.dir)[d.kernel]?.readouts ?? [];
+  return d.meters.map((m, k) => {
+    if (!m.readout) return null;
+    const r = listed.find((x) => macro(x.name) === m.readout);
+    if (!r) throw new Error(`${file}: meters[${k}] names readout ${m.readout}, which omx-contract's ${d.kernel} kernel does not declare (${listed.map((x) => macro(x.name)).join(', ') || 'none'})`);
+    return r;
+  });
+}
+
+/** What a meter's port and descriptor entry are called, from its id: a band's prefix (`band2`) as "Band 2",
+ * the kind its suffix names (Gr, Gain, In, Out, Key) in words, any other prefix (the plugin's own name, as
+ * `comp` in compGr) left out. */
+const METER_WORDS = { Gr: 'gain reduction', Gain: 'gain', In: 'input level', Out: 'output level', Key: 'key level' };
+export function meterLabel(id) {
+  const m = id.match(/^(?:band(\d+))?[a-z]*?(Gr|Gain|In|Out|Key)$/);
+  if (!m) throw new Error(`meter '${id}': no label for it (its id ends in none of ${Object.keys(METER_WORDS).join(', ')})`);
+  const words = METER_WORDS[m[2]];
+  return m[1] ? `Band ${m[1]} ${words}` : `${words[0].toUpperCase()}${words.slice(1)}`;
+}
+
+/** Each meter of declaration `d` as the faces publish it, in order: its id, kind, channels (one for a reading
+ * of the kernel's, two for a level the face measures, left and right), label, display range and unit (a
+ * readout's, else the declared range in dBFS), and the output symbol of each channel: the id for one channel,
+ * `<id>_<channel>` from 0 for more, the names omx-clap-core derives from clap.meters/1 (doc/reference.md). */
+export function metersOf(d) {
+  const readouts = d.meterReadouts ?? (d.meters ?? []).map(() => null);
+  return (d.meters ?? []).map((m, k) => {
+    const r = readouts[k];
+    const channels = m.kind === 'gain_reduction' || 'read' in m ? 1 : 2;
+    const range = r ? { min: r.min, max: r.max, unit: r.unit, scale: r.scale } : { min: m.min, max: m.max, unit: 'dBFS', scale: 'linear' };
+    const symbols = channels === 1 ? [m.id] : Array.from({ length: channels }, (_, c) => `${m.id}_${c}`);
+    return { id: m.id, kind: m.kind, channels, label: meterLabel(m.id), ...range, symbols, readout: r };
+  });
+}
+
 /** Whether the plugin reads the host's tempo: its descriptor's needs.tempo. Its LV2 face then has a `control` atom
  * input, the port right after the face's own (enabled, latency), so an appended parameter moves it no more than them. */
 export const tempoOf = (d) => Boolean(d.descriptor?.needs?.tempo);
@@ -517,8 +560,11 @@ export function lv2Ports(d, face = faceIds()) {
     [face.enabledLv2Index, { symbol: 'enabled', name: 'Enabled', a: 'lv2:ControlPort , lv2:InputPort', enabled: true }],
     [face.latencyLv2Index, { symbol: 'latency', name: 'Latency', a: 'lv2:ControlPort , lv2:OutputPort', latency: true }],
   ]);
+  const meters = metersOf(d).flatMap((m) => m.symbols.map((symbol, c) => ({
+    symbol, name: m.channels === 1 ? m.label : `${m.label} ${['L', 'R'][c] ?? c}`, a: 'lv2:ControlPort , lv2:OutputPort', meter: m,
+  })));
   const rest = [...(tempoOf(d) ? [{ symbol: 'control', name: 'Control', a: 'atom:AtomPort , lv2:InputPort', time: true }] : []),
-    ...audio, ...params];
+    ...meters, ...audio, ...params];
   const n = rest.length + fixed.size;
   if (fixed.size !== 2 || [...fixed.keys()].some((i) => !(i >= 0 && i < n))) throw new Error(`${d.stem}: the face's LV2 indices ${[...fixed.keys()]} do not fit ${n} ports`);
   const out = [];
@@ -646,10 +692,12 @@ ${contractOf(d, scaleOf).slice(0, -1).map((r) => `  { ${r.unitEnum}u, OMX_CLAP_S
 
 ${emitHintsC(K, d.hints ?? [])}
 ${emitPanelRows(d)}
-/* LV2 port indices (tools/gen.mjs lv2Ports): enabled and latency at omx-contract's permanent indices, the audio ports,
- * then parameter i at FIRST_PARAM + i. */
-${ports.filter((p) => !p.param).map((p) => `#define OMX_${K}_LV2_PORT_${macro(p.symbol)} ${p.index}u`).join('\n')}
+/* LV2 port indices (tools/gen.mjs lv2Ports): enabled and latency at omx-contract's permanent indices, the tempo's control,
+ * the meters' outputs, the audio ports, then parameter i at FIRST_PARAM + i. */
+${ports.filter((p) => !p.param && !p.meter).map((p) => `#define OMX_${K}_LV2_PORT_${macro(p.symbol)} ${p.index}u`).join('\n')}
 #define OMX_${K}_LV2_PORT_FIRST_PARAM ${firstParam}u
+/* The meters' output control ports, one per channel in the order their values are published, from here on. */
+#define OMX_${K}_LV2_PORT_FIRST_METER ${ports.find((p) => p.meter)?.index ?? ports.length}u
 #define OMX_${K}_LV2_PORT_COUNT ${ports.length}u
 
 #endif /* OMX_${K}_PARAMS_H */
@@ -705,6 +753,9 @@ export function emitPluginTtl(d) {
       lines.push('        lv2:default 1 ;', '        lv2:minimum 0 ;', '        lv2:maximum 1 ;', '        lv2:designation lv2:enabled ;', '        lv2:portProperty lv2:toggled ;');
     } else if (p.latency) {
       lines.push('        lv2:designation lv2:latency ;', '        lv2:portProperty lv2:integer ;', '        units:unit units:frame ;');
+    } else if (p.meter) {
+      lines.push(`        lv2:minimum ${ttlNum(p.meter.min)} ;`, `        lv2:maximum ${ttlNum(p.meter.max)} ;`);
+      if (lv2UnitRef(p.meter.unit)) lines.push(`        units:unit ${lv2UnitRef(p.meter.unit)} ;`);
     } else if (p.time) {
       // the host's transport: time:Position objects, read for their time:beatsPerMinute; optional, no tempo without it
       lines.push('        atom:bufferType atom:Sequence ;', '        atom:supports time:Position ;', '        lv2:designation lv2:control ;', '        lv2:portProperty lv2:connectionOptional ;');
@@ -762,7 +813,8 @@ lv2:displayPriority
 const hintPrefix = (d, pick) => hintPrefixes(d.hintVocabulary, d.hints ?? []).filter(([p]) => pick(p)).map(([p, ns]) => `@prefix ${`${p}:`.padEnd(6)} <${ns}> .\n`).join('');
 
 /** The plugin-defined units this plugin's ports use, in a fixed order. */
-const customUnitsOf = (d) => Object.keys(LV2_CUSTOM_UNITS).filter((name) => d.params.some((q, i) => lv2UnitRef(faceUnit(d, i)) === `<urn:openmixer:unit#${name}>`));
+const customUnitsOf = (d) => Object.keys(LV2_CUSTOM_UNITS).filter((name) =>
+  [...d.params.map((q, i) => faceUnit(d, i)), ...metersOf(d).map((m) => m.unit)].some((u) => lv2UnitRef(u) === `<urn:openmixer:unit#${name}>`));
 
 /** A control's group as a CLAP module path (plugin-hostd's group-path, written: the labels joined by "/"). */
 const moduleOf = (d, i) => (d.descriptor?.controls[i]?.group ?? []).join('/');
@@ -957,6 +1009,8 @@ export function latencyRows(d) {
 
 /** clap.meters/1's kind of each meter kind a declaration may name. */
 const METER_KINDS = { gain_reduction: 'CLAP_METER_KIND_GAIN_REDUCTION', level: 'CLAP_METER_KIND_LEVEL' };
+/** The shared faces' kind of each (include/omx_plugin_face.h): clap.meters/1's numbers, without CLAP's headers. */
+const FACE_METER_KINDS = { gain_reduction: 'OMX_FACE_METER_KIND_GAIN_REDUCTION', level: 'OMX_FACE_METER_KIND_LEVEL' };
 /** The most values a plugin's meters carry together: include/omx_meter_ring.h's OMX_METER_RING_MAX. */
 const METER_VALUES_MAX = 16;
 /** A C double literal: always with a point. */
@@ -1016,7 +1070,7 @@ export function meterRows(d, face) {
       row = { channels: 2, min: m.min, max: m.max, core: '', ref: '' };
     }
     const out = {
-      meterIndex: k, meterName: m.id, meterKind: METER_KINDS[m.kind], meterReadCore: row.core, meterReadRef: row.ref,
+      meterIndex: k, meterName: m.id, meterKind: METER_KINDS[m.kind], meterFaceKind: FACE_METER_KINDS[m.kind], meterReadCore: row.core, meterReadRef: row.ref,
       meterChannels: row.channels, meterOffset: offset, meterRight: offset + 1, meterMin: cdouble(row.min), meterMax: cdouble(row.max),
       isGr: m.kind === 'gain_reduction', isLinear: m.linear === true, isRead: reads, isIn: m.source === 'input', isOut: m.source === 'output',
       // where the shared face reads it (include/omx_plugin_face.h); what a bypassed kernel's stale reading
