@@ -7,7 +7,8 @@
  * dyneq kernel, reached through omx_dyneq_core.h's vtable.
  *
  * Ports: in_l, in_r, out_l, out_r, then the declared parameters in order, then `enabled`
- * (lv2:enabled; 0 is the bypass) and `latency`. A parameter port the host left unconnected reads
+ * (lv2:enabled; 0 is the bypass) and `latency`, then one output control port per channel of each
+ * declared meter, written after every block. A parameter port the host left unconnected reads
  * its declared default.
  */
 #include "omx_lv2_face.h"
@@ -15,9 +16,23 @@
 /* The generated table FIRST: its guard is omx-dsp's own, so the instance header reads this table. */
 #include "omx_dyneq_params.h"
 #include "omx_dyneq_core.h"
+#include "omx_meter_ring.h"
+
+/* The declaration's meters, in order, as the CLAP face lists them: each one's channels sit at `at` among the
+ * 6 values the face writes after a block, the output control ports from OMX_DYNEQ_LV2_PORT_FIRST_METER on. */
+_Static_assert(6u <= OMX_METER_RING_MAX, "one block's values fit the face's array");
+static const struct omx_face_meter G_METERS[] = {
+    {"band1Gain", OMX_FACE_METER_KIND_GAIN_REDUCTION, 1u, 0u, (double)OMX_DYNEQ_READOUT_BAND1_GAIN_DB_MIN, (double)OMX_DYNEQ_READOUT_BAND1_GAIN_DB_MAX, OMX_FACE_METER_READ},
+    {"band2Gain", OMX_FACE_METER_KIND_GAIN_REDUCTION, 1u, 1u, (double)OMX_DYNEQ_READOUT_BAND2_GAIN_DB_MIN, (double)OMX_DYNEQ_READOUT_BAND2_GAIN_DB_MAX, OMX_FACE_METER_READ},
+    {"band3Gain", OMX_FACE_METER_KIND_GAIN_REDUCTION, 1u, 2u, (double)OMX_DYNEQ_READOUT_BAND3_GAIN_DB_MIN, (double)OMX_DYNEQ_READOUT_BAND3_GAIN_DB_MAX, OMX_FACE_METER_READ},
+    {"band4Gain", OMX_FACE_METER_KIND_GAIN_REDUCTION, 1u, 3u, (double)OMX_DYNEQ_READOUT_BAND4_GAIN_DB_MIN, (double)OMX_DYNEQ_READOUT_BAND4_GAIN_DB_MAX, OMX_FACE_METER_READ},
+    {"band5Gain", OMX_FACE_METER_KIND_GAIN_REDUCTION, 1u, 4u, (double)OMX_DYNEQ_READOUT_BAND5_GAIN_DB_MIN, (double)OMX_DYNEQ_READOUT_BAND5_GAIN_DB_MAX, OMX_FACE_METER_READ},
+    {"band6Gain", OMX_FACE_METER_KIND_GAIN_REDUCTION, 1u, 5u, (double)OMX_DYNEQ_READOUT_BAND6_GAIN_DB_MIN, (double)OMX_DYNEQ_READOUT_BAND6_GAIN_DB_MAX, OMX_FACE_METER_READ},
+};
 
 static const struct omx_face G_FACE = {
     OMX_FACE_TABLES(DYNEQ), .core = &OMX_DYNEQ_CORE,
+    .meters = G_METERS, .meter_count = 6u, .meter_values = 6u,
     OMX_FACE_LV2_PORTS(DYNEQ, UINT32_MAX),
 };
 

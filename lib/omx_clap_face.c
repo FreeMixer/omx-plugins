@@ -55,7 +55,11 @@
 #include "omx_meter_ring.h"
 #include "omx_preset_file.h"
 #include <omxdsp/omx_denormal.h>    /* omx_denormals_off, per callback */
-#include <omxdsp/mix/omx_meter.h>   /* omx_meter_level_db: a level meter's reading */
+#include "omx_face_meters.h"         /* one block's meter values, the LV2 face's too */
+
+_Static_assert((int)OMX_FACE_METER_KIND_GAIN_REDUCTION == (int)CLAP_METER_KIND_GAIN_REDUCTION &&
+                   (int)OMX_FACE_METER_KIND_LEVEL == (int)CLAP_METER_KIND_LEVEL,
+               "a face meter's kind is clap.meters/1's");
 
 /* The host's bypass: the slot after the declared ones, and CLAP id OMX_PLUGIN_FACE_BYPASS_CLAP_ID (omx-contract), the
  * same in every plugin and never moved by an appended parameter. A declared parameter's id is its slot. */
@@ -235,16 +239,6 @@ static void g_reset(const clap_plugin_t *p) {
   g->face->core->init(g->core, g->rate);
 }
 
-/** The meters of `source` (the inputs' or the outputs' peak), each leg's level of `buf`. */
-static void g_levels(const G *g, uint32_t source, const clap_audio_buffer_t *buf, uint32_t frames, double *mv) {
-  for (uint32_t m = 0; m < g->face->meter_count; ++m) {
-    const struct omx_face_meter *row = &g->face->meters[m];
-    if (row->source != source) continue;
-    mv[row->at] = omx_meter_level_db(buf->data32[0], frames, row->min);
-    mv[row->at + 1] = omx_meter_level_db(buf->data32[1], frames, row->min);
-  }
-}
-
 static clap_process_status g_process(const clap_plugin_t *p, const clap_process_t *pr) {
   G *g = G_OF(p);
   const struct omx_face *f = g->face;
@@ -263,7 +257,7 @@ static clap_process_status g_process(const clap_plugin_t *p, const clap_process_
   f->core->resolve(g->core, g->values, bypassed);
   double mv[OMX_METER_RING_MAX];
   /* the inputs' peak, before the kernel runs (the outputs may be the inputs) */
-  if (f->meter_count) g_levels(g, OMX_FACE_METER_IN, ai, pr->frames_count, mv);
+  if (f->meter_count) omx_face_meter_levels(f, OMX_FACE_METER_IN, ai->data32[0], ai->data32[1], pr->frames_count, mv);
   const float *key = NULL;
   if (f->key_symbol) {
     const clap_audio_buffer_t *ak = pr->audio_inputs_count > 1 ? &pr->audio_inputs[1] : NULL;
@@ -272,15 +266,8 @@ static clap_process_status g_process(const clap_plugin_t *p, const clap_process_
   f->core->run(g->core, key, ai->data32[0], ai->data32[1], ao->data32[0], ao->data32[1], pr->frames_count);
   g_publish(g);
   if (f->meter_count) {
-    /* The kernel's readings of this block; a bypassed kernel's state is stale, and reads 0 (a level the
-     * kernel reads, its display minimum). */
-    for (uint32_t m = 0; m < f->meter_count; ++m) {
-      const struct omx_face_meter *row = &f->meters[m];
-      if (row->source == OMX_FACE_METER_READ)
-        mv[row->at] = bypassed ? (row->kind == CLAP_METER_KIND_GAIN_REDUCTION ? 0.0 : row->min)
-                               : (double)f->core->meter(g->core, m);
-    }
-    g_levels(g, OMX_FACE_METER_OUT, ao, pr->frames_count, mv);
+    omx_face_meter_readings(f, g->core, bypassed, mv);
+    omx_face_meter_levels(f, OMX_FACE_METER_OUT, ao->data32[0], ao->data32[1], pr->frames_count, mv);
     omx_meter_ring_publish(&g->meters, mv, f->meter_values);
   }
   /* A parameter that moves the kernel's latency (as the pitch shifter's mix crossing 100 % does):
