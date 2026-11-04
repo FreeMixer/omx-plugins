@@ -80,6 +80,12 @@ struct omx_face {
   uint32_t meter_count, meter_values;
   struct omx_face_lv2_ports lv2;
   const struct omx_face_core *core;
+  /* The host's tempo, for a plugin whose descriptor says needs.tempo (its core's omx_<kernel>_core_tempo): called
+   * before every resolve with the block's tempo in BPM, 0 when the host handed none (no CLAP transport, or one
+   * without CLAP_TRANSPORT_HAS_TEMPO; no LV2 time:Position with time:beatsPerMinute yet). NULL: reads no tempo. */
+  void (*tempo)(void *core, double bpm);
+  /* With `tempo`, the LV2 face's atom input port (generated OMX_<K>_LV2_PORT_CONTROL) where time:Position arrives. */
+  uint32_t lv2_control;
 };
 
 /* The fields generated/omx_<kernel>_params.h names for every plugin, by its OMX_<K>_ prefix: a plugin's

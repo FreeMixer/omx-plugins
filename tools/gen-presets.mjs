@@ -116,7 +116,11 @@ const DEFINITIONS = {
     ['mustard-b', 'Hard Peak', COMP(-10, 10, 1, 200, 2, 'Limiter')],
     ['mustard-c', 'Slow RMS', COMP(-22, 2.5, 20, 300, 3)],
     ['mustard-d', 'Firm RMS', COMP(-14, 6, 8, 150, 4)],
-    ['ssl-bus-glue', 'Bus Glue 4:1', COMP(-10, 4, 30, 300, 1.5)],
+    // the bus-glue shape at 4:1 with the detector on the output: the feedback loop of a VCA bus compressor
+    ['ssl-bus-glue', 'Bus Glue 4:1', { ...COMP(-10, 4, 30, 300, 1.5), detectorTopology: 'Feedback' }],
+    // the ducker (openmixer ducker spec §3 item 4): ratio 20 held at a -12 dB range, a fast duck and a slow return;
+    // the key is the host's (keySource is left out), and the threshold and the rest come up at their defaults
+    ['ducker', 'Ducker', { ratio: 20, attackMs: 1, releaseMs: 300, duck: 1, rangeDb: -12 }],
   ],
   // the card's uses (the remaining-FX wave, FX-1): a vocal harsh only when pushed, proximity boom, a
   // monitor ring that appears at level; one band each, cutting while the band is loud
@@ -218,6 +222,9 @@ const DEFINITIONS = {
     ['mix-bus', 'Mix Bus', { thresholdDb: -12, ratio: '2:1', attack: '30 ms', release: 'Auto', makeupDb: 2 }],
     ['drum-bus', 'Drum Bus', { thresholdDb: -14, ratio: '4:1', attack: '10 ms', release: '0.3 s', makeupDb: 3, keyHpHz: 80 }],
     ['parallel', 'Parallel Squash', { thresholdDb: -24, ratio: '10:1', attack: '3 ms', release: '0.1 s', makeupDb: 6, mixPct: 40 }],
+    // the VCA bus compressor's front panel at its public default (4:1, fastest attack, auto release), the detector
+    // on the output; threshold and make-up are desk judgement
+    ['vca-bus', 'VCA Bus 4:1', { thresholdDb: -10, ratio: '4:1', attack: '0.1 ms', release: 'Auto', makeupDb: 2, detectorTopology: 'Feedback' }],
   ],
   'org.openmixer.loudlevel': [
     ['speech', 'Speech', { targetLufs: -20, rangeDb: 9, speedDbPerS: 1.5, gateLufs: -50, window: 'Short-term' }],

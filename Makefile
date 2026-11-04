@@ -21,6 +21,8 @@
 #                   (tools/round-trip.{sh,mjs}, with its two sabotage arms; part of `make test`)
 #   make contract-union  parallel make targets render omx-contract's union into private directories and read it whole
 #                   (tools/test/contract-union-race-test.mjs; part of `make test` and `make test-faces`)
+#   make face-ids   the host's bypass and LV2 enabled and latency sit at omx-contract's permanent ids (OMX_PLUGIN_FACE_IDS), none
+#                   moved by an appended parameter (tools/test/face-ids-test.mjs, with its self-test; part of `make test`)
 #   make probe-checks  clap-params-check, panel-check, clap-ext-check and port-groups-check each fail on a built face that is wrong,
 #                   one change at a time (tools/test/probe-checks-selftest.mjs; part of `make test`)
 #   make eq-probe-race  parallel make targets each build build/eq-default-probe privately and run it whole
@@ -160,11 +162,11 @@ LIB_FLAGS  := -fPIC -fvisibility=hidden -DOMX_CLAP_STATIC -Iinclude
 # read only by the targets that build the archive, so `make version` and the rest need no omx-dsp
 lib_cflags = $(call dep_check,omxdsp,$(OMXDSP_MIN))$(call dep_check,omx-contract,$(CONTRACT_MIN))$(shell $(PKG_CONFIG) --cflags omxdsp omx-contract omx-clap-core clap)
 
-.PHONY: summary-numbers param-tie presets presets-figures test-role all lib lib-test test test-faces units panel-layout descriptor-view lv2-units lv2-deprecated lv2-maintainer lv2-manifest release-version resource-hints format-tables contract-union probe-checks eq-probe-race band-groups strip-visible-when phaser-depth geq-widgets round-trip hints modgui manual install install-pins install-test package-lists install-devel install-contract contract-dir lv2bench-ran clean version recipe-test completeness selftest private-refs params-doc check-params-doc strip-crosscheck strip-bands strip-bands-bench meters-abi meter-level dsp-copies panel-copies meter-ring clap-validate
+.PHONY: summary-numbers param-tie presets presets-figures test-role all lib lib-test test test-faces units panel-layout descriptor-view lv2-units lv2-deprecated lv2-maintainer lv2-manifest release-version resource-hints format-tables contract-union probe-checks face-ids eq-probe-race band-groups strip-visible-when phaser-depth geq-widgets round-trip hints modgui manual install install-pins install-test package-lists install-devel install-contract contract-dir lv2bench-ran clean version recipe-test completeness selftest private-refs params-doc check-params-doc strip-crosscheck strip-bands strip-bands-bench meters-abi meter-level dsp-copies panel-copies meter-ring clap-validate
 all: lib
 	@for p in $(PLUGINS); do $(MAKE) -C $$p all || exit 1; done
 lib: $(LIB) $(LIB_PC)
-test: lib units panel-layout descriptor-view lv2-units lv2-deprecated lv2-maintainer lv2-manifest release-version resource-hints format-tables contract-union contract-dir lv2bench-ran probe-checks eq-probe-race band-groups strip-visible-when phaser-depth geq-widgets summary-numbers param-tie
+test: lib units panel-layout descriptor-view lv2-units lv2-deprecated lv2-maintainer lv2-manifest release-version resource-hints format-tables contract-union contract-dir lv2bench-ran probe-checks eq-probe-race band-groups phaser-depth geq-widgets summary-numbers param-tie face-ids strip-visible-when
 	@if [ -z "$(PLUGINS)" ]; then echo "no plugins yet"; fi
 	@for p in $(PLUGINS); do $(MAKE) -C $$p test || exit 1; done
 	@$(MAKE) -s round-trip
@@ -217,6 +219,11 @@ contract-union:
 # the four probe checkers (params, panel, CLAP extensions, port groups) each go red on a face that is wrong, one change at a time
 probe-checks:
 	node tools/test/probe-checks-selftest.mjs
+# the host's bypass (CLAP) and enabled and latency (LV2) at omx-contract's permanent ids in every plugin, none moved by an
+# appended parameter or an added sidechain; the self-test holds the rule it replaced red
+face-ids:
+	node tools/test/face-ids-test.mjs
+	node tools/test/face-ids-test.mjs --self-test
 # the EQ default probe is run whole while other processes build it (make -j): a fake compiler, readers a little apart
 eq-probe-race:
 	node tools/test/eq-probe-race-test.mjs
@@ -283,7 +290,8 @@ meters-abi:
 	$(CC) -std=gnu11 -Wall -Wextra -Werror $(shell $(PKG_CONFIG) --cflags omx-clap-core clap) -o build/meters-abi-test tools/test/meters-abi-test.c
 	build/meters-abi-test
 	@echo "ok   clap.meters/1 as omx-clap-core installs it: id, enums, sizeof and offsetof"
-# every level meter of the metered faces reads bit for bit what tools/test/meter-level.sha256 holds, and every
+# every level meter of the metered faces reads what tools/test/<face>.meter-level.txt holds within the bound
+# omx-dsp's fast-maths bound gives (meter-level-digest --tolerance), and a level moved past that bound is red; every
 # other meter (a gain reduction, float through libm) reads within a tolerance what tools/test/<face>.meter-others.txt holds
 METER_LEVEL_FACES := omx-comp omx-deesser
 # faces whose meters are all gain reductions: no level to digest, only the values within the tolerance
@@ -291,14 +299,17 @@ METER_GR_FACES := omx-keyed-gate omx-limiter
 meter-level:
 	@mkdir -p build
 	@for f in $(METER_LEVEL_FACES) $(METER_GR_FACES); do $(MAKE) -s -C plugins/$$f all || exit 1; done
-	$(CC) -std=gnu11 -Wall -Wextra -Werror $(shell $(PKG_CONFIG) --cflags omx-clap-core clap) -o build/meter-level-digest tools/test/meter-level-digest.c -ldl -lm
+	$(CC) -std=gnu11 -Wall -Wextra -Werror $(shell $(PKG_CONFIG) --cflags omxdsp omx-clap-core clap) -o build/meter-level-digest tools/test/meter-level-digest.c -ldl -lm
 	node tools/test/meter-values-check.mjs --self-test
-	@for f in $(METER_LEVEL_FACES); do \
-	  got=$$(build/meter-level-digest plugins/$$f/build/$$f.clap --others build/$$f.meter-others.txt | sha256sum | cut -d' ' -f1); \
-	  want=$$(sed -n "s/^\([0-9a-f]*\)  $$f\$$/\1/p" tools/test/meter-level.sha256); \
-	  if [ "$$got" != "$$want" ] || [ -z "$$want" ]; then echo "FAIL meter-level $$f: $$got, expected $$want" >&2; exit 1; fi; \
-	  echo "ok   meter-level $$f: the level meters read $$got"; \
+	@tol=$$(build/meter-level-digest --tolerance) || exit 1; \
+	for f in $(METER_LEVEL_FACES); do \
+	  build/meter-level-digest plugins/$$f/build/$$f.clap --others build/$$f.meter-others.txt > build/$$f.meter-level.txt || exit 1; \
+	  node tools/test/meter-values-check.mjs --tolerance-db $$tol build/$$f.meter-level.txt tools/test/$$f.meter-level.txt || exit 1; \
 	  node tools/test/meter-values-check.mjs build/$$f.meter-others.txt tools/test/$$f.meter-others.txt || exit 1; \
+	  build/meter-level-digest plugins/$$f/build/$$f.clap --input-gain-db $$(awk "BEGIN { print 4 * $$tol }") > build/$$f.meter-level-moved.txt || exit 1; \
+	  if node tools/test/meter-values-check.mjs --tolerance-db $$tol build/$$f.meter-level-moved.txt tools/test/$$f.meter-level.txt >/dev/null 2>&1; then \
+	    echo "FAIL meter-level $$f: a level moved by four times the bound ($$tol dB) passed" >&2; exit 1; fi; \
+	  echo "ok   meter-level $$f: a level moved by four times the bound is red"; \
 	done
 	@for f in $(METER_GR_FACES); do \
 	  build/meter-level-digest plugins/$$f/build/$$f.clap --others build/$$f.meter-others.txt >/dev/null || exit 1; \

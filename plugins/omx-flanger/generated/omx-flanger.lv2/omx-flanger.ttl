@@ -31,32 +31,52 @@
     omxres:opensSockets false ;
     lv2:port
     [
-        a lv2:AudioPort , lv2:InputPort ;
+        a lv2:ControlPort , lv2:InputPort ;
         lv2:index 0 ;
+        lv2:symbol "enabled" ;
+        lv2:name "Enabled" ;
+        lv2:default 1 ;
+        lv2:minimum 0 ;
+        lv2:maximum 1 ;
+        lv2:designation lv2:enabled ;
+        lv2:portProperty lv2:toggled
+    ] ,
+    [
+        a lv2:ControlPort , lv2:OutputPort ;
+        lv2:index 1 ;
+        lv2:symbol "latency" ;
+        lv2:name "Latency" ;
+        lv2:designation lv2:latency ;
+        lv2:portProperty lv2:integer ;
+        units:unit units:frame
+    ] ,
+    [
+        a lv2:AudioPort , lv2:InputPort ;
+        lv2:index 2 ;
         lv2:symbol "in_l" ;
         lv2:name "In L"
     ] ,
     [
         a lv2:AudioPort , lv2:InputPort ;
-        lv2:index 1 ;
+        lv2:index 3 ;
         lv2:symbol "in_r" ;
         lv2:name "In R"
     ] ,
     [
         a lv2:AudioPort , lv2:OutputPort ;
-        lv2:index 2 ;
+        lv2:index 4 ;
         lv2:symbol "out_l" ;
         lv2:name "Out L"
     ] ,
     [
         a lv2:AudioPort , lv2:OutputPort ;
-        lv2:index 3 ;
+        lv2:index 5 ;
         lv2:symbol "out_r" ;
         lv2:name "Out R"
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 4 ;
+        lv2:index 6 ;
         lv2:symbol "rate" ;
         lv2:name "Rate" ;
         lv2:default 0.25 ;
@@ -68,7 +88,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 5 ;
+        lv2:index 7 ;
         lv2:symbol "depth" ;
         lv2:name "Depth" ;
         lv2:default 2 ;
@@ -79,7 +99,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 6 ;
+        lv2:index 8 ;
         lv2:symbol "feedback" ;
         lv2:name "Feedback" ;
         lv2:default 0.6 ;
@@ -89,7 +109,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 7 ;
+        lv2:index 9 ;
         lv2:symbol "mix" ;
         lv2:name "Mix" ;
         lv2:default 50 ;
@@ -98,26 +118,6 @@
         units:unit units:pc ;
         lv2:designation param:wetDryRatio ;
         pg:group <urn:openmixer:flanger#flanger>
-    ] ,
-    [
-        a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 8 ;
-        lv2:symbol "enabled" ;
-        lv2:name "Enabled" ;
-        lv2:default 1 ;
-        lv2:minimum 0 ;
-        lv2:maximum 1 ;
-        lv2:designation lv2:enabled ;
-        lv2:portProperty lv2:toggled
-    ] ,
-    [
-        a lv2:ControlPort , lv2:OutputPort ;
-        lv2:index 9 ;
-        lv2:symbol "latency" ;
-        lv2:name "Latency" ;
-        lv2:designation lv2:latency ;
-        lv2:portProperty lv2:integer ;
-        units:unit units:frame
     ] .
 
 # lv2:displayPriority on a port group is the term Zynthian reads to order a plugin's groups (zynthian_lv2.py), and the

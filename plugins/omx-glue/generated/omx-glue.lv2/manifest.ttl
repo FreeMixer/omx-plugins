@@ -24,3 +24,8 @@
     a pset:Preset ;
     lv2:appliesTo <urn:openmixer:glue> ;
     rdfs:seeAlso <presets.ttl> .
+
+<urn:openmixer:glue#preset-vca-bus>
+    a pset:Preset ;
+    lv2:appliesTo <urn:openmixer:glue> ;
+    rdfs:seeAlso <presets.ttl> .

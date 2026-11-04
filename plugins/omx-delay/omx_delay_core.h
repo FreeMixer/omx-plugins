@@ -9,12 +9,6 @@
  *
  * GENERATED — DO NOT EDIT BY HAND. Produced by tools/gen.mjs from plugins/omx-delay/omx-delay.decl.json and
  * the face's resolve() prototype: each argument takes the parameter whose contract control it names.
- * `sync` is no parameter: the declaration holds it at its kernel's declared default, OMX_DELAY_SYNCS_DEFAULT.
- * `division` is no parameter: the declaration holds it at its kernel's declared default, OMX_DELAY_DIVISIONS_DEFAULT.
- * `mode` is no parameter: the declaration holds it at its kernel's declared default, OMX_DELAY_MODES_DEFAULT.
- * `duck_db` is no parameter: the declaration holds it at its kernel's declared default, OMX_DELAY_DUCK_DB_RANGE_DEFAULT.
- * `duck_threshold_db` is no parameter: the declaration holds it at its kernel's declared default, OMX_DELAY_DUCK_THRESHOLD_DB_RANGE_DEFAULT.
- * `duck_release_ms` is no parameter: the declaration holds it at its kernel's declared default, OMX_DELAY_DUCK_RELEASE_MS_RANGE_DEFAULT.
  */
 #ifndef OMX_DELAY_CORE_H
 #define OMX_DELAY_CORE_H
@@ -62,18 +56,24 @@ static inline void omx_delay_core_resolve(OmxDelayCore *c, const float *values, 
                                   /* tap3_factor */ (int)lrintf(values[OMX_DELAY_PARAM_TAP3_FACTOR]),
                                   /* tap3_gain */ values[OMX_DELAY_PARAM_TAP3_GAIN],
                                   /* tap3_pan */ values[OMX_DELAY_PARAM_TAP3_PAN],
-                                  /* sync */ (int)OMX_DELAY_SYNCS_DEFAULT,
-                                  /* division */ (int)OMX_DELAY_DIVISIONS_DEFAULT,
-                                  /* mode */ (int)OMX_DELAY_MODES_DEFAULT,
-                                  /* duck_db */ (float)OMX_DELAY_DUCK_DB_RANGE_DEFAULT,
-                                  /* duck_threshold_db */ (float)OMX_DELAY_DUCK_THRESHOLD_DB_RANGE_DEFAULT,
-                                  /* duck_release_ms */ (float)OMX_DELAY_DUCK_RELEASE_MS_RANGE_DEFAULT);
+                                  /* sync */ (int)lrintf(values[OMX_DELAY_PARAM_SYNC]),
+                                  /* division */ (int)lrintf(values[OMX_DELAY_PARAM_DIVISION]),
+                                  /* mode */ (int)lrintf(values[OMX_DELAY_PARAM_MODE]),
+                                  /* duck_db */ values[OMX_DELAY_PARAM_DUCK_DB],
+                                  /* duck_threshold_db */ values[OMX_DELAY_PARAM_DUCK_THRESHOLD_DB],
+                                  /* duck_release_ms */ values[OMX_DELAY_PARAM_DUCK_RELEASE_MS]);
 }
 
 /** The latency the kernel adds, in samples. */
 static inline uint32_t omx_delay_core_latency(const OmxDelayCore *c) {
   (void)c;
   return (uint32_t)lrintf((float)(omx_delay_instance_latency(&c->inst)));
+}
+
+/** The host's tempo for the next resolve, BPM; 0 (or any non-positive value) is none: the kernel keeps its time
+ * control. */
+static inline void omx_delay_core_tempo(OmxDelayCore *c, double bpm) {
+  omx_delay_instance_set_tempo(&c->inst, (float)bpm);
 }
 
 /** One block, stereo; the outputs may alias the inputs. */
@@ -93,6 +93,7 @@ static inline void omx_delay_core_run_v(void *c, const float *key, const float *
   (void)key;
   omx_delay_core_run((OmxDelayCore *)c, in_l, in_r, out_l, out_r, frames);
 }
+static inline void omx_delay_core_tempo_v(void *c, double bpm) { omx_delay_core_tempo((OmxDelayCore *)c, bpm); }
 
 static const struct omx_face_core OMX_DELAY_CORE = {sizeof(OmxDelayCore), omx_delay_core_init_v, omx_delay_core_resolve_v,
                                                    omx_delay_core_latency_v, omx_delay_core_run_v,
