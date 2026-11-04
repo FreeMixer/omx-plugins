@@ -123,16 +123,6 @@
   "console": {
     "$comment": "The OpenMixer console draws its deEsser stage: the de-esser panel (mode select, then freqHz, widthOct, thresholdDb, ratio, rangeDb, attackMs, releaseMs, then a gain-reduction bar, a readout the contract does not declare yet); its band and GR are drawn over the EQ curve, not in its panel. Its chip shows the de-esser's main settings. Its overview card has no controls.",
     "placement": {
-      "strips": [
-        "input",
-        "fxReturn",
-        "aux",
-        "mix",
-        "matrix",
-        "main",
-        "fxSend",
-        "mixMinus"
-      ],
       "group": "walk",
       "stage": "deEsser",
       "after": "eq",

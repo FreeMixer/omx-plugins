@@ -64,7 +64,7 @@ Step 1 checks before it writes:
 | `lv2.class`, `clap.features` | `REVIEW`, and `audio-effect`, `stereo` | the LV2 class and the CLAP kind |
 | `summary`, `manual` | left out: the README row reads `description`, the section is the parameter table | optional prose |
 | `panel` | one section of every parameter | groups the controls into sections: the one panel the MOD GUI and the console draw |
-| `console` | its `placement`'s strip kinds and group as `REVIEW` | the placement, and the card and chip the console draws |
+| `console` | its `placement`'s group as `REVIEW` | the placement (its `strips` only when the plugin confines itself to some strip kinds), and the card and chip the console draws |
 | `portHints` | written after the first generation: the pin of the hints the generated TTL carries (`make hints` holds every later TTL to it) | — |
 
 Step 3 refuses while any `REVIEW` mark is left, naming each by its JSON pointer. When the draft is
