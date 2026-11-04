@@ -46,6 +46,7 @@
 #include "clap/stream.h"
 
 #include "omx_clap_face.h"
+#include <omxcontract/omx_plugin_face_ids.h> /* the host bypass's permanent CLAP id */
 #include <omx-clap-host/omx_clap_ext.h>
 #include <omx-clap-host/clap_meters.h>
 #include "omx_meter_ring.h"
@@ -53,10 +54,12 @@
 #include <omxdsp/omx_denormal.h>    /* omx_denormals_off, per callback */
 #include <omxdsp/mix/omx_meter.h>   /* omx_meter_level_db: a level meter's reading */
 
-/* The host's bypass, appended after the declared ids. */
+/* The host's bypass: the slot after the declared ones, and CLAP id OMX_PLUGIN_FACE_BYPASS_CLAP_ID (omx-contract), the
+ * same in every plugin and never moved by an appended parameter. A declared parameter's id is its slot. */
 #define G_DECLARED(g) ((g)->face->param_count)
 #define G_BYPASS(g) G_DECLARED(g)
 #define G_PARAMS(g) (G_DECLARED(g) + 1u)
+#define G_NO_SLOT UINT32_MAX
 
 /* One allocation: this, then the values, the applied values, the touched flags and the core, each
  * G_PARAMS long (the core the vtable's size). */
@@ -81,6 +84,15 @@ typedef struct {
 } G;
 
 #define G_OF(p) ((G *)(p)->plugin_data)
+
+/** CLAP id -> slot: a declared id is its own, the bypass id the bypass's slot; G_NO_SLOT for any other. */
+static uint32_t g_slot(const G *g, clap_id id) {
+  if (id < G_DECLARED(g)) return id;
+  return id == OMX_PLUGIN_FACE_BYPASS_CLAP_ID ? G_BYPASS(g) : G_NO_SLOT;
+}
+
+/** Slot -> CLAP id. */
+static clap_id g_id(const G *g, uint32_t slot) { return slot == G_BYPASS(g) ? OMX_PLUGIN_FACE_BYPASS_CLAP_ID : slot; }
 
 static float g_min(const G *g, uint32_t i) { return i < G_DECLARED(g) ? g->face->params[i].min : 0.0f; }
 static float g_max(const G *g, uint32_t i) { return i < G_DECLARED(g) ? g->face->params[i].max : 1.0f; }
@@ -122,9 +134,10 @@ static void g_drain(G *g, const clap_input_events_t *in) {
     const clap_event_header_t *h = in->get(in, k);
     if (!h || h->space_id != CLAP_CORE_EVENT_SPACE_ID || h->type != CLAP_EVENT_PARAM_VALUE) continue;
     const clap_event_param_value_t *e = (const clap_event_param_value_t *)h;
-    if (e->param_id < G_PARAMS(g)) {
-      g->values[e->param_id] = g_clamp(g, e->param_id, e->value);
-      g->touched[e->param_id] = 1;
+    const uint32_t i = g_slot(g, e->param_id);
+    if (i != G_NO_SLOT) {
+      g->values[i] = g_clamp(g, i, e->value);
+      g->touched[i] = 1;
     }
   }
 }
@@ -261,7 +274,7 @@ static bool g_params_info(const clap_plugin_t *p, uint32_t i, clap_param_info_t 
   const G *g = G_OF(p);
   if (i >= G_PARAMS(g)) return false;
   memset(info, 0, sizeof *info);
-  info->id = i;
+  info->id = g_id(g, i);
   info->flags = CLAP_PARAM_IS_AUTOMATABLE;
   if (i == G_BYPASS(g)) {
     info->flags |= CLAP_PARAM_IS_STEPPED | CLAP_PARAM_IS_BYPASS;
@@ -280,22 +293,24 @@ static bool g_params_info(const clap_plugin_t *p, uint32_t i, clap_param_info_t 
 /** The APPLIED value, safe on the host's main (control) thread while audio runs. */
 static bool g_params_value(const clap_plugin_t *p, clap_id id, double *out) {
   G *g = G_OF(p);
-  if (id >= G_PARAMS(g)) return false;
-  *out = atomic_load_explicit(&g->applied[id], memory_order_relaxed);
+  const uint32_t i = g_slot(g, id);
+  if (i == G_NO_SLOT) return false;
+  *out = atomic_load_explicit(&g->applied[i], memory_order_relaxed);
   return true;
 }
 
 static bool g_params_to_text(const clap_plugin_t *p, clap_id id, double v, char *out, uint32_t size) {
   const G *g = G_OF(p);
-  if (id >= G_PARAMS(g)) return false;
-  const char *unit = id < G_DECLARED(g) ? g->face->params[id].unit : "";
+  const uint32_t i = g_slot(g, id);
+  if (i == G_NO_SLOT) return false;
+  const char *unit = i < G_DECLARED(g) ? g->face->params[i].unit : "";
   snprintf(out, size, unit[0] ? "%g %s" : "%g", v, unit);
   return true;
 }
 
 static bool g_params_from_text(const clap_plugin_t *p, clap_id id, const char *text, double *out) {
   char *end = NULL;
-  if (id >= G_PARAMS(G_OF(p)) || !text) return false;
+  if (g_slot(G_OF(p), id) == G_NO_SLOT || !text) return false;
   *out = strtod(text, &end);
   return end != text;
 }
