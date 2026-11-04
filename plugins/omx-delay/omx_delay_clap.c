@@ -16,6 +16,7 @@ static const char *G_FEATURES[] = {OMX_DELAY_CLAP_FEATURES, NULL};
 
 static const struct omx_face G_FACE = {
     OMX_FACE_TABLES(DELAY), .features = G_FEATURES, .core = &OMX_DELAY_CORE,
+    .tempo = omx_delay_core_tempo_v,
 };
 
 static const struct omx_clap_face G_CLAP = OMX_CLAP_FACE(&G_FACE, G_FEATURES, OMX_DELAY_CLAP_ID, OMX_DELAY_NAME, OMX_DELAY_VENDOR,
