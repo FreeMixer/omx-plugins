@@ -12,18 +12,19 @@ Source0: %{url}/archive/v%{version}/%{name}-%{version}.tar.gz
 BuildRequires: gcc
 BuildRequires: make
 BuildRequires: pkgconf-pkg-config
-# The releases this tree builds against: a floor each (no ceiling), once here and
-# the same in debian/control (tools/deps-check.sh). The Makefile and tools/gen.mjs read them from here.
-BuildRequires: omx-dsp-devel >= 0.30.0
-BuildRequires: omx-contract-devel >= 3.9.0
-BuildRequires: omx-clap-core-devel >= 0.23.0
+# The releases this tree builds against: a floor and a ceiling each (the next minor of the release it is
+# proven on; from 1.0 the next major), once here and in debian/control
+# the same (tools/deps-check.sh). The Makefile and tools/gen.mjs read them from here.
+BuildRequires: (omx-dsp-devel >= 0.30.0 with omx-dsp-devel < 0.31)
+BuildRequires: (omx-contract-devel >= 3.9.0 with omx-contract-devel < 4)
+BuildRequires: (omx-clap-core-devel >= 0.23.0 with omx-clap-core-devel < 0.30)
 # plugin-hostd's format tables, which the generators read backwards (tools/format-tables.mjs)
-BuildRequires: plugin-hostd-devel >= 0.15.2
+BuildRequires: (plugin-hostd-devel >= 0.15.2 with plugin-hostd-devel < 0.19)
 # the omx-contract command, first packaged in 2.15.0: the generators read the contract directory through it
 # (3.3.0: the directory and its schema are omx-contract-data's, the definitions each owner's -contract package's)
-BuildRequires: omx-contract >= 3.9.0
+BuildRequires: (omx-contract >= 3.9.0 with omx-contract < 4)
 # the panel layout and the MOD GUI are omx-panel's, from a descriptor and the declared panel (tools/omx-panel.mjs)
-BuildRequires: omx-panel >= 0.10.0
+BuildRequires: (omx-panel >= 0.10.0 with omx-panel < 0.11)
 # omx-panel recommends omx-plugins-devel: an older one installed beside this build puts its release's contract
 # package where make test reads this one's (tools/test/contract-dir-check.sh), so a build installs none
 BuildConflicts: omx-plugins-devel < %{version}
@@ -39,10 +40,10 @@ BuildRequires: lilv-devel
 BuildRequires: sord
 BuildRequires: omx-clap-host
 # %%check: make round-trip scans the built faces back with plugin-hostd-probe describe
-BuildRequires: plugin-hostd >= 0.15.2
+BuildRequires: (plugin-hostd >= 0.15.2 with plugin-hostd < 0.19)
 # %%install: our own plugins' pins are known at build time (tools/gen-pins.sh); %%check then holds the
 # shipped pins.d file to the shipped binaries' hashes (tools/pins-check.sh)
-BuildRequires: plugin-qualify >= 0.9.0
+BuildRequires: (plugin-qualify >= 0.9.0 with plugin-qualify < 0.20)
 # the shipped .clap is the stripped one (find-debuginfo runs after %%install), so its pin is measured
 # again once the buildroot is stripped: a pin taken at %%install names bytes the package never ships
 %define __spec_install_post \
@@ -57,8 +58,8 @@ Requires: %{name}-clap%{?_isa} = %{version}-%{release}
 Requires: %{name}-lv2%{?_isa} = %{version}-%{release}
 # each plugin's descriptor, which a host and the console read at run time
 Requires: %{name}-contract = %{version}-%{release}
-# the first plugin-hostd release that reads pins.d (plugin-hostd issue #42): a floor only, no ceiling
-Recommends: plugin-hostd >= 0.5.0
+# the first plugin-hostd release that reads pins.d (plugin-hostd issue #42)
+Recommends: (plugin-hostd >= 0.5.0 with plugin-hostd < 0.19)
 
 %description
 Take the sound of the OpenMixer console into your DAW or onto your own rig:
@@ -117,9 +118,9 @@ Its documentation is on openmixer.org.
 
 %package devel
 Summary: Headers and static library of the OpenMixer plugins, for projects that build on them
-Requires: omx-dsp-devel >= 0.30.0
+Requires: (omx-dsp-devel >= 0.30.0 with omx-dsp-devel < 0.31)
 # the generated parameter headers include omx-contract's C renders, and omxplugins.pc requires omx-contract
-Requires: omx-contract-devel >= 3.9.0
+Requires: (omx-contract-devel >= 3.9.0 with omx-contract-devel < 4)
 Requires: %{name}-contract = %{version}-%{release}
 Requires: clap-devel
 
@@ -136,7 +137,7 @@ Its documentation is on openmixer.org.
 Summary: The OpenMixer plugins' descriptors in omx-contract's contract directory
 BuildArch: noarch
 # the contract directory, its schema and its reader's own package
-Requires: omx-contract-data >= 3.9.0
+Requires: (omx-contract-data >= 3.9.0 with omx-contract-data < 4)
 # the files lived in omx-plugins-devel before this package
 Conflicts: %{name}-devel < %{version}-%{release}
 
@@ -291,6 +292,10 @@ tools/pins-check.sh %{buildroot}%{_datadir}/plugin-hostd/pins.d/omx-plugins.pins
 - The packages install their licence and a short README and no other markdown
   (#314)
 - Build floors: omx-dsp 0.30.0, omx-contract 3.9.0, omx-panel 0.10.0
+- Every dependency on a library of ours states a floor and a ceiling, in the spec, debian/control and
+  omxplugins.pc: omx-dsp >= 0.30.0 and < 0.31, omx-contract >= 3.9.0 and < 4, omx-clap-core >= 0.23.0 and
+  < 0.30, plugin-hostd >= 0.15.2 and < 0.19, omx-panel >= 0.10.0 and < 0.11, plugin-qualify >= 0.9.0 and
+  < 0.20 (tools/deps-check.sh holds them)
 
 * Tue Nov 03 2026 Pau Aliagas <linuxnow@gmail.com> - 0.18.0-1
 - Each plugin runs in place where it is proven to: a host that hands an output

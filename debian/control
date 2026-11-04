@@ -4,12 +4,12 @@ Priority: optional
 Maintainer: Pau Aliagas <linuxnow@gmail.com>
 Build-Depends: debhelper-compat (= 13),
                clap-headers,
-               libomxdsp-dev (>= 0.30.0),
-               libomx-contract-dev (>= 3.9.0),
-               omx-contract (>= 3.9.0),
-               libomx-clap-core-dev (>= 0.23.0),
-               plugin-hostd-dev (>= 0.15.2),
-               omx-panel (>= 0.10.0),
+               libomxdsp-dev (>= 0.30.0~), libomxdsp-dev (<< 0.31~),
+               libomx-contract-dev (>= 3.9.0~), libomx-contract-dev (<< 4~),
+               omx-contract (>= 3.9.0~), omx-contract (<< 4~),
+               libomx-clap-core-dev (>= 0.23.0~), libomx-clap-core-dev (<< 0.30~),
+               plugin-hostd-dev (>= 0.15.2~), plugin-hostd-dev (<< 0.19~),
+               omx-panel (>= 0.10.0~), omx-panel (<< 0.11~),
                lv2-dev,
                pkgconf,
                nodejs <!nocheck>,
@@ -19,8 +19,10 @@ Build-Depends: debhelper-compat (= 13),
                sordi <!nocheck>,
                serdi <!nocheck>,
                omx-clap-host <!nocheck>,
-               plugin-hostd (>= 0.15.2) <!nocheck>,
-               plugin-qualify (>= 0.9.0)
+               plugin-hostd (>= 0.15.2~) <!nocheck>,
+               plugin-hostd (<< 0.19~) <!nocheck>,
+               plugin-qualify (>= 0.9.0~),
+               plugin-qualify (<< 0.20~)
 Standards-Version: 4.6.2
 Homepage: https://github.com/FreeMixer/omx-plugins
 Rules-Requires-Root: no
@@ -29,7 +31,7 @@ Package: omx-plugins
 Section: metapackages
 Architecture: any
 Depends: omx-plugins-clap (= ${binary:Version}), omx-plugins-lv2 (= ${binary:Version}), omx-plugins-contract (= ${source:Version}), ${misc:Depends}
-Recommends: plugin-hostd (>= 0.5.0)
+Recommends: plugin-hostd (>= 0.5.0~), plugin-hostd (<< 0.19~)
 Description: OpenMixer delay, drive, EQ, strip, gate and effects (CLAP, LV2)
  Take the sound of the OpenMixer console into your DAW or onto your own rig:
  delay, drive, the channel EQ as an 8-band EQ, a 16-band EQ or a 32-band EQ,
@@ -82,7 +84,7 @@ Description: OpenMixer test instruments, for host tests and plugin measurement
 Package: omx-plugins-dev
 Section: libdevel
 Architecture: any
-Depends: libomxdsp-dev (>= 0.30.0), libomx-contract-dev (>= 3.9.0), omx-plugins-contract (= ${source:Version}), clap-headers, ${misc:Depends}
+Depends: libomxdsp-dev (>= 0.30.0~), libomxdsp-dev (<< 0.31~), libomx-contract-dev (>= 3.9.0~), libomx-contract-dev (<< 4~), omx-plugins-contract (= ${source:Version}), clap-headers, ${misc:Depends}
 Description: Headers and static library of the OpenMixer plugins
  The headers other projects include to use the OpenMixer plugins' parameters
  and instance code, such as omx_delay_core.h and each plugin's generated
