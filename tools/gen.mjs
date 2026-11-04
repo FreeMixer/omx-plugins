@@ -44,7 +44,7 @@ import { faceBinding } from './instance-face.mjs';
 import { descriptorFile, descriptorOf, descriptorText, isWhole, panelDescription, portGroupsOf, travelUnit, viewOf } from './descriptor.mjs';
 import { lv2Designation, lv2UnitNames, lv2UnitRef } from './format-tables.mjs';
 import { DISPLAY_KINDS, DISPLAY_SOURCES, FAMILIES, PLACEMENTS, WIDGETS, pagesOf, panelFingerprint } from './omx-panel.mjs';
-import { CONTRACT_VERSION, contractFingerprint, contractOf } from './param-contract.mjs';
+import { CONTRACT_VERSION, contractFingerprint, contractOf, faceIds } from './param-contract.mjs';
 import { SPEC_FILE, controlOf, eqDefaultBands, findName, kernelControls, locateContract, packagingRange, paramKernel, resolveParam } from './omx-contract.mjs';
 import { bandsMacro, baseOf, expandVariant, variantStems } from './variants.mjs';
 import { omxdspInclude, render } from './template.mjs';
@@ -439,10 +439,11 @@ export const choicesOf = (p) => p.points ?? p.values?.map((label, k) => ({ value
 /** The port symbols every plugin has, which no parameter or key may take. */
 const FIXED_PORTS = ['in_l', 'in_r', 'out_l', 'out_r', 'enabled', 'latency'];
 
-/** The LV2 port list, in index order: audio in (and the sidechain key, when declared), audio out,
- * the declared parameters, enabled, latency; `lv2.enabledPort: "first"` puts enabled before the
- * parameters. One rule, read by the TTL, the MOD GUI and (as macros) the LV2 C face. */
-export function lv2Ports(d) {
+/** The LV2 port list, in index order: the face's own ports at omx-contract's permanent indices (OMX_PLUGIN_FACE_IDS:
+ * enabled 0, latency 1), then audio in (and the sidechain key, when declared), audio out, then the declared parameters.
+ * Appending a parameter or a port moves neither enabled nor latency. `face` is the ids (default: this tree's contract).
+ * One rule, read by the TTL, the MOD GUI and (as macros) the LV2 C face. */
+export function lv2Ports(d, face = faceIds()) {
   const IN = 'lv2:AudioPort , lv2:InputPort', OUT = 'lv2:AudioPort , lv2:OutputPort';
   const audio = [
     { symbol: 'in_l', name: 'In L', a: IN }, { symbol: 'in_r', name: 'In R', a: IN },
@@ -450,15 +451,16 @@ export function lv2Ports(d) {
     { symbol: 'out_l', name: 'Out L', a: OUT }, { symbol: 'out_r', name: 'Out R', a: OUT },
   ];
   const params = d.params.map((p) => ({ symbol: p.symbol, name: p.name, a: 'lv2:ControlPort , lv2:InputPort', param: p }));
-  const enabled = { symbol: 'enabled', name: 'Enabled', a: 'lv2:ControlPort , lv2:InputPort', enabled: true };
-  const first = d.lv2.enabledPort === 'first';
-  return [
-    ...audio,
-    ...(first ? [enabled] : []),
-    ...params,
-    ...(first ? [] : [enabled]),
-    { symbol: 'latency', name: 'Latency', a: 'lv2:ControlPort , lv2:OutputPort', latency: true },
-  ].map((p, index) => ({ ...p, index }));
+  const fixed = new Map([
+    [face.enabledLv2Index, { symbol: 'enabled', name: 'Enabled', a: 'lv2:ControlPort , lv2:InputPort', enabled: true }],
+    [face.latencyLv2Index, { symbol: 'latency', name: 'Latency', a: 'lv2:ControlPort , lv2:OutputPort', latency: true }],
+  ]);
+  const rest = [...audio, ...params];
+  const n = rest.length + fixed.size;
+  if (fixed.size !== 2 || [...fixed.keys()].some((i) => !(i >= 0 && i < n))) throw new Error(`${d.stem}: the face's LV2 indices ${[...fixed.keys()]} do not fit ${n} ports`);
+  const out = [];
+  for (let index = 0, k = 0; index < n; index++) out.push({ ...(fixed.get(index) ?? rest[k++]), index });
+  return out;
 }
 
 const cf = (n) => `${Number.isInteger(n) ? `${n}.0` : `${n}`}f`;
@@ -561,7 +563,7 @@ ${d.params.map((p) => [['MIN', p.min], ['MAX', p.max], ['DEFAULT', p.def]].map((
 #define OMX_${K}_DECL_DIGEST "${digestOf(d.params)}"
 
 /* org.openmixer.param-contract/1 (tools/param-contract.mjs): each parameter's unit, scale and step, in
- * id order; the host's bypass, the last id, is the face's. */
+ * id order; the host's bypass, CLAP id OMX_PLUGIN_FACE_BYPASS_CLAP_ID (omx-contract), is the face's. */
 #define OMX_${K}_PARAM_CONTRACT_VERSION ${CONTRACT_VERSION}u
 #define OMX_${K}_PARAM_CONTRACT_FINGERPRINT "${contractFingerprint(contractOf(d, scaleOf))}"
 static const struct omx_param_contract_row OMX_${K}_PARAM_CONTRACT[${P}_COUNT] = {
@@ -570,7 +572,8 @@ ${contractOf(d, scaleOf).slice(0, -1).map((r) => `  { ${r.unitEnum}u, OMX_CLAP_S
 
 ${emitHintsC(K, d.hints ?? [])}
 ${emitPanelRows(d)}
-/* LV2 port indices (tools/gen.mjs lv2Ports): audio, then parameter i at FIRST_PARAM + i, then these. */
+/* LV2 port indices (tools/gen.mjs lv2Ports): enabled and latency at omx-contract's permanent indices, the audio ports,
+ * then parameter i at FIRST_PARAM + i. */
 ${ports.filter((p) => !p.param).map((p) => `#define OMX_${K}_LV2_PORT_${macro(p.symbol)} ${p.index}u`).join('\n')}
 #define OMX_${K}_LV2_PORT_FIRST_PARAM ${firstParam}u
 #define OMX_${K}_LV2_PORT_COUNT ${ports.length}u

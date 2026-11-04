@@ -324,7 +324,7 @@ static const char *const OMX_EQ8_PARAM_MODULES[OMX_EQ8_PARAM_COUNT] = {
 #define OMX_EQ8_DECL_DIGEST "c3aed8574463db0f192ce1c2001a47944578978db7ebdfd2cadcd5602dc271a0"
 
 /* org.openmixer.param-contract/1 (tools/param-contract.mjs): each parameter's unit, scale and step, in
- * id order; the host's bypass, the last id, is the face's. */
+ * id order; the host's bypass, CLAP id OMX_PLUGIN_FACE_BYPASS_CLAP_ID (omx-contract), is the face's. */
 #define OMX_EQ8_PARAM_CONTRACT_VERSION 1u
 #define OMX_EQ8_PARAM_CONTRACT_FINGERPRINT "717733632742a913b553f1acc9c3dec8d6ec13428b0aa34d9e36511fd205abb1"
 static const struct omx_param_contract_row OMX_EQ8_PARAM_CONTRACT[OMX_EQ8_PARAM_COUNT] = {
@@ -513,14 +513,15 @@ static const struct omx_panel_rows OMX_EQ8_PANEL = {
   NULL, 0u,
 };
 
-/* LV2 port indices (tools/gen.mjs lv2Ports): audio, then parameter i at FIRST_PARAM + i, then these. */
-#define OMX_EQ8_LV2_PORT_IN_L 0u
-#define OMX_EQ8_LV2_PORT_IN_R 1u
-#define OMX_EQ8_LV2_PORT_OUT_L 2u
-#define OMX_EQ8_LV2_PORT_OUT_R 3u
-#define OMX_EQ8_LV2_PORT_ENABLED 50u
-#define OMX_EQ8_LV2_PORT_LATENCY 51u
-#define OMX_EQ8_LV2_PORT_FIRST_PARAM 4u
+/* LV2 port indices (tools/gen.mjs lv2Ports): enabled and latency at omx-contract's permanent indices, the audio ports,
+ * then parameter i at FIRST_PARAM + i. */
+#define OMX_EQ8_LV2_PORT_ENABLED 0u
+#define OMX_EQ8_LV2_PORT_LATENCY 1u
+#define OMX_EQ8_LV2_PORT_IN_L 2u
+#define OMX_EQ8_LV2_PORT_IN_R 3u
+#define OMX_EQ8_LV2_PORT_OUT_L 4u
+#define OMX_EQ8_LV2_PORT_OUT_R 5u
+#define OMX_EQ8_LV2_PORT_FIRST_PARAM 6u
 #define OMX_EQ8_LV2_PORT_COUNT 52u
 
 #endif /* OMX_EQ8_PARAMS_H */

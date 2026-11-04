@@ -111,7 +111,7 @@ static const char *const OMX_DRIVE_PARAM_MODULES[OMX_DRIVE_PARAM_COUNT] = {
 #define OMX_DRIVE_DECL_DIGEST "0ace5ddc34e47ca5e4258c820757c6b1d5dc0c2172e8e71c39b036347f8e6e0c"
 
 /* org.openmixer.param-contract/1 (tools/param-contract.mjs): each parameter's unit, scale and step, in
- * id order; the host's bypass, the last id, is the face's. */
+ * id order; the host's bypass, CLAP id OMX_PLUGIN_FACE_BYPASS_CLAP_ID (omx-contract), is the face's. */
 #define OMX_DRIVE_PARAM_CONTRACT_VERSION 1u
 #define OMX_DRIVE_PARAM_CONTRACT_FINGERPRINT "d7bc8c775efd557f555f597a287da8d8310e73782215f5bbfd025dba56d5df1d"
 static const struct omx_param_contract_row OMX_DRIVE_PARAM_CONTRACT[OMX_DRIVE_PARAM_COUNT] = {
@@ -181,14 +181,15 @@ static const struct omx_panel_rows OMX_DRIVE_PANEL = {
   NULL, 0u,
 };
 
-/* LV2 port indices (tools/gen.mjs lv2Ports): audio, then parameter i at FIRST_PARAM + i, then these. */
-#define OMX_DRIVE_LV2_PORT_IN_L 0u
-#define OMX_DRIVE_LV2_PORT_IN_R 1u
-#define OMX_DRIVE_LV2_PORT_OUT_L 2u
-#define OMX_DRIVE_LV2_PORT_OUT_R 3u
-#define OMX_DRIVE_LV2_PORT_ENABLED 15u
-#define OMX_DRIVE_LV2_PORT_LATENCY 16u
-#define OMX_DRIVE_LV2_PORT_FIRST_PARAM 4u
+/* LV2 port indices (tools/gen.mjs lv2Ports): enabled and latency at omx-contract's permanent indices, the audio ports,
+ * then parameter i at FIRST_PARAM + i. */
+#define OMX_DRIVE_LV2_PORT_ENABLED 0u
+#define OMX_DRIVE_LV2_PORT_LATENCY 1u
+#define OMX_DRIVE_LV2_PORT_IN_L 2u
+#define OMX_DRIVE_LV2_PORT_IN_R 3u
+#define OMX_DRIVE_LV2_PORT_OUT_L 4u
+#define OMX_DRIVE_LV2_PORT_OUT_R 5u
+#define OMX_DRIVE_LV2_PORT_FIRST_PARAM 6u
 #define OMX_DRIVE_LV2_PORT_COUNT 17u
 
 #endif /* OMX_DRIVE_PARAMS_H */

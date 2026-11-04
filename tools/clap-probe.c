@@ -561,14 +561,19 @@ static int state_empty(const char *path) {
   const clap_plugin_state_t *st = (const clap_plugin_state_t *)c.plugin->get_extension(c.plugin, CLAP_EXT_STATE);
   const uint32_t n = c.params->count(c.plugin);
   static double before[MAX_PARAMS];
-  for (uint32_t i = 0; i < n && i < MAX_PARAMS; i++) c.params->get_value(c.plugin, i, &before[i]);
-  Blob empty = {NULL, 0, 0, 0};
+  static clap_id ids[MAX_PARAMS];
   int fails = 0;
+  /* by each parameter's id, never its index: the bypass's id is not its index */
+  for (uint32_t i = 0; i < n && i < MAX_PARAMS; i++) {
+    clap_param_info_t info;
+    if (!c.params->get_info(c.plugin, i, &info) || !c.params->get_value(c.plugin, ids[i] = info.id, &before[i]))
+      printf("FAIL state: parameter %u has no value\n", i), fails++;
+  }
+  Blob empty = {NULL, 0, 0, 0};
   if (state_load(&c, st, &empty)) printf("FAIL state: an empty state was accepted\n"), fails++;
   for (uint32_t i = 0; i < n && i < MAX_PARAMS; i++) {
-    double v;
-    c.params->get_value(c.plugin, i, &v);
-    if (v != before[i]) printf("FAIL state: a refused empty state moved parameter %u\n", i), fails++;
+    double v = 0.0;
+    if (!c.params->get_value(c.plugin, ids[i], &v) || v != before[i]) printf("FAIL state: a refused empty state moved parameter %u\n", ids[i]), fails++;
   }
   if (!fails) printf("PASS state: an empty state is refused, the values untouched\n");
   clap_close(&c);
