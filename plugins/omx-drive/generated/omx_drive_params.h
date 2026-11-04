@@ -189,6 +189,8 @@ static const struct omx_panel_rows OMX_DRIVE_PANEL = {
 #define OMX_DRIVE_LV2_PORT_ENABLED 15u
 #define OMX_DRIVE_LV2_PORT_LATENCY 16u
 #define OMX_DRIVE_LV2_PORT_FIRST_PARAM 4u
+/* The meters' output control ports, one per channel in the order their values are published, from here on. */
+#define OMX_DRIVE_LV2_PORT_FIRST_METER 17u
 #define OMX_DRIVE_LV2_PORT_COUNT 17u
 
 #endif /* OMX_DRIVE_PARAMS_H */

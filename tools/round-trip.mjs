@@ -17,6 +17,9 @@
  * id its symbol (omx-contract's descriptor schema; plugin-hostd docs/formats.md), an LV2 face's audio ports are one
  * per channel with the generator's own symbols and names (the descriptor's port id and name are CLAP's), a CLAP face
  * reads back the float it stores. The face's own bypass (CLAP_PARAM_IS_BYPASS, lv2:enabled) stands beside the controls.
+ * A meter is an output control port on the LV2 face, which a scan reads as a read-only control by the meter's symbol,
+ * one per channel (`<symbol>_<channel>` past one); the CLAP face publishes it through clap.meters/1, which plugin-hostd's
+ * CLAP table has no row for.
  * The bags (`extensions.<format>`) are equal: every source field the authored bag holds, the scanned one holds with the
  * same value (an LV2 field's values a set, as RDF states them).
  *
@@ -89,6 +92,15 @@ export const LOSSES = {
   'lv2 controls[].group (panel section)': 280,
   // the toggles UPSTREAM names, scanned as travels, carry no toggle's default
   'lv2 controls[].default': 100,
+  // a meter: plugin-hostd's CLAP table has no row for clap.meters/1 (one word a meter: 20 meters); an LV2 output
+  // control port carries its symbol, range, unit and scale, and no word for its CLAP id, kind, channel count or
+  // readout doc; a two-channel level is two ports, each named for its channel (4 meters, 8 ports)
+  'clap meters[]': 20,
+  'lv2 meters[].id': 20,
+  'lv2 meters[].kind': 20,
+  'lv2 meters[].channels': 20,
+  'lv2 meters[].doc': 16,
+  'lv2 meters[].name': 8,
 };
 
 /** A break in plugin-hostd's wave tip, reported, each `differs` it causes printed with it
@@ -145,8 +157,10 @@ export function compareFace(format, authored, scanned) {
     else emit('plugin', `plugin.${k}`, a, sp[k], read(`plugin.${k}`));
   }
 
-  // the controls, in order, the face's own bypass beside them
-  const sc = scanned.controls.filter((c) => c.meaning !== FACE_OWN[format]);
+  // the controls, in order, the face's own bypass beside them and, on LV2, the meters' read-only ports after them
+  const outs = (authored.meters ?? []).flatMap((m) => (m.channels > 1 ? Array.from({ length: m.channels }, (_, k) => `${m.symbol}_${k}`) : [m.symbol]));
+  const isMeterPort = (c) => format === 'lv2' && c.readonly === true && outs.includes(c.id);
+  const sc = scanned.controls.filter((c) => c.meaning !== FACE_OWN[format] && !isMeterPort(c));
   if (sc.length !== authored.controls.length) out.push({ verdict: 'differs', format, where: 'controls', word: 'controls', authored: authored.controls.length, scanned: sc.length });
   authored.controls.forEach((c, i) => {
     const s = sc[i] ?? {};
@@ -174,6 +188,29 @@ export function compareFace(format, authored, scanned) {
       }
     }
   });
+
+  // the meters: on LV2 each channel's read-only control, by its symbol; the CLAP scan reads no clap.meters/1
+  const sm = scanned.controls.filter(isMeterPort);
+  for (const m of authored.meters ?? []) {
+    const where = `meter ${m.symbol}`;
+    if (format === 'clap') {
+      emit(where, 'meters[]', m.symbol, undefined, false);
+      continue;
+    }
+    const chans = m.channels > 1 ? Array.from({ length: m.channels }, (_, k) => `${m.symbol}_${k}`) : [m.symbol];
+    for (const sym of chans) {
+      const s = sm.find((c) => c.id === sym);
+      if (!s) {
+        out.push({ verdict: 'differs', format, where, word: 'meters[].symbol', authored: sym, scanned: undefined });
+        continue;
+      }
+      emit(where, 'meters[].symbol', sym, s.id);
+      for (const k of ['min', 'max', 'unit', 'scale']) emit(where, `meters[].${k}`, m[k], s.travel?.[k]);
+      // a meter of more than one channel is one port per channel, each named for its channel
+      emit(where, 'meters[].name', m.name, m.channels > 1 ? undefined : s.name, m.channels === 1);
+    }
+    for (const k of ['id', 'kind', 'channels', 'doc']) if (m[k] !== undefined) emit(where, `meters[].${k}`, m[k], undefined, false);
+  }
 
   // the ports: by direction, in order
   const sports = [...scanned.ports];

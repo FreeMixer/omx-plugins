@@ -119,6 +119,8 @@ static const struct omx_panel_rows OMX_PITCH_PANEL = {
 #define OMX_PITCH_LV2_PORT_ENABLED 7u
 #define OMX_PITCH_LV2_PORT_LATENCY 8u
 #define OMX_PITCH_LV2_PORT_FIRST_PARAM 4u
+/* The meters' output control ports, one per channel in the order their values are published, from here on. */
+#define OMX_PITCH_LV2_PORT_FIRST_METER 9u
 #define OMX_PITCH_LV2_PORT_COUNT 9u
 
 #endif /* OMX_PITCH_PARAMS_H */

@@ -515,6 +515,8 @@ static const struct omx_panel_rows OMX_STRIP_PANEL = {
 #define OMX_STRIP_LV2_PORT_ENABLED 55u
 #define OMX_STRIP_LV2_PORT_LATENCY 56u
 #define OMX_STRIP_LV2_PORT_FIRST_PARAM 4u
+/* The meters' output control ports, one per channel in the order their values are published, from here on. */
+#define OMX_STRIP_LV2_PORT_FIRST_METER 57u
 #define OMX_STRIP_LV2_PORT_COUNT 57u
 
 #endif /* OMX_STRIP_PARAMS_H */

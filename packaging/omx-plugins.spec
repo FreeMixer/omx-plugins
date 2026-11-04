@@ -15,13 +15,13 @@ BuildRequires: pkgconf-pkg-config
 # The releases this tree builds against: a floor each (no ceiling), once here and
 # the same in debian/control (tools/deps-check.sh). The Makefile and tools/gen.mjs read them from here.
 BuildRequires: omx-dsp-devel >= 0.28.0
-BuildRequires: omx-contract-devel >= 3.7.1
+BuildRequires: omx-contract-devel >= 3.9.0
 BuildRequires: omx-clap-core-devel >= 0.14.0
 # plugin-hostd's format tables, which the generators read backwards (tools/format-tables.mjs)
 BuildRequires: plugin-hostd-devel >= 0.15.2
 # the omx-contract command, first packaged in 2.15.0: the generators read the contract directory through it
 # (3.3.0: the directory and its schema are omx-contract-data's, the definitions each owner's -contract package's)
-BuildRequires: omx-contract >= 3.7.1
+BuildRequires: omx-contract >= 3.9.0
 # the panel layout and the MOD GUI are omx-panel's, from a descriptor and the declared panel (tools/omx-panel.mjs)
 BuildRequires: omx-panel >= 0.2.0
 # omx-panel recommends omx-plugins-devel: an older one installed beside this build puts its release's contract
@@ -118,7 +118,7 @@ Its documentation is on openmixer.org.
 Summary: Headers and static library of the OpenMixer plugins, for projects that build on them
 Requires: omx-dsp-devel >= 0.28.0
 # the generated parameter headers include omx-contract's C renders, and omxplugins.pc requires omx-contract
-Requires: omx-contract-devel >= 3.7.1
+Requires: omx-contract-devel >= 3.9.0
 Requires: %{name}-contract = %{version}-%{release}
 Requires: clap-devel
 
@@ -135,7 +135,7 @@ Its documentation is on openmixer.org.
 Summary: The OpenMixer plugins' descriptors in omx-contract's contract directory
 BuildArch: noarch
 # the contract directory, its schema and its reader's own package
-Requires: omx-contract-data >= 3.7.1
+Requires: omx-contract-data >= 3.9.0
 # the files lived in omx-plugins-devel before this package
 Conflicts: %{name}-devel < %{version}-%{release}
 

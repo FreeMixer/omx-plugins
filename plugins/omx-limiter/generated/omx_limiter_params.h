@@ -119,6 +119,8 @@ static const struct omx_panel_rows OMX_LIMITER_PANEL = {
 #define OMX_LIMITER_LV2_PORT_ENABLED 7u
 #define OMX_LIMITER_LV2_PORT_LATENCY 8u
 #define OMX_LIMITER_LV2_PORT_FIRST_PARAM 4u
-#define OMX_LIMITER_LV2_PORT_COUNT 9u
+/* The meters' output control ports, one per channel in the order their values are published, from here on. */
+#define OMX_LIMITER_LV2_PORT_FIRST_METER 9u
+#define OMX_LIMITER_LV2_PORT_COUNT 10u
 
 #endif /* OMX_LIMITER_PARAMS_H */

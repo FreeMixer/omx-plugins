@@ -213,6 +213,8 @@ static const struct omx_panel_rows OMX_REVERB_PANEL = {
 #define OMX_REVERB_LV2_PORT_ENABLED 17u
 #define OMX_REVERB_LV2_PORT_LATENCY 18u
 #define OMX_REVERB_LV2_PORT_FIRST_PARAM 4u
+/* The meters' output control ports, one per channel in the order their values are published, from here on. */
+#define OMX_REVERB_LV2_PORT_FIRST_METER 19u
 #define OMX_REVERB_LV2_PORT_COUNT 19u
 
 #endif /* OMX_REVERB_PARAMS_H */

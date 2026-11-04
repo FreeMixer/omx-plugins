@@ -5,7 +5,7 @@
  * docs/declaration-as-descriptor.md):
  *
  *   - descriptorOf(d): the `authored` descriptor of a declaration as tools/gen.mjs loads it: the plugin's
- *     identity, one control per parameter, its ports, its latency. A plugin folder holding
+ *     identity, one control per parameter, its ports, its latency, its meters. A plugin folder holding
  *     <stem>.descriptor.json keeps it equal to this render (gen.mjs writes it, --check refuses it stale),
  *     so the travels it states are always what its links resolve to.
  *   - viewOf(descriptor, extras): the declaration tools/gen.mjs resolves, from the descriptor and the
@@ -13,7 +13,7 @@
  *
  * omx-panel lays a panel out from a descriptor of any origin (tools/omx-panel.mjs); for ours it reads this one.
  */
-import { choicesOf, scaleOf } from './gen.mjs';
+import { choicesOf, metersOf, scaleOf } from './gen.mjs';
 import { clapFeatureField, clapFeatureValue } from './format-tables.mjs';
 import { installedContractDir, locateContract, ownersOf, packagingRange } from './omx-contract.mjs';
 import { meaningOfRole, panelLayout } from './omx-panel.mjs';
@@ -24,6 +24,10 @@ export const descriptorFile = (stem) => `${stem}.descriptor.json`;
 /** The schema the descriptor words are in, and the release that added them. */
 export const DESCRIPTOR_SCHEMA = 'https://github.com/FreeMixer/omx-contract/raw/v3/schema/omx-contract.schema.json';
 export const DESCRIPTOR_SCHEMA_FLOOR = '3.7.0';
+/** The release that added `meters` (omx-contract docs/descriptors.md): the floor of a descriptor that states them. */
+export const DESCRIPTOR_METERS_FLOOR = '3.9.0';
+/** The descriptor's word for each meter kind a declaration names. */
+const METER_KIND_WORDS = { gain_reduction: 'gain-reduction', level: 'level' };
 
 /** The plugin features the descriptor names; a declaration's other CLAP features have no word there. */
 export const FEATURES = ['audio-effect', 'instrument', 'note-effect', 'analyzer'];
@@ -165,15 +169,26 @@ export function descriptorOf(d) {
     ...(d.sidechain ? [{ id: 1, name: d.sidechain.symbol, kind: 'audio', direction: 'in', role: 'sidechain', channels: 1, layout: 'mono' }] : []),
     { id: 0, name: 'out', kind: 'audio', direction: 'out', role: 'main', channels: 2, layout: 'stereo' },
   ];
+  // each meter as the faces publish it: its CLAP id (its index), the symbol a host reads it by, its range, and
+  // the kernel readout it publishes, linked where its travel would be; a level the face measures is the face's own
+  const meters = metersOf(d).map((m, k) => {
+    const link = m.readout ? `data/kernels/${d.kernel}.json#readouts[${m.readout.name}]` : undefined;
+    return {
+      id: k, symbol: m.id, name: m.label, ...(m.readout ? { doc: m.readout.doc } : {}), kind: METER_KIND_WORDS[m.kind], channels: m.channels,
+      unit: m.unit, min: m.min, max: m.max, scale: m.scale,
+      source: link ? { from: atOf(link) ? { link, at: atOf(link) } : link } : { impl: face },
+    };
+  });
   const descriptor = {
     $schema: DESCRIPTOR_SCHEMA,
-    requires: { 'omx-contract-schema': `>= ${DESCRIPTOR_SCHEMA_FLOOR}` },
+    requires: { 'omx-contract-schema': `>= ${meters.length ? DESCRIPTOR_METERS_FLOOR : DESCRIPTOR_SCHEMA_FLOOR}` },
     origin: 'authored',
     plugin: { id: d.clap.id, format: 'clap', uri: d.lv2.uri, name: d.name, vendor: d.vendor, version: d.version, doc: d.description, features: d.clap.features.filter((f) => FEATURES.includes(f)) },
     controls,
     ports,
     needs: { extensions: { optional: [LV2_HARD_RT] } },
     latency: { reports: true },
+    ...(meters.length ? { meters } : {}),
     extensions: extensionsOf(d),
     source: { impl: face },
   };

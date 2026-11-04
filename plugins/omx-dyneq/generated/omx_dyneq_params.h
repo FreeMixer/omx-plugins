@@ -732,6 +732,8 @@ static const struct omx_panel_rows OMX_DYNEQ_PANEL = {
 #define OMX_DYNEQ_LV2_PORT_ENABLED 77u
 #define OMX_DYNEQ_LV2_PORT_LATENCY 78u
 #define OMX_DYNEQ_LV2_PORT_FIRST_PARAM 4u
-#define OMX_DYNEQ_LV2_PORT_COUNT 79u
+/* The meters' output control ports, one per channel in the order their values are published, from here on. */
+#define OMX_DYNEQ_LV2_PORT_FIRST_METER 79u
+#define OMX_DYNEQ_LV2_PORT_COUNT 85u
 
 #endif /* OMX_DYNEQ_PARAMS_H */

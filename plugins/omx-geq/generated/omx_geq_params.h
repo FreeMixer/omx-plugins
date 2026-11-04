@@ -374,6 +374,8 @@ static const struct omx_panel_rows OMX_GEQ_PANEL = {
 #define OMX_GEQ_LV2_PORT_ENABLED 35u
 #define OMX_GEQ_LV2_PORT_LATENCY 36u
 #define OMX_GEQ_LV2_PORT_FIRST_PARAM 4u
+/* The meters' output control ports, one per channel in the order their values are published, from here on. */
+#define OMX_GEQ_LV2_PORT_FIRST_METER 37u
 #define OMX_GEQ_LV2_PORT_COUNT 37u
 
 #endif /* OMX_GEQ_PARAMS_H */
