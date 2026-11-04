@@ -20,7 +20,7 @@
  *   plugins/<stem>/Makefile                          the build and `make test`
  *
  * and, from every plugin folder at once, the regions of the shared files between a `BEGIN
- * GENERATED <name>` line and its `END GENERATED <name>` line (SHARED below): the README's catalogue
+ * GENERATED <name>` line and its `END GENERATED <name>` line (SHARED below): the catalogue's
  * and sections, the RPM %files lists, CI's installed-file lists and libomxplugins' table of CLAP
  * entries (include/omx_clap_static.h, lib/omx_clap_static.c). Adding a plugin touches only its
  * folder; two plugins' changes merge in either order.
@@ -44,7 +44,7 @@ import { faceBinding } from './instance-face.mjs';
 import { descriptorFile, descriptorOf, descriptorText, isWhole, panelDescription, portGroupsOf, travelUnit, viewOf } from './descriptor.mjs';
 import { lv2Designation, lv2UnitNames, lv2UnitRef } from './format-tables.mjs';
 import { DISPLAY_KINDS, DISPLAY_SOURCES, FAMILIES, PLACEMENTS, WIDGETS, pagesOf, panelFingerprint } from './omx-panel.mjs';
-import { CONTRACT_VERSION, contractFingerprint, contractOf } from './param-contract.mjs';
+import { CONTRACT_VERSION, contractFingerprint, contractOf, faceIds } from './param-contract.mjs';
 import { SPEC_FILE, controlOf, eqDefaultBands, findName, kernelControls, locateContract, packagingRange, paramKernel, resolveParam } from './omx-contract.mjs';
 import { bandsMacro, baseOf, expandVariant, variantStems } from './variants.mjs';
 import { omxdspInclude, render } from './template.mjs';
@@ -440,14 +440,15 @@ export const choicesOf = (p) => p.points ?? p.values?.map((label, k) => ({ value
 const FIXED_PORTS = ['in_l', 'in_r', 'out_l', 'out_r', 'enabled', 'latency'];
 
 /** Whether the plugin reads the host's tempo: its descriptor's needs.tempo. Its LV2 face then has a `control` atom
- * input that supports time:Position, after `latency`, so no earlier port moves. */
+ * input, the port right after the face's own (enabled, latency), so an appended parameter moves it no more than them. */
 export const tempoOf = (d) => Boolean(d.descriptor?.needs?.tempo);
 
-/** The LV2 port list, in index order: audio in (and the sidechain key, when declared), audio out,
- * the declared parameters, enabled, latency, and (a plugin that reads the host's tempo) the `control` atom input;
- * `lv2.enabledPort: "first"` puts enabled before the parameters. One rule, read by the TTL, the MOD GUI and (as
- * macros) the LV2 C face. */
-export function lv2Ports(d) {
+/** The LV2 port list, in index order: the face's own ports at omx-contract's permanent indices (OMX_PLUGIN_FACE_IDS:
+ * enabled 0, latency 1), then (a plugin that reads the host's tempo) the `control` atom input, then audio in (and the
+ * sidechain key, when declared), audio out, then the declared parameters. Appending a parameter moves no port; adding
+ * a port moves neither enabled, latency nor control. `face` is the ids (default: this tree's contract).
+ * One rule, read by the TTL, the MOD GUI and (as macros) the LV2 C face. */
+export function lv2Ports(d, face = faceIds()) {
   const IN = 'lv2:AudioPort , lv2:InputPort', OUT = 'lv2:AudioPort , lv2:OutputPort';
   const audio = [
     { symbol: 'in_l', name: 'In L', a: IN }, { symbol: 'in_r', name: 'In R', a: IN },
@@ -455,16 +456,17 @@ export function lv2Ports(d) {
     { symbol: 'out_l', name: 'Out L', a: OUT }, { symbol: 'out_r', name: 'Out R', a: OUT },
   ];
   const params = d.params.map((p) => ({ symbol: p.symbol, name: p.name, a: 'lv2:ControlPort , lv2:InputPort', param: p }));
-  const enabled = { symbol: 'enabled', name: 'Enabled', a: 'lv2:ControlPort , lv2:InputPort', enabled: true };
-  const first = d.lv2.enabledPort === 'first';
-  return [
-    ...audio,
-    ...(first ? [enabled] : []),
-    ...params,
-    ...(first ? [] : [enabled]),
-    { symbol: 'latency', name: 'Latency', a: 'lv2:ControlPort , lv2:OutputPort', latency: true },
-    ...(tempoOf(d) ? [{ symbol: 'control', name: 'Control', a: 'atom:AtomPort , lv2:InputPort', time: true }] : []),
-  ].map((p, index) => ({ ...p, index }));
+  const fixed = new Map([
+    [face.enabledLv2Index, { symbol: 'enabled', name: 'Enabled', a: 'lv2:ControlPort , lv2:InputPort', enabled: true }],
+    [face.latencyLv2Index, { symbol: 'latency', name: 'Latency', a: 'lv2:ControlPort , lv2:OutputPort', latency: true }],
+  ]);
+  const rest = [...(tempoOf(d) ? [{ symbol: 'control', name: 'Control', a: 'atom:AtomPort , lv2:InputPort', time: true }] : []),
+    ...audio, ...params];
+  const n = rest.length + fixed.size;
+  if (fixed.size !== 2 || [...fixed.keys()].some((i) => !(i >= 0 && i < n))) throw new Error(`${d.stem}: the face's LV2 indices ${[...fixed.keys()]} do not fit ${n} ports`);
+  const out = [];
+  for (let index = 0, k = 0; index < n; index++) out.push({ ...(fixed.get(index) ?? rest[k++]), index });
+  return out;
 }
 
 const cf = (n) => `${Number.isInteger(n) ? `${n}.0` : `${n}`}f`;
@@ -567,7 +569,7 @@ ${d.params.map((p) => [['MIN', p.min], ['MAX', p.max], ['DEFAULT', p.def]].map((
 #define OMX_${K}_DECL_DIGEST "${digestOf(d.params)}"
 
 /* org.openmixer.param-contract/1 (tools/param-contract.mjs): each parameter's unit, scale and step, in
- * id order; the host's bypass, the last id, is the face's. */
+ * id order; the host's bypass, CLAP id OMX_PLUGIN_FACE_BYPASS_CLAP_ID (omx-contract), is the face's. */
 #define OMX_${K}_PARAM_CONTRACT_VERSION ${CONTRACT_VERSION}u
 #define OMX_${K}_PARAM_CONTRACT_FINGERPRINT "${contractFingerprint(contractOf(d, scaleOf))}"
 static const struct omx_param_contract_row OMX_${K}_PARAM_CONTRACT[${P}_COUNT] = {
@@ -576,7 +578,8 @@ ${contractOf(d, scaleOf).slice(0, -1).map((r) => `  { ${r.unitEnum}u, OMX_CLAP_S
 
 ${emitHintsC(K, d.hints ?? [])}
 ${emitPanelRows(d)}
-/* LV2 port indices (tools/gen.mjs lv2Ports): audio, then parameter i at FIRST_PARAM + i, then these. */
+/* LV2 port indices (tools/gen.mjs lv2Ports): enabled and latency at omx-contract's permanent indices, the audio ports,
+ * then parameter i at FIRST_PARAM + i. */
 ${ports.filter((p) => !p.param).map((p) => `#define OMX_${K}_LV2_PORT_${macro(p.symbol)} ${p.index}u`).join('\n')}
 #define OMX_${K}_LV2_PORT_FIRST_PARAM ${firstParam}u
 #define OMX_${K}_LV2_PORT_COUNT ${ports.length}u
@@ -714,7 +717,7 @@ const cfloat = (n) => {
   return `${/[.e]/.test(t) ? t : `${t}.0`}f`;
 };
 
-/** How a README row and section read a resolved parameter: its range and its default, in words. */
+/** How a catalogue row and section read a resolved parameter: its range and its default, in words. */
 export function paramRow(p) {
   const unit = p.unit ? ` ${p.unit}` : '';
   if (p.kind === 'toggle') return { name: p.name, range: 'off / on', default: p.def ? 'on' : 'off' };
@@ -725,7 +728,7 @@ export function paramRow(p) {
 
 /** The manual's own words around the numbers: each `{range:<symbol>}`, `{default:<symbol>}`,
  * `{min:<symbol>}` and `{max:<symbol>}` in a line of `manual` reads that resolved parameter (its
- * range and default as the parameter table words them, or its bare limit), so the README never
+ * range and default as the parameter table words them, or its bare limit), so the catalogue never
  * retypes a number omx-contract or the declaration holds. A symbol no parameter has, or any other
  * `{word:...}`, is refused. A `summary` reads the same words (`summaryOf`). */
 export function fillManual(d, line, what = 'manual') {
@@ -739,7 +742,7 @@ export function fillManual(d, line, what = 'manual') {
   return out;
 }
 
-/** The README catalogue's words for a plugin: its `summary` with the numbers it reads from the declaration filled in
+/** The catalogue's words for a plugin: its `summary` with the numbers it reads from the declaration filled in
  * (`up to {max:fxDelayTime} ms`), else its description as the descriptor states it. */
 export function summaryOf(d) {
   return d.summary === undefined ? d.description : fillManual(d, d.summary, 'summary');
@@ -1287,7 +1290,7 @@ const byStem = (a, b) => a.stem.localeCompare(b.stem, 'en', { numeric: true });
 
 /** Each region's lines, from the shipped plugins' declarations. */
 export const SHARED = {
-  'README.md': {
+  'docs/catalogue.md': {
     catalogue: (ds) => [
       '',
       '| Plugin | CLAP id | LV2 URI | What it does |',

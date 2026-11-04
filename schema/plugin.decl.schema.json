@@ -88,7 +88,7 @@
           "type": "string",
           "minLength": 20,
           "title": "Summary",
-          "description": "The plugin's row in the README's catalogue, when it says more than the description (ranges, latency, rates). Left out, the row reads the description."
+          "description": "The plugin's row in the catalogue (docs/catalogue.md), when it says more than the description (ranges, latency, rates). Left out, the row reads the description."
         },
         "clap": {
           "type": "object",
@@ -136,14 +136,6 @@
               "pattern": "^lv2:[A-Za-z]*Plugin$",
               "title": "LV2 class",
               "description": "The LV2 plugin class: lv2:DelayPlugin, lv2:ModulatorPlugin, lv2:Plugin, ... A described plugin's is in its descriptor's extension bag (rdf:type), never its extras file."
-            },
-            "enabledPort": {
-              "enum": [
-                "first",
-                "last"
-              ],
-              "title": "Enabled port",
-              "description": "Where the host's bypass port `enabled` sits among the LV2 control ports: before the parameters (first) or after them (last, the default). A plugin that replaces an existing bundle keeps that bundle's port order."
             }
           }
         },
@@ -342,7 +334,7 @@
           },
           "minItems": 1,
           "title": "Manual",
-          "description": "The plugin's section of the README below its heading, one Markdown line per entry. A number a parameter holds is never typed here: {range:<symbol>} and {default:<symbol>} read as the parameter table words them, {min:<symbol>} and {max:<symbol>} the bare limit, all from the resolved parameter. Left out, the section is the parameter table generated from the resolved parameters, and \"Plus the host's bypass.\""
+          "description": "The plugin's section of the catalogue (docs/catalogue.md) below its heading, one Markdown line per entry. A number a parameter holds is never typed here: {range:<symbol>} and {default:<symbol>} read as the parameter table words them, {min:<symbol>} and {max:<symbol>} the bare limit, all from the resolved parameter. Left out, the section is the parameter table generated from the resolved parameters, and \"Plus the host's bypass.\""
         },
         "console": {
           "$ref": "#/$defs/console"

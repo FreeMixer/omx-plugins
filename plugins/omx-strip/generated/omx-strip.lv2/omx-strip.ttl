@@ -31,32 +31,52 @@
     omxres:opensSockets false ;
     lv2:port
     [
-        a lv2:AudioPort , lv2:InputPort ;
+        a lv2:ControlPort , lv2:InputPort ;
         lv2:index 0 ;
+        lv2:symbol "enabled" ;
+        lv2:name "Enabled" ;
+        lv2:default 1 ;
+        lv2:minimum 0 ;
+        lv2:maximum 1 ;
+        lv2:designation lv2:enabled ;
+        lv2:portProperty lv2:toggled
+    ] ,
+    [
+        a lv2:ControlPort , lv2:OutputPort ;
+        lv2:index 1 ;
+        lv2:symbol "latency" ;
+        lv2:name "Latency" ;
+        lv2:designation lv2:latency ;
+        lv2:portProperty lv2:integer ;
+        units:unit units:frame
+    ] ,
+    [
+        a lv2:AudioPort , lv2:InputPort ;
+        lv2:index 2 ;
         lv2:symbol "in_l" ;
         lv2:name "In L"
     ] ,
     [
         a lv2:AudioPort , lv2:InputPort ;
-        lv2:index 1 ;
+        lv2:index 3 ;
         lv2:symbol "in_r" ;
         lv2:name "In R"
     ] ,
     [
         a lv2:AudioPort , lv2:OutputPort ;
-        lv2:index 2 ;
+        lv2:index 4 ;
         lv2:symbol "out_l" ;
         lv2:name "Out L"
     ] ,
     [
         a lv2:AudioPort , lv2:OutputPort ;
-        lv2:index 3 ;
+        lv2:index 5 ;
         lv2:symbol "out_r" ;
         lv2:name "Out R"
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 4 ;
+        lv2:index 6 ;
         lv2:symbol "trimOn" ;
         lv2:name "Input" ;
         lv2:default 1 ;
@@ -67,7 +87,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 5 ;
+        lv2:index 7 ;
         lv2:symbol "trimDb" ;
         lv2:name "Trim" ;
         lv2:default 0 ;
@@ -78,7 +98,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 6 ;
+        lv2:index 8 ;
         lv2:symbol "filterOn" ;
         lv2:name "Filters" ;
         lv2:default 1 ;
@@ -89,7 +109,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 7 ;
+        lv2:index 9 ;
         lv2:symbol "hpfOn" ;
         lv2:name "HPF" ;
         lv2:default 0 ;
@@ -100,7 +120,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 8 ;
+        lv2:index 10 ;
         lv2:symbol "hpfFreq" ;
         lv2:name "HPF Freq" ;
         lv2:default 80 ;
@@ -113,7 +133,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 9 ;
+        lv2:index 11 ;
         lv2:symbol "hpfSlope" ;
         lv2:name "HPF Slope" ;
         lv2:default 12 ;
@@ -128,7 +148,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 10 ;
+        lv2:index 12 ;
         lv2:symbol "lpfOn" ;
         lv2:name "LPF" ;
         lv2:default 0 ;
@@ -139,7 +159,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 11 ;
+        lv2:index 13 ;
         lv2:symbol "lpfFreq" ;
         lv2:name "LPF Freq" ;
         lv2:default 18000 ;
@@ -152,7 +172,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 12 ;
+        lv2:index 14 ;
         lv2:symbol "lpfSlope" ;
         lv2:name "LPF Slope" ;
         lv2:default 12 ;
@@ -167,7 +187,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 13 ;
+        lv2:index 15 ;
         lv2:symbol "gateOn" ;
         lv2:name "Gate" ;
         lv2:default 0 ;
@@ -178,7 +198,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 14 ;
+        lv2:index 16 ;
         lv2:symbol "gateThreshold" ;
         lv2:name "Gate Threshold" ;
         lv2:default -40 ;
@@ -189,7 +209,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 15 ;
+        lv2:index 17 ;
         lv2:symbol "gateRatio" ;
         lv2:name "Gate Ratio" ;
         lv2:default 16 ;
@@ -199,7 +219,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 16 ;
+        lv2:index 18 ;
         lv2:symbol "gateRange" ;
         lv2:name "Gate Range" ;
         lv2:default -90 ;
@@ -210,7 +230,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 17 ;
+        lv2:index 19 ;
         lv2:symbol "gateAttack" ;
         lv2:name "Gate Attack" ;
         lv2:default 1 ;
@@ -221,7 +241,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 18 ;
+        lv2:index 20 ;
         lv2:symbol "gateRelease" ;
         lv2:name "Gate Release" ;
         lv2:default 100 ;
@@ -232,7 +252,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 19 ;
+        lv2:index 21 ;
         lv2:symbol "gateKneeStart" ;
         lv2:name "Gate Knee Start" ;
         lv2:default -43 ;
@@ -244,7 +264,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 20 ;
+        lv2:index 22 ;
         lv2:symbol "gateKneeEnd" ;
         lv2:name "Gate Knee End" ;
         lv2:default -37 ;
@@ -256,7 +276,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 21 ;
+        lv2:index 23 ;
         lv2:symbol "gateHold" ;
         lv2:name "Gate Hold" ;
         lv2:default 10 ;
@@ -268,7 +288,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 22 ;
+        lv2:index 24 ;
         lv2:symbol "gateHysteresis" ;
         lv2:name "Gate Hysteresis" ;
         lv2:default 3 ;
@@ -279,7 +299,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 23 ;
+        lv2:index 25 ;
         lv2:symbol "eqOn" ;
         lv2:name "EQ" ;
         lv2:default 1 ;
@@ -290,7 +310,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 24 ;
+        lv2:index 26 ;
         lv2:symbol "eq1Type" ;
         lv2:name "EQ 1 Type" ;
         lv2:default 1 ;
@@ -308,7 +328,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 25 ;
+        lv2:index 27 ;
         lv2:symbol "eq1Freq" ;
         lv2:name "EQ 1 Freq" ;
         lv2:default 100 ;
@@ -321,7 +341,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 26 ;
+        lv2:index 28 ;
         lv2:symbol "eq1Gain" ;
         lv2:name "EQ 1 Gain" ;
         lv2:default 0 ;
@@ -332,7 +352,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 27 ;
+        lv2:index 29 ;
         lv2:symbol "eq1Q" ;
         lv2:name "EQ 1 Q" ;
         lv2:default 1 ;
@@ -342,7 +362,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 28 ;
+        lv2:index 30 ;
         lv2:symbol "eq1On" ;
         lv2:name "EQ 1" ;
         lv2:default 0 ;
@@ -353,7 +373,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 29 ;
+        lv2:index 31 ;
         lv2:symbol "eq2Type" ;
         lv2:name "EQ 2 Type" ;
         lv2:default 0 ;
@@ -371,7 +391,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 30 ;
+        lv2:index 32 ;
         lv2:symbol "eq2Freq" ;
         lv2:name "EQ 2 Freq" ;
         lv2:default 400 ;
@@ -384,7 +404,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 31 ;
+        lv2:index 33 ;
         lv2:symbol "eq2Gain" ;
         lv2:name "EQ 2 Gain" ;
         lv2:default 0 ;
@@ -395,7 +415,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 32 ;
+        lv2:index 34 ;
         lv2:symbol "eq2Q" ;
         lv2:name "EQ 2 Q" ;
         lv2:default 1 ;
@@ -405,7 +425,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 33 ;
+        lv2:index 35 ;
         lv2:symbol "eq2On" ;
         lv2:name "EQ 2" ;
         lv2:default 0 ;
@@ -416,7 +436,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 34 ;
+        lv2:index 36 ;
         lv2:symbol "eq3Type" ;
         lv2:name "EQ 3 Type" ;
         lv2:default 0 ;
@@ -434,7 +454,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 35 ;
+        lv2:index 37 ;
         lv2:symbol "eq3Freq" ;
         lv2:name "EQ 3 Freq" ;
         lv2:default 2000 ;
@@ -447,7 +467,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 36 ;
+        lv2:index 38 ;
         lv2:symbol "eq3Gain" ;
         lv2:name "EQ 3 Gain" ;
         lv2:default 0 ;
@@ -458,7 +478,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 37 ;
+        lv2:index 39 ;
         lv2:symbol "eq3Q" ;
         lv2:name "EQ 3 Q" ;
         lv2:default 1 ;
@@ -468,7 +488,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 38 ;
+        lv2:index 40 ;
         lv2:symbol "eq3On" ;
         lv2:name "EQ 3" ;
         lv2:default 0 ;
@@ -479,7 +499,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 39 ;
+        lv2:index 41 ;
         lv2:symbol "eq4Type" ;
         lv2:name "EQ 4 Type" ;
         lv2:default 2 ;
@@ -497,7 +517,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 40 ;
+        lv2:index 42 ;
         lv2:symbol "eq4Freq" ;
         lv2:name "EQ 4 Freq" ;
         lv2:default 8000 ;
@@ -510,7 +530,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 41 ;
+        lv2:index 43 ;
         lv2:symbol "eq4Gain" ;
         lv2:name "EQ 4 Gain" ;
         lv2:default 0 ;
@@ -521,7 +541,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 42 ;
+        lv2:index 44 ;
         lv2:symbol "eq4Q" ;
         lv2:name "EQ 4 Q" ;
         lv2:default 1 ;
@@ -531,7 +551,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 43 ;
+        lv2:index 45 ;
         lv2:symbol "eq4On" ;
         lv2:name "EQ 4" ;
         lv2:default 0 ;
@@ -542,7 +562,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 44 ;
+        lv2:index 46 ;
         lv2:symbol "compOn" ;
         lv2:name "Comp" ;
         lv2:default 0 ;
@@ -553,7 +573,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 45 ;
+        lv2:index 47 ;
         lv2:symbol "compThreshold" ;
         lv2:name "Comp Threshold" ;
         lv2:default -18 ;
@@ -564,7 +584,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 46 ;
+        lv2:index 48 ;
         lv2:symbol "compRatio" ;
         lv2:name "Comp Ratio" ;
         lv2:default 4 ;
@@ -574,7 +594,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 47 ;
+        lv2:index 49 ;
         lv2:symbol "compKnee" ;
         lv2:name "Comp Knee" ;
         lv2:default 6 ;
@@ -585,7 +605,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 48 ;
+        lv2:index 50 ;
         lv2:symbol "compAttack" ;
         lv2:name "Comp Attack" ;
         lv2:default 5 ;
@@ -596,7 +616,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 49 ;
+        lv2:index 51 ;
         lv2:symbol "compRelease" ;
         lv2:name "Comp Release" ;
         lv2:default 200 ;
@@ -607,7 +627,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 50 ;
+        lv2:index 52 ;
         lv2:symbol "compMakeup" ;
         lv2:name "Comp Makeup" ;
         lv2:default 0 ;
@@ -618,7 +638,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 51 ;
+        lv2:index 53 ;
         lv2:symbol "compKind" ;
         lv2:name "Comp Kind" ;
         lv2:default 0 ;
@@ -632,7 +652,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 52 ;
+        lv2:index 54 ;
         lv2:symbol "compMix" ;
         lv2:name "Comp Mix" ;
         lv2:default 100 ;
@@ -644,7 +664,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 53 ;
+        lv2:index 55 ;
         lv2:symbol "compDetectorOversampling" ;
         lv2:name "Comp Detector Oversampling" ;
         lv2:default 0 ;
@@ -659,7 +679,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 54 ;
+        lv2:index 56 ;
         lv2:symbol "order" ;
         lv2:name "Order" ;
         lv2:default 0 ;
@@ -667,26 +687,6 @@
         lv2:maximum 119 ;
         lv2:portProperty lv2:integer ;
         pg:group <urn:openmixer:strip#order>
-    ] ,
-    [
-        a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 55 ;
-        lv2:symbol "enabled" ;
-        lv2:name "Enabled" ;
-        lv2:default 1 ;
-        lv2:minimum 0 ;
-        lv2:maximum 1 ;
-        lv2:designation lv2:enabled ;
-        lv2:portProperty lv2:toggled
-    ] ,
-    [
-        a lv2:ControlPort , lv2:OutputPort ;
-        lv2:index 56 ;
-        lv2:symbol "latency" ;
-        lv2:name "Latency" ;
-        lv2:designation lv2:latency ;
-        lv2:portProperty lv2:integer ;
-        units:unit units:frame
     ] .
 
 # lv2:displayPriority on a port group is the term Zynthian reads to order a plugin's groups (zynthian_lv2.py), and the

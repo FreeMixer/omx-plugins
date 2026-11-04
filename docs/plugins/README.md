@@ -21,7 +21,7 @@ One page for each plugin: its ids, its audio ports, its pages (the LV2 port grou
 | [omx eq8](omx-eq8.md) | `org.openmixer.eq8` | `urn:openmixer:eq8` | 46 | 10 |
 | [omx flanger](omx-flanger.md) | `org.openmixer.flanger` | `urn:openmixer:flanger` | 4 | 1 |
 | [omx geq](omx-geq.md) | `org.openmixer.geq` | `urn:openmixer:geq` | 31 | 1 |
-| [omx glue](omx-glue.md) | `org.openmixer.glue` | `urn:openmixer:glue` | 7 | 1 |
+| [omx glue](omx-glue.md) | `org.openmixer.glue` | `urn:openmixer:glue` | 8 | 1 |
 | [omx keyed-gate](omx-keyed-gate.md) | `org.openmixer.keyed-gate` | `urn:openmixer:keyed-gate` | 12 | 2 |
 | [omx limiter](omx-limiter.md) | `org.openmixer.limiter` | `urn:openmixer:limiter` | 3 | 1 |
 | [omx loudlevel](omx-loudlevel.md) | `org.openmixer.loudlevel` | `urn:openmixer:loudlevel` | 5 | 1 |

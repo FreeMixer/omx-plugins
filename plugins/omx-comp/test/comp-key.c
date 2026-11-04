@@ -18,6 +18,10 @@
  *   D  self       keySource self with the same loud key routed: the programme passes at 0 dB
  *   E  duck       duck on, rangeDb DUCK_DB: the same key holds the programme at DUCK_DB, not at the law
  *   F  meters     (CLAP) after the keyed run, compKey reads the key's level and compGr the law's reduction
+ *   G  ducker     the ducker preset's values (presets/org.openmixer.comp/ducker.json: ratio 20, attack 1 ms,
+ *                 release 300 ms, duck on, rangeDb -12), a key 30 dB over the threshold: the law asks
+ *                 -28.5 dB and the programme is held at -12.0 dB, within FLOOR_TOL; duck off, the same
+ *                 values follow the law, within GAIN_TOL
  *
  * The threshold, ratio, knee and times are the declared defaults; the key's level is chosen above the
  * threshold by more than half the knee, so the law is the straight line past the knee.
@@ -48,6 +52,12 @@
 #define PROG_HZ 1000.0
 #define KEY_HZ 220.0
 #define DUCK_DB (-6.0)
+#define DUCKER_RATIO 20.0f  /* the ducker preset's ratio, attack, release and range (tools/gen-presets.mjs) */
+#define DUCKER_ATTACK_MS 1.0f
+#define DUCKER_RELEASE_MS 300.0f
+#define DUCKER_RANGE_DB (-12.0)
+#define DUCKER_OVER_DB 30.0 /* the key over the threshold, dB */
+#define FLOOR_TOL 0.001     /* dB: on the floor the gain is a constant, so the output's RMS over the input's is exact */
 #define GAIN_TOL 0.05       /* dB: the detector settled on a square key, the programme sine measured over MEASURE_S */
 #define METER_TOL 0.05      /* dB: a meter is one block's reading of the settled detector */
 #define MAXLEN 288000u      /* RUN_S at 192 kHz */
@@ -218,6 +228,28 @@ static void all_arms(const char *name, const Face *f) {
     const double gd = rms_db(g_ol, from, n) - in_db;
     snprintf(what, sizeof what, "E: duck on, range %.0f dB, the law asking %.3f dB: gain %.3f dB", DUCK_DB, law, gd);
     ok(ran && fabs(gd - DUCK_DB) <= GAIN_TOL, what);
+
+    /* G: the ducker preset's values, the key 30 dB over the threshold */
+    defaults(v);
+    v[OMX_COMP_PARAM_KEY_SOURCE] = 1.0f;
+    v[OMX_COMP_PARAM_RATIO] = DUCKER_RATIO;
+    v[OMX_COMP_PARAM_ATTACK_MS] = DUCKER_ATTACK_MS;
+    v[OMX_COMP_PARAM_RELEASE_MS] = DUCKER_RELEASE_MS;
+    v[OMX_COMP_PARAM_DUCK] = 1.0f;
+    v[OMX_COMP_PARAM_RANGE_DB] = (float)DUCKER_RANGE_DB;
+    const double Td = v[OMX_COMP_PARAM_THRESHOLD_DB];
+    const double law_d = -DUCKER_OVER_DB * (1.0 - 1.0 / DUCKER_RATIO);
+    square(g_key, n, KEY_HZ, Td + DUCKER_OVER_DB);
+    ran = run_face(f, v, g_key, n, NULL);
+    const double gf = rms_db(g_ol, from, n) - in_db;
+    snprintf(what, sizeof what, "G: the ducker preset, a key %.0f dB over the threshold, the law asking %.3f dB: gain %.4f dB, the floor %.1f",
+             DUCKER_OVER_DB, law_d, gf, DUCKER_RANGE_DB);
+    ok(ran && fabs(gf - DUCKER_RANGE_DB) <= FLOOR_TOL, what);
+    v[OMX_COMP_PARAM_DUCK] = 0.0f;
+    ran = run_face(f, v, g_key, n, NULL);
+    const double gl_d = rms_db(g_ol, from, n) - in_db;
+    snprintf(what, sizeof what, "G: the same values, duck off: gain %.3f dB, the law %.3f dB (the range floors nothing)", gl_d, law_d);
+    ok(ran && fabs(gl_d - law_d) <= GAIN_TOL, what);
   }
 }
 

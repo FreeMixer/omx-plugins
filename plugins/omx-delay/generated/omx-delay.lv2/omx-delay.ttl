@@ -35,32 +35,62 @@
     omxres:opensSockets false ;
     lv2:port
     [
-        a lv2:AudioPort , lv2:InputPort ;
+        a lv2:ControlPort , lv2:InputPort ;
         lv2:index 0 ;
+        lv2:symbol "enabled" ;
+        lv2:name "Enabled" ;
+        lv2:default 1 ;
+        lv2:minimum 0 ;
+        lv2:maximum 1 ;
+        lv2:designation lv2:enabled ;
+        lv2:portProperty lv2:toggled
+    ] ,
+    [
+        a lv2:ControlPort , lv2:OutputPort ;
+        lv2:index 1 ;
+        lv2:symbol "latency" ;
+        lv2:name "Latency" ;
+        lv2:designation lv2:latency ;
+        lv2:portProperty lv2:integer ;
+        units:unit units:frame
+    ] ,
+    [
+        a atom:AtomPort , lv2:InputPort ;
+        lv2:index 2 ;
+        lv2:symbol "control" ;
+        lv2:name "Control" ;
+        atom:bufferType atom:Sequence ;
+        atom:supports time:Position ;
+        lv2:designation lv2:control ;
+        lv2:portProperty lv2:connectionOptional
+    ] ,
+    [
+        a lv2:AudioPort , lv2:InputPort ;
+        lv2:index 3 ;
         lv2:symbol "in_l" ;
         lv2:name "In L"
     ] ,
     [
         a lv2:AudioPort , lv2:InputPort ;
-        lv2:index 1 ;
+        lv2:index 4 ;
         lv2:symbol "in_r" ;
         lv2:name "In R"
     ] ,
     [
         a lv2:AudioPort , lv2:OutputPort ;
-        lv2:index 2 ;
+        lv2:index 5 ;
         lv2:symbol "out_l" ;
         lv2:name "Out L"
     ] ,
     [
         a lv2:AudioPort , lv2:OutputPort ;
-        lv2:index 3 ;
+        lv2:index 6 ;
         lv2:symbol "out_r" ;
         lv2:name "Out R"
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 4 ;
+        lv2:index 7 ;
         lv2:symbol "fxDelayTime" ;
         lv2:name "Time" ;
         lv2:default 300 ;
@@ -73,7 +103,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 5 ;
+        lv2:index 8 ;
         lv2:symbol "fxDelayFeedback" ;
         lv2:name "Feedback" ;
         lv2:default 0.3 ;
@@ -83,7 +113,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 6 ;
+        lv2:index 9 ;
         lv2:symbol "tone" ;
         lv2:name "Tone" ;
         lv2:default 0.3 ;
@@ -93,7 +123,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 7 ;
+        lv2:index 10 ;
         lv2:symbol "mix" ;
         lv2:name "Mix" ;
         lv2:default 0.3 ;
@@ -104,7 +134,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 8 ;
+        lv2:index 11 ;
         lv2:symbol "pingpong" ;
         lv2:name "Pingpong" ;
         lv2:default 0 ;
@@ -115,7 +145,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 9 ;
+        lv2:index 12 ;
         lv2:symbol "fxDelayTaps" ;
         lv2:name "Taps" ;
         lv2:default 1 ;
@@ -126,7 +156,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 10 ;
+        lv2:index 13 ;
         lv2:symbol "tap0Gain" ;
         lv2:name "Tap 1 Gain" ;
         lv2:default 1 ;
@@ -136,7 +166,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 11 ;
+        lv2:index 14 ;
         lv2:symbol "tap0Pan" ;
         lv2:name "Tap 1 Pan" ;
         lv2:default 0 ;
@@ -146,7 +176,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 12 ;
+        lv2:index 15 ;
         lv2:symbol "tap1Factor" ;
         lv2:name "Tap 2 Time" ;
         lv2:default 3 ;
@@ -169,7 +199,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 13 ;
+        lv2:index 16 ;
         lv2:symbol "tap1Gain" ;
         lv2:name "Tap 2 Gain" ;
         lv2:default 0.7 ;
@@ -179,7 +209,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 14 ;
+        lv2:index 17 ;
         lv2:symbol "tap1Pan" ;
         lv2:name "Tap 2 Pan" ;
         lv2:default -0.5 ;
@@ -189,7 +219,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 15 ;
+        lv2:index 18 ;
         lv2:symbol "tap2Factor" ;
         lv2:name "Tap 3 Time" ;
         lv2:default 5 ;
@@ -212,7 +242,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 16 ;
+        lv2:index 19 ;
         lv2:symbol "tap2Gain" ;
         lv2:name "Tap 3 Gain" ;
         lv2:default 0.5 ;
@@ -222,7 +252,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 17 ;
+        lv2:index 20 ;
         lv2:symbol "tap2Pan" ;
         lv2:name "Tap 3 Pan" ;
         lv2:default 0.5 ;
@@ -232,7 +262,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 18 ;
+        lv2:index 21 ;
         lv2:symbol "tap3Factor" ;
         lv2:name "Tap 4 Time" ;
         lv2:default 8 ;
@@ -255,7 +285,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 19 ;
+        lv2:index 22 ;
         lv2:symbol "tap3Gain" ;
         lv2:name "Tap 4 Gain" ;
         lv2:default 0.35 ;
@@ -265,7 +295,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 20 ;
+        lv2:index 23 ;
         lv2:symbol "tap3Pan" ;
         lv2:name "Tap 4 Pan" ;
         lv2:default 0 ;
@@ -275,7 +305,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 21 ;
+        lv2:index 24 ;
         lv2:symbol "sync" ;
         lv2:name "Sync" ;
         lv2:default 0 ;
@@ -289,7 +319,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 22 ;
+        lv2:index 25 ;
         lv2:symbol "division" ;
         lv2:name "Division" ;
         lv2:default 6 ;
@@ -319,7 +349,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 23 ;
+        lv2:index 26 ;
         lv2:symbol "mode" ;
         lv2:name "Mode" ;
         lv2:default 0 ;
@@ -334,7 +364,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 24 ;
+        lv2:index 27 ;
         lv2:symbol "duckDb" ;
         lv2:name "Duck" ;
         lv2:default 0 ;
@@ -345,7 +375,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 25 ;
+        lv2:index 28 ;
         lv2:symbol "duckThresholdDb" ;
         lv2:name "Duck Threshold" ;
         lv2:default -30 ;
@@ -357,7 +387,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 26 ;
+        lv2:index 29 ;
         lv2:symbol "duckReleaseMs" ;
         lv2:name "Duck Release" ;
         lv2:default 250 ;
@@ -366,36 +396,6 @@
         lv2:portProperty lv2:integer ;
         units:unit units:ms ;
         pg:group <urn:openmixer:delay#duck>
-    ] ,
-    [
-        a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 27 ;
-        lv2:symbol "enabled" ;
-        lv2:name "Enabled" ;
-        lv2:default 1 ;
-        lv2:minimum 0 ;
-        lv2:maximum 1 ;
-        lv2:designation lv2:enabled ;
-        lv2:portProperty lv2:toggled
-    ] ,
-    [
-        a lv2:ControlPort , lv2:OutputPort ;
-        lv2:index 28 ;
-        lv2:symbol "latency" ;
-        lv2:name "Latency" ;
-        lv2:designation lv2:latency ;
-        lv2:portProperty lv2:integer ;
-        units:unit units:frame
-    ] ,
-    [
-        a atom:AtomPort , lv2:InputPort ;
-        lv2:index 29 ;
-        lv2:symbol "control" ;
-        lv2:name "Control" ;
-        atom:bufferType atom:Sequence ;
-        atom:supports time:Position ;
-        lv2:designation lv2:control ;
-        lv2:portProperty lv2:connectionOptional
     ] .
 
 # lv2:displayPriority on a port group is the term Zynthian reads to order a plugin's groups (zynthian_lv2.py), and the
