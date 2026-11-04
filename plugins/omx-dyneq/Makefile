@@ -62,7 +62,8 @@ CLAPDIR ?= $(PREFIX)/lib/clap
 TTL      := $(GEN)/$(NAME).lv2
 TTL_SRCS := $(shell find $(TTL) -type f 2>/dev/null)
 CORE     := omx_dyneq_core.h $(GEN)/omx_dyneq_params.h $(ROOT)/include/omx_panel_description.h \
-            $(ROOT)/include/omx_param_contract.h $(ROOT)/include/omx_preset_file.h $(ROOT)/include/omx_plugin_face.h
+            $(ROOT)/include/omx_param_contract.h $(ROOT)/include/omx_preset_file.h $(ROOT)/include/omx_plugin_face.h \
+            $(ROOT)/include/omx_face_meters.h
 
 all: $(B)/$(NAME).clap $(BUNDLE)/$(NAME).so $(BUNDLE)/manifest.ttl
 
@@ -104,6 +105,10 @@ $(B)/preset-probe: $(ROOT)/tools/preset-probe.c | $(B)
 $(B)/dyneq-oracle: test/dyneq-oracle.c $(CORE) | $(B)
 	$(CC) $(CFLAGS) $(WARN) -I$(GEN) -I$(ROOT)/include $(DSP_CFLAGS) $(ABI_CFLAGS) -o $@ $< $(LILV) -ldl $(LDLIBS)
 
+# Hand-written (the declaration's `oracles`): moved from the console engine with the effect.
+$(B)/dyneq-readout: test/dyneq-readout.c $(CORE) | $(B)
+	$(CC) $(CFLAGS) $(WARN) -I$(GEN) -I$(ROOT)/include -I$(ROOT)/tools/test $(DSP_CFLAGS) $(ABI_CFLAGS) -o $@ $< $(LILV) -ldl -lpthread $(LDLIBS)
+
 gen:
 	node $(ROOT)/tools/gen.mjs $(CURDIR)
 	node $(ROOT)/tools/panel-file.mjs $(CURDIR) $(PANEL_FILE)
@@ -128,7 +133,8 @@ check:
 # clap.preset-load, exactly the preset files' (docs/presets.md), each sabotaged red by --self-test.
 # Every test runs, and the target fails if any failed, so a new plugin shows all its red tests at
 # once.
-test: all check $(B)/clap-probe $(B)/panel-probe $(B)/clap-ext-probe $(B)/port-groups-probe $(B)/preset-probe $(B)/dyneq-oracle
+# dyneq-readout: the hand-written oracle the declaration names, on both faces.
+test: all check $(B)/clap-probe $(B)/panel-probe $(B)/clap-ext-probe $(B)/port-groups-probe $(B)/preset-probe $(B)/dyneq-oracle $(B)/dyneq-readout
 	@fail=0; \
 	$(B)/clap-probe params $(B)/$(NAME).clap > $(B)/clap-params.txt && \
 	  node $(ROOT)/tools/clap-params-check.mjs $(CURDIR) $(B)/clap-params.txt || fail=1; \
@@ -136,6 +142,8 @@ test: all check $(B)/clap-probe $(B)/panel-probe $(B)/clap-ext-probe $(B)/port-g
 	$(B)/clap-probe state $(B)/$(NAME).clap || fail=1; \
 	$(B)/dyneq-oracle clap $(B)/$(NAME).clap || fail=1; \
 	$(B)/dyneq-oracle lv2 $(BUNDLE) $(URI) || fail=1; \
+	$(B)/dyneq-readout clap $(B)/$(NAME).clap || fail=1; \
+	$(B)/dyneq-readout lv2 $(BUNDLE) $(URI) || fail=1; \
 	$(B)/panel-probe clap $(B)/$(NAME).clap > $(B)/panel-clap.txt && \
 	  node $(ROOT)/tools/panel-check.mjs $(CURDIR) clap $(B)/panel-clap.txt || fail=1; \
 	$(B)/panel-probe lv2 $(BUNDLE) $(URI) > $(B)/panel-lv2.txt && \

@@ -382,6 +382,9 @@
     "listen5",
     "listen6"
   ],
+  "oracles": [
+    "dyneq-readout"
+  ],
   "meters": [
     {
       "id": "band1Gain",
