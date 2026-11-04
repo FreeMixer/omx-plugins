@@ -3,10 +3,19 @@
 /*
  * meter-level-digest.c — the clap.meters/1 values of a built face: a minimal CLAP host runs the face over
  * a fixed stimulus (silence, dc and noise at levels from 0 dBFS to far below any meter's minimum, sines,
- * impulses, a NaN and an infinite sample, blocks of 1 to 300 frames) and, after every block, writes the
- * bit pattern of every value of every LEVEL meter the face measures (two channels) to stdout. `meter-level-digest <x.clap> | sha256sum`
- * is the digest tools/test/meter-level.sha256 holds: a change to how a level meter reads moves it. A
- * level meter is a peak and a log10 in double, which every toolchain rounds alike.
+ * impulses, a NaN and an infinite sample, blocks of 1 to 300 frames) and, after every block, writes every
+ * value of every LEVEL meter the face measures (two channels) to stdout as text, one line per value,
+ * `<block> <meter> <value>`, %.17g. tools/test/meter-values-check.mjs compares it against
+ * tools/test/<face>.meter-level.txt within the bound `--tolerance` prints. A level meter is a peak and a
+ * log10 in double, but what it reads went through the kernel's gain curve, whose log10f and powf omx-dsp may run
+ * through libmvec: the readings are not bit-identical between a build with libmvec and one without.
+ *
+ * `--tolerance` prints, in dB, the largest move of a reading that omx-dsp's fast-maths bound allows
+ * (omx_fastmath.h): a level taken to dB by log10f, off by OMX_FM_LOG10F_MAX_ULP float ULP at the largest
+ * magnitude the library takes it over (the log10 of OMX_LIN_TO_DB_FLOOR_LIN), and a gain taken back to linear
+ * by powf, off by OMX_FM_POWF_MAX_ULP ULP.
+ *
+ * `--input-gain-db <x>` scales the stimulus by x dB: a real level error, for the sabotage arm of `make meter-level`.
  *
  * `--others <file>` writes every other meter's values (a gain reduction or a level the kernel reads: its own reading, in
  * float through libm's float functions, whose last bit differs between C libraries) to <file> as text,
@@ -15,6 +24,7 @@
  * gate's: a gain reduction only) is read with --others alone. Used by `make meter-level`.
  */
 #include <dlfcn.h>
+#include <float.h>
 #include <math.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -22,6 +32,8 @@
 #include <string.h>
 
 #include <omx-clap-host/clap_meters.h>
+#include <omxdsp/omx_fastmath.h>
+#include <omxdsp/omxdsp_definitions.h>
 
 #include "clap/entry.h"
 #include "clap/factory/plugin-factory.h"
@@ -40,6 +52,13 @@ static uint32_t ev_size(const clap_input_events_t *l) { (void)l; return 0; }
 static const clap_event_header_t *ev_get(const clap_input_events_t *l, uint32_t i) { (void)l, (void)i; return NULL; }
 static bool ev_push(const clap_output_events_t *l, const clap_event_header_t *e) { (void)l, (void)e; return true; }
 
+/** dB: the bound of a reading's move through a gain curve, from omx-dsp's fast-maths bound. */
+static double tolerance_db(void) {
+  const double log10_ulp = ldexp(1.0, ilogb(-log10(OMX_LIN_TO_DB_FLOOR_LIN_DOUBLE)) - (FLT_MANT_DIG - 1));
+  return 20.0 * OMX_FM_LOG10F_MAX_ULP * log10_ulp + 20.0 * log10(1.0 + OMX_FM_POWF_MAX_ULP * FLT_EPSILON);
+}
+
+static double g_input_gain = 1.0;
 static uint32_t g_seed = 0x2545F491u;
 static float noise(void) {
   g_seed = g_seed * 1664525u + 1013904223u;
@@ -49,7 +68,7 @@ static float noise(void) {
 /** The stimulus of block `b`: a kind, a level and a length, all functions of `b`. */
 static void fill(uint32_t b, uint32_t n, float *l, float *r) {
   static const double db[] = {0.0, -3.0, -12.0, -30.0, -45.0, -59.0, -61.0, -80.0, -120.0, -200.0, 6.0};
-  const double amp = pow(10.0, db[(b / 7u) % 11u] / 20.0);
+  const double amp = g_input_gain * pow(10.0, db[(b / 7u) % 11u] / 20.0);
   const uint32_t kind = b % 7u;
   for (uint32_t i = 0; i < n; i++) {
     float a = 0.0f, c = 0.0f;
@@ -71,13 +90,21 @@ static void fill(uint32_t b, uint32_t n, float *l, float *r) {
 }
 
 int main(int argc, char **argv) {
+  if (argc == 2 && strcmp(argv[1], "--tolerance") == 0) return printf("%.3g\n", tolerance_db()), 0;
   FILE *others = NULL;
-  if (argc == 4 && strcmp(argv[2], "--others") == 0) {
-    others = fopen(argv[3], "w");
-    if (!others) return fprintf(stderr, "open %s\n", argv[3]), 2;
-  } else if (argc != 2) {
-    return fprintf(stderr, "usage: meter-level-digest <x.clap> [--others <file>]\n"), 2;
+  const char *others_path = NULL;
+  for (int a = 2; a < argc; a++) {
+    if (strcmp(argv[a], "--others") == 0 && a + 1 < argc) {
+      others_path = argv[++a];
+    } else if (strcmp(argv[a], "--input-gain-db") == 0 && a + 1 < argc) {
+      g_input_gain = pow(10.0, strtod(argv[++a], NULL) / 20.0);
+    } else {
+      argc = 0;
+    }
   }
+  if (argc < 2)
+    return fprintf(stderr, "usage: meter-level-digest <x.clap> [--others <file>] [--input-gain-db <x>] | --tolerance\n"), 2;
+  if (others_path && !(others = fopen(others_path, "w"))) return fprintf(stderr, "open %s\n", others_path), 2;
   void *so = dlopen(argv[1], RTLD_NOW | RTLD_LOCAL);
   if (!so) return fprintf(stderr, "dlopen %s: %s\n", argv[1], dlerror()), 1;
   const clap_plugin_entry_t *entry = (const clap_plugin_entry_t *)dlsym(so, "clap_entry");
@@ -126,8 +153,8 @@ int main(int argc, char **argv) {
       double v[8] = {0};
       uint32_t got = m->get_values(p, k, v, 8);
       if (is_level[k]) {
-        fwrite(&got, sizeof got, 1, stdout);
-        fwrite(v, sizeof(double), got, stdout);
+        for (uint32_t j = 0; j < got; j++) printf("%u %u %.17g\n", b, k, v[j]);
+        if (got == 0) printf("%u %u none\n", b, k);
       } else if (others) {
         for (uint32_t j = 0; j < got; j++) fprintf(others, "%u %u %.9g\n", b, k, v[j]);
         if (got == 0) fprintf(others, "%u %u none\n", b, k);
@@ -139,6 +166,6 @@ int main(int argc, char **argv) {
   p->destroy(p);
   entry->deinit();
   dlclose(so);
-  if (others && fclose(others) != 0) return fprintf(stderr, "write %s\n", argv[3]), 1;
+  if (others && fclose(others) != 0) return fprintf(stderr, "write %s\n", others_path), 1;
   return 0;
 }
