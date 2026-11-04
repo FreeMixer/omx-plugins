@@ -68,6 +68,8 @@ _Static_assert((int)OMX_FACE_METER_KIND_GAIN_REDUCTION == (int)CLAP_METER_KIND_G
 #define G_PARAMS(g) (G_DECLARED(g) + 1u)
 #define G_NO_SLOT UINT32_MAX
 
+#define G_GOV_MAX 8u
+
 /* One allocation: this, then the values, the applied values, the touched flags and the core, each
  * G_PARAMS long (the core the vtable's size). */
 typedef struct {
@@ -88,6 +90,11 @@ typedef struct {
   unsigned char *touched;                   /* set by the host or a state: a placement default leaves it */
   _Atomic uint32_t placed;                  /* a placement for the audio thread to apply, plus one; 0 none */
   struct omx_meter_ring meters;             /* every meter's values after the last block; none since activation */
+  const clap_host_remote_controls_t *host_pages; /* the host's clap.remote-controls, when it offers one */
+  uint32_t gov_count;                       /* the parameters that decide which controls a page holds (visibleWhen) */
+  uint32_t gov[G_GOV_MAX];
+  _Atomic float paged[G_GOV_MAX];           /* each one's value when the pages were last announced */
+  _Atomic int pages_dirty;                  /* a governing value moved: the host is told on its main thread */
 } G;
 
 #define G_OF(p) ((G *)(p)->plugin_data)
@@ -114,6 +121,15 @@ static float g_clamp(const G *g, uint32_t i, double v) {
 
 static void g_publish(G *g) {
   for (uint32_t i = 0; i < G_PARAMS(g); ++i) atomic_store_explicit(&g->applied[i], g->values[i], memory_order_relaxed);
+  /* A value that decides which controls the pages hold moved: the pages are a function of it, so the host is asked,
+   * on its main thread, to read them again (clap.remote-controls changed()). */
+  int moved = 0;
+  for (uint32_t k = 0; k < g->gov_count; ++k)
+    if (g->values[g->gov[k]] != atomic_load_explicit(&g->paged[k], memory_order_relaxed)) {
+      atomic_store_explicit(&g->paged[k], g->values[g->gov[k]], memory_order_relaxed);
+      moved = 1;
+    }
+  if (moved && !atomic_exchange(&g->pages_dirty, 1) && g->host && g->host->request_callback) g->host->request_callback(g->host);
 }
 
 /** The placement's defaults (the panel's placement defaults) on every parameter that has one and
@@ -170,6 +186,8 @@ static bool g_init(const clap_plugin_t *p) {
     g->host_latency = (const clap_host_latency_t *)g->host->get_extension(g->host, CLAP_EXT_LATENCY);
   if (g->host && g->host->get_extension)
     g->host_params = (const clap_host_params_t *)g->host->get_extension(g->host, CLAP_EXT_PARAMS);
+  if (g->host && g->host->get_extension)
+    g->host_pages = (const clap_host_remote_controls_t *)g->host->get_extension(g->host, CLAP_EXT_REMOTE_CONTROLS);
   g_place(g, g_placement(g));
   g_publish(g);
   if (g->face->meter_count) omx_meter_ring_init(&g->meters);
@@ -516,10 +534,61 @@ static const omx_clap_plugin_resource_hints_t G_RESOURCE_HINTS_EXT = {g_resource
 
 /* ---- clap.remote-controls: the panel's pages ------------------------------------------------ */
 
-static uint32_t g_pages_count(const clap_plugin_t *p) { return G_OF(p)->face->page_count; }
+/* A control the current values show: no rule, or the governing parameter's value is a bit of the rule's mask. */
+static bool g_shown(const G *g, const struct omx_panel_control_row *c) {
+  if (c->visible_param == OMX_CLAP_PANEL_INVALID_ID) return true;
+  if (c->visible_param >= G_DECLARED(g)) return false;
+  const float v = atomic_load_explicit(&g->applied[c->visible_param], memory_order_relaxed);
+  if (!(v >= 0.0f && v <= 63.0f) || v != (float)(uint32_t)v) return false;
+  return ((c->visible_mask >> (uint32_t)v) & 1u) != 0u;
+}
+
+/** The pages of a panel with visibility rules: each section's SHOWN controls in order, eight a page (the page rule of
+ * omx-panel's pagesOf), a section left with none having no page. `index` UINT32_MAX counts; else it finds the page and
+ * fills `page`. */
+static uint32_t g_pages_cut(const G *g, uint32_t index, clap_remote_controls_page_t *page) {
+  const struct omx_panel_rows *r = g->face->panel;
+  uint32_t total = 0;
+  for (uint32_t s = 0; s < r->section_count; ++s) {
+    uint32_t n = 0;
+    for (uint32_t c = 0; c < r->control_count; ++c)
+      if (r->controls[c].section == s && g_shown(g, &r->controls[c])) ++n;
+    const uint32_t pages = (n + OMX_PANEL_PAGE_SIZE - 1u) / OMX_PANEL_PAGE_SIZE;
+    if (index != UINT32_MAX && index >= total && index < total + pages) {
+      const uint32_t k = index - total;
+      memset(page, 0, sizeof *page);
+      snprintf(page->section_name, sizeof page->section_name, "%s", r->sections[s].label);
+      if (pages == 1u) snprintf(page->page_name, sizeof page->page_name, "%s", r->sections[s].label);
+      else snprintf(page->page_name, sizeof page->page_name, "%s %u", r->sections[s].label, k + 1u);
+      page->page_id = index;
+      uint32_t seen = 0, slot = 0;
+      for (uint32_t c = 0; c < r->control_count; ++c) {
+        if (r->controls[c].section != s || !g_shown(g, &r->controls[c])) continue;
+        if (seen / OMX_PANEL_PAGE_SIZE == k) page->param_ids[slot++] = r->controls[c].param;
+        ++seen;
+      }
+      for (; slot < CLAP_REMOTE_CONTROLS_COUNT; ++slot) page->param_ids[slot] = OMX_CLAP_PANEL_INVALID_ID;
+      page->is_for_preset = false;
+      return total + pages;
+    }
+    total += pages;
+  }
+  return total;
+}
+
+static uint32_t g_pages_count(const clap_plugin_t *p) {
+  const G *g = G_OF(p);
+  return g->gov_count ? g_pages_cut(g, UINT32_MAX, NULL) : g->face->page_count;
+}
 
 static bool g_pages_get(const clap_plugin_t *p, uint32_t index, clap_remote_controls_page_t *page) {
-  const struct omx_face *f = G_OF(p)->face;
+  const G *g = G_OF(p);
+  const struct omx_face *f = g->face;
+  if (g->gov_count) {
+    if (index >= g_pages_cut(g, UINT32_MAX, NULL)) return false;
+    g_pages_cut(g, index, page);
+    return true;
+  }
   if (index >= f->page_count) return false;
   const struct omx_panel_page_row *r = &f->pages[index];
   memset(page, 0, sizeof *page);
@@ -594,7 +663,10 @@ static const void *g_get_extension(const clap_plugin_t *p, const char *id) {
   return NULL;
 }
 
-static void g_on_main_thread(const clap_plugin_t *p) { (void)p; }
+static void g_on_main_thread(const clap_plugin_t *p) {
+  G *g = G_OF(p);
+  if (atomic_exchange(&g->pages_dirty, 0) && g->host_pages && g->host_pages->changed) g->host_pages->changed(g->host);
+}
 
 /* ---- factory ---------------------------------------------------------------------------- */
 
@@ -630,6 +702,18 @@ static const clap_plugin_t *g_create(const struct omx_clap_face *cf, const clap_
   g->plugin.get_extension = g_get_extension;
   g->plugin.on_main_thread = g_on_main_thread;
   for (uint32_t i = 0; i < G_PARAMS(g); ++i) g->values[i] = g_def(g, i);
+  /* the parameters the panel's visibility rules read: the pages follow them */
+  const struct omx_panel_rows *pr = f->panel;
+  for (uint32_t c = 0; pr && c < pr->control_count; ++c) {
+    const uint32_t gp = pr->controls[c].visible_param;
+    if (gp == OMX_CLAP_PANEL_INVALID_ID || gp >= G_DECLARED(g)) continue;
+    uint32_t k = 0;
+    while (k < g->gov_count && g->gov[k] != gp) ++k;
+    if (k == g->gov_count && g->gov_count < G_GOV_MAX) {
+      g->gov[g->gov_count++] = gp;
+      atomic_store_explicit(&g->paged[k], g->values[gp], memory_order_relaxed);
+    }
+  }
   g_publish(g);
   return &g->plugin;
 }
