@@ -11,7 +11,7 @@
  *
  *   param <id> <symbol> <unit> <scale> <step> <min> <max> <default> <flags>
  *       get_info and org.openmixer.param-contract/1's get, for every parameter params lists;
- *   contract <version> <fingerprint> <migration steps>
+ *   contract <version> <fingerprint>
  *   page <index> <page_id> <section name> <page name> <param ids, comma-separated> <is_for_preset>
  *       clap.remote-controls, every page;
  *   placed|moved|kept <placement> <id> <value>
@@ -171,7 +171,7 @@ int main(int argc, char **argv) {
   omx_clap_param_contract_info_t c;
   if (pc->get(p, params->count(p), &c)) fprintf(stderr, "the contract answers an id params does not list\n"), rc = 1;
   const char *fp = pc->fingerprint(p);
-  printf("contract\t%" PRIu32 "\t%s\t%" PRIu32 "\n", pc->version(p), fp ? fp : "-", pc->migration_count(p));
+  printf("contract\t%" PRIu32 "\t%s\n", pc->version(p), fp ? fp : "-");
   for (uint32_t k = 0; k < rc_ext->count(p); ++k) {
     clap_remote_controls_page_t page;
     if (!rc_ext->get(p, k, &page)) {

@@ -1534,6 +1534,10 @@ function main(argv) {
   const dirs = argv.filter((a) => !a.startsWith('--'));
   let stale = 0;
   const put = (path, shown, text, how) => {
+    // Every plugin runs in place: its oracle's in-place arm proves the output bit for bit the separate
+    // buffers' one, so no bundle may tell a host otherwise.
+    if (path.endsWith('.ttl') && /inPlaceBroken/.test(text))
+      throw new Error(`gen: ${shown} declares lv2:inPlaceBroken; every plugin's oracle proves it runs in place (its in-place arm)`);
     const now = existsSync(path) ? readFileSync(path, 'utf8') : null;
     if (now === text) return;
     if (check) {

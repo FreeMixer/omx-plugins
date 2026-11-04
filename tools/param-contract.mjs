@@ -7,8 +7,8 @@
  * (include/omx_param_contract.h); the unit codes are omx-contract's (OMX_PARAM_CONTRACT_UNITS). tools/clap-ext-check.mjs
  * reads what a built face serves back.
  *
- * The contract's version is 1: its first publication, with no migration step. A later change of a
- * symbol, unit, scale, travel or stepping changes the fingerprint and needs the next version.
+ * The contract's version is 1: its first publication. A later change of a symbol, unit, scale, travel
+ * or stepping changes the fingerprint and needs the next version.
  */
 import { createHash } from 'node:crypto';
 import { dirname, join } from 'node:path';

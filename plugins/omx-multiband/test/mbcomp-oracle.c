@@ -18,7 +18,9 @@
  * honest: the reference must move the signal, and a reference with any ONE parameter one step off must
  * differ from the face (the sabotage arm), so a wrong or dead coefficient is seen. A CLAP face's
  * reported latency holds while it is active and moves only at the activation after the restart it
- * asks for, as the CLAP latency extension says.
+ * asks for, as the CLAP latency extension says. The plan runs again IN PLACE (each output the buffer of
+ * its input), bit for bit the first run; and, through CLAP, with each block split in two, its second half
+ * carrying no event, bit for bit the kernel resolving the same values again before that half.
  * The declaration's meters: after every block of the plan, through the CLAP face's clap.meters/1 and
  * the LV2 face's output control ports (one per channel, the value as a float) at every declared rate,
  * every channel of every meter is held bit for bit to a reference computed here
@@ -264,6 +266,15 @@ static void key_make(float *k, uint32_t n, double sr) {
 }
 #endif
 
+/* Set for the quiet arm: every block of the plan runs as two, its values resolved before each half (the
+ * reference) or sent before the first half only (the face, whose second half is a block with no event). */
+static bool quiet;
+static uint32_t quiet_blocks;
+
+/* The frames of the next part of a block of `whole` frames with `left` to run: all of it, or in the quiet
+ * arm its first half, then the rest. */
+static uint32_t part_of(uint32_t whole, uint32_t left) { return quiet && left == whole && whole > 1u ? whole / 2u : left; }
+
 /* The block's values, with parameter `off` (or none, -1) moved one step inside its travel. */
 static void values_of(const Block *k, int off, float *v) {
   memcpy(v, k->v, sizeof k->v);
@@ -282,8 +293,10 @@ static void reference(double sr, int off, const float *key, const float *il, con
     const Block *k = &PLAN[b];
     float values[NP];
     values_of(k, off, values);
-    const uint32_t frames = frames_of(k, sr);
-    for (uint32_t r = 0; r < STRETCH; r++) {
+    const uint32_t whole = frames_of(k, sr);
+    for (uint32_t r = 0; r < STRETCH; r++)
+      for (uint32_t left = whole, frames; left; left -= frames) {
+      frames = part_of(whole, left);
       omx_mbcomp_instance_resolve(&inst, k->bypass, values[OMX_MBCOMP_PARAM_BANDS], (const float[OMX_MBC_MAX_XOVERS]){values[OMX_MBCOMP_PARAM_XOVER_HZ1], values[OMX_MBCOMP_PARAM_XOVER_HZ2], values[OMX_MBCOMP_PARAM_XOVER_HZ3], values[OMX_MBCOMP_PARAM_XOVER_HZ4]}, (const float[OMX_MBC_MAX_BANDS]){values[OMX_MBCOMP_PARAM_THRESHOLD_DB1], values[OMX_MBCOMP_PARAM_THRESHOLD_DB2], values[OMX_MBCOMP_PARAM_THRESHOLD_DB3], values[OMX_MBCOMP_PARAM_THRESHOLD_DB4], values[OMX_MBCOMP_PARAM_THRESHOLD_DB5]}, (const float[OMX_MBC_MAX_BANDS]){values[OMX_MBCOMP_PARAM_RATIO1], values[OMX_MBCOMP_PARAM_RATIO2], values[OMX_MBCOMP_PARAM_RATIO3], values[OMX_MBCOMP_PARAM_RATIO4], values[OMX_MBCOMP_PARAM_RATIO5]}, (const float[OMX_MBC_MAX_BANDS]){values[OMX_MBCOMP_PARAM_ATTACK_MS1], values[OMX_MBCOMP_PARAM_ATTACK_MS2], values[OMX_MBCOMP_PARAM_ATTACK_MS3], values[OMX_MBCOMP_PARAM_ATTACK_MS4], values[OMX_MBCOMP_PARAM_ATTACK_MS5]}, (const float[OMX_MBC_MAX_BANDS]){values[OMX_MBCOMP_PARAM_RELEASE_MS1], values[OMX_MBCOMP_PARAM_RELEASE_MS2], values[OMX_MBCOMP_PARAM_RELEASE_MS3], values[OMX_MBCOMP_PARAM_RELEASE_MS4], values[OMX_MBCOMP_PARAM_RELEASE_MS5]}, (const float[OMX_MBC_MAX_BANDS]){values[OMX_MBCOMP_PARAM_MAKEUP_DB1], values[OMX_MBCOMP_PARAM_MAKEUP_DB2], values[OMX_MBCOMP_PARAM_MAKEUP_DB3], values[OMX_MBCOMP_PARAM_MAKEUP_DB4], values[OMX_MBCOMP_PARAM_MAKEUP_DB5]}, (const int[OMX_MBC_MAX_BANDS]){(int)lrintf(values[OMX_MBCOMP_PARAM_SOLO1]), (int)lrintf(values[OMX_MBCOMP_PARAM_SOLO2]), (int)lrintf(values[OMX_MBCOMP_PARAM_SOLO3]), (int)lrintf(values[OMX_MBCOMP_PARAM_SOLO4]), (int)lrintf(values[OMX_MBCOMP_PARAM_SOLO5])}, (const int[OMX_MBC_MAX_BANDS]){(int)lrintf(values[OMX_MBCOMP_PARAM_BAND_BYPASS1]), (int)lrintf(values[OMX_MBCOMP_PARAM_BAND_BYPASS2]), (int)lrintf(values[OMX_MBCOMP_PARAM_BAND_BYPASS3]), (int)lrintf(values[OMX_MBCOMP_PARAM_BAND_BYPASS4]), (int)lrintf(values[OMX_MBCOMP_PARAM_BAND_BYPASS5])}, values[OMX_MBCOMP_PARAM_MIX_PCT], values[OMX_MBCOMP_PARAM_OUTPUT_DB]);
 #if KEYED
       omx_mbcomp_instance_run(&inst, key ? key + at : NULL, il + at, ir + at, ol + at, orr + at, frames);
@@ -364,6 +377,25 @@ static void run_checks(const char *face, Driver *d, double sr, bool keyed, bool 
   check(ran && lat == want, face, sr, what);
   snprintf(what, sizeof what, "the reported latency moves only at activation, after a restart asked for%s", pass);
   check(ran && !latency_broke, face, sr, what);
+  /* in place: the same plan with each output the buffer of its input (CLAP's in_place_pair, an LV2 host that
+   * connects one buffer to both ports) gives what separate buffers gave, bit for bit */
+  memcpy(xl, il, (size_t)n * sizeof(float));
+  memcpy(xr, ir, (size_t)n * sizeof(float));
+  bool in_place = d->run(d->face, PLAN, NBLOCKS, sr, key, xl, xr, xl, xr, NULL);
+  snprintf(what, sizeof what, "in place, the output is the separate buffers' output, bit for bit%s", pass);
+  check(ran && in_place && same(xl, ol, n) && same(xr, orr, n), face, sr, what);
+  if (strcmp(face, "clap") == 0) {
+    /* quiet blocks: each block split in two, its values sent before the first half only; the second half, a
+     * block with no event, runs as the reference's, which resolves the same values again before it */
+    quiet = true, quiet_blocks = 0;
+    bool q = d->run(d->face, PLAN, NBLOCKS, sr, key, il, ir, xl, xr, NULL);
+    reference(sr, -1, key, il, ir, wl, wr, NULL);
+    quiet = false;
+    snprintf(what, sizeof what, "%u blocks with no event, each the output of resolving the same values again, bit for bit%s",
+             quiet_blocks, pass);
+    check(ran && q && quiet_blocks > 0 && same(xl, wl, n) && same(xr, wr, n), face, sr, what);
+    reference(sr, -1, key, il, ir, wl, wr, NULL); /* the arms below read the whole-block reference */
+  }
   if (metering) {
     bool agrees = ran, reduces = false, legs = false, shaped = false;
     /* an LV2 output control port carries a float: the reference's value as the face writes it */
@@ -509,19 +541,22 @@ static bool clap_run(void *face, const Block *plan, size_t nblocks, double sr, c
   for (size_t b = 0; ok && b < nblocks * STRETCH; b++) {
     const Block *k = &plan[b / STRETCH];
     if (lat->get(p) != activated) latency_broke = true;
+    const uint32_t whole = frames_of(k, sr);
+    for (uint32_t left = whole, frames; ok && left; left -= frames) {
+    frames = part_of(whole, left);
     Events evs = {.n = 0};
-    for (uint32_t i = 0; i <= NP; i++) {
+    for (uint32_t i = 0; i <= NP && left == whole; i++) {
       clap_event_param_value_t *e = &evs.ev[evs.n++];
       memset(e, 0, sizeof *e);
       e->header = (clap_event_header_t){sizeof *e, 0, CLAP_CORE_EVENT_SPACE_ID, CLAP_EVENT_PARAM_VALUE, 0};
       e->param_id = ids[i], e->note_id = -1, e->port_index = -1, e->channel = -1, e->key = -1;
       e->value = i < NP ? (double)k->v[i] : (k->bypass ? 1.0 : 0.0);
     }
+    if (evs.n == 0) quiet_blocks++;
     clap_input_events_t in = {&evs, ev_size, ev_get};
     float *ib[2] = {(float *)il + at, (float *)ir + at}, *ob[2] = {ol + at, orr + at};
     float *kb[1] = {key ? (float *)key + at : NULL};
     clap_audio_buffer_t ai[2] = {{ib, NULL, 2, 0, 0}, {kb, NULL, 1, 0, 0}}, ao = {ob, NULL, 2, 0, 0};
-    const uint32_t frames = frames_of(k, sr);
     clap_process_t pr = {.steady_time = at, .frames_count = frames, .audio_inputs = ai, .audio_outputs = &ao,
                          .audio_inputs_count = key ? 2u : 1u, .audio_outputs_count = 1, .in_events = &in,
                          .out_events = &out};
@@ -532,6 +567,7 @@ static bool clap_run(void *face, const Block *plan, size_t nblocks, double sr, c
         for (uint32_t c = 0; c < METERS[m].channels; c++) v[c] = NAN;
     }
     at += frames;
+    }
   }
   if (ok && lat->get(p) != activated) latency_broke = true;
   if (ok && restart_asked) {

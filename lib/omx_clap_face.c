@@ -95,6 +95,8 @@ typedef struct {
   uint32_t gov[G_GOV_MAX];
   _Atomic float paged[G_GOV_MAX];           /* each one's value when the pages were last announced */
   _Atomic int pages_dirty;                  /* a governing value moved: the host is told on its main thread */
+  _Atomic int dirty;                        /* the values moved since the core last resolved them: resolve before the next block */
+  double tempo;                             /* the tempo the core last resolved with, BPM; 0 none (audio thread) */
 } G;
 
 #define G_OF(p) ((G *)(p)->plugin_data)
@@ -147,19 +149,20 @@ static void g_place(G *g, uint32_t placement) {
 }
 
 /** Frame 0: a placement the host changed while active, then every value event in the block, are
- * applied before the kernel runs. */
+ * applied before the kernel runs. A value that moved marks the values dirty; a block with no event leaves
+ * them, and the core, as they are. */
 static void g_drain(G *g, const clap_input_events_t *in) {
   const uint32_t placed = atomic_exchange_explicit(&g->placed, 0, memory_order_acquire);
-  if (placed) g_place(g, placed - 1);
-  if (!in) return;
-  const uint32_t n = in->size(in);
+  if (placed) g_place(g, placed - 1), atomic_store_explicit(&g->dirty, 1, memory_order_relaxed);
+  const uint32_t n = in ? in->size(in) : 0u;
   for (uint32_t k = 0; k < n; ++k) {
     const clap_event_header_t *h = in->get(in, k);
     if (!h || h->space_id != CLAP_CORE_EVENT_SPACE_ID || h->type != CLAP_EVENT_PARAM_VALUE) continue;
     const clap_event_param_value_t *e = (const clap_event_param_value_t *)h;
     const uint32_t i = g_slot(g, e->param_id);
     if (i != G_NO_SLOT) {
-      g->values[i] = g_clamp(g, i, e->value);
+      const float v = g_clamp(g, i, e->value);
+      if (v != g->values[i]) g->values[i] = v, atomic_store_explicit(&g->dirty, 1, memory_order_relaxed);
       g->touched[i] = 1;
     }
   }
@@ -216,6 +219,7 @@ static bool g_activate(const clap_plugin_t *p, double sample_rate, uint32_t min_
   if (atomic_exchange(&g->latency, lat) != lat && g->host_latency && g->host_latency->changed)
     g->host_latency->changed(g->host);
   atomic_store(&g->restart_asked, 0);
+  atomic_store(&g->dirty, 1); /* a fresh core resolves before its first block */
   if (g->face->meter_count) omx_meter_ring_clear(&g->meters);
   g->active = 1;
   return true;
@@ -237,6 +241,7 @@ static void g_stop_processing(const clap_plugin_t *p) { G_OF(p)->processing = 0;
 static void g_reset(const clap_plugin_t *p) {
   G *g = G_OF(p);
   g->face->core->init(g->core, g->rate);
+  atomic_store(&g->dirty, 1);
 }
 
 static clap_process_status g_process(const clap_plugin_t *p, const clap_process_t *pr) {
@@ -249,12 +254,18 @@ static clap_process_status g_process(const clap_plugin_t *p, const clap_process_
   const clap_audio_buffer_t *ao = &pr->audio_outputs[0];
   if (ai->channel_count < 2 || ao->channel_count < 2 || !ai->data32 || !ao->data32) return CLAP_PROCESS_ERROR;
   const int bypassed = g->values[G_BYPASS(g)] > 0.5f;
-  /* the block's tempo, for a plugin that reads one: the transport's when it carries a tempo, else none (0) */
+  /* A quiet block (no value moved, the same tempo) skips the resolve: the core keeps its smoothing as it is, which is
+   * what resolving the same values again gives, bit for bit (each plugin's oracle, its quiet arm). */
+  int dirty = atomic_exchange_explicit(&g->dirty, 0, memory_order_acquire);
+  /* the block's tempo, for a plugin that reads one: the transport's when it carries a tempo, else none (0); the core
+   * takes it at its next resolve, so a tempo that moved resolves */
   if (f->tempo) {
     const clap_event_transport_t *t = pr->transport;
-    f->tempo(g->core, t && (t->flags & CLAP_TRANSPORT_HAS_TEMPO) ? t->tempo : 0.0);
+    const double bpm = t && (t->flags & CLAP_TRANSPORT_HAS_TEMPO) ? t->tempo : 0.0;
+    if (bpm != g->tempo) g->tempo = bpm, dirty = 1;
+    f->tempo(g->core, bpm);
   }
-  f->core->resolve(g->core, g->values, bypassed);
+  if (dirty) f->core->resolve(g->core, g->values, bypassed);
   double mv[OMX_METER_RING_MAX];
   /* the inputs' peak, before the kernel runs (the outputs may be the inputs) */
   if (f->meter_count) omx_face_meter_levels(f, OMX_FACE_METER_IN, ai->data32[0], ai->data32[1], pr->frames_count, mv);
@@ -430,6 +441,7 @@ static bool g_state_load(const clap_plugin_t *p, const clap_istream_t *s) {
   if (!any) return false;
   for (uint32_t i = 0; i < n; ++i)
     if (set[i]) g->values[i] = v[i], g->touched[i] = 1;
+  atomic_store(&g->dirty, 1);
   g_publish(g);
   /* The values a state set are new to the host: it reads them again (clap.params rescan). */
   if (g->host_params && g->host_params->rescan) g->host_params->rescan(g->host, CLAP_PARAM_RESCAN_VALUES);
@@ -446,6 +458,7 @@ static void g_preset_param(const char *symbol, double value, void *ctx) {
     if (strcmp(symbol, g->face->params[i].symbol) == 0) {
       g->values[i] = g_clamp(g, i, value);
       g->touched[i] = 1;
+      atomic_store(&g->dirty, 1);
     }
   }
 }
@@ -508,20 +521,7 @@ static bool g_contract_get(const clap_plugin_t *p, uint32_t id, omx_clap_param_c
                                 info);
 }
 
-static uint32_t g_contract_migrations(const clap_plugin_t *p) {
-  (void)p;
-  return 0;
-}
-
-static bool g_contract_migration(const clap_plugin_t *p, uint32_t index, omx_clap_param_migration_t *step) {
-  (void)p;
-  (void)index;
-  (void)step;
-  return false;
-}
-
-static const omx_clap_plugin_param_contract_t G_CONTRACT_EXT = {g_contract_version, g_contract_fingerprint, g_contract_get,
-                                                                g_contract_migrations, g_contract_migration};
+static const omx_clap_plugin_param_contract_t G_CONTRACT_EXT = {g_contract_version, g_contract_fingerprint, g_contract_get};
 
 /* ---- org.openmixer.resource-hints.draft/0: the declaration's hints -------------------------- */
 

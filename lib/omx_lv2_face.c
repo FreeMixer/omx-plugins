@@ -56,6 +56,9 @@ typedef struct {
   int mapped;                       /* the host gave urid:map */
   TimeUrids u;
   double bpm; /* the last time:beatsPerMinute received; 0: none yet */
+  int bypass; /* the bypass the core last resolved */
+  int dirty;  /* resolve before the next block: a value or the bypass moved, or the core is fresh */
+  double tempo; /* the tempo the core last resolved with; 0: none */
 } Face;
 
 LV2_Handle omx_lv2_face_instantiate(const LV2_Descriptor *d, double rate, const char *bundle,
@@ -87,6 +90,7 @@ LV2_Handle omx_lv2_face_instantiate(const LV2_Descriptor *d, double rate, const 
         s->mapped = 1;
       }
   f->core->init(s->core, s->rate);
+  s->dirty = 1;
   return s;
 }
 
@@ -110,6 +114,7 @@ void omx_lv2_face_connect_port(LV2_Handle h, uint32_t port, void *data) {
 void omx_lv2_face_activate(LV2_Handle h) {
   Face *s = (Face *)h;
   s->face->core->init(s->core, s->rate);
+  s->dirty = 1;
 }
 
 static float value(const Face *s, uint32_t i) { return s->param[i] ? *s->param[i] : s->face->params[i].def; }
@@ -146,9 +151,19 @@ void omx_lv2_face_run(LV2_Handle h, uint32_t frames) {
   const struct omx_face_core *c = s->face->core;
   omx_denormals_off();
   const int bypass = s->enabled && *s->enabled < 0.5f;
-  for (uint32_t i = 0; i < s->face->param_count; ++i) s->values[i] = value(s, i);
-  if (s->face->tempo) s->face->tempo(s->core, block_tempo(s));
-  c->resolve(s->core, s->values, bypass);
+  /* A block whose control ports and tempo read what the core last resolved skips the resolve: the core keeps its
+   * smoothing as it is, which resolving the same values again gives, bit for bit. */
+  int dirty = s->dirty || bypass != s->bypass;
+  for (uint32_t i = 0; i < s->face->param_count; ++i) {
+    const float v = value(s, i);
+    if (v != s->values[i]) s->values[i] = v, dirty = 1;
+  }
+  if (s->face->tempo) {
+    const double bpm = block_tempo(s);
+    if (bpm != s->tempo) s->tempo = bpm, dirty = 1;
+    s->face->tempo(s->core, bpm);
+  }
+  if (dirty) c->resolve(s->core, s->values, bypass), s->bypass = bypass, s->dirty = 0;
   if (s->latency) *s->latency = (float)c->latency(s->core);
   const struct omx_face *f = s->face;
   double mv[OMX_METER_RING_MAX];
