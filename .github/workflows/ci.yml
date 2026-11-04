@@ -6,12 +6,13 @@ name: ci
 # built (their own make test included), their file lists checked and the packages installed and loaded
 # by a CLAP and an LV2 scanner; and the release workflow as a dry run. Nothing is signed or published
 # here. The build dependencies come from the packaging (dnf builddep, apt-get build-dep), the ones
-# Fedora and Debian do not carry from the FreeMixer channel; nothing is pinned or fetched by version.
+# Fedora and Debian do not carry from the FreeMixer channel; nothing is pinned or fetched by version. A pull
+# request into dedupe/all, and a push to it, take the siblings listed in .github/wave-deps from their own dedupe/all.
 
 on:
   pull_request:
   push:
-    branches: [main]
+    branches: [main, dedupe/all]
 
 permissions:
   contents: read
@@ -74,6 +75,9 @@ jobs:
 
       - name: The checkout is a git directory this job may read
         run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+
+      # a dedupe/all run builds on its siblings' dedupe/all (.github/wave-deps); @main until FreeMixer/.github moves v1 past it
+      - uses: FreeMixer/.github/.github/actions/wave-deps@main
 
       - name: Install what the spec builds and tests with
         run: |
@@ -157,6 +161,9 @@ jobs:
       - name: The checkout is a git directory this job may read
         run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
 
+      # a dedupe/all run builds on its siblings' dedupe/all (.github/wave-deps); @main until FreeMixer/.github moves v1 past it
+      - uses: FreeMixer/.github/.github/actions/wave-deps@main
+
       - name: Install what the spec builds and tests with
         run: |
           dnf builddep -y --setopt=install_weak_deps=False packaging/omx-plugins.spec
@@ -189,6 +196,9 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      # a dedupe/all run builds on its siblings' dedupe/all (.github/wave-deps); @main until FreeMixer/.github moves v1 past it
+      - uses: FreeMixer/.github/.github/actions/wave-deps@main
 
       - uses: FreeMixer/.github/.github/actions/build-rpm@v1
 
@@ -358,6 +368,9 @@ jobs:
       - name: Take build dependencies from the OpenMixer channel
         uses: FreeMixer/.github/.github/actions/add-openmixer@v1
 
+      # a dedupe/all run builds on its siblings' dedupe/all (.github/wave-deps); @main until FreeMixer/.github moves v1 past it
+      - uses: FreeMixer/.github/.github/actions/wave-deps@main
+
       - uses: FreeMixer/.github/.github/actions/build-deb@v1
 
       - name: The packages install and their plugins load
@@ -448,6 +461,9 @@ jobs:
         uses: FreeMixer/.github/.github/actions/add-openmixer@v1
 
       - uses: actions/checkout@v4
+
+      # a dedupe/all run builds on its siblings' dedupe/all (.github/wave-deps); @main until FreeMixer/.github moves v1 past it
+      - uses: FreeMixer/.github/.github/actions/wave-deps@main
 
       - name: Install what the spec builds with, and clap-validator from the Audinux COPR
         run: |
