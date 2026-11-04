@@ -69,7 +69,9 @@ omx-panel's layout of each finds the declared family and roles; the layout's own
 [docs/panel-layout.md](https://github.com/FreeMixer/omx-panel/blob/main/docs/panel-layout.md)) and `make descriptor-view`
 (`tools/test/descriptor-view-test.mjs`: each described plugin's descriptor fresh and in omx-contract's
 words, and the declaration its view) and `make descriptor-features` (`tools/test/descriptor-features-check.mjs`: the
-descriptor's feature words are read from the installed schema, and no tool lists them).
+descriptor's feature words are read from the installed schema, and no tool lists them) and `make placement-strips`
+(`tools/test/placement-strips-check.mjs`: a declaration's `console.placement.strips` is a restriction to fewer than the
+rack kinds the schema enumerates, never the whole set, never a kind without a rack).
 
 After the plugins, `make round-trip` runs the round trip: for every plugin with a descriptor it generates
 (`node tools/gen.mjs`), builds both faces, scans each built face back with `plugin-hostd-probe describe` (plugin-hostd

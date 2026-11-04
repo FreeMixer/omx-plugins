@@ -61,16 +61,6 @@
   "console": {
     "$comment": "The OpenMixer console draws its flanger stage: the modulation panel (rateHz, depthMs, feedback, mix). Its chip shows rateHz; the overview card shows the engage switch only.",
     "placement": {
-      "strips": [
-        "input",
-        "fxReturn",
-        "aux",
-        "mix",
-        "matrix",
-        "main",
-        "fxSend",
-        "mixMinus"
-      ],
       "group": "walk",
       "stage": "flanger",
       "after": "chorus",

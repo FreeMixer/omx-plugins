@@ -41,14 +41,6 @@
   "console": {
     "$comment": "The OpenMixer console has no loudness leveler stage. Racked as a plugin in a channel's insert rack, it is drawn by the generic plugin editor.",
     "placement": {
-      "strips": [
-        "input",
-        "fxReturn",
-        "aux",
-        "mix",
-        "matrix",
-        "main"
-      ],
       "group": "plugins"
     }
   },

@@ -61,16 +61,6 @@
   "console": {
     "$comment": "The console has the pitch stage in its walk, with nothing declared for it to present, and draws no panel, chip or card for it today; racked as a plugin it is drawn by the generic plugin editor.",
     "placement": {
-      "strips": [
-        "input",
-        "fxReturn",
-        "aux",
-        "mix",
-        "matrix",
-        "main",
-        "fxSend",
-        "mixMinus"
-      ],
       "group": "walk",
       "stage": "pitch",
       "after": "flanger",
