@@ -1,7 +1,7 @@
 {
   "$schema": "https://github.com/FreeMixer/omx-contract/raw/v3/schema/omx-contract.schema.json",
   "requires": {
-    "omx-contract-schema": ">= 3.7.0"
+    "omx-contract-schema": ">= 3.9.0"
   },
   "origin": "authored",
   "plugin": {
@@ -1830,6 +1830,116 @@
   "latency": {
     "reports": true
   },
+  "meters": [
+    {
+      "id": 0,
+      "symbol": "band1Gain",
+      "name": "Band 1 gain",
+      "doc": "The gain band 1's dynamics apply now, in dB, both ways: a cut negative, a boost positive, 0 while the band rests, is off or its dynamics are off. The band's gain computer re-run on the level its detector reached at the block's last sample (omx_band_dyn_offset_db), so the reading and the gain the sample took are one computation.",
+      "kind": "gain-reduction",
+      "channels": 1,
+      "unit": "dB",
+      "min": -24,
+      "max": 12,
+      "scale": "linear",
+      "source": {
+        "from": {
+          "link": "data/kernels/dyneq.json#readouts[band1GainDb]",
+          "at": "omx-dsp@0.28.0"
+        }
+      }
+    },
+    {
+      "id": 1,
+      "symbol": "band2Gain",
+      "name": "Band 2 gain",
+      "doc": "The gain band 2's dynamics apply now, in dB, both ways: a cut negative, a boost positive, 0 while the band rests, is off or its dynamics are off. The band's gain computer re-run on the level its detector reached at the block's last sample (omx_band_dyn_offset_db), so the reading and the gain the sample took are one computation.",
+      "kind": "gain-reduction",
+      "channels": 1,
+      "unit": "dB",
+      "min": -24,
+      "max": 12,
+      "scale": "linear",
+      "source": {
+        "from": {
+          "link": "data/kernels/dyneq.json#readouts[band2GainDb]",
+          "at": "omx-dsp@0.28.0"
+        }
+      }
+    },
+    {
+      "id": 2,
+      "symbol": "band3Gain",
+      "name": "Band 3 gain",
+      "doc": "The gain band 3's dynamics apply now, in dB, both ways: a cut negative, a boost positive, 0 while the band rests, is off or its dynamics are off. The band's gain computer re-run on the level its detector reached at the block's last sample (omx_band_dyn_offset_db), so the reading and the gain the sample took are one computation.",
+      "kind": "gain-reduction",
+      "channels": 1,
+      "unit": "dB",
+      "min": -24,
+      "max": 12,
+      "scale": "linear",
+      "source": {
+        "from": {
+          "link": "data/kernels/dyneq.json#readouts[band3GainDb]",
+          "at": "omx-dsp@0.28.0"
+        }
+      }
+    },
+    {
+      "id": 3,
+      "symbol": "band4Gain",
+      "name": "Band 4 gain",
+      "doc": "The gain band 4's dynamics apply now, in dB, both ways: a cut negative, a boost positive, 0 while the band rests, is off or its dynamics are off. The band's gain computer re-run on the level its detector reached at the block's last sample (omx_band_dyn_offset_db), so the reading and the gain the sample took are one computation.",
+      "kind": "gain-reduction",
+      "channels": 1,
+      "unit": "dB",
+      "min": -24,
+      "max": 12,
+      "scale": "linear",
+      "source": {
+        "from": {
+          "link": "data/kernels/dyneq.json#readouts[band4GainDb]",
+          "at": "omx-dsp@0.28.0"
+        }
+      }
+    },
+    {
+      "id": 4,
+      "symbol": "band5Gain",
+      "name": "Band 5 gain",
+      "doc": "The gain band 5's dynamics apply now, in dB, both ways: a cut negative, a boost positive, 0 while the band rests, is off or its dynamics are off. The band's gain computer re-run on the level its detector reached at the block's last sample (omx_band_dyn_offset_db), so the reading and the gain the sample took are one computation.",
+      "kind": "gain-reduction",
+      "channels": 1,
+      "unit": "dB",
+      "min": -24,
+      "max": 12,
+      "scale": "linear",
+      "source": {
+        "from": {
+          "link": "data/kernels/dyneq.json#readouts[band5GainDb]",
+          "at": "omx-dsp@0.28.0"
+        }
+      }
+    },
+    {
+      "id": 5,
+      "symbol": "band6Gain",
+      "name": "Band 6 gain",
+      "doc": "The gain band 6's dynamics apply now, in dB, both ways: a cut negative, a boost positive, 0 while the band rests, is off or its dynamics are off. The band's gain computer re-run on the level its detector reached at the block's last sample (omx_band_dyn_offset_db), so the reading and the gain the sample took are one computation.",
+      "kind": "gain-reduction",
+      "channels": 1,
+      "unit": "dB",
+      "min": -24,
+      "max": 12,
+      "scale": "linear",
+      "source": {
+        "from": {
+          "link": "data/kernels/dyneq.json#readouts[band6GainDb]",
+          "at": "omx-dsp@0.28.0"
+        }
+      }
+    }
+  ],
   "extensions": {
     "clap": {
       "clap_plugin_descriptor.features": [

@@ -950,6 +950,60 @@
         lv2:designation lv2:latency ;
         lv2:portProperty lv2:integer ;
         units:unit units:frame
+    ] ,
+    [
+        a lv2:ControlPort , lv2:OutputPort ;
+        lv2:index 79 ;
+        lv2:symbol "band1Gain" ;
+        lv2:name "Band 1 gain" ;
+        lv2:minimum -24 ;
+        lv2:maximum 12 ;
+        units:unit units:db
+    ] ,
+    [
+        a lv2:ControlPort , lv2:OutputPort ;
+        lv2:index 80 ;
+        lv2:symbol "band2Gain" ;
+        lv2:name "Band 2 gain" ;
+        lv2:minimum -24 ;
+        lv2:maximum 12 ;
+        units:unit units:db
+    ] ,
+    [
+        a lv2:ControlPort , lv2:OutputPort ;
+        lv2:index 81 ;
+        lv2:symbol "band3Gain" ;
+        lv2:name "Band 3 gain" ;
+        lv2:minimum -24 ;
+        lv2:maximum 12 ;
+        units:unit units:db
+    ] ,
+    [
+        a lv2:ControlPort , lv2:OutputPort ;
+        lv2:index 82 ;
+        lv2:symbol "band4Gain" ;
+        lv2:name "Band 4 gain" ;
+        lv2:minimum -24 ;
+        lv2:maximum 12 ;
+        units:unit units:db
+    ] ,
+    [
+        a lv2:ControlPort , lv2:OutputPort ;
+        lv2:index 83 ;
+        lv2:symbol "band5Gain" ;
+        lv2:name "Band 5 gain" ;
+        lv2:minimum -24 ;
+        lv2:maximum 12 ;
+        units:unit units:db
+    ] ,
+    [
+        a lv2:ControlPort , lv2:OutputPort ;
+        lv2:index 84 ;
+        lv2:symbol "band6Gain" ;
+        lv2:name "Band 6 gain" ;
+        lv2:minimum -24 ;
+        lv2:maximum 12 ;
+        units:unit units:db
     ] .
 
 # lv2:displayPriority on a port group is the term Zynthian reads to order a plugin's groups (zynthian_lv2.py), and the

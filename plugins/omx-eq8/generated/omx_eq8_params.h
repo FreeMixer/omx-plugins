@@ -521,6 +521,8 @@ static const struct omx_panel_rows OMX_EQ8_PANEL = {
 #define OMX_EQ8_LV2_PORT_ENABLED 50u
 #define OMX_EQ8_LV2_PORT_LATENCY 51u
 #define OMX_EQ8_LV2_PORT_FIRST_PARAM 4u
+/* The meters' output control ports, one per channel in the order their values are published, from here on. */
+#define OMX_EQ8_LV2_PORT_FIRST_METER 52u
 #define OMX_EQ8_LV2_PORT_COUNT 52u
 
 #endif /* OMX_EQ8_PARAMS_H */

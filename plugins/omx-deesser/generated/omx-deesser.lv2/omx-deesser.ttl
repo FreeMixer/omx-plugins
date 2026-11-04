@@ -173,6 +173,51 @@
         lv2:designation lv2:latency ;
         lv2:portProperty lv2:integer ;
         units:unit units:frame
+    ] ,
+    [
+        a lv2:ControlPort , lv2:OutputPort ;
+        lv2:index 14 ;
+        lv2:symbol "deessGr" ;
+        lv2:name "Gain reduction" ;
+        lv2:minimum -24 ;
+        lv2:maximum 0 ;
+        units:unit units:db
+    ] ,
+    [
+        a lv2:ControlPort , lv2:OutputPort ;
+        lv2:index 15 ;
+        lv2:symbol "deessIn_0" ;
+        lv2:name "Input level L" ;
+        lv2:minimum -60 ;
+        lv2:maximum 6 ;
+        units:unit <urn:openmixer:unit#dBFS>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:OutputPort ;
+        lv2:index 16 ;
+        lv2:symbol "deessIn_1" ;
+        lv2:name "Input level R" ;
+        lv2:minimum -60 ;
+        lv2:maximum 6 ;
+        units:unit <urn:openmixer:unit#dBFS>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:OutputPort ;
+        lv2:index 17 ;
+        lv2:symbol "deessOut_0" ;
+        lv2:name "Output level L" ;
+        lv2:minimum -60 ;
+        lv2:maximum 6 ;
+        units:unit <urn:openmixer:unit#dBFS>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:OutputPort ;
+        lv2:index 18 ;
+        lv2:symbol "deessOut_1" ;
+        lv2:name "Output level R" ;
+        lv2:minimum -60 ;
+        lv2:maximum 6 ;
+        units:unit <urn:openmixer:unit#dBFS>
     ] .
 
 # lv2:displayPriority on a port group is the term Zynthian reads to order a plugin's groups (zynthian_lv2.py), and the
@@ -189,6 +234,12 @@ lv2:displayPriority
     lv2:name "De-esser" ;
     lv2:displayPriority 1 ;
     rdfs:label "De-esser" .
+
+<urn:openmixer:unit#dBFS>
+    a units:Unit ;
+    rdfs:label "decibels (full scale)" ;
+    units:render "%f dBFS" ;
+    units:symbol "dBFS" .
 
 <urn:openmixer:unit#ratio>
     a units:Unit ;

@@ -227,6 +227,15 @@
         lv2:designation lv2:latency ;
         lv2:portProperty lv2:integer ;
         units:unit units:frame
+    ] ,
+    [
+        a lv2:ControlPort , lv2:OutputPort ;
+        lv2:index 19 ;
+        lv2:symbol "gateGr" ;
+        lv2:name "Gain reduction" ;
+        lv2:minimum -90 ;
+        lv2:maximum 0 ;
+        units:unit units:db
     ] .
 
 # lv2:displayPriority on a port group is the term Zynthian reads to order a plugin's groups (zynthian_lv2.py), and the

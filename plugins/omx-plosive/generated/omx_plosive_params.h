@@ -163,6 +163,8 @@ static const struct omx_panel_rows OMX_PLOSIVE_PANEL = {
 #define OMX_PLOSIVE_LV2_PORT_ENABLED 13u
 #define OMX_PLOSIVE_LV2_PORT_LATENCY 14u
 #define OMX_PLOSIVE_LV2_PORT_FIRST_PARAM 4u
+/* The meters' output control ports, one per channel in the order their values are published, from here on. */
+#define OMX_PLOSIVE_LV2_PORT_FIRST_METER 15u
 #define OMX_PLOSIVE_LV2_PORT_COUNT 15u
 
 #endif /* OMX_PLOSIVE_PARAMS_H */

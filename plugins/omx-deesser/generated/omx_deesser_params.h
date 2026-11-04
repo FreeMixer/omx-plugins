@@ -165,6 +165,8 @@ static const struct omx_panel_rows OMX_DEESSER_PANEL = {
 #define OMX_DEESSER_LV2_PORT_ENABLED 12u
 #define OMX_DEESSER_LV2_PORT_LATENCY 13u
 #define OMX_DEESSER_LV2_PORT_FIRST_PARAM 4u
-#define OMX_DEESSER_LV2_PORT_COUNT 14u
+/* The meters' output control ports, one per channel in the order their values are published, from here on. */
+#define OMX_DEESSER_LV2_PORT_FIRST_METER 14u
+#define OMX_DEESSER_LV2_PORT_COUNT 19u
 
 #endif /* OMX_DEESSER_PARAMS_H */

@@ -448,6 +448,8 @@ static const struct omx_panel_rows OMX_MBCOMP_PANEL = {
 #define OMX_MBCOMP_LV2_PORT_ENABLED 46u
 #define OMX_MBCOMP_LV2_PORT_LATENCY 47u
 #define OMX_MBCOMP_LV2_PORT_FIRST_PARAM 4u
-#define OMX_MBCOMP_LV2_PORT_COUNT 48u
+/* The meters' output control ports, one per channel in the order their values are published, from here on. */
+#define OMX_MBCOMP_LV2_PORT_FIRST_METER 48u
+#define OMX_MBCOMP_LV2_PORT_COUNT 53u
 
 #endif /* OMX_MBCOMP_PARAMS_H */

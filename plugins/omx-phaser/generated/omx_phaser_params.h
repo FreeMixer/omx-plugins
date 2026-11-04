@@ -144,6 +144,8 @@ static const struct omx_panel_rows OMX_PHASER_PANEL = {
 #define OMX_PHASER_LV2_PORT_ENABLED 10u
 #define OMX_PHASER_LV2_PORT_LATENCY 11u
 #define OMX_PHASER_LV2_PORT_FIRST_PARAM 4u
+/* The meters' output control ports, one per channel in the order their values are published, from here on. */
+#define OMX_PHASER_LV2_PORT_FIRST_METER 12u
 #define OMX_PHASER_LV2_PORT_COUNT 12u
 
 #endif /* OMX_PHASER_PARAMS_H */

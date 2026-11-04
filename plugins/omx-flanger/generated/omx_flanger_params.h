@@ -129,6 +129,8 @@ static const struct omx_panel_rows OMX_FLANGER_PANEL = {
 #define OMX_FLANGER_LV2_PORT_ENABLED 8u
 #define OMX_FLANGER_LV2_PORT_LATENCY 9u
 #define OMX_FLANGER_LV2_PORT_FIRST_PARAM 4u
+/* The meters' output control ports, one per channel in the order their values are published, from here on. */
+#define OMX_FLANGER_LV2_PORT_FIRST_METER 10u
 #define OMX_FLANGER_LV2_PORT_COUNT 10u
 
 #endif /* OMX_FLANGER_PARAMS_H */

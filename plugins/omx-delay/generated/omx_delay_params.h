@@ -239,6 +239,8 @@ static const struct omx_panel_rows OMX_DELAY_PANEL = {
 #define OMX_DELAY_LV2_PORT_ENABLED 21u
 #define OMX_DELAY_LV2_PORT_LATENCY 22u
 #define OMX_DELAY_LV2_PORT_FIRST_PARAM 4u
+/* The meters' output control ports, one per channel in the order their values are published, from here on. */
+#define OMX_DELAY_LV2_PORT_FIRST_METER 23u
 #define OMX_DELAY_LV2_PORT_COUNT 23u
 
 #endif /* OMX_DELAY_PARAMS_H */

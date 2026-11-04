@@ -130,6 +130,8 @@ static const struct omx_panel_rows OMX_SPRING_PANEL = {
 #define OMX_SPRING_LV2_PORT_ENABLED 9u
 #define OMX_SPRING_LV2_PORT_LATENCY 10u
 #define OMX_SPRING_LV2_PORT_FIRST_PARAM 4u
+/* The meters' output control ports, one per channel in the order their values are published, from here on. */
+#define OMX_SPRING_LV2_PORT_FIRST_METER 11u
 #define OMX_SPRING_LV2_PORT_COUNT 11u
 
 #endif /* OMX_SPRING_PARAMS_H */

@@ -560,6 +560,51 @@
         lv2:designation lv2:latency ;
         lv2:portProperty lv2:integer ;
         units:unit units:frame
+    ] ,
+    [
+        a lv2:ControlPort , lv2:OutputPort ;
+        lv2:index 48 ;
+        lv2:symbol "band1Gr" ;
+        lv2:name "Band 1 gain reduction" ;
+        lv2:minimum -60 ;
+        lv2:maximum 0 ;
+        units:unit units:db
+    ] ,
+    [
+        a lv2:ControlPort , lv2:OutputPort ;
+        lv2:index 49 ;
+        lv2:symbol "band2Gr" ;
+        lv2:name "Band 2 gain reduction" ;
+        lv2:minimum -60 ;
+        lv2:maximum 0 ;
+        units:unit units:db
+    ] ,
+    [
+        a lv2:ControlPort , lv2:OutputPort ;
+        lv2:index 50 ;
+        lv2:symbol "band3Gr" ;
+        lv2:name "Band 3 gain reduction" ;
+        lv2:minimum -60 ;
+        lv2:maximum 0 ;
+        units:unit units:db
+    ] ,
+    [
+        a lv2:ControlPort , lv2:OutputPort ;
+        lv2:index 51 ;
+        lv2:symbol "band4Gr" ;
+        lv2:name "Band 4 gain reduction" ;
+        lv2:minimum -60 ;
+        lv2:maximum 0 ;
+        units:unit units:db
+    ] ,
+    [
+        a lv2:ControlPort , lv2:OutputPort ;
+        lv2:index 52 ;
+        lv2:symbol "band5Gr" ;
+        lv2:name "Band 5 gain reduction" ;
+        lv2:minimum -60 ;
+        lv2:maximum 0 ;
+        units:unit units:db
     ] .
 
 # lv2:displayPriority on a port group is the term Zynthian reads to order a plugin's groups (zynthian_lv2.py), and the
