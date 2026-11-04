@@ -248,7 +248,7 @@
       "automatable": true,
       "source": {
         "from": {
-          "link": "data/kernels/glue.json#GLUE_DETECTOR_TOPOLOGIES",
+          "link": "data/kernels/comp.json#DETECTOR_TOPOLOGY",
           "at": "omx-dsp@0.28.0"
         }
       }
