@@ -34,7 +34,7 @@ Every plugin, what it does, and its controls; the parameter pages, the factory p
 | **omx reverb** | `org.openmixer.reverb` | `urn:openmixer:reverb` | The console's reverb: room, plate, hall, reverse and gated algorithms with pre-delay, size, damping, width and low and high cuts, mixed with the dry signal. |
 | **omx rotary** | `org.openmixer.rotary` | `urn:openmixer:rotary` | The console's rotary speaker: a drum rotor on the low band and a horn rotor on the high band, with stop, slow and fast speeds, mixed with the dry signal. |
 | **omx spring** | `org.openmixer.spring` | `urn:openmixer:spring` | A spring reverb: a delay, a chain of all-passes and a darkening loop, with decay, length, tension and damping. |
-| **omx strip** | `org.openmixer.strip` | `urn:openmixer:strip` | The console's channel strip in one plugin: input trim, HPF/LPF, gate, four-band EQ and compressor, in the desk's order or any other. Stereo, real-time safe. |
+| **omx strip** | `org.openmixer.strip` | `urn:openmixer:strip` | The console's channel strip in one plugin: input trim, HPF/LPF, gate, EQ of 1 to 32 bands (4 at first) and compressor, in the desk's order or any other. Stereo, real-time safe. |
 | **omx suboct** | `org.openmixer.suboct` | `urn:openmixer:suboct` | Adds a note one or two octaves below a single played line, by dividing its pitch, with a tracking range and a gate for quiet input. |
 | **omx transient** | `org.openmixer.transient` | `urn:openmixer:transient` | The console's transient designer: more or less attack and sustain, from two envelope contrasts, with no threshold to set. |
 | **omx tremolo** | `org.openmixer.tremolo` | `urn:openmixer:tremolo` | The console's tremolo and auto-pan: one oscillator turned into a level change on both legs, or into a left-right pan. |
@@ -542,7 +542,7 @@ Five stages, each omx-dsp's instance face of the console's own kernel, run one a
 | Input | on/off; Trim, a click-free ramp to each new gain |
 | Filters | on/off; HPF and LPF, each on/off, its frequency, 12 or 24 dB/oct |
 | Gate | on/off, threshold, ratio, range, attack, release, knee start and end, hold, hysteresis |
-| EQ | on/off; four bands, each on/off, type (bell, low or high shelf, notch, all-pass 1st or 2nd order), frequency, gain, Q |
+| EQ | on/off; Bands, how many bands run (1 to 32, whole steps); each band on/off, type (bell, low or high shelf, notch, all-pass 1st or 2nd order), frequency, gain, Q |
 | Comp | on/off, threshold, ratio, knee, attack, release, make-up, kind (compressor: RMS detector; limiter: peak), mix, detector oversampling (auto, off, 4x) |
 
 **Order** (0 to 119) picks the order of the five stages: 0 is the desk's input > filters > gate > EQ >
@@ -551,6 +551,8 @@ comp > EQ > gate > filters > input). Plus the host's bypass. The latency reporte
 stages': the gate's and the compressor's 4x detector paths while they are engaged, else zero.
 
 0.3.0 changed the parameter list (the Input and Filters switches, the gate's knee, hold and hysteresis, the compressor's kind, mix and detector oversampling, five-stage orders): a session saved with 0.2.0 does not load as it was, though at 0.2.0's settings the strip sounds the same, sample for sample.
+
+**Bands** sets how many of the EQ's band slots run, from the first: a band past it is not processed at all (it costs nothing, and the strip sounds as if it were not there), and keeps its settings for when Bands reaches it again. The bands past the fourth and Bands itself came after the strip's other parameters, so their ids and ports follow all of those: a session or preset saved before them loads with its four bands as they were and Bands at its default.
 
 ### omx suboct
 

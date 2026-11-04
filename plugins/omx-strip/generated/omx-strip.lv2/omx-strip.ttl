@@ -24,7 +24,7 @@
     lv2:project <https://github.com/FreeMixer/omx-plugins> ;
     lv2:minorVersion 17 ;
     lv2:microVersion 0 ;
-    rdfs:comment "The OpenMixer console's channel strip in one plugin: input trim, high- and low-pass filters, gate, four-band EQ and compressor, in the console's order or any other. No DSP of its own: each stage is omx-dsp's instance face of the console's kernel, called in order." ;
+    rdfs:comment "The OpenMixer console's channel strip in one plugin: input trim, high- and low-pass filters, gate, a parametric EQ of as many bands as its Bands control says, and compressor, in the console's order or any other. No DSP of its own: each stage is omx-dsp's instance face of the console's kernel, called in order." ;
     lv2:optionalFeature lv2:hardRTCapable ;
     omxres:threadsSpawned "0"^^xsd:integer ;
     omxres:streamsFromDisk false ;
@@ -687,6 +687,1781 @@
         lv2:maximum 119 ;
         lv2:portProperty lv2:integer ;
         pg:group <urn:openmixer:strip#order>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 57 ;
+        lv2:symbol "eqBands" ;
+        lv2:name "EQ Bands" ;
+        lv2:default 4 ;
+        lv2:minimum 1 ;
+        lv2:maximum 32 ;
+        lv2:portProperty lv2:integer ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 58 ;
+        lv2:symbol "eq5Type" ;
+        lv2:name "EQ 5 Type" ;
+        lv2:default 0 ;
+        lv2:minimum 0 ;
+        lv2:maximum 5 ;
+        lv2:portProperty lv2:integer , lv2:enumeration ;
+        lv2:scalePoint
+            [ rdfs:label "Bell" ; rdf:value 0 ] ,
+            [ rdfs:label "Low Shelf" ; rdf:value 1 ] ,
+            [ rdfs:label "High Shelf" ; rdf:value 2 ] ,
+            [ rdfs:label "Notch" ; rdf:value 3 ] ,
+            [ rdfs:label "All-pass 1st" ; rdf:value 4 ] ,
+            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ] ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 59 ;
+        lv2:symbol "eq5Freq" ;
+        lv2:name "EQ 5 Freq" ;
+        lv2:default 50 ;
+        lv2:minimum 20 ;
+        lv2:maximum 20000 ;
+        lv2:portProperty lv2:integer ;
+        lv2:portProperty pprops:logarithmic ;
+        units:unit units:hz ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 60 ;
+        lv2:symbol "eq5Gain" ;
+        lv2:name "EQ 5 Gain" ;
+        lv2:default 0 ;
+        lv2:minimum -15 ;
+        lv2:maximum 15 ;
+        units:unit units:db ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 61 ;
+        lv2:symbol "eq5Q" ;
+        lv2:name "EQ 5 Q" ;
+        lv2:default 1 ;
+        lv2:minimum 0.3 ;
+        lv2:maximum 116 ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 62 ;
+        lv2:symbol "eq5On" ;
+        lv2:name "EQ 5" ;
+        lv2:default 0 ;
+        lv2:minimum 0 ;
+        lv2:maximum 1 ;
+        lv2:portProperty lv2:toggled ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 63 ;
+        lv2:symbol "eq6Type" ;
+        lv2:name "EQ 6 Type" ;
+        lv2:default 0 ;
+        lv2:minimum 0 ;
+        lv2:maximum 5 ;
+        lv2:portProperty lv2:integer , lv2:enumeration ;
+        lv2:scalePoint
+            [ rdfs:label "Bell" ; rdf:value 0 ] ,
+            [ rdfs:label "Low Shelf" ; rdf:value 1 ] ,
+            [ rdfs:label "High Shelf" ; rdf:value 2 ] ,
+            [ rdfs:label "Notch" ; rdf:value 3 ] ,
+            [ rdfs:label "All-pass 1st" ; rdf:value 4 ] ,
+            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ] ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 64 ;
+        lv2:symbol "eq6Freq" ;
+        lv2:name "EQ 6 Freq" ;
+        lv2:default 63 ;
+        lv2:minimum 20 ;
+        lv2:maximum 20000 ;
+        lv2:portProperty lv2:integer ;
+        lv2:portProperty pprops:logarithmic ;
+        units:unit units:hz ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 65 ;
+        lv2:symbol "eq6Gain" ;
+        lv2:name "EQ 6 Gain" ;
+        lv2:default 0 ;
+        lv2:minimum -15 ;
+        lv2:maximum 15 ;
+        units:unit units:db ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 66 ;
+        lv2:symbol "eq6Q" ;
+        lv2:name "EQ 6 Q" ;
+        lv2:default 1 ;
+        lv2:minimum 0.3 ;
+        lv2:maximum 116 ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 67 ;
+        lv2:symbol "eq6On" ;
+        lv2:name "EQ 6" ;
+        lv2:default 0 ;
+        lv2:minimum 0 ;
+        lv2:maximum 1 ;
+        lv2:portProperty lv2:toggled ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 68 ;
+        lv2:symbol "eq7Type" ;
+        lv2:name "EQ 7 Type" ;
+        lv2:default 0 ;
+        lv2:minimum 0 ;
+        lv2:maximum 5 ;
+        lv2:portProperty lv2:integer , lv2:enumeration ;
+        lv2:scalePoint
+            [ rdfs:label "Bell" ; rdf:value 0 ] ,
+            [ rdfs:label "Low Shelf" ; rdf:value 1 ] ,
+            [ rdfs:label "High Shelf" ; rdf:value 2 ] ,
+            [ rdfs:label "Notch" ; rdf:value 3 ] ,
+            [ rdfs:label "All-pass 1st" ; rdf:value 4 ] ,
+            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ] ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 69 ;
+        lv2:symbol "eq7Freq" ;
+        lv2:name "EQ 7 Freq" ;
+        lv2:default 80 ;
+        lv2:minimum 20 ;
+        lv2:maximum 20000 ;
+        lv2:portProperty lv2:integer ;
+        lv2:portProperty pprops:logarithmic ;
+        units:unit units:hz ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 70 ;
+        lv2:symbol "eq7Gain" ;
+        lv2:name "EQ 7 Gain" ;
+        lv2:default 0 ;
+        lv2:minimum -15 ;
+        lv2:maximum 15 ;
+        units:unit units:db ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 71 ;
+        lv2:symbol "eq7Q" ;
+        lv2:name "EQ 7 Q" ;
+        lv2:default 1 ;
+        lv2:minimum 0.3 ;
+        lv2:maximum 116 ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 72 ;
+        lv2:symbol "eq7On" ;
+        lv2:name "EQ 7" ;
+        lv2:default 0 ;
+        lv2:minimum 0 ;
+        lv2:maximum 1 ;
+        lv2:portProperty lv2:toggled ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 73 ;
+        lv2:symbol "eq8Type" ;
+        lv2:name "EQ 8 Type" ;
+        lv2:default 0 ;
+        lv2:minimum 0 ;
+        lv2:maximum 5 ;
+        lv2:portProperty lv2:integer , lv2:enumeration ;
+        lv2:scalePoint
+            [ rdfs:label "Bell" ; rdf:value 0 ] ,
+            [ rdfs:label "Low Shelf" ; rdf:value 1 ] ,
+            [ rdfs:label "High Shelf" ; rdf:value 2 ] ,
+            [ rdfs:label "Notch" ; rdf:value 3 ] ,
+            [ rdfs:label "All-pass 1st" ; rdf:value 4 ] ,
+            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ] ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 74 ;
+        lv2:symbol "eq8Freq" ;
+        lv2:name "EQ 8 Freq" ;
+        lv2:default 100 ;
+        lv2:minimum 20 ;
+        lv2:maximum 20000 ;
+        lv2:portProperty lv2:integer ;
+        lv2:portProperty pprops:logarithmic ;
+        units:unit units:hz ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 75 ;
+        lv2:symbol "eq8Gain" ;
+        lv2:name "EQ 8 Gain" ;
+        lv2:default 0 ;
+        lv2:minimum -15 ;
+        lv2:maximum 15 ;
+        units:unit units:db ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 76 ;
+        lv2:symbol "eq8Q" ;
+        lv2:name "EQ 8 Q" ;
+        lv2:default 1 ;
+        lv2:minimum 0.3 ;
+        lv2:maximum 116 ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 77 ;
+        lv2:symbol "eq8On" ;
+        lv2:name "EQ 8" ;
+        lv2:default 0 ;
+        lv2:minimum 0 ;
+        lv2:maximum 1 ;
+        lv2:portProperty lv2:toggled ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 78 ;
+        lv2:symbol "eq9Type" ;
+        lv2:name "EQ 9 Type" ;
+        lv2:default 0 ;
+        lv2:minimum 0 ;
+        lv2:maximum 5 ;
+        lv2:portProperty lv2:integer , lv2:enumeration ;
+        lv2:scalePoint
+            [ rdfs:label "Bell" ; rdf:value 0 ] ,
+            [ rdfs:label "Low Shelf" ; rdf:value 1 ] ,
+            [ rdfs:label "High Shelf" ; rdf:value 2 ] ,
+            [ rdfs:label "Notch" ; rdf:value 3 ] ,
+            [ rdfs:label "All-pass 1st" ; rdf:value 4 ] ,
+            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ] ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 79 ;
+        lv2:symbol "eq9Freq" ;
+        lv2:name "EQ 9 Freq" ;
+        lv2:default 125 ;
+        lv2:minimum 20 ;
+        lv2:maximum 20000 ;
+        lv2:portProperty lv2:integer ;
+        lv2:portProperty pprops:logarithmic ;
+        units:unit units:hz ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 80 ;
+        lv2:symbol "eq9Gain" ;
+        lv2:name "EQ 9 Gain" ;
+        lv2:default 0 ;
+        lv2:minimum -15 ;
+        lv2:maximum 15 ;
+        units:unit units:db ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 81 ;
+        lv2:symbol "eq9Q" ;
+        lv2:name "EQ 9 Q" ;
+        lv2:default 1 ;
+        lv2:minimum 0.3 ;
+        lv2:maximum 116 ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 82 ;
+        lv2:symbol "eq9On" ;
+        lv2:name "EQ 9" ;
+        lv2:default 0 ;
+        lv2:minimum 0 ;
+        lv2:maximum 1 ;
+        lv2:portProperty lv2:toggled ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 83 ;
+        lv2:symbol "eq10Type" ;
+        lv2:name "EQ 10 Type" ;
+        lv2:default 0 ;
+        lv2:minimum 0 ;
+        lv2:maximum 5 ;
+        lv2:portProperty lv2:integer , lv2:enumeration ;
+        lv2:scalePoint
+            [ rdfs:label "Bell" ; rdf:value 0 ] ,
+            [ rdfs:label "Low Shelf" ; rdf:value 1 ] ,
+            [ rdfs:label "High Shelf" ; rdf:value 2 ] ,
+            [ rdfs:label "Notch" ; rdf:value 3 ] ,
+            [ rdfs:label "All-pass 1st" ; rdf:value 4 ] ,
+            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ] ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 84 ;
+        lv2:symbol "eq10Freq" ;
+        lv2:name "EQ 10 Freq" ;
+        lv2:default 160 ;
+        lv2:minimum 20 ;
+        lv2:maximum 20000 ;
+        lv2:portProperty lv2:integer ;
+        lv2:portProperty pprops:logarithmic ;
+        units:unit units:hz ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 85 ;
+        lv2:symbol "eq10Gain" ;
+        lv2:name "EQ 10 Gain" ;
+        lv2:default 0 ;
+        lv2:minimum -15 ;
+        lv2:maximum 15 ;
+        units:unit units:db ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 86 ;
+        lv2:symbol "eq10Q" ;
+        lv2:name "EQ 10 Q" ;
+        lv2:default 1 ;
+        lv2:minimum 0.3 ;
+        lv2:maximum 116 ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 87 ;
+        lv2:symbol "eq10On" ;
+        lv2:name "EQ 10" ;
+        lv2:default 0 ;
+        lv2:minimum 0 ;
+        lv2:maximum 1 ;
+        lv2:portProperty lv2:toggled ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 88 ;
+        lv2:symbol "eq11Type" ;
+        lv2:name "EQ 11 Type" ;
+        lv2:default 0 ;
+        lv2:minimum 0 ;
+        lv2:maximum 5 ;
+        lv2:portProperty lv2:integer , lv2:enumeration ;
+        lv2:scalePoint
+            [ rdfs:label "Bell" ; rdf:value 0 ] ,
+            [ rdfs:label "Low Shelf" ; rdf:value 1 ] ,
+            [ rdfs:label "High Shelf" ; rdf:value 2 ] ,
+            [ rdfs:label "Notch" ; rdf:value 3 ] ,
+            [ rdfs:label "All-pass 1st" ; rdf:value 4 ] ,
+            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ] ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 89 ;
+        lv2:symbol "eq11Freq" ;
+        lv2:name "EQ 11 Freq" ;
+        lv2:default 200 ;
+        lv2:minimum 20 ;
+        lv2:maximum 20000 ;
+        lv2:portProperty lv2:integer ;
+        lv2:portProperty pprops:logarithmic ;
+        units:unit units:hz ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 90 ;
+        lv2:symbol "eq11Gain" ;
+        lv2:name "EQ 11 Gain" ;
+        lv2:default 0 ;
+        lv2:minimum -15 ;
+        lv2:maximum 15 ;
+        units:unit units:db ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 91 ;
+        lv2:symbol "eq11Q" ;
+        lv2:name "EQ 11 Q" ;
+        lv2:default 1 ;
+        lv2:minimum 0.3 ;
+        lv2:maximum 116 ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 92 ;
+        lv2:symbol "eq11On" ;
+        lv2:name "EQ 11" ;
+        lv2:default 0 ;
+        lv2:minimum 0 ;
+        lv2:maximum 1 ;
+        lv2:portProperty lv2:toggled ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 93 ;
+        lv2:symbol "eq12Type" ;
+        lv2:name "EQ 12 Type" ;
+        lv2:default 0 ;
+        lv2:minimum 0 ;
+        lv2:maximum 5 ;
+        lv2:portProperty lv2:integer , lv2:enumeration ;
+        lv2:scalePoint
+            [ rdfs:label "Bell" ; rdf:value 0 ] ,
+            [ rdfs:label "Low Shelf" ; rdf:value 1 ] ,
+            [ rdfs:label "High Shelf" ; rdf:value 2 ] ,
+            [ rdfs:label "Notch" ; rdf:value 3 ] ,
+            [ rdfs:label "All-pass 1st" ; rdf:value 4 ] ,
+            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ] ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 94 ;
+        lv2:symbol "eq12Freq" ;
+        lv2:name "EQ 12 Freq" ;
+        lv2:default 250 ;
+        lv2:minimum 20 ;
+        lv2:maximum 20000 ;
+        lv2:portProperty lv2:integer ;
+        lv2:portProperty pprops:logarithmic ;
+        units:unit units:hz ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 95 ;
+        lv2:symbol "eq12Gain" ;
+        lv2:name "EQ 12 Gain" ;
+        lv2:default 0 ;
+        lv2:minimum -15 ;
+        lv2:maximum 15 ;
+        units:unit units:db ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 96 ;
+        lv2:symbol "eq12Q" ;
+        lv2:name "EQ 12 Q" ;
+        lv2:default 1 ;
+        lv2:minimum 0.3 ;
+        lv2:maximum 116 ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 97 ;
+        lv2:symbol "eq12On" ;
+        lv2:name "EQ 12" ;
+        lv2:default 0 ;
+        lv2:minimum 0 ;
+        lv2:maximum 1 ;
+        lv2:portProperty lv2:toggled ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 98 ;
+        lv2:symbol "eq13Type" ;
+        lv2:name "EQ 13 Type" ;
+        lv2:default 0 ;
+        lv2:minimum 0 ;
+        lv2:maximum 5 ;
+        lv2:portProperty lv2:integer , lv2:enumeration ;
+        lv2:scalePoint
+            [ rdfs:label "Bell" ; rdf:value 0 ] ,
+            [ rdfs:label "Low Shelf" ; rdf:value 1 ] ,
+            [ rdfs:label "High Shelf" ; rdf:value 2 ] ,
+            [ rdfs:label "Notch" ; rdf:value 3 ] ,
+            [ rdfs:label "All-pass 1st" ; rdf:value 4 ] ,
+            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ] ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 99 ;
+        lv2:symbol "eq13Freq" ;
+        lv2:name "EQ 13 Freq" ;
+        lv2:default 315 ;
+        lv2:minimum 20 ;
+        lv2:maximum 20000 ;
+        lv2:portProperty lv2:integer ;
+        lv2:portProperty pprops:logarithmic ;
+        units:unit units:hz ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 100 ;
+        lv2:symbol "eq13Gain" ;
+        lv2:name "EQ 13 Gain" ;
+        lv2:default 0 ;
+        lv2:minimum -15 ;
+        lv2:maximum 15 ;
+        units:unit units:db ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 101 ;
+        lv2:symbol "eq13Q" ;
+        lv2:name "EQ 13 Q" ;
+        lv2:default 1 ;
+        lv2:minimum 0.3 ;
+        lv2:maximum 116 ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 102 ;
+        lv2:symbol "eq13On" ;
+        lv2:name "EQ 13" ;
+        lv2:default 0 ;
+        lv2:minimum 0 ;
+        lv2:maximum 1 ;
+        lv2:portProperty lv2:toggled ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 103 ;
+        lv2:symbol "eq14Type" ;
+        lv2:name "EQ 14 Type" ;
+        lv2:default 0 ;
+        lv2:minimum 0 ;
+        lv2:maximum 5 ;
+        lv2:portProperty lv2:integer , lv2:enumeration ;
+        lv2:scalePoint
+            [ rdfs:label "Bell" ; rdf:value 0 ] ,
+            [ rdfs:label "Low Shelf" ; rdf:value 1 ] ,
+            [ rdfs:label "High Shelf" ; rdf:value 2 ] ,
+            [ rdfs:label "Notch" ; rdf:value 3 ] ,
+            [ rdfs:label "All-pass 1st" ; rdf:value 4 ] ,
+            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ] ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 104 ;
+        lv2:symbol "eq14Freq" ;
+        lv2:name "EQ 14 Freq" ;
+        lv2:default 355 ;
+        lv2:minimum 20 ;
+        lv2:maximum 20000 ;
+        lv2:portProperty lv2:integer ;
+        lv2:portProperty pprops:logarithmic ;
+        units:unit units:hz ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 105 ;
+        lv2:symbol "eq14Gain" ;
+        lv2:name "EQ 14 Gain" ;
+        lv2:default 0 ;
+        lv2:minimum -15 ;
+        lv2:maximum 15 ;
+        units:unit units:db ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 106 ;
+        lv2:symbol "eq14Q" ;
+        lv2:name "EQ 14 Q" ;
+        lv2:default 1 ;
+        lv2:minimum 0.3 ;
+        lv2:maximum 116 ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 107 ;
+        lv2:symbol "eq14On" ;
+        lv2:name "EQ 14" ;
+        lv2:default 0 ;
+        lv2:minimum 0 ;
+        lv2:maximum 1 ;
+        lv2:portProperty lv2:toggled ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 108 ;
+        lv2:symbol "eq15Type" ;
+        lv2:name "EQ 15 Type" ;
+        lv2:default 0 ;
+        lv2:minimum 0 ;
+        lv2:maximum 5 ;
+        lv2:portProperty lv2:integer , lv2:enumeration ;
+        lv2:scalePoint
+            [ rdfs:label "Bell" ; rdf:value 0 ] ,
+            [ rdfs:label "Low Shelf" ; rdf:value 1 ] ,
+            [ rdfs:label "High Shelf" ; rdf:value 2 ] ,
+            [ rdfs:label "Notch" ; rdf:value 3 ] ,
+            [ rdfs:label "All-pass 1st" ; rdf:value 4 ] ,
+            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ] ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 109 ;
+        lv2:symbol "eq15Freq" ;
+        lv2:name "EQ 15 Freq" ;
+        lv2:default 450 ;
+        lv2:minimum 20 ;
+        lv2:maximum 20000 ;
+        lv2:portProperty lv2:integer ;
+        lv2:portProperty pprops:logarithmic ;
+        units:unit units:hz ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 110 ;
+        lv2:symbol "eq15Gain" ;
+        lv2:name "EQ 15 Gain" ;
+        lv2:default 0 ;
+        lv2:minimum -15 ;
+        lv2:maximum 15 ;
+        units:unit units:db ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 111 ;
+        lv2:symbol "eq15Q" ;
+        lv2:name "EQ 15 Q" ;
+        lv2:default 1 ;
+        lv2:minimum 0.3 ;
+        lv2:maximum 116 ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 112 ;
+        lv2:symbol "eq15On" ;
+        lv2:name "EQ 15" ;
+        lv2:default 0 ;
+        lv2:minimum 0 ;
+        lv2:maximum 1 ;
+        lv2:portProperty lv2:toggled ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 113 ;
+        lv2:symbol "eq16Type" ;
+        lv2:name "EQ 16 Type" ;
+        lv2:default 0 ;
+        lv2:minimum 0 ;
+        lv2:maximum 5 ;
+        lv2:portProperty lv2:integer , lv2:enumeration ;
+        lv2:scalePoint
+            [ rdfs:label "Bell" ; rdf:value 0 ] ,
+            [ rdfs:label "Low Shelf" ; rdf:value 1 ] ,
+            [ rdfs:label "High Shelf" ; rdf:value 2 ] ,
+            [ rdfs:label "Notch" ; rdf:value 3 ] ,
+            [ rdfs:label "All-pass 1st" ; rdf:value 4 ] ,
+            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ] ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 114 ;
+        lv2:symbol "eq16Freq" ;
+        lv2:name "EQ 16 Freq" ;
+        lv2:default 560 ;
+        lv2:minimum 20 ;
+        lv2:maximum 20000 ;
+        lv2:portProperty lv2:integer ;
+        lv2:portProperty pprops:logarithmic ;
+        units:unit units:hz ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 115 ;
+        lv2:symbol "eq16Gain" ;
+        lv2:name "EQ 16 Gain" ;
+        lv2:default 0 ;
+        lv2:minimum -15 ;
+        lv2:maximum 15 ;
+        units:unit units:db ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 116 ;
+        lv2:symbol "eq16Q" ;
+        lv2:name "EQ 16 Q" ;
+        lv2:default 1 ;
+        lv2:minimum 0.3 ;
+        lv2:maximum 116 ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 117 ;
+        lv2:symbol "eq16On" ;
+        lv2:name "EQ 16" ;
+        lv2:default 0 ;
+        lv2:minimum 0 ;
+        lv2:maximum 1 ;
+        lv2:portProperty lv2:toggled ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 118 ;
+        lv2:symbol "eq17Type" ;
+        lv2:name "EQ 17 Type" ;
+        lv2:default 0 ;
+        lv2:minimum 0 ;
+        lv2:maximum 5 ;
+        lv2:portProperty lv2:integer , lv2:enumeration ;
+        lv2:scalePoint
+            [ rdfs:label "Bell" ; rdf:value 0 ] ,
+            [ rdfs:label "Low Shelf" ; rdf:value 1 ] ,
+            [ rdfs:label "High Shelf" ; rdf:value 2 ] ,
+            [ rdfs:label "Notch" ; rdf:value 3 ] ,
+            [ rdfs:label "All-pass 1st" ; rdf:value 4 ] ,
+            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ] ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 119 ;
+        lv2:symbol "eq17Freq" ;
+        lv2:name "EQ 17 Freq" ;
+        lv2:default 710 ;
+        lv2:minimum 20 ;
+        lv2:maximum 20000 ;
+        lv2:portProperty lv2:integer ;
+        lv2:portProperty pprops:logarithmic ;
+        units:unit units:hz ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 120 ;
+        lv2:symbol "eq17Gain" ;
+        lv2:name "EQ 17 Gain" ;
+        lv2:default 0 ;
+        lv2:minimum -15 ;
+        lv2:maximum 15 ;
+        units:unit units:db ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 121 ;
+        lv2:symbol "eq17Q" ;
+        lv2:name "EQ 17 Q" ;
+        lv2:default 1 ;
+        lv2:minimum 0.3 ;
+        lv2:maximum 116 ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 122 ;
+        lv2:symbol "eq17On" ;
+        lv2:name "EQ 17" ;
+        lv2:default 0 ;
+        lv2:minimum 0 ;
+        lv2:maximum 1 ;
+        lv2:portProperty lv2:toggled ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 123 ;
+        lv2:symbol "eq18Type" ;
+        lv2:name "EQ 18 Type" ;
+        lv2:default 0 ;
+        lv2:minimum 0 ;
+        lv2:maximum 5 ;
+        lv2:portProperty lv2:integer , lv2:enumeration ;
+        lv2:scalePoint
+            [ rdfs:label "Bell" ; rdf:value 0 ] ,
+            [ rdfs:label "Low Shelf" ; rdf:value 1 ] ,
+            [ rdfs:label "High Shelf" ; rdf:value 2 ] ,
+            [ rdfs:label "Notch" ; rdf:value 3 ] ,
+            [ rdfs:label "All-pass 1st" ; rdf:value 4 ] ,
+            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ] ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 124 ;
+        lv2:symbol "eq18Freq" ;
+        lv2:name "EQ 18 Freq" ;
+        lv2:default 900 ;
+        lv2:minimum 20 ;
+        lv2:maximum 20000 ;
+        lv2:portProperty lv2:integer ;
+        lv2:portProperty pprops:logarithmic ;
+        units:unit units:hz ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 125 ;
+        lv2:symbol "eq18Gain" ;
+        lv2:name "EQ 18 Gain" ;
+        lv2:default 0 ;
+        lv2:minimum -15 ;
+        lv2:maximum 15 ;
+        units:unit units:db ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 126 ;
+        lv2:symbol "eq18Q" ;
+        lv2:name "EQ 18 Q" ;
+        lv2:default 1 ;
+        lv2:minimum 0.3 ;
+        lv2:maximum 116 ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 127 ;
+        lv2:symbol "eq18On" ;
+        lv2:name "EQ 18" ;
+        lv2:default 0 ;
+        lv2:minimum 0 ;
+        lv2:maximum 1 ;
+        lv2:portProperty lv2:toggled ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 128 ;
+        lv2:symbol "eq19Type" ;
+        lv2:name "EQ 19 Type" ;
+        lv2:default 0 ;
+        lv2:minimum 0 ;
+        lv2:maximum 5 ;
+        lv2:portProperty lv2:integer , lv2:enumeration ;
+        lv2:scalePoint
+            [ rdfs:label "Bell" ; rdf:value 0 ] ,
+            [ rdfs:label "Low Shelf" ; rdf:value 1 ] ,
+            [ rdfs:label "High Shelf" ; rdf:value 2 ] ,
+            [ rdfs:label "Notch" ; rdf:value 3 ] ,
+            [ rdfs:label "All-pass 1st" ; rdf:value 4 ] ,
+            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ] ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 129 ;
+        lv2:symbol "eq19Freq" ;
+        lv2:name "EQ 19 Freq" ;
+        lv2:default 1120 ;
+        lv2:minimum 20 ;
+        lv2:maximum 20000 ;
+        lv2:portProperty lv2:integer ;
+        lv2:portProperty pprops:logarithmic ;
+        units:unit units:hz ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 130 ;
+        lv2:symbol "eq19Gain" ;
+        lv2:name "EQ 19 Gain" ;
+        lv2:default 0 ;
+        lv2:minimum -15 ;
+        lv2:maximum 15 ;
+        units:unit units:db ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 131 ;
+        lv2:symbol "eq19Q" ;
+        lv2:name "EQ 19 Q" ;
+        lv2:default 1 ;
+        lv2:minimum 0.3 ;
+        lv2:maximum 116 ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 132 ;
+        lv2:symbol "eq19On" ;
+        lv2:name "EQ 19" ;
+        lv2:default 0 ;
+        lv2:minimum 0 ;
+        lv2:maximum 1 ;
+        lv2:portProperty lv2:toggled ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 133 ;
+        lv2:symbol "eq20Type" ;
+        lv2:name "EQ 20 Type" ;
+        lv2:default 0 ;
+        lv2:minimum 0 ;
+        lv2:maximum 5 ;
+        lv2:portProperty lv2:integer , lv2:enumeration ;
+        lv2:scalePoint
+            [ rdfs:label "Bell" ; rdf:value 0 ] ,
+            [ rdfs:label "Low Shelf" ; rdf:value 1 ] ,
+            [ rdfs:label "High Shelf" ; rdf:value 2 ] ,
+            [ rdfs:label "Notch" ; rdf:value 3 ] ,
+            [ rdfs:label "All-pass 1st" ; rdf:value 4 ] ,
+            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ] ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 134 ;
+        lv2:symbol "eq20Freq" ;
+        lv2:name "EQ 20 Freq" ;
+        lv2:default 1400 ;
+        lv2:minimum 20 ;
+        lv2:maximum 20000 ;
+        lv2:portProperty lv2:integer ;
+        lv2:portProperty pprops:logarithmic ;
+        units:unit units:hz ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 135 ;
+        lv2:symbol "eq20Gain" ;
+        lv2:name "EQ 20 Gain" ;
+        lv2:default 0 ;
+        lv2:minimum -15 ;
+        lv2:maximum 15 ;
+        units:unit units:db ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 136 ;
+        lv2:symbol "eq20Q" ;
+        lv2:name "EQ 20 Q" ;
+        lv2:default 1 ;
+        lv2:minimum 0.3 ;
+        lv2:maximum 116 ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 137 ;
+        lv2:symbol "eq20On" ;
+        lv2:name "EQ 20" ;
+        lv2:default 0 ;
+        lv2:minimum 0 ;
+        lv2:maximum 1 ;
+        lv2:portProperty lv2:toggled ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 138 ;
+        lv2:symbol "eq21Type" ;
+        lv2:name "EQ 21 Type" ;
+        lv2:default 0 ;
+        lv2:minimum 0 ;
+        lv2:maximum 5 ;
+        lv2:portProperty lv2:integer , lv2:enumeration ;
+        lv2:scalePoint
+            [ rdfs:label "Bell" ; rdf:value 0 ] ,
+            [ rdfs:label "Low Shelf" ; rdf:value 1 ] ,
+            [ rdfs:label "High Shelf" ; rdf:value 2 ] ,
+            [ rdfs:label "Notch" ; rdf:value 3 ] ,
+            [ rdfs:label "All-pass 1st" ; rdf:value 4 ] ,
+            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ] ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 139 ;
+        lv2:symbol "eq21Freq" ;
+        lv2:name "EQ 21 Freq" ;
+        lv2:default 1600 ;
+        lv2:minimum 20 ;
+        lv2:maximum 20000 ;
+        lv2:portProperty lv2:integer ;
+        lv2:portProperty pprops:logarithmic ;
+        units:unit units:hz ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 140 ;
+        lv2:symbol "eq21Gain" ;
+        lv2:name "EQ 21 Gain" ;
+        lv2:default 0 ;
+        lv2:minimum -15 ;
+        lv2:maximum 15 ;
+        units:unit units:db ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 141 ;
+        lv2:symbol "eq21Q" ;
+        lv2:name "EQ 21 Q" ;
+        lv2:default 1 ;
+        lv2:minimum 0.3 ;
+        lv2:maximum 116 ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 142 ;
+        lv2:symbol "eq21On" ;
+        lv2:name "EQ 21" ;
+        lv2:default 0 ;
+        lv2:minimum 0 ;
+        lv2:maximum 1 ;
+        lv2:portProperty lv2:toggled ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 143 ;
+        lv2:symbol "eq22Type" ;
+        lv2:name "EQ 22 Type" ;
+        lv2:default 0 ;
+        lv2:minimum 0 ;
+        lv2:maximum 5 ;
+        lv2:portProperty lv2:integer , lv2:enumeration ;
+        lv2:scalePoint
+            [ rdfs:label "Bell" ; rdf:value 0 ] ,
+            [ rdfs:label "Low Shelf" ; rdf:value 1 ] ,
+            [ rdfs:label "High Shelf" ; rdf:value 2 ] ,
+            [ rdfs:label "Notch" ; rdf:value 3 ] ,
+            [ rdfs:label "All-pass 1st" ; rdf:value 4 ] ,
+            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ] ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 144 ;
+        lv2:symbol "eq22Freq" ;
+        lv2:name "EQ 22 Freq" ;
+        lv2:default 2000 ;
+        lv2:minimum 20 ;
+        lv2:maximum 20000 ;
+        lv2:portProperty lv2:integer ;
+        lv2:portProperty pprops:logarithmic ;
+        units:unit units:hz ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 145 ;
+        lv2:symbol "eq22Gain" ;
+        lv2:name "EQ 22 Gain" ;
+        lv2:default 0 ;
+        lv2:minimum -15 ;
+        lv2:maximum 15 ;
+        units:unit units:db ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 146 ;
+        lv2:symbol "eq22Q" ;
+        lv2:name "EQ 22 Q" ;
+        lv2:default 1 ;
+        lv2:minimum 0.3 ;
+        lv2:maximum 116 ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 147 ;
+        lv2:symbol "eq22On" ;
+        lv2:name "EQ 22" ;
+        lv2:default 0 ;
+        lv2:minimum 0 ;
+        lv2:maximum 1 ;
+        lv2:portProperty lv2:toggled ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 148 ;
+        lv2:symbol "eq23Type" ;
+        lv2:name "EQ 23 Type" ;
+        lv2:default 0 ;
+        lv2:minimum 0 ;
+        lv2:maximum 5 ;
+        lv2:portProperty lv2:integer , lv2:enumeration ;
+        lv2:scalePoint
+            [ rdfs:label "Bell" ; rdf:value 0 ] ,
+            [ rdfs:label "Low Shelf" ; rdf:value 1 ] ,
+            [ rdfs:label "High Shelf" ; rdf:value 2 ] ,
+            [ rdfs:label "Notch" ; rdf:value 3 ] ,
+            [ rdfs:label "All-pass 1st" ; rdf:value 4 ] ,
+            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ] ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 149 ;
+        lv2:symbol "eq23Freq" ;
+        lv2:name "EQ 23 Freq" ;
+        lv2:default 2500 ;
+        lv2:minimum 20 ;
+        lv2:maximum 20000 ;
+        lv2:portProperty lv2:integer ;
+        lv2:portProperty pprops:logarithmic ;
+        units:unit units:hz ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 150 ;
+        lv2:symbol "eq23Gain" ;
+        lv2:name "EQ 23 Gain" ;
+        lv2:default 0 ;
+        lv2:minimum -15 ;
+        lv2:maximum 15 ;
+        units:unit units:db ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 151 ;
+        lv2:symbol "eq23Q" ;
+        lv2:name "EQ 23 Q" ;
+        lv2:default 1 ;
+        lv2:minimum 0.3 ;
+        lv2:maximum 116 ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 152 ;
+        lv2:symbol "eq23On" ;
+        lv2:name "EQ 23" ;
+        lv2:default 0 ;
+        lv2:minimum 0 ;
+        lv2:maximum 1 ;
+        lv2:portProperty lv2:toggled ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 153 ;
+        lv2:symbol "eq24Type" ;
+        lv2:name "EQ 24 Type" ;
+        lv2:default 0 ;
+        lv2:minimum 0 ;
+        lv2:maximum 5 ;
+        lv2:portProperty lv2:integer , lv2:enumeration ;
+        lv2:scalePoint
+            [ rdfs:label "Bell" ; rdf:value 0 ] ,
+            [ rdfs:label "Low Shelf" ; rdf:value 1 ] ,
+            [ rdfs:label "High Shelf" ; rdf:value 2 ] ,
+            [ rdfs:label "Notch" ; rdf:value 3 ] ,
+            [ rdfs:label "All-pass 1st" ; rdf:value 4 ] ,
+            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ] ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 154 ;
+        lv2:symbol "eq24Freq" ;
+        lv2:name "EQ 24 Freq" ;
+        lv2:default 3150 ;
+        lv2:minimum 20 ;
+        lv2:maximum 20000 ;
+        lv2:portProperty lv2:integer ;
+        lv2:portProperty pprops:logarithmic ;
+        units:unit units:hz ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 155 ;
+        lv2:symbol "eq24Gain" ;
+        lv2:name "EQ 24 Gain" ;
+        lv2:default 0 ;
+        lv2:minimum -15 ;
+        lv2:maximum 15 ;
+        units:unit units:db ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 156 ;
+        lv2:symbol "eq24Q" ;
+        lv2:name "EQ 24 Q" ;
+        lv2:default 1 ;
+        lv2:minimum 0.3 ;
+        lv2:maximum 116 ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 157 ;
+        lv2:symbol "eq24On" ;
+        lv2:name "EQ 24" ;
+        lv2:default 0 ;
+        lv2:minimum 0 ;
+        lv2:maximum 1 ;
+        lv2:portProperty lv2:toggled ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 158 ;
+        lv2:symbol "eq25Type" ;
+        lv2:name "EQ 25 Type" ;
+        lv2:default 0 ;
+        lv2:minimum 0 ;
+        lv2:maximum 5 ;
+        lv2:portProperty lv2:integer , lv2:enumeration ;
+        lv2:scalePoint
+            [ rdfs:label "Bell" ; rdf:value 0 ] ,
+            [ rdfs:label "Low Shelf" ; rdf:value 1 ] ,
+            [ rdfs:label "High Shelf" ; rdf:value 2 ] ,
+            [ rdfs:label "Notch" ; rdf:value 3 ] ,
+            [ rdfs:label "All-pass 1st" ; rdf:value 4 ] ,
+            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ] ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 159 ;
+        lv2:symbol "eq25Freq" ;
+        lv2:name "EQ 25 Freq" ;
+        lv2:default 4000 ;
+        lv2:minimum 20 ;
+        lv2:maximum 20000 ;
+        lv2:portProperty lv2:integer ;
+        lv2:portProperty pprops:logarithmic ;
+        units:unit units:hz ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 160 ;
+        lv2:symbol "eq25Gain" ;
+        lv2:name "EQ 25 Gain" ;
+        lv2:default 0 ;
+        lv2:minimum -15 ;
+        lv2:maximum 15 ;
+        units:unit units:db ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 161 ;
+        lv2:symbol "eq25Q" ;
+        lv2:name "EQ 25 Q" ;
+        lv2:default 1 ;
+        lv2:minimum 0.3 ;
+        lv2:maximum 116 ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 162 ;
+        lv2:symbol "eq25On" ;
+        lv2:name "EQ 25" ;
+        lv2:default 0 ;
+        lv2:minimum 0 ;
+        lv2:maximum 1 ;
+        lv2:portProperty lv2:toggled ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 163 ;
+        lv2:symbol "eq26Type" ;
+        lv2:name "EQ 26 Type" ;
+        lv2:default 0 ;
+        lv2:minimum 0 ;
+        lv2:maximum 5 ;
+        lv2:portProperty lv2:integer , lv2:enumeration ;
+        lv2:scalePoint
+            [ rdfs:label "Bell" ; rdf:value 0 ] ,
+            [ rdfs:label "Low Shelf" ; rdf:value 1 ] ,
+            [ rdfs:label "High Shelf" ; rdf:value 2 ] ,
+            [ rdfs:label "Notch" ; rdf:value 3 ] ,
+            [ rdfs:label "All-pass 1st" ; rdf:value 4 ] ,
+            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ] ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 164 ;
+        lv2:symbol "eq26Freq" ;
+        lv2:name "EQ 26 Freq" ;
+        lv2:default 5000 ;
+        lv2:minimum 20 ;
+        lv2:maximum 20000 ;
+        lv2:portProperty lv2:integer ;
+        lv2:portProperty pprops:logarithmic ;
+        units:unit units:hz ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 165 ;
+        lv2:symbol "eq26Gain" ;
+        lv2:name "EQ 26 Gain" ;
+        lv2:default 0 ;
+        lv2:minimum -15 ;
+        lv2:maximum 15 ;
+        units:unit units:db ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 166 ;
+        lv2:symbol "eq26Q" ;
+        lv2:name "EQ 26 Q" ;
+        lv2:default 1 ;
+        lv2:minimum 0.3 ;
+        lv2:maximum 116 ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 167 ;
+        lv2:symbol "eq26On" ;
+        lv2:name "EQ 26" ;
+        lv2:default 0 ;
+        lv2:minimum 0 ;
+        lv2:maximum 1 ;
+        lv2:portProperty lv2:toggled ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 168 ;
+        lv2:symbol "eq27Type" ;
+        lv2:name "EQ 27 Type" ;
+        lv2:default 0 ;
+        lv2:minimum 0 ;
+        lv2:maximum 5 ;
+        lv2:portProperty lv2:integer , lv2:enumeration ;
+        lv2:scalePoint
+            [ rdfs:label "Bell" ; rdf:value 0 ] ,
+            [ rdfs:label "Low Shelf" ; rdf:value 1 ] ,
+            [ rdfs:label "High Shelf" ; rdf:value 2 ] ,
+            [ rdfs:label "Notch" ; rdf:value 3 ] ,
+            [ rdfs:label "All-pass 1st" ; rdf:value 4 ] ,
+            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ] ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 169 ;
+        lv2:symbol "eq27Freq" ;
+        lv2:name "EQ 27 Freq" ;
+        lv2:default 6300 ;
+        lv2:minimum 20 ;
+        lv2:maximum 20000 ;
+        lv2:portProperty lv2:integer ;
+        lv2:portProperty pprops:logarithmic ;
+        units:unit units:hz ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 170 ;
+        lv2:symbol "eq27Gain" ;
+        lv2:name "EQ 27 Gain" ;
+        lv2:default 0 ;
+        lv2:minimum -15 ;
+        lv2:maximum 15 ;
+        units:unit units:db ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 171 ;
+        lv2:symbol "eq27Q" ;
+        lv2:name "EQ 27 Q" ;
+        lv2:default 1 ;
+        lv2:minimum 0.3 ;
+        lv2:maximum 116 ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 172 ;
+        lv2:symbol "eq27On" ;
+        lv2:name "EQ 27" ;
+        lv2:default 0 ;
+        lv2:minimum 0 ;
+        lv2:maximum 1 ;
+        lv2:portProperty lv2:toggled ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 173 ;
+        lv2:symbol "eq28Type" ;
+        lv2:name "EQ 28 Type" ;
+        lv2:default 0 ;
+        lv2:minimum 0 ;
+        lv2:maximum 5 ;
+        lv2:portProperty lv2:integer , lv2:enumeration ;
+        lv2:scalePoint
+            [ rdfs:label "Bell" ; rdf:value 0 ] ,
+            [ rdfs:label "Low Shelf" ; rdf:value 1 ] ,
+            [ rdfs:label "High Shelf" ; rdf:value 2 ] ,
+            [ rdfs:label "Notch" ; rdf:value 3 ] ,
+            [ rdfs:label "All-pass 1st" ; rdf:value 4 ] ,
+            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ] ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 174 ;
+        lv2:symbol "eq28Freq" ;
+        lv2:name "EQ 28 Freq" ;
+        lv2:default 8000 ;
+        lv2:minimum 20 ;
+        lv2:maximum 20000 ;
+        lv2:portProperty lv2:integer ;
+        lv2:portProperty pprops:logarithmic ;
+        units:unit units:hz ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 175 ;
+        lv2:symbol "eq28Gain" ;
+        lv2:name "EQ 28 Gain" ;
+        lv2:default 0 ;
+        lv2:minimum -15 ;
+        lv2:maximum 15 ;
+        units:unit units:db ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 176 ;
+        lv2:symbol "eq28Q" ;
+        lv2:name "EQ 28 Q" ;
+        lv2:default 1 ;
+        lv2:minimum 0.3 ;
+        lv2:maximum 116 ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 177 ;
+        lv2:symbol "eq28On" ;
+        lv2:name "EQ 28" ;
+        lv2:default 0 ;
+        lv2:minimum 0 ;
+        lv2:maximum 1 ;
+        lv2:portProperty lv2:toggled ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 178 ;
+        lv2:symbol "eq29Type" ;
+        lv2:name "EQ 29 Type" ;
+        lv2:default 0 ;
+        lv2:minimum 0 ;
+        lv2:maximum 5 ;
+        lv2:portProperty lv2:integer , lv2:enumeration ;
+        lv2:scalePoint
+            [ rdfs:label "Bell" ; rdf:value 0 ] ,
+            [ rdfs:label "Low Shelf" ; rdf:value 1 ] ,
+            [ rdfs:label "High Shelf" ; rdf:value 2 ] ,
+            [ rdfs:label "Notch" ; rdf:value 3 ] ,
+            [ rdfs:label "All-pass 1st" ; rdf:value 4 ] ,
+            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ] ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 179 ;
+        lv2:symbol "eq29Freq" ;
+        lv2:name "EQ 29 Freq" ;
+        lv2:default 9000 ;
+        lv2:minimum 20 ;
+        lv2:maximum 20000 ;
+        lv2:portProperty lv2:integer ;
+        lv2:portProperty pprops:logarithmic ;
+        units:unit units:hz ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 180 ;
+        lv2:symbol "eq29Gain" ;
+        lv2:name "EQ 29 Gain" ;
+        lv2:default 0 ;
+        lv2:minimum -15 ;
+        lv2:maximum 15 ;
+        units:unit units:db ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 181 ;
+        lv2:symbol "eq29Q" ;
+        lv2:name "EQ 29 Q" ;
+        lv2:default 1 ;
+        lv2:minimum 0.3 ;
+        lv2:maximum 116 ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 182 ;
+        lv2:symbol "eq29On" ;
+        lv2:name "EQ 29" ;
+        lv2:default 0 ;
+        lv2:minimum 0 ;
+        lv2:maximum 1 ;
+        lv2:portProperty lv2:toggled ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 183 ;
+        lv2:symbol "eq30Type" ;
+        lv2:name "EQ 30 Type" ;
+        lv2:default 0 ;
+        lv2:minimum 0 ;
+        lv2:maximum 5 ;
+        lv2:portProperty lv2:integer , lv2:enumeration ;
+        lv2:scalePoint
+            [ rdfs:label "Bell" ; rdf:value 0 ] ,
+            [ rdfs:label "Low Shelf" ; rdf:value 1 ] ,
+            [ rdfs:label "High Shelf" ; rdf:value 2 ] ,
+            [ rdfs:label "Notch" ; rdf:value 3 ] ,
+            [ rdfs:label "All-pass 1st" ; rdf:value 4 ] ,
+            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ] ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 184 ;
+        lv2:symbol "eq30Freq" ;
+        lv2:name "EQ 30 Freq" ;
+        lv2:default 11200 ;
+        lv2:minimum 20 ;
+        lv2:maximum 20000 ;
+        lv2:portProperty lv2:integer ;
+        lv2:portProperty pprops:logarithmic ;
+        units:unit units:hz ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 185 ;
+        lv2:symbol "eq30Gain" ;
+        lv2:name "EQ 30 Gain" ;
+        lv2:default 0 ;
+        lv2:minimum -15 ;
+        lv2:maximum 15 ;
+        units:unit units:db ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 186 ;
+        lv2:symbol "eq30Q" ;
+        lv2:name "EQ 30 Q" ;
+        lv2:default 1 ;
+        lv2:minimum 0.3 ;
+        lv2:maximum 116 ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 187 ;
+        lv2:symbol "eq30On" ;
+        lv2:name "EQ 30" ;
+        lv2:default 0 ;
+        lv2:minimum 0 ;
+        lv2:maximum 1 ;
+        lv2:portProperty lv2:toggled ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 188 ;
+        lv2:symbol "eq31Type" ;
+        lv2:name "EQ 31 Type" ;
+        lv2:default 0 ;
+        lv2:minimum 0 ;
+        lv2:maximum 5 ;
+        lv2:portProperty lv2:integer , lv2:enumeration ;
+        lv2:scalePoint
+            [ rdfs:label "Bell" ; rdf:value 0 ] ,
+            [ rdfs:label "Low Shelf" ; rdf:value 1 ] ,
+            [ rdfs:label "High Shelf" ; rdf:value 2 ] ,
+            [ rdfs:label "Notch" ; rdf:value 3 ] ,
+            [ rdfs:label "All-pass 1st" ; rdf:value 4 ] ,
+            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ] ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 189 ;
+        lv2:symbol "eq31Freq" ;
+        lv2:name "EQ 31 Freq" ;
+        lv2:default 14000 ;
+        lv2:minimum 20 ;
+        lv2:maximum 20000 ;
+        lv2:portProperty lv2:integer ;
+        lv2:portProperty pprops:logarithmic ;
+        units:unit units:hz ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 190 ;
+        lv2:symbol "eq31Gain" ;
+        lv2:name "EQ 31 Gain" ;
+        lv2:default 0 ;
+        lv2:minimum -15 ;
+        lv2:maximum 15 ;
+        units:unit units:db ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 191 ;
+        lv2:symbol "eq31Q" ;
+        lv2:name "EQ 31 Q" ;
+        lv2:default 1 ;
+        lv2:minimum 0.3 ;
+        lv2:maximum 116 ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 192 ;
+        lv2:symbol "eq31On" ;
+        lv2:name "EQ 31" ;
+        lv2:default 0 ;
+        lv2:minimum 0 ;
+        lv2:maximum 1 ;
+        lv2:portProperty lv2:toggled ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 193 ;
+        lv2:symbol "eq32Type" ;
+        lv2:name "EQ 32 Type" ;
+        lv2:default 2 ;
+        lv2:minimum 0 ;
+        lv2:maximum 5 ;
+        lv2:portProperty lv2:integer , lv2:enumeration ;
+        lv2:scalePoint
+            [ rdfs:label "Bell" ; rdf:value 0 ] ,
+            [ rdfs:label "Low Shelf" ; rdf:value 1 ] ,
+            [ rdfs:label "High Shelf" ; rdf:value 2 ] ,
+            [ rdfs:label "Notch" ; rdf:value 3 ] ,
+            [ rdfs:label "All-pass 1st" ; rdf:value 4 ] ,
+            [ rdfs:label "All-pass 2nd" ; rdf:value 5 ] ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 194 ;
+        lv2:symbol "eq32Freq" ;
+        lv2:name "EQ 32 Freq" ;
+        lv2:default 18000 ;
+        lv2:minimum 20 ;
+        lv2:maximum 20000 ;
+        lv2:portProperty lv2:integer ;
+        lv2:portProperty pprops:logarithmic ;
+        units:unit units:hz ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 195 ;
+        lv2:symbol "eq32Gain" ;
+        lv2:name "EQ 32 Gain" ;
+        lv2:default 0 ;
+        lv2:minimum -15 ;
+        lv2:maximum 15 ;
+        units:unit units:db ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 196 ;
+        lv2:symbol "eq32Q" ;
+        lv2:name "EQ 32 Q" ;
+        lv2:default 1 ;
+        lv2:minimum 0.3 ;
+        lv2:maximum 116 ;
+        pg:group <urn:openmixer:strip#eq>
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 197 ;
+        lv2:symbol "eq32On" ;
+        lv2:name "EQ 32" ;
+        lv2:default 0 ;
+        lv2:minimum 0 ;
+        lv2:maximum 1 ;
+        lv2:portProperty lv2:toggled ;
+        pg:group <urn:openmixer:strip#eq>
     ] .
 
 # lv2:displayPriority on a port group is the term Zynthian reads to order a plugin's groups (zynthian_lv2.py), and the

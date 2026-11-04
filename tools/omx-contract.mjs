@@ -460,7 +460,7 @@ export const declKernels = (d) =>
 
 /** A declaration's hand-written parameters: its `params`, or a chain's elements' (each naming its
  * element's kernel); a chain's switches and `order` are generated, never declared. */
-export const declParams = (d) => d.params ?? (d.chain ?? []).flatMap((el) => (el.params ?? []).map((p) => ({ ...p, kernel: p.kernel ?? el.kernel })));
+export const declParams = (d) => d.params ?? (d.chain ?? []).flatMap((el) => [...(el.params ?? []), ...(el.appended ?? [])].map((p) => ({ ...p, kernel: p.kernel ?? el.kernel })));
 
 /**
  * The kernel one parameter's reference is read from: its own `kernel` (which must be one of the

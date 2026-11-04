@@ -4,11 +4,11 @@
 
 # omx strip
 
-The OpenMixer console's channel strip in one plugin: input trim, high- and low-pass filters, gate, four-band EQ and compressor, in the console's order or any other. No DSP of its own: each stage is omx-dsp's instance face of the console's kernel, called in order.
+The OpenMixer console's channel strip in one plugin: input trim, high- and low-pass filters, gate, a parametric EQ of as many bands as its Bands control says, and compressor, in the console's order or any other. No DSP of its own: each stage is omx-dsp's instance face of the console's kernel, called in order.
 
 - CLAP id: `org.openmixer.strip`
 - LV2 URI: `urn:openmixer:strip`
-- Parameters: 51, plus the host's bypass
+- Parameters: 192, plus the host's bypass
 
 ## Audio ports
 
@@ -26,13 +26,13 @@ A page is where a host shows a parameter. In LV2 each page is a port group, `pg:
 | Input | `trim` | 6 | `Input` | 2 |
 | Filters | `filter` | 5 | `Filters` | 7 |
 | Gate | `gate` | 4 | `Gate` | 10 |
-| EQ | `eq` | 3 | `EQ` | 21 |
+| EQ | `eq` | 3 | `EQ` | 162 |
 | Comp | `comp` | 2 | `Comp` | 10 |
 | Order | `order` | 1 | `Order` | 1 |
 
 ## Parameters
 
-Ids are the order below, 0 to 50; a parameter appended later takes the next id. The bypass's id is its own (below).
+Ids are the order below, 0 to 191; a parameter appended later takes the next id. The bypass's id is its own (below).
 
 | Id | Symbol | Name | Unit | Min | Max | Default | Step or values | Flags | Page (priority) |
 |---|---|---|---|---|---|---|---|---|---|
@@ -87,6 +87,147 @@ Ids are the order below, 0 to 50; a parameter appended later takes the next id. 
 | 48 | `compMix` | Comp Mix | % | 0 | 100 | 100 | whole steps | automatable | Comp (2) |
 | 49 | `compDetectorOversampling` | Comp Detector Oversampling |  | 0 | 2 | Auto (0) | 0 Auto, 1 Off, 2 4x | automatable | Comp (2) |
 | 50 | `order` | Order |  | 0 | 119 | 0 | whole steps | automatable | Order (1) |
+| 51 | `eqBands` | EQ Bands |  | 1 | 32 | 4 | whole steps | automatable | EQ (3) |
+| 52 | `eq5Type` | EQ 5 Type |  | 0 | 5 | Bell (0) | 0 Bell, 1 Low Shelf, 2 High Shelf, 3 Notch, 4 All-pass 1st, 5 All-pass 2nd | automatable | EQ (3) |
+| 53 | `eq5Freq` | EQ 5 Freq | Hz | 20 | 20000 | 50 | whole steps | automatable | EQ (3) |
+| 54 | `eq5Gain` | EQ 5 Gain | dB | -15 | 15 | 0 | continuous, linear | automatable | EQ (3) |
+| 55 | `eq5Q` | EQ 5 Q |  | 0.3 | 116 | 1 | continuous, linear | automatable | EQ (3) |
+| 56 | `eq5On` | EQ 5 |  | off | on | off | toggle | automatable | EQ (3) |
+| 57 | `eq6Type` | EQ 6 Type |  | 0 | 5 | Bell (0) | 0 Bell, 1 Low Shelf, 2 High Shelf, 3 Notch, 4 All-pass 1st, 5 All-pass 2nd | automatable | EQ (3) |
+| 58 | `eq6Freq` | EQ 6 Freq | Hz | 20 | 20000 | 63 | whole steps | automatable | EQ (3) |
+| 59 | `eq6Gain` | EQ 6 Gain | dB | -15 | 15 | 0 | continuous, linear | automatable | EQ (3) |
+| 60 | `eq6Q` | EQ 6 Q |  | 0.3 | 116 | 1 | continuous, linear | automatable | EQ (3) |
+| 61 | `eq6On` | EQ 6 |  | off | on | off | toggle | automatable | EQ (3) |
+| 62 | `eq7Type` | EQ 7 Type |  | 0 | 5 | Bell (0) | 0 Bell, 1 Low Shelf, 2 High Shelf, 3 Notch, 4 All-pass 1st, 5 All-pass 2nd | automatable | EQ (3) |
+| 63 | `eq7Freq` | EQ 7 Freq | Hz | 20 | 20000 | 80 | whole steps | automatable | EQ (3) |
+| 64 | `eq7Gain` | EQ 7 Gain | dB | -15 | 15 | 0 | continuous, linear | automatable | EQ (3) |
+| 65 | `eq7Q` | EQ 7 Q |  | 0.3 | 116 | 1 | continuous, linear | automatable | EQ (3) |
+| 66 | `eq7On` | EQ 7 |  | off | on | off | toggle | automatable | EQ (3) |
+| 67 | `eq8Type` | EQ 8 Type |  | 0 | 5 | Bell (0) | 0 Bell, 1 Low Shelf, 2 High Shelf, 3 Notch, 4 All-pass 1st, 5 All-pass 2nd | automatable | EQ (3) |
+| 68 | `eq8Freq` | EQ 8 Freq | Hz | 20 | 20000 | 100 | whole steps | automatable | EQ (3) |
+| 69 | `eq8Gain` | EQ 8 Gain | dB | -15 | 15 | 0 | continuous, linear | automatable | EQ (3) |
+| 70 | `eq8Q` | EQ 8 Q |  | 0.3 | 116 | 1 | continuous, linear | automatable | EQ (3) |
+| 71 | `eq8On` | EQ 8 |  | off | on | off | toggle | automatable | EQ (3) |
+| 72 | `eq9Type` | EQ 9 Type |  | 0 | 5 | Bell (0) | 0 Bell, 1 Low Shelf, 2 High Shelf, 3 Notch, 4 All-pass 1st, 5 All-pass 2nd | automatable | EQ (3) |
+| 73 | `eq9Freq` | EQ 9 Freq | Hz | 20 | 20000 | 125 | whole steps | automatable | EQ (3) |
+| 74 | `eq9Gain` | EQ 9 Gain | dB | -15 | 15 | 0 | continuous, linear | automatable | EQ (3) |
+| 75 | `eq9Q` | EQ 9 Q |  | 0.3 | 116 | 1 | continuous, linear | automatable | EQ (3) |
+| 76 | `eq9On` | EQ 9 |  | off | on | off | toggle | automatable | EQ (3) |
+| 77 | `eq10Type` | EQ 10 Type |  | 0 | 5 | Bell (0) | 0 Bell, 1 Low Shelf, 2 High Shelf, 3 Notch, 4 All-pass 1st, 5 All-pass 2nd | automatable | EQ (3) |
+| 78 | `eq10Freq` | EQ 10 Freq | Hz | 20 | 20000 | 160 | whole steps | automatable | EQ (3) |
+| 79 | `eq10Gain` | EQ 10 Gain | dB | -15 | 15 | 0 | continuous, linear | automatable | EQ (3) |
+| 80 | `eq10Q` | EQ 10 Q |  | 0.3 | 116 | 1 | continuous, linear | automatable | EQ (3) |
+| 81 | `eq10On` | EQ 10 |  | off | on | off | toggle | automatable | EQ (3) |
+| 82 | `eq11Type` | EQ 11 Type |  | 0 | 5 | Bell (0) | 0 Bell, 1 Low Shelf, 2 High Shelf, 3 Notch, 4 All-pass 1st, 5 All-pass 2nd | automatable | EQ (3) |
+| 83 | `eq11Freq` | EQ 11 Freq | Hz | 20 | 20000 | 200 | whole steps | automatable | EQ (3) |
+| 84 | `eq11Gain` | EQ 11 Gain | dB | -15 | 15 | 0 | continuous, linear | automatable | EQ (3) |
+| 85 | `eq11Q` | EQ 11 Q |  | 0.3 | 116 | 1 | continuous, linear | automatable | EQ (3) |
+| 86 | `eq11On` | EQ 11 |  | off | on | off | toggle | automatable | EQ (3) |
+| 87 | `eq12Type` | EQ 12 Type |  | 0 | 5 | Bell (0) | 0 Bell, 1 Low Shelf, 2 High Shelf, 3 Notch, 4 All-pass 1st, 5 All-pass 2nd | automatable | EQ (3) |
+| 88 | `eq12Freq` | EQ 12 Freq | Hz | 20 | 20000 | 250 | whole steps | automatable | EQ (3) |
+| 89 | `eq12Gain` | EQ 12 Gain | dB | -15 | 15 | 0 | continuous, linear | automatable | EQ (3) |
+| 90 | `eq12Q` | EQ 12 Q |  | 0.3 | 116 | 1 | continuous, linear | automatable | EQ (3) |
+| 91 | `eq12On` | EQ 12 |  | off | on | off | toggle | automatable | EQ (3) |
+| 92 | `eq13Type` | EQ 13 Type |  | 0 | 5 | Bell (0) | 0 Bell, 1 Low Shelf, 2 High Shelf, 3 Notch, 4 All-pass 1st, 5 All-pass 2nd | automatable | EQ (3) |
+| 93 | `eq13Freq` | EQ 13 Freq | Hz | 20 | 20000 | 315 | whole steps | automatable | EQ (3) |
+| 94 | `eq13Gain` | EQ 13 Gain | dB | -15 | 15 | 0 | continuous, linear | automatable | EQ (3) |
+| 95 | `eq13Q` | EQ 13 Q |  | 0.3 | 116 | 1 | continuous, linear | automatable | EQ (3) |
+| 96 | `eq13On` | EQ 13 |  | off | on | off | toggle | automatable | EQ (3) |
+| 97 | `eq14Type` | EQ 14 Type |  | 0 | 5 | Bell (0) | 0 Bell, 1 Low Shelf, 2 High Shelf, 3 Notch, 4 All-pass 1st, 5 All-pass 2nd | automatable | EQ (3) |
+| 98 | `eq14Freq` | EQ 14 Freq | Hz | 20 | 20000 | 355 | whole steps | automatable | EQ (3) |
+| 99 | `eq14Gain` | EQ 14 Gain | dB | -15 | 15 | 0 | continuous, linear | automatable | EQ (3) |
+| 100 | `eq14Q` | EQ 14 Q |  | 0.3 | 116 | 1 | continuous, linear | automatable | EQ (3) |
+| 101 | `eq14On` | EQ 14 |  | off | on | off | toggle | automatable | EQ (3) |
+| 102 | `eq15Type` | EQ 15 Type |  | 0 | 5 | Bell (0) | 0 Bell, 1 Low Shelf, 2 High Shelf, 3 Notch, 4 All-pass 1st, 5 All-pass 2nd | automatable | EQ (3) |
+| 103 | `eq15Freq` | EQ 15 Freq | Hz | 20 | 20000 | 450 | whole steps | automatable | EQ (3) |
+| 104 | `eq15Gain` | EQ 15 Gain | dB | -15 | 15 | 0 | continuous, linear | automatable | EQ (3) |
+| 105 | `eq15Q` | EQ 15 Q |  | 0.3 | 116 | 1 | continuous, linear | automatable | EQ (3) |
+| 106 | `eq15On` | EQ 15 |  | off | on | off | toggle | automatable | EQ (3) |
+| 107 | `eq16Type` | EQ 16 Type |  | 0 | 5 | Bell (0) | 0 Bell, 1 Low Shelf, 2 High Shelf, 3 Notch, 4 All-pass 1st, 5 All-pass 2nd | automatable | EQ (3) |
+| 108 | `eq16Freq` | EQ 16 Freq | Hz | 20 | 20000 | 560 | whole steps | automatable | EQ (3) |
+| 109 | `eq16Gain` | EQ 16 Gain | dB | -15 | 15 | 0 | continuous, linear | automatable | EQ (3) |
+| 110 | `eq16Q` | EQ 16 Q |  | 0.3 | 116 | 1 | continuous, linear | automatable | EQ (3) |
+| 111 | `eq16On` | EQ 16 |  | off | on | off | toggle | automatable | EQ (3) |
+| 112 | `eq17Type` | EQ 17 Type |  | 0 | 5 | Bell (0) | 0 Bell, 1 Low Shelf, 2 High Shelf, 3 Notch, 4 All-pass 1st, 5 All-pass 2nd | automatable | EQ (3) |
+| 113 | `eq17Freq` | EQ 17 Freq | Hz | 20 | 20000 | 710 | whole steps | automatable | EQ (3) |
+| 114 | `eq17Gain` | EQ 17 Gain | dB | -15 | 15 | 0 | continuous, linear | automatable | EQ (3) |
+| 115 | `eq17Q` | EQ 17 Q |  | 0.3 | 116 | 1 | continuous, linear | automatable | EQ (3) |
+| 116 | `eq17On` | EQ 17 |  | off | on | off | toggle | automatable | EQ (3) |
+| 117 | `eq18Type` | EQ 18 Type |  | 0 | 5 | Bell (0) | 0 Bell, 1 Low Shelf, 2 High Shelf, 3 Notch, 4 All-pass 1st, 5 All-pass 2nd | automatable | EQ (3) |
+| 118 | `eq18Freq` | EQ 18 Freq | Hz | 20 | 20000 | 900 | whole steps | automatable | EQ (3) |
+| 119 | `eq18Gain` | EQ 18 Gain | dB | -15 | 15 | 0 | continuous, linear | automatable | EQ (3) |
+| 120 | `eq18Q` | EQ 18 Q |  | 0.3 | 116 | 1 | continuous, linear | automatable | EQ (3) |
+| 121 | `eq18On` | EQ 18 |  | off | on | off | toggle | automatable | EQ (3) |
+| 122 | `eq19Type` | EQ 19 Type |  | 0 | 5 | Bell (0) | 0 Bell, 1 Low Shelf, 2 High Shelf, 3 Notch, 4 All-pass 1st, 5 All-pass 2nd | automatable | EQ (3) |
+| 123 | `eq19Freq` | EQ 19 Freq | Hz | 20 | 20000 | 1120 | whole steps | automatable | EQ (3) |
+| 124 | `eq19Gain` | EQ 19 Gain | dB | -15 | 15 | 0 | continuous, linear | automatable | EQ (3) |
+| 125 | `eq19Q` | EQ 19 Q |  | 0.3 | 116 | 1 | continuous, linear | automatable | EQ (3) |
+| 126 | `eq19On` | EQ 19 |  | off | on | off | toggle | automatable | EQ (3) |
+| 127 | `eq20Type` | EQ 20 Type |  | 0 | 5 | Bell (0) | 0 Bell, 1 Low Shelf, 2 High Shelf, 3 Notch, 4 All-pass 1st, 5 All-pass 2nd | automatable | EQ (3) |
+| 128 | `eq20Freq` | EQ 20 Freq | Hz | 20 | 20000 | 1400 | whole steps | automatable | EQ (3) |
+| 129 | `eq20Gain` | EQ 20 Gain | dB | -15 | 15 | 0 | continuous, linear | automatable | EQ (3) |
+| 130 | `eq20Q` | EQ 20 Q |  | 0.3 | 116 | 1 | continuous, linear | automatable | EQ (3) |
+| 131 | `eq20On` | EQ 20 |  | off | on | off | toggle | automatable | EQ (3) |
+| 132 | `eq21Type` | EQ 21 Type |  | 0 | 5 | Bell (0) | 0 Bell, 1 Low Shelf, 2 High Shelf, 3 Notch, 4 All-pass 1st, 5 All-pass 2nd | automatable | EQ (3) |
+| 133 | `eq21Freq` | EQ 21 Freq | Hz | 20 | 20000 | 1600 | whole steps | automatable | EQ (3) |
+| 134 | `eq21Gain` | EQ 21 Gain | dB | -15 | 15 | 0 | continuous, linear | automatable | EQ (3) |
+| 135 | `eq21Q` | EQ 21 Q |  | 0.3 | 116 | 1 | continuous, linear | automatable | EQ (3) |
+| 136 | `eq21On` | EQ 21 |  | off | on | off | toggle | automatable | EQ (3) |
+| 137 | `eq22Type` | EQ 22 Type |  | 0 | 5 | Bell (0) | 0 Bell, 1 Low Shelf, 2 High Shelf, 3 Notch, 4 All-pass 1st, 5 All-pass 2nd | automatable | EQ (3) |
+| 138 | `eq22Freq` | EQ 22 Freq | Hz | 20 | 20000 | 2000 | whole steps | automatable | EQ (3) |
+| 139 | `eq22Gain` | EQ 22 Gain | dB | -15 | 15 | 0 | continuous, linear | automatable | EQ (3) |
+| 140 | `eq22Q` | EQ 22 Q |  | 0.3 | 116 | 1 | continuous, linear | automatable | EQ (3) |
+| 141 | `eq22On` | EQ 22 |  | off | on | off | toggle | automatable | EQ (3) |
+| 142 | `eq23Type` | EQ 23 Type |  | 0 | 5 | Bell (0) | 0 Bell, 1 Low Shelf, 2 High Shelf, 3 Notch, 4 All-pass 1st, 5 All-pass 2nd | automatable | EQ (3) |
+| 143 | `eq23Freq` | EQ 23 Freq | Hz | 20 | 20000 | 2500 | whole steps | automatable | EQ (3) |
+| 144 | `eq23Gain` | EQ 23 Gain | dB | -15 | 15 | 0 | continuous, linear | automatable | EQ (3) |
+| 145 | `eq23Q` | EQ 23 Q |  | 0.3 | 116 | 1 | continuous, linear | automatable | EQ (3) |
+| 146 | `eq23On` | EQ 23 |  | off | on | off | toggle | automatable | EQ (3) |
+| 147 | `eq24Type` | EQ 24 Type |  | 0 | 5 | Bell (0) | 0 Bell, 1 Low Shelf, 2 High Shelf, 3 Notch, 4 All-pass 1st, 5 All-pass 2nd | automatable | EQ (3) |
+| 148 | `eq24Freq` | EQ 24 Freq | Hz | 20 | 20000 | 3150 | whole steps | automatable | EQ (3) |
+| 149 | `eq24Gain` | EQ 24 Gain | dB | -15 | 15 | 0 | continuous, linear | automatable | EQ (3) |
+| 150 | `eq24Q` | EQ 24 Q |  | 0.3 | 116 | 1 | continuous, linear | automatable | EQ (3) |
+| 151 | `eq24On` | EQ 24 |  | off | on | off | toggle | automatable | EQ (3) |
+| 152 | `eq25Type` | EQ 25 Type |  | 0 | 5 | Bell (0) | 0 Bell, 1 Low Shelf, 2 High Shelf, 3 Notch, 4 All-pass 1st, 5 All-pass 2nd | automatable | EQ (3) |
+| 153 | `eq25Freq` | EQ 25 Freq | Hz | 20 | 20000 | 4000 | whole steps | automatable | EQ (3) |
+| 154 | `eq25Gain` | EQ 25 Gain | dB | -15 | 15 | 0 | continuous, linear | automatable | EQ (3) |
+| 155 | `eq25Q` | EQ 25 Q |  | 0.3 | 116 | 1 | continuous, linear | automatable | EQ (3) |
+| 156 | `eq25On` | EQ 25 |  | off | on | off | toggle | automatable | EQ (3) |
+| 157 | `eq26Type` | EQ 26 Type |  | 0 | 5 | Bell (0) | 0 Bell, 1 Low Shelf, 2 High Shelf, 3 Notch, 4 All-pass 1st, 5 All-pass 2nd | automatable | EQ (3) |
+| 158 | `eq26Freq` | EQ 26 Freq | Hz | 20 | 20000 | 5000 | whole steps | automatable | EQ (3) |
+| 159 | `eq26Gain` | EQ 26 Gain | dB | -15 | 15 | 0 | continuous, linear | automatable | EQ (3) |
+| 160 | `eq26Q` | EQ 26 Q |  | 0.3 | 116 | 1 | continuous, linear | automatable | EQ (3) |
+| 161 | `eq26On` | EQ 26 |  | off | on | off | toggle | automatable | EQ (3) |
+| 162 | `eq27Type` | EQ 27 Type |  | 0 | 5 | Bell (0) | 0 Bell, 1 Low Shelf, 2 High Shelf, 3 Notch, 4 All-pass 1st, 5 All-pass 2nd | automatable | EQ (3) |
+| 163 | `eq27Freq` | EQ 27 Freq | Hz | 20 | 20000 | 6300 | whole steps | automatable | EQ (3) |
+| 164 | `eq27Gain` | EQ 27 Gain | dB | -15 | 15 | 0 | continuous, linear | automatable | EQ (3) |
+| 165 | `eq27Q` | EQ 27 Q |  | 0.3 | 116 | 1 | continuous, linear | automatable | EQ (3) |
+| 166 | `eq27On` | EQ 27 |  | off | on | off | toggle | automatable | EQ (3) |
+| 167 | `eq28Type` | EQ 28 Type |  | 0 | 5 | Bell (0) | 0 Bell, 1 Low Shelf, 2 High Shelf, 3 Notch, 4 All-pass 1st, 5 All-pass 2nd | automatable | EQ (3) |
+| 168 | `eq28Freq` | EQ 28 Freq | Hz | 20 | 20000 | 8000 | whole steps | automatable | EQ (3) |
+| 169 | `eq28Gain` | EQ 28 Gain | dB | -15 | 15 | 0 | continuous, linear | automatable | EQ (3) |
+| 170 | `eq28Q` | EQ 28 Q |  | 0.3 | 116 | 1 | continuous, linear | automatable | EQ (3) |
+| 171 | `eq28On` | EQ 28 |  | off | on | off | toggle | automatable | EQ (3) |
+| 172 | `eq29Type` | EQ 29 Type |  | 0 | 5 | Bell (0) | 0 Bell, 1 Low Shelf, 2 High Shelf, 3 Notch, 4 All-pass 1st, 5 All-pass 2nd | automatable | EQ (3) |
+| 173 | `eq29Freq` | EQ 29 Freq | Hz | 20 | 20000 | 9000 | whole steps | automatable | EQ (3) |
+| 174 | `eq29Gain` | EQ 29 Gain | dB | -15 | 15 | 0 | continuous, linear | automatable | EQ (3) |
+| 175 | `eq29Q` | EQ 29 Q |  | 0.3 | 116 | 1 | continuous, linear | automatable | EQ (3) |
+| 176 | `eq29On` | EQ 29 |  | off | on | off | toggle | automatable | EQ (3) |
+| 177 | `eq30Type` | EQ 30 Type |  | 0 | 5 | Bell (0) | 0 Bell, 1 Low Shelf, 2 High Shelf, 3 Notch, 4 All-pass 1st, 5 All-pass 2nd | automatable | EQ (3) |
+| 178 | `eq30Freq` | EQ 30 Freq | Hz | 20 | 20000 | 11200 | whole steps | automatable | EQ (3) |
+| 179 | `eq30Gain` | EQ 30 Gain | dB | -15 | 15 | 0 | continuous, linear | automatable | EQ (3) |
+| 180 | `eq30Q` | EQ 30 Q |  | 0.3 | 116 | 1 | continuous, linear | automatable | EQ (3) |
+| 181 | `eq30On` | EQ 30 |  | off | on | off | toggle | automatable | EQ (3) |
+| 182 | `eq31Type` | EQ 31 Type |  | 0 | 5 | Bell (0) | 0 Bell, 1 Low Shelf, 2 High Shelf, 3 Notch, 4 All-pass 1st, 5 All-pass 2nd | automatable | EQ (3) |
+| 183 | `eq31Freq` | EQ 31 Freq | Hz | 20 | 20000 | 14000 | whole steps | automatable | EQ (3) |
+| 184 | `eq31Gain` | EQ 31 Gain | dB | -15 | 15 | 0 | continuous, linear | automatable | EQ (3) |
+| 185 | `eq31Q` | EQ 31 Q |  | 0.3 | 116 | 1 | continuous, linear | automatable | EQ (3) |
+| 186 | `eq31On` | EQ 31 |  | off | on | off | toggle | automatable | EQ (3) |
+| 187 | `eq32Type` | EQ 32 Type |  | 0 | 5 | High Shelf (2) | 0 Bell, 1 Low Shelf, 2 High Shelf, 3 Notch, 4 All-pass 1st, 5 All-pass 2nd | automatable | EQ (3) |
+| 188 | `eq32Freq` | EQ 32 Freq | Hz | 20 | 20000 | 18000 | whole steps | automatable | EQ (3) |
+| 189 | `eq32Gain` | EQ 32 Gain | dB | -15 | 15 | 0 | continuous, linear | automatable | EQ (3) |
+| 190 | `eq32Q` | EQ 32 Q |  | 0.3 | 116 | 1 | continuous, linear | automatable | EQ (3) |
+| 191 | `eq32On` | EQ 32 |  | off | on | off | toggle | automatable | EQ (3) |
 
 ## Bypass
 

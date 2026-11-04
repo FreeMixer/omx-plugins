@@ -7,8 +7,8 @@
   "vendor": "openmixer",
   "url": "https://github.com/FreeMixer/omx-plugins",
   "version": "0.13.0",
-  "description": "The OpenMixer console's channel strip in one plugin: input trim, high- and low-pass filters, gate, four-band EQ and compressor, in the console's order or any other. No DSP of its own: each stage is omx-dsp's instance face of the console's kernel, called in order.",
-  "summary": "The console's channel strip in one plugin: input trim, HPF/LPF, gate, four-band EQ and compressor, in the desk's order or any other. Stereo, real-time safe.",
+  "description": "The OpenMixer console's channel strip in one plugin: input trim, high- and low-pass filters, gate, a parametric EQ of as many bands as its Bands control says, and compressor, in the console's order or any other. No DSP of its own: each stage is omx-dsp's instance face of the console's kernel, called in order.",
+  "summary": "The console's channel strip in one plugin: input trim, HPF/LPF, gate, EQ of {min:eqBands} to {max:eqBands} bands ({default:eqBands} at first) and compressor, in the desk's order or any other. Stereo, real-time safe.",
   "clap": {
     "id": "org.openmixer.strip",
     "features": [
@@ -77,7 +77,7 @@
           "unit": "dB/oct"
         }
       ],
-      "faceBands": "eq8",
+      "faceBands": "eq32",
       "fixed": {
         "bandType": "default",
         "freq": "default",
@@ -312,8 +312,1052 @@
           "ref": "EQ_BAND_ONS"
         }
       ],
-      "bands": "strip",
-      "faceBands": "eq8",
+      "bands": "eq32",
+      "faceBands": "eq32",
+      "bandCount": {
+        "symbol": "eqBands",
+        "name": "EQ Bands",
+        "default": "strip",
+        "gates": "bandOn"
+      },
+      "appended": [
+        {
+          "symbol": "eq5Type",
+          "name": "EQ 5 Type",
+          "ref": "EQ_BAND_TYPES",
+          "defaultBand": {
+            "strip": "eq32",
+            "index": 4,
+            "of": "type"
+          }
+        },
+        {
+          "symbol": "eq5Freq",
+          "name": "EQ 5 Freq",
+          "ref": "EQ_FREQ_RANGE",
+          "defaultBand": {
+            "strip": "eq32",
+            "index": 4,
+            "of": "centre"
+          }
+        },
+        {
+          "symbol": "eq5Gain",
+          "name": "EQ 5 Gain",
+          "ref": "EQ_GAIN_RANGE",
+          "defaultRef": "EQ_BAND_DEFAULTS.gainDb"
+        },
+        {
+          "symbol": "eq5Q",
+          "name": "EQ 5 Q",
+          "ref": "EQ_Q_RANGE",
+          "defaultRef": "EQ_BAND_DEFAULTS.q"
+        },
+        {
+          "symbol": "eq5On",
+          "name": "EQ 5",
+          "ref": "EQ_BAND_ONS"
+        },
+        {
+          "symbol": "eq6Type",
+          "name": "EQ 6 Type",
+          "ref": "EQ_BAND_TYPES",
+          "defaultBand": {
+            "strip": "eq32",
+            "index": 5,
+            "of": "type"
+          }
+        },
+        {
+          "symbol": "eq6Freq",
+          "name": "EQ 6 Freq",
+          "ref": "EQ_FREQ_RANGE",
+          "defaultBand": {
+            "strip": "eq32",
+            "index": 5,
+            "of": "centre"
+          }
+        },
+        {
+          "symbol": "eq6Gain",
+          "name": "EQ 6 Gain",
+          "ref": "EQ_GAIN_RANGE",
+          "defaultRef": "EQ_BAND_DEFAULTS.gainDb"
+        },
+        {
+          "symbol": "eq6Q",
+          "name": "EQ 6 Q",
+          "ref": "EQ_Q_RANGE",
+          "defaultRef": "EQ_BAND_DEFAULTS.q"
+        },
+        {
+          "symbol": "eq6On",
+          "name": "EQ 6",
+          "ref": "EQ_BAND_ONS"
+        },
+        {
+          "symbol": "eq7Type",
+          "name": "EQ 7 Type",
+          "ref": "EQ_BAND_TYPES",
+          "defaultBand": {
+            "strip": "eq32",
+            "index": 6,
+            "of": "type"
+          }
+        },
+        {
+          "symbol": "eq7Freq",
+          "name": "EQ 7 Freq",
+          "ref": "EQ_FREQ_RANGE",
+          "defaultBand": {
+            "strip": "eq32",
+            "index": 6,
+            "of": "centre"
+          }
+        },
+        {
+          "symbol": "eq7Gain",
+          "name": "EQ 7 Gain",
+          "ref": "EQ_GAIN_RANGE",
+          "defaultRef": "EQ_BAND_DEFAULTS.gainDb"
+        },
+        {
+          "symbol": "eq7Q",
+          "name": "EQ 7 Q",
+          "ref": "EQ_Q_RANGE",
+          "defaultRef": "EQ_BAND_DEFAULTS.q"
+        },
+        {
+          "symbol": "eq7On",
+          "name": "EQ 7",
+          "ref": "EQ_BAND_ONS"
+        },
+        {
+          "symbol": "eq8Type",
+          "name": "EQ 8 Type",
+          "ref": "EQ_BAND_TYPES",
+          "defaultBand": {
+            "strip": "eq32",
+            "index": 7,
+            "of": "type"
+          }
+        },
+        {
+          "symbol": "eq8Freq",
+          "name": "EQ 8 Freq",
+          "ref": "EQ_FREQ_RANGE",
+          "defaultBand": {
+            "strip": "eq32",
+            "index": 7,
+            "of": "centre"
+          }
+        },
+        {
+          "symbol": "eq8Gain",
+          "name": "EQ 8 Gain",
+          "ref": "EQ_GAIN_RANGE",
+          "defaultRef": "EQ_BAND_DEFAULTS.gainDb"
+        },
+        {
+          "symbol": "eq8Q",
+          "name": "EQ 8 Q",
+          "ref": "EQ_Q_RANGE",
+          "defaultRef": "EQ_BAND_DEFAULTS.q"
+        },
+        {
+          "symbol": "eq8On",
+          "name": "EQ 8",
+          "ref": "EQ_BAND_ONS"
+        },
+        {
+          "symbol": "eq9Type",
+          "name": "EQ 9 Type",
+          "ref": "EQ_BAND_TYPES",
+          "defaultBand": {
+            "strip": "eq32",
+            "index": 8,
+            "of": "type"
+          }
+        },
+        {
+          "symbol": "eq9Freq",
+          "name": "EQ 9 Freq",
+          "ref": "EQ_FREQ_RANGE",
+          "defaultBand": {
+            "strip": "eq32",
+            "index": 8,
+            "of": "centre"
+          }
+        },
+        {
+          "symbol": "eq9Gain",
+          "name": "EQ 9 Gain",
+          "ref": "EQ_GAIN_RANGE",
+          "defaultRef": "EQ_BAND_DEFAULTS.gainDb"
+        },
+        {
+          "symbol": "eq9Q",
+          "name": "EQ 9 Q",
+          "ref": "EQ_Q_RANGE",
+          "defaultRef": "EQ_BAND_DEFAULTS.q"
+        },
+        {
+          "symbol": "eq9On",
+          "name": "EQ 9",
+          "ref": "EQ_BAND_ONS"
+        },
+        {
+          "symbol": "eq10Type",
+          "name": "EQ 10 Type",
+          "ref": "EQ_BAND_TYPES",
+          "defaultBand": {
+            "strip": "eq32",
+            "index": 9,
+            "of": "type"
+          }
+        },
+        {
+          "symbol": "eq10Freq",
+          "name": "EQ 10 Freq",
+          "ref": "EQ_FREQ_RANGE",
+          "defaultBand": {
+            "strip": "eq32",
+            "index": 9,
+            "of": "centre"
+          }
+        },
+        {
+          "symbol": "eq10Gain",
+          "name": "EQ 10 Gain",
+          "ref": "EQ_GAIN_RANGE",
+          "defaultRef": "EQ_BAND_DEFAULTS.gainDb"
+        },
+        {
+          "symbol": "eq10Q",
+          "name": "EQ 10 Q",
+          "ref": "EQ_Q_RANGE",
+          "defaultRef": "EQ_BAND_DEFAULTS.q"
+        },
+        {
+          "symbol": "eq10On",
+          "name": "EQ 10",
+          "ref": "EQ_BAND_ONS"
+        },
+        {
+          "symbol": "eq11Type",
+          "name": "EQ 11 Type",
+          "ref": "EQ_BAND_TYPES",
+          "defaultBand": {
+            "strip": "eq32",
+            "index": 10,
+            "of": "type"
+          }
+        },
+        {
+          "symbol": "eq11Freq",
+          "name": "EQ 11 Freq",
+          "ref": "EQ_FREQ_RANGE",
+          "defaultBand": {
+            "strip": "eq32",
+            "index": 10,
+            "of": "centre"
+          }
+        },
+        {
+          "symbol": "eq11Gain",
+          "name": "EQ 11 Gain",
+          "ref": "EQ_GAIN_RANGE",
+          "defaultRef": "EQ_BAND_DEFAULTS.gainDb"
+        },
+        {
+          "symbol": "eq11Q",
+          "name": "EQ 11 Q",
+          "ref": "EQ_Q_RANGE",
+          "defaultRef": "EQ_BAND_DEFAULTS.q"
+        },
+        {
+          "symbol": "eq11On",
+          "name": "EQ 11",
+          "ref": "EQ_BAND_ONS"
+        },
+        {
+          "symbol": "eq12Type",
+          "name": "EQ 12 Type",
+          "ref": "EQ_BAND_TYPES",
+          "defaultBand": {
+            "strip": "eq32",
+            "index": 11,
+            "of": "type"
+          }
+        },
+        {
+          "symbol": "eq12Freq",
+          "name": "EQ 12 Freq",
+          "ref": "EQ_FREQ_RANGE",
+          "defaultBand": {
+            "strip": "eq32",
+            "index": 11,
+            "of": "centre"
+          }
+        },
+        {
+          "symbol": "eq12Gain",
+          "name": "EQ 12 Gain",
+          "ref": "EQ_GAIN_RANGE",
+          "defaultRef": "EQ_BAND_DEFAULTS.gainDb"
+        },
+        {
+          "symbol": "eq12Q",
+          "name": "EQ 12 Q",
+          "ref": "EQ_Q_RANGE",
+          "defaultRef": "EQ_BAND_DEFAULTS.q"
+        },
+        {
+          "symbol": "eq12On",
+          "name": "EQ 12",
+          "ref": "EQ_BAND_ONS"
+        },
+        {
+          "symbol": "eq13Type",
+          "name": "EQ 13 Type",
+          "ref": "EQ_BAND_TYPES",
+          "defaultBand": {
+            "strip": "eq32",
+            "index": 12,
+            "of": "type"
+          }
+        },
+        {
+          "symbol": "eq13Freq",
+          "name": "EQ 13 Freq",
+          "ref": "EQ_FREQ_RANGE",
+          "defaultBand": {
+            "strip": "eq32",
+            "index": 12,
+            "of": "centre"
+          }
+        },
+        {
+          "symbol": "eq13Gain",
+          "name": "EQ 13 Gain",
+          "ref": "EQ_GAIN_RANGE",
+          "defaultRef": "EQ_BAND_DEFAULTS.gainDb"
+        },
+        {
+          "symbol": "eq13Q",
+          "name": "EQ 13 Q",
+          "ref": "EQ_Q_RANGE",
+          "defaultRef": "EQ_BAND_DEFAULTS.q"
+        },
+        {
+          "symbol": "eq13On",
+          "name": "EQ 13",
+          "ref": "EQ_BAND_ONS"
+        },
+        {
+          "symbol": "eq14Type",
+          "name": "EQ 14 Type",
+          "ref": "EQ_BAND_TYPES",
+          "defaultBand": {
+            "strip": "eq32",
+            "index": 13,
+            "of": "type"
+          }
+        },
+        {
+          "symbol": "eq14Freq",
+          "name": "EQ 14 Freq",
+          "ref": "EQ_FREQ_RANGE",
+          "defaultBand": {
+            "strip": "eq32",
+            "index": 13,
+            "of": "centre"
+          }
+        },
+        {
+          "symbol": "eq14Gain",
+          "name": "EQ 14 Gain",
+          "ref": "EQ_GAIN_RANGE",
+          "defaultRef": "EQ_BAND_DEFAULTS.gainDb"
+        },
+        {
+          "symbol": "eq14Q",
+          "name": "EQ 14 Q",
+          "ref": "EQ_Q_RANGE",
+          "defaultRef": "EQ_BAND_DEFAULTS.q"
+        },
+        {
+          "symbol": "eq14On",
+          "name": "EQ 14",
+          "ref": "EQ_BAND_ONS"
+        },
+        {
+          "symbol": "eq15Type",
+          "name": "EQ 15 Type",
+          "ref": "EQ_BAND_TYPES",
+          "defaultBand": {
+            "strip": "eq32",
+            "index": 14,
+            "of": "type"
+          }
+        },
+        {
+          "symbol": "eq15Freq",
+          "name": "EQ 15 Freq",
+          "ref": "EQ_FREQ_RANGE",
+          "defaultBand": {
+            "strip": "eq32",
+            "index": 14,
+            "of": "centre"
+          }
+        },
+        {
+          "symbol": "eq15Gain",
+          "name": "EQ 15 Gain",
+          "ref": "EQ_GAIN_RANGE",
+          "defaultRef": "EQ_BAND_DEFAULTS.gainDb"
+        },
+        {
+          "symbol": "eq15Q",
+          "name": "EQ 15 Q",
+          "ref": "EQ_Q_RANGE",
+          "defaultRef": "EQ_BAND_DEFAULTS.q"
+        },
+        {
+          "symbol": "eq15On",
+          "name": "EQ 15",
+          "ref": "EQ_BAND_ONS"
+        },
+        {
+          "symbol": "eq16Type",
+          "name": "EQ 16 Type",
+          "ref": "EQ_BAND_TYPES",
+          "defaultBand": {
+            "strip": "eq32",
+            "index": 15,
+            "of": "type"
+          }
+        },
+        {
+          "symbol": "eq16Freq",
+          "name": "EQ 16 Freq",
+          "ref": "EQ_FREQ_RANGE",
+          "defaultBand": {
+            "strip": "eq32",
+            "index": 15,
+            "of": "centre"
+          }
+        },
+        {
+          "symbol": "eq16Gain",
+          "name": "EQ 16 Gain",
+          "ref": "EQ_GAIN_RANGE",
+          "defaultRef": "EQ_BAND_DEFAULTS.gainDb"
+        },
+        {
+          "symbol": "eq16Q",
+          "name": "EQ 16 Q",
+          "ref": "EQ_Q_RANGE",
+          "defaultRef": "EQ_BAND_DEFAULTS.q"
+        },
+        {
+          "symbol": "eq16On",
+          "name": "EQ 16",
+          "ref": "EQ_BAND_ONS"
+        },
+        {
+          "symbol": "eq17Type",
+          "name": "EQ 17 Type",
+          "ref": "EQ_BAND_TYPES",
+          "defaultBand": {
+            "strip": "eq32",
+            "index": 16,
+            "of": "type"
+          }
+        },
+        {
+          "symbol": "eq17Freq",
+          "name": "EQ 17 Freq",
+          "ref": "EQ_FREQ_RANGE",
+          "defaultBand": {
+            "strip": "eq32",
+            "index": 16,
+            "of": "centre"
+          }
+        },
+        {
+          "symbol": "eq17Gain",
+          "name": "EQ 17 Gain",
+          "ref": "EQ_GAIN_RANGE",
+          "defaultRef": "EQ_BAND_DEFAULTS.gainDb"
+        },
+        {
+          "symbol": "eq17Q",
+          "name": "EQ 17 Q",
+          "ref": "EQ_Q_RANGE",
+          "defaultRef": "EQ_BAND_DEFAULTS.q"
+        },
+        {
+          "symbol": "eq17On",
+          "name": "EQ 17",
+          "ref": "EQ_BAND_ONS"
+        },
+        {
+          "symbol": "eq18Type",
+          "name": "EQ 18 Type",
+          "ref": "EQ_BAND_TYPES",
+          "defaultBand": {
+            "strip": "eq32",
+            "index": 17,
+            "of": "type"
+          }
+        },
+        {
+          "symbol": "eq18Freq",
+          "name": "EQ 18 Freq",
+          "ref": "EQ_FREQ_RANGE",
+          "defaultBand": {
+            "strip": "eq32",
+            "index": 17,
+            "of": "centre"
+          }
+        },
+        {
+          "symbol": "eq18Gain",
+          "name": "EQ 18 Gain",
+          "ref": "EQ_GAIN_RANGE",
+          "defaultRef": "EQ_BAND_DEFAULTS.gainDb"
+        },
+        {
+          "symbol": "eq18Q",
+          "name": "EQ 18 Q",
+          "ref": "EQ_Q_RANGE",
+          "defaultRef": "EQ_BAND_DEFAULTS.q"
+        },
+        {
+          "symbol": "eq18On",
+          "name": "EQ 18",
+          "ref": "EQ_BAND_ONS"
+        },
+        {
+          "symbol": "eq19Type",
+          "name": "EQ 19 Type",
+          "ref": "EQ_BAND_TYPES",
+          "defaultBand": {
+            "strip": "eq32",
+            "index": 18,
+            "of": "type"
+          }
+        },
+        {
+          "symbol": "eq19Freq",
+          "name": "EQ 19 Freq",
+          "ref": "EQ_FREQ_RANGE",
+          "defaultBand": {
+            "strip": "eq32",
+            "index": 18,
+            "of": "centre"
+          }
+        },
+        {
+          "symbol": "eq19Gain",
+          "name": "EQ 19 Gain",
+          "ref": "EQ_GAIN_RANGE",
+          "defaultRef": "EQ_BAND_DEFAULTS.gainDb"
+        },
+        {
+          "symbol": "eq19Q",
+          "name": "EQ 19 Q",
+          "ref": "EQ_Q_RANGE",
+          "defaultRef": "EQ_BAND_DEFAULTS.q"
+        },
+        {
+          "symbol": "eq19On",
+          "name": "EQ 19",
+          "ref": "EQ_BAND_ONS"
+        },
+        {
+          "symbol": "eq20Type",
+          "name": "EQ 20 Type",
+          "ref": "EQ_BAND_TYPES",
+          "defaultBand": {
+            "strip": "eq32",
+            "index": 19,
+            "of": "type"
+          }
+        },
+        {
+          "symbol": "eq20Freq",
+          "name": "EQ 20 Freq",
+          "ref": "EQ_FREQ_RANGE",
+          "defaultBand": {
+            "strip": "eq32",
+            "index": 19,
+            "of": "centre"
+          }
+        },
+        {
+          "symbol": "eq20Gain",
+          "name": "EQ 20 Gain",
+          "ref": "EQ_GAIN_RANGE",
+          "defaultRef": "EQ_BAND_DEFAULTS.gainDb"
+        },
+        {
+          "symbol": "eq20Q",
+          "name": "EQ 20 Q",
+          "ref": "EQ_Q_RANGE",
+          "defaultRef": "EQ_BAND_DEFAULTS.q"
+        },
+        {
+          "symbol": "eq20On",
+          "name": "EQ 20",
+          "ref": "EQ_BAND_ONS"
+        },
+        {
+          "symbol": "eq21Type",
+          "name": "EQ 21 Type",
+          "ref": "EQ_BAND_TYPES",
+          "defaultBand": {
+            "strip": "eq32",
+            "index": 20,
+            "of": "type"
+          }
+        },
+        {
+          "symbol": "eq21Freq",
+          "name": "EQ 21 Freq",
+          "ref": "EQ_FREQ_RANGE",
+          "defaultBand": {
+            "strip": "eq32",
+            "index": 20,
+            "of": "centre"
+          }
+        },
+        {
+          "symbol": "eq21Gain",
+          "name": "EQ 21 Gain",
+          "ref": "EQ_GAIN_RANGE",
+          "defaultRef": "EQ_BAND_DEFAULTS.gainDb"
+        },
+        {
+          "symbol": "eq21Q",
+          "name": "EQ 21 Q",
+          "ref": "EQ_Q_RANGE",
+          "defaultRef": "EQ_BAND_DEFAULTS.q"
+        },
+        {
+          "symbol": "eq21On",
+          "name": "EQ 21",
+          "ref": "EQ_BAND_ONS"
+        },
+        {
+          "symbol": "eq22Type",
+          "name": "EQ 22 Type",
+          "ref": "EQ_BAND_TYPES",
+          "defaultBand": {
+            "strip": "eq32",
+            "index": 21,
+            "of": "type"
+          }
+        },
+        {
+          "symbol": "eq22Freq",
+          "name": "EQ 22 Freq",
+          "ref": "EQ_FREQ_RANGE",
+          "defaultBand": {
+            "strip": "eq32",
+            "index": 21,
+            "of": "centre"
+          }
+        },
+        {
+          "symbol": "eq22Gain",
+          "name": "EQ 22 Gain",
+          "ref": "EQ_GAIN_RANGE",
+          "defaultRef": "EQ_BAND_DEFAULTS.gainDb"
+        },
+        {
+          "symbol": "eq22Q",
+          "name": "EQ 22 Q",
+          "ref": "EQ_Q_RANGE",
+          "defaultRef": "EQ_BAND_DEFAULTS.q"
+        },
+        {
+          "symbol": "eq22On",
+          "name": "EQ 22",
+          "ref": "EQ_BAND_ONS"
+        },
+        {
+          "symbol": "eq23Type",
+          "name": "EQ 23 Type",
+          "ref": "EQ_BAND_TYPES",
+          "defaultBand": {
+            "strip": "eq32",
+            "index": 22,
+            "of": "type"
+          }
+        },
+        {
+          "symbol": "eq23Freq",
+          "name": "EQ 23 Freq",
+          "ref": "EQ_FREQ_RANGE",
+          "defaultBand": {
+            "strip": "eq32",
+            "index": 22,
+            "of": "centre"
+          }
+        },
+        {
+          "symbol": "eq23Gain",
+          "name": "EQ 23 Gain",
+          "ref": "EQ_GAIN_RANGE",
+          "defaultRef": "EQ_BAND_DEFAULTS.gainDb"
+        },
+        {
+          "symbol": "eq23Q",
+          "name": "EQ 23 Q",
+          "ref": "EQ_Q_RANGE",
+          "defaultRef": "EQ_BAND_DEFAULTS.q"
+        },
+        {
+          "symbol": "eq23On",
+          "name": "EQ 23",
+          "ref": "EQ_BAND_ONS"
+        },
+        {
+          "symbol": "eq24Type",
+          "name": "EQ 24 Type",
+          "ref": "EQ_BAND_TYPES",
+          "defaultBand": {
+            "strip": "eq32",
+            "index": 23,
+            "of": "type"
+          }
+        },
+        {
+          "symbol": "eq24Freq",
+          "name": "EQ 24 Freq",
+          "ref": "EQ_FREQ_RANGE",
+          "defaultBand": {
+            "strip": "eq32",
+            "index": 23,
+            "of": "centre"
+          }
+        },
+        {
+          "symbol": "eq24Gain",
+          "name": "EQ 24 Gain",
+          "ref": "EQ_GAIN_RANGE",
+          "defaultRef": "EQ_BAND_DEFAULTS.gainDb"
+        },
+        {
+          "symbol": "eq24Q",
+          "name": "EQ 24 Q",
+          "ref": "EQ_Q_RANGE",
+          "defaultRef": "EQ_BAND_DEFAULTS.q"
+        },
+        {
+          "symbol": "eq24On",
+          "name": "EQ 24",
+          "ref": "EQ_BAND_ONS"
+        },
+        {
+          "symbol": "eq25Type",
+          "name": "EQ 25 Type",
+          "ref": "EQ_BAND_TYPES",
+          "defaultBand": {
+            "strip": "eq32",
+            "index": 24,
+            "of": "type"
+          }
+        },
+        {
+          "symbol": "eq25Freq",
+          "name": "EQ 25 Freq",
+          "ref": "EQ_FREQ_RANGE",
+          "defaultBand": {
+            "strip": "eq32",
+            "index": 24,
+            "of": "centre"
+          }
+        },
+        {
+          "symbol": "eq25Gain",
+          "name": "EQ 25 Gain",
+          "ref": "EQ_GAIN_RANGE",
+          "defaultRef": "EQ_BAND_DEFAULTS.gainDb"
+        },
+        {
+          "symbol": "eq25Q",
+          "name": "EQ 25 Q",
+          "ref": "EQ_Q_RANGE",
+          "defaultRef": "EQ_BAND_DEFAULTS.q"
+        },
+        {
+          "symbol": "eq25On",
+          "name": "EQ 25",
+          "ref": "EQ_BAND_ONS"
+        },
+        {
+          "symbol": "eq26Type",
+          "name": "EQ 26 Type",
+          "ref": "EQ_BAND_TYPES",
+          "defaultBand": {
+            "strip": "eq32",
+            "index": 25,
+            "of": "type"
+          }
+        },
+        {
+          "symbol": "eq26Freq",
+          "name": "EQ 26 Freq",
+          "ref": "EQ_FREQ_RANGE",
+          "defaultBand": {
+            "strip": "eq32",
+            "index": 25,
+            "of": "centre"
+          }
+        },
+        {
+          "symbol": "eq26Gain",
+          "name": "EQ 26 Gain",
+          "ref": "EQ_GAIN_RANGE",
+          "defaultRef": "EQ_BAND_DEFAULTS.gainDb"
+        },
+        {
+          "symbol": "eq26Q",
+          "name": "EQ 26 Q",
+          "ref": "EQ_Q_RANGE",
+          "defaultRef": "EQ_BAND_DEFAULTS.q"
+        },
+        {
+          "symbol": "eq26On",
+          "name": "EQ 26",
+          "ref": "EQ_BAND_ONS"
+        },
+        {
+          "symbol": "eq27Type",
+          "name": "EQ 27 Type",
+          "ref": "EQ_BAND_TYPES",
+          "defaultBand": {
+            "strip": "eq32",
+            "index": 26,
+            "of": "type"
+          }
+        },
+        {
+          "symbol": "eq27Freq",
+          "name": "EQ 27 Freq",
+          "ref": "EQ_FREQ_RANGE",
+          "defaultBand": {
+            "strip": "eq32",
+            "index": 26,
+            "of": "centre"
+          }
+        },
+        {
+          "symbol": "eq27Gain",
+          "name": "EQ 27 Gain",
+          "ref": "EQ_GAIN_RANGE",
+          "defaultRef": "EQ_BAND_DEFAULTS.gainDb"
+        },
+        {
+          "symbol": "eq27Q",
+          "name": "EQ 27 Q",
+          "ref": "EQ_Q_RANGE",
+          "defaultRef": "EQ_BAND_DEFAULTS.q"
+        },
+        {
+          "symbol": "eq27On",
+          "name": "EQ 27",
+          "ref": "EQ_BAND_ONS"
+        },
+        {
+          "symbol": "eq28Type",
+          "name": "EQ 28 Type",
+          "ref": "EQ_BAND_TYPES",
+          "defaultBand": {
+            "strip": "eq32",
+            "index": 27,
+            "of": "type"
+          }
+        },
+        {
+          "symbol": "eq28Freq",
+          "name": "EQ 28 Freq",
+          "ref": "EQ_FREQ_RANGE",
+          "defaultBand": {
+            "strip": "eq32",
+            "index": 27,
+            "of": "centre"
+          }
+        },
+        {
+          "symbol": "eq28Gain",
+          "name": "EQ 28 Gain",
+          "ref": "EQ_GAIN_RANGE",
+          "defaultRef": "EQ_BAND_DEFAULTS.gainDb"
+        },
+        {
+          "symbol": "eq28Q",
+          "name": "EQ 28 Q",
+          "ref": "EQ_Q_RANGE",
+          "defaultRef": "EQ_BAND_DEFAULTS.q"
+        },
+        {
+          "symbol": "eq28On",
+          "name": "EQ 28",
+          "ref": "EQ_BAND_ONS"
+        },
+        {
+          "symbol": "eq29Type",
+          "name": "EQ 29 Type",
+          "ref": "EQ_BAND_TYPES",
+          "defaultBand": {
+            "strip": "eq32",
+            "index": 28,
+            "of": "type"
+          }
+        },
+        {
+          "symbol": "eq29Freq",
+          "name": "EQ 29 Freq",
+          "ref": "EQ_FREQ_RANGE",
+          "defaultBand": {
+            "strip": "eq32",
+            "index": 28,
+            "of": "centre"
+          }
+        },
+        {
+          "symbol": "eq29Gain",
+          "name": "EQ 29 Gain",
+          "ref": "EQ_GAIN_RANGE",
+          "defaultRef": "EQ_BAND_DEFAULTS.gainDb"
+        },
+        {
+          "symbol": "eq29Q",
+          "name": "EQ 29 Q",
+          "ref": "EQ_Q_RANGE",
+          "defaultRef": "EQ_BAND_DEFAULTS.q"
+        },
+        {
+          "symbol": "eq29On",
+          "name": "EQ 29",
+          "ref": "EQ_BAND_ONS"
+        },
+        {
+          "symbol": "eq30Type",
+          "name": "EQ 30 Type",
+          "ref": "EQ_BAND_TYPES",
+          "defaultBand": {
+            "strip": "eq32",
+            "index": 29,
+            "of": "type"
+          }
+        },
+        {
+          "symbol": "eq30Freq",
+          "name": "EQ 30 Freq",
+          "ref": "EQ_FREQ_RANGE",
+          "defaultBand": {
+            "strip": "eq32",
+            "index": 29,
+            "of": "centre"
+          }
+        },
+        {
+          "symbol": "eq30Gain",
+          "name": "EQ 30 Gain",
+          "ref": "EQ_GAIN_RANGE",
+          "defaultRef": "EQ_BAND_DEFAULTS.gainDb"
+        },
+        {
+          "symbol": "eq30Q",
+          "name": "EQ 30 Q",
+          "ref": "EQ_Q_RANGE",
+          "defaultRef": "EQ_BAND_DEFAULTS.q"
+        },
+        {
+          "symbol": "eq30On",
+          "name": "EQ 30",
+          "ref": "EQ_BAND_ONS"
+        },
+        {
+          "symbol": "eq31Type",
+          "name": "EQ 31 Type",
+          "ref": "EQ_BAND_TYPES",
+          "defaultBand": {
+            "strip": "eq32",
+            "index": 30,
+            "of": "type"
+          }
+        },
+        {
+          "symbol": "eq31Freq",
+          "name": "EQ 31 Freq",
+          "ref": "EQ_FREQ_RANGE",
+          "defaultBand": {
+            "strip": "eq32",
+            "index": 30,
+            "of": "centre"
+          }
+        },
+        {
+          "symbol": "eq31Gain",
+          "name": "EQ 31 Gain",
+          "ref": "EQ_GAIN_RANGE",
+          "defaultRef": "EQ_BAND_DEFAULTS.gainDb"
+        },
+        {
+          "symbol": "eq31Q",
+          "name": "EQ 31 Q",
+          "ref": "EQ_Q_RANGE",
+          "defaultRef": "EQ_BAND_DEFAULTS.q"
+        },
+        {
+          "symbol": "eq31On",
+          "name": "EQ 31",
+          "ref": "EQ_BAND_ONS"
+        },
+        {
+          "symbol": "eq32Type",
+          "name": "EQ 32 Type",
+          "ref": "EQ_BAND_TYPES",
+          "defaultBand": {
+            "strip": "eq32",
+            "index": 31,
+            "of": "type"
+          }
+        },
+        {
+          "symbol": "eq32Freq",
+          "name": "EQ 32 Freq",
+          "ref": "EQ_FREQ_RANGE",
+          "defaultBand": {
+            "strip": "eq32",
+            "index": 31,
+            "of": "centre"
+          }
+        },
+        {
+          "symbol": "eq32Gain",
+          "name": "EQ 32 Gain",
+          "ref": "EQ_GAIN_RANGE",
+          "defaultRef": "EQ_BAND_DEFAULTS.gainDb"
+        },
+        {
+          "symbol": "eq32Q",
+          "name": "EQ 32 Q",
+          "ref": "EQ_Q_RANGE",
+          "defaultRef": "EQ_BAND_DEFAULTS.q"
+        },
+        {
+          "symbol": "eq32On",
+          "name": "EQ 32",
+          "ref": "EQ_BAND_ONS"
+        }
+      ],
       "fixed": {
         "hpfOn": "off",
         "hpfFreq": {
@@ -626,6 +1670,818 @@
         "lv2:toggled"
       ]
     },
+    "eq5Type": {
+      "props": [
+        "lv2:enumeration",
+        "lv2:integer"
+      ],
+      "points": [
+        "0 Bell",
+        "1 Low Shelf",
+        "2 High Shelf",
+        "3 Notch",
+        "4 All-pass 1st",
+        "5 All-pass 2nd"
+      ]
+    },
+    "eq5Freq": {
+      "props": [
+        "lv2:integer",
+        "pprops:logarithmic"
+      ],
+      "unit": "units:hz"
+    },
+    "eq5Gain": {
+      "unit": "units:db"
+    },
+    "eq5On": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "eq6Type": {
+      "props": [
+        "lv2:enumeration",
+        "lv2:integer"
+      ],
+      "points": [
+        "0 Bell",
+        "1 Low Shelf",
+        "2 High Shelf",
+        "3 Notch",
+        "4 All-pass 1st",
+        "5 All-pass 2nd"
+      ]
+    },
+    "eq6Freq": {
+      "props": [
+        "lv2:integer",
+        "pprops:logarithmic"
+      ],
+      "unit": "units:hz"
+    },
+    "eq6Gain": {
+      "unit": "units:db"
+    },
+    "eq6On": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "eq7Type": {
+      "props": [
+        "lv2:enumeration",
+        "lv2:integer"
+      ],
+      "points": [
+        "0 Bell",
+        "1 Low Shelf",
+        "2 High Shelf",
+        "3 Notch",
+        "4 All-pass 1st",
+        "5 All-pass 2nd"
+      ]
+    },
+    "eq7Freq": {
+      "props": [
+        "lv2:integer",
+        "pprops:logarithmic"
+      ],
+      "unit": "units:hz"
+    },
+    "eq7Gain": {
+      "unit": "units:db"
+    },
+    "eq7On": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "eq8Type": {
+      "props": [
+        "lv2:enumeration",
+        "lv2:integer"
+      ],
+      "points": [
+        "0 Bell",
+        "1 Low Shelf",
+        "2 High Shelf",
+        "3 Notch",
+        "4 All-pass 1st",
+        "5 All-pass 2nd"
+      ]
+    },
+    "eq8Freq": {
+      "props": [
+        "lv2:integer",
+        "pprops:logarithmic"
+      ],
+      "unit": "units:hz"
+    },
+    "eq8Gain": {
+      "unit": "units:db"
+    },
+    "eq8On": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "eq9Type": {
+      "props": [
+        "lv2:enumeration",
+        "lv2:integer"
+      ],
+      "points": [
+        "0 Bell",
+        "1 Low Shelf",
+        "2 High Shelf",
+        "3 Notch",
+        "4 All-pass 1st",
+        "5 All-pass 2nd"
+      ]
+    },
+    "eq9Freq": {
+      "props": [
+        "lv2:integer",
+        "pprops:logarithmic"
+      ],
+      "unit": "units:hz"
+    },
+    "eq9Gain": {
+      "unit": "units:db"
+    },
+    "eq9On": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "eq10Type": {
+      "props": [
+        "lv2:enumeration",
+        "lv2:integer"
+      ],
+      "points": [
+        "0 Bell",
+        "1 Low Shelf",
+        "2 High Shelf",
+        "3 Notch",
+        "4 All-pass 1st",
+        "5 All-pass 2nd"
+      ]
+    },
+    "eq10Freq": {
+      "props": [
+        "lv2:integer",
+        "pprops:logarithmic"
+      ],
+      "unit": "units:hz"
+    },
+    "eq10Gain": {
+      "unit": "units:db"
+    },
+    "eq10On": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "eq11Type": {
+      "props": [
+        "lv2:enumeration",
+        "lv2:integer"
+      ],
+      "points": [
+        "0 Bell",
+        "1 Low Shelf",
+        "2 High Shelf",
+        "3 Notch",
+        "4 All-pass 1st",
+        "5 All-pass 2nd"
+      ]
+    },
+    "eq11Freq": {
+      "props": [
+        "lv2:integer",
+        "pprops:logarithmic"
+      ],
+      "unit": "units:hz"
+    },
+    "eq11Gain": {
+      "unit": "units:db"
+    },
+    "eq11On": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "eq12Type": {
+      "props": [
+        "lv2:enumeration",
+        "lv2:integer"
+      ],
+      "points": [
+        "0 Bell",
+        "1 Low Shelf",
+        "2 High Shelf",
+        "3 Notch",
+        "4 All-pass 1st",
+        "5 All-pass 2nd"
+      ]
+    },
+    "eq12Freq": {
+      "props": [
+        "lv2:integer",
+        "pprops:logarithmic"
+      ],
+      "unit": "units:hz"
+    },
+    "eq12Gain": {
+      "unit": "units:db"
+    },
+    "eq12On": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "eq13Type": {
+      "props": [
+        "lv2:enumeration",
+        "lv2:integer"
+      ],
+      "points": [
+        "0 Bell",
+        "1 Low Shelf",
+        "2 High Shelf",
+        "3 Notch",
+        "4 All-pass 1st",
+        "5 All-pass 2nd"
+      ]
+    },
+    "eq13Freq": {
+      "props": [
+        "lv2:integer",
+        "pprops:logarithmic"
+      ],
+      "unit": "units:hz"
+    },
+    "eq13Gain": {
+      "unit": "units:db"
+    },
+    "eq13On": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "eq14Type": {
+      "props": [
+        "lv2:enumeration",
+        "lv2:integer"
+      ],
+      "points": [
+        "0 Bell",
+        "1 Low Shelf",
+        "2 High Shelf",
+        "3 Notch",
+        "4 All-pass 1st",
+        "5 All-pass 2nd"
+      ]
+    },
+    "eq14Freq": {
+      "props": [
+        "lv2:integer",
+        "pprops:logarithmic"
+      ],
+      "unit": "units:hz"
+    },
+    "eq14Gain": {
+      "unit": "units:db"
+    },
+    "eq14On": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "eq15Type": {
+      "props": [
+        "lv2:enumeration",
+        "lv2:integer"
+      ],
+      "points": [
+        "0 Bell",
+        "1 Low Shelf",
+        "2 High Shelf",
+        "3 Notch",
+        "4 All-pass 1st",
+        "5 All-pass 2nd"
+      ]
+    },
+    "eq15Freq": {
+      "props": [
+        "lv2:integer",
+        "pprops:logarithmic"
+      ],
+      "unit": "units:hz"
+    },
+    "eq15Gain": {
+      "unit": "units:db"
+    },
+    "eq15On": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "eq16Type": {
+      "props": [
+        "lv2:enumeration",
+        "lv2:integer"
+      ],
+      "points": [
+        "0 Bell",
+        "1 Low Shelf",
+        "2 High Shelf",
+        "3 Notch",
+        "4 All-pass 1st",
+        "5 All-pass 2nd"
+      ]
+    },
+    "eq16Freq": {
+      "props": [
+        "lv2:integer",
+        "pprops:logarithmic"
+      ],
+      "unit": "units:hz"
+    },
+    "eq16Gain": {
+      "unit": "units:db"
+    },
+    "eq16On": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "eq17Type": {
+      "props": [
+        "lv2:enumeration",
+        "lv2:integer"
+      ],
+      "points": [
+        "0 Bell",
+        "1 Low Shelf",
+        "2 High Shelf",
+        "3 Notch",
+        "4 All-pass 1st",
+        "5 All-pass 2nd"
+      ]
+    },
+    "eq17Freq": {
+      "props": [
+        "lv2:integer",
+        "pprops:logarithmic"
+      ],
+      "unit": "units:hz"
+    },
+    "eq17Gain": {
+      "unit": "units:db"
+    },
+    "eq17On": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "eq18Type": {
+      "props": [
+        "lv2:enumeration",
+        "lv2:integer"
+      ],
+      "points": [
+        "0 Bell",
+        "1 Low Shelf",
+        "2 High Shelf",
+        "3 Notch",
+        "4 All-pass 1st",
+        "5 All-pass 2nd"
+      ]
+    },
+    "eq18Freq": {
+      "props": [
+        "lv2:integer",
+        "pprops:logarithmic"
+      ],
+      "unit": "units:hz"
+    },
+    "eq18Gain": {
+      "unit": "units:db"
+    },
+    "eq18On": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "eq19Type": {
+      "props": [
+        "lv2:enumeration",
+        "lv2:integer"
+      ],
+      "points": [
+        "0 Bell",
+        "1 Low Shelf",
+        "2 High Shelf",
+        "3 Notch",
+        "4 All-pass 1st",
+        "5 All-pass 2nd"
+      ]
+    },
+    "eq19Freq": {
+      "props": [
+        "lv2:integer",
+        "pprops:logarithmic"
+      ],
+      "unit": "units:hz"
+    },
+    "eq19Gain": {
+      "unit": "units:db"
+    },
+    "eq19On": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "eq20Type": {
+      "props": [
+        "lv2:enumeration",
+        "lv2:integer"
+      ],
+      "points": [
+        "0 Bell",
+        "1 Low Shelf",
+        "2 High Shelf",
+        "3 Notch",
+        "4 All-pass 1st",
+        "5 All-pass 2nd"
+      ]
+    },
+    "eq20Freq": {
+      "props": [
+        "lv2:integer",
+        "pprops:logarithmic"
+      ],
+      "unit": "units:hz"
+    },
+    "eq20Gain": {
+      "unit": "units:db"
+    },
+    "eq20On": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "eq21Type": {
+      "props": [
+        "lv2:enumeration",
+        "lv2:integer"
+      ],
+      "points": [
+        "0 Bell",
+        "1 Low Shelf",
+        "2 High Shelf",
+        "3 Notch",
+        "4 All-pass 1st",
+        "5 All-pass 2nd"
+      ]
+    },
+    "eq21Freq": {
+      "props": [
+        "lv2:integer",
+        "pprops:logarithmic"
+      ],
+      "unit": "units:hz"
+    },
+    "eq21Gain": {
+      "unit": "units:db"
+    },
+    "eq21On": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "eq22Type": {
+      "props": [
+        "lv2:enumeration",
+        "lv2:integer"
+      ],
+      "points": [
+        "0 Bell",
+        "1 Low Shelf",
+        "2 High Shelf",
+        "3 Notch",
+        "4 All-pass 1st",
+        "5 All-pass 2nd"
+      ]
+    },
+    "eq22Freq": {
+      "props": [
+        "lv2:integer",
+        "pprops:logarithmic"
+      ],
+      "unit": "units:hz"
+    },
+    "eq22Gain": {
+      "unit": "units:db"
+    },
+    "eq22On": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "eq23Type": {
+      "props": [
+        "lv2:enumeration",
+        "lv2:integer"
+      ],
+      "points": [
+        "0 Bell",
+        "1 Low Shelf",
+        "2 High Shelf",
+        "3 Notch",
+        "4 All-pass 1st",
+        "5 All-pass 2nd"
+      ]
+    },
+    "eq23Freq": {
+      "props": [
+        "lv2:integer",
+        "pprops:logarithmic"
+      ],
+      "unit": "units:hz"
+    },
+    "eq23Gain": {
+      "unit": "units:db"
+    },
+    "eq23On": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "eq24Type": {
+      "props": [
+        "lv2:enumeration",
+        "lv2:integer"
+      ],
+      "points": [
+        "0 Bell",
+        "1 Low Shelf",
+        "2 High Shelf",
+        "3 Notch",
+        "4 All-pass 1st",
+        "5 All-pass 2nd"
+      ]
+    },
+    "eq24Freq": {
+      "props": [
+        "lv2:integer",
+        "pprops:logarithmic"
+      ],
+      "unit": "units:hz"
+    },
+    "eq24Gain": {
+      "unit": "units:db"
+    },
+    "eq24On": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "eq25Type": {
+      "props": [
+        "lv2:enumeration",
+        "lv2:integer"
+      ],
+      "points": [
+        "0 Bell",
+        "1 Low Shelf",
+        "2 High Shelf",
+        "3 Notch",
+        "4 All-pass 1st",
+        "5 All-pass 2nd"
+      ]
+    },
+    "eq25Freq": {
+      "props": [
+        "lv2:integer",
+        "pprops:logarithmic"
+      ],
+      "unit": "units:hz"
+    },
+    "eq25Gain": {
+      "unit": "units:db"
+    },
+    "eq25On": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "eq26Type": {
+      "props": [
+        "lv2:enumeration",
+        "lv2:integer"
+      ],
+      "points": [
+        "0 Bell",
+        "1 Low Shelf",
+        "2 High Shelf",
+        "3 Notch",
+        "4 All-pass 1st",
+        "5 All-pass 2nd"
+      ]
+    },
+    "eq26Freq": {
+      "props": [
+        "lv2:integer",
+        "pprops:logarithmic"
+      ],
+      "unit": "units:hz"
+    },
+    "eq26Gain": {
+      "unit": "units:db"
+    },
+    "eq26On": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "eq27Type": {
+      "props": [
+        "lv2:enumeration",
+        "lv2:integer"
+      ],
+      "points": [
+        "0 Bell",
+        "1 Low Shelf",
+        "2 High Shelf",
+        "3 Notch",
+        "4 All-pass 1st",
+        "5 All-pass 2nd"
+      ]
+    },
+    "eq27Freq": {
+      "props": [
+        "lv2:integer",
+        "pprops:logarithmic"
+      ],
+      "unit": "units:hz"
+    },
+    "eq27Gain": {
+      "unit": "units:db"
+    },
+    "eq27On": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "eq28Type": {
+      "props": [
+        "lv2:enumeration",
+        "lv2:integer"
+      ],
+      "points": [
+        "0 Bell",
+        "1 Low Shelf",
+        "2 High Shelf",
+        "3 Notch",
+        "4 All-pass 1st",
+        "5 All-pass 2nd"
+      ]
+    },
+    "eq28Freq": {
+      "props": [
+        "lv2:integer",
+        "pprops:logarithmic"
+      ],
+      "unit": "units:hz"
+    },
+    "eq28Gain": {
+      "unit": "units:db"
+    },
+    "eq28On": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "eq29Type": {
+      "props": [
+        "lv2:enumeration",
+        "lv2:integer"
+      ],
+      "points": [
+        "0 Bell",
+        "1 Low Shelf",
+        "2 High Shelf",
+        "3 Notch",
+        "4 All-pass 1st",
+        "5 All-pass 2nd"
+      ]
+    },
+    "eq29Freq": {
+      "props": [
+        "lv2:integer",
+        "pprops:logarithmic"
+      ],
+      "unit": "units:hz"
+    },
+    "eq29Gain": {
+      "unit": "units:db"
+    },
+    "eq29On": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "eq30Type": {
+      "props": [
+        "lv2:enumeration",
+        "lv2:integer"
+      ],
+      "points": [
+        "0 Bell",
+        "1 Low Shelf",
+        "2 High Shelf",
+        "3 Notch",
+        "4 All-pass 1st",
+        "5 All-pass 2nd"
+      ]
+    },
+    "eq30Freq": {
+      "props": [
+        "lv2:integer",
+        "pprops:logarithmic"
+      ],
+      "unit": "units:hz"
+    },
+    "eq30Gain": {
+      "unit": "units:db"
+    },
+    "eq30On": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "eq31Type": {
+      "props": [
+        "lv2:enumeration",
+        "lv2:integer"
+      ],
+      "points": [
+        "0 Bell",
+        "1 Low Shelf",
+        "2 High Shelf",
+        "3 Notch",
+        "4 All-pass 1st",
+        "5 All-pass 2nd"
+      ]
+    },
+    "eq31Freq": {
+      "props": [
+        "lv2:integer",
+        "pprops:logarithmic"
+      ],
+      "unit": "units:hz"
+    },
+    "eq31Gain": {
+      "unit": "units:db"
+    },
+    "eq31On": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
+    "eq32Type": {
+      "props": [
+        "lv2:enumeration",
+        "lv2:integer"
+      ],
+      "points": [
+        "0 Bell",
+        "1 Low Shelf",
+        "2 High Shelf",
+        "3 Notch",
+        "4 All-pass 1st",
+        "5 All-pass 2nd"
+      ]
+    },
+    "eq32Freq": {
+      "props": [
+        "lv2:integer",
+        "pprops:logarithmic"
+      ],
+      "unit": "units:hz"
+    },
+    "eq32Gain": {
+      "unit": "units:db"
+    },
+    "eq32On": {
+      "props": [
+        "lv2:toggled"
+      ]
+    },
     "compOn": {
       "props": [
         "lv2:toggled"
@@ -674,6 +2530,11 @@
       ]
     },
     "order": {
+      "props": [
+        "lv2:integer"
+      ]
+    },
+    "eqBands": {
       "props": [
         "lv2:integer"
       ]
@@ -747,7 +2608,148 @@
     "+47 compKind",
     "+48 compMix",
     "+49 compDetectorOversampling",
-    "+50 order"
+    "+50 order",
+    "+51 eqBands",
+    "+52 eq5Type",
+    "+53 eq5Freq",
+    "+54 eq5Gain",
+    "+55 eq5Q",
+    "+56 eq5On",
+    "+57 eq6Type",
+    "+58 eq6Freq",
+    "+59 eq6Gain",
+    "+60 eq6Q",
+    "+61 eq6On",
+    "+62 eq7Type",
+    "+63 eq7Freq",
+    "+64 eq7Gain",
+    "+65 eq7Q",
+    "+66 eq7On",
+    "+67 eq8Type",
+    "+68 eq8Freq",
+    "+69 eq8Gain",
+    "+70 eq8Q",
+    "+71 eq8On",
+    "+72 eq9Type",
+    "+73 eq9Freq",
+    "+74 eq9Gain",
+    "+75 eq9Q",
+    "+76 eq9On",
+    "+77 eq10Type",
+    "+78 eq10Freq",
+    "+79 eq10Gain",
+    "+80 eq10Q",
+    "+81 eq10On",
+    "+82 eq11Type",
+    "+83 eq11Freq",
+    "+84 eq11Gain",
+    "+85 eq11Q",
+    "+86 eq11On",
+    "+87 eq12Type",
+    "+88 eq12Freq",
+    "+89 eq12Gain",
+    "+90 eq12Q",
+    "+91 eq12On",
+    "+92 eq13Type",
+    "+93 eq13Freq",
+    "+94 eq13Gain",
+    "+95 eq13Q",
+    "+96 eq13On",
+    "+97 eq14Type",
+    "+98 eq14Freq",
+    "+99 eq14Gain",
+    "+100 eq14Q",
+    "+101 eq14On",
+    "+102 eq15Type",
+    "+103 eq15Freq",
+    "+104 eq15Gain",
+    "+105 eq15Q",
+    "+106 eq15On",
+    "+107 eq16Type",
+    "+108 eq16Freq",
+    "+109 eq16Gain",
+    "+110 eq16Q",
+    "+111 eq16On",
+    "+112 eq17Type",
+    "+113 eq17Freq",
+    "+114 eq17Gain",
+    "+115 eq17Q",
+    "+116 eq17On",
+    "+117 eq18Type",
+    "+118 eq18Freq",
+    "+119 eq18Gain",
+    "+120 eq18Q",
+    "+121 eq18On",
+    "+122 eq19Type",
+    "+123 eq19Freq",
+    "+124 eq19Gain",
+    "+125 eq19Q",
+    "+126 eq19On",
+    "+127 eq20Type",
+    "+128 eq20Freq",
+    "+129 eq20Gain",
+    "+130 eq20Q",
+    "+131 eq20On",
+    "+132 eq21Type",
+    "+133 eq21Freq",
+    "+134 eq21Gain",
+    "+135 eq21Q",
+    "+136 eq21On",
+    "+137 eq22Type",
+    "+138 eq22Freq",
+    "+139 eq22Gain",
+    "+140 eq22Q",
+    "+141 eq22On",
+    "+142 eq23Type",
+    "+143 eq23Freq",
+    "+144 eq23Gain",
+    "+145 eq23Q",
+    "+146 eq23On",
+    "+147 eq24Type",
+    "+148 eq24Freq",
+    "+149 eq24Gain",
+    "+150 eq24Q",
+    "+151 eq24On",
+    "+152 eq25Type",
+    "+153 eq25Freq",
+    "+154 eq25Gain",
+    "+155 eq25Q",
+    "+156 eq25On",
+    "+157 eq26Type",
+    "+158 eq26Freq",
+    "+159 eq26Gain",
+    "+160 eq26Q",
+    "+161 eq26On",
+    "+162 eq27Type",
+    "+163 eq27Freq",
+    "+164 eq27Gain",
+    "+165 eq27Q",
+    "+166 eq27On",
+    "+167 eq28Type",
+    "+168 eq28Freq",
+    "+169 eq28Gain",
+    "+170 eq28Q",
+    "+171 eq28On",
+    "+172 eq29Type",
+    "+173 eq29Freq",
+    "+174 eq29Gain",
+    "+175 eq29Q",
+    "+176 eq29On",
+    "+177 eq30Type",
+    "+178 eq30Freq",
+    "+179 eq30Gain",
+    "+180 eq30Q",
+    "+181 eq30On",
+    "+182 eq31Type",
+    "+183 eq31Freq",
+    "+184 eq31Gain",
+    "+185 eq31Q",
+    "+186 eq31On",
+    "+187 eq32Type",
+    "+188 eq32Freq",
+    "+189 eq32Gain",
+    "+190 eq32Q",
+    "+191 eq32On"
   ],
   "panel": {
     "family": "none",
@@ -795,6 +2797,7 @@
         "label": "EQ",
         "controls": [
           "eqOn",
+          "eqBands",
           "eq1Type",
           "eq1Freq",
           "eq1Gain",
@@ -814,7 +2817,147 @@
           "eq4Freq",
           "eq4Gain",
           "eq4Q",
-          "eq4On"
+          "eq4On",
+          "eq5Type",
+          "eq5Freq",
+          "eq5Gain",
+          "eq5Q",
+          "eq5On",
+          "eq6Type",
+          "eq6Freq",
+          "eq6Gain",
+          "eq6Q",
+          "eq6On",
+          "eq7Type",
+          "eq7Freq",
+          "eq7Gain",
+          "eq7Q",
+          "eq7On",
+          "eq8Type",
+          "eq8Freq",
+          "eq8Gain",
+          "eq8Q",
+          "eq8On",
+          "eq9Type",
+          "eq9Freq",
+          "eq9Gain",
+          "eq9Q",
+          "eq9On",
+          "eq10Type",
+          "eq10Freq",
+          "eq10Gain",
+          "eq10Q",
+          "eq10On",
+          "eq11Type",
+          "eq11Freq",
+          "eq11Gain",
+          "eq11Q",
+          "eq11On",
+          "eq12Type",
+          "eq12Freq",
+          "eq12Gain",
+          "eq12Q",
+          "eq12On",
+          "eq13Type",
+          "eq13Freq",
+          "eq13Gain",
+          "eq13Q",
+          "eq13On",
+          "eq14Type",
+          "eq14Freq",
+          "eq14Gain",
+          "eq14Q",
+          "eq14On",
+          "eq15Type",
+          "eq15Freq",
+          "eq15Gain",
+          "eq15Q",
+          "eq15On",
+          "eq16Type",
+          "eq16Freq",
+          "eq16Gain",
+          "eq16Q",
+          "eq16On",
+          "eq17Type",
+          "eq17Freq",
+          "eq17Gain",
+          "eq17Q",
+          "eq17On",
+          "eq18Type",
+          "eq18Freq",
+          "eq18Gain",
+          "eq18Q",
+          "eq18On",
+          "eq19Type",
+          "eq19Freq",
+          "eq19Gain",
+          "eq19Q",
+          "eq19On",
+          "eq20Type",
+          "eq20Freq",
+          "eq20Gain",
+          "eq20Q",
+          "eq20On",
+          "eq21Type",
+          "eq21Freq",
+          "eq21Gain",
+          "eq21Q",
+          "eq21On",
+          "eq22Type",
+          "eq22Freq",
+          "eq22Gain",
+          "eq22Q",
+          "eq22On",
+          "eq23Type",
+          "eq23Freq",
+          "eq23Gain",
+          "eq23Q",
+          "eq23On",
+          "eq24Type",
+          "eq24Freq",
+          "eq24Gain",
+          "eq24Q",
+          "eq24On",
+          "eq25Type",
+          "eq25Freq",
+          "eq25Gain",
+          "eq25Q",
+          "eq25On",
+          "eq26Type",
+          "eq26Freq",
+          "eq26Gain",
+          "eq26Q",
+          "eq26On",
+          "eq27Type",
+          "eq27Freq",
+          "eq27Gain",
+          "eq27Q",
+          "eq27On",
+          "eq28Type",
+          "eq28Freq",
+          "eq28Gain",
+          "eq28Q",
+          "eq28On",
+          "eq29Type",
+          "eq29Freq",
+          "eq29Gain",
+          "eq29Q",
+          "eq29On",
+          "eq30Type",
+          "eq30Freq",
+          "eq30Gain",
+          "eq30Q",
+          "eq30On",
+          "eq31Type",
+          "eq31Freq",
+          "eq31Gain",
+          "eq31Q",
+          "eq31On",
+          "eq32Type",
+          "eq32Freq",
+          "eq32Gain",
+          "eq32Q",
+          "eq32On"
         ]
       },
       {
@@ -850,7 +2993,7 @@
     "| Input | on/off; Trim, a click-free ramp to each new gain |",
     "| Filters | on/off; HPF and LPF, each on/off, its frequency, 12 or 24 dB/oct |",
     "| Gate | on/off, threshold, ratio, range, attack, release, knee start and end, hold, hysteresis |",
-    "| EQ | on/off; four bands, each on/off, type (bell, low or high shelf, notch, all-pass 1st or 2nd order), frequency, gain, Q |",
+    "| EQ | on/off; Bands, how many bands run ({range:eqBands}); each band on/off, type (bell, low or high shelf, notch, all-pass 1st or 2nd order), frequency, gain, Q |",
     "| Comp | on/off, threshold, ratio, knee, attack, release, make-up, kind (compressor: RMS detector; limiter: peak), mix, detector oversampling (auto, off, 4x) |",
     "",
     "**Order** ({min:order} to {max:order}) picks the order of the five stages: 0 is the desk's input > filters > gate > EQ >",
@@ -858,7 +3001,9 @@
     "comp > EQ > gate > filters > input). Plus the host's bypass. The latency reported is the sum of the",
     "stages': the gate's and the compressor's 4x detector paths while they are engaged, else zero.",
     "",
-    "0.3.0 changed the parameter list (the Input and Filters switches, the gate's knee, hold and hysteresis, the compressor's kind, mix and detector oversampling, five-stage orders): a session saved with 0.2.0 does not load as it was, though at 0.2.0's settings the strip sounds the same, sample for sample."
+    "0.3.0 changed the parameter list (the Input and Filters switches, the gate's knee, hold and hysteresis, the compressor's kind, mix and detector oversampling, five-stage orders): a session saved with 0.2.0 does not load as it was, though at 0.2.0's settings the strip sounds the same, sample for sample.",
+    "",
+    "**Bands** sets how many of the EQ's band slots run, from the first: a band past it is not processed at all (it costs nothing, and the strip sounds as if it were not there), and keeps its settings for when Bands reaches it again. The bands past the fourth and Bands itself came after the strip's other parameters, so their ids and ports follow all of those: a session or preset saved before them loads with its four bands as they were and Bands at its default."
   ],
   "console": {
     "$comment": "The OpenMixer console has no channel-strip stage: its strip is the trim, the EQ (with the HPF and LPF), the gate and the dynamics stages themselves. Racked as a plugin in a channel's insert rack, it is drawn by the generic plugin editor.",
