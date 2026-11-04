@@ -498,30 +498,37 @@ static const omx_clap_plugin_panel_description_t G_PANEL_EXT = {g_panel_fingerpr
 
 /* ---- org.openmixer.param-contract/1: the declaration's contract, the bypass last --------------- */
 
+/* The scale codes the generator writes into the rows (include/omx_param_contract.h) are the owner's OMX_CLAP_PARAM_SCALES,
+ * one each: tools/test/param-units-check.mjs holds their numbers to omx-contract's PARAM_SCALES words. */
+#define G_ONE_SCALE(code, name) +1
+_Static_assert(0 OMX_CLAP_PARAM_SCALES(G_ONE_SCALE) == OMX_CLAP_SCALE_COUNT, "omx_param_contract.h's scales are not omx-clap-core's");
+#undef G_ONE_SCALE
+
 static uint32_t g_contract_version(const clap_plugin_t *p) { return G_OF(p)->face->contract_version; }
 
 static const char *g_contract_fingerprint(const clap_plugin_t *p) { return G_OF(p)->face->contract_fingerprint; }
 
-static bool g_contract_get(const clap_plugin_t *p, uint32_t id, omx_clap_param_contract_info_t *info) {
+/* Fills the host's `entry` for CLAP parameter `id` from the face's rows: a declared one (0 to count - 1, its symbol the
+ * parameter table's) or the bypass at OMX_PLUGIN_FACE_BYPASS_CLAP_ID; false for any other id. */
+static bool g_contract_get(const clap_plugin_t *p, clap_id id, omx_clap_param_contract_entry_t *entry) {
   const G *g = G_OF(p);
-  return omx_param_contract_get(g->face->contract, G_DECLARED(g), id, id < G_DECLARED(g) ? g->face->params[id].symbol : NULL,
-                                info);
+  const uint32_t count = G_DECLARED(g);
+  const bool bypass_id = id == OMX_PLUGIN_FACE_BYPASS_CLAP_ID;
+  if (!entry || (id >= count && !bypass_id)) return false;
+  const struct omx_param_contract_row bypass = {OMX_CLAP_UNIT_NONE, OMX_CLAP_SCALE_STEPPED, 1.0};
+  const struct omx_param_contract_row *r = bypass_id ? &bypass : &g->face->contract[id];
+  const char *s = bypass_id ? "bypass" : g->face->params[id].symbol;
+  uint32_t i = 0;
+  for (; s && s[i] && i + 1 < OMX_CLAP_PARAM_CONTRACT_SYMBOL_SIZE; ++i) entry->symbol[i] = s[i];
+  entry->symbol[i] = 0;
+  entry->param_id = id;
+  entry->unit = r->unit;
+  entry->scale = r->scale;
+  entry->step = r->step;
+  return true;
 }
 
-static uint32_t g_contract_migrations(const clap_plugin_t *p) {
-  (void)p;
-  return 0;
-}
-
-static bool g_contract_migration(const clap_plugin_t *p, uint32_t index, omx_clap_param_migration_t *step) {
-  (void)p;
-  (void)index;
-  (void)step;
-  return false;
-}
-
-static const omx_clap_plugin_param_contract_t G_CONTRACT_EXT = {g_contract_version, g_contract_fingerprint, g_contract_get,
-                                                                g_contract_migrations, g_contract_migration};
+static const omx_clap_plugin_param_contract_ext_t G_CONTRACT_EXT = {g_contract_version, g_contract_fingerprint, g_contract_get};
 
 /* ---- org.openmixer.resource-hints.draft/0: the declaration's hints -------------------------- */
 
@@ -655,7 +662,7 @@ static const void *g_get_extension(const clap_plugin_t *p, const char *id) {
   if (strcmp(id, CLAP_EXT_PRESET_LOAD) == 0 || strcmp(id, CLAP_EXT_PRESET_LOAD_COMPAT) == 0) return &G_PRESET_LOAD_EXT;
   if (strcmp(id, OMX_CLAP_EXT_DECLARATION) == 0) return &G_DECL_EXT;
   if (strcmp(id, OMX_PANEL_DESCRIPTION_ID) == 0) return &G_PANEL_EXT;
-  if (strcmp(id, OMX_PARAM_CONTRACT_ID) == 0) return &G_CONTRACT_EXT;
+  if (strcmp(id, OMX_CLAP_EXT_PARAM_CONTRACT) == 0) return &G_CONTRACT_EXT;
   if (strcmp(id, CLAP_EXT_REMOTE_CONTROLS) == 0) return &G_PAGES_EXT;
   if (strcmp(id, CLAP_EXT_TRACK_INFO) == 0) return &G_TRACK_INFO_EXT;
   if (strcmp(id, OMX_CLAP_EXT_RESOURCE_HINTS_DRAFT) == 0) return &G_RESOURCE_HINTS_EXT;

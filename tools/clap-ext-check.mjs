@@ -6,7 +6,7 @@
  * read it, against the plugin's DECLARATION:
  *
  *   - org.openmixer.param-contract/1: each parameter's symbol, unit, scale and step are the
- *     declaration's (tools/param-contract.mjs), the bypass last; version 1, no migration step; the
+ *     declaration's (tools/param-contract.mjs), the bypass last; version 1; the
  *     fingerprint is the SHA-256 of what get_info and the contract serve, and the declaration's;
  *   - clap.remote-controls: the pages of the page rule over the declaration's panel sections;
  *   - clap.track-info: under each placement, before activation and after it, every parameter reads
@@ -50,8 +50,8 @@ const served = of('param').map(([, symbol, unitEnum, scale, step, min, max, def,
 const unitOf = Object.fromEntries(want.map((r) => [r.unitEnum, r.unit]));
 const row = (r) => [r.symbol, r.unitEnum, r.scale, r.step];
 check(same(served.map(row), want.map(row)), `param-contract: symbol, unit, scale and step of the ${want.length} parameters are the declaration's`, JSON.stringify(served.map(row)));
-const [version, fingerprint, migrations] = of('contract')[0] ?? [];
-check(Number(version) === CONTRACT_VERSION && Number(migrations) === 0, `param-contract: version ${CONTRACT_VERSION}, no migration step`, `version ${version}, ${migrations} steps`);
+const [version, fingerprint] = of('contract')[0] ?? [];
+check(Number(version) === CONTRACT_VERSION, `param-contract: version ${CONTRACT_VERSION}`, `version ${version}`);
 const servedRows = served.map((r) => ({ ...r, unit: unitOf[r.unitEnum] ?? `?${r.unitEnum}` }));
 check(fingerprint === contractFingerprint(servedRows), 'param-contract: the fingerprint is that of what get_info and the contract serve', `${fingerprint}, computed over:\n${contractCanonical(servedRows)}`);
 check(fingerprint === contractFingerprint(want), "param-contract: the fingerprint is the declaration's", `${fingerprint}, the declaration's ${contractFingerprint(want)}`);

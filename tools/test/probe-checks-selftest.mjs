@@ -124,7 +124,6 @@ const extArms = [
   ['a step changed', set('param', 0, 5, (v) => (v === '0' ? '1' : '0')), /FAIL clap-ext param-contract: symbol, unit, scale and step/],
   ['a parameter lost', drop('param', 1), /FAIL clap-ext param-contract: symbol, unit, scale and step/],
   ['the contract version changed', set('contract', 0, 1, plus(1)), /FAIL clap-ext param-contract: version/],
-  ['a migration step claimed', set('contract', 0, 3, '1'), /FAIL clap-ext param-contract: version/],
   ['the fingerprint changed', set('contract', 0, 2, flip), /FAIL clap-ext param-contract: the fingerprint/],
   ['a remote-control page lost', drop('page', 0), /FAIL clap-ext remote-controls/],
   ['a remote-control page renamed', set('page', 0, 4, 'Other'), /FAIL clap-ext remote-controls/],
