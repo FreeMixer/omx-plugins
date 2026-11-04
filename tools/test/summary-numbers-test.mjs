@@ -8,7 +8,7 @@
  *   1. NO TYPED LIMIT. A number in a shipped summary that is a limit or the default of one of the plugin's own
  *      parameters must be a `{max|min|default|range:<symbol>}` word (tools/gen.mjs summaryOf), not typed.
  *   2. FOLLOWS THE CONTRACT. For every summary that reads a parameter's limit, the travel's upper limit is moved
- *      out by one step in a copy of the installed release (OMX_CONTRACT_DIR): the README catalogue row must then
+ *      out by one step in a copy of the installed release (OMX_CONTRACT_DIR): the catalogue row must then
  *      carry the moved limit, and no longer the old one.
  * `--self-test`: a summary with its limit typed again is refused by part 1, and part 2's reading of an unmoved
  * copy finds the row unchanged (so a typed summary could not pass it).
@@ -40,7 +40,7 @@ function typedLimits(d, summary = d.summary) {
   const limits = new Set(d.params.filter((p) => p.kind !== 'toggle').flatMap((p) => [p.min, p.max, p.def]).filter((x) => Number.isFinite(x)));
   return typed(summary ?? '').filter((n) => limits.has(n));
 }
-const row = (d) => SHARED['README.md'].catalogue([d]).find((l) => l.startsWith(`| **${d.name}**`));
+const row = (d) => SHARED['docs/catalogue.md'].catalogue([d]).find((l) => l.startsWith(`| **${d.name}**`));
 
 function load(dir, contract) {
   process.env.OMX_CONTRACT_DIR = contract;

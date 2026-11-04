@@ -28,7 +28,7 @@ A page is where a host shows a parameter. In LV2 each page is a port group, `pg:
 
 ## Parameters
 
-Ids are the order below, 0 to 16; the bypass takes the next id.
+Ids are the order below, 0 to 16; a parameter appended later takes the next id. The bypass's id is its own (below).
 
 | Id | Symbol | Name | Unit | Min | Max | Default | Step or values | Flags | Page (priority) |
 |---|---|---|---|---|---|---|---|---|---|
@@ -52,5 +52,5 @@ Ids are the order below, 0 to 16; the bypass takes the next id.
 
 ## Bypass
 
-CLAP: the host's bypass, a parameter named Bypass at id 17, flagged automatable, stepped and bypass; 0 is processing, 1 bypassed.
-LV2: the port `enabled` (`lv2:designation lv2:enabled`), 1 is processing, 0 is bypassed; it comes after the parameter ports. The output port `latency` reports the latency in frames.
+CLAP: the host's bypass, a parameter named Bypass at id 2147418112 (0x7FFF0000) in every plugin, flagged automatable, stepped and bypass; 0 is processing, 1 bypassed. The id never moves when a parameter is appended.
+LV2: the port `enabled` (`lv2:designation lv2:enabled`) at index 0, 1 is processing, 0 is bypassed; the output port `latency` at index 1 reports the latency in frames. Both come before the audio and parameter ports in every plugin, so neither moves; a preset or a session names a port by its symbol.
