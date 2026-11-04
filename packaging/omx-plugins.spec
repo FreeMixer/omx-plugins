@@ -168,6 +168,7 @@ tools/pins-check.sh %{buildroot}%{_datadir}/plugin-hostd/pins.d/omx-plugins.pins
 
 %files
 %license LICENSE
+%doc README.md
 # the factory presets of every plugin, read only data the console's preset library lists (presets/)
 %{_datadir}/omx/presets/
 # our own plugins' pins, known at build time (plugin-hostd issue #42's pins.d, a floor-only Recommends above);
@@ -177,6 +178,7 @@ tools/pins-check.sh %{buildroot}%{_datadir}/plugin-hostd/pins.d/omx-plugins.pins
 
 %files clap
 %license LICENSE
+%doc README.md
 %dir /usr/lib/clap
 # BEGIN GENERATED clap-files: tools/gen.mjs, one line per shipped plugin
 /usr/lib/clap/omx-balancer.clap
@@ -212,6 +214,7 @@ tools/pins-check.sh %{buildroot}%{_datadir}/plugin-hostd/pins.d/omx-plugins.pins
 
 %files test
 %license LICENSE
+%doc README.md
 %dir %{_libexecdir}/omx-plugins
 %dir %{_libexecdir}/omx-plugins/test
 # BEGIN GENERATED clap-test-files: tools/gen.mjs, one line per test plugin
@@ -223,17 +226,20 @@ tools/pins-check.sh %{buildroot}%{_datadir}/plugin-hostd/pins.d/omx-plugins.pins
 
 %files devel
 %license LICENSE
+%doc README.md
 %{_includedir}/omx-plugins/
 %{_libdir}/libomxplugins.a
 %{_libdir}/pkgconfig/omxplugins.pc
 
 %files contract
 %license LICENSE
+%doc README.md
 # each plugin's descriptor and the manifest, in omx-contract's contract directory (the directory itself is omx-contract-data's)
 %{_datadir}/omx-contract/contract.d/3/omx-plugins/
 
 %files lv2
 %license LICENSE
+%doc README.md
 # BEGIN GENERATED lv2-files: tools/gen.mjs, one line per shipped plugin
 %{_libdir}/lv2/omx-balancer.lv2/
 %{_libdir}/lv2/omx-chorus.lv2/

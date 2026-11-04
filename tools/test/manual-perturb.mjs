@@ -8,7 +8,7 @@
  * read from omx-contract (each ref and field once), two moves, each in a fresh copy of the installed
  * release read through OMX_CONTRACT_DIR (tools/omx-contract.mjs perturbCopy):
  *
- *   1. the travel's upper limit goes out by one step: where the plugin's README section carried the
+ *   1. the travel's upper limit goes out by one step: where the plugin's catalogue section carried the
  *      parameter's range ("<min> to <max>"), it must carry it fewer times against the copy;
  *   2. the travel's default goes to its other end, for a parameter whose default is the travel's
  *      own (no defaultId, defaultRef or defaultBand): where the section carried the default
@@ -33,7 +33,7 @@ if (!where.dir) {
   process.exit(1);
 }
 const installed = where.dir;
-const section = (d) => SHARED['README.md'].sections([d]).join('\n');
+const section = (d) => SHARED['docs/catalogue.md'].sections([d]).join('\n');
 /** How many times `words` stand on their own in `text` (not inside a longer number). */
 const times = (text, words) => text.match(new RegExp(`(?<![\\w.-])${words.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?![\\w]|\\.\\d)`, 'g'))?.length ?? 0;
 const rangeWords = (p) => `${p.min} to ${p.max}`;
