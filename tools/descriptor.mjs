@@ -144,6 +144,9 @@ export function descriptorOf(d) {
   const choiceUnits = {}, byKind = {};
   const controls = d.params.map((p, i) => {
     const c = { id: i, symbol: p.symbol, name: p.name };
+    // a described control's prose is the descriptor's own word, kept as written
+    const doc = d.descriptor?.controls[i]?.doc;
+    if (doc !== undefined) c.doc = doc;
     const choices = choicesOf(p);
     if (p.kind === 'toggle') Object.assign(c, { kind: 'toggle', default: p.def !== 0 });
     else if (choices) {
@@ -172,7 +175,9 @@ export function descriptorOf(d) {
     plugin: { id: d.clap.id, format: 'clap', uri: d.lv2.uri, name: d.name, vendor: d.vendor, version: d.version, doc: d.description, features: d.clap.features.filter((f) => FEATURES.includes(f)) },
     controls,
     ports,
-    needs: { extensions: { optional: [LV2_HARD_RT] } },
+    // what the host must hand: the tempo (a plugin that syncs to it), as its descriptor says; the RT capability always
+    // a plugin that reads the tempo maps the time:Position's URIs when its LV2 host lends urid:map
+    needs: d.descriptor?.needs?.tempo ? { tempo: true, extensions: { optional: ['urid:map', LV2_HARD_RT] } } : { extensions: { optional: [LV2_HARD_RT] } },
     latency: { reports: true },
     extensions: extensionsOf(d),
     source: { impl: face },
