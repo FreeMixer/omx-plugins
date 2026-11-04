@@ -200,6 +200,9 @@
     "thresholdDb4": -40,
     "thresholdDb5": -40
   },
+  "oracles": [
+    "mbcomp-readout"
+  ],
   "meters": [
     {
       "id": "band1Gr",

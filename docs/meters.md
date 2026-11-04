@@ -12,6 +12,15 @@ omx-clap-core reads for meters since it removed `org.openmixer.meters/1` (omx-cl
 `docs/meters.md`): every channel of every meter becomes an output symbol, read at
 the host's idle rate through `get_values()`.
 
+The LV2 face writes the same values to output control ports, one per channel, after the `latency` port: each
+port's symbol is the one omx-clap-core derives from the CLAP meter's name (the meter's `id` for one channel,
+`<id>_<channel>` from 0 for more), its range the meter's display range. So a host reads `band2Gr` by the same
+symbol from either face. The plugin's descriptor lists the meters (omx-contract's `meters` word, schema 3.9.0):
+the id, the symbol, the kind, the channels, the range, and the kernel readout each publishes, linked as
+`data/kernels/<kernel>.json#readouts[<name>]`. A console learns from the descriptor which readouts a linked
+plugin carries. A meter is never also a read-only parameter: CLAP has a word for meters, and omx-clap-core
+refuses a meter symbol a parameter answers to.
+
 No released CLAP SDK ships `clap/ext/draft/meters.h` yet. omx-clap-core installs its declaration as
 `<omx-clap-host/clap_meters.h>` (it includes the SDK's header instead once the SDK has it), and the
 plugins include that one. `tools/test/meters-abi-test.c`, run by `make test`, holds its id, enums,
@@ -93,8 +102,12 @@ does not expose yet (FX-14, #148), so today it would read 0 for ever.
 
 ## The tests
 
+Both faces compute one block's values in one place, `include/omx_face_meters.h`: the CLAP face publishes them,
+the LV2 face writes them to its ports as floats.
+
 The identity test (`test/<kernel>-oracle.c`) reads every meter after every block of its plan
-through the CLAP face, at every declared rate, and holds every channel to a reference it computes
+through the CLAP face's clap.meters/1 and the LV2 face's output control ports (the reference as a float there),
+at every declared rate, and holds every channel to a reference it computes
 from the same block: a gain reduction to the same instance face, run directly on the same blocks,
 read at the declared `field` (0 when bypassed); a level to its own peak of the block's input, or of
 the reference's output, in dBFS and floored at `min`. Bit for bit. The meter list must be the
@@ -110,3 +123,14 @@ mixes two blocks shows two numbers, and a read older than the same reader's last
 one; either fails the run. Its self-test breaks the header three ways, each of which must go red:
 two copies instead of three, no second load of the word, and the word stored before the copy is
 filled.
+
+The readouts' values are held by hand-written oracles on both faces, at the nine oracle rates, against the audio
+they describe (`tools/test/face-driver.h` drives a built face and reads a meter by its symbol):
+
+- `omx-dyneq` `dyneq-readout`: a bell at the tone with dynamics Down at threshold -60 and ratio 20 reads its range
+  (-6, then -9) as band2Gain and cuts the tone by the same, each within 0.05 dB; under the threshold it reads 0;
+  a static -6 dB bell with dynamics off reads exactly 0 (the readout is the dynamics' gain); bypassed, 0.
+- `omx-multiband` `mbcomp-readout`: a -40 dBFS RMS tone at band 2's centre, threshold -60, ratio 20 and a symmetric
+  detector reads -(L - T)(1 - 1/R) at the band's soloed level L within 0.05 dB (-18.84 dB) as band2Gr, and the
+  soloed band is held down by what it reads; the other bands read exactly 0; bypassed, 0.
+- `omx-comp` `comp-key`: compKey and compGr after a keyed run, now on the LV2 face too.

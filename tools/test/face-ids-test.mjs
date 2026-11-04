@@ -14,6 +14,9 @@
  *      they were, and every port that was there keeps its symbol's index, so a host that stored an index still finds it.
  *   3. SYMBOLS. A preset or a session names a port by its symbol: the set of symbols is the old set, the order of the
  *      declared controls among themselves unchanged.
+ *   4. METERS. A plugin's meter output ports are STRUCTURAL: after the face's own ports (and the tempo's control), before
+ *      the audio ports and the parameters, in the order the declaration lists its meters, one port a channel. So an
+ *      appended parameter moves no meter port, and the generated header's FIRST_METER and the TTL agree with the list.
  * `--self-test`: the rule this replaced (enabled and latency after the controls, the bypass the next CLAP id) is red
  * under part 2, so the check cannot pass a face that moves them.
  *
@@ -21,7 +24,7 @@
  */
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { ROOT, loadDecl, lv2Ports, pluginDirs, tempoOf } from '../gen.mjs';
+import { ROOT, loadDecl, lv2Ports, metersOf, pluginDirs, tempoOf } from '../gen.mjs';
 import { faceIds } from '../param-contract.mjs';
 
 const ids = faceIds();
@@ -32,11 +35,12 @@ const say = (ok, m) => {
 };
 
 /** The rule this replaced: audio, the controls, enabled, latency, then the tempo's `control` input of a plugin that
- * reads one; the bypass the CLAP id after the last control. */
+ * reads one, then the meters' outputs; the bypass the CLAP id after the last control. */
 function oldLv2Ports(d) {
   const audio = ['in_l', 'in_r', ...(d.sidechain ? [d.sidechain.symbol] : []), 'out_l', 'out_r'].map((symbol) => ({ symbol }));
   return [...audio, ...d.params.map((p) => ({ symbol: p.symbol, param: p })), { symbol: 'enabled', enabled: true }, { symbol: 'latency', latency: true },
-    ...(tempoOf(d) ? [{ symbol: 'control' }] : [])]
+    ...(tempoOf(d) ? [{ symbol: 'control' }] : []),
+    ...metersOf(d).flatMap((m) => m.symbols.map((symbol) => ({ symbol, meter: true })))]
     .map((p, index) => ({ ...p, index }));
 }
 const oldBypassId = (d) => d.params.length;
@@ -49,7 +53,7 @@ function moved(d, grown, portsOf, bypassOf) {
   const out = [];
   const a = portsOf(d), b = portsOf(grown);
   for (const s of ['enabled', 'latency']) if (indexOf(a, s) !== indexOf(b, s)) out.push(`${s} moved ${indexOf(a, s)} -> ${indexOf(b, s)}`);
-  for (const p of a) if (indexOf(b, p.symbol) !== p.index && !['enabled', 'latency'].includes(p.symbol) && !grown.sidechain) out.push(`${p.symbol} moved ${p.index} -> ${indexOf(b, p.symbol)}`);
+  for (const p of a) if (indexOf(b, p.symbol) !== p.index && !['enabled', 'latency'].includes(p.symbol) && (!grown.sidechain || p.meter)) out.push(`${p.symbol} moved ${p.index} -> ${indexOf(b, p.symbol)}`);
   if (bypassOf(d) !== bypassOf(grown)) out.push(`the CLAP bypass id moved ${bypassOf(d)} -> ${bypassOf(grown)}`);
   return out;
 }
@@ -65,6 +69,9 @@ const decls = pluginDirs(ROOT).map((dir) => loadDecl(dir));
 if (selfTest) {
   for (const d of decls) {
     const m = moved(d, appended(d), oldLv2Ports, oldBypassId);
+    const metered = metersOf(d).length > 0;
+    say(!metered || m.some((x) => /^(\w+) moved/.test(x) && metersOf(d).some((mt) => mt.symbols.some((sy) => x.startsWith(`${sy} moved`)))),
+      `self-test ${d.stem}: the old rule moves a meter port when a parameter is appended${metered ? '' : ' (no meters: nothing to move)'}`);
     say(m.some((x) => x.startsWith('enabled moved')) && m.some((x) => x.startsWith('latency moved')) && m.some((x) => x.startsWith('the CLAP bypass id moved')),
       `self-test ${d.stem}: the old rule is red on an appended parameter (${m.slice(0, 3).join('; ')})`);
   }
@@ -84,6 +91,17 @@ if (selfTest) {
     for (const [what, grown] of [['an appended parameter', appended(d)], ['an added sidechain', keyed(d)], ['both', keyed(appended(d))]]) {
       const m = moved(d, grown, lv2Ports, newBypassId);
       say(m.length === 0, `${d.stem}: ${what} moves no face id${m.length ? `: ${m.join('; ')}` : ''}`);
+    }
+    const meterSyms = metersOf(d).flatMap((mt) => mt.symbols);
+    if (meterSyms.length) {
+      const at0 = meterSyms.map((sy) => indexOf(ports, sy));
+      const firstAudio = Math.min(...['in_l', 'in_r', 'out_l', 'out_r'].map((sy) => indexOf(ports, sy))), firstParam = Math.min(...d.params.map((p) => indexOf(ports, p.symbol)));
+      const structuralFloor = 2 + (tempoOf(d) ? 1 : 0);
+      say(at0.every((x, k) => x === structuralFloor + k) && at0.at(-1) < firstAudio && firstAudio < firstParam,
+        `${d.stem}: the ${meterSyms.length} meter ports are structural, in declared order at ${at0[0]}..${at0.at(-1)}, before the audio (${firstAudio}) and the parameters (${firstParam})`);
+      const header2 = header.match(new RegExp(`^#define OMX_${K}_LV2_PORT_FIRST_METER (\\d+)u$`, 'm'))?.[1];
+      say(Number(header2) === at0[0], `${d.stem}: the generated header's FIRST_METER is ${at0[0]}`);
+      say(meterSyms.every((sy, k) => at(sy) === at0[k]), `${d.stem}: the generated TTL's meter ports are where the list puts them`);
     }
     const old = oldLv2Ports(d).map((p) => p.symbol), now = ports.map((p) => p.symbol);
     const controls = (list) => list.filter((s) => d.params.some((p) => p.symbol === s));

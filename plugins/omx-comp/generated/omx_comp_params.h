@@ -249,16 +249,18 @@ static const struct omx_panel_rows OMX_COMP_PANEL = {
   NULL, 0u,
 };
 
-/* LV2 port indices (tools/gen.mjs lv2Ports): enabled and latency at omx-contract's permanent indices, the audio ports,
- * then parameter i at FIRST_PARAM + i. */
+/* LV2 port indices (tools/gen.mjs lv2Ports): enabled and latency at omx-contract's permanent indices, the tempo's control,
+ * the meters' outputs, the audio ports, then parameter i at FIRST_PARAM + i. */
 #define OMX_COMP_LV2_PORT_ENABLED 0u
 #define OMX_COMP_LV2_PORT_LATENCY 1u
-#define OMX_COMP_LV2_PORT_IN_L 2u
-#define OMX_COMP_LV2_PORT_IN_R 3u
-#define OMX_COMP_LV2_PORT_KEY 4u
-#define OMX_COMP_LV2_PORT_OUT_L 5u
-#define OMX_COMP_LV2_PORT_OUT_R 6u
-#define OMX_COMP_LV2_PORT_FIRST_PARAM 7u
-#define OMX_COMP_LV2_PORT_COUNT 26u
+#define OMX_COMP_LV2_PORT_IN_L 8u
+#define OMX_COMP_LV2_PORT_IN_R 9u
+#define OMX_COMP_LV2_PORT_KEY 10u
+#define OMX_COMP_LV2_PORT_OUT_L 11u
+#define OMX_COMP_LV2_PORT_OUT_R 12u
+#define OMX_COMP_LV2_PORT_FIRST_PARAM 13u
+/* The meters' output control ports, one per channel in the order their values are published, from here on. */
+#define OMX_COMP_LV2_PORT_FIRST_METER 2u
+#define OMX_COMP_LV2_PORT_COUNT 32u
 
 #endif /* OMX_COMP_PARAMS_H */

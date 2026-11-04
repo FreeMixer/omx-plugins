@@ -149,8 +149,8 @@ static const struct omx_panel_rows OMX_ROTARY_PANEL = {
   NULL, 0u,
 };
 
-/* LV2 port indices (tools/gen.mjs lv2Ports): enabled and latency at omx-contract's permanent indices, the audio ports,
- * then parameter i at FIRST_PARAM + i. */
+/* LV2 port indices (tools/gen.mjs lv2Ports): enabled and latency at omx-contract's permanent indices, the tempo's control,
+ * the meters' outputs, the audio ports, then parameter i at FIRST_PARAM + i. */
 #define OMX_ROTARY_LV2_PORT_ENABLED 0u
 #define OMX_ROTARY_LV2_PORT_LATENCY 1u
 #define OMX_ROTARY_LV2_PORT_IN_L 2u
@@ -158,6 +158,8 @@ static const struct omx_panel_rows OMX_ROTARY_PANEL = {
 #define OMX_ROTARY_LV2_PORT_OUT_L 4u
 #define OMX_ROTARY_LV2_PORT_OUT_R 5u
 #define OMX_ROTARY_LV2_PORT_FIRST_PARAM 6u
+/* The meters' output control ports, one per channel in the order their values are published, from here on. */
+#define OMX_ROTARY_LV2_PORT_FIRST_METER 14u
 #define OMX_ROTARY_LV2_PORT_COUNT 14u
 
 #endif /* OMX_ROTARY_PARAMS_H */

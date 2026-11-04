@@ -20,9 +20,9 @@ static const char *G_FEATURES[] = {OMX_DEESSER_CLAP_FEATURES, NULL};
  * the 5 values the face publishes after a block. */
 _Static_assert(5u <= OMX_METER_RING_MAX, "one publication holds every meter's values");
 static const struct omx_face_meter G_METERS[] = {
-    {"deessGr", CLAP_METER_KIND_GAIN_REDUCTION, 1u, 0u, (double)OMX_DEESSER_READOUT_GAIN_REDUCTION_DB_MIN, (double)OMX_DEESSER_READOUT_GAIN_REDUCTION_DB_MAX, OMX_FACE_METER_READ},
-    {"deessIn", CLAP_METER_KIND_LEVEL, 2u, 1u, -60.0, 6.0, OMX_FACE_METER_IN},
-    {"deessOut", CLAP_METER_KIND_LEVEL, 2u, 3u, -60.0, 6.0, OMX_FACE_METER_OUT},
+    {"deessGr", OMX_FACE_METER_KIND_GAIN_REDUCTION, 1u, 0u, (double)OMX_DEESSER_READOUT_GAIN_REDUCTION_DB_MIN, (double)OMX_DEESSER_READOUT_GAIN_REDUCTION_DB_MAX, OMX_FACE_METER_READ},
+    {"deessIn", OMX_FACE_METER_KIND_LEVEL, 2u, 1u, -60.0, 6.0, OMX_FACE_METER_IN},
+    {"deessOut", OMX_FACE_METER_KIND_LEVEL, 2u, 3u, -60.0, 6.0, OMX_FACE_METER_OUT},
 };
 
 static const struct omx_face G_FACE = {

@@ -62,7 +62,8 @@ CLAPDIR ?= $(PREFIX)/lib/clap
 TTL      := $(GEN)/$(NAME).lv2
 TTL_SRCS := $(shell find $(TTL) -type f 2>/dev/null)
 CORE     := omx_comp_core.h $(GEN)/omx_comp_params.h $(ROOT)/include/omx_panel_description.h \
-            $(ROOT)/include/omx_param_contract.h $(ROOT)/include/omx_preset_file.h $(ROOT)/include/omx_plugin_face.h
+            $(ROOT)/include/omx_param_contract.h $(ROOT)/include/omx_preset_file.h $(ROOT)/include/omx_plugin_face.h \
+            $(ROOT)/include/omx_face_meters.h
 
 all: $(B)/$(NAME).clap $(BUNDLE)/$(NAME).so $(BUNDLE)/manifest.ttl
 
@@ -106,7 +107,7 @@ $(B)/comp-oracle: test/comp-oracle.c $(CORE) | $(B)
 
 # Hand-written (the declaration's `oracles`): moved from the console engine with the effect.
 $(B)/comp-key: test/comp-key.c $(CORE) | $(B)
-	$(CC) $(CFLAGS) $(WARN) -I$(GEN) -I$(ROOT)/include $(DSP_CFLAGS) $(ABI_CFLAGS) -o $@ $< $(LILV) -ldl -lpthread $(LDLIBS)
+	$(CC) $(CFLAGS) $(WARN) -I$(GEN) -I$(ROOT)/include -I$(ROOT)/tools/test $(DSP_CFLAGS) $(ABI_CFLAGS) -o $@ $< $(LILV) -ldl -lpthread $(LDLIBS)
 
 gen:
 	node $(ROOT)/tools/gen.mjs $(CURDIR)
