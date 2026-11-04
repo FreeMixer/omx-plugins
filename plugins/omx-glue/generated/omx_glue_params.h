@@ -25,7 +25,8 @@ enum {
   OMX_GLUE_PARAM_MAKEUP_DB = 4,
   OMX_GLUE_PARAM_KEY_HP_HZ = 5,
   OMX_GLUE_PARAM_MIX_PCT = 6,
-  OMX_GLUE_PARAM_COUNT = 7
+  OMX_GLUE_PARAM_DETECTOR_TOPOLOGY = 7,
+  OMX_GLUE_PARAM_COUNT = 8
 };
 
 static const omx_plugin_param OMX_GLUE_PARAMS[OMX_GLUE_PARAM_COUNT] = {
@@ -36,11 +37,13 @@ static const omx_plugin_param OMX_GLUE_PARAMS[OMX_GLUE_PARAM_COUNT] = {
   { "makeupDb", "Makeup", "dB", 0.0f, 24.0f, 0.0f, 0u },
   { "keyHpHz", "Key High-pass", "Hz", 0.0f, 500.0f, 0.0f, OMX_PLUGIN_PARAM_INTEGER },
   { "mixPct", "Mix", "%", 0.0f, 100.0f, 100.0f, OMX_PLUGIN_PARAM_INTEGER },
+  { "detectorTopology", "Detector Topology", "", 0.0f, 1.0f, 0.0f, OMX_PLUGIN_PARAM_INTEGER },
 };
 
 /* Each parameter's CLAP module (clap_param_info.module): its descriptor control's group as a module path, "" for a
  * plugin with no descriptor. */
 static const char *const OMX_GLUE_PARAM_MODULES[OMX_GLUE_PARAM_COUNT] = {
+  "Glue",
   "Glue",
   "Glue",
   "Glue",
@@ -72,6 +75,9 @@ static const char *const OMX_GLUE_PARAM_MODULES[OMX_GLUE_PARAM_COUNT] = {
 #define OMX_GLUE_PARAM_MIX_PCT_MIN 0.0f
 #define OMX_GLUE_PARAM_MIX_PCT_MAX 100.0f
 #define OMX_GLUE_PARAM_MIX_PCT_DEFAULT 100.0f
+#define OMX_GLUE_PARAM_DETECTOR_TOPOLOGY_MIN 0.0f
+#define OMX_GLUE_PARAM_DETECTOR_TOPOLOGY_MAX 1.0f
+#define OMX_GLUE_PARAM_DETECTOR_TOPOLOGY_DEFAULT 0.0f
 
 /* The identity every face publishes. */
 #define OMX_GLUE_NAME "omx glue"
@@ -83,13 +89,13 @@ static const char *const OMX_GLUE_PARAM_MODULES[OMX_GLUE_PARAM_COUNT] = {
 #define OMX_GLUE_CLAP_FEATURES "audio-effect", "compressor", "stereo"
 #define OMX_GLUE_LV2_URI "urn:openmixer:glue"
 /* org.openmixer.declaration/1: the declaration's plain description and the digest of its parameters. */
-#define OMX_GLUE_DECL_SOURCE "omx glue: Threshold -40 to 0 dB, Ratio 0 to 2, Attack 0 to 5, Release 0 to 4, Makeup 0 to 24 dB, Key High-pass 0 to 500 Hz, Mix 0 to 100 %"
-#define OMX_GLUE_DECL_DIGEST "2b34f80caf284bc29dc277f25bde3b1da1b641fb4b97a750f55d0c3291ef971c"
+#define OMX_GLUE_DECL_SOURCE "omx glue: Threshold -40 to 0 dB, Ratio 0 to 2, Attack 0 to 5, Release 0 to 4, Makeup 0 to 24 dB, Key High-pass 0 to 500 Hz, Mix 0 to 100 %, Detector Topology 0 to 1"
+#define OMX_GLUE_DECL_DIGEST "7bcb023ca90e579d8a3ed67bd6066c428c3c8eb20cb121d2d092ce0876f6de0f"
 
 /* org.openmixer.param-contract/1 (tools/param-contract.mjs): each parameter's unit, scale and step, in
  * id order; the host's bypass, the last id, is the face's. */
 #define OMX_GLUE_PARAM_CONTRACT_VERSION 1u
-#define OMX_GLUE_PARAM_CONTRACT_FINGERPRINT "db6c45228672c2e249ed50cef56f8e74d13da53734c1929b1a481036be729371"
+#define OMX_GLUE_PARAM_CONTRACT_FINGERPRINT "7f2c2b19ab3474118548bdfffbb3316299e5cc3bbe8d22d40791f39656d0b848"
 static const struct omx_param_contract_row OMX_GLUE_PARAM_CONTRACT[OMX_GLUE_PARAM_COUNT] = {
   { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* thresholdDb db */
   { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* ratio none */
@@ -98,6 +104,7 @@ static const struct omx_param_contract_row OMX_GLUE_PARAM_CONTRACT[OMX_GLUE_PARA
   { 13u, OMX_CLAP_SCALE_LINEAR, 0.0 }, /* makeupDb db */
   { 16u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* keyHpHz hz */
   { 14u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* mixPct pc */
+  { 0u, OMX_CLAP_SCALE_STEPPED, 1.0 }, /* detectorTopology none */
 };
 
 /* org.openmixer.resource-hints.draft/0 (omx-contract RESOURCE_HINTS, tools/resource-hints.mjs): the hints the
@@ -111,7 +118,7 @@ static const omx_resource_hints_t OMX_GLUE_RESOURCE_HINTS = {
 
 /* org.openmixer.panel-description/1 (tools/panel-description.mjs): the declaration's panel as the rows
  * include/omx_panel_description.h serves, parameter ids the declaration's. Family none. */
-#define OMX_GLUE_PANEL_FINGERPRINT "21089a793fcf06214efe22c7255617b313d140973f50d8c09409a73178727c05"
+#define OMX_GLUE_PANEL_FINGERPRINT "12377e18c7b109d7e936905498378ce92d5ced468826c46133310cfef298f63e"
 static const struct omx_panel_section_row OMX_GLUE_PANEL_SECTIONS[] = {
   { "glue", "fx.glue.section.glue", "Glue" },
 };
@@ -123,16 +130,17 @@ static const struct omx_panel_control_row OMX_GLUE_PANEL_CONTROLS[] = {
   { 4u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.glue.makeup_db", "Makeup", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
   { 5u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.glue.key_hp_hz", "Key High-pass", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
   { 6u, 0u, OMX_CLAP_WIDGET_KNOB, "fx.glue.mix_pct", "Mix", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
+  { 7u, 0u, OMX_CLAP_WIDGET_AUTO, "fx.glue.detector_topology", "Detector Topology", OMX_CLAP_PANEL_INVALID_ID, 0x0u },
 };
 /* clap.remote-controls/2: the pages of the page rule over the sections. */
 static const struct omx_panel_page_row OMX_GLUE_PANEL_PAGES[] = {
-  { "Glue", "Glue", { 0u, 1u, 2u, 3u, 4u, 5u, 6u, OMX_CLAP_PANEL_INVALID_ID } },
+  { "Glue", "Glue", { 0u, 1u, 2u, 3u, 4u, 5u, 6u, 7u } },
 };
 #define OMX_GLUE_PANEL_PAGE_COUNT 1u
 static const struct omx_panel_rows OMX_GLUE_PANEL = {
   OMX_GLUE_PANEL_FINGERPRINT, OMX_CLAP_FAMILY_NONE,
   OMX_GLUE_PANEL_SECTIONS, 1u,
-  OMX_GLUE_PANEL_CONTROLS, 7u,
+  OMX_GLUE_PANEL_CONTROLS, 8u,
   NULL, 0u,
   NULL, 0u,
   NULL, 0u,
@@ -143,9 +151,9 @@ static const struct omx_panel_rows OMX_GLUE_PANEL = {
 #define OMX_GLUE_LV2_PORT_IN_R 1u
 #define OMX_GLUE_LV2_PORT_OUT_L 2u
 #define OMX_GLUE_LV2_PORT_OUT_R 3u
-#define OMX_GLUE_LV2_PORT_ENABLED 11u
-#define OMX_GLUE_LV2_PORT_LATENCY 12u
+#define OMX_GLUE_LV2_PORT_ENABLED 12u
+#define OMX_GLUE_LV2_PORT_LATENCY 13u
 #define OMX_GLUE_LV2_PORT_FIRST_PARAM 4u
-#define OMX_GLUE_LV2_PORT_COUNT 13u
+#define OMX_GLUE_LV2_PORT_COUNT 14u
 
 #endif /* OMX_GLUE_PARAMS_H */

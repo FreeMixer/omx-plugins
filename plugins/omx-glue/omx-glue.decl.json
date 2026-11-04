@@ -27,7 +27,8 @@
           "release",
           "makeupDb",
           "keyHpHz",
-          "mixPct"
+          "mixPct",
+          "detectorTopology"
         ]
       }
     ]
@@ -101,6 +102,16 @@
         "lv2:integer"
       ],
       "unit": "units:pc"
+    },
+    "detectorTopology": {
+      "props": [
+        "lv2:enumeration",
+        "lv2:integer"
+      ],
+      "points": [
+        "0 Feedforward",
+        "1 Feedback"
+      ]
     },
     "enabled": {
       "props": [
