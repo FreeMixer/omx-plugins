@@ -1,3 +1,37 @@
+omx-plugins (0.19.0) unstable; urgency=medium
+
+  * omx-delay syncs to the host's tempo: sync, division, mode and duck are
+    appended, defaulting to free, 1/4, digital and no duck, so sessions and
+    presets sound as before. A CLAP host hands the tempo in the transport, an
+    LV2 host as time:Position on the control port; with none, a synced delay
+    keeps its Time control (#311).
+  * omx-strip's EQ has up to 32 bands, chosen by a Bands control (default 4).
+    The existing ids and ports do not move; a band's controls are shown, and
+    the CLAP remote-control pages follow, while Bands reaches it (#312, #317,
+    #318).
+  * omx-glue gains Detector Topology, feedforward by default, read from
+    comp's declaration; the ssl-bus-glue preset runs the feedback detector,
+    and VCA Bus 4:1 is new (#310). omx-comp gains the ducker preset (#309).
+  * Readouts on both faces: each meter is an LV2 output control port as well
+    as a clap.meters/1 meter, and every descriptor lists its meters, so a host
+    can show the dynamic EQ's band gains and the multiband's gain reductions.
+    The limiter's reported look-ahead is held to an impulse at every rate
+    (#313).
+  * The host's bypass keeps one CLAP id, 0x7FFF0000, in every plugin, and
+    LV2 enabled and latency are ports 0 and 1, so appending a parameter no
+    longer moves them. Sessions and presets go by symbol and are unaffected;
+    automation stored on the bypass by id must be bound again (#315).
+  * A quiet block still skips the resolve with a tempo: a tempo that moved
+    resolves.
+  * The MOD GUI film strips are rendered by omx-panel at build time; none is
+    committed.
+  * The packages install their licence and a short README and no other
+    markdown; their descriptions point to openmixer.org (#314).
+  * Built on omx-dsp 0.30.0, omx-contract 3.9.0 and omx-panel 0.10.0; those
+    are the build floors.
+
+ -- Pau Aliagas <linuxnow@gmail.com>  Wed, 04 Nov 2026 18:00:00 +0100
+
 omx-plugins (0.18.0) unstable; urgency=medium
 
   * Each plugin runs in place where it is proven to: a host that hands an

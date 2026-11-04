@@ -22,7 +22,7 @@
 NAME       := omx-glue
 URI        := urn:openmixer:glue
 CLAP_ID    := org.openmixer.glue
-OMXDSP_MIN ?= 0.29.0
+OMXDSP_MIN ?= 0.30.0
 ROOT       := $(abspath ../..)
 GEN        := generated
 B          := build
