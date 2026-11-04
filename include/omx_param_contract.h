@@ -4,7 +4,7 @@
  * omx_param_contract.h — org.openmixer.param-contract/1, what a plugin publishes about each of its
  * parameters beyond clap_param_info: a symbol stable across versions, the unit of its plain value,
  * how the value maps to a control's travel (linear, logarithmic or stepped) and the quantum the
- * plugin resolves; then the contract's version and the migration steps between versions.
+ * plugin resolves; then the contract's version and its fingerprint.
  *
  * Two parts, as in omx_panel_description.h: the extension a CLAP host reads, as exact C structures,
  * and the rows a face serves it from (struct omx_param_contract_row), one per declared parameter,
@@ -53,19 +53,6 @@ typedef struct omx_clap_param_contract_info {
   double step;    /* the plain-unit quantum the plugin resolves; 0 continuous, 1 stepped */
 } omx_clap_param_contract_info_t;
 
-/** One migration step: contract version from_version -> from_version + 1, one symbol. */
-typedef struct omx_clap_param_migration {
-  uint32_t from_version;
-  char from_symbol[OMX_CLAP_PARAM_SYMBOL_SIZE];
-  char to_symbol[OMX_CLAP_PARAM_SYMBOL_SIZE];
-  uint32_t from_unit;
-  uint32_t to_unit;
-  double factor;
-  double offset;
-  uint32_t value_map_count;
-  const double *value_map;
-} omx_clap_param_migration_t;
-
 #ifdef CLAP_ABI
 #define OMX_PARAM_CONTRACT_ABI CLAP_ABI
 #else
@@ -82,10 +69,6 @@ typedef struct omx_clap_plugin_param_contract {
   const char *(OMX_PARAM_CONTRACT_ABI *fingerprint)(const struct clap_plugin *plugin);
   /* [main-thread] fills *info for a param_id params lists; false for an unknown id. */
   bool(OMX_PARAM_CONTRACT_ABI *get)(const struct clap_plugin *plugin, uint32_t param_id, omx_clap_param_contract_info_t *info);
-  /* [main-thread] the migration steps of versions 1..version()-1. */
-  uint32_t(OMX_PARAM_CONTRACT_ABI *migration_count)(const struct clap_plugin *plugin);
-  /* [main-thread] fills *step, by from_version ascending; false past the end. */
-  bool(OMX_PARAM_CONTRACT_ABI *get_migration)(const struct clap_plugin *plugin, uint32_t index, omx_clap_param_migration_t *step);
 } omx_clap_plugin_param_contract_t;
 
 /* ---- the rows a face serves the extension from -------------------------------------------------- */

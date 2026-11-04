@@ -4,10 +4,10 @@ Priority: optional
 Maintainer: Pau Aliagas <linuxnow@gmail.com>
 Build-Depends: debhelper-compat (= 13),
                clap-headers,
-               libomxdsp-dev (>= 0.28.0),
+               libomxdsp-dev (>= 0.29.0),
                libomx-contract-dev (>= 3.7.1),
                omx-contract (>= 3.7.1),
-               libomx-clap-core-dev (>= 0.14.0),
+               libomx-clap-core-dev (>= 0.23.0),
                plugin-hostd-dev (>= 0.15.2),
                omx-panel (>= 0.2.0),
                lv2-dev,
@@ -52,6 +52,7 @@ Description: OpenMixer delay, drive, EQ, strip, gate and effects (CLAP, LV2)
 Package: omx-plugins-clap
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
+Breaks: omx-clap-host (<< 0.23.0~)
 Description: OpenMixer delay, drive, EQ, strip, gate and effects as CLAP plugins
  The OpenMixer console's delay, drive, 8-, 16- and 32-band EQ, 31-band
  graphic EQ, channel strip, keyed gate and effects (chorus, flanger, phaser,
@@ -75,7 +76,7 @@ Description: OpenMixer test instruments, for host tests and plugin measurement
 Package: omx-plugins-dev
 Section: libdevel
 Architecture: any
-Depends: libomxdsp-dev (>= 0.28.0), libomx-contract-dev (>= 3.7.1), omx-plugins-contract (= ${source:Version}), clap-headers, ${misc:Depends}
+Depends: libomxdsp-dev (>= 0.29.0), libomx-contract-dev (>= 3.7.1), omx-plugins-contract (= ${source:Version}), clap-headers, ${misc:Depends}
 Description: Headers and static library of the OpenMixer plugins
  The headers other projects include to use the OpenMixer plugins' parameters
  and instance code, such as omx_delay_core.h and each plugin's generated

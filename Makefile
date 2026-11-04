@@ -50,6 +50,8 @@
 #     make selftest      the recipe's checkers, wizard and commit protocol, each sabotaged (needs git)
 #   make meters-abi  the clap.meters/1 header omx-clap-core installs has the id, enums, sizeof and offsetof the
 #                    plugins are built for (tools/test/meters-abi-test.c, compile and run; part of `make test`)
+#   make param-contract-abi  include/omx_param_contract.h's extension table and entry are the layout omx-clap-core's
+#                    omx_clap_ext.h reads (tools/test/param-contract-abi-test.c, compile and run; part of `make test`)
 #   make strip-crosscheck   omx-strip, a chain, against the hand-ported strip it replaced, bit for bit at
 #                    the old plugin's settings (tools/test/strip-crosscheck.sh; needs the git history, and builds the
 #                    omx-contract and omx-dsp releases the old commit pinned, from sibling checkouts' tags or GitHub).
@@ -90,7 +92,7 @@
 #   make package-lists  every plugin the build makes is installed and listed by exactly the package it belongs
 #                   to, in the RPM spec and the Debian .install files: tools/package-lists-check.sh over a staged
 #                   install, with its --self-test (part of `make test`)
-VERSION := 0.17.0
+VERSION := 0.18.0
 PLUGINS := $(sort $(dir $(wildcard plugins/*/Makefile)))
 # A test plugin is built, tested and linked into libomxplugins.a like the others; `make install` never installs
 # it, and `make install-test` puts it outside the CLAP path: its declaration says `"role": "test"`
@@ -147,11 +149,11 @@ LIB_FLAGS  := -fPIC -fvisibility=hidden -DOMX_CLAP_STATIC -Iinclude
 # read only by the targets that build the archive, so `make version` and the rest need no omx-dsp
 lib_cflags = $(call dep_check,omxdsp,$(OMXDSP_MIN))$(call dep_check,omx-contract,$(CONTRACT_MIN))$(shell $(PKG_CONFIG) --cflags omxdsp omx-contract omx-clap-core clap)
 
-.PHONY: summary-numbers param-tie presets presets-figures test-role all lib lib-test test test-faces units panel-layout descriptor-view lv2-units lv2-deprecated lv2-maintainer lv2-manifest release-version resource-hints format-tables contract-union probe-checks eq-probe-race band-groups phaser-depth geq-widgets round-trip hints modgui manual install install-pins install-test package-lists install-devel install-contract contract-dir lv2bench-ran clean version recipe-test completeness selftest private-refs params-doc check-params-doc strip-crosscheck meters-abi meter-level dsp-copies meter-ring clap-validate
+.PHONY: summary-numbers param-tie face-dirty-order presets presets-figures test-role all lib lib-test test test-faces units panel-layout descriptor-view lv2-units lv2-deprecated lv2-maintainer lv2-manifest release-version resource-hints format-tables contract-union probe-checks eq-probe-race band-groups phaser-depth geq-widgets round-trip hints modgui manual install install-pins install-test package-lists install-devel install-contract contract-dir lv2bench-ran clean version recipe-test completeness selftest private-refs params-doc check-params-doc strip-crosscheck meters-abi meter-level dsp-copies meter-ring clap-validate param-contract-abi
 all: lib
 	@for p in $(PLUGINS); do $(MAKE) -C $$p all || exit 1; done
 lib: $(LIB) $(LIB_PC)
-test: lib units panel-layout descriptor-view lv2-units lv2-deprecated lv2-maintainer lv2-manifest release-version resource-hints format-tables contract-union contract-dir lv2bench-ran probe-checks eq-probe-race band-groups phaser-depth geq-widgets summary-numbers param-tie
+test: lib units panel-layout descriptor-view lv2-units lv2-deprecated lv2-maintainer lv2-manifest release-version resource-hints format-tables contract-union contract-dir lv2bench-ran probe-checks eq-probe-race band-groups phaser-depth geq-widgets summary-numbers param-tie face-dirty-order
 	@if [ -z "$(PLUGINS)" ]; then echo "no plugins yet"; fi
 	@for p in $(PLUGINS); do $(MAKE) -C $$p test || exit 1; done
 	@$(MAKE) -s round-trip
@@ -162,6 +164,7 @@ test: lib units panel-layout descriptor-view lv2-units lv2-deprecated lv2-mainta
 	@$(MAKE) -s presets
 	@$(MAKE) -s presets-figures
 	@$(MAKE) -s meters-abi
+	@$(MAKE) -s param-contract-abi
 	@$(MAKE) -s meter-level
 	@$(MAKE) -s test-role
 	@$(MAKE) -s package-lists
@@ -170,6 +173,7 @@ test: lib units panel-layout descriptor-view lv2-units lv2-deprecated lv2-mainta
 test-faces: all lib contract-union eq-probe-race
 	@$(MAKE) -s lib-test
 	@$(MAKE) -s meters-abi
+	@$(MAKE) -s param-contract-abi
 	@$(MAKE) -s meter-level
 	@$(MAKE) -s test-role
 	@$(MAKE) -s package-lists
@@ -209,6 +213,10 @@ eq-probe-race:
 # omx-eq8's generated descriptor and TTL hold a port group per band, HPF and LPF as before (#257)
 param-tie:
 	node tools/test/param-tie-test.mjs
+# the CLAP face reads its dirty flag acquire and publishes it release, so the audio thread never sees the flag
+# before the values (weak-memory targets), with its sabotage arms
+face-dirty-order:
+	node tools/test/face-dirty-order-check.mjs --self-test
 summary-numbers:
 	node tools/test/summary-numbers-test.mjs --self-test
 phaser-depth:
@@ -263,7 +271,13 @@ meters-abi:
 	$(CC) -std=gnu11 -Wall -Wextra -Werror $(shell $(PKG_CONFIG) --cflags omx-clap-core clap) -o build/meters-abi-test tools/test/meters-abi-test.c
 	build/meters-abi-test
 	@echo "ok   clap.meters/1 as omx-clap-core installs it: id, enums, sizeof and offsetof"
-# every level meter of the metered faces reads bit for bit what tools/test/meter-level.sha256 holds, and every
+param-contract-abi:
+	@mkdir -p build
+	$(CC) -std=gnu11 -Wall -Wextra -Werror -Iinclude $(shell $(PKG_CONFIG) --cflags omx-contract omx-clap-core clap) -o build/param-contract-abi-test tools/test/param-contract-abi-test.c
+	build/param-contract-abi-test
+	@echo "ok   org.openmixer.param-contract/1 as omx-clap-core reads it: id, sizeof and offsetof"
+# every level meter of the metered faces reads what tools/test/<face>.meter-level.txt holds within the bound
+# omx-dsp's fast-maths bound gives (meter-level-digest --tolerance), and a level moved past that bound is red; every
 # other meter (a gain reduction, float through libm) reads within a tolerance what tools/test/<face>.meter-others.txt holds
 METER_LEVEL_FACES := omx-comp omx-deesser
 # faces whose meters are all gain reductions: no level to digest, only the values within the tolerance
@@ -271,14 +285,17 @@ METER_GR_FACES := omx-keyed-gate omx-limiter
 meter-level:
 	@mkdir -p build
 	@for f in $(METER_LEVEL_FACES) $(METER_GR_FACES); do $(MAKE) -s -C plugins/$$f all || exit 1; done
-	$(CC) -std=gnu11 -Wall -Wextra -Werror $(shell $(PKG_CONFIG) --cflags omx-clap-core clap) -o build/meter-level-digest tools/test/meter-level-digest.c -ldl -lm
+	$(CC) -std=gnu11 -Wall -Wextra -Werror $(shell $(PKG_CONFIG) --cflags omxdsp omx-clap-core clap) -o build/meter-level-digest tools/test/meter-level-digest.c -ldl -lm
 	node tools/test/meter-values-check.mjs --self-test
-	@for f in $(METER_LEVEL_FACES); do \
-	  got=$$(build/meter-level-digest plugins/$$f/build/$$f.clap --others build/$$f.meter-others.txt | sha256sum | cut -d' ' -f1); \
-	  want=$$(sed -n "s/^\([0-9a-f]*\)  $$f\$$/\1/p" tools/test/meter-level.sha256); \
-	  if [ "$$got" != "$$want" ] || [ -z "$$want" ]; then echo "FAIL meter-level $$f: $$got, expected $$want" >&2; exit 1; fi; \
-	  echo "ok   meter-level $$f: the level meters read $$got"; \
+	@tol=$$(build/meter-level-digest --tolerance) || exit 1; \
+	for f in $(METER_LEVEL_FACES); do \
+	  build/meter-level-digest plugins/$$f/build/$$f.clap --others build/$$f.meter-others.txt > build/$$f.meter-level.txt || exit 1; \
+	  node tools/test/meter-values-check.mjs --tolerance-db $$tol build/$$f.meter-level.txt tools/test/$$f.meter-level.txt || exit 1; \
 	  node tools/test/meter-values-check.mjs build/$$f.meter-others.txt tools/test/$$f.meter-others.txt || exit 1; \
+	  build/meter-level-digest plugins/$$f/build/$$f.clap --input-gain-db $$(awk "BEGIN { print 4 * $$tol }") > build/$$f.meter-level-moved.txt || exit 1; \
+	  if node tools/test/meter-values-check.mjs --tolerance-db $$tol build/$$f.meter-level-moved.txt tools/test/$$f.meter-level.txt >/dev/null 2>&1; then \
+	    echo "FAIL meter-level $$f: a level moved by four times the bound ($$tol dB) passed" >&2; exit 1; fi; \
+	  echo "ok   meter-level $$f: a level moved by four times the bound is red"; \
 	done
 	@for f in $(METER_GR_FACES); do \
 	  build/meter-level-digest plugins/$$f/build/$$f.clap --others build/$$f.meter-others.txt >/dev/null || exit 1; \

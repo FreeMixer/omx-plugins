@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # Copyright (C) 2026 Pau Aliagas <linuxnow@gmail.com>
 Name: omx-plugins
-Version: 0.17.0
+Version: 0.18.0
 Release: 1%{?dist}
 License: GPL-3.0-or-later
 Summary: The OpenMixer console's delay, drive, EQ, channel strip, keyed gate and effects, as plugins for your DAW
@@ -14,9 +14,9 @@ BuildRequires: make
 BuildRequires: pkgconf-pkg-config
 # The releases this tree builds against: a floor each (no ceiling), once here and
 # the same in debian/control (tools/deps-check.sh). The Makefile and tools/gen.mjs read them from here.
-BuildRequires: omx-dsp-devel >= 0.28.0
+BuildRequires: omx-dsp-devel >= 0.29.0
 BuildRequires: omx-contract-devel >= 3.7.1
-BuildRequires: omx-clap-core-devel >= 0.14.0
+BuildRequires: omx-clap-core-devel >= 0.23.0
 # plugin-hostd's format tables, which the generators read backwards (tools/format-tables.mjs)
 BuildRequires: plugin-hostd-devel >= 0.15.2
 # the omx-contract command, first packaged in 2.15.0: the generators read the contract directory through it
@@ -78,6 +78,7 @@ files in %{_datadir}/omx/presets.
 
 %package clap
 Summary: OpenMixer delay, drive, EQ, strip, gate and effects as CLAP plugins
+Conflicts: omx-clap-host < 0.23.0
 
 %description clap
 The OpenMixer console's delay, drive, 8-, 16- and 32-band EQ, 31-band graphic
@@ -112,7 +113,7 @@ own machine.
 
 %package devel
 Summary: Headers and static library of the OpenMixer plugins, for projects that build on them
-Requires: omx-dsp-devel >= 0.28.0
+Requires: omx-dsp-devel >= 0.29.0
 # the generated parameter headers include omx-contract's C renders, and omxplugins.pc requires omx-contract
 Requires: omx-contract-devel >= 3.7.1
 Requires: %{name}-contract = %{version}-%{release}
@@ -264,6 +265,22 @@ tools/pins-check.sh %{buildroot}%{_datadir}/plugin-hostd/pins.d/omx-plugins.pins
 # END GENERATED lv2-files
 
 %changelog
+* Tue Nov 03 2026 Pau Aliagas <linuxnow@gmail.com> - 0.18.0-1
+- Each plugin runs in place where it is proven to: a host that hands an output
+  the buffer of its input (CLAP's in_place_pair, an LV2 host that connects both
+  ports to one buffer) gets the same result as with two buffers, held by a test
+  per plugin.
+- A quiet block skips the resolve: when no parameter moved since the last block,
+  the plugin runs on the coefficients it holds.
+- The CLAP face reads its dirty flag with acquire, against the main thread's
+  release store.
+- Built on omx-dsp 0.29.0's fast maths (libmvec where the toolchain has it); the
+  build floor is omx-dsp 0.29.0.
+- The CLAP plugins no longer carry the parameter-contract migration members,
+  which no plugin ever filled (zero steps everywhere); a host older than omx-
+  clap-host 0.23.0 read past the shorter table, so the package declares the
+  conflict (#184).
+
 * Sat Oct 31 2026 Pau Aliagas <linuxnow@gmail.com> - 0.17.0-1
 - omx-dyneq, the six-band dynamic EQ, and omx-multiband, the multiband
   compressor of two to five bands, from omx-dsp 0.26.0's kernels (#179).

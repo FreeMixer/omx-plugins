@@ -22,7 +22,7 @@
 NAME       := omx-clipper
 URI        := urn:openmixer:clipper
 CLAP_ID    := org.openmixer.clipper
-OMXDSP_MIN ?= 0.28.0
+OMXDSP_MIN ?= 0.29.0
 ROOT       := $(abspath ../..)
 GEN        := generated
 B          := build
