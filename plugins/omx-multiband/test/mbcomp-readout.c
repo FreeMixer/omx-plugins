@@ -17,8 +17,8 @@
  *              being 20 dB past its threshold, far beyond any knee; bands 1 and 3, the tone's skirts well under
  *              their thresholds, read exactly 0. Band 2's attack and release are both BALLISTICS_MS, so its RMS
  *              detector settles on the mean square itself: with a faster attack than release it settles between
- *              the RMS and the peak, as the console's round trip measured (25.40, 27.30 and 24.44 dB at the
- *              defaults, openmixer#2368), and the law at L would not be the reading
+ *              the RMS and the peak (25.40, 27.30 and 24.44 dB of reduction measured in a round trip at the
+ *              defaults), and the law at L would not be the reading
  *   C  heard   the same with band 2 soloed: the output's RMS over L is band2Gr within TOL
  *   D  bypass  the host's bypass after the reduction: every band reads exactly 0
  *
