@@ -112,9 +112,6 @@ jobs:
       arch-matrix: ${{ (github.event_name != 'push' && inputs.arm == false) && '["amd64"]' || '["amd64", "arm64"]' }}
       requires: ''
       # the channel publishes no fedora 45 tree yet (omx-contract, omx-dsp-devel, omx-panel, plugin-hostd, plugin-qualify and the rest
-      # answer nothing provides on fc45), so the build installs from fc44 only
-      fedora-versions: '["44"]'
-      channel-deps: true
     secrets: inherit
 
   # The trixie DEBs just built, repacked as one tarball laid out for a Zynthian's plugin directories
