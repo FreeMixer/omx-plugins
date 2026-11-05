@@ -99,13 +99,14 @@ jobs:
           tools/deps-check.sh
           tools/deps-check.sh --self-test
 
-      - name: Every source file carries its SPDX line
+      - name: Every file a comment can be written in opens with its licence
         id: handback-spdx
-        run: tools/spdx-check.sh
+        uses: FreeMixer/.github/.github/actions/spdx-check@c67b6d0e09fd9f7cf9a8dd24ff41ea30d99f893c
 
       - name: No tracked file points into a private repository
         id: handback-private-refs
-        run: make private-refs
+        uses: FreeMixer/.github/.github/actions/private-refs-check@v1
+
 
       - name: No source carries a copy of a function omx-dsp exports, and a planted copy goes red
         id: handback-dsp-copies
@@ -450,9 +451,8 @@ jobs:
   clap-validator:
     # clap-validator is the CLAP project's own conformance tester (state round trips, parameter fuzzing,
     # thread rules). It runs on every built .clap, the test plugins included, and keeps one JSON report each.
-    # Until every plugin is clean a failed test is reported (a warning, the job summary, the report artifact)
-    # and does not fail the job; the step is made required, continue-on-error removed, once they pass.
-    # The state tests are required: the step after the summary fails the job on any of them.
+    # A failed test fails the job. The factory presets are installed first, where the plugins declare them, because
+    # the preset-discovery tests crawl that location.
     name: clap-validator (fedora:44, amd64)
     runs-on: ${{ github.event.pull_request.head.repo.fork && 'ubuntu-latest' || vars.OMX_RUNNER || 'ubuntu-latest' }}
     timeout-minutes: 30
@@ -482,9 +482,10 @@ jobs:
       - name: Build every plugin
         run: make -j"$(nproc)" all
 
+      - name: Install the factory presets where the plugins declare them
+        run: make install-presets
+
       - name: Validate every built .clap
-        id: validate
-        continue-on-error: true
         run: |
           set -euo pipefail
           mkdir -p build
@@ -500,18 +501,6 @@ jobs:
             grep -E '^(omx-|  FAIL|FAIL)' build/clap-validator.log || echo 'no failed test'
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
-          if [ "${{ steps.validate.outcome }}" = failure ]; then
-            echo "::warning::clap-validator reported failures (not yet required); see the job summary and the report artifact"
-          fi
-
-      - name: The state and event-ordering tests are required
-        # every plugin's state round trip (state-reproducibility-*, state-invalid-*) must pass; the
-        # repo's own test of it is `clap-probe state`, in every plugin's make test. The event-ordering
-        # tests (process-sleep-process-status, process-varying-block-sizes, process-random-block-sizes,
-        # transport-fuzz) must pass too: they catch an output event reported out of sample order.
-        run: |
-          node tools/clap-validate-required.mjs build/clap-validator state- \
-            process-sleep-process-status process-varying-block-sizes process-random-block-sizes transport-fuzz
 
       - uses: actions/upload-artifact@v4
         if: always()
@@ -536,19 +525,7 @@ jobs:
       publish: false
       arm: false  # arm64/aarch64 build at release only
 
-  # A commit message is published like a file. A pull request's own commits must carry no
-  # attribution line (the commit-message-check action of FreeMixer/.github); what is already on the base is not read.
-  commit-message-check:
-    name: commit messages pass the message check
-    if: github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          ref: ${{ github.event.pull_request.head.sha }}
-      # @main until FreeMixer/.github moves v1 past the action
-      - uses: FreeMixer/.github/.github/actions/commit-message-check@main
-        with:
-          base-ref: ${{ github.event.pull_request.base.ref }}
+  # The shared checks on what this repository publishes: a pull request's own commits carry no attribution line, no
+  # tracked file points into a private repository, and no local copy of these checks is kept.
+  public-sources:
+    uses: FreeMixer/.github/.github/workflows/public-sources-check.yml@v1
