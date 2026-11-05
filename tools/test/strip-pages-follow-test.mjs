@@ -18,11 +18,12 @@
  */
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { panelDescription } from '../descriptor.mjs';
 import { loadDecl } from '../gen.mjs';
 import { pagesOf } from '../omx-panel.mjs';
 
-const ROOT = join(import.meta.dirname, '..', '..');
+const ROOT = join(fileURLToPath(new URL('.', import.meta.url)), '..', '..');
 const NONE = 4294967295;
 const d = loadDecl(join(ROOT, 'plugins', 'omx-strip'));
 const x = panelDescription(d);
