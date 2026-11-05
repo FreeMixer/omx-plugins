@@ -17,7 +17,7 @@ BuildRequires: pkgconf-pkg-config
 # the same (tools/deps-check.sh). The Makefile and tools/gen.mjs read them from here.
 BuildRequires: (omx-dsp-devel >= 0.30.0 with omx-dsp-devel < 0.31)
 BuildRequires: (omx-contract-devel >= 3.9.0 with omx-contract-devel < 4)
-BuildRequires: (omx-clap-core-devel >= 0.23.0 with omx-clap-core-devel < 0.30)
+BuildRequires: (omx-clap-core-devel >= 0.24.0 with omx-clap-core-devel < 0.30)
 # plugin-hostd's format tables, which the generators read backwards (tools/format-tables.mjs)
 BuildRequires: (plugin-hostd-devel >= 0.15.2 with plugin-hostd-devel < 0.19)
 # the omx-contract command, first packaged in 2.15.0: the generators read the contract directory through it
@@ -293,7 +293,7 @@ tools/pins-check.sh %{buildroot}%{_datadir}/plugin-hostd/pins.d/omx-plugins.pins
   (#314)
 - Build floors: omx-dsp 0.30.0, omx-contract 3.9.0, omx-panel 0.10.0
 - Every dependency on a library of ours states a floor and a ceiling, in the spec, debian/control and
-  omxplugins.pc: omx-dsp >= 0.30.0 and < 0.31, omx-contract >= 3.9.0 and < 4, omx-clap-core >= 0.23.0 and
+  omxplugins.pc: omx-dsp >= 0.30.0 and < 0.31, omx-contract >= 3.9.0 and < 4, omx-clap-core >= 0.24.0 and
   < 0.30, plugin-hostd >= 0.15.2 and < 0.19, omx-panel >= 0.10.0 and < 0.11, plugin-qualify >= 0.9.0 and
   < 0.20 (tools/deps-check.sh holds them)
 

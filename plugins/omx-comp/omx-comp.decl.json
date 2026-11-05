@@ -240,16 +240,6 @@
   "console": {
     "$comment": "The compressor as a dynamics stage of the console walk: one section of the ten controls, in declaration order. Its placement follows the other dynamics stages (gate, de-esser); the card, chip and graph the console draws for it are not declared yet.",
     "placement": {
-      "strips": [
-        "input",
-        "fxReturn",
-        "aux",
-        "mix",
-        "matrix",
-        "main",
-        "fxSend",
-        "mixMinus"
-      ],
       "group": "walk",
       "stage": "comp",
       "after": "deEsser",

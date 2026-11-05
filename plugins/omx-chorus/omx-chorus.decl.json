@@ -68,16 +68,6 @@
   "console": {
     "$comment": "The OpenMixer console draws its chorus stage: the panel is the modulation panel (rateHz, depthMs, voices, mix, spread); the stage's chip in the FX row shows rateHz; the overview card shows the engage switch only.",
     "placement": {
-      "strips": [
-        "input",
-        "fxReturn",
-        "aux",
-        "mix",
-        "matrix",
-        "main",
-        "fxSend",
-        "mixMinus"
-      ],
       "group": "walk",
       "stage": "chorus",
       "after": "rotary",

@@ -93,7 +93,7 @@ $(B)/clap-probe: $(ROOT)/tools/clap-probe.c | $(B)
 $(B)/panel-probe: $(ROOT)/tools/panel-probe.c $(ROOT)/include/omx_panel_description.h | $(B)
 	$(CC) $(CFLAGS) $(WARN) -I$(ROOT)/include $(ABI_CFLAGS) -o $@ $< $(LILV) -ldl
 
-$(B)/clap-ext-probe: $(ROOT)/tools/clap-ext-probe.c $(ROOT)/include/omx_param_contract.h | $(B)
+$(B)/clap-ext-probe: $(ROOT)/tools/clap-ext-probe.c | $(B)
 	$(CC) $(CFLAGS) $(WARN) -I$(ROOT)/include $(ABI_CFLAGS) $(CONTRACT_CFLAGS) -o $@ $< -ldl
 
 $(B)/port-groups-probe: $(ROOT)/tools/port-groups-probe.c | $(B)

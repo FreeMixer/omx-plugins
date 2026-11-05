@@ -3,12 +3,12 @@
 /*
  * param-contract.mjs — org.openmixer.param-contract/1 of a plugin, from its declaration: each
  * parameter's symbol, unit, scale and step, the host's bypass last, and the canonical serialisation
- * whose SHA-256 is the fingerprint. tools/gen.mjs writes the rows a CLAP face serves
- * (include/omx_param_contract.h); the unit codes are omx-contract's (OMX_PARAM_CONTRACT_UNITS). tools/clap-ext-check.mjs
- * reads what a built face serves back.
+ * whose SHA-256 is the fingerprint. The extension is omx-clap-core's (<omx-clap-host/omx_clap_ext.h>); tools/gen.mjs
+ * writes the rows a CLAP face serves it from (include/omx_param_contract.h); the unit codes are omx-contract's
+ * (OMX_PARAM_CONTRACT_UNITS). tools/clap-ext-check.mjs reads what a built face serves back.
  *
- * The contract's version is 1: its first publication. A later change of a symbol, unit, scale, travel
- * or stepping changes the fingerprint and needs the next version.
+ * The contract's version is 1: its first publication. A later change of a
+ * symbol, unit, scale, travel or stepping changes the fingerprint and needs the next version.
  */
 import { createHash } from 'node:crypto';
 import { dirname, join } from 'node:path';

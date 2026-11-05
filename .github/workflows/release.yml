@@ -84,7 +84,7 @@ jobs:
 
   rpm:
     needs: qualify
-    uses: FreeMixer/.github/.github/workflows/build-rpm.yml@v1.1.1
+    uses: FreeMixer/.github/.github/workflows/build-rpm.yml@v1
     with:
       package-name: omx-plugins
       binary-names: omx-plugins omx-plugins-clap omx-plugins-lv2

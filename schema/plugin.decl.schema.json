@@ -1193,11 +1193,10 @@
           "type": "object",
           "additionalProperties": false,
           "required": [
-            "strips",
             "group"
           ],
           "title": "Placement",
-          "description": "Where the plugin may go in a strip's chain.",
+          "description": "Where the plugin may go in a strip's chain: the group the console puts it in, and a restriction to some strip kinds when the plugin has one.",
           "properties": {
             "strips": {
               "type": "array",
@@ -1205,10 +1204,17 @@
               "uniqueItems": true,
               "items": {
                 "type": "string",
-                "pattern": "^[a-z][a-zA-Z0-9]*$"
+                "enum": [
+                  "input",
+                  "fxReturn",
+                  "main",
+                  "aux",
+                  "mix",
+                  "matrix"
+                ]
               },
               "title": "Strip kinds",
-              "description": "The strip kinds that may host the plugin, in the console's names (input, fxReturn, aux, mix, matrix, main, fxSend, mixMinus)."
+              "description": "A restriction: the strip kinds that may host the plugin, fewer than all the kinds the console gives an insert rack (the enum is the console's INSERT_RACK_KINDS, in its names; fxSend and mixMinus host no rack and are never listed). Written only when a plugin confines itself; left out, the plugin goes wherever the console puts its group. tools/test/placement-strips-check.mjs refuses a list of every rack kind."
             },
             "group": {
               "type": "string",

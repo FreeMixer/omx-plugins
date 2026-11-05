@@ -183,7 +183,7 @@ async function main() {
     `the draft has one parameter per resolve() argument, named by the contract (${draft.decl?.params.map((p) => `${p.symbol}:${p.name}`).join(' ')})`);
   expect(draft.decl?.params.every((p) => p.ref && !('min' in p) && !('def' in p)), 'the draft is by reference only');
   const marks = reviewMarks(draft.decl);
-  expect(marks.join(' ') === '/description /clap/features/1 /lv2/class /params/3/values/0 /params/3/values/1 /console/placement/strips/0 /console/placement/group',
+  expect(marks.join(' ') === '/description /clap/features/1 /lv2/class /params/3/values/0 /params/3/values/1 /console/placement/group',
     `the draft marks every design choice REVIEW (${marks.join(' ')})`);
   const unsettled = await planPlugin(draft.decl, src, { root: tree, recipe });
   expect(!unsettled.ok && unsettled.refusals.length === marks.length, `a draft with REVIEW marks is refused, each named (${unsettled.refusals.map((r) => r.field).join(' ')})`);
@@ -192,7 +192,7 @@ async function main() {
   settled.clap.features[1] = 'wobble';
   settled.lv2.class = 'lv2:ModulatorPlugin';
   settled.params[3].values = ['Wobble', 'Pan'];
-  settled.console.placement = { strips: ['input'], group: 'plugins' };
+  settled.console.placement = { group: 'plugins' };
   const answers = settled; // what section 5 mutates
   const plan = await planPlugin(settled, src, { root: tree, recipe });
   expect(plan.ok, `the settled draft is accepted${plan.ok ? '' : `: ${plan.refusals.map((r) => `${r.field} ${r.reason}`).join('; ')}`}`);
@@ -802,7 +802,7 @@ static inline float omx_wobble_instance_level_db(const OmxWobbleInstance *s) { r
     settled.description = 'A test chain: the console EQ, then its gate, then its compressor, in any order.';
     settled.clap.features[1] = 'mixing';
     settled.lv2.class = 'lv2:MixerPlugin';
-    settled.console.placement = { strips: ['input'], group: 'plugins' };
+    settled.console.placement = { group: 'plugins' };
     const [eq, gate, comp] = settled.chain;
     eq.on = true;
     eq.name = 'EQ';

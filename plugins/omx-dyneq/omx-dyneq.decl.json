@@ -594,14 +594,6 @@
   "console": {
     "$comment": "The OpenMixer console has no dynamic EQ stage yet: racked as a plugin in a channel's insert rack, it is drawn by the generic plugin editor until the console's card, its EQ curve with each band's live excursion, lands (the remaining-FX wave's console lane).",
     "placement": {
-      "strips": [
-        "input",
-        "fxReturn",
-        "aux",
-        "mix",
-        "matrix",
-        "main"
-      ],
       "group": "plugins"
     }
   },
