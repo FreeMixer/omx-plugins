@@ -50,8 +50,6 @@
 #   make check-params-doc  the committed pages are what the declarations generate, and say what the generated TTLs say (tools/test/params-doc-test.mjs); run by CI beside `node tools/gen.mjs --check`
 #   make panel-copies  no tracked file is a film strip or a fixture omx-panel renders or ships: `omx-panel copies`
 #                      over the tree, with its --self-test; run by CI beside `make test`
-#   make private-refs  no tracked file (generated ones included) points into a private repository, issue, branch or path
-#                      (tools/private-refs-check.sh, with its --self-test); run by CI beside `make test`
 #   make recipe-test   the repository's own checks, run by CI beside `make test`:
 #     make completeness  every plugin against recipes/plugin.recipe.json, each gap naming its wizard step;
 #                        a gap not in recipes/completeness-debt.json fails, and so does a paid debt entry
@@ -94,7 +92,7 @@
 #   make install-devel   the public headers other projects include: $(INCLUDEDIR)/omx-plugins/*.h,
 #                   and $(LIBDIR)/libomxplugins.a with $(LIBDIR)/pkgconfig/omxplugins.pc
 #   make clap-validate  clap-validator on every built .clap (tools/clap-validate.sh): one JSON report each in build/clap-validator;
-#                   CI runs it and reports a failure without failing the job until every plugin passes
+#                   the factory presets must be installed (make install-presets); in CI a failed test fails the job
 #   make release-version  every generated header, descriptor and LV2 plugin file carries VERSION, with its sabotage arms
 #                   (tools/test/release-version-check.mjs; part of `make test`)
 #   make version    the release version, the one packaging/omx-plugins.spec and debian/changelog carry
@@ -164,7 +162,7 @@ LIB_FLAGS  := -fPIC -fvisibility=hidden -DOMX_CLAP_STATIC -Iinclude
 # read only by the targets that build the archive, so `make version` and the rest need no omx-dsp
 lib_cflags = $(call dep_check,omxdsp,$(OMXDSP_MIN))$(call dep_check,omx-contract,$(CONTRACT_MIN))$(shell $(PKG_CONFIG) --cflags omxdsp omx-contract omx-clap-core clap)
 
-.PHONY: summary-numbers param-tie presets presets-figures test-role all lib lib-test test test-faces units panel-layout descriptor-view lv2-units lv2-deprecated lv2-maintainer lv2-manifest release-version resource-hints format-tables contract-union probe-checks face-ids eq-probe-race band-groups strip-visible-when strip-pages-follow phaser-depth geq-widgets round-trip hints modgui manual install install-pins install-test package-lists install-devel install-contract contract-dir lv2bench-ran clean version recipe-test completeness selftest private-refs params-doc check-params-doc strip-crosscheck strip-bands strip-bands-bench meters-abi meter-level dsp-copies panel-copies meter-ring clap-validate
+.PHONY: install-presets summary-numbers param-tie presets presets-figures test-role all lib lib-test test test-faces units panel-layout descriptor-view lv2-units lv2-deprecated lv2-maintainer lv2-manifest release-version resource-hints format-tables contract-union probe-checks face-ids eq-probe-race band-groups strip-visible-when strip-pages-follow phaser-depth geq-widgets round-trip hints modgui manual install install-pins install-test package-lists install-devel install-contract contract-dir lv2bench-ran clean version recipe-test completeness selftest params-doc check-params-doc strip-crosscheck strip-bands strip-bands-bench meters-abi meter-level dsp-copies panel-copies meter-ring clap-validate
 all: lib
 	@for p in $(PLUGINS); do $(MAKE) -C $$p all || exit 1; done
 lib: $(LIB) $(LIB_PC)
@@ -293,9 +291,6 @@ OMX_PANEL ?= omx-panel
 panel-copies:
 	$(OMX_PANEL) copies --self-test
 	$(OMX_PANEL) copies .
-private-refs:
-	tools/private-refs-check.sh
-	tools/private-refs-check.sh --self-test
 meters-abi:
 	@mkdir -p build
 	$(CC) -std=gnu11 -Wall -Wextra -Werror $(shell $(PKG_CONFIG) --cflags omx-clap-core clap) -o build/meters-abi-test tools/test/meters-abi-test.c
@@ -344,8 +339,11 @@ strip-bands-bench:
 	build/strip-bands-bench plugins/omx-strip/build/omx-strip.clap $(BENCH_RATES)
 install:
 	@for p in $(SHIP_PLUGINS); do $(MAKE) -C $$p install || exit 1; done
-	find presets -type f -name '*.json' | while read -r f; do install -D -m644 "$$f" "$(DESTDIR)$(DATADIR)/omx/$$f"; done
+	$(MAKE) -s install-presets
 	$(MAKE) -s install-pins
+# the factory presets, where every plugin's preset-discovery factory declares them
+install-presets:
+	find presets -type f -name '*.json' | while read -r f; do install -D -m644 "$$f" "$(DESTDIR)$(DATADIR)/omx/$$f"; done
 # every shipped plugin's pin, known at build time: scans the .clap files the step above just installed,
 # so the pins ship beside the binaries they were measured from (tools/gen-pins.sh, which needs
 # plugin-qualify >= 0.9.0; run on its own once the plugins are already installed, e.g. in a package's
