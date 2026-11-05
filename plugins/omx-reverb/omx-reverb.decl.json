@@ -163,16 +163,6 @@
   "console": {
     "$comment": "The OpenMixer console draws its reverb stage: the decay drawn over time, above the reverb panel (preset and algorithm selects, then size, damping, predelayMs, width, mix, lowcut, highcut, then the reverse, gated or plate row of the chosen algorithm). Its chip shows size. Its overview card carries the reverb's controls.",
     "placement": {
-      "strips": [
-        "input",
-        "fxReturn",
-        "aux",
-        "mix",
-        "matrix",
-        "main",
-        "fxSend",
-        "mixMinus"
-      ],
       "group": "walk",
       "stage": "reverb",
       "after": "delay",

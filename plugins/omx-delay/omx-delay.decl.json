@@ -142,16 +142,6 @@
   "console": {
     "$comment": "The OpenMixer console draws its delay stage: the echo taps drawn over time, above the delay panel (pingpong and sync latches, timeMs or a synced division, then feedback, mix, tone, the mode and the duck). The console's tempo reaches the plugin as its host transport tempo. Its chip shows timeMs. Its overview card carries the delay's controls.",
     "placement": {
-      "strips": [
-        "input",
-        "fxReturn",
-        "aux",
-        "mix",
-        "matrix",
-        "main",
-        "fxSend",
-        "mixMinus"
-      ],
       "group": "walk",
       "stage": "delay",
       "after": "tremolo",

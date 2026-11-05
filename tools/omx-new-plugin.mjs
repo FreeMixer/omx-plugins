@@ -176,9 +176,10 @@ export function draftDeclaration(kernel, src, { root = ROOT, recipe = loadRecipe
   }
   fillDerived(decl, { schema, version: treeVersion(root, recipe) }, recipe);
   // every plugin declares its panel (the MOD GUI: one section of every parameter until a person
-  // groups them) and its console block (where the console may place it: a person's choice)
+  // groups them) and its console block (the group the console puts it in: a person's choice; `strips` only
+  // when the plugin confines itself to some strip kinds)
   decl.panel = draftPanel(schema, decl);
-  decl.console = { placement: { strips: [`${REVIEW}: the strip kinds that may host it (input, fxReturn, aux, mix, matrix, main, ...)`], group: `${REVIEW}: walk, tail or plugins (the console's channel layout)` } };
+  decl.console = { placement: { group: `${REVIEW}: walk, tail or plugins (the console's channel layout)` } };
   return { refusals: [], decl: canonical(schema, decl), unbound: controls.filter((c) => !bound.binding.some((b) => b.param.symbol === c.name)).map((c) => c.name) };
 }
 
@@ -355,7 +356,7 @@ export function draftChain(kernels, chainSrc, { root = ROOT, recipe = loadRecipe
   fillDerived(decl, { schema, version: treeVersion(root, recipe) }, recipe);
   // as a single plugin's: the panel one section per element, the console placement a person's choice
   decl.panel = draftPanel(schema, decl);
-  decl.console = { placement: { strips: [`${REVIEW}: the strip kinds that may host it (input, fxReturn, aux, mix, matrix, main, ...)`], group: `${REVIEW}: walk, tail or plugins (the console's channel layout)` } };
+  decl.console = { placement: { group: `${REVIEW}: walk, tail or plugins (the console's channel layout)` } };
   return { refusals: [], decl: canonical(schema, decl), notes };
 }
 
