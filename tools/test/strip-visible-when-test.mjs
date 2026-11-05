@@ -16,11 +16,12 @@
  * omx-panel whose layout reads `visibleWhen` (OMX_PANEL_DIR).
  */
 import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { panelDescription } from '../descriptor.mjs';
 import { loadDecl } from '../gen.mjs';
 import { isVisible, pagesOf } from '../omx-panel.mjs';
 
-const ROOT = join(import.meta.dirname, '..', '..');
+const ROOT = join(fileURLToPath(new URL('.', import.meta.url)), '..', '..');
 const BANDS = 32;
 const PARTS = ['Type', 'Freq', 'Gain', 'Q', 'On'];
 
