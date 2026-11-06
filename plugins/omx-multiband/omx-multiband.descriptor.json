@@ -1,7 +1,7 @@
 {
   "$schema": "https://github.com/FreeMixer/omx-contract/raw/v3/schema/omx-contract.schema.json",
   "requires": {
-    "omx-contract-schema": ">= 3.7.0"
+    "omx-contract-schema": ">= 3.9.0"
   },
   "origin": "authored",
   "plugin": {
@@ -10,7 +10,7 @@
     "uri": "urn:openmixer:multiband",
     "name": "omx multiband",
     "vendor": "openmixer",
-    "version": "0.18.0",
+    "version": "0.19.0",
     "doc": "A multiband compressor: two to five bands split by Linkwitz-Riley crossovers, each band its own compressor with threshold, ratio, attack, release, make-up, solo and bypass, then a mix and an output gain, for in-ear mixes, vocals and playback buses.",
     "features": [
       "audio-effect"
@@ -48,7 +48,7 @@
       "source": {
         "from": {
           "link": "data/kernels/mbcomp.json#MBCOMP_BANDS_RANGE",
-          "at": "omx-dsp@0.29.0"
+          "at": "omx-dsp@0.30.0"
         }
       }
     },
@@ -72,7 +72,7 @@
       "source": {
         "from": {
           "link": "data/kernels/mbcomp.json#MBCOMP_XOVER_HZ_RANGE",
-          "at": "omx-dsp@0.29.0"
+          "at": "omx-dsp@0.30.0"
         }
       }
     },
@@ -96,7 +96,7 @@
       "source": {
         "from": {
           "link": "data/kernels/mbcomp.json#MBCOMP_XOVER_HZ_RANGE",
-          "at": "omx-dsp@0.29.0"
+          "at": "omx-dsp@0.30.0"
         }
       }
     },
@@ -120,7 +120,7 @@
       "source": {
         "from": {
           "link": "data/kernels/mbcomp.json#MBCOMP_XOVER_HZ_RANGE",
-          "at": "omx-dsp@0.29.0"
+          "at": "omx-dsp@0.30.0"
         }
       }
     },
@@ -144,7 +144,7 @@
       "source": {
         "from": {
           "link": "data/kernels/mbcomp.json#MBCOMP_XOVER_HZ_RANGE",
-          "at": "omx-dsp@0.29.0"
+          "at": "omx-dsp@0.30.0"
         }
       }
     },
@@ -169,7 +169,7 @@
       "source": {
         "from": {
           "link": "data/kernels/mbcomp.json#MBCOMP_THRESHOLD_DB_RANGE",
-          "at": "omx-dsp@0.29.0"
+          "at": "omx-dsp@0.30.0"
         }
       }
     },
@@ -193,7 +193,7 @@
       "source": {
         "from": {
           "link": "data/kernels/mbcomp.json#MBCOMP_THRESHOLD_DB_RANGE",
-          "at": "omx-dsp@0.29.0"
+          "at": "omx-dsp@0.30.0"
         }
       }
     },
@@ -217,7 +217,7 @@
       "source": {
         "from": {
           "link": "data/kernels/mbcomp.json#MBCOMP_THRESHOLD_DB_RANGE",
-          "at": "omx-dsp@0.29.0"
+          "at": "omx-dsp@0.30.0"
         }
       }
     },
@@ -241,7 +241,7 @@
       "source": {
         "from": {
           "link": "data/kernels/mbcomp.json#MBCOMP_THRESHOLD_DB_RANGE",
-          "at": "omx-dsp@0.29.0"
+          "at": "omx-dsp@0.30.0"
         }
       }
     },
@@ -265,7 +265,7 @@
       "source": {
         "from": {
           "link": "data/kernels/mbcomp.json#MBCOMP_THRESHOLD_DB_RANGE",
-          "at": "omx-dsp@0.29.0"
+          "at": "omx-dsp@0.30.0"
         }
       }
     },
@@ -290,7 +290,7 @@
       "source": {
         "from": {
           "link": "data/kernels/mbcomp.json#MBCOMP_RATIO_RANGE",
-          "at": "omx-dsp@0.29.0"
+          "at": "omx-dsp@0.30.0"
         }
       }
     },
@@ -314,7 +314,7 @@
       "source": {
         "from": {
           "link": "data/kernels/mbcomp.json#MBCOMP_RATIO_RANGE",
-          "at": "omx-dsp@0.29.0"
+          "at": "omx-dsp@0.30.0"
         }
       }
     },
@@ -338,7 +338,7 @@
       "source": {
         "from": {
           "link": "data/kernels/mbcomp.json#MBCOMP_RATIO_RANGE",
-          "at": "omx-dsp@0.29.0"
+          "at": "omx-dsp@0.30.0"
         }
       }
     },
@@ -362,7 +362,7 @@
       "source": {
         "from": {
           "link": "data/kernels/mbcomp.json#MBCOMP_RATIO_RANGE",
-          "at": "omx-dsp@0.29.0"
+          "at": "omx-dsp@0.30.0"
         }
       }
     },
@@ -386,7 +386,7 @@
       "source": {
         "from": {
           "link": "data/kernels/mbcomp.json#MBCOMP_RATIO_RANGE",
-          "at": "omx-dsp@0.29.0"
+          "at": "omx-dsp@0.30.0"
         }
       }
     },
@@ -411,7 +411,7 @@
       "source": {
         "from": {
           "link": "data/kernels/mbcomp.json#MBCOMP_ATTACK_MS_RANGE",
-          "at": "omx-dsp@0.29.0"
+          "at": "omx-dsp@0.30.0"
         }
       }
     },
@@ -435,7 +435,7 @@
       "source": {
         "from": {
           "link": "data/kernels/mbcomp.json#MBCOMP_ATTACK_MS_RANGE",
-          "at": "omx-dsp@0.29.0"
+          "at": "omx-dsp@0.30.0"
         }
       }
     },
@@ -459,7 +459,7 @@
       "source": {
         "from": {
           "link": "data/kernels/mbcomp.json#MBCOMP_ATTACK_MS_RANGE",
-          "at": "omx-dsp@0.29.0"
+          "at": "omx-dsp@0.30.0"
         }
       }
     },
@@ -483,7 +483,7 @@
       "source": {
         "from": {
           "link": "data/kernels/mbcomp.json#MBCOMP_ATTACK_MS_RANGE",
-          "at": "omx-dsp@0.29.0"
+          "at": "omx-dsp@0.30.0"
         }
       }
     },
@@ -507,7 +507,7 @@
       "source": {
         "from": {
           "link": "data/kernels/mbcomp.json#MBCOMP_ATTACK_MS_RANGE",
-          "at": "omx-dsp@0.29.0"
+          "at": "omx-dsp@0.30.0"
         }
       }
     },
@@ -532,7 +532,7 @@
       "source": {
         "from": {
           "link": "data/kernels/mbcomp.json#MBCOMP_RELEASE_MS_RANGE",
-          "at": "omx-dsp@0.29.0"
+          "at": "omx-dsp@0.30.0"
         }
       }
     },
@@ -556,7 +556,7 @@
       "source": {
         "from": {
           "link": "data/kernels/mbcomp.json#MBCOMP_RELEASE_MS_RANGE",
-          "at": "omx-dsp@0.29.0"
+          "at": "omx-dsp@0.30.0"
         }
       }
     },
@@ -580,7 +580,7 @@
       "source": {
         "from": {
           "link": "data/kernels/mbcomp.json#MBCOMP_RELEASE_MS_RANGE",
-          "at": "omx-dsp@0.29.0"
+          "at": "omx-dsp@0.30.0"
         }
       }
     },
@@ -604,7 +604,7 @@
       "source": {
         "from": {
           "link": "data/kernels/mbcomp.json#MBCOMP_RELEASE_MS_RANGE",
-          "at": "omx-dsp@0.29.0"
+          "at": "omx-dsp@0.30.0"
         }
       }
     },
@@ -628,7 +628,7 @@
       "source": {
         "from": {
           "link": "data/kernels/mbcomp.json#MBCOMP_RELEASE_MS_RANGE",
-          "at": "omx-dsp@0.29.0"
+          "at": "omx-dsp@0.30.0"
         }
       }
     },
@@ -653,7 +653,7 @@
       "source": {
         "from": {
           "link": "data/kernels/mbcomp.json#MBCOMP_MAKEUP_DB_RANGE",
-          "at": "omx-dsp@0.29.0"
+          "at": "omx-dsp@0.30.0"
         }
       }
     },
@@ -677,7 +677,7 @@
       "source": {
         "from": {
           "link": "data/kernels/mbcomp.json#MBCOMP_MAKEUP_DB_RANGE",
-          "at": "omx-dsp@0.29.0"
+          "at": "omx-dsp@0.30.0"
         }
       }
     },
@@ -701,7 +701,7 @@
       "source": {
         "from": {
           "link": "data/kernels/mbcomp.json#MBCOMP_MAKEUP_DB_RANGE",
-          "at": "omx-dsp@0.29.0"
+          "at": "omx-dsp@0.30.0"
         }
       }
     },
@@ -725,7 +725,7 @@
       "source": {
         "from": {
           "link": "data/kernels/mbcomp.json#MBCOMP_MAKEUP_DB_RANGE",
-          "at": "omx-dsp@0.29.0"
+          "at": "omx-dsp@0.30.0"
         }
       }
     },
@@ -749,7 +749,7 @@
       "source": {
         "from": {
           "link": "data/kernels/mbcomp.json#MBCOMP_MAKEUP_DB_RANGE",
-          "at": "omx-dsp@0.29.0"
+          "at": "omx-dsp@0.30.0"
         }
       }
     },
@@ -766,7 +766,7 @@
       "source": {
         "from": {
           "link": "data/kernels/mbcomp.json#MBCOMP_SOLOS",
-          "at": "omx-dsp@0.29.0"
+          "at": "omx-dsp@0.30.0"
         }
       }
     },
@@ -783,7 +783,7 @@
       "source": {
         "from": {
           "link": "data/kernels/mbcomp.json#MBCOMP_SOLOS",
-          "at": "omx-dsp@0.29.0"
+          "at": "omx-dsp@0.30.0"
         }
       }
     },
@@ -800,7 +800,7 @@
       "source": {
         "from": {
           "link": "data/kernels/mbcomp.json#MBCOMP_SOLOS",
-          "at": "omx-dsp@0.29.0"
+          "at": "omx-dsp@0.30.0"
         }
       }
     },
@@ -817,7 +817,7 @@
       "source": {
         "from": {
           "link": "data/kernels/mbcomp.json#MBCOMP_SOLOS",
-          "at": "omx-dsp@0.29.0"
+          "at": "omx-dsp@0.30.0"
         }
       }
     },
@@ -834,7 +834,7 @@
       "source": {
         "from": {
           "link": "data/kernels/mbcomp.json#MBCOMP_SOLOS",
-          "at": "omx-dsp@0.29.0"
+          "at": "omx-dsp@0.30.0"
         }
       }
     },
@@ -851,7 +851,7 @@
       "source": {
         "from": {
           "link": "data/kernels/mbcomp.json#MBCOMP_BAND_BYPASSES",
-          "at": "omx-dsp@0.29.0"
+          "at": "omx-dsp@0.30.0"
         }
       }
     },
@@ -868,7 +868,7 @@
       "source": {
         "from": {
           "link": "data/kernels/mbcomp.json#MBCOMP_BAND_BYPASSES",
-          "at": "omx-dsp@0.29.0"
+          "at": "omx-dsp@0.30.0"
         }
       }
     },
@@ -885,7 +885,7 @@
       "source": {
         "from": {
           "link": "data/kernels/mbcomp.json#MBCOMP_BAND_BYPASSES",
-          "at": "omx-dsp@0.29.0"
+          "at": "omx-dsp@0.30.0"
         }
       }
     },
@@ -902,7 +902,7 @@
       "source": {
         "from": {
           "link": "data/kernels/mbcomp.json#MBCOMP_BAND_BYPASSES",
-          "at": "omx-dsp@0.29.0"
+          "at": "omx-dsp@0.30.0"
         }
       }
     },
@@ -919,7 +919,7 @@
       "source": {
         "from": {
           "link": "data/kernels/mbcomp.json#MBCOMP_BAND_BYPASSES",
-          "at": "omx-dsp@0.29.0"
+          "at": "omx-dsp@0.30.0"
         }
       }
     },
@@ -944,7 +944,7 @@
       "source": {
         "from": {
           "link": "data/kernels/mbcomp.json#MBCOMP_MIX_PCT_RANGE",
-          "at": "omx-dsp@0.29.0"
+          "at": "omx-dsp@0.30.0"
         }
       }
     },
@@ -969,7 +969,7 @@
       "source": {
         "from": {
           "link": "data/kernels/mbcomp.json#MBCOMP_OUTPUT_DB_RANGE",
-          "at": "omx-dsp@0.29.0"
+          "at": "omx-dsp@0.30.0"
         }
       }
     }
@@ -1004,6 +1004,98 @@
   "latency": {
     "reports": true
   },
+  "meters": [
+    {
+      "id": 0,
+      "symbol": "band1Gr",
+      "name": "Band 1 gain reduction",
+      "doc": "Band 1's gain reduction, dB with CLAP's sign: the band's gain computer re-run on its RMS level after the last block (omx_mbcomp_band_gr_db), make-up excluded; 0 while it reduces nothing, is bypassed or is past the band count.",
+      "kind": "gain-reduction",
+      "channels": 1,
+      "unit": "dB",
+      "min": -60,
+      "max": 0,
+      "scale": "linear",
+      "source": {
+        "from": {
+          "link": "data/kernels/mbcomp.json#readouts[band1GainReductionDb]",
+          "at": "omx-dsp@0.30.0"
+        }
+      }
+    },
+    {
+      "id": 1,
+      "symbol": "band2Gr",
+      "name": "Band 2 gain reduction",
+      "doc": "Band 2's gain reduction, dB with CLAP's sign: the band's gain computer re-run on its RMS level after the last block (omx_mbcomp_band_gr_db), make-up excluded; 0 while it reduces nothing, is bypassed or is past the band count.",
+      "kind": "gain-reduction",
+      "channels": 1,
+      "unit": "dB",
+      "min": -60,
+      "max": 0,
+      "scale": "linear",
+      "source": {
+        "from": {
+          "link": "data/kernels/mbcomp.json#readouts[band2GainReductionDb]",
+          "at": "omx-dsp@0.30.0"
+        }
+      }
+    },
+    {
+      "id": 2,
+      "symbol": "band3Gr",
+      "name": "Band 3 gain reduction",
+      "doc": "Band 3's gain reduction, dB with CLAP's sign: the band's gain computer re-run on its RMS level after the last block (omx_mbcomp_band_gr_db), make-up excluded; 0 while it reduces nothing, is bypassed or is past the band count.",
+      "kind": "gain-reduction",
+      "channels": 1,
+      "unit": "dB",
+      "min": -60,
+      "max": 0,
+      "scale": "linear",
+      "source": {
+        "from": {
+          "link": "data/kernels/mbcomp.json#readouts[band3GainReductionDb]",
+          "at": "omx-dsp@0.30.0"
+        }
+      }
+    },
+    {
+      "id": 3,
+      "symbol": "band4Gr",
+      "name": "Band 4 gain reduction",
+      "doc": "Band 4's gain reduction, dB with CLAP's sign: the band's gain computer re-run on its RMS level after the last block (omx_mbcomp_band_gr_db), make-up excluded; 0 while it reduces nothing, is bypassed or is past the band count.",
+      "kind": "gain-reduction",
+      "channels": 1,
+      "unit": "dB",
+      "min": -60,
+      "max": 0,
+      "scale": "linear",
+      "source": {
+        "from": {
+          "link": "data/kernels/mbcomp.json#readouts[band4GainReductionDb]",
+          "at": "omx-dsp@0.30.0"
+        }
+      }
+    },
+    {
+      "id": 4,
+      "symbol": "band5Gr",
+      "name": "Band 5 gain reduction",
+      "doc": "Band 5's gain reduction, dB with CLAP's sign: the band's gain computer re-run on its RMS level after the last block (omx_mbcomp_band_gr_db), make-up excluded; 0 while it reduces nothing, is bypassed or is past the band count.",
+      "kind": "gain-reduction",
+      "channels": 1,
+      "unit": "dB",
+      "min": -60,
+      "max": 0,
+      "scale": "linear",
+      "source": {
+        "from": {
+          "link": "data/kernels/mbcomp.json#readouts[band5GainReductionDb]",
+          "at": "omx-dsp@0.30.0"
+        }
+      }
+    }
+  ],
   "extensions": {
     "clap": {
       "clap_plugin_descriptor.features": [

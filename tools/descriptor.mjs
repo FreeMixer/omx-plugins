@@ -5,7 +5,7 @@
  * docs/declaration-as-descriptor.md):
  *
  *   - descriptorOf(d): the `authored` descriptor of a declaration as tools/gen.mjs loads it: the plugin's
- *     identity, one control per parameter, its ports, its latency. A plugin folder holding
+ *     identity, one control per parameter, its ports, its latency, its meters. A plugin folder holding
  *     <stem>.descriptor.json keeps it equal to this render (gen.mjs writes it, --check refuses it stale),
  *     so the travels it states are always what its links resolve to.
  *   - viewOf(descriptor, extras): the declaration tools/gen.mjs resolves, from the descriptor and the
@@ -13,9 +13,11 @@
  *
  * omx-panel lays a panel out from a descriptor of any origin (tools/omx-panel.mjs); for ours it reads this one.
  */
-import { choicesOf, scaleOf } from './gen.mjs';
+import { existsSync, readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { choicesOf, metersOf, scaleOf } from './gen.mjs';
 import { clapFeatureField, clapFeatureValue } from './format-tables.mjs';
-import { installedContractDir, locateContract, ownersOf, packagingRange } from './omx-contract.mjs';
+import { installedContractDir, installedDataDir, locateContract, ownersOf, packagingRange } from './omx-contract.mjs';
 import { meaningOfRole, panelLayout } from './omx-panel.mjs';
 
 /** The descriptor file of a plugin folder. */
@@ -24,9 +26,34 @@ export const descriptorFile = (stem) => `${stem}.descriptor.json`;
 /** The schema the descriptor words are in, and the release that added them. */
 export const DESCRIPTOR_SCHEMA = 'https://github.com/FreeMixer/omx-contract/raw/v3/schema/omx-contract.schema.json';
 export const DESCRIPTOR_SCHEMA_FLOOR = '3.7.0';
+/** The release that added `meters` (omx-contract docs/descriptors.md): the floor of a descriptor that states them. */
+export const DESCRIPTOR_METERS_FLOOR = '3.9.0';
+/** The descriptor's word for each meter kind a declaration names. */
+const METER_KIND_WORDS = { gain_reduction: 'gain-reduction', level: 'level' };
 
-/** The plugin features the descriptor names; a declaration's other CLAP features have no word there. */
-export const FEATURES = ['audio-effect', 'instrument', 'note-effect', 'analyzer'];
+/** The schema's file in omx-contract's data directory, where the descriptor words are read from. */
+export const DESCRIPTOR_SCHEMA_FILE = 'omx-contract.schema.json';
+
+/** The installed omx-contract's schema: the file $OMX_CONTRACT_SCHEMA names (a moved copy standing in for the install,
+ * as the perturbation proofs set it beside OMX_CONTRACT_DIR), else the one in $OMX_CONTRACT_DIR when that copy carries
+ * it, else the data directory's (`pkg-config --variable=datadir omx-contract`). */
+export function descriptorSchemaFile() {
+  const file = [process.env.OMX_CONTRACT_SCHEMA, ...[process.env.OMX_CONTRACT_DIR, installedDataDir()].filter(Boolean).map((d) => join(d, DESCRIPTOR_SCHEMA_FILE))].filter(Boolean).find((f) => existsSync(f));
+  if (!file) throw new Error(`${DESCRIPTOR_SCHEMA_FILE}: not in the installed omx-contract's data directory; install omx-contract-devel >= ${DESCRIPTOR_SCHEMA_FLOOR} (BUILDING.md)`);
+  return file;
+}
+
+/** The plugin features a descriptor names, the enum of the schema's `$defs.plugin` features (omx-contract
+ * docs/descriptors.md); a declaration's other CLAP features have no word there. */
+export function descriptorFeatures(schema = JSON.parse(readFileSync(descriptorSchemaFile(), 'utf8'))) {
+  const list = schema?.$defs?.plugin?.properties?.features?.items?.enum;
+  if (!Array.isArray(list) || !list.length || list.some((w) => typeof w !== 'string')) throw new Error(`${DESCRIPTOR_SCHEMA_FILE}: $defs.plugin.properties.features.items.enum is not the descriptor's feature words`);
+  return list;
+}
+
+/** The descriptor's feature words, the installed schema's: never spelled here (tools/test/descriptor-features-check.mjs
+ * refuses a list of them in any tool). */
+export const FEATURES = descriptorFeatures();
 
 /** The extension bag's source fields our faces write (omx-contract docs/descriptors.md, The extension bag): CLAP's
  * open features, in the face's order, and the LV2 face's types as its .ttl states them. */
@@ -144,6 +171,9 @@ export function descriptorOf(d) {
   const choiceUnits = {}, byKind = {};
   const controls = d.params.map((p, i) => {
     const c = { id: i, symbol: p.symbol, name: p.name };
+    // a described control's prose is the descriptor's own word, kept as written
+    const doc = d.descriptor?.controls[i]?.doc;
+    if (doc !== undefined) c.doc = doc;
     const choices = choicesOf(p);
     if (p.kind === 'toggle') Object.assign(c, { kind: 'toggle', default: p.def !== 0 });
     else if (choices) {
@@ -165,15 +195,28 @@ export function descriptorOf(d) {
     ...(d.sidechain ? [{ id: 1, name: d.sidechain.symbol, kind: 'audio', direction: 'in', role: 'sidechain', channels: 1, layout: 'mono' }] : []),
     { id: 0, name: 'out', kind: 'audio', direction: 'out', role: 'main', channels: 2, layout: 'stereo' },
   ];
+  // each meter as the faces publish it: its CLAP id (its index), the symbol a host reads it by, its range, and
+  // the kernel readout it publishes, linked where its travel would be; a level the face measures is the face's own
+  const meters = metersOf(d).map((m, k) => {
+    const link = m.readout ? `data/kernels/${d.kernel}.json#readouts[${m.readout.name}]` : undefined;
+    return {
+      id: k, symbol: m.id, name: m.label, ...(m.readout ? { doc: m.readout.doc } : {}), kind: METER_KIND_WORDS[m.kind], channels: m.channels,
+      unit: m.unit, min: m.min, max: m.max, scale: m.scale,
+      source: link ? { from: atOf(link) ? { link, at: atOf(link) } : link } : { impl: face },
+    };
+  });
   const descriptor = {
     $schema: DESCRIPTOR_SCHEMA,
-    requires: { 'omx-contract-schema': `>= ${DESCRIPTOR_SCHEMA_FLOOR}` },
+    requires: { 'omx-contract-schema': `>= ${meters.length ? DESCRIPTOR_METERS_FLOOR : DESCRIPTOR_SCHEMA_FLOOR}` },
     origin: 'authored',
     plugin: { id: d.clap.id, format: 'clap', uri: d.lv2.uri, name: d.name, vendor: d.vendor, version: d.version, doc: d.description, features: d.clap.features.filter((f) => FEATURES.includes(f)) },
     controls,
     ports,
-    needs: { extensions: { optional: [LV2_HARD_RT] } },
+    // what the host must hand: the tempo (a plugin that syncs to it), as its descriptor says; the RT capability always
+    // a plugin that reads the tempo maps the time:Position's URIs when its LV2 host lends urid:map
+    needs: d.descriptor?.needs?.tempo ? { tempo: true, extensions: { optional: ['urid:map', LV2_HARD_RT] } } : { extensions: { optional: [LV2_HARD_RT] } },
     latency: { reports: true },
+    ...(meters.length ? { meters } : {}),
     extensions: extensionsOf(d),
     source: { impl: face },
   };

@@ -6,16 +6,8 @@
     "delay"
   ],
   "url": "https://github.com/FreeMixer/omx-plugins",
-  "summary": "Stereo delay up to {max:fxDelayTime} ms: feedback through a tone filter that darkens each repeat, ping-pong, wet/dry mix. Zero latency, real-time safe.",
+  "summary": "Stereo delay up to {max:fxDelayTime} ms, free or synced to the host's tempo: feedback through a tone filter that darkens each repeat, ping-pong, up to four read taps, a tape or analog colour, wet/dry mix and a duck under the input. Zero latency, real-time safe.",
   "binding": "instance",
-  "held": [
-    "sync",
-    "division",
-    "mode",
-    "duckDb",
-    "duckThresholdDb",
-    "duckReleaseMs"
-  ],
   "engaged": {
     "fxDelayTaps": 4
   },
@@ -48,6 +40,9 @@
     "streams-from-disk": false,
     "opens-sockets": false
   },
+  "oracles": [
+    "delay-tempo"
+  ],
   "panel": {
     "family": "delay",
     "roles": {
@@ -66,9 +61,18 @@
           "fxDelayTime",
           "fxDelayFeedback",
           "mix",
-          "tone"
+          "tone",
+          "mode"
         ],
         "graph": "delay-taps"
+      },
+      {
+        "key": "tempo",
+        "label": "Tempo",
+        "controls": [
+          "sync",
+          "division"
+        ]
       },
       {
         "key": "taps",
@@ -87,6 +91,15 @@
           "tap3Gain",
           "tap3Pan"
         ]
+      },
+      {
+        "key": "duck",
+        "label": "Duck",
+        "controls": [
+          "duckDb",
+          "duckThresholdDb",
+          "duckReleaseMs"
+        ]
       }
     ]
   },
@@ -98,6 +111,9 @@
     "| Mix (wet) | {range:mix} | {default:mix} |",
     "| Tone (0 bright, 1 dark repeats) | {range:tone} | {default:tone} |",
     "| Ping-pong | {range:pingpong} | {default:pingpong} |",
+    "| Sync (free: the Time control; tempo: the Division at the host's tempo) | Free, Tempo | Free |",
+    "| Division (while synced) | 1/1 to 1/32, each straight, dotted and triplet | 1/4 |",
+    "| Mode (the repeats' colour) | Digital, Tape, Analog | Digital |",
     "| Taps (engaged read taps of the one delay line) | {range:fxDelayTaps} | {default:fxDelayTaps} |",
     "| Tap 1 gain | {range:tap0Gain} | {default:tap0Gain} |",
     "| Tap 1 pan (left to right) | {range:tap0Pan} | {default:tap0Pan} |",
@@ -110,25 +126,22 @@
     "| Tap 4 time (a share of the delay time) | 1/4 to 3 | {default:tap3Factor} |",
     "| Tap 4 gain | {range:tap3Gain} | {default:tap3Gain} |",
     "| Tap 4 pan (left to right) | {range:tap3Pan} | {default:tap3Pan} |",
+    "| Duck (how far the repeats drop while the input is loud) | {range:duckDb} | {default:duckDb} |",
+    "| Duck threshold | {range:duckThresholdDb} | {default:duckThresholdDb} |",
+    "| Duck release | {range:duckReleaseMs} | {default:duckReleaseMs} |",
     "",
     "With one tap the delay is the single-tap echo. Raising Taps adds the second to fourth reads of the same line, each with its own time, gain and pan; the feedback comes from the longest engaged tap, so a pattern repeats as a whole.",
+    "",
+    "With Sync at Tempo the time is the Division at the host's tempo: 60000 / BPM x the division's beats (a quarter note is one beat), held to the Time control's top. The tempo is the CLAP host's transport tempo, or the LV2 host's time:Position time:beatsPerMinute on the plugin's Control port. While the host hands no tempo the delay keeps the Time control, exactly as at Free.",
+    "",
+    "Mode colours the repeats: Digital is the delay as it shipped; Tape puts a low pass and a slow wow in the loop; Analog a lower low pass and a soft saturation. Duck lowers the repeats while the input is above the threshold, by up to the Duck depth, and lets them back up over the release.",
     "",
     "Plus the host's bypass. The tone filter holds the same corner at every sample rate, so a session",
     "moved from 48 to 96 kHz sounds the same."
   ],
   "console": {
-    "$comment": "The OpenMixer console draws its delay stage: the echo taps drawn over time, above the delay panel (pingpong and sync latches, timeMs or a synced division, then feedback, mix, tone; sync and division have no parameter here). Its chip shows timeMs. Its overview card carries the delay's controls.",
+    "$comment": "The OpenMixer console draws its delay stage: the echo taps drawn over time, above the delay panel (pingpong and sync latches, timeMs or a synced division, then feedback, mix, tone, the mode and the duck). The console's tempo reaches the plugin as its host transport tempo. Its chip shows timeMs. Its overview card carries the delay's controls.",
     "placement": {
-      "strips": [
-        "input",
-        "fxReturn",
-        "aux",
-        "mix",
-        "matrix",
-        "main",
-        "fxSend",
-        "mixMinus"
-      ],
       "group": "walk",
       "stage": "delay",
       "after": "tremolo",

@@ -71,7 +71,7 @@ static const char *const OMX_PHASER_PARAM_MODULES[OMX_PHASER_PARAM_COUNT] = {
 #define OMX_PHASER_NAME "omx phaser"
 #define OMX_PHASER_VENDOR "openmixer"
 #define OMX_PHASER_URL "https://github.com/FreeMixer/omx-plugins"
-#define OMX_PHASER_VERSION "0.18.0"
+#define OMX_PHASER_VERSION "0.19.0"
 #define OMX_PHASER_DESCRIPTION "The console's phaser: identical all-pass sections swept in octaves by one oscillator, with feedback around the chain and a wet/dry mix."
 #define OMX_PHASER_CLAP_ID "org.openmixer.phaser"
 #define OMX_PHASER_CLAP_FEATURES "audio-effect", "phaser", "stereo"
@@ -81,7 +81,7 @@ static const char *const OMX_PHASER_PARAM_MODULES[OMX_PHASER_PARAM_COUNT] = {
 #define OMX_PHASER_DECL_DIGEST "d39a2a6935c7d0e32234d86d28aa84bcb731db7c680d1cd28dd517edff5fe512"
 
 /* org.openmixer.param-contract/1 (tools/param-contract.mjs): each parameter's unit, scale and step, in
- * id order; the host's bypass, the last id, is the face's. */
+ * id order; the host's bypass, CLAP id OMX_PLUGIN_FACE_BYPASS_CLAP_ID (omx-contract), is the face's. */
 #define OMX_PHASER_PARAM_CONTRACT_VERSION 1u
 #define OMX_PHASER_PARAM_CONTRACT_FINGERPRINT "ce52de8667a3734d436618dd2a7c57f9a6428f2ae0d80e3ae77159efef05c13e"
 static const struct omx_param_contract_row OMX_PHASER_PARAM_CONTRACT[OMX_PHASER_PARAM_COUNT] = {
@@ -136,14 +136,17 @@ static const struct omx_panel_rows OMX_PHASER_PANEL = {
   NULL, 0u,
 };
 
-/* LV2 port indices (tools/gen.mjs lv2Ports): audio, then parameter i at FIRST_PARAM + i, then these. */
-#define OMX_PHASER_LV2_PORT_IN_L 0u
-#define OMX_PHASER_LV2_PORT_IN_R 1u
-#define OMX_PHASER_LV2_PORT_OUT_L 2u
-#define OMX_PHASER_LV2_PORT_OUT_R 3u
-#define OMX_PHASER_LV2_PORT_ENABLED 10u
-#define OMX_PHASER_LV2_PORT_LATENCY 11u
-#define OMX_PHASER_LV2_PORT_FIRST_PARAM 4u
+/* LV2 port indices (tools/gen.mjs lv2Ports): enabled and latency at omx-contract's permanent indices, the tempo's control,
+ * the meters' outputs, the audio ports, then parameter i at FIRST_PARAM + i. */
+#define OMX_PHASER_LV2_PORT_ENABLED 0u
+#define OMX_PHASER_LV2_PORT_LATENCY 1u
+#define OMX_PHASER_LV2_PORT_IN_L 2u
+#define OMX_PHASER_LV2_PORT_IN_R 3u
+#define OMX_PHASER_LV2_PORT_OUT_L 4u
+#define OMX_PHASER_LV2_PORT_OUT_R 5u
+#define OMX_PHASER_LV2_PORT_FIRST_PARAM 6u
+/* The meters' output control ports, one per channel in the order their values are published, from here on. */
+#define OMX_PHASER_LV2_PORT_FIRST_METER 12u
 #define OMX_PHASER_LV2_PORT_COUNT 12u
 
 #endif /* OMX_PHASER_PARAMS_H */

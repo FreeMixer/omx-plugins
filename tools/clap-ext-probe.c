@@ -2,8 +2,8 @@
 // Copyright (C) 2026 Pau Aliagas <linuxnow@gmail.com>
 /*
  * clap-ext-probe.c — a CLAP host that reads the extensions a built omx plugin serves beyond its
- * parameters, as a host would: it knows no plugin, only CLAP, include/omx_param_contract.h and
- * omx-contract's <omxcontract/omx_resource_hints.h>.
+ * parameters, as a host would: it knows no plugin, only CLAP, omx-clap-core's <omx-clap-host/omx_clap_ext.h>
+ * and omx-contract's <omxcontract/omx_resource_hints.h>.
  *
  *   clap-ext-probe <x.clap>
  *
@@ -42,7 +42,7 @@
 #include "clap/factory/plugin-factory.h"
 #include "clap/host.h"
 
-#include "omx_param_contract.h"
+#include <omx-clap-host/omx_clap_ext.h>
 #include <omxcontract/omx_resource_hints.h>
 
 #define MAX_PARAMS 512u
@@ -154,12 +154,12 @@ int main(int argc, char **argv) {
   const clap_plugin_t *p = create();
   if (!p) return 1;
   const clap_plugin_params_t *params = (const clap_plugin_params_t *)p->get_extension(p, CLAP_EXT_PARAMS);
-  const omx_clap_plugin_param_contract_t *pc = (const omx_clap_plugin_param_contract_t *)p->get_extension(p, OMX_PARAM_CONTRACT_ID);
+  const omx_clap_plugin_param_contract_ext_t *pc = (const omx_clap_plugin_param_contract_ext_t *)p->get_extension(p, OMX_CLAP_EXT_PARAM_CONTRACT);
   const clap_plugin_remote_controls_t *rc_ext = (const clap_plugin_remote_controls_t *)p->get_extension(p, CLAP_EXT_REMOTE_CONTROLS);
-  if (!params || !pc || !rc_ext) return fprintf(stderr, "missing: %s%s%s\n", params ? "" : "params ", pc ? "" : OMX_PARAM_CONTRACT_ID " ", rc_ext ? "" : CLAP_EXT_REMOTE_CONTROLS), 1;
+  if (!params || !pc || !rc_ext) return fprintf(stderr, "missing: %s%s%s\n", params ? "" : "params ", pc ? "" : "org.openmixer.param-contract/1 ", rc_ext ? "" : CLAP_EXT_REMOTE_CONTROLS), 1;
   for (uint32_t i = 0; i < params->count(p); ++i) {
     clap_param_info_t info;
-    omx_clap_param_contract_info_t c;
+    omx_clap_param_contract_entry_t c;
     if (!params->get_info(p, i, &info) || !pc->get(p, info.id, &c)) {
       fprintf(stderr, "param %u has no contract entry\n", i);
       rc = 1;
@@ -168,7 +168,7 @@ int main(int argc, char **argv) {
     printf("param\t%" PRIu32 "\t%s\t%" PRIu32 "\t%" PRIu32 "\t%.17g\t%.17g\t%.17g\t%.17g\t%" PRIx32 "\n", info.id, c.symbol, c.unit, c.scale, c.step,
            info.min_value, info.max_value, info.default_value, (uint32_t)info.flags);
   }
-  omx_clap_param_contract_info_t c;
+  omx_clap_param_contract_entry_t c;
   if (pc->get(p, params->count(p), &c)) fprintf(stderr, "the contract answers an id params does not list\n"), rc = 1;
   const char *fp = pc->fingerprint(p);
   printf("contract\t%" PRIu32 "\t%s\n", pc->version(p), fp ? fp : "-");

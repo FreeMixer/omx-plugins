@@ -1,15 +1,17 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 Pau Aliagas <linuxnow@gmail.com>
 Source: omx-plugins
 Section: sound
 Priority: optional
 Maintainer: Pau Aliagas <linuxnow@gmail.com>
 Build-Depends: debhelper-compat (= 13),
                clap-headers,
-               libomxdsp-dev (>= 0.29.0),
-               libomx-contract-dev (>= 3.7.1),
-               omx-contract (>= 3.7.1),
-               libomx-clap-core-dev (>= 0.23.0),
-               plugin-hostd-dev (>= 0.15.2),
-               omx-panel (>= 0.2.0),
+               libomxdsp-dev (>= 0.30.0~), libomxdsp-dev (<< 0.31~),
+               libomx-contract-dev (>= 3.9.0~), libomx-contract-dev (<< 4~),
+               omx-contract (>= 3.9.0~), omx-contract (<< 4~),
+               libomx-clap-core-dev (>= 0.24.0~), libomx-clap-core-dev (<< 0.31~),
+               plugin-hostd-dev (>= 0.15.2~), plugin-hostd-dev (<< 0.20~),
+               omx-panel (>= 0.10.0~), omx-panel (<< 0.11~),
                lv2-dev,
                pkgconf,
                nodejs <!nocheck>,
@@ -19,8 +21,10 @@ Build-Depends: debhelper-compat (= 13),
                sordi <!nocheck>,
                serdi <!nocheck>,
                omx-clap-host <!nocheck>,
-               plugin-hostd (>= 0.15.2) <!nocheck>,
-               plugin-qualify (>= 0.9.0)
+               plugin-hostd (>= 0.15.2~) <!nocheck>,
+               plugin-hostd (<< 0.20~) <!nocheck>,
+               plugin-qualify (>= 0.9.0~),
+               plugin-qualify (<< 0.20~)
 Standards-Version: 4.6.2
 Homepage: https://github.com/FreeMixer/omx-plugins
 Rules-Requires-Root: no
@@ -29,7 +33,7 @@ Package: omx-plugins
 Section: metapackages
 Architecture: any
 Depends: omx-plugins-clap (= ${binary:Version}), omx-plugins-lv2 (= ${binary:Version}), omx-plugins-contract (= ${source:Version}), ${misc:Depends}
-Recommends: plugin-hostd (>= 0.5.0)
+Recommends: plugin-hostd (>= 0.5.0~), plugin-hostd (<< 0.20~)
 Description: OpenMixer delay, drive, EQ, strip, gate and effects (CLAP, LV2)
  Take the sound of the OpenMixer console into your DAW or onto your own rig:
  delay, drive, the channel EQ as an 8-band EQ, a 16-band EQ or a 32-band EQ,
@@ -38,7 +42,7 @@ Description: OpenMixer delay, drive, EQ, strip, gate and effects (CLAP, LV2)
  tremolo, rotary speaker, reverb, pitch shifter, transient shaper, de-esser,
  sub-octaver, plosive tamer,
  clipper, upward compressor, bus compressor, loudness leveler,
- spectral balancer, spring reverb,
+ spectral balancer, spring reverb, doubler, tone control, ducker,
  limiter, compressor with its sidechain key, multiband compressor and dynamic
  EQ. They come as CLAP plugins for Bitwig, REAPER and Carla, and as LV2
  plugins for Ardour, Carla, MOD and Zynthian. Each one runs the same DSP as the
@@ -48,6 +52,8 @@ Description: OpenMixer delay, drive, EQ, strip, gate and effects (CLAP, LV2)
  This package installs both formats; omx-plugins-clap and omx-plugins-lv2
  install one each. It also carries the factory presets of every plugin, as
  files in /usr/share/omx/presets.
+ .
+ Its documentation is on openmixer.org.
 
 Package: omx-plugins-clap
 Architecture: any
@@ -63,6 +69,8 @@ Description: OpenMixer delay, drive, EQ, strip, gate and effects as CLAP plugins
  limiter, compressor) as CLAP plugins, installed in /usr/lib/clap where Bitwig,
  REAPER, Carla and other CLAP hosts find them. They run the console's own DSP,
  so they sound like the desk, sample for sample.
+ .
+ Its documentation is on openmixer.org.
 
 Package: omx-plugins-test
 Architecture: any
@@ -72,11 +80,13 @@ Description: OpenMixer test instruments, for host tests and plugin measurement
  a pool voice, a note echo and a transport probe, as CLAP plugins. They are
  installed in /usr/libexec/omx-plugins/test, outside every CLAP search path, so
  no host lists them; a test or the plugin qualifier opens them there by path.
+ .
+ Its documentation is on openmixer.org.
 
 Package: omx-plugins-dev
 Section: libdevel
 Architecture: any
-Depends: libomxdsp-dev (>= 0.29.0), libomx-contract-dev (>= 3.7.1), omx-plugins-contract (= ${source:Version}), clap-headers, ${misc:Depends}
+Depends: libomxdsp-dev (>= 0.30.0~), libomxdsp-dev (<< 0.31~), libomx-contract-dev (>= 3.9.0~), libomx-contract-dev (<< 4~), omx-plugins-contract (= ${source:Version}), clap-headers, ${misc:Depends}
 Description: Headers and static library of the OpenMixer plugins
  The headers other projects include to use the OpenMixer plugins' parameters
  and instance code, such as omx_delay_core.h and each plugin's generated
@@ -84,6 +94,8 @@ Description: Headers and static library of the OpenMixer plugins
  (pkg-config omxplugins): every plugin's CLAP face in one static library,
  with the table of their entries in omx_clap_static.h, for a host that runs
  the plugins in its own process without loading .clap files.
+ .
+ Its documentation is on openmixer.org.
 
 Package: omx-plugins-contract
 Architecture: all
@@ -96,6 +108,8 @@ Description: OpenMixer plugins' descriptors in omx-contract's contract directory
  and the manifest naming this release, as files in omx-contract's contract
  directory, for any program that reads them at run time: a host, the
  console's panels and the omx-contract command.
+ .
+ Its documentation is on openmixer.org.
 
 Package: omx-plugins-lv2
 Architecture: any
@@ -111,3 +125,5 @@ Description: OpenMixer delay, drive, EQ, strip, gate and effects as LV2 plugins
  Carla, MOD and Zynthian find them, with a MOD GUI where the plugin has one.
  They run the console's own DSP, so they sound like the desk, sample for
  sample.
+ .
+ Its documentation is on openmixer.org.

@@ -22,7 +22,7 @@
 NAME       := omx-geq
 URI        := urn:openmixer:geq
 CLAP_ID    := org.openmixer.geq
-OMXDSP_MIN ?= 0.29.0
+OMXDSP_MIN ?= 0.30.0
 ROOT       := $(abspath ../..)
 GEN        := generated
 B          := build
@@ -62,7 +62,8 @@ CLAPDIR ?= $(PREFIX)/lib/clap
 TTL      := $(GEN)/$(NAME).lv2
 TTL_SRCS := $(shell find $(TTL) -type f 2>/dev/null)
 CORE     := omx_geq_core.h $(GEN)/omx_geq_params.h $(ROOT)/include/omx_panel_description.h \
-            $(ROOT)/include/omx_param_contract.h $(ROOT)/include/omx_preset_file.h $(ROOT)/include/omx_plugin_face.h
+            $(ROOT)/include/omx_param_contract.h $(ROOT)/include/omx_preset_file.h $(ROOT)/include/omx_plugin_face.h \
+            $(ROOT)/include/omx_face_meters.h
 
 all: $(B)/$(NAME).clap $(BUNDLE)/$(NAME).so $(BUNDLE)/manifest.ttl
 
@@ -75,9 +76,13 @@ $(BUNDLE)/$(NAME).so: omx_geq_lv2.c $(ROOT)/lib/omx_lv2_face.c $(ROOT)/include/o
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(WARN) $(PLUGIN) $(LV2_CFLAGS) -o $@ $(filter %.c,$^) $(LDFLAGS) $(LDLIBS)
 
 # The bundle's text and images are generated and committed; the build copies them beside the binary.
+# The film strips are omx-panel's render of its look, the same in every bundle: never committed, omx-panel writes them
+# into the built bundle.
 $(BUNDLE)/manifest.ttl: $(TTL_SRCS) | $(B)
 	@mkdir -p $(BUNDLE)
 	cp -r $(TTL)/. $(BUNDLE)/
+	node $(ROOT)/tools/panel-file.mjs $(CURDIR) $(PANEL_FILE)
+	$(OMX_PANEL) modgui --films-only --descriptor $(NAME).descriptor.json --panel $(PANEL_FILE) --out $(BUNDLE)
 
 $(B):
 	@mkdir -p $@
@@ -88,7 +93,7 @@ $(B)/clap-probe: $(ROOT)/tools/clap-probe.c | $(B)
 $(B)/panel-probe: $(ROOT)/tools/panel-probe.c $(ROOT)/include/omx_panel_description.h | $(B)
 	$(CC) $(CFLAGS) $(WARN) -I$(ROOT)/include $(ABI_CFLAGS) -o $@ $< $(LILV) -ldl
 
-$(B)/clap-ext-probe: $(ROOT)/tools/clap-ext-probe.c $(ROOT)/include/omx_param_contract.h | $(B)
+$(B)/clap-ext-probe: $(ROOT)/tools/clap-ext-probe.c | $(B)
 	$(CC) $(CFLAGS) $(WARN) -I$(ROOT)/include $(ABI_CFLAGS) $(CONTRACT_CFLAGS) -o $@ $< -ldl
 
 $(B)/port-groups-probe: $(ROOT)/tools/port-groups-probe.c | $(B)
@@ -103,12 +108,12 @@ $(B)/geq-oracle: test/geq-oracle.c $(CORE) | $(B)
 gen:
 	node $(ROOT)/tools/gen.mjs $(CURDIR)
 	node $(ROOT)/tools/panel-file.mjs $(CURDIR) $(PANEL_FILE)
-	$(OMX_PANEL) modgui $(MODGUI)
+	$(OMX_PANEL) modgui --no-films $(MODGUI)
 
 check:
 	node $(ROOT)/tools/gen.mjs --check $(CURDIR)
 	node $(ROOT)/tools/panel-file.mjs $(CURDIR) $(PANEL_FILE)
-	$(OMX_PANEL) modgui --check $(MODGUI)
+	$(OMX_PANEL) modgui --check --no-films $(MODGUI)
 
 # The parameter test: the built CLAP face's parameters are the declaration's, and every one of them
 # reaches the kernel. The state test: a saved state, loaded into a fresh instance, gives back every
@@ -141,7 +146,7 @@ test: all check $(B)/clap-probe $(B)/panel-probe $(B)/clap-ext-probe $(B)/port-g
 	node $(ROOT)/tools/test/resource-hints-check.mjs --binaries $(CURDIR) $(B)/$(NAME).clap $(BUNDLE)/$(NAME).so || fail=1; \
 	$(B)/port-groups-probe $(BUNDLE) $(URI) > $(B)/port-groups.txt && \
 	  node $(ROOT)/tools/port-groups-check.mjs $(CURDIR) $(B)/port-groups.txt || fail=1; \
-	MODGUI_SOURCE='$(MODGUI_SOURCE)' sh $(OMX_PANEL_DIR)/tools/modgui-test.sh $(GEN)/$(NAME).lv2 $(NAME).descriptor.json $(PANEL_FILE) || fail=1; \
+	MODGUI_SOURCE='$(MODGUI_SOURCE)' sh $(OMX_PANEL_DIR)/tools/modgui-test.sh $(BUNDLE) $(NAME).descriptor.json $(PANEL_FILE) || fail=1; \
 	node $(ROOT)/tools/test/presets-host-check.mjs --self-test $(B)/preset-probe $(CURDIR) || fail=1; \
 	sh $(ROOT)/tools/host-check.sh $(B)/$(NAME).clap $(BUNDLE) $(URI) $(CLAP_ID) || fail=1; \
 	exit $$fail

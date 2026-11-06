@@ -8,9 +8,6 @@
   "noun": "keyed gate",
   "url": "https://github.com/FreeMixer/omx-plugins",
   "summary": "The console's channel gate with a sidechain key: the detector listens to the key your host routes to it, or to the signal itself. One gain for both legs, so the stereo image never shifts. Real-time safe.",
-  "lv2": {
-    "enabledPort": "first"
-  },
   "binding": "instance",
   "held": [
     "keyListen",
@@ -197,16 +194,6 @@
   "console": {
     "$comment": "The OpenMixer console draws its gate stage and its key in the processing strip: the gate's curve beside its encoders (thresholdDb, rangeDb, ratio, attackMs, holdMs, releaseMs, hysteresisDb), the knee as readouts (knee_start, knee_end are not drawn as controls), then the KEY section (key source select, key HP and LP; the voice-band button and listen have no parameter here). Its chip shows the gate's main settings. Its overview card carries the gate's controls.",
     "placement": {
-      "strips": [
-        "input",
-        "fxReturn",
-        "aux",
-        "mix",
-        "matrix",
-        "main",
-        "fxSend",
-        "mixMinus"
-      ],
       "group": "walk",
       "stage": "gate",
       "fxGroup": "dynamics"

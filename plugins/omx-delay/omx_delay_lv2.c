@@ -19,6 +19,7 @@
 static const struct omx_face G_FACE = {
     OMX_FACE_TABLES(DELAY), .core = &OMX_DELAY_CORE,
     OMX_FACE_LV2_PORTS(DELAY, UINT32_MAX),
+    .tempo = omx_delay_core_tempo_v, .lv2_control = OMX_DELAY_LV2_PORT_CONTROL,
 };
 
 static const struct omx_lv2_face G_LV2 = OMX_LV2_FACE(&G_FACE, OMX_DELAY_LV2_URI);

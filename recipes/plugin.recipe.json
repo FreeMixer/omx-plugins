@@ -12,7 +12,7 @@
     }
   },
   "contract": {
-    "range": "packaging/omx-plugins.spec: BuildRequires omx-contract-devel >= floor",
+    "range": "packaging/omx-plugins.spec: BuildRequires (omx-contract-devel >= floor with omx-contract-devel < ceiling)",
     "byReferenceSince": "1.1.0"
   },
   "derived": {
@@ -37,7 +37,7 @@
     "faces": "the build and the CLAP and LV2 faces, plain C over omx-dsp, and their binding to the kernel",
     "tests": "the parameter test and the kernel-identity test",
     "packaging": "the RPM and DEB file lists, the metapackage's description and CI's installed-file checks",
-    "docs": "the README's catalogue row and manual section"
+    "docs": "the catalogue (docs/catalogue.md) row and manual section"
   },
   "layers": [
     {
@@ -78,7 +78,7 @@
     {
       "id": "docs",
       "what": "the manual and the catalogue",
-      "message": "{name}: in the README's catalogue"
+      "message": "{name}: in the catalogue (docs/catalogue.md)"
     }
   ],
   "artifacts": [
@@ -453,13 +453,13 @@
     },
     {
       "id": "catalogue-row",
-      "what": "the README catalogue's row, from the declaration's summary or description: a generated region (tools/gen.mjs)",
+      "what": "the catalogue's row (docs/catalogue.md), from the declaration's summary or description: a generated region (tools/gen.mjs)",
       "step": "docs",
       "layer": "docs",
       "made": "GENERATED",
-      "target": "README.md#The plugins",
+      "target": "docs/catalogue.md#The plugins",
       "paths": [
-        "README.md"
+        "docs/catalogue.md"
       ],
       "questions": [
         "/$defs/plugin/properties/description"
@@ -468,27 +468,27 @@
       "when": "always",
       "checker": {
         "fn": "sharedListed",
-        "file": "README.md",
+        "file": "docs/catalogue.md",
         "region": "catalogue",
         "needle": "| **{name}** | `{clapId}` | `{uri}` |"
       }
     },
     {
       "id": "manual-section",
-      "what": "the README's section, from the declaration's manual or its parameters: a generated region (tools/gen.mjs)",
+      "what": "the plugin's section of docs/catalogue.md, from the declaration's manual or its parameters: a generated region (tools/gen.mjs)",
       "step": "docs",
       "layer": "docs",
       "made": "GENERATED",
-      "target": "README.md#{name}",
+      "target": "docs/catalogue.md#{name}",
       "paths": [
-        "README.md"
+        "docs/catalogue.md"
       ],
       "questions": [],
       "template": "tools/gen.mjs",
       "when": "always",
       "checker": {
         "fn": "sharedListed",
-        "file": "README.md",
+        "file": "docs/catalogue.md",
         "region": "sections",
         "needle": "### {name}"
       }

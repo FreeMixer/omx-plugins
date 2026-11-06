@@ -1,7 +1,7 @@
 {
   "$schema": "https://github.com/FreeMixer/omx-contract/raw/v3/schema/omx-contract.schema.json",
   "requires": {
-    "omx-contract-schema": ">= 3.7.0"
+    "omx-contract-schema": ">= 3.9.0"
   },
   "origin": "authored",
   "plugin": {
@@ -10,7 +10,7 @@
     "uri": "urn:openmixer:deesser",
     "name": "omx deesser",
     "vendor": "openmixer",
-    "version": "0.18.0",
+    "version": "0.19.0",
     "doc": "The console's de-esser: a detector on a band around the sibilance drives the compressor's gain computer, and the reduction lands on that band alone or on the whole signal.",
     "features": [
       "audio-effect"
@@ -38,7 +38,7 @@
       "source": {
         "from": {
           "link": "data/kernels/deesser.json#DEESS_FREQ_RANGE",
-          "at": "omx-dsp@0.29.0"
+          "at": "omx-dsp@0.30.0"
         }
       }
     },
@@ -63,7 +63,7 @@
       "source": {
         "from": {
           "link": "data/kernels/deesser.json#DEESS_WIDTH_RANGE",
-          "at": "omx-dsp@0.29.0"
+          "at": "omx-dsp@0.30.0"
         }
       }
     },
@@ -88,7 +88,7 @@
       "source": {
         "from": {
           "link": "data/kernels/deesser.json#DEESS_THRESHOLD_RANGE",
-          "at": "omx-dsp@0.29.0"
+          "at": "omx-dsp@0.30.0"
         }
       }
     },
@@ -113,7 +113,7 @@
       "source": {
         "from": {
           "link": "data/kernels/deesser.json#DEESS_RATIO_RANGE",
-          "at": "omx-dsp@0.29.0"
+          "at": "omx-dsp@0.30.0"
         }
       }
     },
@@ -138,7 +138,7 @@
       "source": {
         "from": {
           "link": "data/kernels/deesser.json#DEESS_RANGE_RANGE",
-          "at": "omx-dsp@0.29.0"
+          "at": "omx-dsp@0.30.0"
         }
       }
     },
@@ -163,7 +163,7 @@
       "source": {
         "from": {
           "link": "data/kernels/deesser.json#DEESS_ATTACK_RANGE",
-          "at": "omx-dsp@0.29.0"
+          "at": "omx-dsp@0.30.0"
         }
       }
     },
@@ -188,7 +188,7 @@
       "source": {
         "from": {
           "link": "data/kernels/deesser.json#DEESS_RELEASE_RANGE",
-          "at": "omx-dsp@0.29.0"
+          "at": "omx-dsp@0.30.0"
         }
       }
     },
@@ -218,7 +218,7 @@
       "source": {
         "from": {
           "link": "data/kernels/deesser.json#DEESS_MODES",
-          "at": "omx-dsp@0.29.0"
+          "at": "omx-dsp@0.30.0"
         }
       }
     }
@@ -253,6 +253,54 @@
   "latency": {
     "reports": true
   },
+  "meters": [
+    {
+      "id": 0,
+      "symbol": "deessGr",
+      "name": "Gain reduction",
+      "doc": "The de-esser's gain reduction, in dB with CLAP's sign: 0 while it reduces nothing, negative the reduction it applies. The display range runs down to DEESS_RANGE_RANGE.min: the de-esser reduces by its range at most.",
+      "kind": "gain-reduction",
+      "channels": 1,
+      "unit": "dB",
+      "min": -24,
+      "max": 0,
+      "scale": "linear",
+      "source": {
+        "from": {
+          "link": "data/kernels/deesser.json#readouts[gainReductionDb]",
+          "at": "omx-dsp@0.30.0"
+        }
+      }
+    },
+    {
+      "id": 1,
+      "symbol": "deessIn",
+      "name": "Input level",
+      "kind": "level",
+      "channels": 2,
+      "unit": "dBFS",
+      "min": -60,
+      "max": 6,
+      "scale": "linear",
+      "source": {
+        "impl": "plugins/omx-deesser/omx_deesser_clap.c#clap_entry"
+      }
+    },
+    {
+      "id": 2,
+      "symbol": "deessOut",
+      "name": "Output level",
+      "kind": "level",
+      "channels": 2,
+      "unit": "dBFS",
+      "min": -60,
+      "max": 6,
+      "scale": "linear",
+      "source": {
+        "impl": "plugins/omx-deesser/omx_deesser_clap.c#clap_entry"
+      }
+    }
+  ],
   "extensions": {
     "clap": {
       "clap_plugin_descriptor.features": [

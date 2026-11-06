@@ -43,7 +43,8 @@ export function modgui(d, mode = '') {
     writeFileSync(panel, panelFileText(d));
     const descriptor = join(tmp, descriptorFile(d.stem));
     writeFileSync(descriptor, descriptorText(d));
-    return omxPanel(['modgui', ...(mode ? [mode] : []), '--descriptor', descriptor, '--panel', panel, '--out', bundleDir(d), '--source', modguiSource(d)]);
+    // the committed bundle carries no film strip: the build writes it (Makefile.tmpl)
+    return omxPanel(['modgui', ...(mode ? [mode] : []), '--no-films', '--descriptor', descriptor, '--panel', panel, '--out', bundleDir(d), '--source', modguiSource(d)]);
   } finally {
     rmSync(tmp, { recursive: true, force: true });
   }

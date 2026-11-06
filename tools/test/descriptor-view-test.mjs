@@ -62,7 +62,7 @@ for (const dir of described) {
     const t = e?.kind === 'travels' ? (link.field ? e.value[link.field] : e.value) : undefined;
     return t ? { min: t.min, max: t.max } : undefined;
   };
-  const bandQ = (d) => d.controls.filter((c) => c.kind === 'travel' && /^(b\d+_q|eq\dQ)$/.test(c.symbol));
+  const bandQ = (d) => d.controls.filter((c) => c.kind === 'travel' && /^(b\d+_q|eq\d+Q)$/.test(c.symbol));
   let total = 0;
   for (const dir of described) {
     const stem = dir.split('/').pop();
@@ -75,7 +75,7 @@ for (const dir of described) {
       if (qs.length) check(`${stem}: ${qs.length} band-Q controls (${label}) state the travel their link resolves to`, bad, []);
     }
   }
-  if (items(contract).EQ_NOTCH_Q_RANGE) check('the band-Q controls checked are the 60 of eq8, eq16, eq32 and the strip', total, 60);
+  if (items(contract).EQ_NOTCH_Q_RANGE) check('the band-Q controls checked are the 88 of eq8, eq16, eq32 and the strip', total, 88);
 }
 
 // the descriptor words: the installed omx-contract's schema
@@ -194,8 +194,8 @@ editJson(DESC, (x) => { x.controls[united.id].travel.unit = 'ratio'; });
 check(`arm: ${united.symbol}, a ${united.travel.unit} travel stating ratio, is stale`, descriptorText(loadDecl(copy)) === readFileSync(join(copy, DESC), 'utf8'), false);
 
 const ratios = described.flatMap((d) => JSON.parse(readFileSync(join(d, descriptorFile(d.split('/').pop())), 'utf8')).controls.filter((c) => c.travel?.unit === 'ratio').map((c) => `${d.split('/').pop()}.${c.symbol}`));
-check('the ratio unit (gap 4) is stated by exactly the ratio controls: comp, de-esser, gate, the dynamic EQ\'s six bands and the multiband\'s five', ratios, [
-  'omx-comp.ratio', 'omx-deesser.deessRatio', ...[1, 2, 3, 4, 5, 6].map((n) => `omx-dyneq.ratio${n}`), 'omx-keyed-gate.ratio', ...[1, 2, 3, 4, 5].map((n) => `omx-multiband.ratio${n}`), 'omx-upward.ratio',
+check('the ratio unit (gap 4) is stated by exactly the ratio controls: comp, de-esser, ducker, gate, the dynamic EQ\'s six bands and the multiband\'s five', ratios, [
+  'omx-comp.ratio', 'omx-deesser.deessRatio', 'omx-ducker.ratio', ...[1, 2, 3, 4, 5, 6].map((n) => `omx-dyneq.ratio${n}`), 'omx-keyed-gate.ratio', ...[1, 2, 3, 4, 5].map((n) => `omx-multiband.ratio${n}`), 'omx-upward.ratio',
 ]);
 
 rmSync(scratch, { recursive: true, force: true });

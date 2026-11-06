@@ -23,6 +23,12 @@
  * Plain C, no CLAP or LV2 header needed: a key or label is copied into the fixed-size fields of the
  * host's structure, whose sizes are CLAP's (CLAP_NAME_SIZE is 256, clap_id a uint32_t,
  * CLAP_INVALID_ID UINT32_MAX).
+ *
+ * The words of the enumerations below are declared elsewhere and only spelled here as C: the families
+ * and the widgets in omx-contract (PANEL_FAMILIES and PANEL_WIDGETS, data/panel.json), the display
+ * kinds, the display sources and the placements in omx-panel (tools/panel-description.mjs); and
+ * omx-clap-core's <omx-clap-host/omx_clap_ext.h> lists each with its code and enumerator for the
+ * host. tools/test/panel-words-check.mjs holds every enum to them, order and count.
  */
 #ifndef OMX_PANEL_DESCRIPTION_H
 #define OMX_PANEL_DESCRIPTION_H

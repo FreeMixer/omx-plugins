@@ -38,7 +38,7 @@ import { fileURLToPath } from 'node:url';
 import { bindFace, instanceHeader, parseFace } from './instance-face.mjs';
 import { controlOf, items, kernelControls, kernelExists, locateContract, resolveParam } from './omx-contract.mjs';
 import { ROOT, checkPlugin, consoleErrors, gapLines, layerOfPath, loadRecipe, loadSchema, panelErrors, pluginFacts, pluginStems, validate } from './plugin-recipe.mjs';
-import { chainBindings, defaultPanel, loadDecl, prepareDecl } from './gen.mjs';
+import { chainBindings, defaultPanel, instanceExtras, loadDecl, prepareDecl } from './gen.mjs';
 import { describedOf, descriptorFile } from './descriptor.mjs';
 import { modgui } from './panel-file.mjs';
 import { pinOfTtl } from './port-hints.mjs';
@@ -176,9 +176,10 @@ export function draftDeclaration(kernel, src, { root = ROOT, recipe = loadRecipe
   }
   fillDerived(decl, { schema, version: treeVersion(root, recipe) }, recipe);
   // every plugin declares its panel (the MOD GUI: one section of every parameter until a person
-  // groups them) and its console block (where the console may place it: a person's choice)
+  // groups them) and its console block (the group the console puts it in: a person's choice; `strips` only
+  // when the plugin confines itself to some strip kinds)
   decl.panel = draftPanel(schema, decl);
-  decl.console = { placement: { strips: [`${REVIEW}: the strip kinds that may host it (input, fxReturn, aux, mix, matrix, main, ...)`], group: `${REVIEW}: walk, tail or plugins (the console's channel layout)` } };
+  decl.console = { placement: { group: `${REVIEW}: walk, tail or plugins (the console's channel layout)` } };
   return { refusals: [], decl: canonical(schema, decl), unbound: controls.filter((c) => !bound.binding.some((b) => b.param.symbol === c.name)).map((c) => c.name) };
 }
 
@@ -250,7 +251,11 @@ export async function planPlugin(declIn, src, { root = ROOT, recipe = loadRecipe
     }
   });
   if (refusals.length) return { ok: false, refusals };
-  const bound = bindFace(src.face, decl.params, controls);
+  // a control the plugin does not expose is passed at its "fixed" value or held at its default, as tools/gen.mjs binds it
+  const extraErrors = [];
+  const extra = instanceExtras({ ...decl, tree: root, controls }, extraErrors);
+  for (const e of extraErrors) refuse('/fixed', e);
+  const bound = bindFace(src.face, [...decl.params, ...extra.map((f) => f.p)], [...controls, ...extra.map((f) => f.c)]);
   for (const e of bound.errors) refuse('/params', e);
 
   await checkPanelConsole(schema, decl, symbols, resolved, refuse, root);
@@ -355,7 +360,7 @@ export function draftChain(kernels, chainSrc, { root = ROOT, recipe = loadRecipe
   fillDerived(decl, { schema, version: treeVersion(root, recipe) }, recipe);
   // as a single plugin's: the panel one section per element, the console placement a person's choice
   decl.panel = draftPanel(schema, decl);
-  decl.console = { placement: { strips: [`${REVIEW}: the strip kinds that may host it (input, fxReturn, aux, mix, matrix, main, ...)`], group: `${REVIEW}: walk, tail or plugins (the console's channel layout)` } };
+  decl.console = { placement: { group: `${REVIEW}: walk, tail or plugins (the console's channel layout)` } };
   return { refusals: [], decl: canonical(schema, decl), notes };
 }
 

@@ -83,7 +83,7 @@ static const char *const OMX_ROTARY_PARAM_MODULES[OMX_ROTARY_PARAM_COUNT] = {
 #define OMX_ROTARY_NAME "omx rotary"
 #define OMX_ROTARY_VENDOR "openmixer"
 #define OMX_ROTARY_URL "https://github.com/FreeMixer/omx-plugins"
-#define OMX_ROTARY_VERSION "0.18.0"
+#define OMX_ROTARY_VERSION "0.19.0"
 #define OMX_ROTARY_DESCRIPTION "The console's rotary speaker: a drum rotor on the low band and a horn rotor on the high band, with stop, slow and fast speeds, mixed with the dry signal."
 #define OMX_ROTARY_CLAP_ID "org.openmixer.rotary"
 #define OMX_ROTARY_CLAP_FEATURES "audio-effect", "stereo"
@@ -93,7 +93,7 @@ static const char *const OMX_ROTARY_PARAM_MODULES[OMX_ROTARY_PARAM_COUNT] = {
 #define OMX_ROTARY_DECL_DIGEST "0f1ffd01a7af4af40fdfb19f71a56ccec05cd0ed038c21237374b29ea4d347e3"
 
 /* org.openmixer.param-contract/1 (tools/param-contract.mjs): each parameter's unit, scale and step, in
- * id order; the host's bypass, the last id, is the face's. */
+ * id order; the host's bypass, CLAP id OMX_PLUGIN_FACE_BYPASS_CLAP_ID (omx-contract), is the face's. */
 #define OMX_ROTARY_PARAM_CONTRACT_VERSION 1u
 #define OMX_ROTARY_PARAM_CONTRACT_FINGERPRINT "7b064efba0e9985f2c12b82e577a32aeecd9502f6fcfce98f373d8a88d720c79"
 static const struct omx_param_contract_row OMX_ROTARY_PARAM_CONTRACT[OMX_ROTARY_PARAM_COUNT] = {
@@ -149,14 +149,17 @@ static const struct omx_panel_rows OMX_ROTARY_PANEL = {
   NULL, 0u,
 };
 
-/* LV2 port indices (tools/gen.mjs lv2Ports): audio, then parameter i at FIRST_PARAM + i, then these. */
-#define OMX_ROTARY_LV2_PORT_IN_L 0u
-#define OMX_ROTARY_LV2_PORT_IN_R 1u
-#define OMX_ROTARY_LV2_PORT_OUT_L 2u
-#define OMX_ROTARY_LV2_PORT_OUT_R 3u
-#define OMX_ROTARY_LV2_PORT_ENABLED 12u
-#define OMX_ROTARY_LV2_PORT_LATENCY 13u
-#define OMX_ROTARY_LV2_PORT_FIRST_PARAM 4u
+/* LV2 port indices (tools/gen.mjs lv2Ports): enabled and latency at omx-contract's permanent indices, the tempo's control,
+ * the meters' outputs, the audio ports, then parameter i at FIRST_PARAM + i. */
+#define OMX_ROTARY_LV2_PORT_ENABLED 0u
+#define OMX_ROTARY_LV2_PORT_LATENCY 1u
+#define OMX_ROTARY_LV2_PORT_IN_L 2u
+#define OMX_ROTARY_LV2_PORT_IN_R 3u
+#define OMX_ROTARY_LV2_PORT_OUT_L 4u
+#define OMX_ROTARY_LV2_PORT_OUT_R 5u
+#define OMX_ROTARY_LV2_PORT_FIRST_PARAM 6u
+/* The meters' output control ports, one per channel in the order their values are published, from here on. */
+#define OMX_ROTARY_LV2_PORT_FIRST_METER 14u
 #define OMX_ROTARY_LV2_PORT_COUNT 14u
 
 #endif /* OMX_ROTARY_PARAMS_H */

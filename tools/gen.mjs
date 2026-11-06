@@ -20,7 +20,7 @@
  *   plugins/<stem>/Makefile                          the build and `make test`
  *
  * and, from every plugin folder at once, the regions of the shared files between a `BEGIN
- * GENERATED <name>` line and its `END GENERATED <name>` line (SHARED below): the README's catalogue
+ * GENERATED <name>` line and its `END GENERATED <name>` line (SHARED below): the catalogue's
  * and sections, the RPM %files lists, CI's installed-file lists and libomxplugins' table of CLAP
  * entries (include/omx_clap_static.h, lib/omx_clap_static.c). Adding a plugin touches only its
  * folder; two plugins' changes merge in either order.
@@ -44,8 +44,8 @@ import { faceBinding } from './instance-face.mjs';
 import { descriptorFile, descriptorOf, descriptorText, isWhole, panelDescription, portGroupsOf, travelUnit, viewOf } from './descriptor.mjs';
 import { lv2Designation, lv2UnitNames, lv2UnitRef } from './format-tables.mjs';
 import { DISPLAY_KINDS, DISPLAY_SOURCES, FAMILIES, PLACEMENTS, WIDGETS, pagesOf, panelFingerprint } from './omx-panel.mjs';
-import { CONTRACT_VERSION, contractFingerprint, contractOf } from './param-contract.mjs';
-import { SPEC_FILE, controlOf, eqDefaultBands, findName, kernelControls, locateContract, packagingRange, paramKernel, resolveParam } from './omx-contract.mjs';
+import { CONTRACT_VERSION, contractFingerprint, contractOf, faceIds } from './param-contract.mjs';
+import { SPEC_FILE, controlOf, eqDefaultBands, findName, kernelControls, locateContract, packagingRange, paramKernel, renderKernels, resolveParam } from './omx-contract.mjs';
 import { bandsMacro, baseOf, expandVariant, variantStems } from './variants.mjs';
 import { omxdspInclude, render } from './template.mjs';
 import { generateTest, isTestDir, loadTestDecl, testPluginDirs } from './test-plugins.mjs';
@@ -132,6 +132,7 @@ export function prepareDecl(file, d, stem, dir = dirname(file)) {
   if (d.sidechain && (seen.has(d.sidechain.symbol) || FIXED_PORTS.includes(d.sidechain.symbol))) throw new Error(`${file}: sidechain symbol '${d.sidechain.symbol}' is taken`);
   if (d.binding === 'chain') checkShipped(file, d);
   if (d.meters && d.binding !== 'instance') throw new Error(`${file}: "meters" are read from an instance face; this declaration's binding is ${d.binding ?? 'its own'}`);
+  d.meterReadouts = meterReadoutsOf(file, d);
   for (const o of d.oracles ?? []) {
     if (o === `${d.kernel}-oracle`) throw new Error(`${file}: oracle '${o}' is the generated identity test's name`);
     if (!existsSync(join(dir, 'test', `${o}.c`))) throw new Error(`${file}: oracle '${o}' names test/${o}.c, which does not exist`);
@@ -226,12 +227,69 @@ function flattenChain(file, d) {
   }
   if (d.order === 'permutable') out.push({ symbol: 'order', name: 'Order', unit: '', min: 0, max: factorial(d.chain.length) - 1, def: 0, kind: 'integer', own: 'stage-order' });
   else if (d.order !== undefined) throw new Error(`${file}: "order" is "permutable" or left out (the declared order)`);
+  // what an element gained after the plugin shipped comes AFTER every parameter it had, so no id and no LV2 parameter
+  // port moves: element by element in chain order, its band count (`bandCount`), then its `appended` parameters
+  for (const el of d.chain) {
+    if (el.bandCount !== undefined) out.push(bandCountParam(file, d, el));
+    for (const p of el.appended ?? []) {
+      if (p.ref === undefined) throw new Error(`${file}: chain element '${el.id}': appended '${p.symbol}' has no ref; an element's parameters are its kernel's contract controls`);
+      if (p.kernel !== undefined && p.kernel !== el.kernel) throw new Error(`${file}: chain element '${el.id}': '${p.symbol}' names kernel '${p.kernel}', not the element's '${el.kernel}'`);
+      out.push({ ...p, kernel: el.kernel, element: el.id });
+    }
+  }
   if (d.key !== undefined) {
     if (!ids.has(d.key)) throw new Error(`${file}: "key" names '${d.key}', no element of the chain`);
     if (!d.sidechain) throw new Error(`${file}: "key" hands the plugin's sidechain to '${d.key}'; declare it in "sidechain"`);
   } else if (d.sidechain) throw new Error(`${file}: a chain's "sidechain" goes to one element, named by "key"`);
   return out;
 }
+
+/**
+ * An element's band count (`bandCount`): the plugin's own integer parameter, from one band to the `max` of the
+ * element's `bands` in its kernel's count sheet (eq's EQ_BAND_COUNTS), coming up at the `default` of the sheet key
+ * `bandCount.default` names. The bands at and past it are passed to the face switched off (its per-band control
+ * `bandCount.gates`), so the face leaves them out of its bank: they cost no processing and sound as if absent.
+ */
+function bandCountParam(file, d, el) {
+  const bc = el.bandCount;
+  if (!el.bands) throw new Error(`${file}: chain element '${el.id}' declares "bandCount" and no "bands": a count of what?`);
+  const where = locateContract(treeOf(file));
+  if (!where.dir) throw new Error(`${file}: chain element '${el.id}' counts its bands in omx-contract and ${where.why}`);
+  const controls = kernelControls(where.dir, el.kernel);
+  const sheet = controls.find((c) => c.count)?.count;
+  if (!sheet) throw new Error(`${file}: chain element '${el.id}' declares "bandCount", and the ${el.kernel} kernel has no per-band control`);
+  const counts = findName(where.dir, el.kernel, sheet).entry?.value ?? {};
+  const max = counts[el.bands]?.max, def = counts[bc.default]?.default;
+  if (!Number.isInteger(max)) throw new Error(`${file}: chain element '${el.id}': ${sheet} has no '${el.bands}' with a max`);
+  if (!Number.isInteger(def) || def < 1 || def > max) throw new Error(`${file}: chain element '${el.id}': "bandCount" comes up at ${sheet}.${bc.default}.default (${def}), not a count from 1 to ${max}`);
+  const gated = controls.find((c) => c.name === bc.gates);
+  if (!gated?.count) throw new Error(`${file}: chain element '${el.id}': "bandCount" gates '${bc.gates}', no per-band control of the ${el.kernel} kernel`);
+  return { symbol: bc.symbol, name: bc.name, unit: '', min: 1, max, def, kind: 'integer', own: 'band-count', element: el.id, gates: bc.gates };
+}
+
+/** The band-count parameter of element `el`, or undefined. */
+const bandCountOf = (d, el) => d.params.find((p) => p.own === 'band-count' && p.element === el.id);
+
+/** The per-band parameters of each element with a band count, by control: `[[i, ...], ...]`, each list one control's
+ * parameters (every band's type, every band's switch, ...) of one element, indices into d.params. */
+function bandGroups(d) {
+  const out = [];
+  for (const el of d.chain ?? []) {
+    if (!bandCountOf(d, el)) continue;
+    const byControl = new Map();
+    d.params.forEach((p, i) => {
+      const c = d.controls?.[i];
+      if (p.element !== el.id || !c?.count) return;
+      if (!byControl.has(c.name)) byControl.set(c.name, []);
+      byControl.get(c.name).push(i);
+    });
+    out.push(...byControl.values());
+  }
+  return out;
+}
+
+/** The C name of the function that reads element `el`'s band count from the values (emitted in the parameter header). */
+const bandCountFn = (d, el) => `omx_${d.kernel}_${el.id}_band_count`;
 
 /** The macro of an element's band count, `bands` the key of its kernel's count sheet (eq's
  * EQ_BAND_COUNTS: strip, eq8, ...): OMX_EQ_BAND_COUNTS_STRIP_MAX. */
@@ -439,10 +497,58 @@ export const choicesOf = (p) => p.points ?? p.values?.map((label, k) => ({ value
 /** The port symbols every plugin has, which no parameter or key may take. */
 const FIXED_PORTS = ['in_l', 'in_r', 'out_l', 'out_r', 'enabled', 'latency'];
 
-/** The LV2 port list, in index order: audio in (and the sidechain key, when declared), audio out,
- * the declared parameters, enabled, latency; `lv2.enabledPort: "first"` puts enabled before the
- * parameters. One rule, read by the TTL, the MOD GUI and (as macros) the LV2 C face. */
-export function lv2Ports(d) {
+/** The kernel readout each meter of declaration `d` names (`readout`, the readout's name in macro case), as
+ * omx-contract's render resolves it for the plugin's kernel: `{ name, doc, unit, min, max, scale }`, or null for a
+ * meter the face measures (a level at the input or the output), in the order of `meters`. */
+function meterReadoutsOf(file, d) {
+  if (!d.meters?.some((m) => m.readout)) return (d.meters ?? []).map(() => null);
+  const where = locateContract(treeOf(file));
+  if (!where.dir) throw new Error(`${file}: its "meters" read omx-contract's ${d.kernel} readouts and ${where.why}`);
+  const listed = renderKernels(where.dir)[d.kernel]?.readouts ?? [];
+  return d.meters.map((m, k) => {
+    if (!m.readout) return null;
+    const r = listed.find((x) => macro(x.name) === m.readout);
+    if (!r) throw new Error(`${file}: meters[${k}] names readout ${m.readout}, which omx-contract's ${d.kernel} kernel does not declare (${listed.map((x) => macro(x.name)).join(', ') || 'none'})`);
+    return r;
+  });
+}
+
+/** What a meter's port and descriptor entry are called, from its id: a band's prefix (`band2`) as "Band 2",
+ * the kind its suffix names (Gr, Gain, In, Out, Key) in words, any other prefix (the plugin's own name, as
+ * `comp` in compGr) left out. */
+const METER_WORDS = { Gr: 'gain reduction', Gain: 'gain', In: 'input level', Out: 'output level', Key: 'key level' };
+export function meterLabel(id) {
+  const m = id.match(/^(?:band(\d+))?[a-z]*?(Gr|Gain|In|Out|Key)$/);
+  if (!m) throw new Error(`meter '${id}': no label for it (its id ends in none of ${Object.keys(METER_WORDS).join(', ')})`);
+  const words = METER_WORDS[m[2]];
+  return m[1] ? `Band ${m[1]} ${words}` : `${words[0].toUpperCase()}${words.slice(1)}`;
+}
+
+/** Each meter of declaration `d` as the faces publish it, in order: its id, kind, channels (one for a reading
+ * of the kernel's, two for a level the face measures, left and right), label, display range and unit (a
+ * readout's, else the declared range in dBFS), and the output symbol of each channel: the id for one channel,
+ * `<id>_<channel>` from 0 for more, the names omx-clap-core derives from clap.meters/1 (doc/reference.md). */
+export function metersOf(d) {
+  const readouts = d.meterReadouts ?? (d.meters ?? []).map(() => null);
+  return (d.meters ?? []).map((m, k) => {
+    const r = readouts[k];
+    const channels = m.kind === 'gain_reduction' || 'read' in m ? 1 : 2;
+    const range = r ? { min: r.min, max: r.max, unit: r.unit, scale: r.scale } : { min: m.min, max: m.max, unit: 'dBFS', scale: 'linear' };
+    const symbols = channels === 1 ? [m.id] : Array.from({ length: channels }, (_, c) => `${m.id}_${c}`);
+    return { id: m.id, kind: m.kind, channels, label: meterLabel(m.id), ...range, symbols, readout: r };
+  });
+}
+
+/** Whether the plugin reads the host's tempo: its descriptor's needs.tempo. Its LV2 face then has a `control` atom
+ * input, the port right after the face's own (enabled, latency), so an appended parameter moves it no more than them. */
+export const tempoOf = (d) => Boolean(d.descriptor?.needs?.tempo);
+
+/** The LV2 port list, in index order: the face's own ports at omx-contract's permanent indices (OMX_PLUGIN_FACE_IDS:
+ * enabled 0, latency 1), then (a plugin that reads the host's tempo) the `control` atom input, then audio in (and the
+ * sidechain key, when declared), audio out, then the declared parameters. Appending a parameter moves no port; adding
+ * a port moves neither enabled, latency nor control. `face` is the ids (default: this tree's contract).
+ * One rule, read by the TTL, the MOD GUI and (as macros) the LV2 C face. */
+export function lv2Ports(d, face = faceIds()) {
   const IN = 'lv2:AudioPort , lv2:InputPort', OUT = 'lv2:AudioPort , lv2:OutputPort';
   const audio = [
     { symbol: 'in_l', name: 'In L', a: IN }, { symbol: 'in_r', name: 'In R', a: IN },
@@ -450,15 +556,20 @@ export function lv2Ports(d) {
     { symbol: 'out_l', name: 'Out L', a: OUT }, { symbol: 'out_r', name: 'Out R', a: OUT },
   ];
   const params = d.params.map((p) => ({ symbol: p.symbol, name: p.name, a: 'lv2:ControlPort , lv2:InputPort', param: p }));
-  const enabled = { symbol: 'enabled', name: 'Enabled', a: 'lv2:ControlPort , lv2:InputPort', enabled: true };
-  const first = d.lv2.enabledPort === 'first';
-  return [
-    ...audio,
-    ...(first ? [enabled] : []),
-    ...params,
-    ...(first ? [] : [enabled]),
-    { symbol: 'latency', name: 'Latency', a: 'lv2:ControlPort , lv2:OutputPort', latency: true },
-  ].map((p, index) => ({ ...p, index }));
+  const fixed = new Map([
+    [face.enabledLv2Index, { symbol: 'enabled', name: 'Enabled', a: 'lv2:ControlPort , lv2:InputPort', enabled: true }],
+    [face.latencyLv2Index, { symbol: 'latency', name: 'Latency', a: 'lv2:ControlPort , lv2:OutputPort', latency: true }],
+  ]);
+  const meters = metersOf(d).flatMap((m) => m.symbols.map((symbol, c) => ({
+    symbol, name: m.channels === 1 ? m.label : `${m.label} ${['L', 'R'][c] ?? c}`, a: 'lv2:ControlPort , lv2:OutputPort', meter: m,
+  })));
+  const rest = [...(tempoOf(d) ? [{ symbol: 'control', name: 'Control', a: 'atom:AtomPort , lv2:InputPort', time: true }] : []),
+    ...meters, ...audio, ...params];
+  const n = rest.length + fixed.size;
+  if (fixed.size !== 2 || [...fixed.keys()].some((i) => !(i >= 0 && i < n))) throw new Error(`${d.stem}: the face's LV2 indices ${[...fixed.keys()]} do not fit ${n} ports`);
+  const out = [];
+  for (let index = 0, k = 0; index < n; index++) out.push({ ...(fixed.get(index) ?? rest[k++]), index });
+  return out;
 }
 
 const cf = (n) => `${Number.isInteger(n) ? `${n}.0` : `${n}`}f`;
@@ -516,7 +627,7 @@ export function emitParamsHeader(d) {
  * table is the one the kernel's instance header reads.
  */
 #include <stddef.h>
-
+${(d.chain ?? []).some((el) => bandCountOf(d, el)) ? '#include <math.h>\n#include <stdint.h>\n' : ''}
 #include <omxcontract/omx_resource_hints.h>
 
 #include "omx_panel_description.h"
@@ -546,7 +657,18 @@ ${d.params.map((p, i) => `  ${cstr(moduleOf(d, i))},`).join('\n')}
 
 /* One macro per declared bound: what a C face reads where a constant is needed. */
 ${d.params.map((p) => [['MIN', p.min], ['MAX', p.max], ['DEFAULT', p.def]].map(([k, v]) => `#define ${P}_${macro(p.symbol)}_${k} ${cf(v)}`).join('\n')).join('\n')}
-
+${(d.chain ?? []).filter((el) => bandCountOf(d, el)).map((el) => {
+    const N = `${P}_${macro(bandCountOf(d, el).symbol)}`;
+    return `
+/* The ${el.id} element's band count, read from the values the faces resolve: the word rounded into its travel, a
+ * non-finite word its default. Its bands from this one on are passed switched off: out of the face's bank. */
+static inline uint32_t ${bandCountFn(d, el)}(const float *values) {
+  const float w = values[${N}];
+  const float n = w - w == 0.0f ? rintf(w) : ${N}_DEFAULT;
+  return (uint32_t)(n < ${N}_MIN ? ${N}_MIN : n > ${N}_MAX ? ${N}_MAX : n);
+}
+`;
+  }).join('')}
 /* The identity every face publishes. */
 #define OMX_${K}_NAME "${d.name}"
 #define OMX_${K}_VENDOR "${d.vendor}"
@@ -561,7 +683,7 @@ ${d.params.map((p) => [['MIN', p.min], ['MAX', p.max], ['DEFAULT', p.def]].map((
 #define OMX_${K}_DECL_DIGEST "${digestOf(d.params)}"
 
 /* org.openmixer.param-contract/1 (tools/param-contract.mjs): each parameter's unit, scale and step, in
- * id order; the host's bypass, the last id, is the face's. */
+ * id order; the host's bypass, CLAP id OMX_PLUGIN_FACE_BYPASS_CLAP_ID (omx-contract), is the face's. */
 #define OMX_${K}_PARAM_CONTRACT_VERSION ${CONTRACT_VERSION}u
 #define OMX_${K}_PARAM_CONTRACT_FINGERPRINT "${contractFingerprint(contractOf(d, scaleOf))}"
 static const struct omx_param_contract_row OMX_${K}_PARAM_CONTRACT[${P}_COUNT] = {
@@ -570,9 +692,12 @@ ${contractOf(d, scaleOf).slice(0, -1).map((r) => `  { ${r.unitEnum}u, OMX_CLAP_S
 
 ${emitHintsC(K, d.hints ?? [])}
 ${emitPanelRows(d)}
-/* LV2 port indices (tools/gen.mjs lv2Ports): audio, then parameter i at FIRST_PARAM + i, then these. */
-${ports.filter((p) => !p.param).map((p) => `#define OMX_${K}_LV2_PORT_${macro(p.symbol)} ${p.index}u`).join('\n')}
+/* LV2 port indices (tools/gen.mjs lv2Ports): enabled and latency at omx-contract's permanent indices, the tempo's control,
+ * the meters' outputs, the audio ports, then parameter i at FIRST_PARAM + i. */
+${ports.filter((p) => !p.param && !p.meter).map((p) => `#define OMX_${K}_LV2_PORT_${macro(p.symbol)} ${p.index}u`).join('\n')}
 #define OMX_${K}_LV2_PORT_FIRST_PARAM ${firstParam}u
+/* The meters' output control ports, one per channel in the order their values are published, from here on. */
+#define OMX_${K}_LV2_PORT_FIRST_METER ${ports.find((p) => p.meter)?.index ?? ports.length}u
 #define OMX_${K}_LV2_PORT_COUNT ${ports.length}u
 
 #endif /* OMX_${K}_PARAMS_H */
@@ -628,16 +753,22 @@ export function emitPluginTtl(d) {
       lines.push('        lv2:default 1 ;', '        lv2:minimum 0 ;', '        lv2:maximum 1 ;', '        lv2:designation lv2:enabled ;', '        lv2:portProperty lv2:toggled ;');
     } else if (p.latency) {
       lines.push('        lv2:designation lv2:latency ;', '        lv2:portProperty lv2:integer ;', '        units:unit units:frame ;');
+    } else if (p.meter) {
+      lines.push(`        lv2:minimum ${ttlNum(p.meter.min)} ;`, `        lv2:maximum ${ttlNum(p.meter.max)} ;`);
+      if (lv2UnitRef(p.meter.unit)) lines.push(`        units:unit ${lv2UnitRef(p.meter.unit)} ;`);
+    } else if (p.time) {
+      // the host's transport: time:Position objects, read for their time:beatsPerMinute; optional, no tempo without it
+      lines.push('        atom:bufferType atom:Sequence ;', '        atom:supports time:Position ;', '        lv2:designation lv2:control ;', '        lv2:portProperty lv2:connectionOptional ;');
     }
     return `    [\n${lines.join('\n').replace(/ ;$/, '')}\n    ]`;
   };
   return `${TTL_BANNER}# GENERATED by tools/gen.mjs from plugins/${d.stem}/${d.stem}.decl.json — DO NOT EDIT BY HAND.
-@prefix doap:  <http://usefulinc.com/ns/doap#> .
+${tempoOf(d) ? '@prefix atom:  <http://lv2plug.in/ns/ext/atom#> .\n' : ''}@prefix doap:  <http://usefulinc.com/ns/doap#> .
 @prefix foaf:  <http://xmlns.com/foaf/0.1/> .
 @prefix lv2:   <http://lv2plug.in/ns/lv2core#> .
 ${hintPrefix(d, (p) => p !== 'xsd')}${d.params.some((q, i) => faceDesignation(d, i)?.startsWith('param:')) ? '@prefix param: <http://lv2plug.in/ns/ext/parameters#> .\n' : ''}${d.panel ? '@prefix pg:    <http://lv2plug.in/ns/ext/port-groups#> .\n' : ''}${d.params.some((q) => scaleOf(q) === 'log') ? '@prefix pprops: <http://lv2plug.in/ns/ext/port-props#> .\n' : ''}${d.params.some((q) => choicesOf(q)) ? '@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .\n' : ''}@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
-@prefix units: <http://lv2plug.in/ns/extensions/units#> .
-${hintPrefix(d, (p) => p === 'xsd')}
+${tempoOf(d) ? '@prefix time:  <http://lv2plug.in/ns/ext/time#> .\n' : ''}@prefix units: <http://lv2plug.in/ns/extensions/units#> .
+${tempoOf(d) ? '@prefix urid:  <http://lv2plug.in/ns/ext/urid#> .\n' : ''}${hintPrefix(d, (p) => p === 'xsd')}
 <${d.url}>
     a doap:Project ;
     doap:name "omx-plugins" ;
@@ -652,7 +783,7 @@ ${hintPrefix(d, (p) => p === 'xsd')}
     lv2:microVersion ${d.version.split('.')[2]} ;
     rdfs:comment ${ttlStr(d.description)} ;
     lv2:optionalFeature lv2:hardRTCapable ;
-${hintTriples(d.hintVocabulary, d.hints ?? []).map((l) => `${l}\n`).join('')}    lv2:port
+${tempoOf(d) ? '    lv2:optionalFeature urid:map ;\n' : ''}${hintTriples(d.hintVocabulary, d.hints ?? []).map((l) => `${l}\n`).join('')}    lv2:port
 ${lv2Ports(d).map(port).join(' ,\n')} .
 ${portGroupsOf(d).length ? `
 # lv2:displayPriority on a port group is the term Zynthian reads to order a plugin's groups (zynthian_lv2.py), and the
@@ -682,7 +813,8 @@ lv2:displayPriority
 const hintPrefix = (d, pick) => hintPrefixes(d.hintVocabulary, d.hints ?? []).filter(([p]) => pick(p)).map(([p, ns]) => `@prefix ${`${p}:`.padEnd(6)} <${ns}> .\n`).join('');
 
 /** The plugin-defined units this plugin's ports use, in a fixed order. */
-const customUnitsOf = (d) => Object.keys(LV2_CUSTOM_UNITS).filter((name) => d.params.some((q, i) => lv2UnitRef(faceUnit(d, i)) === `<urn:openmixer:unit#${name}>`));
+const customUnitsOf = (d) => Object.keys(LV2_CUSTOM_UNITS).filter((name) =>
+  [...d.params.map((q, i) => faceUnit(d, i)), ...metersOf(d).map((m) => m.unit)].some((u) => lv2UnitRef(u) === `<urn:openmixer:unit#${name}>`));
 
 /** A control's group as a CLAP module path (plugin-hostd's group-path, written: the labels joined by "/"). */
 const moduleOf = (d, i) => (d.descriptor?.controls[i]?.group ?? []).join('/');
@@ -705,7 +837,7 @@ const cfloat = (n) => {
   return `${/[.e]/.test(t) ? t : `${t}.0`}f`;
 };
 
-/** How a README row and section read a resolved parameter: its range and its default, in words. */
+/** How a catalogue row and section read a resolved parameter: its range and its default, in words. */
 export function paramRow(p) {
   const unit = p.unit ? ` ${p.unit}` : '';
   if (p.kind === 'toggle') return { name: p.name, range: 'off / on', default: p.def ? 'on' : 'off' };
@@ -716,7 +848,7 @@ export function paramRow(p) {
 
 /** The manual's own words around the numbers: each `{range:<symbol>}`, `{default:<symbol>}`,
  * `{min:<symbol>}` and `{max:<symbol>}` in a line of `manual` reads that resolved parameter (its
- * range and default as the parameter table words them, or its bare limit), so the README never
+ * range and default as the parameter table words them, or its bare limit), so the catalogue never
  * retypes a number omx-contract or the declaration holds. A symbol no parameter has, or any other
  * `{word:...}`, is refused. A `summary` reads the same words (`summaryOf`). */
 export function fillManual(d, line, what = 'manual') {
@@ -730,7 +862,7 @@ export function fillManual(d, line, what = 'manual') {
   return out;
 }
 
-/** The README catalogue's words for a plugin: its `summary` with the numbers it reads from the declaration filled in
+/** The catalogue's words for a plugin: its `summary` with the numbers it reads from the declaration filled in
  * (`up to {max:fxDelayTime} ms`), else its description as the descriptor states it. */
 export function summaryOf(d) {
   return d.summary === undefined ? d.description : fillManual(d, d.summary, 'summary');
@@ -818,7 +950,7 @@ function stepped(params, v, keep) {
   });
 }
 
-export function oraclePlan(params, controls = [], { engaged = [], monitors = [] } = {}) {
+export function oraclePlan(params, controls = [], { engaged = [], monitors = [], together = [] } = {}) {
   const held = new Set(params.map((_, i) => i).filter((i) => controls[i]?.rearms));
   // a chain's element switches: on in the release and choice sections, so each element is heard
   // there (an EQ switched off by the stepped row would hide every band's Q), and never stepped; a
@@ -840,13 +972,19 @@ export function oraclePlan(params, controls = [], { engaged = [], monitors = [] 
   const tail = tailMs(params);
   const defaults = params.map((p, i) => (on.has(i) ? at.get(i) : p.def));
   const release = [row(0, BURST_MS, SIGNAL.burst, defaults, 0), row(0, tail, SIGNAL.tail, defaults, 0)];
+  // each choice heard at each of its values; a group run together (`together`: one per-band control of an element
+  // with a band count, every band of it) takes each value on every member at once, so each band is heard at each
+  // value in one set of rows, not one set per band
   const choices = [];
+  const groupOf = new Map(together.flatMap((g) => g.map((i) => [i, g])));
   params.forEach((p, c) => {
     const vals = valuesOf(p);
     if (!vals || held.has(c)) return;
+    const members = groupOf.get(c) ?? [c];
+    if (members[0] !== c) return;
     for (const value of vals) {
-      const v = defaults.map((d, i) => (i === c ? value : d));
-      const moved = stepped(params, v, new Set([...held, ...on, ...quiet, c]));
+      const v = defaults.map((d, i) => (members.includes(i) ? value : d));
+      const moved = stepped(params, v, new Set([...held, ...on, ...quiet, ...members]));
       choices.push(row(0, BURST_MS, SIGNAL.burst, v, 0), row(0, tail, SIGNAL.tail, v, 0), row(0, tail, SIGNAL.tail, moved, 0));
     }
   });
@@ -871,6 +1009,8 @@ export function latencyRows(d) {
 
 /** clap.meters/1's kind of each meter kind a declaration may name. */
 const METER_KINDS = { gain_reduction: 'CLAP_METER_KIND_GAIN_REDUCTION', level: 'CLAP_METER_KIND_LEVEL' };
+/** The shared faces' kind of each (include/omx_plugin_face.h): clap.meters/1's numbers, without CLAP's headers. */
+const FACE_METER_KINDS = { gain_reduction: 'OMX_FACE_METER_KIND_GAIN_REDUCTION', level: 'OMX_FACE_METER_KIND_LEVEL' };
 /** The most values a plugin's meters carry together: include/omx_meter_ring.h's OMX_METER_RING_MAX. */
 const METER_VALUES_MAX = 16;
 /** A C double literal: always with a point. */
@@ -930,7 +1070,7 @@ export function meterRows(d, face) {
       row = { channels: 2, min: m.min, max: m.max, core: '', ref: '' };
     }
     const out = {
-      meterIndex: k, meterName: m.id, meterKind: METER_KINDS[m.kind], meterReadCore: row.core, meterReadRef: row.ref,
+      meterIndex: k, meterName: m.id, meterKind: METER_KINDS[m.kind], meterFaceKind: FACE_METER_KINDS[m.kind], meterReadCore: row.core, meterReadRef: row.ref,
       meterChannels: row.channels, meterOffset: offset, meterRight: offset + 1, meterMin: cdouble(row.min), meterMax: cdouble(row.max),
       isGr: m.kind === 'gain_reduction', isLinear: m.linear === true, isRead: reads, isIn: m.source === 'input', isOut: m.source === 'output',
       // where the shared face reads it (include/omx_plugin_face.h); what a bypassed kernel's stale reading
@@ -1020,12 +1160,18 @@ function heldControls(d, kernel, names, prefix, who, errors) {
 }
 
 /** The binding of `d` to its kernel's instance face, or a thrown error naming what is missing. */
+/** The face arguments a single-face plugin does not expose: each `fixed` control at its value, then each `held`
+ * one at its kernel's default, as `{ p, c }` pairs a binding appends to the parameters and their controls. */
+export function instanceExtras(d, errors) {
+  const held = heldControls(d, d.face ?? d.kernel, d.held, d.stem, d.stem, errors);
+  const fixed = fixedArgs(d, { id: d.kernel, kernel: d.face ?? d.kernel, fixed: d.fixed }, d.controls ?? [], errors);
+  return [...fixed, ...held];
+}
+
 export function bindingOf(d) {
   const errors = [];
-  const held = heldControls(d, d.face ?? d.kernel, d.held, d.stem, d.stem, errors);
   // the controls of the face this plugin does not expose: each passed at its `fixed` value, or held at its kernel's default
-  const fixed = fixedArgs(d, { id: d.kernel, kernel: d.face ?? d.kernel, fixed: d.fixed }, d.controls ?? [], errors);
-  const extra = [...fixed, ...held];
+  const extra = instanceExtras(d, errors);
   const b = faceBinding(omxdspInclude(), d.face ?? d.kernel, [...d.params, ...extra.map((f) => f.p)], [...(d.controls ?? []), ...extra.map((f) => f.c)]);
   errors.push(...b.errors);
   if (errors.length) throw new Error(`plugins/${d.stem}: binding: instance, but ${errors.join('; ')}`);
@@ -1043,6 +1189,7 @@ export function generateInstance(d) {
   // keyed: the plugin's key port reaches the face, through run (the key first) or run_keyed (the
   // mono key on key_l, key_r NULL)
   const keyed = face.keyed || (face.keyable && Boolean(d.sidechain));
+  if (tempoOf(d) && !face.tempo) throw new Error(`plugins/${d.stem}: its descriptor needs.tempo, and omx-dsp's face defines no omx_${d.face ?? d.kernel}_instance_set_tempo(${face.type} *, float bpm)`);
   const K = d.kernel.toUpperCase();
   const macro_ = (sym) => `OMX_${K}_PARAM_${macro(sym)}`;
   // a fixed control is its value, a parameter its port's
@@ -1063,7 +1210,7 @@ export function generateInstance(d) {
     runFn: keyed && !face.keyed ? 'run_keyed' : 'run', keyTail: keyed && !face.keyed ? ', NULL' : '',
     plan: oraclePlan(d.params, d.controls ?? [], { monitors: monitorsOf(d), engaged: engagedOf(d) }), held: heldOf(d),
     engaged: engagedOf(d).map(([i, v]) => ({ symbol: d.params[i].symbol, value: v })), monitors: monitorsOf(d).map((i) => ({ symbol: d.params[i].symbol })), stretch: d.stretch ?? oracleStretch(face), liveStretch: d.liveStretch ?? false, spanStretch: d.stretch !== undefined, noSpan: d.stretch === undefined, steps: d.params.map((p) => cfloat(d.sabotageStep?.[p.symbol] ?? stepOf(p))).join(', '),
-    chain: false,
+    chain: false, tempo: tempoOf(d),
     latencyChecks: latencyRows(d), measuresLatency: Boolean(d.latencyChecks),
     ...meterView(d, face),
   };
@@ -1199,13 +1346,19 @@ export function generateChain(d) {
   const K = d.kernel.toUpperCase();
   const macro_ = (sym) => `OMX_${K}_PARAM_${macro(sym)}`;
   const one = (type, p) => (p.held ? heldValue(type, p) : p.fixed !== undefined ? (type === 'int' ? `${p.fixed}` : cfloat(p.fixed)) : type === 'int' ? `(int)lrintf(values[${macro_(p.symbol)}])` : `values[${macro_(p.symbol)}]`);
-  const value = (b) => (b.extent ? `(const ${b.elem}[${b.extent}]){${b.params.map((p) => one(b.elem, p)).join(', ')}}` : one(b.type, b.param));
+  // a per-band control an element's band count gates: band k passes its own value while k is under the count, else 0
+  // (off), so the face leaves it out of its bank
+  const gate = (el, b, p, k, text) => {
+    const n = bandCountOf(d, el);
+    return n && b.control === n.gates && p.fixed === undefined ? `(${k}u < ${bandCountFn(d, el)}(values) ? ${text} : 0)` : text;
+  };
+  const valueOf = (el) => (b) => (b.extent ? `(const ${b.elem}[${b.extent}]){${b.params.map((p, k) => gate(el, b, p, k, one(b.elem, p))).join(', ')}}` : one(b.type, b.param));
   const lat = (b, self) => (b.face.latency.fn ? `${b.face.latency.fn}(${self})` : b.face.latency.macro);
   const keyed = d.key !== undefined;
   const elements = bound.map((b, index) => ({
     id: b.el.id, index, name: elementName(b.el), face: b.el.kernel, faceType: b.face.type, srType: b.face.srType,
     on: macro_(`${b.el.id}On`),
-    binding: b.binding.map((x) => ({ arg: x.arg, value: value(x) })),
+    binding: b.binding.map((x) => ({ arg: x.arg, value: valueOf(b.el)(x) })),
     arrays: b.binding.filter((x) => x.extent).map((x) => ({ arg: x.arg, count: x.params.length, extent: x.extent })),
     renames: b.renames.map((x) => ({ arg: x.arg, rename: x.rename })),
     fixed: (b.el.fixed ? Object.entries(b.el.fixed) : []).map(([name, v]) => ({ control: name, at: JSON.stringify(v) })),
@@ -1226,7 +1379,12 @@ export function generateChain(d) {
     sequence: elements.map((e) => e.name).join(' > '),
     latency: elements.map((e) => `(float)(${e.latency})`).join(' + '), refLatency: elements.map((e) => `(float)(${e.refLatency})`).join(' + '),
     keyed, keyPort: keyed ? macro(d.sidechain.symbol) : '', keySymbol: keyed ? d.sidechain.symbol : '',
-    plan: oraclePlan(d.params, d.controls ?? [], { engaged: d.params.map((p, i) => i).filter((i) => d.params[i].own === 'switch' && d.params[i].element) }),
+    // engaged where the others are held: each element's switch on, and each band count at its maximum, so every band
+    // the release and choice sections switch on is heard there
+    plan: oraclePlan(d.params, d.controls ?? [], {
+      engaged: d.params.flatMap((p, i) => (p.own === 'switch' && p.element ? [i] : p.own === 'band-count' ? [[i, p.max]] : [])),
+      together: bandGroups(d),
+    }),
     held: heldOf(d), stretch: keyed ? 64 : 1, noSpan: true, steps: d.params.map((p) => cfloat(d.sabotageStep?.[p.symbol] ?? stepOf(p))).join(', '),
     latencyChecks: latencyRows(d), measuresLatency: Boolean(d.latencyChecks),
     // the single-face fields the shared templates read, empty for a chain
@@ -1277,7 +1435,7 @@ const byStem = (a, b) => a.stem.localeCompare(b.stem, 'en', { numeric: true });
 
 /** Each region's lines, from the shipped plugins' declarations. */
 export const SHARED = {
-  'README.md': {
+  'docs/catalogue.md': {
     catalogue: (ds) => [
       '',
       '| Plugin | CLAP id | LV2 URI | What it does |',

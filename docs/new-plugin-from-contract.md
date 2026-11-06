@@ -64,7 +64,7 @@ Step 1 checks before it writes:
 | `lv2.class`, `clap.features` | `REVIEW`, and `audio-effect`, `stereo` | the LV2 class and the CLAP kind |
 | `summary`, `manual` | left out: the README row reads `description`, the section is the parameter table | optional prose |
 | `panel` | one section of every parameter | groups the controls into sections: the one panel the MOD GUI and the console draw |
-| `console` | its `placement`'s strip kinds and group as `REVIEW` | the placement, and the card and chip the console draws |
+| `console` | its `placement`'s group as `REVIEW` | the placement (its `strips` only when the plugin confines itself to some strip kinds), and the card and chip the console draws |
 | `portHints` | written after the first generation: the pin of the hints the generated TTL carries (`make hints` holds every later TTL to it) | — |
 
 Step 3 refuses while any `REVIEW` mark is left, naming each by its JSON pointer. When the draft is
@@ -171,9 +171,17 @@ it exposes (`strip`), `faceBands`, the key its face is compiled at where omx-dsp
 smaller count (`eq8`), and `fixed`, the controls of its kernel it does not expose, each at an id, a
 number, `"default"` (refused for a travel that declares none) or `{"defaultRef": "<SHEET>.<field>"}`;
 a per-band control fixed so covers every band the element does not expose, `"default"` giving each
-its own default by the contract's one rule. omx-strip's EQ exposes the strip's four bands on the
-eq8 face, the other four fixed off; its filter element is the eq face with every band fixed off;
-its gate, which takes no key in a strip, has its key source fixed at `self`.
+its own default by the contract's one rule. An element with `bands` may declare `bandCount`
+(`symbol`, `name`, `default`, `gates`): the plugin's own integer parameter, one band to the `max`
+of its `bands`, coming up at the `default` of the sheet key `default` names; each band from the
+count on is passed with its per-band control `gates` off, out of the face's bank, so it costs no
+processing and the output is the output without it. Parameters an element gained after its plugin
+shipped go in its `appended`: they, and its `bandCount` before them, come after every element's
+`params` and the `order`, so no id and no LV2 parameter port the plugin had moves. omx-strip's EQ
+exposes 32 band slots on the eq32 face, the first four in `params` and the rest appended, with
+`eqBands` (EQ_BAND_COUNTS: up to `eq32`'s max, at first `strip`'s default) running the first of
+them; its filter element is the eq face with every band fixed off; its gate, which takes no key in
+a strip, has its key source fixed at `self`.
 
 The generated binding copies in to out once and runs each element's face in place in the chosen
 order; an element's bypass is its switch off or the host's bypass; the latency is the sum. The

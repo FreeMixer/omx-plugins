@@ -88,7 +88,7 @@
           "type": "string",
           "minLength": 20,
           "title": "Summary",
-          "description": "The plugin's row in the README's catalogue, when it says more than the description (ranges, latency, rates). Left out, the row reads the description."
+          "description": "The plugin's row in the catalogue (docs/catalogue.md), when it says more than the description (ranges, latency, rates). Left out, the row reads the description."
         },
         "clap": {
           "type": "object",
@@ -136,14 +136,6 @@
               "pattern": "^lv2:[A-Za-z]*Plugin$",
               "title": "LV2 class",
               "description": "The LV2 plugin class: lv2:DelayPlugin, lv2:ModulatorPlugin, lv2:Plugin, ... A described plugin's is in its descriptor's extension bag (rdf:type), never its extras file."
-            },
-            "enabledPort": {
-              "enum": [
-                "first",
-                "last"
-              ],
-              "title": "Enabled port",
-              "description": "Where the host's bypass port `enabled` sits among the LV2 control ports: before the parameters (first) or after them (last, the default). A plugin that replaces an existing bundle keeps that bundle's port order."
             }
           }
         },
@@ -342,7 +334,7 @@
           },
           "minItems": 1,
           "title": "Manual",
-          "description": "The plugin's section of the README below its heading, one Markdown line per entry. A number a parameter holds is never typed here: {range:<symbol>} and {default:<symbol>} read as the parameter table words them, {min:<symbol>} and {max:<symbol>} the bare limit, all from the resolved parameter. Left out, the section is the parameter table generated from the resolved parameters, and \"Plus the host's bypass.\""
+          "description": "The plugin's section of the catalogue (docs/catalogue.md) below its heading, one Markdown line per entry. A number a parameter holds is never typed here: {range:<symbol>} and {default:<symbol>} read as the parameter table words them, {min:<symbol>} and {max:<symbol>} the bare limit, all from the resolved parameter. Left out, the section is the parameter table generated from the resolved parameters, and \"Plus the host's bypass.\""
         },
         "console": {
           "$ref": "#/$defs/console"
@@ -776,6 +768,10 @@
             "$ref": "#/$defs/section"
           }
         },
+        "visibleWhen": {
+          "$ref": "https://github.com/FreeMixer/omx-panel/schema/panel.schema.json#/$defs/visibleWhen",
+          "description": "Each control shown only while another control holds certain values, by symbol: `{ param, values }`, or for a count `{ param, atLeast: n }` (a band's controls follow a band count). The rule is omx-panel's (schema/panel.schema.json), which carries it into the description's visible and mask."
+        },
         "widgets": {
           "type": "object",
           "title": "Widgets",
@@ -1197,11 +1193,10 @@
           "type": "object",
           "additionalProperties": false,
           "required": [
-            "strips",
             "group"
           ],
           "title": "Placement",
-          "description": "Where the plugin may go in a strip's chain.",
+          "description": "Where the plugin may go in a strip's chain: the group the console puts it in, and a restriction to some strip kinds when the plugin has one.",
           "properties": {
             "strips": {
               "type": "array",
@@ -1209,10 +1204,17 @@
               "uniqueItems": true,
               "items": {
                 "type": "string",
-                "pattern": "^[a-z][a-zA-Z0-9]*$"
+                "enum": [
+                  "input",
+                  "fxReturn",
+                  "main",
+                  "aux",
+                  "mix",
+                  "matrix"
+                ]
               },
               "title": "Strip kinds",
-              "description": "The strip kinds that may host the plugin, in the console's names (input, fxReturn, aux, mix, matrix, main, fxSend, mixMinus)."
+              "description": "A restriction: the strip kinds that may host the plugin, fewer than all the kinds the console gives an insert rack (the enum is the console's INSERT_RACK_KINDS, in its names; fxSend and mixMinus host no rack and are never listed). Written only when a plugin confines itself; left out, the plugin goes wherever the console puts its group. tools/test/placement-strips-check.mjs refuses a list of every rack kind."
             },
             "group": {
               "type": "string",
@@ -1351,6 +1353,45 @@
           "pattern": "^[a-z][a-z0-9]*$",
           "title": "Face bands",
           "description": "The count sheet key the element's face is compiled at, where it differs from `bands` (omx-dsp's eq face takes eq8, eq16 or eq32 only): the bands past `bands` are passed as `fixed` says, never exposed. Elements over one face share it. Left out, `bands`."
+        },
+        "bandCount": {
+          "type": "object",
+          "required": [
+            "symbol",
+            "name",
+            "default",
+            "gates"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "symbol": {
+              "type": "string",
+              "pattern": "^[a-z][A-Za-z0-9]*$"
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1
+            },
+            "default": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9]*$"
+            },
+            "gates": {
+              "type": "string",
+              "pattern": "^[a-z][A-Za-z0-9]*$"
+            }
+          },
+          "title": "Band count",
+          "description": "How many of the element's `bands` run: the plugin's own integer parameter `symbol`, from one band to the `max` of `bands` in the kernel's count sheet, coming up at the `default` of the sheet key `default` names (eq's EQ_BAND_COUNTS: strip). Each band from the count on is passed to the face with its per-band control `gates` (eq's bandOn) off, so the face leaves it out of its bank: it costs no processing and the output is the output without it. The parameter comes after every parameter the plugin had (see `appended`), first among the element's additions."
+        },
+        "appended": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/param"
+          },
+          "title": "Appended parameters",
+          "description": "Parameters the element gained after its plugin shipped, by reference to its kernel as `params` are: flattened after every element's `params`, the order and the element's `bandCount`, element by element, so the ids and LV2 parameter ports a shipped plugin had do not move. A per-band control's parameters bind in `params` then `appended` order."
         },
         "fixed": {
           "type": "object",

@@ -183,7 +183,7 @@ async function main() {
     `the draft has one parameter per resolve() argument, named by the contract (${draft.decl?.params.map((p) => `${p.symbol}:${p.name}`).join(' ')})`);
   expect(draft.decl?.params.every((p) => p.ref && !('min' in p) && !('def' in p)), 'the draft is by reference only');
   const marks = reviewMarks(draft.decl);
-  expect(marks.join(' ') === '/description /clap/features/1 /lv2/class /params/3/values/0 /params/3/values/1 /console/placement/strips/0 /console/placement/group',
+  expect(marks.join(' ') === '/description /clap/features/1 /lv2/class /params/3/values/0 /params/3/values/1 /console/placement/group',
     `the draft marks every design choice REVIEW (${marks.join(' ')})`);
   const unsettled = await planPlugin(draft.decl, src, { root: tree, recipe });
   expect(!unsettled.ok && unsettled.refusals.length === marks.length, `a draft with REVIEW marks is refused, each named (${unsettled.refusals.map((r) => r.field).join(' ')})`);
@@ -192,7 +192,7 @@ async function main() {
   settled.clap.features[1] = 'wobble';
   settled.lv2.class = 'lv2:ModulatorPlugin';
   settled.params[3].values = ['Wobble', 'Pan'];
-  settled.console.placement = { strips: ['input'], group: 'plugins' };
+  settled.console.placement = { group: 'plugins' };
   const answers = settled; // what section 5 mutates
   const plan = await planPlugin(settled, src, { root: tree, recipe });
   expect(plan.ok, `the settled draft is accepted${plan.ok ? '' : `: ${plan.refusals.map((r) => `${r.field} ${r.reason}`).join('; ')}`}`);
@@ -201,7 +201,7 @@ async function main() {
   const P_ = 'plugins/omx-wobble';
   for (const f of ['omx-wobble.decl.json', 'Makefile', 'omx_wobble_clap.c', 'omx_wobble_lv2.c', 'omx_wobble_core.h', 'test/wobble-oracle.c', 'generated/omx_wobble_params.h'])
     expect(written.includes(`${P_}/${f}`), `the wizard wrote ${P_}/${f}`);
-  for (const f of ['README.md', 'packaging/omx-plugins.spec', '.github/workflows/ci.yml']) expect(written.includes(f), `the shared file ${f} lists the new plugin`);
+  for (const f of ['docs/catalogue.md', 'packaging/omx-plugins.spec', '.github/workflows/ci.yml']) expect(written.includes(f), `the shared file ${f} lists the new plugin`);
   const header = readFileSync(join(tree, P_, 'generated/omx_wobble_params.h'), 'utf8');
   expect(header.includes('{ "rateHz", "Rate", "Hz", 0.1f, 20.0f, 4.0f, 0u }'), 'the generated table carries the kernel file\'s rate travel');
   const core = readFileSync(join(tree, P_, 'omx_wobble_core.h'), 'utf8');
@@ -235,7 +235,7 @@ async function main() {
   // the wizard writes the plugin described: a control's name is its descriptor's
   sabotageGen('a descriptor that moved a control\'s name', `${P_}/omx-wobble.descriptor.json`, (t) => t.replace('"name": "Depth"', '"name": "Depth Amount"'), `STALE ${P_}/generated/omx_wobble_params.h`);
   sabotageGen('a face whose argument no contract control names', face, (t) => t.replace('float depth,', 'float intensity,'), "resolve argument 'intensity'");
-  sabotageGen('a hand edit to a shared file', 'README.md', (t) => t.replace('| **omx wobble** |', '| **omx wobble (beta)** |'), 'STALE README.md');
+  sabotageGen('a hand edit to a shared file', 'docs/catalogue.md', (t) => t.replace('| **omx wobble** |', '| **omx wobble (beta)** |'), 'STALE docs/catalogue.md');
   {
     const was = readFileSync(join(tree, P_, 'omx_wobble_core.h'), 'utf8');
     writeFileSync(join(tree, P_, 'omx_wobble_core.h'), `${was}\n`);
@@ -314,8 +314,8 @@ async function main() {
     ['namedIn', 'package-description', () => edit('debian/control', (s) => s.replace(/delay, drive,/g, 'delay,'))],
     ['sharedListed', 'ci-installed-files', () => edit('.github/workflows/ci.yml', (s) => s.replaceAll(' drive ', ' '))],
     ['sharedListed', 'static-table', () => edit('lib/omx_clap_static.c', (s) => s.replace('{"org.openmixer.drive", &omx_clap_entry_drive},\n', ''))],
-    ['sharedListed', 'catalogue-row', () => edit('README.md', (s) => s.replace('`org.openmixer.drive`', '`org.openmixer.x`'))],
-    ['sharedListed', 'manual-section', () => edit('README.md', (s) => s.replace('### omx drive\n', '### drive\n'))],
+    ['sharedListed', 'catalogue-row', () => edit('docs/catalogue.md', (s) => s.replace('`org.openmixer.drive`', '`org.openmixer.x`'))],
+    ['sharedListed', 'manual-section', () => edit('docs/catalogue.md', (s) => s.replace('### omx drive\n', '### drive\n'))],
     ['noFiles', 'no-cpp', () => add(`${P}/shell.cpp`, '// SPDX-License-Identifier: GPL-3.0-or-later\n')],
     ['noText', 'no-dpf', () => add(`${P}/dpf_shell.h`, '#include "DistrhoPlugin.hpp"\n')],
     ['noCopiedDsp', 'no-copied-dsp', () => add(`${P}/copied.h`, `static inline float ${dspName}(float x) {\n  return x;\n}\n`)],
@@ -354,7 +354,7 @@ async function main() {
   const whole = await ratchet();
   expect(!whole.fresh.length && !whole.stale.length && whole.held.length === loadDebt(t).length,
     `the debt holds today's gaps exactly (${whole.held.length} held, ${whole.fresh.length} new, ${whole.stale.length} stale)`);
-  let undo = edit('README.md', (s) => s.replace('### omx drive\n', '### drive\n'));
+  let undo = edit('docs/catalogue.md', (s) => s.replace('### omx drive\n', '### drive\n'));
   const unheld = await ratchet();
   undo();
   expect(unheld.fresh.includes("omx-drive manual-section"), `sabotage: a gap the debt does not hold fails the ratchet (${unheld.fresh.join(", ")})`);
@@ -407,7 +407,7 @@ async function main() {
 
   // ---- 4. the recipe itself ----------------------------------------------------------------
   const grown = JSON.parse(JSON.stringify(recipe));
-  grown.artifacts.push({ id: 'sabotage-notes', what: 'a section every plugin now owes', step: 'docs', layer: 'docs', made: 'HAND-WRITTEN', target: 'README.md', paths: [], questions: [], template: null, when: 'always', checker: { fn: 'sharedListed', file: 'README.md', region: 'sections', needle: '### {name} notes' } });
+  grown.artifacts.push({ id: 'sabotage-notes', what: 'a section every plugin now owes', step: 'docs', layer: 'docs', made: 'HAND-WRITTEN', target: 'docs/catalogue.md', paths: [], questions: [], template: null, when: 'always', checker: { fn: 'sharedListed', file: 'docs/catalogue.md', region: 'sections', needle: '### {name} notes' } });
   let allRed = true;
   for (const s of ['omx-delay', 'omx-drive', 'omx-eq8', 'omx-strip']) {
     if (!gapLines(await checkPlugin(t, grown, s)).some((l) => l.includes('sabotage-notes missing'))) allRed = false;
@@ -802,7 +802,7 @@ static inline float omx_wobble_instance_level_db(const OmxWobbleInstance *s) { r
     settled.description = 'A test chain: the console EQ, then its gate, then its compressor, in any order.';
     settled.clap.features[1] = 'mixing';
     settled.lv2.class = 'lv2:MixerPlugin';
-    settled.console.placement = { strips: ['input'], group: 'plugins' };
+    settled.console.placement = { group: 'plugins' };
     const [eq, gate, comp] = settled.chain;
     eq.on = true;
     eq.name = 'EQ';

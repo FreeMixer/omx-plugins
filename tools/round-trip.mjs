@@ -17,6 +17,9 @@
  * id its symbol (omx-contract's descriptor schema; plugin-hostd docs/formats.md), an LV2 face's audio ports are one
  * per channel with the generator's own symbols and names (the descriptor's port id and name are CLAP's), a CLAP face
  * reads back the float it stores. The face's own bypass (CLAP_PARAM_IS_BYPASS, lv2:enabled) stands beside the controls.
+ * A meter is an output control port on the LV2 face, which a scan reads as a read-only control by the meter's symbol,
+ * one per channel (`<symbol>_<channel>` past one); the CLAP face publishes it through clap.meters/1, which plugin-hostd's
+ * CLAP table has no row for.
  * The bags (`extensions.<format>`) are equal: every source field the authored bag holds, the scanned one holds with the
  * same value (an LV2 field's values a set, as RDF states them).
  *
@@ -52,43 +55,58 @@ export const FORMATS = ['clap', 'lv2'];
 export const LOSSES = {
   // OR2: a meaning has a CLAP word only for the bypass, an LV2 term only for some (lv2:designation); LV2 has no unit
   // for "" (a plain number)
-  'clap controls[].meaning': 298,
-  'lv2 controls[].meaning': 112,
-  'lv2 controls[].travel.unit ""': 91,
+  'clap controls[].meaning': 309,
+  'lv2 controls[].meaning': 116,
+  'lv2 controls[].travel.unit ""': 123,
   // plugin-hostd 0.7.0's LV2 table has no row for urn:openmixer:unit#ratio, the ratio unit our faces write (gap 4)
-  'lv2 controls[].travel.unit "ratio"': 15,
+  'lv2 controls[].travel.unit "ratio"': 16,
   // nor for urn:openmixer:unit#dBoct, the unit of the compressor's key tilt (dB/oct, omx-contract 3.1.0)
   'lv2 controls[].travel.unit "dB/oct"': 2,
   // CLAP: no row reads a unit, a linear or log scale, a step, a choice (our faces set no CLAP_PARAM_IS_ENUM), the
   // session symbol, the LV2 URI, a side-chain's role or what an LV2 host may lend
-  'clap controls[].travel.unit': 451,
-  'clap controls[].travel.scale': 393,
-  'clap controls[].travel.step': 451,
-  'clap controls[].kind': 205,
-  'clap controls[].ids': 105,
-  'clap controls[].values': 105,
-  'clap controls[].labels': 105,
-  'clap controls[].default': 205,
-  'clap controls[].symbol': 656,
-  'clap plugin.uri': 29,
-  'clap ports[].role': 2,
-  'clap needs.extensions.optional': 29,
+  'clap controls[].travel.unit': 559,
+  'clap controls[].travel.scale': 488,
+  'clap controls[].travel.step': 559,
+  'clap controls[].kind': 266,
+  'clap controls[].ids': 137,
+  'clap controls[].values': 137,
+  'clap controls[].labels': 137,
+  'clap controls[].default': 266,
+  'clap controls[].symbol': 825,
+  'clap plugin.uri': 32,
+  'clap ports[].role': 3,
+  'clap needs.extensions.optional': 32,
   // LV2: no row reads a step, automation, the plugin's version or vendor (our .ttl writes no doap:maintainer); a
   // control's id is its symbol and a point's id its label, so the CLAP id and our point ids are no LV2 word; the
   // audio ports are one per channel, with the generator's symbols and names
-  'lv2 controls[].travel.step': 451,
-  'lv2 controls[].automatable': 656,
-  'lv2 controls[].id': 656,
-  'lv2 controls[].ids': 105,
-  'lv2 plugin.version': 29,
-  'lv2 plugin.vendor': 29,
-  'lv2 ports[].id': 60,
-  'lv2 ports[].name': 60,
+  'lv2 controls[].travel.step': 559,
+  'lv2 controls[].automatable': 825,
+  'lv2 controls[].id': 825,
+  'lv2 controls[].ids': 137,
+  'lv2 plugin.version': 32,
+  'lv2 plugin.vendor': 32,
+  'lv2 ports[].id': 67,
+  'lv2 ports[].name': 67,
   // LV2 port groups are flat: a control in a section's subgroup (an EQ's band, #257) carries the group, not the
   // section above it (omx-eq8, omx-eq16 and omx-eq32: five controls a band, 8 + 16 + 32 bands)
   'lv2 controls[].group (panel section)': 280,
   // the toggles UPSTREAM names, scanned as travels, carry no toggle's default
-  'lv2 controls[].default': 100,
+  'lv2 controls[].default': 129,
+  // neither face carries a control's prose (omx-delay's sync), nor states that it reads the tempo: CLAP has no static
+  // word for it, and the LV2 face's control port supports time:Position, which a scan reads as no tempo word
+  'clap controls[].doc': 1,
+  'lv2 controls[].doc': 1,
+  'clap needs.tempo': 1,
+  'lv2 needs.tempo': 1,
+  // a meter: plugin-hostd's CLAP table has no row for clap.meters/1 (one word a meter: 20 meters); an LV2 output
+  // control port carries its symbol, range, unit and scale, and no word for its CLAP id, kind, channel count or
+  // readout doc; a two-channel level is two ports, each named for its channel (4 meters, 8 ports)
+  'clap meters[]': 20,
+  'lv2 meters[].id': 20,
+  'lv2 meters[].kind': 20,
+  'lv2 meters[].channels': 20,
+  'lv2 meters[].doc': 16,
+  'lv2 meters[].name': 8,
 };
 
 /** A break in plugin-hostd's wave tip, reported, each `differs` it causes printed with it
@@ -145,8 +163,10 @@ export function compareFace(format, authored, scanned) {
     else emit('plugin', `plugin.${k}`, a, sp[k], read(`plugin.${k}`));
   }
 
-  // the controls, in order, the face's own bypass beside them
-  const sc = scanned.controls.filter((c) => c.meaning !== FACE_OWN[format]);
+  // the controls, in order, the face's own bypass beside them and, on LV2, the meters' read-only ports after them
+  const outs = (authored.meters ?? []).flatMap((m) => (m.channels > 1 ? Array.from({ length: m.channels }, (_, k) => `${m.symbol}_${k}`) : [m.symbol]));
+  const isMeterPort = (c) => format === 'lv2' && c.readonly === true && outs.includes(c.id);
+  const sc = scanned.controls.filter((c) => c.meaning !== FACE_OWN[format] && !isMeterPort(c));
   if (sc.length !== authored.controls.length) out.push({ verdict: 'differs', format, where: 'controls', word: 'controls', authored: authored.controls.length, scanned: sc.length });
   authored.controls.forEach((c, i) => {
     const s = sc[i] ?? {};
@@ -174,6 +194,29 @@ export function compareFace(format, authored, scanned) {
       }
     }
   });
+
+  // the meters: on LV2 each channel's read-only control, by its symbol; the CLAP scan reads no clap.meters/1
+  const sm = scanned.controls.filter(isMeterPort);
+  for (const m of authored.meters ?? []) {
+    const where = `meter ${m.symbol}`;
+    if (format === 'clap') {
+      emit(where, 'meters[]', m.symbol, undefined, false);
+      continue;
+    }
+    const chans = m.channels > 1 ? Array.from({ length: m.channels }, (_, k) => `${m.symbol}_${k}`) : [m.symbol];
+    for (const sym of chans) {
+      const s = sm.find((c) => c.id === sym);
+      if (!s) {
+        out.push({ verdict: 'differs', format, where, word: 'meters[].symbol', authored: sym, scanned: undefined });
+        continue;
+      }
+      emit(where, 'meters[].symbol', sym, s.id);
+      for (const k of ['min', 'max', 'unit', 'scale']) emit(where, `meters[].${k}`, m[k], s.travel?.[k]);
+      // a meter of more than one channel is one port per channel, each named for its channel
+      emit(where, 'meters[].name', m.name, m.channels > 1 ? undefined : s.name, m.channels === 1);
+    }
+    for (const k of ['id', 'kind', 'channels', 'doc']) if (m[k] !== undefined) emit(where, `meters[].${k}`, m[k], undefined, false);
+  }
 
   // the ports: by direction, in order
   const sports = [...scanned.ports];

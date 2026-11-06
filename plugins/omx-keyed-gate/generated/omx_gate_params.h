@@ -107,7 +107,7 @@ static const char *const OMX_GATE_PARAM_MODULES[OMX_GATE_PARAM_COUNT] = {
 #define OMX_GATE_NAME "omx keyed-gate"
 #define OMX_GATE_VENDOR "openmixer"
 #define OMX_GATE_URL "https://github.com/FreeMixer/omx-plugins"
-#define OMX_GATE_VERSION "0.18.0"
+#define OMX_GATE_VERSION "0.19.0"
 #define OMX_GATE_DESCRIPTION "The OpenMixer console's channel gate with an external key: the stereo signal is gated while the detector listens to the sidechain input the host routes to it, or to the signal itself with the key unconnected or set to Self. One gain drives both legs. An attack under 0.5 ms engages 4x detector oversampling, which adds 72 frames of latency, reported to the host. The DSP is omx-dsp's <omxdsp/fx/omx_gate_instance.h>, the console's own gate."
 #define OMX_GATE_CLAP_ID "org.openmixer.keyed-gate"
 #define OMX_GATE_CLAP_FEATURES "audio-effect", "gate", "stereo"
@@ -117,7 +117,7 @@ static const char *const OMX_GATE_PARAM_MODULES[OMX_GATE_PARAM_COUNT] = {
 #define OMX_GATE_DECL_DIGEST "89c6643026ff9a19b63266e7c5661b32863e3689620767db36a0707c46367fe8"
 
 /* org.openmixer.param-contract/1 (tools/param-contract.mjs): each parameter's unit, scale and step, in
- * id order; the host's bypass, the last id, is the face's. */
+ * id order; the host's bypass, CLAP id OMX_PLUGIN_FACE_BYPASS_CLAP_ID (omx-contract), is the face's. */
 #define OMX_GATE_PARAM_CONTRACT_VERSION 1u
 #define OMX_GATE_PARAM_CONTRACT_FINGERPRINT "fb378b79e0e68a9b25293e3aeb0b134134cded48e07e07665f6f182c05092b3e"
 static const struct omx_param_contract_row OMX_GATE_PARAM_CONTRACT[OMX_GATE_PARAM_COUNT] = {
@@ -196,15 +196,18 @@ static const struct omx_panel_rows OMX_GATE_PANEL = {
   NULL, 0u,
 };
 
-/* LV2 port indices (tools/gen.mjs lv2Ports): audio, then parameter i at FIRST_PARAM + i, then these. */
-#define OMX_GATE_LV2_PORT_IN_L 0u
-#define OMX_GATE_LV2_PORT_IN_R 1u
-#define OMX_GATE_LV2_PORT_KEY 2u
-#define OMX_GATE_LV2_PORT_OUT_L 3u
-#define OMX_GATE_LV2_PORT_OUT_R 4u
-#define OMX_GATE_LV2_PORT_ENABLED 5u
-#define OMX_GATE_LV2_PORT_LATENCY 18u
-#define OMX_GATE_LV2_PORT_FIRST_PARAM 6u
-#define OMX_GATE_LV2_PORT_COUNT 19u
+/* LV2 port indices (tools/gen.mjs lv2Ports): enabled and latency at omx-contract's permanent indices, the tempo's control,
+ * the meters' outputs, the audio ports, then parameter i at FIRST_PARAM + i. */
+#define OMX_GATE_LV2_PORT_ENABLED 0u
+#define OMX_GATE_LV2_PORT_LATENCY 1u
+#define OMX_GATE_LV2_PORT_IN_L 3u
+#define OMX_GATE_LV2_PORT_IN_R 4u
+#define OMX_GATE_LV2_PORT_KEY 5u
+#define OMX_GATE_LV2_PORT_OUT_L 6u
+#define OMX_GATE_LV2_PORT_OUT_R 7u
+#define OMX_GATE_LV2_PORT_FIRST_PARAM 8u
+/* The meters' output control ports, one per channel in the order their values are published, from here on. */
+#define OMX_GATE_LV2_PORT_FIRST_METER 2u
+#define OMX_GATE_LV2_PORT_COUNT 20u
 
 #endif /* OMX_GATE_PARAMS_H */

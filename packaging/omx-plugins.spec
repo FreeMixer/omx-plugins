@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # Copyright (C) 2026 Pau Aliagas <linuxnow@gmail.com>
 Name: omx-plugins
-Version: 0.18.0
+Version: 0.19.0
 Release: 1%{?dist}
 License: GPL-3.0-or-later
 Summary: The OpenMixer console's delay, drive, EQ, channel strip, keyed gate and effects, as plugins for your DAW
@@ -12,18 +12,19 @@ Source0: %{url}/archive/v%{version}/%{name}-%{version}.tar.gz
 BuildRequires: gcc
 BuildRequires: make
 BuildRequires: pkgconf-pkg-config
-# The releases this tree builds against: a floor each (no ceiling), once here and
-# the same in debian/control (tools/deps-check.sh). The Makefile and tools/gen.mjs read them from here.
-BuildRequires: omx-dsp-devel >= 0.29.0
-BuildRequires: omx-contract-devel >= 3.7.1
-BuildRequires: omx-clap-core-devel >= 0.23.0
+# The releases this tree builds against: a floor and a ceiling each (the next minor of the release it is
+# proven on; from 1.0 the next major), once here and in debian/control
+# the same (tools/deps-check.sh). The Makefile and tools/gen.mjs read them from here.
+BuildRequires: (omx-dsp-devel >= 0.30.0 with omx-dsp-devel < 0.31)
+BuildRequires: (omx-contract-devel >= 3.9.0 with omx-contract-devel < 4)
+BuildRequires: (omx-clap-core-devel >= 0.24.0 with omx-clap-core-devel < 0.31)
 # plugin-hostd's format tables, which the generators read backwards (tools/format-tables.mjs)
-BuildRequires: plugin-hostd-devel >= 0.15.2
+BuildRequires: (plugin-hostd-devel >= 0.15.2 with plugin-hostd-devel < 0.20)
 # the omx-contract command, first packaged in 2.15.0: the generators read the contract directory through it
 # (3.3.0: the directory and its schema are omx-contract-data's, the definitions each owner's -contract package's)
-BuildRequires: omx-contract >= 3.7.1
+BuildRequires: (omx-contract >= 3.9.0 with omx-contract < 4)
 # the panel layout and the MOD GUI are omx-panel's, from a descriptor and the declared panel (tools/omx-panel.mjs)
-BuildRequires: omx-panel >= 0.2.0
+BuildRequires: (omx-panel >= 0.10.0 with omx-panel < 0.11)
 # omx-panel recommends omx-plugins-devel: an older one installed beside this build puts its release's contract
 # package where make test reads this one's (tools/test/contract-dir-check.sh), so a build installs none
 BuildConflicts: omx-plugins-devel < %{version}
@@ -39,10 +40,10 @@ BuildRequires: lilv-devel
 BuildRequires: sord
 BuildRequires: omx-clap-host
 # %%check: make round-trip scans the built faces back with plugin-hostd-probe describe
-BuildRequires: plugin-hostd >= 0.15.2
+BuildRequires: (plugin-hostd >= 0.15.2 with plugin-hostd < 0.20)
 # %%install: our own plugins' pins are known at build time (tools/gen-pins.sh); %%check then holds the
 # shipped pins.d file to the shipped binaries' hashes (tools/pins-check.sh)
-BuildRequires: plugin-qualify >= 0.9.0
+BuildRequires: (plugin-qualify >= 0.9.0 with plugin-qualify < 0.20)
 # the shipped .clap is the stripped one (find-debuginfo runs after %%install), so its pin is measured
 # again once the buildroot is stripped: a pin taken at %%install names bytes the package never ships
 %define __spec_install_post \
@@ -57,20 +58,21 @@ Requires: %{name}-clap%{?_isa} = %{version}-%{release}
 Requires: %{name}-lv2%{?_isa} = %{version}-%{release}
 # each plugin's descriptor, which a host and the console read at run time
 Requires: %{name}-contract = %{version}-%{release}
-# the first plugin-hostd release that reads pins.d (plugin-hostd issue #42): a floor only, no ceiling
-Recommends: plugin-hostd >= 0.5.0
+# the first plugin-hostd release that reads pins.d (plugin-hostd issue #42)
+Recommends: (plugin-hostd >= 0.5.0 with plugin-hostd < 0.20)
 
 %description
 Take the sound of the OpenMixer console into your DAW or onto your own rig:
 delay, drive, the channel EQ as an 8-band EQ, a 16-band EQ or a 32-band EQ, a
 31-band graphic EQ, the full channel strip and the keyed gate with its sidechain
 input, and the console's effects: chorus, flanger, phaser, tremolo, rotary
-speaker, reverb, pitch shifter, transient shaper, de-esser, sub-octaver, plosive tamer, clipper, upward compressor, bus compressor, loudness leveler, spectral balancer, spring reverb, limiter, compressor
+speaker, reverb, pitch shifter, transient shaper, de-esser, sub-octaver, plosive tamer, clipper, upward compressor, bus compressor, loudness leveler, spectral balancer, spring reverb, doubler, tone control, ducker, limiter, compressor
 with its sidechain key, multiband compressor and dynamic EQ. They come
 as CLAP plugins for Bitwig, REAPER and Carla, and as LV2 plugins for Ardour,
 Carla, MOD and Zynthian. Each one runs the same DSP as the console, so a track sounds the same
 in a session as it does on the desk, sample for sample. Every plugin comes in
 both formats with the same controls, MOD GUI included.
+Its documentation is on openmixer.org.
 
 This package installs both formats; omx-plugins-clap and omx-plugins-lv2
 install one each. It also carries the factory presets of every plugin, as
@@ -87,6 +89,7 @@ rotary speaker, reverb, pitch shifter, transient shaper, de-esser, sub-octaver, 
 CLAP plugins, installed in /usr/lib/clap where Bitwig, REAPER,
 Carla and other CLAP hosts find them. They run the console's own DSP, so they
 sound like the desk.
+Its documentation is on openmixer.org.
 
 %package lv2
 Summary: OpenMixer delay, drive, EQ, strip, gate and effects as LV2 plugins
@@ -99,6 +102,7 @@ rotary speaker, reverb, pitch shifter, transient shaper, de-esser, sub-octaver, 
 LV2 plugins, installed in %{_libdir}/lv2 where Ardour, Carla, MOD
 and Zynthian find them, with a MOD GUI where the plugin has one. They run the
 console's own DSP, so they sound like the desk.
+Its documentation is on openmixer.org.
 
 %package test
 Summary: The OpenMixer test instruments, for host tests and plugin measurement
@@ -110,12 +114,13 @@ pool voice, a note echo and a transport probe, as CLAP plugins. They are install
 lists them; a test or the plugin qualifier opens them there by path. Install
 this package on a console to measure the linked test instruments' cost on its
 own machine.
+Its documentation is on openmixer.org.
 
 %package devel
 Summary: Headers and static library of the OpenMixer plugins, for projects that build on them
-Requires: omx-dsp-devel >= 0.29.0
+Requires: (omx-dsp-devel >= 0.30.0 with omx-dsp-devel < 0.31)
 # the generated parameter headers include omx-contract's C renders, and omxplugins.pc requires omx-contract
-Requires: omx-contract-devel >= 3.7.1
+Requires: (omx-contract-devel >= 3.9.0 with omx-contract-devel < 4)
 Requires: %{name}-contract = %{version}-%{release}
 Requires: clap-devel
 
@@ -126,12 +131,13 @@ parameter header, installed in %{_includedir}/omx-plugins, and
 libomxplugins.a (pkg-config omxplugins): every plugin's CLAP face in one
 static library, with the table of their entries in omx_clap_static.h, for a
 host that runs the plugins in its own process without loading .clap files.
+Its documentation is on openmixer.org.
 
 %package contract
 Summary: The OpenMixer plugins' descriptors in omx-contract's contract directory
 BuildArch: noarch
 # the contract directory, its schema and its reader's own package
-Requires: omx-contract-data >= 3.7.1
+Requires: (omx-contract-data >= 3.9.0 with omx-contract-data < 4)
 # the files lived in omx-plugins-devel before this package
 Conflicts: %{name}-devel < %{version}-%{release}
 
@@ -140,6 +146,7 @@ Each OpenMixer plugin's descriptor, its parameters in omx-contract's words,
 and the manifest naming this release, as files in omx-contract's contract
 directory, for any program that reads them at run time: a host, the console's
 panels and the omx-contract command.
+Its documentation is on openmixer.org.
 
 %prep
 %autosetup
@@ -182,7 +189,9 @@ tools/pins-check.sh %{buildroot}%{_datadir}/plugin-hostd/pins.d/omx-plugins.pins
 /usr/lib/clap/omx-comp.clap
 /usr/lib/clap/omx-deesser.clap
 /usr/lib/clap/omx-delay.clap
+/usr/lib/clap/omx-doubler.clap
 /usr/lib/clap/omx-drive.clap
+/usr/lib/clap/omx-ducker.clap
 /usr/lib/clap/omx-dyneq.clap
 /usr/lib/clap/omx-eq8.clap
 /usr/lib/clap/omx-eq16.clap
@@ -202,6 +211,7 @@ tools/pins-check.sh %{buildroot}%{_datadir}/plugin-hostd/pins.d/omx-plugins.pins
 /usr/lib/clap/omx-spring.clap
 /usr/lib/clap/omx-strip.clap
 /usr/lib/clap/omx-suboct.clap
+/usr/lib/clap/omx-tone.clap
 /usr/lib/clap/omx-transient.clap
 /usr/lib/clap/omx-tremolo.clap
 /usr/lib/clap/omx-upward.clap
@@ -209,6 +219,7 @@ tools/pins-check.sh %{buildroot}%{_datadir}/plugin-hostd/pins.d/omx-plugins.pins
 
 %files test
 %license LICENSE
+%doc README.md
 %dir %{_libexecdir}/omx-plugins
 %dir %{_libexecdir}/omx-plugins/test
 # BEGIN GENERATED clap-test-files: tools/gen.mjs, one line per test plugin
@@ -220,12 +231,14 @@ tools/pins-check.sh %{buildroot}%{_datadir}/plugin-hostd/pins.d/omx-plugins.pins
 
 %files devel
 %license LICENSE
+%doc README.md
 %{_includedir}/omx-plugins/
 %{_libdir}/libomxplugins.a
 %{_libdir}/pkgconfig/omxplugins.pc
 
 %files contract
 %license LICENSE
+%doc README.md
 # each plugin's descriptor and the manifest, in omx-contract's contract directory (the directory itself is omx-contract-data's)
 %{_datadir}/omx-contract/contract.d/3/omx-plugins/
 
@@ -239,7 +252,9 @@ tools/pins-check.sh %{buildroot}%{_datadir}/plugin-hostd/pins.d/omx-plugins.pins
 %{_libdir}/lv2/omx-comp.lv2/
 %{_libdir}/lv2/omx-deesser.lv2/
 %{_libdir}/lv2/omx-delay.lv2/
+%{_libdir}/lv2/omx-doubler.lv2/
 %{_libdir}/lv2/omx-drive.lv2/
+%{_libdir}/lv2/omx-ducker.lv2/
 %{_libdir}/lv2/omx-dyneq.lv2/
 %{_libdir}/lv2/omx-eq8.lv2/
 %{_libdir}/lv2/omx-eq16.lv2/
@@ -259,12 +274,37 @@ tools/pins-check.sh %{buildroot}%{_datadir}/plugin-hostd/pins.d/omx-plugins.pins
 %{_libdir}/lv2/omx-spring.lv2/
 %{_libdir}/lv2/omx-strip.lv2/
 %{_libdir}/lv2/omx-suboct.lv2/
+%{_libdir}/lv2/omx-tone.lv2/
 %{_libdir}/lv2/omx-transient.lv2/
 %{_libdir}/lv2/omx-tremolo.lv2/
 %{_libdir}/lv2/omx-upward.lv2/
 # END GENERATED lv2-files
 
 %changelog
+* Wed Nov 04 2026 Pau Aliagas <linuxnow@gmail.com> - 0.19.0-1
+- omx-delay syncs to the host's tempo: sync, division, mode and duck, appended,
+  defaults unchanged in sound; with no tempo a synced delay keeps its Time (#311)
+- omx-strip's EQ has up to 32 bands, chosen by Bands; existing ids and ports do
+  not move; band controls and CLAP pages follow Bands (#312, #317, #318)
+- New plugins: omx-doubler, omx-tone and omx-ducker, each with CLAP and LV2 faces and
+  factory presets, over omx-dsp's doubler, tone and comp faces
+- omx-glue gains Detector Topology and the VCA Bus 4:1 preset, ssl-bus-glue runs
+  the feedback detector (#310); omx-comp gains the ducker preset (#309)
+- Readouts on both faces: LV2 output ports beside clap.meters/1, and meters in
+  every descriptor; the limiter's look-ahead held by an impulse (#313)
+- The host's bypass keeps CLAP id 0x7FFF0000 in every plugin, LV2 enabled and
+  latency are ports 0 and 1; automation stored on the bypass by id must be bound
+  again (#315)
+- A quiet block skips the resolve unless the tempo moved
+- The MOD GUI film strips are rendered by omx-panel at build time
+- The packages install their licence and a short README and no other markdown
+  (#314)
+- Build floors: omx-dsp 0.30.0, omx-contract 3.9.0, omx-panel 0.10.0
+- Every dependency on a library of ours states a floor and a ceiling, in the spec, debian/control and
+  omxplugins.pc: omx-dsp >= 0.30.0 and < 0.31, omx-contract >= 3.9.0 and < 4, omx-clap-core >= 0.24.0 and
+  < 0.31, plugin-hostd >= 0.15.2 and < 0.20, omx-panel >= 0.10.0 and < 0.11, plugin-qualify >= 0.9.0 and
+  < 0.20 (tools/deps-check.sh holds them)
+
 * Tue Nov 03 2026 Pau Aliagas <linuxnow@gmail.com> - 0.18.0-1
 - Each plugin runs in place where it is proven to: a host that hands an output
   the buffer of its input (CLAP's in_place_pair, an LV2 host that connects both

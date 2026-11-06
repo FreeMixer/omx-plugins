@@ -43,22 +43,20 @@ export function compareVersions(a, b) {
 
 /**
  * The range packaging/omx-plugins.spec requires of the build dependency `pkg` (`omx-dsp-devel`,
- * `omx-contract-devel`): `{ floor }`, from its BuildRequires line `pkg >= floor`. Throws when it is
- * missing or written twice.
+ * `omx-contract-devel`): `{ floor, ceiling }`, from its BuildRequires line `(pkg >= floor with pkg < ceiling)`.
+ * Throws when it is missing, written twice, or has no ceiling.
  */
 export function packagingRange(pkg, root = ROOT) {
   const file = join(root, SPEC_FILE);
   if (!existsSync(file)) throw new Error(`${SPEC_FILE} is missing: the packaging is where the releases this tree builds against are declared`);
   const spec = readFileSync(file, 'utf8');
-  const one = (op) => {
-    const found = [...spec.matchAll(new RegExp(`^BuildRequires: ${pkg.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')} ${op} ([0-9][0-9.]*)$`, 'gm'))];
-    if (found.length !== 1) throw new Error(`${SPEC_FILE}: ${found.length ? 'more than one' : 'no'} "BuildRequires: ${pkg} ${op} <version>" line`);
-    return found[0][1];
-  };
-  return { floor: one('>=') };
+  const name = pkg.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const found = [...spec.matchAll(new RegExp(`^BuildRequires: \\(${name} >= ([0-9][0-9.]*) with ${name} < ([0-9][0-9.]*)\\)$`, 'gm'))];
+  if (found.length !== 1) throw new Error(`${SPEC_FILE}: ${found.length ? 'more than one' : 'no'} "BuildRequires: (${pkg} >= <floor> with ${pkg} < <ceiling>)" line`);
+  return { floor: found[0][1], ceiling: found[0][2] };
 }
 
-const inRange = (v, r) => compareVersions(v, r.floor) >= 0;
+const inRange = (v, r) => compareVersions(v, r.floor) >= 0 && compareVersions(v, r.ceiling) < 0;
 
 const versionOf = (dir) => {
   try {
@@ -181,7 +179,7 @@ export function locateContract(root = ROOT) {
   } catch (e) {
     return { dir: undefined, why: e.message };
   }
-  const want = `omx-contract >= ${range.floor} (${SPEC_FILE})`;
+  const want = `omx-contract >= ${range.floor} and < ${range.ceiling} (${SPEC_FILE})`;
   const env = process.env.OMX_CONTRACT_DIR;
   const dir = env || installedDataDir();
   const at = env ? `OMX_CONTRACT_DIR=${env}` : dir;
@@ -211,6 +209,17 @@ const SHARED_FILES = ['data/primitives.json', 'data/rates.json'];
  * data/primitives/<item>.json, omx-contract's data/rates/<item>.json). A shared name belongs to no kernel. */
 const SHARED = { includes: (rel) => SHARED_FILES.includes(rel) || /^data\/(primitives|rates)\/[a-z0-9-]+\.json$/.test(rel ?? '') };
 
+/** The kernels index of the release at `dir` (the json render's `kernels`): each kernel's controls and their items. */
+function kernelsIndex(dir) {
+  const k = `kernels:${dir}`;
+  if (!resolvedCache.has(k)) resolvedCache.set(k, JSON.parse(readFileSync(join(dir, RESOLVED), 'utf8')).kernels ?? {});
+  return resolvedCache.get(k);
+}
+
+/** Does `kernel` take `name` by a USE: one of its controls whose item another kernel declares (omx-contract's
+ * cross-kernel use: glue's detectorTopology takes comp's DETECTOR_TOPOLOGY, one declaration, no copy)? */
+const usesName = (index, kernel, name) => (index?.[kernel]?.controls ?? []).some((c) => c.global === name);
+
 /** Does the kernel have its file in omx-contract at `dir`? */
 export const kernelExists = (dir, kernel) => Object.values(items(dir)).some((e) => e.rel === kernelFile(kernel));
 
@@ -218,8 +227,8 @@ export const kernelExists = (dir, kernel) => Object.values(items(dir)).some((e) 
 export function findName(dir, kernel, name) {
   const e = items(dir)[name];
   if (!e) return { error: `'${name}' is in neither ${kernelFile(kernel)} nor the shared files` };
-  if (e.rel === kernelFile(kernel) || SHARED.includes(e.rel)) return { file: e.rel, entry: e };
-  return { error: `'${name}' is in ${e.rel}, another kernel's file: a plugin reads only its own kernel (${kernel})` };
+  if (e.rel === kernelFile(kernel) || SHARED.includes(e.rel) || usesName(kernelsIndex(dir), kernel, name)) return { file: e.rel, entry: e };
+  return { error: `'${name}' is in ${e.rel}, another kernel's file: a plugin reads only its own kernel (${kernel}) and the items its controls use` };
 }
 
 const num = (v, what) => {
@@ -412,7 +421,7 @@ export function perturbCopy(src, dst, kernel, p, { move = 'default' } = {}) {
   if (existsSync(join(src, OWNERS))) execFileSync('cp', [join(src, OWNERS), dst]);
   const file = join(dst, RESOLVED);
   const data = JSON.parse(readFileSync(file, 'utf8'));
-  const where = findNameIn(data.items, kernel, p.ref);
+  const where = findNameIn(data.items, kernel, p.ref, data.kernels);
   if (where.error) throw new Error(where.error);
   const e = data.items[p.ref];
   if (move === 'max') {
@@ -435,10 +444,10 @@ export function perturbCopy(src, dst, kernel, p, { move = 'default' } = {}) {
   return where.file;
 }
 
-function findNameIn(its, kernel, name) {
+function findNameIn(its, kernel, name, index) {
   const e = its[name];
   if (!e) return { error: `'${name}' is in neither ${kernelFile(kernel)} nor the shared files` };
-  if (e.rel === kernelFile(kernel) || SHARED.includes(e.rel)) return { file: e.rel };
+  if (e.rel === kernelFile(kernel) || SHARED.includes(e.rel) || usesName(index, kernel, name)) return { file: e.rel };
   return { error: `'${name}' is in ${e.rel}, another kernel's file` };
 }
 
@@ -449,7 +458,7 @@ export const declKernels = (d) =>
 
 /** A declaration's hand-written parameters: its `params`, or a chain's elements' (each naming its
  * element's kernel); a chain's switches and `order` are generated, never declared. */
-export const declParams = (d) => d.params ?? (d.chain ?? []).flatMap((el) => (el.params ?? []).map((p) => ({ ...p, kernel: p.kernel ?? el.kernel })));
+export const declParams = (d) => d.params ?? (d.chain ?? []).flatMap((el) => [...(el.params ?? []), ...(el.appended ?? [])].map((p) => ({ ...p, kernel: p.kernel ?? el.kernel })));
 
 /**
  * The kernel one parameter's reference is read from: its own `kernel` (which must be one of the

@@ -6,7 +6,8 @@
  * {{kernel}} kernel, reached through omx_{{kernel}}_core.h's vtable.
  *
  * Ports: in_l, in_r, out_l, out_r, then the declared parameters in order, then `enabled`
- * (lv2:enabled; 0 is the bypass) and `latency`. A parameter port the host left unconnected reads
+ * (lv2:enabled; 0 is the bypass) and `latency`{{#metered}}, then one output control port per channel of each
+ * declared meter, written after every block{{/metered}}. A parameter port the host left unconnected reads
  * its declared default.
 {{#keyed}} * The sidechain `{{keySymbol}}` (lv2:isSideChain, connectionOptional) follows in_l and in_r; an
  * unconnected key is the kernel's own detector.
@@ -16,12 +17,22 @@
 /* The generated table FIRST: its guard is omx-dsp's own, so the instance header reads this table. */
 #include "omx_{{kernel}}_params.h"
 #include "omx_{{kernel}}_core.h"
+{{#metered}}#include "omx_meter_ring.h"
 
+/* The declaration's meters, in order, as the CLAP face lists them: each one's channels sit at `at` among the
+ * {{meterValues}} values the face writes after a block, the output control ports from OMX_{{K}}_LV2_PORT_FIRST_METER on. */
+_Static_assert({{meterValues}}u <= OMX_METER_RING_MAX, "one block's values fit the face's array");
+static const struct omx_face_meter G_METERS[] = {
+{{#meters}}    {"{{meterName}}", {{meterFaceKind}}, {{meterChannels}}u, {{meterOffset}}u, {{meterMin}}, {{meterMax}}, {{meterSource}}},
+{{/meters}}};
+{{/metered}}
 static const struct omx_face G_FACE = {
     OMX_FACE_TABLES({{K}}), .core = &OMX_{{K}}_CORE,
-{{#keyed}}    .key_symbol = "{{keySymbol}}", OMX_FACE_LV2_PORTS({{K}}, OMX_{{K}}_LV2_PORT_{{keyPort}}),
+{{#metered}}    .meters = G_METERS, .meter_count = {{meterCount}}u, .meter_values = {{meterValues}}u,
+{{/metered}}{{#keyed}}    .key_symbol = "{{keySymbol}}", OMX_FACE_LV2_PORTS({{K}}, OMX_{{K}}_LV2_PORT_{{keyPort}}),
 {{/keyed}}{{^keyed}}    OMX_FACE_LV2_PORTS({{K}}, UINT32_MAX),
-{{/keyed}}};
+{{/keyed}}{{#tempo}}    .tempo = omx_{{kernel}}_core_tempo_v, .lv2_control = OMX_{{K}}_LV2_PORT_CONTROL,
+{{/tempo}}};
 
 static const struct omx_lv2_face G_LV2 = OMX_LV2_FACE(&G_FACE, OMX_{{K}}_LV2_URI);
 

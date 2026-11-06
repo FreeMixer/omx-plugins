@@ -21,7 +21,7 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..');
-const { loadDecl, scaleOf } = await import('../gen.mjs');
+const { loadDecl, lv2Ports, scaleOf } = await import('../gen.mjs');
 const { contractFingerprint, contractOf, scalesOf } = await import('../param-contract.mjs');
 const { locateContract } = await import('../omx-contract.mjs');
 const contract = locateContract(ROOT);
@@ -96,6 +96,7 @@ const paramArms = [
   ['the bypass flag lost', (r) => r.map((x, i, all) => (i === all.length - 1 ? [...x.slice(0, 5), bit(16)(x[5])] : x)), /FAIL clap-params /],
   ['a parameter lost', (r) => r.filter((_, i) => i !== 1), /FAIL clap-params: \d+ parameters/],
   ['two parameters swapped', (r) => { const o = [...r]; [o[0], o[1]] = [o[1], o[0]]; return o; }, /FAIL clap-params /],
+  ['the bypass at the id after the last parameter (the rule before omx-contract 3.9.0)', (r) => r.map((x, i, all) => (i === all.length - 1 ? [`${all.length - 1}`, ...x.slice(1)] : x)), /FAIL clap-params Bypass/],
 ];
 
 const panelArms = (face) => [
@@ -149,14 +150,17 @@ const movedAndSealed = (dir) => (rows) => {
   return set('contract', 0, 2, contractFingerprint(served))(moved);
 };
 
+/* The port rows by LV2 index: omx-reverb's first control and its in_l, wherever the port rule puts them. */
+const reverbPorts = lv2Ports(loadDecl(join(ROOT, 'plugins', 'omx-reverb')));
+const FIRST_CONTROL = reverbPorts.find((p) => p.param).index, IN_L = reverbPorts.find((p) => p.symbol === 'in_l').index;
 const groupArms = [
-  ['a parameter out of its group', set('port', 4, 2, '-'), /FAIL port-groups /],
-  ['a group relabelled', set('port', 4, 3, 'Other'), /FAIL port-groups /],
-  ['a parameter in another section\'s group', set('port', 4, 2, (v) => (v === 'reverb' ? 'plate' : 'reverb')), /FAIL port-groups /],
-  ['a group renamed (lv2:name)', set('port', 4, 4, 'Other'), /FAIL port-groups /],
-  ['a group\'s display priority moved', set('port', 4, 5, plus(1)), /FAIL port-groups /],
-  ['a port lost', drop('port', 5), /FAIL port-groups /],
-  ['an audio port put in a group', set('port', 0, 2, 'reverb'), /FAIL port-groups in_l/],
+  ['a parameter out of its group', set('port', FIRST_CONTROL, 2, '-'), /FAIL port-groups /],
+  ['a group relabelled', set('port', FIRST_CONTROL, 3, 'Other'), /FAIL port-groups /],
+  ['a parameter in another section\'s group', set('port', FIRST_CONTROL, 2, (v) => (v === 'reverb' ? 'plate' : 'reverb')), /FAIL port-groups /],
+  ['a group renamed (lv2:name)', set('port', FIRST_CONTROL, 4, 'Other'), /FAIL port-groups /],
+  ['a group\'s display priority moved', set('port', FIRST_CONTROL, 5, plus(1)), /FAIL port-groups /],
+  ['a port lost', drop('port', FIRST_CONTROL + 1), /FAIL port-groups /],
+  ['an audio port put in a group', set('port', IN_L, 2, 'reverb'), /FAIL port-groups in_l/],
 ];
 
 // ---- the runner ----

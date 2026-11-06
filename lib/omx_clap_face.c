@@ -18,6 +18,9 @@
  * the block's peak at the inputs, in dBFS, measured here before the kernel runs (the kernel keeps no level of
  * its own); an output level the block's peak at the outputs, measured here after the kernel ran.
  *
+ * Tempo: a plugin whose descriptor says needs.tempo is handed each block's tempo from clap_process.transport
+ * (its `tempo` when CLAP_TRANSPORT_HAS_TEMPO is set), and none (0) when the host hands no transport or no tempo.
+ *
  * Audio ports: the main stereo pair in and out; a keyed plugin's second, mono, non-main input is the
  * sidechain key. A host that routes nothing to the key (no second port in the process call, no channel,
  * or no buffer) gets the kernel's own detector, as the face's NULL key is.
@@ -46,17 +49,26 @@
 #include "clap/stream.h"
 
 #include "omx_clap_face.h"
+#include <omxcontract/omx_plugin_face_ids.h> /* the host bypass's permanent CLAP id */
 #include <omx-clap-host/omx_clap_ext.h>
 #include <omx-clap-host/clap_meters.h>
 #include "omx_meter_ring.h"
 #include "omx_preset_file.h"
 #include <omxdsp/omx_denormal.h>    /* omx_denormals_off, per callback */
-#include <omxdsp/mix/omx_meter.h>   /* omx_meter_level_db: a level meter's reading */
+#include "omx_face_meters.h"         /* one block's meter values, the LV2 face's too */
 
-/* The host's bypass, appended after the declared ids. */
+_Static_assert((int)OMX_FACE_METER_KIND_GAIN_REDUCTION == (int)CLAP_METER_KIND_GAIN_REDUCTION &&
+                   (int)OMX_FACE_METER_KIND_LEVEL == (int)CLAP_METER_KIND_LEVEL,
+               "a face meter's kind is clap.meters/1's");
+
+/* The host's bypass: the slot after the declared ones, and CLAP id OMX_PLUGIN_FACE_BYPASS_CLAP_ID (omx-contract), the
+ * same in every plugin and never moved by an appended parameter. A declared parameter's id is its slot. */
 #define G_DECLARED(g) ((g)->face->param_count)
 #define G_BYPASS(g) G_DECLARED(g)
 #define G_PARAMS(g) (G_DECLARED(g) + 1u)
+#define G_NO_SLOT UINT32_MAX
+
+#define G_GOV_MAX 8u
 
 /* One allocation: this, then the values, the applied values, the touched flags and the core, each
  * G_PARAMS long (the core the vtable's size). */
@@ -78,10 +90,25 @@ typedef struct {
   unsigned char *touched;                   /* set by the host or a state: a placement default leaves it */
   _Atomic uint32_t placed;                  /* a placement for the audio thread to apply, plus one; 0 none */
   struct omx_meter_ring meters;             /* every meter's values after the last block; none since activation */
+  const clap_host_remote_controls_t *host_pages; /* the host's clap.remote-controls, when it offers one */
+  uint32_t gov_count;                       /* the parameters that decide which controls a page holds (visibleWhen) */
+  uint32_t gov[G_GOV_MAX];
+  _Atomic float paged[G_GOV_MAX];           /* each one's value when the pages were last announced */
+  _Atomic int pages_dirty;                  /* a governing value moved: the host is told on its main thread */
   _Atomic int dirty;                        /* the values moved since the core last resolved them: resolve before the next block */
+  double tempo;                             /* the tempo the core last resolved with, BPM; 0 none (audio thread) */
 } G;
 
 #define G_OF(p) ((G *)(p)->plugin_data)
+
+/** CLAP id -> slot: a declared id is its own, the bypass id the bypass's slot; G_NO_SLOT for any other. */
+static uint32_t g_slot(const G *g, clap_id id) {
+  if (id < G_DECLARED(g)) return id;
+  return id == OMX_PLUGIN_FACE_BYPASS_CLAP_ID ? G_BYPASS(g) : G_NO_SLOT;
+}
+
+/** Slot -> CLAP id. */
+static clap_id g_id(const G *g, uint32_t slot) { return slot == G_BYPASS(g) ? OMX_PLUGIN_FACE_BYPASS_CLAP_ID : slot; }
 
 static float g_min(const G *g, uint32_t i) { return i < G_DECLARED(g) ? g->face->params[i].min : 0.0f; }
 static float g_max(const G *g, uint32_t i) { return i < G_DECLARED(g) ? g->face->params[i].max : 1.0f; }
@@ -96,6 +123,15 @@ static float g_clamp(const G *g, uint32_t i, double v) {
 
 static void g_publish(G *g) {
   for (uint32_t i = 0; i < G_PARAMS(g); ++i) atomic_store_explicit(&g->applied[i], g->values[i], memory_order_relaxed);
+  /* A value that decides which controls the pages hold moved: the pages are a function of it, so the host is asked,
+   * on its main thread, to read them again (clap.remote-controls changed()). */
+  int moved = 0;
+  for (uint32_t k = 0; k < g->gov_count; ++k)
+    if (g->values[g->gov[k]] != atomic_load_explicit(&g->paged[k], memory_order_relaxed)) {
+      atomic_store_explicit(&g->paged[k], g->values[g->gov[k]], memory_order_relaxed);
+      moved = 1;
+    }
+  if (moved && !atomic_exchange(&g->pages_dirty, 1) && g->host && g->host->request_callback) g->host->request_callback(g->host);
 }
 
 /** The placement's defaults (the panel's placement defaults) on every parameter that has one and
@@ -123,10 +159,11 @@ static void g_drain(G *g, const clap_input_events_t *in) {
     const clap_event_header_t *h = in->get(in, k);
     if (!h || h->space_id != CLAP_CORE_EVENT_SPACE_ID || h->type != CLAP_EVENT_PARAM_VALUE) continue;
     const clap_event_param_value_t *e = (const clap_event_param_value_t *)h;
-    if (e->param_id < G_PARAMS(g)) {
-      const float v = g_clamp(g, e->param_id, e->value);
-      if (v != g->values[e->param_id]) g->values[e->param_id] = v, atomic_store_explicit(&g->dirty, 1, memory_order_relaxed);
-      g->touched[e->param_id] = 1;
+    const uint32_t i = g_slot(g, e->param_id);
+    if (i != G_NO_SLOT) {
+      const float v = g_clamp(g, i, e->value);
+      if (v != g->values[i]) g->values[i] = v, atomic_store_explicit(&g->dirty, 1, memory_order_relaxed);
+      g->touched[i] = 1;
     }
   }
 }
@@ -152,6 +189,8 @@ static bool g_init(const clap_plugin_t *p) {
     g->host_latency = (const clap_host_latency_t *)g->host->get_extension(g->host, CLAP_EXT_LATENCY);
   if (g->host && g->host->get_extension)
     g->host_params = (const clap_host_params_t *)g->host->get_extension(g->host, CLAP_EXT_PARAMS);
+  if (g->host && g->host->get_extension)
+    g->host_pages = (const clap_host_remote_controls_t *)g->host->get_extension(g->host, CLAP_EXT_REMOTE_CONTROLS);
   g_place(g, g_placement(g));
   g_publish(g);
   if (g->face->meter_count) omx_meter_ring_init(&g->meters);
@@ -205,16 +244,6 @@ static void g_reset(const clap_plugin_t *p) {
   atomic_store(&g->dirty, 1);
 }
 
-/** The meters of `source` (the inputs' or the outputs' peak), each leg's level of `buf`. */
-static void g_levels(const G *g, uint32_t source, const clap_audio_buffer_t *buf, uint32_t frames, double *mv) {
-  for (uint32_t m = 0; m < g->face->meter_count; ++m) {
-    const struct omx_face_meter *row = &g->face->meters[m];
-    if (row->source != source) continue;
-    mv[row->at] = omx_meter_level_db(buf->data32[0], frames, row->min);
-    mv[row->at + 1] = omx_meter_level_db(buf->data32[1], frames, row->min);
-  }
-}
-
 static clap_process_status g_process(const clap_plugin_t *p, const clap_process_t *pr) {
   G *g = G_OF(p);
   const struct omx_face *f = g->face;
@@ -225,12 +254,21 @@ static clap_process_status g_process(const clap_plugin_t *p, const clap_process_
   const clap_audio_buffer_t *ao = &pr->audio_outputs[0];
   if (ai->channel_count < 2 || ao->channel_count < 2 || !ai->data32 || !ao->data32) return CLAP_PROCESS_ERROR;
   const int bypassed = g->values[G_BYPASS(g)] > 0.5f;
-  /* A quiet block (no value moved) skips the resolve: the core keeps its smoothing as it is, which is what
-   * resolving the same values again gives, bit for bit (each plugin's oracle, its quiet arm). */
-  if (atomic_exchange_explicit(&g->dirty, 0, memory_order_acquire)) f->core->resolve(g->core, g->values, bypassed);
+  /* A quiet block (no value moved, the same tempo) skips the resolve: the core keeps its smoothing as it is, which is
+   * what resolving the same values again gives, bit for bit (each plugin's oracle, its quiet arm). */
+  int dirty = atomic_exchange_explicit(&g->dirty, 0, memory_order_acquire);
+  /* the block's tempo, for a plugin that reads one: the transport's when it carries a tempo, else none (0); the core
+   * takes it at its next resolve, so a tempo that moved resolves */
+  if (f->tempo) {
+    const clap_event_transport_t *t = pr->transport;
+    const double bpm = t && (t->flags & CLAP_TRANSPORT_HAS_TEMPO) ? t->tempo : 0.0;
+    if (bpm != g->tempo) g->tempo = bpm, dirty = 1;
+    f->tempo(g->core, bpm);
+  }
+  if (dirty) f->core->resolve(g->core, g->values, bypassed);
   double mv[OMX_METER_RING_MAX];
   /* the inputs' peak, before the kernel runs (the outputs may be the inputs) */
-  if (f->meter_count) g_levels(g, OMX_FACE_METER_IN, ai, pr->frames_count, mv);
+  if (f->meter_count) omx_face_meter_levels(f, OMX_FACE_METER_IN, ai->data32[0], ai->data32[1], pr->frames_count, mv);
   const float *key = NULL;
   if (f->key_symbol) {
     const clap_audio_buffer_t *ak = pr->audio_inputs_count > 1 ? &pr->audio_inputs[1] : NULL;
@@ -239,15 +277,8 @@ static clap_process_status g_process(const clap_plugin_t *p, const clap_process_
   f->core->run(g->core, key, ai->data32[0], ai->data32[1], ao->data32[0], ao->data32[1], pr->frames_count);
   g_publish(g);
   if (f->meter_count) {
-    /* The kernel's readings of this block; a bypassed kernel's state is stale, and reads 0 (a level the
-     * kernel reads, its display minimum). */
-    for (uint32_t m = 0; m < f->meter_count; ++m) {
-      const struct omx_face_meter *row = &f->meters[m];
-      if (row->source == OMX_FACE_METER_READ)
-        mv[row->at] = bypassed ? (row->kind == CLAP_METER_KIND_GAIN_REDUCTION ? 0.0 : row->min)
-                               : (double)f->core->meter(g->core, m);
-    }
-    g_levels(g, OMX_FACE_METER_OUT, ao, pr->frames_count, mv);
+    omx_face_meter_readings(f, g->core, bypassed, mv);
+    omx_face_meter_levels(f, OMX_FACE_METER_OUT, ao->data32[0], ao->data32[1], pr->frames_count, mv);
     omx_meter_ring_publish(&g->meters, mv, f->meter_values);
   }
   /* A parameter that moves the kernel's latency (as the pitch shifter's mix crossing 100 % does):
@@ -267,7 +298,7 @@ static bool g_params_info(const clap_plugin_t *p, uint32_t i, clap_param_info_t 
   const G *g = G_OF(p);
   if (i >= G_PARAMS(g)) return false;
   memset(info, 0, sizeof *info);
-  info->id = i;
+  info->id = g_id(g, i);
   info->flags = CLAP_PARAM_IS_AUTOMATABLE;
   if (i == G_BYPASS(g)) {
     info->flags |= CLAP_PARAM_IS_STEPPED | CLAP_PARAM_IS_BYPASS;
@@ -286,22 +317,24 @@ static bool g_params_info(const clap_plugin_t *p, uint32_t i, clap_param_info_t 
 /** The APPLIED value, safe on the host's main (control) thread while audio runs. */
 static bool g_params_value(const clap_plugin_t *p, clap_id id, double *out) {
   G *g = G_OF(p);
-  if (id >= G_PARAMS(g)) return false;
-  *out = atomic_load_explicit(&g->applied[id], memory_order_relaxed);
+  const uint32_t i = g_slot(g, id);
+  if (i == G_NO_SLOT) return false;
+  *out = atomic_load_explicit(&g->applied[i], memory_order_relaxed);
   return true;
 }
 
 static bool g_params_to_text(const clap_plugin_t *p, clap_id id, double v, char *out, uint32_t size) {
   const G *g = G_OF(p);
-  if (id >= G_PARAMS(g)) return false;
-  const char *unit = id < G_DECLARED(g) ? g->face->params[id].unit : "";
+  const uint32_t i = g_slot(g, id);
+  if (i == G_NO_SLOT) return false;
+  const char *unit = i < G_DECLARED(g) ? g->face->params[i].unit : "";
   snprintf(out, size, unit[0] ? "%g %s" : "%g", v, unit);
   return true;
 }
 
 static bool g_params_from_text(const clap_plugin_t *p, clap_id id, const char *text, double *out) {
   char *end = NULL;
-  if (id >= G_PARAMS(G_OF(p)) || !text) return false;
+  if (g_slot(G_OF(p), id) == G_NO_SLOT || !text) return false;
   *out = strtod(text, &end);
   return end != text;
 }
@@ -478,17 +511,37 @@ static const omx_clap_plugin_panel_description_t G_PANEL_EXT = {g_panel_fingerpr
 
 /* ---- org.openmixer.param-contract/1: the declaration's contract, the bypass last --------------- */
 
+/* The scale codes the generator writes into the rows (include/omx_param_contract.h) are the owner's OMX_CLAP_PARAM_SCALES,
+ * one each: tools/test/param-units-check.mjs holds their numbers to omx-contract's PARAM_SCALES words. */
+#define G_ONE_SCALE(code, name) +1
+_Static_assert(0 OMX_CLAP_PARAM_SCALES(G_ONE_SCALE) == OMX_CLAP_SCALE_COUNT, "omx_param_contract.h's scales are not omx-clap-core's");
+#undef G_ONE_SCALE
+
 static uint32_t g_contract_version(const clap_plugin_t *p) { return G_OF(p)->face->contract_version; }
 
 static const char *g_contract_fingerprint(const clap_plugin_t *p) { return G_OF(p)->face->contract_fingerprint; }
 
-static bool g_contract_get(const clap_plugin_t *p, uint32_t id, omx_clap_param_contract_info_t *info) {
+/* Fills the host's `entry` for CLAP parameter `id` from the face's rows: a declared one (0 to count - 1, its symbol the
+ * parameter table's) or the bypass at OMX_PLUGIN_FACE_BYPASS_CLAP_ID; false for any other id. */
+static bool g_contract_get(const clap_plugin_t *p, clap_id id, omx_clap_param_contract_entry_t *entry) {
   const G *g = G_OF(p);
-  return omx_param_contract_get(g->face->contract, G_DECLARED(g), id, id < G_DECLARED(g) ? g->face->params[id].symbol : NULL,
-                                info);
+  const uint32_t count = G_DECLARED(g);
+  const bool bypass_id = id == OMX_PLUGIN_FACE_BYPASS_CLAP_ID;
+  if (!entry || (id >= count && !bypass_id)) return false;
+  const struct omx_param_contract_row bypass = {OMX_CLAP_UNIT_NONE, OMX_CLAP_SCALE_STEPPED, 1.0};
+  const struct omx_param_contract_row *r = bypass_id ? &bypass : &g->face->contract[id];
+  const char *s = bypass_id ? "bypass" : g->face->params[id].symbol;
+  uint32_t i = 0;
+  for (; s && s[i] && i + 1 < OMX_CLAP_PARAM_CONTRACT_SYMBOL_SIZE; ++i) entry->symbol[i] = s[i];
+  entry->symbol[i] = 0;
+  entry->param_id = id;
+  entry->unit = r->unit;
+  entry->scale = r->scale;
+  entry->step = r->step;
+  return true;
 }
 
-static const omx_clap_plugin_param_contract_t G_CONTRACT_EXT = {g_contract_version, g_contract_fingerprint, g_contract_get};
+static const omx_clap_plugin_param_contract_ext_t G_CONTRACT_EXT = {g_contract_version, g_contract_fingerprint, g_contract_get};
 
 /* ---- org.openmixer.resource-hints.draft/0: the declaration's hints -------------------------- */
 
@@ -501,10 +554,61 @@ static const omx_clap_plugin_resource_hints_t G_RESOURCE_HINTS_EXT = {g_resource
 
 /* ---- clap.remote-controls: the panel's pages ------------------------------------------------ */
 
-static uint32_t g_pages_count(const clap_plugin_t *p) { return G_OF(p)->face->page_count; }
+/* A control the current values show: no rule, or the governing parameter's value is a bit of the rule's mask. */
+static bool g_shown(const G *g, const struct omx_panel_control_row *c) {
+  if (c->visible_param == OMX_CLAP_PANEL_INVALID_ID) return true;
+  if (c->visible_param >= G_DECLARED(g)) return false;
+  const float v = atomic_load_explicit(&g->applied[c->visible_param], memory_order_relaxed);
+  if (!(v >= 0.0f && v <= 63.0f) || v != (float)(uint32_t)v) return false;
+  return ((c->visible_mask >> (uint32_t)v) & 1u) != 0u;
+}
+
+/** The pages of a panel with visibility rules: each section's SHOWN controls in order, eight a page (the page rule of
+ * omx-panel's pagesOf), a section left with none having no page. `index` UINT32_MAX counts; else it finds the page and
+ * fills `page`. */
+static uint32_t g_pages_cut(const G *g, uint32_t index, clap_remote_controls_page_t *page) {
+  const struct omx_panel_rows *r = g->face->panel;
+  uint32_t total = 0;
+  for (uint32_t s = 0; s < r->section_count; ++s) {
+    uint32_t n = 0;
+    for (uint32_t c = 0; c < r->control_count; ++c)
+      if (r->controls[c].section == s && g_shown(g, &r->controls[c])) ++n;
+    const uint32_t pages = (n + OMX_PANEL_PAGE_SIZE - 1u) / OMX_PANEL_PAGE_SIZE;
+    if (index != UINT32_MAX && index >= total && index < total + pages) {
+      const uint32_t k = index - total;
+      memset(page, 0, sizeof *page);
+      snprintf(page->section_name, sizeof page->section_name, "%s", r->sections[s].label);
+      if (pages == 1u) snprintf(page->page_name, sizeof page->page_name, "%s", r->sections[s].label);
+      else snprintf(page->page_name, sizeof page->page_name, "%s %u", r->sections[s].label, k + 1u);
+      page->page_id = index;
+      uint32_t seen = 0, slot = 0;
+      for (uint32_t c = 0; c < r->control_count; ++c) {
+        if (r->controls[c].section != s || !g_shown(g, &r->controls[c])) continue;
+        if (seen / OMX_PANEL_PAGE_SIZE == k) page->param_ids[slot++] = r->controls[c].param;
+        ++seen;
+      }
+      for (; slot < CLAP_REMOTE_CONTROLS_COUNT; ++slot) page->param_ids[slot] = OMX_CLAP_PANEL_INVALID_ID;
+      page->is_for_preset = false;
+      return total + pages;
+    }
+    total += pages;
+  }
+  return total;
+}
+
+static uint32_t g_pages_count(const clap_plugin_t *p) {
+  const G *g = G_OF(p);
+  return g->gov_count ? g_pages_cut(g, UINT32_MAX, NULL) : g->face->page_count;
+}
 
 static bool g_pages_get(const clap_plugin_t *p, uint32_t index, clap_remote_controls_page_t *page) {
-  const struct omx_face *f = G_OF(p)->face;
+  const G *g = G_OF(p);
+  const struct omx_face *f = g->face;
+  if (g->gov_count) {
+    if (index >= g_pages_cut(g, UINT32_MAX, NULL)) return false;
+    g_pages_cut(g, index, page);
+    return true;
+  }
   if (index >= f->page_count) return false;
   const struct omx_panel_page_row *r = &f->pages[index];
   memset(page, 0, sizeof *page);
@@ -571,7 +675,7 @@ static const void *g_get_extension(const clap_plugin_t *p, const char *id) {
   if (strcmp(id, CLAP_EXT_PRESET_LOAD) == 0 || strcmp(id, CLAP_EXT_PRESET_LOAD_COMPAT) == 0) return &G_PRESET_LOAD_EXT;
   if (strcmp(id, OMX_CLAP_EXT_DECLARATION) == 0) return &G_DECL_EXT;
   if (strcmp(id, OMX_PANEL_DESCRIPTION_ID) == 0) return &G_PANEL_EXT;
-  if (strcmp(id, OMX_PARAM_CONTRACT_ID) == 0) return &G_CONTRACT_EXT;
+  if (strcmp(id, OMX_CLAP_EXT_PARAM_CONTRACT) == 0) return &G_CONTRACT_EXT;
   if (strcmp(id, CLAP_EXT_REMOTE_CONTROLS) == 0) return &G_PAGES_EXT;
   if (strcmp(id, CLAP_EXT_TRACK_INFO) == 0) return &G_TRACK_INFO_EXT;
   if (strcmp(id, OMX_CLAP_EXT_RESOURCE_HINTS_DRAFT) == 0) return &G_RESOURCE_HINTS_EXT;
@@ -579,7 +683,10 @@ static const void *g_get_extension(const clap_plugin_t *p, const char *id) {
   return NULL;
 }
 
-static void g_on_main_thread(const clap_plugin_t *p) { (void)p; }
+static void g_on_main_thread(const clap_plugin_t *p) {
+  G *g = G_OF(p);
+  if (atomic_exchange(&g->pages_dirty, 0) && g->host_pages && g->host_pages->changed) g->host_pages->changed(g->host);
+}
 
 /* ---- factory ---------------------------------------------------------------------------- */
 
@@ -615,6 +722,18 @@ static const clap_plugin_t *g_create(const struct omx_clap_face *cf, const clap_
   g->plugin.get_extension = g_get_extension;
   g->plugin.on_main_thread = g_on_main_thread;
   for (uint32_t i = 0; i < G_PARAMS(g); ++i) g->values[i] = g_def(g, i);
+  /* the parameters the panel's visibility rules read: the pages follow them */
+  const struct omx_panel_rows *pr = f->panel;
+  for (uint32_t c = 0; pr && c < pr->control_count; ++c) {
+    const uint32_t gp = pr->controls[c].visible_param;
+    if (gp == OMX_CLAP_PANEL_INVALID_ID || gp >= G_DECLARED(g)) continue;
+    uint32_t k = 0;
+    while (k < g->gov_count && g->gov[k] != gp) ++k;
+    if (k == g->gov_count && g->gov_count < G_GOV_MAX) {
+      g->gov[g->gov_count++] = gp;
+      atomic_store_explicit(&g->paged[k], g->values[gp], memory_order_relaxed);
+    }
+  }
   g_publish(g);
   return &g->plugin;
 }

@@ -3,12 +3,12 @@
 /*
  * param-contract.mjs — org.openmixer.param-contract/1 of a plugin, from its declaration: each
  * parameter's symbol, unit, scale and step, the host's bypass last, and the canonical serialisation
- * whose SHA-256 is the fingerprint. tools/gen.mjs writes the rows a CLAP face serves
- * (include/omx_param_contract.h); the unit codes are omx-contract's (OMX_PARAM_CONTRACT_UNITS). tools/clap-ext-check.mjs
- * reads what a built face serves back.
+ * whose SHA-256 is the fingerprint. The extension is omx-clap-core's (<omx-clap-host/omx_clap_ext.h>); tools/gen.mjs
+ * writes the rows a CLAP face serves it from (include/omx_param_contract.h); the unit codes are omx-contract's
+ * (OMX_PARAM_CONTRACT_UNITS). tools/clap-ext-check.mjs reads what a built face serves back.
  *
- * The contract's version is 1: its first publication. A later change of a symbol, unit, scale, travel
- * or stepping changes the fingerprint and needs the next version.
+ * The contract's version is 1: its first publication. A later change of a
+ * symbol, unit, scale, travel or stepping changes the fingerprint and needs the next version.
  */
 import { createHash } from 'node:crypto';
 import { dirname, join } from 'node:path';
@@ -38,6 +38,29 @@ export function declaredUnits(dir) {
   const item = items(dir)[PARAM_UNITS_ITEM];
   if (item?.kind !== 'sheet' || typeof item.value !== 'object') throw new Error(`${dir}: the resolved contract holds no ${PARAM_UNITS_ITEM} sheet (omx-contract >= 3.6.0)`);
   return Object.fromEntries(Object.entries(item.value).sort((a, b) => a[1] - b[1]));
+}
+
+/** The ids a face gives its own controls are omx-contract's: the sheet OMX_PLUGIN_FACE_IDS (data/plugin-face.json,
+ * omx-contract >= 3.9.0), rendered to omxcontract/omx_plugin_face_ids.h. The CLAP bypass id and the LV2 enabled and latency
+ * indices are the same in every plugin and never move when a control is appended. */
+export const FACE_IDS_ITEM = 'OMX_PLUGIN_FACE_IDS';
+
+/** `{ bypassClapId, enabledLv2Index, latencyLv2Index }` of the resolved contract at `dir` (default: this tree's). */
+let faceIdsCache;
+export function faceIds(dir) {
+  if (dir === undefined && faceIdsCache) return faceIdsCache;
+  let at = dir;
+  if (at === undefined) {
+    const found = locateContract(ROOT);
+    if (!found.dir) throw new Error(`${FACE_IDS_ITEM}: ${found.why}`);
+    at = found.dir;
+  }
+  const v = items(at)[FACE_IDS_ITEM]?.value;
+  for (const k of ['bypassClapId', 'enabledLv2Index', 'latencyLv2Index'])
+    if (!Number.isInteger(v?.[k])) throw new Error(`${at}: the resolved contract holds no ${FACE_IDS_ITEM}.${k} (omx-contract >= 3.9.0)`);
+  const ids = { bypassClapId: v.bypassClapId, enabledLv2Index: v.enabledLv2Index, latencyLv2Index: v.latencyLv2Index };
+  if (dir === undefined) faceIdsCache = ids;
+  return ids;
 }
 
 /** The units by name without underscores (SEMITONE12TET), as `Map<name, code>`: the declaration's, or with `text` the

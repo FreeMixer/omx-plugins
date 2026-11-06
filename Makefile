@@ -21,6 +21,8 @@
 #                   (tools/round-trip.{sh,mjs}, with its two sabotage arms; part of `make test`)
 #   make contract-union  parallel make targets render omx-contract's union into private directories and read it whole
 #                   (tools/test/contract-union-race-test.mjs; part of `make test` and `make test-faces`)
+#   make face-ids   the host's bypass and LV2 enabled and latency sit at omx-contract's permanent ids (OMX_PLUGIN_FACE_IDS), none
+#                   moved by an appended parameter (tools/test/face-ids-test.mjs, with its self-test; part of `make test`)
 #   make probe-checks  clap-params-check, panel-check, clap-ext-check and port-groups-check each fail on a built face that is wrong,
 #                   one change at a time (tools/test/probe-checks-selftest.mjs; part of `make test`)
 #   make eq-probe-race  parallel make targets each build build/eq-default-probe privately and run it whole
@@ -28,9 +30,13 @@
 #   make param-tie   every by-reference parameter's symbol is its control's words or says its `control`: swapped refs are refused
 #                   (FreeMixer/omx-plugins#58; tools/test/param-tie-test.mjs; part of `make test`)
 #   make summary-numbers  a plugin summary reads its numbers from the declaration: none types a limit or default of its parameters,
-#                   and a moved contract moves the README row (FreeMixer/omx-plugins#174; tools/test/summary-numbers-test.mjs; part of `make test`)
+#                   and a moved contract moves the catalogue row (FreeMixer/omx-plugins#174; tools/test/summary-numbers-test.mjs; part of `make test`)
 #   make phaser-depth  omx-phaser's generated panel publishes its depth role on depthOct, in octaves (FreeMixer/omx-plugins#232;
 #                   tools/test/phaser-depth-role-test.mjs and its --self-test; part of `make test`)
+#   make strip-visible-when  omx-strip's panel follows its band count: at eqBands 4 bands 1..4 are shown and 5..32
+#                   hidden, and no page holds a hidden band (tools/test/strip-visible-when-test.mjs; part of `make test`)
+#   make strip-pages-follow  omx-strip's CLAP remote-control pages follow Bands: 4, 32, 9 and 4 bands read back through the
+#                   extension from the built face, the host told by changed() (tools/test/strip-pages-follow-test.mjs; part of `make test`)
 #   make band-groups  omx-eq8's generated descriptor and TTL hold one LV2 port group per band, Band 1 ... Band 8 in band
 #                   order, each its five controls (tools/test/eq8-band-groups-test.mjs; part of `make test`)
 #   make geq-widgets  omx-geq declares the fader for its 31 bands, and its panel description and generated header serve them
@@ -39,11 +45,11 @@
 #   make modgui     every plugin's MOD GUI is what omx-panel writes from its descriptor and its declared panel: each plugin's
 #                   `make check` (the generated-fresh step of CI runs it beside `node tools/gen.mjs --check`)
 #   make manual     each declaration's manual follows omx-contract: a travel moved in a copy of the release moves
-#                   the README section's range and default (tools/test/manual-perturb.mjs)
+#                   the catalogue section's range and default (tools/test/manual-perturb.mjs)
 #   make params-doc  write docs/plugins/: one page of every parameter for each plugin and the index (tools/params-doc.mjs, from the declarations)
 #   make check-params-doc  the committed pages are what the declarations generate, and say what the generated TTLs say (tools/test/params-doc-test.mjs); run by CI beside `node tools/gen.mjs --check`
-#   make private-refs  no tracked file (generated ones included) points into a private repository, issue, branch or path
-#                      (tools/private-refs-check.sh, with its --self-test); run by CI beside `make test`
+#   make panel-copies  no tracked file is a film strip or a fixture omx-panel renders or ships: `omx-panel copies`
+#                      over the tree, with its --self-test; run by CI beside `make test`
 #   make recipe-test   the repository's own checks, run by CI beside `make test`:
 #     make completeness  every plugin against recipes/plugin.recipe.json, each gap naming its wizard step;
 #                        a gap not in recipes/completeness-debt.json fails, and so does a paid debt entry
@@ -57,6 +63,15 @@
 #                    omx-contract and omx-dsp releases the old commit pinned, from sibling checkouts' tags or GitHub).
 #                    Known gap: the low-pass above 0.6 of Nyquist at 44.1 and 48 kHz is not compared (omx-dsp's hand-over,
 #                    omx-dsp#105/#116/#119, removed a passband lift the hand-ported strip had); the map's @cap line says so
+#   make strip-bands  omx-strip's band count (#308) against the strip before it had one, bit for bit at every declared
+#                   rate: at its default count with every band past it boosted, and with the extra bands flat, it is
+#                   that strip; with the count reaching a boosted band it is not; built to process every band
+#                   whatever the count it is not (the sabotage); and that strip's factory presets, as presets and as the
+#                   sessions it saves, load into this one with the same values and output (tools/test/strip-bands-check.sh,
+#                   tools/test/clap-session-crosscheck.c; needs the git history; part of `make test`)
+#   make strip-bands-bench  omx-strip's CPU cost by band count (4, 8, 16, 32, and its EQ off) through the built CLAP
+#                   face, at BENCH_RATES (default 48000 96000): microseconds per 128-frame block and the share of a core
+#                   (tools/test/strip-bands-bench.c; a figure for one machine, not part of `make test`)
 #   make presets    the factory presets: fresh against tools/gen-presets.mjs, each value inside its declared travel (part of `make test`)
 #   make presets-figures  the measured figures of the console's two catalogue presets, through omx-dsp's instance faces: the
 #                   amp-input bell (+4.00 dB at 2.5 kHz), the amp-tube harmonics (H2/H3 on the closed form), the dimension's
@@ -79,7 +94,7 @@
 #   make install-devel   the public headers other projects include: $(INCLUDEDIR)/omx-plugins/*.h,
 #                   and $(LIBDIR)/libomxplugins.a with $(LIBDIR)/pkgconfig/omxplugins.pc
 #   make clap-validate  clap-validator on every built .clap (tools/clap-validate.sh): one JSON report each in build/clap-validator;
-#                   CI runs it and reports a failure without failing the job until every plugin passes
+#                   the factory presets must be installed (make install-presets); in CI a failed test fails the job
 #   make release-version  every generated header, descriptor and LV2 plugin file carries VERSION, with its sabotage arms
 #                   (tools/test/release-version-check.mjs; part of `make test`)
 #   make version    the release version, the one packaging/omx-plugins.spec and debian/changelog carry
@@ -92,7 +107,7 @@
 #   make package-lists  every plugin the build makes is installed and listed by exactly the package it belongs
 #                   to, in the RPM spec and the Debian .install files: tools/package-lists-check.sh over a staged
 #                   install, with its --self-test (part of `make test`)
-VERSION := 0.18.0
+VERSION := 0.19.0
 PLUGINS := $(sort $(dir $(wildcard plugins/*/Makefile)))
 # A test plugin is built, tested and linked into libomxplugins.a like the others; `make install` never installs
 # it, and `make install-test` puts it outside the CLAP path: its declaration says `"role": "test"`
@@ -131,15 +146,18 @@ LIB_PC     := $(LIB_B)/omxplugins.pc
 CLAP_FACES := $(foreach p,$(PLUGINS),$(wildcard $(p)omx_*_clap.c))
 LIB_OBJS   := $(LIB_B)/omx_clap_static.o $(LIB_B)/omx_clap_face.o $(patsubst %.c,$(LIB_B)/%.o,$(notdir $(CLAP_FACES)))
 # The releases this tree builds against are declared once, in the packaging: packaging/omx-plugins.spec's
-# BuildRequires, a floor (>=) per dependency, no ceiling; debian/control says the same
+# BuildRequires, a floor and a ceiling per dependency (`(pkg >= F with pkg < C)`); debian/control says the same
 # (tools/deps-check.sh). Building the archive stops first, naming the dependency, the range and what is
 # installed, when pkg-config finds a release outside it.
 SPEC       := packaging/omx-plugins.spec
-spec_floor   = $(shell sed -n 's/^BuildRequires: $(1) >= \([0-9.]*\)$$/\1/p' $(SPEC))
+spec_floor   = $(shell sed -n 's/^BuildRequires: ($(1) >= \([0-9.]*\) with $(1) < [0-9.]*)$$/\1/p' $(SPEC))
+spec_ceiling = $(shell sed -n 's/^BuildRequires: ($(1) >= [0-9.]* with $(1) < \([0-9.]*\))$$/\1/p' $(SPEC))
 OMXDSP_MIN        := $(call spec_floor,omx-dsp-devel)
+OMXDSP_MAX        := $(call spec_ceiling,omx-dsp-devel)
 CONTRACT_MIN      := $(call spec_floor,omx-contract-devel)
+CONTRACT_MAX      := $(call spec_ceiling,omx-contract-devel)
 # $(call dep_check,<pkg-config name>,<floor>,<ceiling>): nothing, or a stop naming what is installed
-dep_check = $(if $(shell $(PKG_CONFIG) --atleast-version=$(2) $(1) && echo y),,$(error $(1) >= $(2) is required ($(SPEC)); installed: $(or $(shell $(PKG_CONFIG) --modversion $(1) 2>/dev/null),none). Install omx-dsp-devel and omx-contract-devel (or libomxdsp-dev and libomx-contract-dev) from the channel: BUILDING.md))
+dep_check = $(if $(shell $(PKG_CONFIG) --atleast-version=$(2) $(1) && ! $(PKG_CONFIG) --atleast-version=$(3) $(1) && echo y),,$(error $(1) >= $(2) and < $(3) is required ($(SPEC)); installed: $(or $(shell $(PKG_CONFIG) --modversion $(1) 2>/dev/null),none). Install omx-dsp-devel and omx-contract-devel (or libomxdsp-dev and libomx-contract-dev) from the channel: BUILDING.md))
 PKG_CONFIG ?= pkg-config
 CC         ?= cc
 AR         ?= ar
@@ -147,13 +165,13 @@ CFLAGS     ?= -O2 -g
 LIB_WARN   := -std=gnu11 -Wall -Wextra -Werror
 LIB_FLAGS  := -fPIC -fvisibility=hidden -DOMX_CLAP_STATIC -Iinclude
 # read only by the targets that build the archive, so `make version` and the rest need no omx-dsp
-lib_cflags = $(call dep_check,omxdsp,$(OMXDSP_MIN))$(call dep_check,omx-contract,$(CONTRACT_MIN))$(shell $(PKG_CONFIG) --cflags omxdsp omx-contract omx-clap-core clap)
+lib_cflags = $(call dep_check,omxdsp,$(OMXDSP_MIN),$(OMXDSP_MAX))$(call dep_check,omx-contract,$(CONTRACT_MIN),$(CONTRACT_MAX))$(shell $(PKG_CONFIG) --cflags omxdsp omx-contract omx-clap-core clap)
 
-.PHONY: summary-numbers param-tie face-dirty-order presets presets-figures test-role all lib lib-test test test-faces units panel-layout descriptor-view lv2-units lv2-deprecated lv2-maintainer lv2-manifest release-version resource-hints format-tables contract-union probe-checks eq-probe-race band-groups phaser-depth geq-widgets round-trip hints modgui manual install install-pins install-test package-lists install-devel install-contract contract-dir lv2bench-ran clean version recipe-test completeness selftest private-refs params-doc check-params-doc strip-crosscheck meters-abi meter-level dsp-copies meter-ring clap-validate param-contract-abi
+.PHONY: summary-numbers param-tie presets presets-figures test-role all lib lib-test test test-faces units panel-words panel-layout descriptor-view descriptor-features placement-strips lv2-units lv2-deprecated lv2-maintainer lv2-manifest release-version resource-hints format-tables contract-union probe-checks face-ids eq-probe-race band-groups strip-visible-when strip-pages-follow phaser-depth geq-widgets round-trip hints modgui manual install install-pins install-test package-lists install-devel install-contract contract-dir lv2bench-ran clean version recipe-test completeness selftest params-doc check-params-doc strip-crosscheck strip-bands strip-bands-bench meters-abi meter-level dsp-copies panel-copies meter-ring clap-validate face-dirty-order param-contract-abi
 all: lib
 	@for p in $(PLUGINS); do $(MAKE) -C $$p all || exit 1; done
 lib: $(LIB) $(LIB_PC)
-test: lib units panel-layout descriptor-view lv2-units lv2-deprecated lv2-maintainer lv2-manifest release-version resource-hints format-tables contract-union contract-dir lv2bench-ran probe-checks eq-probe-race band-groups phaser-depth geq-widgets summary-numbers param-tie face-dirty-order
+test: lib units panel-words panel-layout descriptor-view descriptor-features placement-strips lv2-units lv2-deprecated lv2-maintainer lv2-manifest release-version resource-hints format-tables contract-union contract-dir lv2bench-ran probe-checks eq-probe-race band-groups phaser-depth geq-widgets summary-numbers param-tie face-ids strip-visible-when face-dirty-order
 	@if [ -z "$(PLUGINS)" ]; then echo "no plugins yet"; fi
 	@for p in $(PLUGINS); do $(MAKE) -C $$p test || exit 1; done
 	@$(MAKE) -s round-trip
@@ -166,6 +184,7 @@ test: lib units panel-layout descriptor-view lv2-units lv2-deprecated lv2-mainta
 	@$(MAKE) -s meters-abi
 	@$(MAKE) -s param-contract-abi
 	@$(MAKE) -s meter-level
+	@$(MAKE) -s strip-bands
 	@$(MAKE) -s test-role
 	@$(MAKE) -s package-lists
 # what runs with no omx-contract command (debian/rules: no .deb ships the command yet): the built faces, the static
@@ -179,10 +198,16 @@ test-faces: all lib contract-union eq-probe-race
 	@$(MAKE) -s package-lists
 units:
 	node tools/test/param-units-check.mjs --self-test
+panel-words:
+	node tools/test/panel-words-check.mjs --self-test
 panel-layout:
 	node tools/test/panel-layout-test.mjs
 descriptor-view:
 	node tools/test/descriptor-view-test.mjs
+descriptor-features:
+	node tools/test/descriptor-features-check.mjs --self-test
+placement-strips:
+	node tools/test/placement-strips-check.mjs --self-test
 # every declared unit is stated by its port in the generated TTL, with its sabotage arms
 lv2-units:
 	node tools/test/lv2-units-check.mjs --self-test
@@ -207,6 +232,11 @@ contract-union:
 # the four probe checkers (params, panel, CLAP extensions, port groups) each go red on a face that is wrong, one change at a time
 probe-checks:
 	node tools/test/probe-checks-selftest.mjs
+# the host's bypass (CLAP) and enabled and latency (LV2) at omx-contract's permanent ids in every plugin, none moved by an
+# appended parameter or an added sidechain; the self-test holds the rule it replaced red
+face-ids:
+	node tools/test/face-ids-test.mjs
+	node tools/test/face-ids-test.mjs --self-test
 # the EQ default probe is run whole while other processes build it (make -j): a fake compiler, readers a little apart
 eq-probe-race:
 	node tools/test/eq-probe-race-test.mjs
@@ -225,6 +255,17 @@ phaser-depth:
 
 band-groups:
 	node tools/test/eq8-band-groups-test.mjs
+strip-visible-when:
+	node tools/test/strip-visible-when-test.mjs
+# the strip's CLAP remote-control pages follow Bands: the built face and a host that offers clap.remote-controls,
+# read back through the extension at 4, 32, 9, 9 and 4 bands (tools/test/clap-pages-follow-probe.c)
+strip-pages-follow:
+	@mkdir -p build
+	@$(MAKE) -s -C plugins/omx-strip all
+	$(CC) -std=gnu11 -Wall -Wextra -Werror $(shell $(PKG_CONFIG) --cflags omx-clap-core clap) -o build/clap-pages-follow-probe tools/test/clap-pages-follow-probe.c -ldl
+	@id=$$(node -e "import('./tools/gen.mjs').then(m=>{const d=m.loadDecl('plugins/omx-strip');console.log(d.params.findIndex(p=>p.symbol==='eqBands'))})"); \
+	  build/clap-pages-follow-probe plugins/omx-strip/build/omx-strip.clap $$id 4 32 9 9 4 > build/strip-pages-follow.txt && \
+	  node tools/test/strip-pages-follow-test.mjs build/strip-pages-follow.txt
 geq-widgets:
 	node tools/test/geq-widgets-test.mjs
 # the parameter reference of every plugin, written from the declarations (docs/plugins/)
@@ -263,9 +304,10 @@ selftest:
 	tools/qualify-release.sh --self-test
 	tools/gen-pins.sh --self-test
 	tools/pins-check.sh --self-test
-private-refs:
-	tools/private-refs-check.sh
-	tools/private-refs-check.sh --self-test
+OMX_PANEL ?= omx-panel
+panel-copies:
+	$(OMX_PANEL) copies --self-test
+	$(OMX_PANEL) copies .
 meters-abi:
 	@mkdir -p build
 	$(CC) -std=gnu11 -Wall -Wextra -Werror $(shell $(PKG_CONFIG) --cflags omx-clap-core clap) -o build/meters-abi-test tools/test/meters-abi-test.c
@@ -310,10 +352,20 @@ meter-ring:
 	tools/meter-ring-check.sh --self-test
 strip-crosscheck:
 	sh tools/test/strip-crosscheck.sh
+strip-bands:
+	sh tools/test/strip-bands-check.sh
+strip-bands-bench:
+	@$(MAKE) -s -C plugins/omx-strip build/omx-strip.clap
+	@mkdir -p build
+	$(CC) -O2 -std=gnu11 -Wall -Wextra -Werror $(shell $(PKG_CONFIG) --cflags clap) -o build/strip-bands-bench tools/test/strip-bands-bench.c -ldl -lm
+	build/strip-bands-bench plugins/omx-strip/build/omx-strip.clap $(BENCH_RATES)
 install:
 	@for p in $(SHIP_PLUGINS); do $(MAKE) -C $$p install || exit 1; done
-	find presets -type f -name '*.json' | while read -r f; do install -D -m644 "$$f" "$(DESTDIR)$(DATADIR)/omx/$$f"; done
+	$(MAKE) -s install-presets
 	$(MAKE) -s install-pins
+# the factory presets, where every plugin's preset-discovery factory declares them
+install-presets:
+	find presets -type f -name '*.json' | while read -r f; do install -D -m644 "$$f" "$(DESTDIR)$(DATADIR)/omx/$$f"; done
 # every shipped plugin's pin, known at build time: scans the .clap files the step above just installed,
 # so the pins ship beside the binaries they were measured from (tools/gen-pins.sh, which needs
 # plugin-qualify >= 0.9.0; run on its own once the plugins are already installed, e.g. in a package's
@@ -385,7 +437,7 @@ $(foreach f,$(CLAP_FACES),$(eval $(call face_rule,$(f))))
 
 # The prefix, libdir and includedir are filled at install; the version and the omx-dsp and omx-contract floors here.
 $(LIB_PC): lib/omxplugins.pc.in Makefile $(SPEC) | $(LIB_B)
-	sed -e 's,@VERSION@,$(VERSION),' -e 's,@OMXDSP_MIN@,$(OMXDSP_MIN),' -e 's,@CONTRACT_MIN@,$(CONTRACT_MIN),' $< > $@
+	sed -e 's,@VERSION@,$(VERSION),' -e 's,@OMXDSP_MIN@,$(OMXDSP_MIN),' -e 's,@OMXDSP_MAX@,$(OMXDSP_MAX),' -e 's,@CONTRACT_MIN@,$(CONTRACT_MIN),' -e 's,@CONTRACT_MAX@,$(CONTRACT_MAX),' $< > $@
 
 $(LIB_B):
 	@mkdir -p $@

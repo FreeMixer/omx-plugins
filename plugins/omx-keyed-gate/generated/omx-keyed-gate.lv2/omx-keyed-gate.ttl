@@ -23,7 +23,7 @@
     doap:name "omx keyed-gate" ;
     doap:license <https://www.gnu.org/licenses/gpl-3.0.html> ;
     lv2:project <https://github.com/FreeMixer/omx-plugins> ;
-    lv2:minorVersion 18 ;
+    lv2:minorVersion 19 ;
     lv2:microVersion 0 ;
     rdfs:comment "The OpenMixer console's channel gate with an external key: the stereo signal is gated while the detector listens to the sidechain input the host routes to it, or to the signal itself with the key unconnected or set to Self. One gain drives both legs. An attack under 0.5 ms engages 4x detector oversampling, which adds 72 frames of latency, reported to the host. The DSP is omx-dsp's <omxdsp/fx/omx_gate_instance.h>, the console's own gate." ;
     lv2:optionalFeature lv2:hardRTCapable ;
@@ -32,39 +32,8 @@
     omxres:opensSockets false ;
     lv2:port
     [
-        a lv2:AudioPort , lv2:InputPort ;
-        lv2:index 0 ;
-        lv2:symbol "in_l" ;
-        lv2:name "In L"
-    ] ,
-    [
-        a lv2:AudioPort , lv2:InputPort ;
-        lv2:index 1 ;
-        lv2:symbol "in_r" ;
-        lv2:name "In R"
-    ] ,
-    [
-        a lv2:AudioPort , lv2:InputPort ;
-        lv2:index 2 ;
-        lv2:symbol "key" ;
-        lv2:name "Key (Sidechain)" ;
-        lv2:portProperty lv2:isSideChain , lv2:connectionOptional
-    ] ,
-    [
-        a lv2:AudioPort , lv2:OutputPort ;
-        lv2:index 3 ;
-        lv2:symbol "out_l" ;
-        lv2:name "Out L"
-    ] ,
-    [
-        a lv2:AudioPort , lv2:OutputPort ;
-        lv2:index 4 ;
-        lv2:symbol "out_r" ;
-        lv2:name "Out R"
-    ] ,
-    [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 5 ;
+        lv2:index 0 ;
         lv2:symbol "enabled" ;
         lv2:name "Enabled" ;
         lv2:default 1 ;
@@ -74,8 +43,57 @@
         lv2:portProperty lv2:toggled
     ] ,
     [
-        a lv2:ControlPort , lv2:InputPort ;
+        a lv2:ControlPort , lv2:OutputPort ;
+        lv2:index 1 ;
+        lv2:symbol "latency" ;
+        lv2:name "Latency" ;
+        lv2:designation lv2:latency ;
+        lv2:portProperty lv2:integer ;
+        units:unit units:frame
+    ] ,
+    [
+        a lv2:ControlPort , lv2:OutputPort ;
+        lv2:index 2 ;
+        lv2:symbol "gateGr" ;
+        lv2:name "Gain reduction" ;
+        lv2:minimum -90 ;
+        lv2:maximum 0 ;
+        units:unit units:db
+    ] ,
+    [
+        a lv2:AudioPort , lv2:InputPort ;
+        lv2:index 3 ;
+        lv2:symbol "in_l" ;
+        lv2:name "In L"
+    ] ,
+    [
+        a lv2:AudioPort , lv2:InputPort ;
+        lv2:index 4 ;
+        lv2:symbol "in_r" ;
+        lv2:name "In R"
+    ] ,
+    [
+        a lv2:AudioPort , lv2:InputPort ;
+        lv2:index 5 ;
+        lv2:symbol "key" ;
+        lv2:name "Key (Sidechain)" ;
+        lv2:portProperty lv2:isSideChain , lv2:connectionOptional
+    ] ,
+    [
+        a lv2:AudioPort , lv2:OutputPort ;
         lv2:index 6 ;
+        lv2:symbol "out_l" ;
+        lv2:name "Out L"
+    ] ,
+    [
+        a lv2:AudioPort , lv2:OutputPort ;
+        lv2:index 7 ;
+        lv2:symbol "out_r" ;
+        lv2:name "Out R"
+    ] ,
+    [
+        a lv2:ControlPort , lv2:InputPort ;
+        lv2:index 8 ;
         lv2:symbol "key_external" ;
         lv2:name "Key" ;
         lv2:default 1 ;
@@ -89,7 +107,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 7 ;
+        lv2:index 9 ;
         lv2:symbol "threshold" ;
         lv2:name "Threshold" ;
         lv2:default -40 ;
@@ -101,7 +119,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 8 ;
+        lv2:index 10 ;
         lv2:symbol "ratio" ;
         lv2:name "Ratio" ;
         lv2:default 16 ;
@@ -114,7 +132,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 9 ;
+        lv2:index 11 ;
         lv2:symbol "range" ;
         lv2:name "Range" ;
         lv2:default -90 ;
@@ -125,7 +143,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 10 ;
+        lv2:index 12 ;
         lv2:symbol "attack" ;
         lv2:name "Attack" ;
         lv2:default 1 ;
@@ -137,7 +155,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 11 ;
+        lv2:index 13 ;
         lv2:symbol "release" ;
         lv2:name "Release" ;
         lv2:default 100 ;
@@ -149,7 +167,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 12 ;
+        lv2:index 14 ;
         lv2:symbol "knee_start" ;
         lv2:name "Knee Start" ;
         lv2:default -43 ;
@@ -161,7 +179,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 13 ;
+        lv2:index 15 ;
         lv2:symbol "knee_end" ;
         lv2:name "Knee End" ;
         lv2:default -37 ;
@@ -173,7 +191,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 14 ;
+        lv2:index 16 ;
         lv2:symbol "hold" ;
         lv2:name "Hold" ;
         lv2:default 10 ;
@@ -186,7 +204,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 15 ;
+        lv2:index 17 ;
         lv2:symbol "hysteresis" ;
         lv2:name "Hysteresis" ;
         lv2:default 3 ;
@@ -197,7 +215,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 16 ;
+        lv2:index 18 ;
         lv2:symbol "key_hp" ;
         lv2:name "Key High-pass" ;
         lv2:default 0 ;
@@ -209,7 +227,7 @@
     ] ,
     [
         a lv2:ControlPort , lv2:InputPort ;
-        lv2:index 17 ;
+        lv2:index 19 ;
         lv2:symbol "key_lp" ;
         lv2:name "Key Low-pass" ;
         lv2:default 0 ;
@@ -218,15 +236,6 @@
         lv2:portProperty lv2:integer ;
         units:unit units:hz ;
         pg:group <urn:openmixer:keyed-gate#key>
-    ] ,
-    [
-        a lv2:ControlPort , lv2:OutputPort ;
-        lv2:index 18 ;
-        lv2:symbol "latency" ;
-        lv2:name "Latency" ;
-        lv2:designation lv2:latency ;
-        lv2:portProperty lv2:integer ;
-        units:unit units:frame
     ] .
 
 # lv2:displayPriority on a port group is the term Zynthian reads to order a plugin's groups (zynthian_lv2.py), and the

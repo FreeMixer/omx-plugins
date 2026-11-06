@@ -13,7 +13,8 @@ static inline void omx_{{kernel}}_core_run_v(void *c, const float *key, const fl
 {{/keyed}}{{#keyed}}  omx_{{kernel}}_core_run((Omx{{Kernel}}Core *)c, key, in_l, in_r, out_l, out_r, frames);
 {{/keyed}}}
 {{#meterRead}}static inline float omx_{{kernel}}_core_meter_v(const void *c, uint32_t i) { return omx_{{kernel}}_core_meter((const Omx{{Kernel}}Core *)c, i); }
-{{/meterRead}}
+{{/meterRead}}{{#tempo}}static inline void omx_{{kernel}}_core_tempo_v(void *c, double bpm) { omx_{{kernel}}_core_tempo((Omx{{Kernel}}Core *)c, bpm); }
+{{/tempo}}
 static const struct omx_face_core OMX_{{K}}_CORE = {sizeof(Omx{{Kernel}}Core), omx_{{kernel}}_core_init_v, omx_{{kernel}}_core_resolve_v,
                                                    omx_{{kernel}}_core_latency_v, omx_{{kernel}}_core_run_v,
                                                    {{#meterRead}}omx_{{kernel}}_core_meter_v{{/meterRead}}{{^meterRead}}NULL{{/meterRead}}};

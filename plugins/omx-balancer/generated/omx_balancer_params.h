@@ -59,7 +59,7 @@ static const char *const OMX_BALANCER_PARAM_MODULES[OMX_BALANCER_PARAM_COUNT] = 
 #define OMX_BALANCER_NAME "omx balancer"
 #define OMX_BALANCER_VENDOR "openmixer"
 #define OMX_BALANCER_URL "https://github.com/FreeMixer/omx-plugins"
-#define OMX_BALANCER_VERSION "0.18.0"
+#define OMX_BALANCER_VERSION "0.19.0"
 #define OMX_BALANCER_DESCRIPTION "Walks four bands slowly toward a target tone, so a mix settles toward a pink-noise balance without chasing notes."
 #define OMX_BALANCER_CLAP_ID "org.openmixer.balancer"
 #define OMX_BALANCER_CLAP_FEATURES "audio-effect", "equalizer", "stereo"
@@ -69,7 +69,7 @@ static const char *const OMX_BALANCER_PARAM_MODULES[OMX_BALANCER_PARAM_COUNT] = 
 #define OMX_BALANCER_DECL_DIGEST "427d243fbeeca3d3a7f7a86bb6f9c0a2a75ff42890268e7e92547d573480a461"
 
 /* org.openmixer.param-contract/1 (tools/param-contract.mjs): each parameter's unit, scale and step, in
- * id order; the host's bypass, the last id, is the face's. */
+ * id order; the host's bypass, CLAP id OMX_PLUGIN_FACE_BYPASS_CLAP_ID (omx-contract), is the face's. */
 #define OMX_BALANCER_PARAM_CONTRACT_VERSION 1u
 #define OMX_BALANCER_PARAM_CONTRACT_FINGERPRINT "8c1de971be63f6c0df20d1500f885d569497eec815587fe7d31d3a27f45823ee"
 static const struct omx_param_contract_row OMX_BALANCER_PARAM_CONTRACT[OMX_BALANCER_PARAM_COUNT] = {
@@ -114,14 +114,17 @@ static const struct omx_panel_rows OMX_BALANCER_PANEL = {
   NULL, 0u,
 };
 
-/* LV2 port indices (tools/gen.mjs lv2Ports): audio, then parameter i at FIRST_PARAM + i, then these. */
-#define OMX_BALANCER_LV2_PORT_IN_L 0u
-#define OMX_BALANCER_LV2_PORT_IN_R 1u
-#define OMX_BALANCER_LV2_PORT_OUT_L 2u
-#define OMX_BALANCER_LV2_PORT_OUT_R 3u
-#define OMX_BALANCER_LV2_PORT_ENABLED 8u
-#define OMX_BALANCER_LV2_PORT_LATENCY 9u
-#define OMX_BALANCER_LV2_PORT_FIRST_PARAM 4u
+/* LV2 port indices (tools/gen.mjs lv2Ports): enabled and latency at omx-contract's permanent indices, the tempo's control,
+ * the meters' outputs, the audio ports, then parameter i at FIRST_PARAM + i. */
+#define OMX_BALANCER_LV2_PORT_ENABLED 0u
+#define OMX_BALANCER_LV2_PORT_LATENCY 1u
+#define OMX_BALANCER_LV2_PORT_IN_L 2u
+#define OMX_BALANCER_LV2_PORT_IN_R 3u
+#define OMX_BALANCER_LV2_PORT_OUT_L 4u
+#define OMX_BALANCER_LV2_PORT_OUT_R 5u
+#define OMX_BALANCER_LV2_PORT_FIRST_PARAM 6u
+/* The meters' output control ports, one per channel in the order their values are published, from here on. */
+#define OMX_BALANCER_LV2_PORT_FIRST_METER 10u
 #define OMX_BALANCER_LV2_PORT_COUNT 10u
 
 #endif /* OMX_BALANCER_PARAMS_H */

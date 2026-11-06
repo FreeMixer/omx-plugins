@@ -1,8 +1,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # Copyright (C) 2026 Pau Aliagas <linuxnow@gmail.com>
 #
-# The siblings omx-plugins builds on, inside out: on a pull request into dedupe/all, or a push to it, CI builds each from
+# The siblings omx-plugins builds on that are not released yet, inside out (a released one, omx-contract, comes from the channel and has no dedupe/all): on a pull request into dedupe/all, or a push to it, CI builds each from
 # its own dedupe/all and installs from those builds instead of the channel's releases (FreeMixer/.github's wave-deps).
-omx-contract
 omx-dsp
 omx-panel

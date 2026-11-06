@@ -473,7 +473,7 @@ static const char *const OMX_DYNEQ_PARAM_MODULES[OMX_DYNEQ_PARAM_COUNT] = {
 #define OMX_DYNEQ_NAME "omx dyneq"
 #define OMX_DYNEQ_VENDOR "openmixer"
 #define OMX_DYNEQ_URL "https://github.com/FreeMixer/omx-plugins"
-#define OMX_DYNEQ_VERSION "0.18.0"
+#define OMX_DYNEQ_VERSION "0.19.0"
 #define OMX_DYNEQ_DESCRIPTION "A six-band dynamic EQ: each band is an EQ bell or shelf whose gain also moves with the level of its own band, cutting above a threshold (down) or lifting below it (up), held to a range, so a harsh or boomy band is tamed only while it is too loud."
 #define OMX_DYNEQ_CLAP_ID "org.openmixer.dyneq"
 #define OMX_DYNEQ_CLAP_FEATURES "audio-effect", "equalizer", "stereo"
@@ -483,7 +483,7 @@ static const char *const OMX_DYNEQ_PARAM_MODULES[OMX_DYNEQ_PARAM_COUNT] = {
 #define OMX_DYNEQ_DECL_DIGEST "42f922522e41342fe1d9de839ecccca9f1537956c5418067f09bbe0ec8b15024"
 
 /* org.openmixer.param-contract/1 (tools/param-contract.mjs): each parameter's unit, scale and step, in
- * id order; the host's bypass, the last id, is the face's. */
+ * id order; the host's bypass, CLAP id OMX_PLUGIN_FACE_BYPASS_CLAP_ID (omx-contract), is the face's. */
 #define OMX_DYNEQ_PARAM_CONTRACT_VERSION 1u
 #define OMX_DYNEQ_PARAM_CONTRACT_FINGERPRINT "b1c783fb3f786f4b7f74254ece5fb34cff436b49ae4a6f6a07a51448a664395b"
 static const struct omx_param_contract_row OMX_DYNEQ_PARAM_CONTRACT[OMX_DYNEQ_PARAM_COUNT] = {
@@ -724,14 +724,17 @@ static const struct omx_panel_rows OMX_DYNEQ_PANEL = {
   NULL, 0u,
 };
 
-/* LV2 port indices (tools/gen.mjs lv2Ports): audio, then parameter i at FIRST_PARAM + i, then these. */
-#define OMX_DYNEQ_LV2_PORT_IN_L 0u
-#define OMX_DYNEQ_LV2_PORT_IN_R 1u
-#define OMX_DYNEQ_LV2_PORT_OUT_L 2u
-#define OMX_DYNEQ_LV2_PORT_OUT_R 3u
-#define OMX_DYNEQ_LV2_PORT_ENABLED 77u
-#define OMX_DYNEQ_LV2_PORT_LATENCY 78u
-#define OMX_DYNEQ_LV2_PORT_FIRST_PARAM 4u
-#define OMX_DYNEQ_LV2_PORT_COUNT 79u
+/* LV2 port indices (tools/gen.mjs lv2Ports): enabled and latency at omx-contract's permanent indices, the tempo's control,
+ * the meters' outputs, the audio ports, then parameter i at FIRST_PARAM + i. */
+#define OMX_DYNEQ_LV2_PORT_ENABLED 0u
+#define OMX_DYNEQ_LV2_PORT_LATENCY 1u
+#define OMX_DYNEQ_LV2_PORT_IN_L 8u
+#define OMX_DYNEQ_LV2_PORT_IN_R 9u
+#define OMX_DYNEQ_LV2_PORT_OUT_L 10u
+#define OMX_DYNEQ_LV2_PORT_OUT_R 11u
+#define OMX_DYNEQ_LV2_PORT_FIRST_PARAM 12u
+/* The meters' output control ports, one per channel in the order their values are published, from here on. */
+#define OMX_DYNEQ_LV2_PORT_FIRST_METER 2u
+#define OMX_DYNEQ_LV2_PORT_COUNT 85u
 
 #endif /* OMX_DYNEQ_PARAMS_H */

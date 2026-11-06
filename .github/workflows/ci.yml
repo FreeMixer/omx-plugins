@@ -99,17 +99,22 @@ jobs:
           tools/deps-check.sh
           tools/deps-check.sh --self-test
 
-      - name: Every source file carries its SPDX line
+      - name: Every file a comment can be written in opens with its licence
         id: handback-spdx
-        run: tools/spdx-check.sh
+        uses: FreeMixer/.github/.github/actions/spdx-check@c67b6d0e09fd9f7cf9a8dd24ff41ea30d99f893c
 
       - name: No tracked file points into a private repository
         id: handback-private-refs
-        run: make private-refs
+        uses: FreeMixer/.github/.github/actions/private-refs-check@v1
+
 
       - name: No source carries a copy of a function omx-dsp exports, and a planted copy goes red
         id: handback-dsp-copies
         run: make dsp-copies
+
+      - name: No tracked file is a film strip or a fixture omx-panel ships, and a planted one goes red
+        id: handback-panel-copies
+        run: make panel-copies
 
       - name: Every generated file is fresh, built or not
         id: handback-gen
@@ -210,8 +215,8 @@ jobs:
             rpm -qlp "$rpm" | grep -v '^/usr/lib/.build-id' | sort > files-$sub.txt
           done
           # BEGIN GENERATED plugins: tools/gen.mjs, the shipped plugins' short names and kernels, the test plugins' ids
-          shorts="balancer chorus clipper comp deesser delay drive dyneq eq8 eq16 eq32 flanger geq glue keyed-gate limiter loudlevel multiband phaser pitch plosive reverb rotary spring strip suboct transient tremolo upward"
-          kernels="balancer chorus clipper comp deesser delay drive dyneq eq8 eq16 eq32 flanger geq glue gate limiter loudlevel mbcomp phaser pitch plosive reverb rotary spring strip suboct transient tremolo upward"
+          shorts="balancer chorus clipper comp deesser delay doubler drive ducker dyneq eq8 eq16 eq32 flanger geq glue keyed-gate limiter loudlevel multiband phaser pitch plosive reverb rotary spring strip suboct tone transient tremolo upward"
+          kernels="balancer chorus clipper comp deesser delay doubler drive ducker dyneq eq8 eq16 eq32 flanger geq glue gate limiter loudlevel mbcomp phaser pitch plosive reverb rotary spring strip suboct tone transient tremolo upward"
           tests="org.openmixer.test-note-echo org.openmixer.test-pool-voice org.openmixer.test-sine-voice org.openmixer.test-transport-probe"
           teststems="omx-test-note-echo omx-test-pool-voice omx-test-sine-voice omx-test-transport-probe"
           # END GENERATED plugins
@@ -222,6 +227,7 @@ jobs:
           # the test instruments: omx-plugins-test, outside every CLAP search path
           rpm -qlp rpms/omx-plugins-test-[0-9]*.${{ matrix.arch }}.rpm | grep -v '^/usr/lib/.build-id' | sort > files-test.txt
           { printf '%s\n' /usr/libexec/omx-plugins /usr/libexec/omx-plugins/test \
+              /usr/share/doc/omx-plugins-test /usr/share/doc/omx-plugins-test/README.md \
               /usr/share/licenses/omx-plugins-test /usr/share/licenses/omx-plugins-test/LICENSE
             for t in $teststems; do echo "/usr/libexec/omx-plugins/test/$t.clap"; done; } | sort > expected-test.txt
           diff -u expected-test.txt files-test.txt
@@ -238,6 +244,7 @@ jobs:
           cdir=/usr/share/omx-contract/contract.d/3/omx-plugins
           rpm -qlp rpms/omx-plugins-contract-[0-9]*.noarch.rpm | sort > files-contract.txt
           { printf '%s\n' "$cdir" "$cdir/MANIFEST.json" "$cdir/plugins" \
+              /usr/share/doc/omx-plugins-contract /usr/share/doc/omx-plugins-contract/README.md \
               /usr/share/licenses/omx-plugins-contract /usr/share/licenses/omx-plugins-contract/LICENSE
             for d in plugins/*/*.descriptor.json; do echo "$cdir/plugins/$(basename "$d" .descriptor.json).json"; done; } | sort > expected-contract.txt
           diff -u expected-contract.txt files-contract.txt
@@ -285,8 +292,8 @@ jobs:
           out=$(rpm -ql omx-plugins); grep -qx /usr/share/omx/presets/org.openmixer.drive/amp-tube.json <<<"$out"
           test "$(grep -c '^/usr/share/omx/presets/.*\.json$' <<<"$out")" = "$(find presets -name '*.json' | wc -l)"
           # BEGIN GENERATED plugins: tools/gen.mjs, the shipped plugins' short names and kernels, the test plugins' ids
-          shorts="balancer chorus clipper comp deesser delay drive dyneq eq8 eq16 eq32 flanger geq glue keyed-gate limiter loudlevel multiband phaser pitch plosive reverb rotary spring strip suboct transient tremolo upward"
-          kernels="balancer chorus clipper comp deesser delay drive dyneq eq8 eq16 eq32 flanger geq glue gate limiter loudlevel mbcomp phaser pitch plosive reverb rotary spring strip suboct transient tremolo upward"
+          shorts="balancer chorus clipper comp deesser delay doubler drive ducker dyneq eq8 eq16 eq32 flanger geq glue keyed-gate limiter loudlevel multiband phaser pitch plosive reverb rotary spring strip suboct tone transient tremolo upward"
+          kernels="balancer chorus clipper comp deesser delay doubler drive ducker dyneq eq8 eq16 eq32 flanger geq glue gate limiter loudlevel mbcomp phaser pitch plosive reverb rotary spring strip suboct tone transient tremolo upward"
           tests="org.openmixer.test-note-echo org.openmixer.test-pool-voice org.openmixer.test-sine-voice org.openmixer.test-transport-probe"
           teststems="omx-test-note-echo omx-test-pool-voice omx-test-sine-voice omx-test-transport-probe"
           # END GENERATED plugins
@@ -318,8 +325,8 @@ jobs:
           devel=$(find rpms -maxdepth 1 -name "omx-plugins-devel-[0-9]*.rpm" ! -name "*.src.rpm" | head -1)
           dnf_retry --setopt=install_weak_deps=False "$devel" rpms/omx-plugins-contract-[0-9]*.noarch.rpm
           # BEGIN GENERATED plugins: tools/gen.mjs, the shipped plugins' short names and kernels, the test plugins' ids
-          shorts="balancer chorus clipper comp deesser delay drive dyneq eq8 eq16 eq32 flanger geq glue keyed-gate limiter loudlevel multiband phaser pitch plosive reverb rotary spring strip suboct transient tremolo upward"
-          kernels="balancer chorus clipper comp deesser delay drive dyneq eq8 eq16 eq32 flanger geq glue gate limiter loudlevel mbcomp phaser pitch plosive reverb rotary spring strip suboct transient tremolo upward"
+          shorts="balancer chorus clipper comp deesser delay doubler drive ducker dyneq eq8 eq16 eq32 flanger geq glue keyed-gate limiter loudlevel multiband phaser pitch plosive reverb rotary spring strip suboct tone transient tremolo upward"
+          kernels="balancer chorus clipper comp deesser delay doubler drive ducker dyneq eq8 eq16 eq32 flanger geq glue gate limiter loudlevel mbcomp phaser pitch plosive reverb rotary spring strip suboct tone transient tremolo upward"
           tests="org.openmixer.test-note-echo org.openmixer.test-pool-voice org.openmixer.test-sine-voice org.openmixer.test-transport-probe"
           teststems="omx-test-note-echo omx-test-pool-voice omx-test-sine-voice omx-test-transport-probe"
           # END GENERATED plugins
@@ -406,8 +413,8 @@ jobs:
           out=$(dpkg -L omx-plugins); grep -qx /usr/share/omx/presets/org.openmixer.drive/amp-tube.json <<<"$out"
           test "$(grep -c '^/usr/share/omx/presets/.*\.json$' <<<"$out")" = "$(find presets -name '*.json' | wc -l)"
           # BEGIN GENERATED plugins: tools/gen.mjs, the shipped plugins' short names and kernels, the test plugins' ids
-          shorts="balancer chorus clipper comp deesser delay drive dyneq eq8 eq16 eq32 flanger geq glue keyed-gate limiter loudlevel multiband phaser pitch plosive reverb rotary spring strip suboct transient tremolo upward"
-          kernels="balancer chorus clipper comp deesser delay drive dyneq eq8 eq16 eq32 flanger geq glue gate limiter loudlevel mbcomp phaser pitch plosive reverb rotary spring strip suboct transient tremolo upward"
+          shorts="balancer chorus clipper comp deesser delay doubler drive ducker dyneq eq8 eq16 eq32 flanger geq glue keyed-gate limiter loudlevel multiband phaser pitch plosive reverb rotary spring strip suboct tone transient tremolo upward"
+          kernels="balancer chorus clipper comp deesser delay doubler drive ducker dyneq eq8 eq16 eq32 flanger geq glue gate limiter loudlevel mbcomp phaser pitch plosive reverb rotary spring strip suboct tone transient tremolo upward"
           tests="org.openmixer.test-note-echo org.openmixer.test-pool-voice org.openmixer.test-sine-voice org.openmixer.test-transport-probe"
           teststems="omx-test-note-echo omx-test-pool-voice omx-test-sine-voice omx-test-transport-probe"
           # END GENERATED plugins
@@ -433,8 +440,8 @@ jobs:
           set -euo pipefail
           apt-get install -y --no-install-recommends ./debs/omx-plugins-dev_*.deb
           # BEGIN GENERATED plugins: tools/gen.mjs, the shipped plugins' short names and kernels, the test plugins' ids
-          shorts="balancer chorus clipper comp deesser delay drive dyneq eq8 eq16 eq32 flanger geq glue keyed-gate limiter loudlevel multiband phaser pitch plosive reverb rotary spring strip suboct transient tremolo upward"
-          kernels="balancer chorus clipper comp deesser delay drive dyneq eq8 eq16 eq32 flanger geq glue gate limiter loudlevel mbcomp phaser pitch plosive reverb rotary spring strip suboct transient tremolo upward"
+          shorts="balancer chorus clipper comp deesser delay doubler drive ducker dyneq eq8 eq16 eq32 flanger geq glue keyed-gate limiter loudlevel multiband phaser pitch plosive reverb rotary spring strip suboct tone transient tremolo upward"
+          kernels="balancer chorus clipper comp deesser delay doubler drive ducker dyneq eq8 eq16 eq32 flanger geq glue gate limiter loudlevel mbcomp phaser pitch plosive reverb rotary spring strip suboct tone transient tremolo upward"
           tests="org.openmixer.test-note-echo org.openmixer.test-pool-voice org.openmixer.test-sine-voice org.openmixer.test-transport-probe"
           teststems="omx-test-note-echo omx-test-pool-voice omx-test-sine-voice omx-test-transport-probe"
           # END GENERATED plugins
@@ -444,9 +451,8 @@ jobs:
   clap-validator:
     # clap-validator is the CLAP project's own conformance tester (state round trips, parameter fuzzing,
     # thread rules). It runs on every built .clap, the test plugins included, and keeps one JSON report each.
-    # Until every plugin is clean a failed test is reported (a warning, the job summary, the report artifact)
-    # and does not fail the job; the step is made required, continue-on-error removed, once they pass.
-    # The state tests are required: the step after the summary fails the job on any of them.
+    # A failed test fails the job. The factory presets are installed first, where the plugins declare them, because
+    # the preset-discovery tests crawl that location.
     name: clap-validator (fedora:44, amd64)
     runs-on: ${{ github.event.pull_request.head.repo.fork && 'ubuntu-latest' || vars.OMX_RUNNER || 'ubuntu-latest' }}
     timeout-minutes: 30
@@ -476,9 +482,10 @@ jobs:
       - name: Build every plugin
         run: make -j"$(nproc)" all
 
+      - name: Install the factory presets where the plugins declare them
+        run: make install-presets
+
       - name: Validate every built .clap
-        id: validate
-        continue-on-error: true
         run: |
           set -euo pipefail
           mkdir -p build
@@ -494,18 +501,6 @@ jobs:
             grep -E '^(omx-|  FAIL|FAIL)' build/clap-validator.log || echo 'no failed test'
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
-          if [ "${{ steps.validate.outcome }}" = failure ]; then
-            echo "::warning::clap-validator reported failures (not yet required); see the job summary and the report artifact"
-          fi
-
-      - name: The state and event-ordering tests are required
-        # every plugin's state round trip (state-reproducibility-*, state-invalid-*) must pass; the
-        # repo's own test of it is `clap-probe state`, in every plugin's make test. The event-ordering
-        # tests (process-sleep-process-status, process-varying-block-sizes, process-random-block-sizes,
-        # transport-fuzz) must pass too: they catch an output event reported out of sample order.
-        run: |
-          node tools/clap-validate-required.mjs build/clap-validator state- \
-            process-sleep-process-status process-varying-block-sizes process-random-block-sizes transport-fuzz
 
       - uses: actions/upload-artifact@v4
         if: always()
@@ -530,19 +525,7 @@ jobs:
       publish: false
       arm: false  # arm64/aarch64 build at release only
 
-  # A commit message is published like a file. A pull request's own commits must carry no
-  # attribution line (the commit-message-check action of FreeMixer/.github); what is already on the base is not read.
-  commit-message-check:
-    name: commit messages pass the message check
-    if: github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          ref: ${{ github.event.pull_request.head.sha }}
-      # @main until FreeMixer/.github moves v1 past the action
-      - uses: FreeMixer/.github/.github/actions/commit-message-check@main
-        with:
-          base-ref: ${{ github.event.pull_request.base.ref }}
+  # The shared checks on what this repository publishes: a pull request's own commits carry no attribution line, no
+  # tracked file points into a private repository, and no local copy of these checks is kept.
+  public-sources:
+    uses: FreeMixer/.github/.github/workflows/public-sources-check.yml@v1

@@ -6,16 +6,16 @@
 
 | What | Fedora | Debian | Used for |
 |---|---|---|---|
-| omx-dsp ≥ 0.29.0 (`pkg-config omxdsp`) | `omx-dsp-devel` (channel) | `libomxdsp-dev` (channel) | the DSP: every kernel lives there, none here (since 0.26.0: the dynamic EQ, the multiband's controls and readouts, the compressor's key) |
-| omx-contract ≥ 3.7.1 (`pkg-config omx-contract`) | `omx-contract-devel` (channel) | `libomx-contract-dev` (channel) | the declarations: every parameter's travel, read from its installed `omx-contract.json`, and the EQ default rule (its C render; the generators build a small probe, so they need the C compiler too) |
+| omx-dsp ≥ 0.30.0 (`pkg-config omxdsp`) | `omx-dsp-devel` (channel) | `libomxdsp-dev` (channel) | the DSP: every kernel lives there, none here (since 0.26.0: the dynamic EQ, the multiband's controls and readouts, the compressor's key) |
+| omx-contract ≥ 3.9.0 (`pkg-config omx-contract`) | `omx-contract-devel` (channel) | `libomx-contract-dev` (channel) | the declarations: every parameter's travel, read from its installed `omx-contract.json`, and the EQ default rule (its C render; the generators build a small probe, so they need the C compiler too) |
 | openmixer CLAP extensions | `omx-clap-core-devel` (channel) | `libomx-clap-core-dev` (channel) | `<omx-clap-host/omx_clap_ext.h>` |
-| the omx-contract command ≥ 3.7.1 | `omx-contract` (channel) | `omx-contract` (channel) | the generators: the union of the contract directory, read through `omx-contract render --installed` |
+| the omx-contract command ≥ 3.9.0 | `omx-contract` (channel) | `omx-contract` (channel) | the generators: the union of the contract directory, read through `omx-contract render --installed` |
 | CLAP 1.2 headers | `clap-devel` | `clap-headers` (built from the pinned CLAP, see FreeMixer/.github) | the CLAP face |
 | LV2 headers | `lv2-devel` | `lv2-dev` | the LV2 face |
 | C compiler, make, pkg-config | `gcc make pkgconf-pkg-config` | `build-essential pkgconf` | |
 | lilv | `lilv lilv-devel` | `lilv-utils liblilv-dev` | tests: the oracles' LV2 host, `lv2ls`, `lv2info` |
 | Node.js ≥ 18 | `nodejs` | `nodejs` | tests and `make gen`: the generators |
-| omx-panel ≥ 0.2.5 (the `omx-panel` command, `/usr/share/omx-panel`; `$OMX_PANEL_DIR` names another tree, `$OMX_PANEL` another command) | `omx-panel` (channel) | `omx-panel` (channel) | the panels: the layout every face serves and the MOD GUI of each plugin, from its descriptor and its declared panel |
+| omx-panel ≥ 0.10.0 (the `omx-panel` command, `/usr/share/omx-panel`; `$OMX_PANEL_DIR` names another tree, `$OMX_PANEL` another command) | `omx-panel` (channel) | `omx-panel` (channel) | the panels: the layout every face serves and the MOD GUI of each plugin, from its descriptor and its declared panel |
 | sord | `sord` | `sordi` | tests: `sord_validate` on the LV2 bundle |
 | omx-clap-host | `omx-clap-host` (channel) | `omx-clap-host` (channel) | tests: `omx-clap-scan` (the check says SKIP when it is absent; CI and the package builds install it) |
 
@@ -35,11 +35,11 @@ The channel is the OpenMixer package repository, added by installing the openmix
 `https://www.openmixer.org/deb/openmixer-release.deb` for apt). With it installed, `dnf builddep packaging/omx-plugins.spec` or `apt-get build-dep ./` installs
 everything above.
 
-The ranges are written once, in the packaging: `packaging/omx-plugins.spec` (`BuildRequires`, a floor
-a floor `>=`, never a ceiling) and `debian/control` (the same, `>=` only);
-`tools/deps-check.sh` holds the two equal. Nothing else names a version: the Makefile reads the
-floors from the spec, and building the archive stops, naming the dependency, the floor
-and what `pkg-config` finds installed, when an installed release is below it.
+The ranges are written once, in the packaging: `packaging/omx-plugins.spec` (`BuildRequires`, a floor and a
+ceiling: `(omx-dsp-devel >= 0.30.0 with omx-dsp-devel < 0.31)`) and `debian/control` (the same: `(>= 0.30.0~)` and
+`(<< 0.31~)`); `tools/deps-check.sh` holds the two equal. Nothing else names a version: the Makefile reads the
+floors and ceilings from the spec, and building the archive stops, naming the dependency, the range
+and what `pkg-config` finds installed, when an installed release is outside it.
 
 ## Build, test, install
 
@@ -61,12 +61,17 @@ entries by CLAP id that `include/omx_clap_static.h` declares. A host links it th
 `tools/test/static-table-host.c` from the staged `omxplugins.pc` alone and runs it: every plugin's
 CLAP id is in the table once, and each one is created through its factory, activated and run.
 
-Before the plugins, `make test` runs `make units` (the param-contract units are the header's) and
+Before the plugins, `make test` runs `make units` (the param-contract units are the header's), `make panel-words`
+(`tools/test/panel-words-check.mjs`: the enums of `include/omx_panel_description.h` are omx-contract's PANEL_FAMILIES and
+PANEL_WIDGETS, omx-panel's display kinds, sources and placements, and omx-clap-core's lists, code for code) and
 `make panel-layout` (`tools/test/panel-layout-test.mjs`: our plugins' descriptors state no unknown word, and
 omx-panel's layout of each finds the declared family and roles; the layout's own rules are omx-panel's
 [docs/panel-layout.md](https://github.com/FreeMixer/omx-panel/blob/main/docs/panel-layout.md)) and `make descriptor-view`
 (`tools/test/descriptor-view-test.mjs`: each described plugin's descriptor fresh and in omx-contract's
-words, and the declaration its view).
+words, and the declaration its view) and `make descriptor-features` (`tools/test/descriptor-features-check.mjs`: the
+descriptor's feature words are read from the installed schema, and no tool lists them) and `make placement-strips`
+(`tools/test/placement-strips-check.mjs`: a declaration's `console.placement.strips` is a restriction to fewer than the
+rack kinds the schema enumerates, never the whole set, never a kind without a rack).
 
 After the plugins, `make round-trip` runs the round trip: for every plugin with a descriptor it generates
 (`node tools/gen.mjs`), builds both faces, scans each built face back with `plugin-hostd-probe describe` (plugin-hostd

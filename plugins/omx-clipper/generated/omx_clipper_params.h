@@ -53,7 +53,7 @@ static const char *const OMX_CLIPPER_PARAM_MODULES[OMX_CLIPPER_PARAM_COUNT] = {
 #define OMX_CLIPPER_NAME "omx clipper"
 #define OMX_CLIPPER_VENDOR "openmixer"
 #define OMX_CLIPPER_URL "https://github.com/FreeMixer/omx-plugins"
-#define OMX_CLIPPER_VERSION "0.18.0"
+#define OMX_CLIPPER_VERSION "0.19.0"
 #define OMX_CLIPPER_DESCRIPTION "Clips the peaks at a ceiling, with drive in front and an adjustable softness of the bend."
 #define OMX_CLIPPER_CLAP_ID "org.openmixer.clipper"
 #define OMX_CLIPPER_CLAP_FEATURES "audio-effect", "distortion", "stereo"
@@ -63,7 +63,7 @@ static const char *const OMX_CLIPPER_PARAM_MODULES[OMX_CLIPPER_PARAM_COUNT] = {
 #define OMX_CLIPPER_DECL_DIGEST "e77c8f23e4bc2293f2cfad1a340186f5a3021a47cb98d7500d66f000b7f955dd"
 
 /* org.openmixer.param-contract/1 (tools/param-contract.mjs): each parameter's unit, scale and step, in
- * id order; the host's bypass, the last id, is the face's. */
+ * id order; the host's bypass, CLAP id OMX_PLUGIN_FACE_BYPASS_CLAP_ID (omx-contract), is the face's. */
 #define OMX_CLIPPER_PARAM_CONTRACT_VERSION 1u
 #define OMX_CLIPPER_PARAM_CONTRACT_FINGERPRINT "36a5f5efb0b03951929924dbacf8d3d02cf7a3a929917845bcc44709c3ad1b3f"
 static const struct omx_param_contract_row OMX_CLIPPER_PARAM_CONTRACT[OMX_CLIPPER_PARAM_COUNT] = {
@@ -106,14 +106,17 @@ static const struct omx_panel_rows OMX_CLIPPER_PANEL = {
   NULL, 0u,
 };
 
-/* LV2 port indices (tools/gen.mjs lv2Ports): audio, then parameter i at FIRST_PARAM + i, then these. */
-#define OMX_CLIPPER_LV2_PORT_IN_L 0u
-#define OMX_CLIPPER_LV2_PORT_IN_R 1u
-#define OMX_CLIPPER_LV2_PORT_OUT_L 2u
-#define OMX_CLIPPER_LV2_PORT_OUT_R 3u
-#define OMX_CLIPPER_LV2_PORT_ENABLED 7u
-#define OMX_CLIPPER_LV2_PORT_LATENCY 8u
-#define OMX_CLIPPER_LV2_PORT_FIRST_PARAM 4u
+/* LV2 port indices (tools/gen.mjs lv2Ports): enabled and latency at omx-contract's permanent indices, the tempo's control,
+ * the meters' outputs, the audio ports, then parameter i at FIRST_PARAM + i. */
+#define OMX_CLIPPER_LV2_PORT_ENABLED 0u
+#define OMX_CLIPPER_LV2_PORT_LATENCY 1u
+#define OMX_CLIPPER_LV2_PORT_IN_L 2u
+#define OMX_CLIPPER_LV2_PORT_IN_R 3u
+#define OMX_CLIPPER_LV2_PORT_OUT_L 4u
+#define OMX_CLIPPER_LV2_PORT_OUT_R 5u
+#define OMX_CLIPPER_LV2_PORT_FIRST_PARAM 6u
+/* The meters' output control ports, one per channel in the order their values are published, from here on. */
+#define OMX_CLIPPER_LV2_PORT_FIRST_METER 9u
 #define OMX_CLIPPER_LV2_PORT_COUNT 9u
 
 #endif /* OMX_CLIPPER_PARAMS_H */

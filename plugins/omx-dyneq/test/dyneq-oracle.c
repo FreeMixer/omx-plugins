@@ -21,8 +21,9 @@
  * asks for, as the CLAP latency extension says. The plan runs again IN PLACE (each output the buffer of
  * its input), bit for bit the first run; and, through CLAP, with each block split in two, its second half
  * carrying no event, bit for bit the kernel resolving the same values again before that half.
- * The declaration's meters: after every block of the plan, through the CLAP face's clap.meters/1 at
- * every declared rate, every channel of every meter is held bit for bit to a reference computed here
+ * The declaration's meters: after every block of the plan, through the CLAP face's clap.meters/1 and
+ * the LV2 face's output control ports (one per channel, the value as a float) at every declared rate,
+ * every channel of every meter is held bit for bit to a reference computed here
  * from the same block: a gain reduction to what the reference's instance holds at its declared field
  * (0 while bypassed), a level to the peak of the block's input or of the reference's output, in dBFS,
  * floored at the meter's display minimum. The meters are listed as declared, every one coherent;
@@ -305,8 +306,8 @@ static int failures;
 
 /* The meters, the declaration's `meters` in order: each one's name, kind, channels, where they start
  * among the NV values of a block, and display range; the reference's values after every block of the
- * plan, and what the CLAP face's clap.meters/1 reported then (NaN: nothing). Set for the CLAP run of
- * the plan only. */
+ * plan, and what the face reported then (NaN: nothing): the CLAP face's clap.meters/1, the LV2 face's
+ * output control ports. Set for the run of the plan. */
 #define NM 6u
 #define NV 6u
 static const struct {
@@ -471,7 +472,7 @@ static void run_checks(const char *face, Driver *d, double sr, bool keyed, bool 
   const char *pass = KEYED ? (keyed ? " (keyed)" : " (no key)") : "";
   char what[200];
   omx_denormals_off(); /* the faces run with flush-to-zero; so does the reference */
-  const bool metering = strcmp(face, "clap") == 0;
+  const bool metering = true, lv2 = strcmp(face, "lv2") == 0;
   const uint32_t nm = (uint32_t)NBLOCKS * STRETCH * NV;
   double *mwant = calloc(nm, sizeof(double)), *mgot = calloc(nm, sizeof(double));
   if (!mwant || !mgot) abort();
@@ -522,6 +523,9 @@ static void run_checks(const char *face, Driver *d, double sr, bool keyed, bool 
   }
   if (metering) {
     bool agrees = ran, reduces = false, legs = false, shaped = false;
+    /* an LV2 output control port carries a float: the reference's value as the face writes it */
+    if (lv2)
+      for (uint32_t i = 0; i < nm; i++) mwant[i] = (double)(float)mwant[i];
     for (uint32_t i = 0; i < nm; i++)
       if (agrees && memcmp(&mwant[i], &mgot[i], sizeof(double)) != 0) {
         uint32_t m = 0;
@@ -540,14 +544,16 @@ static void run_checks(const char *face, Driver *d, double sr, bool keyed, bool 
             shaped = shaped || memcmp(v, mwant + b * NV + METERS[o].at, 2 * sizeof(double)) != 0;
       }
     (void)reduces, (void)legs, (void)shaped;
-    snprintf(what, sizeof what, "clap.meters/1 lists the declaration's meters, every one coherent%s", pass);
+    snprintf(what, sizeof what, "%s%s", lv2 ? "the LV2 face has an output control port per channel of every meter" : "clap.meters/1 lists the declaration's meters, every one coherent", pass);
     check(ran && meters_listed, face, sr, what);
     snprintf(what, sizeof what, "every channel of every meter is the reference's after every block%s", pass);
     check(agrees, face, sr, what);
     snprintf(what, sizeof what, "the kernel reduces gain in the plan%s", pass);
     check(reduces, face, sr, what);
-    snprintf(what, sizeof what, "no meter value before the first block%s", pass);
-    check(ran && !meters_early, face, sr, what);
+    if (!lv2) {
+      snprintf(what, sizeof what, "no meter value before the first block%s", pass);
+      check(ran && !meters_early, face, sr, what);
+    }
   }
   free(mwant);
   free(mgot);
@@ -750,6 +756,20 @@ static bool lv2_run(void *face, const Block *plan, size_t nblocks, double sr, co
   ok = (cp[NP] = port_of(l, "enabled")) >= 0 && ok;
   ok = (cp[NP + 1] = port_of(l, "latency")) >= 0 && ok;
   for (uint32_t i = 0; ok && i < NP + 2; i++) lilv_instance_connect_port(inst, (uint32_t)cp[i], &cv[i]);
+  /* each meter's channels at their output control ports: the meter's name for one channel, <name>_<c> for more */
+  float mo[NV];
+  bool listed = ok;
+  for (uint32_t m = 0; m < NM; m++)
+    for (uint32_t c = 0; c < METERS[m].channels; c++) {
+      char sym[64];
+      if (METERS[m].channels == 1u) snprintf(sym, sizeof sym, "%s", METERS[m].name);
+      else snprintf(sym, sizeof sym, "%s_%u", METERS[m].name, c);
+      const int32_t mp = port_of(l, sym);
+      listed = listed && mp >= 0;
+      mo[METERS[m].at + c] = NAN;
+      if (ok && mp >= 0) lilv_instance_connect_port(inst, (uint32_t)mp, &mo[METERS[m].at + c]);
+    }
+  if (meters_got) meters_listed = listed;
   if (ok) lilv_instance_activate(inst);
   uint32_t at = 0;
   for (size_t b = 0; ok && b < nblocks * STRETCH; b++) {
@@ -765,6 +785,7 @@ static bool lv2_run(void *face, const Block *plan, size_t nblocks, double sr, co
 #endif
     const uint32_t frames = frames_of(k, sr);
     lilv_instance_run(inst, frames);
+    for (uint32_t i = 0; meters_got && i < NV; i++) meters_got[b * NV + i] = (double)mo[i];
     at += frames;
   }
   if (ok) lilv_instance_deactivate(inst);

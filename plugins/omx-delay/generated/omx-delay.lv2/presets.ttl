@@ -25,7 +25,13 @@
         [ lv2:symbol "tap2Pan" ; pset:value 0.5 ] ,
         [ lv2:symbol "tap3Factor" ; pset:value 8.0 ] ,
         [ lv2:symbol "tap3Gain" ; pset:value 0.35 ] ,
-        [ lv2:symbol "tap3Pan" ; pset:value 0.0 ] .
+        [ lv2:symbol "tap3Pan" ; pset:value 0.0 ] ,
+        [ lv2:symbol "sync" ; pset:value 0.0 ] ,
+        [ lv2:symbol "division" ; pset:value 6.0 ] ,
+        [ lv2:symbol "mode" ; pset:value 0.0 ] ,
+        [ lv2:symbol "duckDb" ; pset:value 0.0 ] ,
+        [ lv2:symbol "duckThresholdDb" ; pset:value -30.0 ] ,
+        [ lv2:symbol "duckReleaseMs" ; pset:value 250.0 ] .
 
 <urn:openmixer:delay#preset-ping-pong>
     a pset:Preset ;
@@ -47,7 +53,13 @@
         [ lv2:symbol "tap2Pan" ; pset:value 0.5 ] ,
         [ lv2:symbol "tap3Factor" ; pset:value 8.0 ] ,
         [ lv2:symbol "tap3Gain" ; pset:value 0.35 ] ,
-        [ lv2:symbol "tap3Pan" ; pset:value 0.0 ] .
+        [ lv2:symbol "tap3Pan" ; pset:value 0.0 ] ,
+        [ lv2:symbol "sync" ; pset:value 0.0 ] ,
+        [ lv2:symbol "division" ; pset:value 6.0 ] ,
+        [ lv2:symbol "mode" ; pset:value 0.0 ] ,
+        [ lv2:symbol "duckDb" ; pset:value 0.0 ] ,
+        [ lv2:symbol "duckThresholdDb" ; pset:value -30.0 ] ,
+        [ lv2:symbol "duckReleaseMs" ; pset:value 250.0 ] .
 
 <urn:openmixer:delay#preset-slapback>
     a pset:Preset ;
@@ -69,7 +81,13 @@
         [ lv2:symbol "tap2Pan" ; pset:value 0.5 ] ,
         [ lv2:symbol "tap3Factor" ; pset:value 8.0 ] ,
         [ lv2:symbol "tap3Gain" ; pset:value 0.35 ] ,
-        [ lv2:symbol "tap3Pan" ; pset:value 0.0 ] .
+        [ lv2:symbol "tap3Pan" ; pset:value 0.0 ] ,
+        [ lv2:symbol "sync" ; pset:value 0.0 ] ,
+        [ lv2:symbol "division" ; pset:value 6.0 ] ,
+        [ lv2:symbol "mode" ; pset:value 0.0 ] ,
+        [ lv2:symbol "duckDb" ; pset:value 0.0 ] ,
+        [ lv2:symbol "duckThresholdDb" ; pset:value -30.0 ] ,
+        [ lv2:symbol "duckReleaseMs" ; pset:value 250.0 ] .
 
 <urn:openmixer:delay#preset-stereo-delay>
     a pset:Preset ;
@@ -91,4 +109,10 @@
         [ lv2:symbol "tap2Pan" ; pset:value 0.5 ] ,
         [ lv2:symbol "tap3Factor" ; pset:value 8.0 ] ,
         [ lv2:symbol "tap3Gain" ; pset:value 0.35 ] ,
-        [ lv2:symbol "tap3Pan" ; pset:value 0.0 ] .
+        [ lv2:symbol "tap3Pan" ; pset:value 0.0 ] ,
+        [ lv2:symbol "sync" ; pset:value 0.0 ] ,
+        [ lv2:symbol "division" ; pset:value 6.0 ] ,
+        [ lv2:symbol "mode" ; pset:value 0.0 ] ,
+        [ lv2:symbol "duckDb" ; pset:value 0.0 ] ,
+        [ lv2:symbol "duckThresholdDb" ; pset:value -30.0 ] ,
+        [ lv2:symbol "duckReleaseMs" ; pset:value 250.0 ] .

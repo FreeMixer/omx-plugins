@@ -37,9 +37,13 @@ struct omx_face_core {
  * inputs (before the kernel runs) or at the outputs (after), in dBFS. */
 enum omx_face_meter_source { OMX_FACE_METER_READ, OMX_FACE_METER_IN, OMX_FACE_METER_OUT };
 
+/** A meter's kind, by clap.meters/1's numbers (lib/omx_clap_face.c asserts the two agree), so the LV2 face
+ * reads it without CLAP's headers. */
+enum omx_face_meter_kind { OMX_FACE_METER_KIND_GAIN_REDUCTION = 1, OMX_FACE_METER_KIND_LEVEL = 2 };
+
 /** One of the declaration's meters: the index is the CLAP meter id; its channels sit at `at` among the
- * values the face publishes after a block. `kind` is the clap.meters/1 kind; a gain reduction reads 0
- * while bypassed, any other kernel reading its `min`. */
+ * values the face publishes after a block, and at LV2 port `first_meter + at` onwards. `kind` is an
+ * enum omx_face_meter_kind; a gain reduction reads 0 while bypassed, any other kernel reading its `min`. */
 struct omx_face_meter {
   const char *name;
   uint32_t kind, channels, at;
@@ -47,9 +51,10 @@ struct omx_face_meter {
   uint32_t source; /* enum omx_face_meter_source */
 };
 
-/** The LV2 face's port indices (generated/omx_<kernel>_params.h's OMX_<K>_LV2_PORT_*). */
+/** The LV2 face's port indices (generated/omx_<kernel>_params.h's OMX_<K>_LV2_PORT_*): `first_meter` is
+ * the first of the meters' output control ports, one per channel in the order the values are published. */
 struct omx_face_lv2_ports {
-  uint32_t in_l, in_r, key, out_l, out_r, enabled, latency, first_param;
+  uint32_t in_l, in_r, key, out_l, out_r, enabled, latency, first_param, first_meter;
 };
 
 struct omx_face {
@@ -80,6 +85,12 @@ struct omx_face {
   uint32_t meter_count, meter_values;
   struct omx_face_lv2_ports lv2;
   const struct omx_face_core *core;
+  /* The host's tempo, for a plugin whose descriptor says needs.tempo (its core's omx_<kernel>_core_tempo): called
+   * before every resolve with the block's tempo in BPM, 0 when the host handed none (no CLAP transport, or one
+   * without CLAP_TRANSPORT_HAS_TEMPO; no LV2 time:Position with time:beatsPerMinute yet). NULL: reads no tempo. */
+  void (*tempo)(void *core, double bpm);
+  /* With `tempo`, the LV2 face's atom input port (generated OMX_<K>_LV2_PORT_CONTROL) where time:Position arrives. */
+  uint32_t lv2_control;
 };
 
 /* The fields generated/omx_<kernel>_params.h names for every plugin, by its OMX_<K>_ prefix: a plugin's

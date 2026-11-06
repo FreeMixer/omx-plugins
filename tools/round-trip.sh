@@ -51,7 +51,15 @@ node "$ROOT/tools/round-trip.mjs" "$TMP/scans" --authored "$stem=$TMP/moved.json
 red "a range changed in the authored descriptor" 'controls\[\]\.travel\.max' "$TMP/arm1.txt"
 mkdir -p "$TMP/lv2"
 cp -r "$P/build/$stem.lv2" "$TMP/lv2/"
-sed -i '0,/lv2:maximum \([0-9.e+-]*\) ;/s//lv2:maximum 12345 ;/' "$TMP/lv2/$stem.lv2/$stem.ttl"
+# the first declared control's lv2:maximum, never the face's own enabled port (lv2:index 0 since 0.19.0)
+node -e '
+const fs = require("node:fs");
+const t = fs.readFileSync(process.argv[1], "utf8");
+const at = [...t.matchAll(/lv2:symbol "([^"]*)"/g)].find((m) => !["enabled", "latency"].includes(m[1]) && /^[^\]]*lv2:maximum/.test(t.slice(m.index)));
+if (!at) process.exit(1);
+const i = t.indexOf("lv2:maximum", at.index);
+fs.writeFileSync(process.argv[1], t.slice(0, i) + t.slice(i).replace(/lv2:maximum [0-9.e+-]* ;/, "lv2:maximum 12345 ;"));
+' "$TMP/lv2/$stem.lv2/$stem.ttl" || exit 1
 cp -r "$TMP/scans" "$TMP/scans2"
 LV2_PATH=$TMP/lv2 "$PROBE" describe "lv2:$(field "$P/$stem.descriptor.json" uri)" >"$TMP/scans2/$stem.lv2.json" || exit 1
 node "$ROOT/tools/round-trip.mjs" "$TMP/scans2" >"$TMP/arm2.txt" 2>&1

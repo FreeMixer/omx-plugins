@@ -39,6 +39,7 @@ const void *omx_lv2_face_extension_data(const char *uri);
 /* The port indices generated/omx_<kernel>_params.h names for every plugin (a keyed plugin's key its own). */
 #define OMX_FACE_LV2_PORTS(K, key_)                                                                              \
   .lv2 = {OMX_##K##_LV2_PORT_IN_L, OMX_##K##_LV2_PORT_IN_R, key_, OMX_##K##_LV2_PORT_OUT_L, OMX_##K##_LV2_PORT_OUT_R, \
-          OMX_##K##_LV2_PORT_ENABLED, OMX_##K##_LV2_PORT_LATENCY, OMX_##K##_LV2_PORT_FIRST_PARAM}
+          OMX_##K##_LV2_PORT_ENABLED, OMX_##K##_LV2_PORT_LATENCY, OMX_##K##_LV2_PORT_FIRST_PARAM,                 \
+          OMX_##K##_LV2_PORT_FIRST_METER}
 
 #endif /* OMX_LV2_FACE_H */
