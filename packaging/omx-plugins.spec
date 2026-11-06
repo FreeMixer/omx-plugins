@@ -17,9 +17,9 @@ BuildRequires: pkgconf-pkg-config
 # the same (tools/deps-check.sh). The Makefile and tools/gen.mjs read them from here.
 BuildRequires: (omx-dsp-devel >= 0.30.0 with omx-dsp-devel < 0.31)
 BuildRequires: (omx-contract-devel >= 3.9.0 with omx-contract-devel < 4)
-BuildRequires: (omx-clap-core-devel >= 0.24.0 with omx-clap-core-devel < 0.30)
+BuildRequires: (omx-clap-core-devel >= 0.24.0 with omx-clap-core-devel < 0.31)
 # plugin-hostd's format tables, which the generators read backwards (tools/format-tables.mjs)
-BuildRequires: (plugin-hostd-devel >= 0.15.2 with plugin-hostd-devel < 0.19)
+BuildRequires: (plugin-hostd-devel >= 0.15.2 with plugin-hostd-devel < 0.20)
 # the omx-contract command, first packaged in 2.15.0: the generators read the contract directory through it
 # (3.3.0: the directory and its schema are omx-contract-data's, the definitions each owner's -contract package's)
 BuildRequires: (omx-contract >= 3.9.0 with omx-contract < 4)
@@ -40,7 +40,7 @@ BuildRequires: lilv-devel
 BuildRequires: sord
 BuildRequires: omx-clap-host
 # %%check: make round-trip scans the built faces back with plugin-hostd-probe describe
-BuildRequires: (plugin-hostd >= 0.15.2 with plugin-hostd < 0.19)
+BuildRequires: (plugin-hostd >= 0.15.2 with plugin-hostd < 0.20)
 # %%install: our own plugins' pins are known at build time (tools/gen-pins.sh); %%check then holds the
 # shipped pins.d file to the shipped binaries' hashes (tools/pins-check.sh)
 BuildRequires: (plugin-qualify >= 0.9.0 with plugin-qualify < 0.20)
@@ -59,7 +59,7 @@ Requires: %{name}-lv2%{?_isa} = %{version}-%{release}
 # each plugin's descriptor, which a host and the console read at run time
 Requires: %{name}-contract = %{version}-%{release}
 # the first plugin-hostd release that reads pins.d (plugin-hostd issue #42)
-Recommends: (plugin-hostd >= 0.5.0 with plugin-hostd < 0.19)
+Recommends: (plugin-hostd >= 0.5.0 with plugin-hostd < 0.20)
 
 %description
 Take the sound of the OpenMixer console into your DAW or onto your own rig:
@@ -302,7 +302,7 @@ tools/pins-check.sh %{buildroot}%{_datadir}/plugin-hostd/pins.d/omx-plugins.pins
 - Build floors: omx-dsp 0.30.0, omx-contract 3.9.0, omx-panel 0.10.0
 - Every dependency on a library of ours states a floor and a ceiling, in the spec, debian/control and
   omxplugins.pc: omx-dsp >= 0.30.0 and < 0.31, omx-contract >= 3.9.0 and < 4, omx-clap-core >= 0.24.0 and
-  < 0.30, plugin-hostd >= 0.15.2 and < 0.19, omx-panel >= 0.10.0 and < 0.11, plugin-qualify >= 0.9.0 and
+  < 0.31, plugin-hostd >= 0.15.2 and < 0.20, omx-panel >= 0.10.0 and < 0.11, plugin-qualify >= 0.9.0 and
   < 0.20 (tools/deps-check.sh holds them)
 
 * Tue Nov 03 2026 Pau Aliagas <linuxnow@gmail.com> - 0.18.0-1
