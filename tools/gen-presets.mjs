@@ -213,6 +213,24 @@ const DEFINITIONS = {
     ['hard-ceiling', 'Hard Ceiling', { driveDb: 3, ceilingDb: -0.3, softnessPct: 0 }],
     ['loud-bus', 'Loud Bus', { driveDb: 9, ceilingDb: -2, softnessPct: 30 }],
   ],
+  'org.openmixer.doubler': [
+    ['vocal-double', 'Vocal Double', { voices: 2, delayMs: 12, detuneCents: 8, spreadPct: 60, mixPct: 50 }],
+    ['tight-adt', 'Tight Double', { voices: 1, delayMs: 9, detuneCents: 4, modDepthMs: 0.3, spreadPct: 30, mixPct: 45 }],
+    ['wide-backing', 'Wide Backing Vocals', { voices: 4, delayMs: 18, detuneCents: 12, modDepthMs: 1, spreadPct: 100, mixPct: 60 }],
+    ['guitar-double', 'Guitar Double', { voices: 2, delayMs: 25, detuneCents: 6, modRateHz: 0.3, spreadPct: 100, mixPct: 50 }],
+  ],
+  'org.openmixer.tone': [
+    ['warmer', 'Warmer', { tiltDb: -3 }],
+    ['brighter', 'Brighter', { tiltDb: 3 }],
+    ['low-pass-sweep', 'Low-Pass Sweep', { filter: -50, resonance: 1.5 }],
+    ['high-pass-sweep', 'High-Pass Sweep', { filter: 50, resonance: 1.5 }],
+  ],
+  'org.openmixer.ducker': [
+    ['voice-over-music', 'Voice Over Music', { thresholdDb: -30, rangeDb: -12, ratio: 20, attackMs: 5, holdMs: 200, releaseMs: 500 }],
+    ['talkback-duck', 'Talkback Duck', { thresholdDb: -35, rangeDb: -20, ratio: 20, attackMs: 1, holdMs: 100, releaseMs: 300 }],
+    ['gentle-bed', 'Gentle Bed Duck', { thresholdDb: -30, rangeDb: -6, ratio: 4, attackMs: 20, holdMs: 300, releaseMs: 1000 }],
+    ['bass-under-kick', 'Bass Under Kick', { thresholdDb: -20, rangeDb: -6, ratio: 20, attackMs: 1, releaseMs: 80, keyLpHz: 150 }],
+  ],
   'org.openmixer.upward': [
     ['room-lift', 'Room Lift', { thresholdDb: -40, ratio: 2, rangeDb: 6 }],
     ['ambience', 'Ambience Up', { thresholdDb: -50, ratio: 3, rangeDb: 12, releaseMs: 400 }],

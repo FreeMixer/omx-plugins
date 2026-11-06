@@ -1,0 +1,49 @@
+{
+  "format": "org.openmixer.preset/1",
+  "plugin": {
+    "id": "org.openmixer.doubler"
+  },
+  "id": "wide-backing",
+  "name": "Wide Backing Vocals",
+  "carries": "params",
+  "params": [
+    {
+      "symbol": "voices",
+      "unit": "",
+      "value": 4
+    },
+    {
+      "symbol": "delayMs",
+      "unit": "ms",
+      "value": 18
+    },
+    {
+      "symbol": "detuneCents",
+      "unit": "cents",
+      "value": 12
+    },
+    {
+      "symbol": "modRateHz",
+      "unit": "Hz",
+      "value": 0.6
+    },
+    {
+      "symbol": "modDepthMs",
+      "unit": "ms",
+      "value": 1
+    },
+    {
+      "symbol": "spreadPct",
+      "unit": "%",
+      "value": 100
+    },
+    {
+      "symbol": "mixPct",
+      "unit": "%",
+      "value": 60
+    }
+  ],
+  "createdAt": "2026-10-17T00:00:00Z",
+  "modifiedAt": "2026-10-17T00:00:00Z",
+  "copyOf": null
+}

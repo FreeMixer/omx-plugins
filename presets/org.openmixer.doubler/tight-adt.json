@@ -1,0 +1,49 @@
+{
+  "format": "org.openmixer.preset/1",
+  "plugin": {
+    "id": "org.openmixer.doubler"
+  },
+  "id": "tight-adt",
+  "name": "Tight Double",
+  "carries": "params",
+  "params": [
+    {
+      "symbol": "voices",
+      "unit": "",
+      "value": 1
+    },
+    {
+      "symbol": "delayMs",
+      "unit": "ms",
+      "value": 9
+    },
+    {
+      "symbol": "detuneCents",
+      "unit": "cents",
+      "value": 4
+    },
+    {
+      "symbol": "modRateHz",
+      "unit": "Hz",
+      "value": 0.6
+    },
+    {
+      "symbol": "modDepthMs",
+      "unit": "ms",
+      "value": 0.3
+    },
+    {
+      "symbol": "spreadPct",
+      "unit": "%",
+      "value": 30
+    },
+    {
+      "symbol": "mixPct",
+      "unit": "%",
+      "value": 45
+    }
+  ],
+  "createdAt": "2026-10-17T00:00:00Z",
+  "modifiedAt": "2026-10-17T00:00:00Z",
+  "copyOf": null
+}
