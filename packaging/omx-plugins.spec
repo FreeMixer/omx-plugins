@@ -24,7 +24,7 @@ BuildRequires: (plugin-hostd-devel >= 0.15.2 with plugin-hostd-devel < 0.20)
 # (3.3.0: the directory and its schema are omx-contract-data's, the definitions each owner's -contract package's)
 BuildRequires: (omx-contract >= 3.9.0 with omx-contract < 4)
 # the panel layout and the MOD GUI are omx-panel's, from a descriptor and the declared panel (tools/omx-panel.mjs)
-BuildRequires: (omx-panel >= 0.10.0 with omx-panel < 0.11)
+BuildRequires: (omx-panel >= 0.11.0 with omx-panel < 0.12)
 # omx-panel recommends omx-plugins-devel: an older one installed beside this build puts its release's contract
 # package where make test reads this one's (tools/test/contract-dir-check.sh), so a build installs none
 BuildConflicts: omx-plugins-devel < %{version}
@@ -283,8 +283,9 @@ tools/pins-check.sh %{buildroot}%{_datadir}/plugin-hostd/pins.d/omx-plugins.pins
 %changelog
 * Fri Nov 06 2026 Pau Aliagas <linuxnow@gmail.com> - 0.19.1-1
 - omx-dsp is taken at 0.31: >= 0.31.0 and < 0.32 (the build, the -devel package
-  and omxplugins.pc), so the channel's omx-dsp 0.31.0 resolves beside this
-  release; nothing else changes
+  and omxplugins.pc), and omx-panel at 0.11: >= 0.11.0 and < 0.12, so the
+  channel's omx-dsp 0.31.0 and omx-panel 0.11.0 resolve beside this release;
+  the MOD GUIs are generated again by omx-panel 0.11.0
 
 * Wed Nov 04 2026 Pau Aliagas <linuxnow@gmail.com> - 0.19.0-1
 - omx-delay syncs to the host's tempo: sync, division, mode and duck, appended,
