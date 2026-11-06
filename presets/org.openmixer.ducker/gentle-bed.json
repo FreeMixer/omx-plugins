@@ -1,0 +1,64 @@
+{
+  "format": "org.openmixer.preset/1",
+  "plugin": {
+    "id": "org.openmixer.ducker"
+  },
+  "id": "gentle-bed",
+  "name": "Gentle Bed Duck",
+  "carries": "params",
+  "params": [
+    {
+      "symbol": "thresholdDb",
+      "unit": "dB",
+      "value": -30
+    },
+    {
+      "symbol": "rangeDb",
+      "unit": "dB",
+      "value": -6
+    },
+    {
+      "symbol": "attackMs",
+      "unit": "ms",
+      "value": 20
+    },
+    {
+      "symbol": "holdMs",
+      "unit": "ms",
+      "value": 300
+    },
+    {
+      "symbol": "releaseMs",
+      "unit": "ms",
+      "value": 1000
+    },
+    {
+      "symbol": "ratio",
+      "unit": "",
+      "value": 4
+    },
+    {
+      "symbol": "kneeDb",
+      "unit": "dB",
+      "value": 6
+    },
+    {
+      "symbol": "keyHpHz",
+      "unit": "Hz",
+      "value": 0
+    },
+    {
+      "symbol": "keyLpHz",
+      "unit": "Hz",
+      "value": 0
+    },
+    {
+      "symbol": "keyListen",
+      "unit": "",
+      "value": 0
+    }
+  ],
+  "createdAt": "2026-10-17T00:00:00Z",
+  "modifiedAt": "2026-10-17T00:00:00Z",
+  "copyOf": null
+}

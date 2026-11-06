@@ -1,0 +1,64 @@
+{
+  "format": "org.openmixer.preset/1",
+  "plugin": {
+    "id": "org.openmixer.ducker"
+  },
+  "id": "talkback-duck",
+  "name": "Talkback Duck",
+  "carries": "params",
+  "params": [
+    {
+      "symbol": "thresholdDb",
+      "unit": "dB",
+      "value": -35
+    },
+    {
+      "symbol": "rangeDb",
+      "unit": "dB",
+      "value": -20
+    },
+    {
+      "symbol": "attackMs",
+      "unit": "ms",
+      "value": 1
+    },
+    {
+      "symbol": "holdMs",
+      "unit": "ms",
+      "value": 100
+    },
+    {
+      "symbol": "releaseMs",
+      "unit": "ms",
+      "value": 300
+    },
+    {
+      "symbol": "ratio",
+      "unit": "",
+      "value": 20
+    },
+    {
+      "symbol": "kneeDb",
+      "unit": "dB",
+      "value": 6
+    },
+    {
+      "symbol": "keyHpHz",
+      "unit": "Hz",
+      "value": 0
+    },
+    {
+      "symbol": "keyLpHz",
+      "unit": "Hz",
+      "value": 0
+    },
+    {
+      "symbol": "keyListen",
+      "unit": "",
+      "value": 0
+    }
+  ],
+  "createdAt": "2026-10-17T00:00:00Z",
+  "modifiedAt": "2026-10-17T00:00:00Z",
+  "copyOf": null
+}

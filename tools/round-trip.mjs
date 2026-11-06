@@ -55,43 +55,43 @@ export const FORMATS = ['clap', 'lv2'];
 export const LOSSES = {
   // OR2: a meaning has a CLAP word only for the bypass, an LV2 term only for some (lv2:designation); LV2 has no unit
   // for "" (a plain number)
-  'clap controls[].meaning': 298,
-  'lv2 controls[].meaning': 112,
-  'lv2 controls[].travel.unit ""': 120,
+  'clap controls[].meaning': 309,
+  'lv2 controls[].meaning': 116,
+  'lv2 controls[].travel.unit ""': 123,
   // plugin-hostd 0.7.0's LV2 table has no row for urn:openmixer:unit#ratio, the ratio unit our faces write (gap 4)
-  'lv2 controls[].travel.unit "ratio"': 15,
+  'lv2 controls[].travel.unit "ratio"': 16,
   // nor for urn:openmixer:unit#dBoct, the unit of the compressor's key tilt (dB/oct, omx-contract 3.1.0)
   'lv2 controls[].travel.unit "dB/oct"': 2,
   // CLAP: no row reads a unit, a linear or log scale, a step, a choice (our faces set no CLAP_PARAM_IS_ENUM), the
   // session symbol, the LV2 URI, a side-chain's role or what an LV2 host may lend
-  'clap controls[].travel.unit': 539,
-  'clap controls[].travel.scale': 478,
-  'clap controls[].travel.step': 539,
-  'clap controls[].kind': 265,
+  'clap controls[].travel.unit': 559,
+  'clap controls[].travel.scale': 488,
+  'clap controls[].travel.step': 559,
+  'clap controls[].kind': 266,
   'clap controls[].ids': 137,
   'clap controls[].values': 137,
   'clap controls[].labels': 137,
-  'clap controls[].default': 265,
-  'clap controls[].symbol': 804,
-  'clap plugin.uri': 29,
-  'clap ports[].role': 2,
-  'clap needs.extensions.optional': 29,
+  'clap controls[].default': 266,
+  'clap controls[].symbol': 825,
+  'clap plugin.uri': 32,
+  'clap ports[].role': 3,
+  'clap needs.extensions.optional': 32,
   // LV2: no row reads a step, automation, the plugin's version or vendor (our .ttl writes no doap:maintainer); a
   // control's id is its symbol and a point's id its label, so the CLAP id and our point ids are no LV2 word; the
   // audio ports are one per channel, with the generator's symbols and names
-  'lv2 controls[].travel.step': 539,
-  'lv2 controls[].automatable': 804,
-  'lv2 controls[].id': 804,
+  'lv2 controls[].travel.step': 559,
+  'lv2 controls[].automatable': 825,
+  'lv2 controls[].id': 825,
   'lv2 controls[].ids': 137,
-  'lv2 plugin.version': 29,
-  'lv2 plugin.vendor': 29,
-  'lv2 ports[].id': 60,
-  'lv2 ports[].name': 60,
+  'lv2 plugin.version': 32,
+  'lv2 plugin.vendor': 32,
+  'lv2 ports[].id': 67,
+  'lv2 ports[].name': 67,
   // LV2 port groups are flat: a control in a section's subgroup (an EQ's band, #257) carries the group, not the
   // section above it (omx-eq8, omx-eq16 and omx-eq32: five controls a band, 8 + 16 + 32 bands)
   'lv2 controls[].group (panel section)': 280,
   // the toggles UPSTREAM names, scanned as travels, carry no toggle's default
-  'lv2 controls[].default': 128,
+  'lv2 controls[].default': 129,
   // neither face carries a control's prose (omx-delay's sync), nor states that it reads the tempo: CLAP has no static
   // word for it, and the LV2 face's control port supports time:Position, which a scan reads as no tempo word
   'clap controls[].doc': 1,
