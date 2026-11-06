@@ -14,7 +14,9 @@ One page for each plugin: its ids, its audio ports, its pages (the LV2 port grou
 | [omx comp](omx-comp.md) | `org.openmixer.comp` | `urn:openmixer:comp` | 19 | 3 |
 | [omx deesser](omx-deesser.md) | `org.openmixer.deesser` | `urn:openmixer:deesser` | 8 | 1 |
 | [omx delay](omx-delay.md) | `org.openmixer.delay` | `urn:openmixer:delay` | 23 | 4 |
+| [omx doubler](omx-doubler.md) | `org.openmixer.doubler` | `urn:openmixer:doubler` | 7 | 3 |
 | [omx drive](omx-drive.md) | `org.openmixer.drive` | `urn:openmixer:drive` | 11 | 1 |
+| [omx ducker](omx-ducker.md) | `org.openmixer.ducker` | `urn:openmixer:ducker` | 10 | 3 |
 | [omx dyneq](omx-dyneq.md) | `org.openmixer.dyneq` | `urn:openmixer:dyneq` | 73 | 7 |
 | [omx eq16](omx-eq16.md) | `org.openmixer.eq16` | `urn:openmixer:eq16` | 86 | 18 |
 | [omx eq32](omx-eq32.md) | `org.openmixer.eq32` | `urn:openmixer:eq32` | 166 | 34 |
@@ -34,6 +36,7 @@ One page for each plugin: its ids, its audio ports, its pages (the LV2 port grou
 | [omx spring](omx-spring.md) | `org.openmixer.spring` | `urn:openmixer:spring` | 5 | 1 |
 | [omx strip](omx-strip.md) | `org.openmixer.strip` | `urn:openmixer:strip` | 192 | 6 |
 | [omx suboct](omx-suboct.md) | `org.openmixer.suboct` | `urn:openmixer:suboct` | 5 | 1 |
+| [omx tone](omx-tone.md) | `org.openmixer.tone` | `urn:openmixer:tone` | 4 | 2 |
 | [omx transient](omx-transient.md) | `org.openmixer.transient` | `urn:openmixer:transient` | 5 | 1 |
 | [omx tremolo](omx-tremolo.md) | `org.openmixer.tremolo` | `urn:openmixer:tremolo` | 4 | 1 |
 | [omx upward](omx-upward.md) | `org.openmixer.upward` | `urn:openmixer:upward` | 5 | 1 |

@@ -66,7 +66,7 @@ Take the sound of the OpenMixer console into your DAW or onto your own rig:
 delay, drive, the channel EQ as an 8-band EQ, a 16-band EQ or a 32-band EQ, a
 31-band graphic EQ, the full channel strip and the keyed gate with its sidechain
 input, and the console's effects: chorus, flanger, phaser, tremolo, rotary
-speaker, reverb, pitch shifter, transient shaper, de-esser, sub-octaver, plosive tamer, clipper, upward compressor, bus compressor, loudness leveler, spectral balancer, spring reverb, limiter, compressor
+speaker, reverb, pitch shifter, transient shaper, de-esser, sub-octaver, plosive tamer, clipper, upward compressor, bus compressor, loudness leveler, spectral balancer, spring reverb, doubler, tone control, ducker, limiter, compressor
 with its sidechain key, multiband compressor and dynamic EQ. They come
 as CLAP plugins for Bitwig, REAPER and Carla, and as LV2 plugins for Ardour,
 Carla, MOD and Zynthian. Each one runs the same DSP as the console, so a track sounds the same
@@ -189,7 +189,9 @@ tools/pins-check.sh %{buildroot}%{_datadir}/plugin-hostd/pins.d/omx-plugins.pins
 /usr/lib/clap/omx-comp.clap
 /usr/lib/clap/omx-deesser.clap
 /usr/lib/clap/omx-delay.clap
+/usr/lib/clap/omx-doubler.clap
 /usr/lib/clap/omx-drive.clap
+/usr/lib/clap/omx-ducker.clap
 /usr/lib/clap/omx-dyneq.clap
 /usr/lib/clap/omx-eq8.clap
 /usr/lib/clap/omx-eq16.clap
@@ -209,6 +211,7 @@ tools/pins-check.sh %{buildroot}%{_datadir}/plugin-hostd/pins.d/omx-plugins.pins
 /usr/lib/clap/omx-spring.clap
 /usr/lib/clap/omx-strip.clap
 /usr/lib/clap/omx-suboct.clap
+/usr/lib/clap/omx-tone.clap
 /usr/lib/clap/omx-transient.clap
 /usr/lib/clap/omx-tremolo.clap
 /usr/lib/clap/omx-upward.clap
@@ -249,7 +252,9 @@ tools/pins-check.sh %{buildroot}%{_datadir}/plugin-hostd/pins.d/omx-plugins.pins
 %{_libdir}/lv2/omx-comp.lv2/
 %{_libdir}/lv2/omx-deesser.lv2/
 %{_libdir}/lv2/omx-delay.lv2/
+%{_libdir}/lv2/omx-doubler.lv2/
 %{_libdir}/lv2/omx-drive.lv2/
+%{_libdir}/lv2/omx-ducker.lv2/
 %{_libdir}/lv2/omx-dyneq.lv2/
 %{_libdir}/lv2/omx-eq8.lv2/
 %{_libdir}/lv2/omx-eq16.lv2/
@@ -269,6 +274,7 @@ tools/pins-check.sh %{buildroot}%{_datadir}/plugin-hostd/pins.d/omx-plugins.pins
 %{_libdir}/lv2/omx-spring.lv2/
 %{_libdir}/lv2/omx-strip.lv2/
 %{_libdir}/lv2/omx-suboct.lv2/
+%{_libdir}/lv2/omx-tone.lv2/
 %{_libdir}/lv2/omx-transient.lv2/
 %{_libdir}/lv2/omx-tremolo.lv2/
 %{_libdir}/lv2/omx-upward.lv2/

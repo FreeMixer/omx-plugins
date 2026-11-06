@@ -38,7 +38,7 @@ import { fileURLToPath } from 'node:url';
 import { bindFace, instanceHeader, parseFace } from './instance-face.mjs';
 import { controlOf, items, kernelControls, kernelExists, locateContract, resolveParam } from './omx-contract.mjs';
 import { ROOT, checkPlugin, consoleErrors, gapLines, layerOfPath, loadRecipe, loadSchema, panelErrors, pluginFacts, pluginStems, validate } from './plugin-recipe.mjs';
-import { chainBindings, defaultPanel, loadDecl, prepareDecl } from './gen.mjs';
+import { chainBindings, defaultPanel, instanceExtras, loadDecl, prepareDecl } from './gen.mjs';
 import { describedOf, descriptorFile } from './descriptor.mjs';
 import { modgui } from './panel-file.mjs';
 import { pinOfTtl } from './port-hints.mjs';
@@ -251,7 +251,11 @@ export async function planPlugin(declIn, src, { root = ROOT, recipe = loadRecipe
     }
   });
   if (refusals.length) return { ok: false, refusals };
-  const bound = bindFace(src.face, decl.params, controls);
+  // a control the plugin does not expose is passed at its "fixed" value or held at its default, as tools/gen.mjs binds it
+  const extraErrors = [];
+  const extra = instanceExtras({ ...decl, tree: root, controls }, extraErrors);
+  for (const e of extraErrors) refuse('/fixed', e);
+  const bound = bindFace(src.face, [...decl.params, ...extra.map((f) => f.p)], [...controls, ...extra.map((f) => f.c)]);
   for (const e of bound.errors) refuse('/params', e);
 
   await checkPanelConsole(schema, decl, symbols, resolved, refuse, root);

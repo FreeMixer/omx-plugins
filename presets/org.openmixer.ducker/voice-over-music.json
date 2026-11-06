@@ -1,0 +1,64 @@
+{
+  "format": "org.openmixer.preset/1",
+  "plugin": {
+    "id": "org.openmixer.ducker"
+  },
+  "id": "voice-over-music",
+  "name": "Voice Over Music",
+  "carries": "params",
+  "params": [
+    {
+      "symbol": "thresholdDb",
+      "unit": "dB",
+      "value": -30
+    },
+    {
+      "symbol": "rangeDb",
+      "unit": "dB",
+      "value": -12
+    },
+    {
+      "symbol": "attackMs",
+      "unit": "ms",
+      "value": 5
+    },
+    {
+      "symbol": "holdMs",
+      "unit": "ms",
+      "value": 200
+    },
+    {
+      "symbol": "releaseMs",
+      "unit": "ms",
+      "value": 500
+    },
+    {
+      "symbol": "ratio",
+      "unit": "",
+      "value": 20
+    },
+    {
+      "symbol": "kneeDb",
+      "unit": "dB",
+      "value": 6
+    },
+    {
+      "symbol": "keyHpHz",
+      "unit": "Hz",
+      "value": 0
+    },
+    {
+      "symbol": "keyLpHz",
+      "unit": "Hz",
+      "value": 0
+    },
+    {
+      "symbol": "keyListen",
+      "unit": "",
+      "value": 0
+    }
+  ],
+  "createdAt": "2026-10-17T00:00:00Z",
+  "modifiedAt": "2026-10-17T00:00:00Z",
+  "copyOf": null
+}
