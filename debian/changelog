@@ -9,6 +9,8 @@ omx-plugins (0.19.0) unstable; urgency=medium
     The existing ids and ports do not move; a band's controls are shown, and
     the CLAP remote-control pages follow, while Bands reaches it (#312, #317,
     #318).
+  * New plugins: omx-doubler, omx-tone and omx-ducker, each with CLAP and LV2
+    faces and factory presets, over omx-dsp's doubler, tone and comp faces.
   * omx-glue gains Detector Topology, feedforward by default, read from
     comp's declaration; the ssl-bus-glue preset runs the feedback detector,
     and VCA Bus 4:1 is new (#310). omx-comp gains the ducker preset (#309).

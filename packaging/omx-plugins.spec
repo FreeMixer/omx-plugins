@@ -286,6 +286,8 @@ tools/pins-check.sh %{buildroot}%{_datadir}/plugin-hostd/pins.d/omx-plugins.pins
   defaults unchanged in sound; with no tempo a synced delay keeps its Time (#311)
 - omx-strip's EQ has up to 32 bands, chosen by Bands; existing ids and ports do
   not move; band controls and CLAP pages follow Bands (#312, #317, #318)
+- New plugins: omx-doubler, omx-tone and omx-ducker, each with CLAP and LV2 faces and
+  factory presets, over omx-dsp's doubler, tone and comp faces
 - omx-glue gains Detector Topology and the VCA Bus 4:1 preset, ssl-bus-glue runs
   the feedback detector (#310); omx-comp gains the ducker preset (#309)
 - Readouts on both faces: LV2 output ports beside clap.meters/1, and meters in
