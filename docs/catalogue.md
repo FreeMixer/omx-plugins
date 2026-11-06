@@ -16,7 +16,9 @@ Every plugin, what it does, and its controls; the parameter pages, the factory p
 | **omx comp** | `org.openmixer.comp` | `urn:openmixer:comp` | The console's compressor: threshold, ratio and knee set how hard it holds the level down, attack and release how fast, with makeup gain and a dry/wet mix. Kind picks the RMS detector (Compressor) or the peak detector (Limiter), and detector oversampling can run the control path at 4x; detector topology has it hear the input (feedforward) or its own output (feedback). Its detector can listen to a key routed to its sidechain input instead, through a high-pass, a low-pass and a tilt, on the louder leg, the mid or the side, with a hold; key listen puts what the detector hears on the output, and duck holds the reduction to a set depth. The DSP is omx-dsp's <omxdsp/fx/omx_comp_instance.h>, the console's own compressor. |
 | **omx deesser** | `org.openmixer.deesser` | `urn:openmixer:deesser` | The console's de-esser: a detector on a band around the sibilance drives the compressor's gain computer, and the reduction lands on that band alone or on the whole signal. |
 | **omx delay** | `org.openmixer.delay` | `urn:openmixer:delay` | Stereo delay up to 2000 ms, free or synced to the host's tempo: feedback through a tone filter that darkens each repeat, ping-pong, up to four read taps, a tape or analog colour, wet/dry mix and a duck under the input. Zero latency, real-time safe. |
+| **omx doubler** | `org.openmixer.doubler` | `urn:openmixer:doubler` | Doubles a voice or an instrument with up to four slightly delayed, detuned and drifting copies spread across the stereo field, the double-tracked sound without a second take. |
 | **omx drive** | `org.openmixer.drive` | `urn:openmixer:drive` | The console's drive: one waveshaper (soft, tape, tube or exciter) run inside the console's 4x oversampler, on the full band, the lows, the highs or a tilt, with drive, character, wet/dry mix and trim. Stereo, real-time safe. |
+| **omx ducker** | `org.openmixer.ducker` | `urn:openmixer:ducker` | Pulls the programme down while a key is heard, music under a voice, by a set depth with attack, hold and release, the console ducker. |
 | **omx dyneq** | `org.openmixer.dyneq` | `urn:openmixer:dyneq` | A six-band dynamic EQ: each band is an EQ bell or shelf whose gain also moves with the level of its own band, cutting above a threshold (down) or lifting below it (up), held to a range, so a harsh or boomy band is tamed only while it is too loud. |
 | **omx eq8** | `org.openmixer.eq8` | `urn:openmixer:eq8` | The console's channel EQ in its 8-band form: 8 parametric bands (bell, shelves, notch, all-pass) plus high- and low-pass filters at 12 or 24 dB/oct. Stereo, zero latency. |
 | **omx eq16** | `org.openmixer.eq16` | `urn:openmixer:eq16` | The console's channel EQ in its 16-band form: 16 parametric bands (bell, shelves, notch, all-pass) plus high- and low-pass filters at 12 or 24 dB/oct. Stereo, zero latency. |
@@ -36,6 +38,7 @@ Every plugin, what it does, and its controls; the parameter pages, the factory p
 | **omx spring** | `org.openmixer.spring` | `urn:openmixer:spring` | A spring reverb: a delay, a chain of all-passes and a darkening loop, with decay, length, tension and damping. |
 | **omx strip** | `org.openmixer.strip` | `urn:openmixer:strip` | The console's channel strip in one plugin: input trim, HPF/LPF, gate, EQ of 1 to 32 bands (4 at first) and compressor, in the desk's order or any other. Stereo, real-time safe. |
 | **omx suboct** | `org.openmixer.suboct` | `urn:openmixer:suboct` | Adds a note one or two octaves below a single played line, by dividing its pitch, with a tracking range and a gate for quiet input. |
+| **omx tone** | `org.openmixer.tone` | `urn:openmixer:tone` | Tilts the whole tone darker or brighter about a pivot, and sweeps a resonant DJ filter from a low-pass through open to a high-pass with one knob. |
 | **omx transient** | `org.openmixer.transient` | `urn:openmixer:transient` | The console's transient designer: more or less attack and sustain, from two envelope contrasts, with no threshold to set. |
 | **omx tremolo** | `org.openmixer.tremolo` | `urn:openmixer:tremolo` | The console's tremolo and auto-pan: one oscillator turned into a level change on both legs, or into a left-right pan. |
 | **omx upward** | `org.openmixer.upward` | `urn:openmixer:upward` | Lifts what is quiet toward a threshold, by a ratio and up to a limit, and leaves the loud alone. |
@@ -155,6 +158,20 @@ Mode colours the repeats: Digital is the delay as it shipped; Tape puts a low pa
 Plus the host's bypass. The tone filter holds the same corner at every sample rate, so a session
 moved from 48 to 96 kHz sounds the same.
 
+### omx doubler
+
+| Parameter | Range | Default |
+|---|---|---|
+| Voices | 1 to 4, whole steps | 2 |
+| Delay | 5 to 40 ms | 12 ms |
+| Detune | 0 to 25 cents | 8 cents |
+| Drift Rate | 0.1 to 2 Hz | 0.6 Hz |
+| Drift Depth | 0 to 3 ms | 0.5 ms |
+| Spread | 0 to 100 %, whole steps | 60 % |
+| Mix | 0 to 100 %, whole steps | 50 % |
+
+Plus the host's bypass.
+
 ### omx drive
 
 | Parameter | Range | Default |
@@ -170,6 +187,23 @@ moved from 48 to 96 kHz sounds the same.
 | Stereo Link | off / on | on |
 | HF Roll-off | Off / 12 kHz / 16 kHz | Off |
 | Oversampling | 1 / 2 / 4 | 4 |
+
+Plus the host's bypass.
+
+### omx ducker
+
+| Parameter | Range | Default |
+|---|---|---|
+| Threshold | -60 to 0 dB, whole steps | -18 dB |
+| Depth | -40 to 0 dB, whole steps | -12 dB |
+| Attack | 0.1 to 100 ms | 5 ms |
+| Hold | 0 to 2000 ms, whole steps | 0 ms |
+| Release | 5 to 3000 ms, whole steps | 200 ms |
+| Ratio | 1 to 20 | 4 |
+| Knee | 0 to 24 dB | 6 dB |
+| Key High-Pass | 0 to 2000 Hz, whole steps | 0 Hz |
+| Key Low-Pass | 0 to 20000 Hz, whole steps | 0 Hz |
+| Key Listen | off / on | off |
 
 Plus the host's bypass.
 
@@ -563,6 +597,17 @@ stages': the gate's and the compressor's 4x detector paths while they are engage
 | Oct2 | 0 to 100 % | 0 % |
 | Dry | 0 to 100 % | 100 % |
 | Track Gate | -80 to -20 dBFS | -50 dBFS |
+
+Plus the host's bypass.
+
+### omx tone
+
+| Parameter | Range | Default |
+|---|---|---|
+| Tilt | -6 to 6 dB | 0 dB |
+| Pivot | 200 to 5000 Hz, whole steps | 1000 Hz |
+| DJ Filter | -100 to 100, whole steps | 0 |
+| Resonance | 0.5 to 4 | 0.71 |
 
 Plus the host's bypass.
 
