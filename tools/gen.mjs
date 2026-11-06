@@ -1160,12 +1160,18 @@ function heldControls(d, kernel, names, prefix, who, errors) {
 }
 
 /** The binding of `d` to its kernel's instance face, or a thrown error naming what is missing. */
+/** The face arguments a single-face plugin does not expose: each `fixed` control at its value, then each `held`
+ * one at its kernel's default, as `{ p, c }` pairs a binding appends to the parameters and their controls. */
+export function instanceExtras(d, errors) {
+  const held = heldControls(d, d.face ?? d.kernel, d.held, d.stem, d.stem, errors);
+  const fixed = fixedArgs(d, { id: d.kernel, kernel: d.face ?? d.kernel, fixed: d.fixed }, d.controls ?? [], errors);
+  return [...fixed, ...held];
+}
+
 export function bindingOf(d) {
   const errors = [];
-  const held = heldControls(d, d.face ?? d.kernel, d.held, d.stem, d.stem, errors);
   // the controls of the face this plugin does not expose: each passed at its `fixed` value, or held at its kernel's default
-  const fixed = fixedArgs(d, { id: d.kernel, kernel: d.face ?? d.kernel, fixed: d.fixed }, d.controls ?? [], errors);
-  const extra = [...fixed, ...held];
+  const extra = instanceExtras(d, errors);
   const b = faceBinding(omxdspInclude(), d.face ?? d.kernel, [...d.params, ...extra.map((f) => f.p)], [...(d.controls ?? []), ...extra.map((f) => f.c)]);
   errors.push(...b.errors);
   if (errors.length) throw new Error(`plugins/${d.stem}: binding: instance, but ${errors.join('; ')}`);
