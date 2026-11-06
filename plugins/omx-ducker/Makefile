@@ -22,7 +22,7 @@
 NAME       := omx-ducker
 URI        := urn:openmixer:ducker
 CLAP_ID    := org.openmixer.ducker
-OMXDSP_MIN ?= 0.30.0
+OMXDSP_MIN ?= 0.31.0
 ROOT       := $(abspath ../..)
 GEN        := generated
 B          := build

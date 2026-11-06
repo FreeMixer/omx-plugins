@@ -22,7 +22,7 @@
 NAME       := omx-flanger
 URI        := urn:openmixer:flanger
 CLAP_ID    := org.openmixer.flanger
-OMXDSP_MIN ?= 0.30.0
+OMXDSP_MIN ?= 0.31.0
 ROOT       := $(abspath ../..)
 GEN        := generated
 B          := build

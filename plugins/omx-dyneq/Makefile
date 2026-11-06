@@ -22,7 +22,7 @@
 NAME       := omx-dyneq
 URI        := urn:openmixer:dyneq
 CLAP_ID    := org.openmixer.dyneq
-OMXDSP_MIN ?= 0.30.0
+OMXDSP_MIN ?= 0.31.0
 ROOT       := $(abspath ../..)
 GEN        := generated
 B          := build
