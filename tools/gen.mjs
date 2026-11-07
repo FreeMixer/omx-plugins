@@ -535,7 +535,14 @@ export function metersOf(d) {
     const channels = m.kind === 'gain_reduction' || 'read' in m ? 1 : 2;
     const range = r ? { min: r.min, max: r.max, unit: r.unit, scale: r.scale } : { min: m.min, max: m.max, unit: 'dBFS', scale: 'linear' };
     const symbols = channels === 1 ? [m.id] : Array.from({ length: channels }, (_, c) => `${m.id}_${c}`);
-    return { id: m.id, kind: m.kind, channels, label: meterLabel(m.id), ...range, symbols, readout: r };
+    // the contract's meter words (omx-contract 3.10.0, docs/meters.md): held unless the declaration says not; a clip
+    // word on a held level the face measures unless it says `clip: false` (meterRows holds the declaration's spelling);
+    // what it measures: a gain reduction its own, a level in dBFS a peak, in dBTP a true peak
+    const reads = m.kind === 'gain_reduction' || 'read' in m;
+    const held = m.held !== false;
+    const clip = held && !reads && m.clip !== false;
+    const measurement = m.kind === 'gain_reduction' ? 'gain-reduction' : range.unit === 'dBFS' ? 'peak' : range.unit === 'dBTP' ? 'true-peak' : undefined;
+    return { id: m.id, kind: m.kind, channels, label: meterLabel(m.id), ...range, symbols, readout: r, held, clip, measurement };
   });
 }
 

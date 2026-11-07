@@ -28,6 +28,8 @@ export const DESCRIPTOR_SCHEMA = 'https://github.com/FreeMixer/omx-contract/raw/
 export const DESCRIPTOR_SCHEMA_FLOOR = '3.7.0';
 /** The release that added `meters` (omx-contract docs/descriptors.md): the floor of a descriptor that states them. */
 export const DESCRIPTOR_METERS_FLOOR = '3.9.0';
+/** The release that added the meter words `held`, `clip` and `measurement`: the floor of a descriptor that states meters. */
+export const DESCRIPTOR_METER_WORDS_FLOOR = '3.10.0';
 /** The descriptor's word for each meter kind a declaration names. */
 const METER_KIND_WORDS = { gain_reduction: 'gain-reduction', level: 'level' };
 
@@ -196,18 +198,21 @@ export function descriptorOf(d) {
     { id: 0, name: 'out', kind: 'audio', direction: 'out', role: 'main', channels: 2, layout: 'stereo' },
   ];
   // each meter as the faces publish it: its CLAP id (its index), the symbol a host reads it by, its range, and
-  // the kernel readout it publishes, linked where its travel would be; a level the face measures is the face's own
+  // the kernel readout it publishes, linked where its travel would be; a level the face measures is the face's own;
+  // and the meter words: what it measures, whether the plugin holds it until read, and on a level whether it carries a
+  // clip word (omx-contract refuses the word on a gain reduction, even false)
   const meters = metersOf(d).map((m, k) => {
     const link = m.readout ? `data/kernels/${d.kernel}.json#readouts[${m.readout.name}]` : undefined;
     return {
       id: k, symbol: m.id, name: m.label, ...(m.readout ? { doc: m.readout.doc } : {}), kind: METER_KIND_WORDS[m.kind], channels: m.channels,
       unit: m.unit, min: m.min, max: m.max, scale: m.scale,
+      ...(m.measurement ? { measurement: m.measurement } : {}), held: m.held, ...(m.kind === 'level' ? { clip: m.clip } : {}),
       source: link ? { from: atOf(link) ? { link, at: atOf(link) } : link } : { impl: face },
     };
   });
   const descriptor = {
     $schema: DESCRIPTOR_SCHEMA,
-    requires: { 'omx-contract-schema': `>= ${meters.length ? DESCRIPTOR_METERS_FLOOR : DESCRIPTOR_SCHEMA_FLOOR}` },
+    requires: { 'omx-contract-schema': `>= ${meters.length ? DESCRIPTOR_METER_WORDS_FLOOR : DESCRIPTOR_SCHEMA_FLOOR}` },
     origin: 'authored',
     plugin: { id: d.clap.id, format: 'clap', uri: d.lv2.uri, name: d.name, vendor: d.vendor, version: d.version, doc: d.description, features: d.clap.features.filter((f) => FEATURES.includes(f)) },
     controls,
