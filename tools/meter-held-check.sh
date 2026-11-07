@@ -44,3 +44,11 @@ if [ "${1:-}" = --self-test ]; then
   exit 0
 fi
 run "$HERE" real
+# the flag bits against omx-clap-core's header, where a checkout of it is named
+if [ -n "${OMX_CLAP_CORE_SRC:-}" ]; then
+  # shellcheck disable=SC2046
+  $CC -std=gnu11 -Wall -Wextra -Werror $($PKG_CONFIG --cflags clap 2>/dev/null || true) -I"$OMX_CLAP_CORE_SRC/src" \
+    -o "$scratch/flags-abi" "$HERE/tools/test/meter-flags-abi-test.c" && "$scratch/flags-abi"
+else
+  echo "pending meter-flags: OMX_CLAP_CORE_SRC names no omx-clap-core checkout; the bits are not compared"
+fi

@@ -53,6 +53,15 @@
 #include <omx-clap-host/omx_clap_ext.h>
 #include <omx-clap-host/clap_meters.h>
 #include "omx_meter_ring.h"
+
+/* The two flag bits omx-clap-core's host reads beyond the draft's (its src/clap_host.h; tools/test/meter-flags-abi-test.c
+ * holds them equal where that header is at hand): the meter is held until read, and a level carries a clip word. */
+#ifndef OMX_CLAP_METER_IS_HELD
+#define OMX_CLAP_METER_IS_HELD (1u << 8)
+#endif
+#ifndef OMX_CLAP_METER_HAS_CLIP
+#define OMX_CLAP_METER_HAS_CLIP (1u << 9)
+#endif
 #include "omx_preset_file.h"
 #include <omxdsp/omx_denormal.h>    /* omx_denormals_off, per callback */
 #include "omx_face_meters.h"         /* one block's meter values, the LV2 face's too */
@@ -90,7 +99,6 @@ typedef struct {
   unsigned char *touched;                   /* set by the host or a state: a placement default leaves it */
   _Atomic uint32_t placed;                  /* a placement for the audio thread to apply, plus one; 0 none */
   struct omx_meter_ring meters;             /* every meter's values after the last block; none since activation */
-  double clip_taken[OMX_METER_RING_MAX];    /* the clip words of each value's last get_values(); the reader's */
   const clap_host_remote_controls_t *host_pages; /* the host's clap.remote-controls, when it offers one */
   uint32_t gov_count;                       /* the parameters that decide which controls a page holds (visibleWhen) */
   uint32_t gov[G_GOV_MAX];
@@ -658,7 +666,8 @@ static bool g_meters_info(const clap_plugin_t *p, uint32_t index, clap_meter_inf
   info->id = index;
   snprintf(info->name, sizeof info->name, "%s", f->meters[index].name);
   info->kind = f->meters[index].kind;
-  info->flags = CLAP_METER_IS_COHERENT;
+  info->flags = CLAP_METER_IS_COHERENT | (f->meters[index].held ? OMX_CLAP_METER_IS_HELD : 0u) |
+                (f->meters[index].clip && f->meters[index].held ? OMX_CLAP_METER_HAS_CLIP : 0u);
   info->channel_count = f->meters[index].channels;
   info->min_value = f->meters[index].min;
   info->max_value = f->meters[index].max;
@@ -667,28 +676,28 @@ static bool g_meters_info(const clap_plugin_t *p, uint32_t index, clap_meter_inf
 
 /** Meter `id`'s values since the host's last read: each channel's largest (a gain reduction's deepest) since then,
  * as docs/meters.md rules, all of the same block's publication; nothing before a block since activation. From any
- * thread but the audio role, one reader per instance. The clip word of the same read waits for the clip extension. */
+ * thread but the audio role, one reader per instance. A meter with a clip word writes it as one more value after its
+ * channels when the host gave room for it (omx-clap-core's clap_host.h, OMX_CLAP_METER_HAS_CLIP): 1 if a run of
+ * samples over full scale ran since the last read, else 0; the count returned includes it. */
 static uint32_t g_meters_values(const clap_plugin_t *p, clap_id id, double *values, uint32_t capacity) {
   G *g = G_OF(p);
   const struct omx_face *f = g->face;
   if (id >= f->meter_count || capacity < 1 || !values) return 0;
-  const uint32_t n = capacity < f->meters[id].channels ? capacity : f->meters[id].channels;
-  return omx_meter_ring_take(&g->meters, f->meters[id].at, NULL, values, g->clip_taken + f->meters[id].at, n);
+  const struct omx_face_meter *row = &f->meters[id];
+  const uint32_t n = capacity < row->channels ? capacity : row->channels;
+  double clips[OMX_METER_RING_MAX];
+  if (omx_meter_ring_take(&g->meters, row->at, NULL, values, clips, n) != n) return 0;
+  if (n == row->channels && row->clip && row->held && capacity > n) {
+    double any = 0.0;
+    for (uint32_t i = 0; i < n; ++i) any = clips[i] > any ? clips[i] : any;
+    values[n] = any > 0.0 ? 1.0 : 0.0;
+    return n + 1u;
+  }
+  return n;
 }
 
 static const clap_plugin_meters_t G_METERS_EXT = {g_meters_count, g_meters_info, g_meters_values};
 
-/** org.openmixer.meter-clip/1: the clip words the last get_values() of meter `id` took. */
-static uint32_t g_meter_clip(const clap_plugin_t *p, clap_id id, double *runs, uint32_t capacity) {
-  G *g = G_OF(p);
-  const struct omx_face *f = g->face;
-  if (id >= f->meter_count || !f->meters[id].clip || capacity < 1 || !runs) return 0;
-  const uint32_t n = capacity < f->meters[id].channels ? capacity : f->meters[id].channels;
-  for (uint32_t i = 0; i < n; ++i) runs[i] = g->clip_taken[f->meters[id].at + i];
-  return n;
-}
-
-static const omx_clap_plugin_meter_clip_t G_METER_CLIP_EXT = {g_meter_clip};
 
 static const void *g_get_extension(const clap_plugin_t *p, const char *id) {
   if (strcmp(id, CLAP_EXT_PARAMS) == 0) return &G_PARAMS_EXT;
@@ -703,7 +712,6 @@ static const void *g_get_extension(const clap_plugin_t *p, const char *id) {
   if (strcmp(id, CLAP_EXT_TRACK_INFO) == 0) return &G_TRACK_INFO_EXT;
   if (strcmp(id, OMX_CLAP_EXT_RESOURCE_HINTS_DRAFT) == 0) return &G_RESOURCE_HINTS_EXT;
   if (G_OF(p)->face->meter_count && strcmp(id, CLAP_EXT_METERS) == 0) return &G_METERS_EXT;
-  if (G_OF(p)->face->meter_count && strcmp(id, OMX_CLAP_EXT_METER_CLIP) == 0) return &G_METER_CLIP_EXT;
   return NULL;
 }
 

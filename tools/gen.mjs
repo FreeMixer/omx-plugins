@@ -1082,6 +1082,8 @@ export function meterRows(d, face) {
       // publishes: no reduction, or a level's display minimum
       meterSource: reads ? 'OMX_FACE_METER_READ' : m.source === 'input' ? 'OMX_FACE_METER_IN' : 'OMX_FACE_METER_OUT',
       meterHeld: m.held === false ? '0u' : '1u', meterClip: !reads && m.clip !== false ? '1u' : '0u',
+      // the flags clap.meters/1 reports (the draft's coherent bit, and omx-clap-core's held bit 8 and clip bit 9; a clip word is a held meter's)
+      meterFlags: `CLAP_METER_IS_COHERENT${m.held === false ? '' : ' | (1u << 8)'}${m.held !== false && !reads && m.clip !== false ? ' | (1u << 9)' : ''}`,
       meterBypassRef: m.kind === 'gain_reduction' ? '0.0' : `METERS[${k}].min`,
     };
     offset += row.channels;

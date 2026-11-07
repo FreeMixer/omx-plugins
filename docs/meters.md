@@ -92,10 +92,11 @@ does not expose yet (FX-14, #148), so today it would read 0 for ever.
 - **The clip word.** A level the face measures (at the inputs or the outputs) carries, on the same
   publication, the longest run of consecutive samples over full scale since the last read, per
   channel, unless its declaration says `clip: false`. It says digital over-full-scale, nothing of
-  the analog stage. clap.meters/1 has no field for it, so `org.openmixer.meter-clip/1`
-  (`include/omx_clap_face.h`) serves it: after a `get_values()` of a meter, `get()` gives the clip
-  words that read took. The LV2 face writes the block's values to its ports on each run and has no
-  reader to hold for.
+  the analog stage. The meter flags `OMX_CLAP_METER_HAS_CLIP` (bit 9, omx-clap-core's
+  `src/clap_host.h`) and, written as the host reads them, `get_values()` gives one more value after
+  the channels when the host leaves room for it: 1 if a run of any channel ran since the last read,
+  0 otherwise. A held meter also carries `OMX_CLAP_METER_IS_HELD` (bit 8). The LV2 face writes the
+  block's values to its ports on each run and has no reader to hold for.
 - **Per block, and coherent.** After each `process()` the audio thread publishes the values of
   every meter at once, through `include/omx_meter_ring.h`, and every meter carries
   `CLAP_METER_IS_COHERENT`: one `get_values()` never mixes two blocks, so a host may derive a
