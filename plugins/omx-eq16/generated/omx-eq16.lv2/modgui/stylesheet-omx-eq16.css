@@ -28,3 +28,5 @@
 .omx-pedal{{{cns}}} .omx-selector-image.selecting .omx-selector-list, .omx-pedal{{{cns}}} .omx-selector-image.open .omx-selector-list { display: block; }
 .omx-pedal{{{cns}}} .omx-selector-option { padding: 2px 6px; font-size: 10px; text-align: left; white-space: nowrap; }
 .omx-pedal{{{cns}}} .omx-selector-option.selected { color: #28c8e6; }
+.omx-pedal{{{cns}}} .omx-curve { position: absolute; box-sizing: border-box; border: 1px solid #3a444f; border-radius: 4px; background: #242b33; }
+.omx-pedal{{{cns}}} .omx-curve-caption { position: absolute; left: 6px; bottom: 2px; font-size: 10px; color: #8a97a3; }
