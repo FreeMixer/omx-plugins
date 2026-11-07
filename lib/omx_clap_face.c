@@ -90,6 +90,7 @@ typedef struct {
   unsigned char *touched;                   /* set by the host or a state: a placement default leaves it */
   _Atomic uint32_t placed;                  /* a placement for the audio thread to apply, plus one; 0 none */
   struct omx_meter_ring meters;             /* every meter's values after the last block; none since activation */
+  double clip_taken[OMX_METER_RING_MAX];    /* the clip words of each value's last get_values(); the reader's */
   const clap_host_remote_controls_t *host_pages; /* the host's clap.remote-controls, when it offers one */
   uint32_t gov_count;                       /* the parameters that decide which controls a page holds (visibleWhen) */
   uint32_t gov[G_GOV_MAX];
@@ -193,7 +194,12 @@ static bool g_init(const clap_plugin_t *p) {
     g->host_pages = (const clap_host_remote_controls_t *)g->host->get_extension(g->host, CLAP_EXT_REMOTE_CONTROLS);
   g_place(g, g_placement(g));
   g_publish(g);
-  if (g->face->meter_count) omx_meter_ring_init(&g->meters);
+  if (g->face->meter_count) {
+    unsigned int deep, hold;
+    omx_meter_ring_init(&g->meters);
+    omx_face_meter_masks(g->face, &deep, &hold);
+    omx_meter_ring_policy(&g->meters, deep, hold);
+  }
   return true;
 }
 
@@ -266,9 +272,12 @@ static clap_process_status g_process(const clap_plugin_t *p, const clap_process_
     f->tempo(g->core, bpm);
   }
   if (dirty) f->core->resolve(g->core, g->values, bypassed);
-  double mv[OMX_METER_RING_MAX];
+  double mv[OMX_METER_RING_MAX], cv[OMX_METER_RING_MAX] = {0};
   /* the inputs' peak, before the kernel runs (the outputs may be the inputs) */
-  if (f->meter_count) omx_face_meter_levels(f, OMX_FACE_METER_IN, ai->data32[0], ai->data32[1], pr->frames_count, mv);
+  if (f->meter_count) {
+    omx_face_meter_levels(f, OMX_FACE_METER_IN, ai->data32[0], ai->data32[1], pr->frames_count, mv);
+    omx_face_meter_clips(f, OMX_FACE_METER_IN, ai->data32[0], ai->data32[1], pr->frames_count, cv);
+  }
   const float *key = NULL;
   if (f->key_symbol) {
     const clap_audio_buffer_t *ak = pr->audio_inputs_count > 1 ? &pr->audio_inputs[1] : NULL;
@@ -279,7 +288,8 @@ static clap_process_status g_process(const clap_plugin_t *p, const clap_process_
   if (f->meter_count) {
     omx_face_meter_readings(f, g->core, bypassed, mv);
     omx_face_meter_levels(f, OMX_FACE_METER_OUT, ao->data32[0], ao->data32[1], pr->frames_count, mv);
-    omx_meter_ring_publish(&g->meters, mv, f->meter_values);
+    omx_face_meter_clips(f, OMX_FACE_METER_OUT, ao->data32[0], ao->data32[1], pr->frames_count, cv);
+    omx_meter_ring_publish_clip(&g->meters, mv, cv, f->meter_values);
   }
   /* A parameter that moves the kernel's latency (as the pitch shifter's mix crossing 100 % does):
    * the reported latency holds until the next activation, and the host is asked, once, for the
@@ -655,17 +665,30 @@ static bool g_meters_info(const clap_plugin_t *p, uint32_t index, clap_meter_inf
   return true;
 }
 
-/** The last block's values of meter `id`, all of that one block, from any thread; nothing before a block
- * since activation. */
+/** Meter `id`'s values since the host's last read: each channel's largest (a gain reduction's deepest) since then,
+ * as docs/meters.md rules, all of the same block's publication; nothing before a block since activation. From any
+ * thread but the audio role, one reader per instance. The clip word of the same read waits for the clip extension. */
 static uint32_t g_meters_values(const clap_plugin_t *p, clap_id id, double *values, uint32_t capacity) {
   G *g = G_OF(p);
   const struct omx_face *f = g->face;
   if (id >= f->meter_count || capacity < 1 || !values) return 0;
   const uint32_t n = capacity < f->meters[id].channels ? capacity : f->meters[id].channels;
-  return omx_meter_ring_read(&g->meters, f->meters[id].at, values, n);
+  return omx_meter_ring_take(&g->meters, f->meters[id].at, NULL, values, g->clip_taken + f->meters[id].at, n);
 }
 
 static const clap_plugin_meters_t G_METERS_EXT = {g_meters_count, g_meters_info, g_meters_values};
+
+/** org.openmixer.meter-clip/1: the clip words the last get_values() of meter `id` took. */
+static uint32_t g_meter_clip(const clap_plugin_t *p, clap_id id, double *runs, uint32_t capacity) {
+  G *g = G_OF(p);
+  const struct omx_face *f = g->face;
+  if (id >= f->meter_count || !f->meters[id].clip || capacity < 1 || !runs) return 0;
+  const uint32_t n = capacity < f->meters[id].channels ? capacity : f->meters[id].channels;
+  for (uint32_t i = 0; i < n; ++i) runs[i] = g->clip_taken[f->meters[id].at + i];
+  return n;
+}
+
+static const omx_clap_plugin_meter_clip_t G_METER_CLIP_EXT = {g_meter_clip};
 
 static const void *g_get_extension(const clap_plugin_t *p, const char *id) {
   if (strcmp(id, CLAP_EXT_PARAMS) == 0) return &G_PARAMS_EXT;
@@ -680,6 +703,7 @@ static const void *g_get_extension(const clap_plugin_t *p, const char *id) {
   if (strcmp(id, CLAP_EXT_TRACK_INFO) == 0) return &G_TRACK_INFO_EXT;
   if (strcmp(id, OMX_CLAP_EXT_RESOURCE_HINTS_DRAFT) == 0) return &G_RESOURCE_HINTS_EXT;
   if (G_OF(p)->face->meter_count && strcmp(id, CLAP_EXT_METERS) == 0) return &G_METERS_EXT;
+  if (G_OF(p)->face->meter_count && strcmp(id, OMX_CLAP_EXT_METER_CLIP) == 0) return &G_METER_CLIP_EXT;
   return NULL;
 }
 

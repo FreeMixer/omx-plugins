@@ -78,8 +78,24 @@ does not expose yet (FX-14, #148), so today it would read 0 for ever.
 
 - **A gain reduction is the kernel's.** A gain reduction is dB with CLAP's sign: 0 none, negative a
   reduction, the deepest gain the kernel applied inside the block (omx-dsp's `gr_min_db`, what
-  the console's own stage publishes). The console holds and releases it for display, as it does
-  for its own stages; the plugin does not.
+  the console's own stage publishes). The plugin holds it until the host reads it: the value a read
+  gives is the deepest since the last read. The reader recovers it for display, as the console does
+  for its own stages.
+- **A plugin holds until read.** Every meter keeps the block value until the host reads it: a level's
+  largest, a gain reduction's deepest since the last read. The audio thread does this with one
+  compare per value per block, beside the value, in the same copy of the ring, so a 10 ms burst
+  between two reads is in the next read whatever the blocks after it were. A read takes the meter it
+  reads, and one reader per instance does it; the host reads at its own tick (50 Hz, spec 7.9) and
+  any thread but the audio role may. A block that lands between a reader's copy and its note of what
+  it took is held once more, never dropped. A meter whose declaration says `held: false` gives the
+  block's own value.
+- **The clip word.** A level the face measures (at the inputs or the outputs) carries, on the same
+  publication, the longest run of consecutive samples over full scale since the last read, per
+  channel, unless its declaration says `clip: false`. It says digital over-full-scale, nothing of
+  the analog stage. clap.meters/1 has no field for it, so `org.openmixer.meter-clip/1`
+  (`include/omx_clap_face.h`) serves it: after a `get_values()` of a meter, `get()` gives the clip
+  words that read took. The LV2 face writes the block's values to its ports on each run and has no
+  reader to hold for.
 - **Per block, and coherent.** After each `process()` the audio thread publishes the values of
   every meter at once, through `include/omx_meter_ring.h`, and every meter carries
   `CLAP_METER_IS_COHERENT`: one `get_values()` never mixes two blocks, so a host may derive a

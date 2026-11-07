@@ -24,6 +24,16 @@
 #include "omx_plugin_face.h"
 #include "omx_preset_file.h"
 
+/** org.openmixer.meter-clip/1: the clip word beside clap.meters/1's values. clap.meters/1 has no word for it, so a
+ * meter that declares `clip` serves it here: the longest run of samples over full scale, per channel, held since the
+ * host's last get_values() of that meter and taken by it (docs/meters.md). [the thread that reads the meters] */
+#define OMX_CLAP_EXT_METER_CLIP "org.openmixer.meter-clip/1"
+typedef struct omx_clap_plugin_meter_clip {
+  /** The clip words of `meter_id`'s channels the last get_values() of it took, up to `capacity`; returns how many
+   * it wrote, 0 for an unknown id or a meter that declares no clip word. */
+  uint32_t (*get)(const clap_plugin_t *plugin, clap_id meter_id, double *runs, uint32_t capacity);
+} omx_clap_plugin_meter_clip_t;
+
 /** One plugin's CLAP factories and descriptors; the factories' callbacks find the plugin from them. */
 struct omx_clap_face {
   clap_plugin_factory_t factory;

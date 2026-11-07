@@ -1037,6 +1037,11 @@ export function meterRows(d, face) {
     const at = 'read' in m ? 'read' : 'field';
     const own = m.kind === 'gain_reduction' ? [at, 'readout'] : reads ? ['read', 'readout'] : ['source', 'min', 'max'];
     if ('linear' in m && !(m.kind === 'gain_reduction' && at === 'field' && m.linear === true)) throw new Error(`${where}: 'linear' is true on a gain reduction read from a 'field'`);
+    // the meter words of docs/meters.md (omx-contract's `held` and `clip`): held, true unless the declaration says it is not;
+    // clip, a run of over-full-scale samples carried on the same publication, true for a level the face measures unless the
+    // declaration says `clip: false`, and never for a reading of the kernel's
+    for (const w of ['held', 'clip']) if (w in m && typeof m[w] !== 'boolean') throw new Error(`${where}: '${w}' is true or false`);
+    if (m.clip === true && reads) throw new Error(`${where}: a reading of the kernel's carries no clip word; the face counts samples over full scale only at the inputs or outputs`);
     for (const key of ['field', 'read', 'readout', 'source', 'min', 'max']) {
       if (own.includes(key) && !(key in m)) throw new Error(`${where}: a ${m.kind} meter names its '${key}'`);
       if (!own.includes(key) && key in m) throw new Error(`${where}: a ${m.kind} meter ${reads && m.kind === 'level' ? 'the kernel reads ' : ''}takes no '${key}'`);
@@ -1076,6 +1081,7 @@ export function meterRows(d, face) {
       // where the shared face reads it (include/omx_plugin_face.h); what a bypassed kernel's stale reading
       // publishes: no reduction, or a level's display minimum
       meterSource: reads ? 'OMX_FACE_METER_READ' : m.source === 'input' ? 'OMX_FACE_METER_IN' : 'OMX_FACE_METER_OUT',
+      meterHeld: m.held === false ? '0u' : '1u', meterClip: !reads && m.clip !== false ? '1u' : '0u',
       meterBypassRef: m.kind === 'gain_reduction' ? '0.0' : `METERS[${k}].min`,
     };
     offset += row.channels;
